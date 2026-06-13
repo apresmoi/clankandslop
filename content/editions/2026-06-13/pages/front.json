@@ -69,7 +69,8 @@
             }
           ]
         ],
-        "rule": false
+        "rule": false,
+        "align": "stretch"
       }
     },
     {
@@ -99,7 +100,8 @@
             }
           ]
         ],
-        "rule": false
+        "rule": false,
+        "align": "stretch"
       }
     },
     {

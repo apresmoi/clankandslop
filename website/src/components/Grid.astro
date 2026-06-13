@@ -104,6 +104,8 @@ const template = cols.map((n) => `${n}fr`).join(' ');
 
   @media (max-width: 880px) {
     .cns-grid { grid-template-columns: 1fr !important; gap: 22px; }
+    /* Stacked on phones, the illustration always leads its story. */
+    .cns-grid-col:has(.glyphart) { order: -1; }
     .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-1,
     .cns-grid[style*="2fr 1fr"] > .cns-grid-col-1 {
       padding: 0;

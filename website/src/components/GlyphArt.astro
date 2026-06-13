@@ -28,19 +28,27 @@ const rows = lines.length;
 </figure>
 
 <style>
-  .glyphart { margin: 0; }
-  .glyphart-stage { container-type: inline-size; }
-  /* Fill the column width; the baked art carries its own margin so it's whole.
-     Height follows the art's aspect — centred in its column. */
+  .glyphart { margin: 0; height: 100%; display: flex; flex-direction: column; }
+  /* Mobile (stacked): no text beside it — fill the column width. */
+  .glyphart-stage { flex: 1 1 auto; min-height: 0; container-type: inline-size; display: flex; }
   .glyphart-pre {
     font-family: var(--font-mono);
     font-size: calc(100cqw / (var(--cols) * 0.6));
     line-height: 1;
     white-space: pre;
     width: fit-content;
-    margin: 0 auto;
+    margin: auto;
     color: var(--ink);
     letter-spacing: 0;
+  }
+  /* Desktop (side by side): the row stretches the cell to the text height, so
+     the art is contained within it — the text is the height ceiling, never the
+     other way round. A hair of slack (rows+1, 0.62) keeps it off the edges. */
+  @media (min-width: 880px) {
+    .glyphart-stage { container-type: size; }
+    .glyphart-pre {
+      font-size: min(calc(100cqw / (var(--cols) * 0.62)), calc(100cqh / (var(--rows) + 1)));
+    }
   }
   .glyphart-play .glyphart-pre { color: var(--accent); }
   .glyphart-caption {
