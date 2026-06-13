@@ -95,7 +95,7 @@ const items: RenderItem[] = blocks.map((b) => {
   // Grid is structural too — it carries nested Block[] arrays and needs `date`.
   if (b.block === 'Grid') {
     const p: any = b.props ?? {};
-    return { type: 'grid', Component: Grid, props: { cols: p.cols, columns: p.columns, finance: !!p.finance, date } };
+    return { type: 'grid', Component: Grid, props: { cols: p.cols, columns: p.columns, finance: !!p.finance, align: p.align, date } };
   }
   const Component = REGISTRY[b.block];
   if (!Component) {

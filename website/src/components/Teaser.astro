@@ -3,7 +3,7 @@ import type { Article } from '../lib/edition.ts';
 
 interface Props {
   article: Article;
-  size?: 'lead' | 'rail' | 'flow';
+  size?: 'lead' | 'rail' | 'flow' | 'feature';
 }
 const { article, size = 'flow' } = Astro.props;
 const href = `/articles/${article.id}`;
@@ -74,6 +74,16 @@ const recordRef = article.evidence_box && article.evidence_box.length > 0
     line-height: 1.42;
     margin-bottom: 16px;
   }
+  /* Feature — paired with a glyph illustration; a bigger head so the row
+     carries more weight than the plain teasers above it. */
+  .teaser-feature :global(.headline-md) {
+    font-size: clamp(24px, 3vw, 32px);
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    margin-bottom: 12px;
+  }
+  .teaser-feature :global(.deck) { font-size: 16px; line-height: 1.5; margin-bottom: 12px; }
+
   @media (max-width: 640px) {
     .teaser-lead :global(.headline-lg) { margin-bottom: 12px; }
     .teaser-rail :global(.headline-md),

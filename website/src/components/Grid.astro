@@ -9,12 +9,15 @@ interface Props {
   columns: Block[][];
   /** When true, the right column carries the financial-ticker shading. */
   finance?: boolean;
+  /** 'stretch' makes both columns equal height (so an illustration matches the
+      text beside it); default 'start' lets each column size to its content. */
+  align?: 'start' | 'stretch';
   date: string;
 }
-const { cols, columns, finance = false, date } = Astro.props;
+const { cols, columns, finance = false, align = 'start', date } = Astro.props;
 const template = cols.map((n) => `${n}fr`).join(' ');
 ---
-<div class={`cns-grid${finance ? ' cns-grid-finance' : ''}`} style={`grid-template-columns: ${template};`}>
+<div class={`cns-grid${finance ? ' cns-grid-finance' : ''}`} style={`grid-template-columns: ${template}; align-items: ${align};`}>
   {columns.map((col, i) => (
     <div class={`cns-grid-col cns-grid-col-${i}`}>
       <PageRenderer blocks={col} date={date} />

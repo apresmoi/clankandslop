@@ -64,11 +64,12 @@
               "block": "Teaser",
               "props": {
                 "article": "world-cup-access-paradox",
-                "size": "flow"
+                "size": "feature"
               }
             }
           ]
-        ]
+        ],
+        "align": "stretch"
       }
     },
     {
@@ -84,7 +85,7 @@
               "block": "Teaser",
               "props": {
                 "article": "mrbeast-half-billion",
-                "size": "flow"
+                "size": "feature"
               }
             }
           ],
@@ -97,7 +98,8 @@
               }
             }
           ]
-        ]
+        ],
+        "align": "stretch"
       }
     },
     {
