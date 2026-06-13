@@ -2,7 +2,11 @@
 // rasterizer (headless), and commit the text. Heavy source (the .obj) stays on
 // the newsroom machine — only the few-KB ASCII ships. Re-run if a model,
 // camera, or built shape changes.  Run from website/:  node scripts/bake-glyphart.mjs
-import { parseObj, buildRasterizeContext, rasterize, createGlyphPerspectiveCamera, computeSceneBbox } from 'glyphcss';
+// Import the locally-built glyphcss source, not the published 0.0.3 package —
+// shadows (castShadow/receiveShadow) landed in source but aren't in the npm
+// build yet. This is a newsroom-machine bake step; the site only ships the
+// committed ASCII, so the website's own glyphcss dep is untouched.
+import { parseObj, buildRasterizeContext, rasterize, createGlyphPerspectiveCamera, computeSceneBbox } from '/Users/apresmoi/glyphcss/packages/glyphcss/dist/index.js';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -12,12 +16,14 @@ const OBJ = '/Users/apresmoi/asciss/website/public/gallery/obj/coliseum.obj';
 const OUT_DIR = resolve(here, '..', 'src', 'data');
 mkdirSync(OUT_DIR, { recursive: true });
 
-function fitToUnitBbox(polys) {
+// Center the mesh at the origin but KEEP its raw scale — the source glyphcss
+// projection treats `zoom` as a CSS scale multiplier on world coords (same as
+// the workbench), so normalizing to a unit box would throw the zoom off and
+// also flatten self-shadow biasing. Center only; size via the camera zoom.
+function center(polys) {
   const b = computeSceneBbox(polys);
   const cx = (b.min[0] + b.max[0]) / 2, cy = (b.min[1] + b.max[1]) / 2, cz = (b.min[2] + b.max[2]) / 2;
-  const size = Math.max(b.max[0] - b.min[0], b.max[1] - b.min[1], b.max[2] - b.min[2]) || 1;
-  const k = 2 / size;
-  return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [(v[0] - cx) * k, (v[1] - cy) * k, (v[2] - cz) * k]) }));
+  return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [v[0] - cx, v[1] - cy, v[2] - cz]) }));
 }
 
 // Crop the rendered grid to the shape's bounding box (+pad cells) so there's
@@ -35,20 +41,27 @@ function trim(ascii, pad = 1) {
     .map((l) => l.slice(minL, maxR).replace(/\s+$/, '')).join('\n');
 }
 
-function bake(name, polygons, camOpts, cols, rows, shadows = false) {
-  const camera = createGlyphPerspectiveCamera({ distance: 100, ...camOpts });
+const DEG = Math.PI / 180;
+// Light direction from azimuth/elevation — same mapping as the glyphcss
+// workbench: [cosEl·sin(az), cosEl·cos(az), sin(el)].
+function lightDir(azDeg, elDeg) {
+  const az = azDeg * DEG, el = elDeg * DEG, ce = Math.cos(el);
+  return [ce * Math.sin(az), ce * Math.cos(az), Math.sin(el)];
+}
+
+function bake(name, polygons, cam, cols, rows, opts = {}) {
+  // cam.rotX/rotY in degrees (workbench convention) → radians.
+  const camera = createGlyphPerspectiveCamera({ distance: 100, rotX: cam.rotX * DEG, rotY: cam.rotY * DEG, zoom: cam.zoom });
   const ctx = buildRasterizeContext({
     camera,
     grid: { cols, rows, cellAspect: 1.67 },
     polygons,
     mode: 'solid',
-    directionalLight: { direction: [-0.45, -0.7, 0.6], intensity: 0.6 },
-    ambientLight: { intensity: 0.55 },
+    directionalLight: opts.light ?? { direction: [-0.45, -0.7, 0.6], intensity: 0.6 },
+    ambientLight: { intensity: opts.ambient ?? 0.55 },
     useColors: false,
-    // Self-shadowing — the mesh casts and receives its own shadows, so the
-    // arcades read with real depth.
-    ...(shadows ? {
-      shadow: { opacity: 0.5 },
+    ...(opts.shadow ? {
+      shadow: opts.shadow,
       castShadowFlags: polygons.map(() => true),
       receiveShadowFlags: polygons.map(() => true),
     } : {}),
@@ -59,9 +72,15 @@ function bake(name, polygons, camOpts, cols, rows, shadows = false) {
   console.log(`${name} → src/data/glyphart-${name}.txt (trimmed ${w}x${h}, ${ascii.length} chars)`);
 }
 
-// ── Coliseum: the model, zoomed out for margin, self-shadowed ──────────────
-bake('coliseum', fitToUnitBbox(parseObj(readFileSync(OBJ, 'utf8')).polygons),
-  { rotX: 1.42, rotY: 0.5, zoom: 0.3 }, 120, 56, true);
+// ── Coliseum: workbench camera + lighting (az 50 / el 30, key 1, ambient 0.4,
+//    shadow opacity 0.35, cast+receive self-shadow, no floor). zoom is a CSS
+//    scale on the raw ~60-unit mesh; lift is in those world units (≈2). ──────
+bake('coliseum', center(parseObj(readFileSync(OBJ, 'utf8')).polygons),
+  { rotX: 63, rotY: 350, zoom: 1.4 }, 150, 120, {
+    light: { direction: lightDir(50, 30), intensity: 1, color: '#ffffff' },
+    ambient: 0.4,
+    shadow: { opacity: 0.35, lift: 2 },
+  });
 
 // ── Play: an extruded ring + a separate, smaller extruded triangle well
 //    inside it (a clear gap so the two shapes never fuse), angled for depth. ──
@@ -84,4 +103,6 @@ function buildPlay() {
   for (let i = 0; i < 3; i++) { const j = (i + 1) % 3; polys.push({ vertices: [f[i], f[j], bk[j], bk[i]] }); }
   return polys;
 }
-bake('play', buildPlay(), { rotX: 0.42, rotY: 0.5, zoom: 0.32 }, 60, 40);
+// play coords are ~unit-scale; source zoom is a CSS multiplier so it needs a
+// much larger zoom than the raw-mesh coliseum to fill the grid.
+bake('play', center(buildPlay()), { rotX: 24, rotY: 29, zoom: 26 }, 60, 40);

@@ -24,7 +24,10 @@ const rows = lines.length;
   <div class="glyphart-stage">
     <pre class="glyphart-pre">{art}</pre>
   </div>
-  {caption && <figcaption class="glyphart-caption">{caption}</figcaption>}
+  <figcaption class="glyphart-caption">
+    {caption && <span class="glyphart-name">{caption}</span>}
+    <a class="glyphart-credit" href="https://glyphcss.com" target="_blank" rel="noopener">glyphcss.com</a>
+  </figcaption>
 </figure>
 
 <style>
@@ -56,6 +59,10 @@ const rows = lines.length;
   :global([data-theme="light"]) .glyphart-pre { font-weight: 700; }
   .glyphart-caption {
     flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
     font-family: var(--font-sans);
     font-size: 10px;
     letter-spacing: 0.18em;
@@ -64,4 +71,15 @@ const rows = lines.length;
     margin-top: 8px;
     text-align: center;
   }
+  /* Tiny credit so readers learn the glyph art is glyphcss. */
+  .glyphart-credit {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: lowercase;
+    color: var(--muted);
+    opacity: 0.7;
+    text-decoration: none;
+  }
+  .glyphart-credit:hover { color: var(--accent); opacity: 1; }
 </style>
