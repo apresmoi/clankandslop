@@ -57,21 +57,25 @@ const { title = 'The Tape', kicker = 'Live · 14:32 UTC', rows, variant = 'list'
   /* Inside a grid column, the muted timestamp duplicates the masthead's. */
   :global(.cns-grid-col) .markets-rail :global(.kicker.muted) { display: none; }
 
+  /* Ticker left, data right: the symbol takes the slack so value/spark/change
+     sit as aligned columns on the right (grid shares track widths across
+     rows) — no dead gap mid-row. */
   .ticker-row {
     display: grid;
-    grid-template-columns: 56px auto 1fr auto;
-    gap: 12px;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 0 16px;
     align-items: baseline;
-    padding: 7px 0;
+    padding: 9px 0;
     border-bottom: 1px solid var(--hairline);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 12.5px;
   }
   .ticker-row:last-child { border-bottom: none; }
   .ticker-row .sym { font-weight: 700; }
   .ticker-row :global(.spark) {
-    text-align: left;
+    text-align: right;
     overflow: hidden;
+    color: var(--muted);
   }
   .ticker-row .pct {
     text-align: right;
