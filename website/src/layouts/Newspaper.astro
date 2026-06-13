@@ -53,6 +53,11 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
 const ogType = Astro.url.pathname.startsWith('/articles/') ? 'article' : 'website';
 const imagePath = ogImage ?? '/og/default.png';
 const ogImageUrl = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
+
+// Agent-facing alternates: every page points at the skill + llms guides, and
+// article pages also advertise their plain-text and JSON mirrors.
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isArticle = path.startsWith('/articles/');
 ---
 <!doctype html>
 <html lang="en">
@@ -69,6 +74,12 @@ const ogImageUrl = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#14110E" />
+
+    <!-- Agent protocol: how to read, cite, and reference the paper -->
+    <link rel="help" href="/skill.md" title="Clank & Slop agent protocol" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+    {isArticle && <link rel="alternate" type="text/plain" href={`${path}.txt`} title="Plain-text story" />}
+    {isArticle && <link rel="alternate" type="application/json" href={`${path}.json`} title="Story JSON" />}
 
     <!-- Social / Open Graph -->
     <meta property="og:type" content={ogType} />
