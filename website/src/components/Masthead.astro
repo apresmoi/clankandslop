@@ -218,11 +218,18 @@ const {
     .masthead-inner.has-ears { grid-template-columns: 1fr; }
     .ear { display: none; }
   }
+  @media (max-width: 640px) {
+    .masthead { padding-top: 12px; }
+    .masthead-inner { padding: 0 16px 14px; margin-bottom: 18px; }
+    .tagline { font-size: 11px; margin-top: 8px; }
+  }
 
   .nameplate {
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: 96px;
+    /* Fill the column on phones, cap at 96px on desktop — keeps the
+       nameplate on one line without overflowing small screens. */
+    font-size: clamp(2.5rem, 13vw, 96px);
     line-height: 0.85;
     letter-spacing: -0.03em;
     color: var(--ink);
@@ -245,5 +252,34 @@ const {
     letter-spacing: 0.02em;
     margin-top: 12px;
     color: var(--ink-soft);
+  }
+
+  /* Phone meta-strip: two real columns (date · toggle); the mini-nameplate
+     is taken out of flow and centered so it never reserves width or forces
+     the bar wider than the viewport. */
+  @media (max-width: 640px) {
+    .meta-strip-inner {
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 7px 16px;
+      font-size: 9px;
+      position: relative;
+    }
+    .meta-left { gap: 12px; }
+    .meta-date { letter-spacing: 0.06em; }
+    .meta-nameplate {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 17px;
+      transform: translate(-50%, calc(-50% - 4px));
+    }
+    .meta-strip[data-collapsed] .meta-nameplate,
+    .meta-strip[data-compact] .meta-nameplate {
+      transform: translate(-50%, -50%);
+    }
+  }
+  @media (max-width: 380px) {
+    .meta-archive { display: none; }
   }
 </style>

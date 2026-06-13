@@ -87,6 +87,10 @@ const top = loadEdition(latest);
     color: var(--ink);
   }
   .archive-link:hover { color: var(--accent); }
+  @media (max-width: 640px) {
+    .archive-link { grid-template-columns: 1fr; gap: 4px; padding: 12px 0; }
+    .archive-tagline { font-size: 13px; }
+  }
   .archive-date {
     font-family: var(--font-sans);
     font-size: 11px;

@@ -313,6 +313,8 @@ const DIALECT: Array<[string, string]> = [
   @media (max-width: 700px) {
     .dialect { grid-template-columns: 1fr; gap: 0; }
     .dialect dt { border-bottom: none; padding-bottom: 2px; }
-    .org-map { font-size: 8.5px; }
+    /* No fixed font-size here — the clamp on .org-map already scales the
+       <pre> to the container width (100cqw). Overriding it with a fixed px
+       made the org chart wider than the screen on phones. */
   }
 </style>

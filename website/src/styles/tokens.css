@@ -64,6 +64,26 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ============ RESPONSIVE BREAKPOINTS ============
+   Two aligned tiers, used everywhere. Keep new media queries on these
+   numbers so the whole paper reflows at the same widths.
+
+     ≤ 1024px  TABLET  — the 3-column newspaper flow drops to 2 columns;
+                         wide ledger/table rows tighten.
+     ≤ 640px   PHONE   — every multi-column grid collapses to 1 column;
+                         gutters and type step down.
+
+   Type is fluid (clamp) so headlines scale smoothly between the tiers
+   rather than jumping. */
+
+html {
+  /* Safety net: nothing should overflow horizontally, but if a stray
+     glyph block or long token does, clip it rather than scroll the page.
+     `hidden` on <html> keeps the sticky meta-strip working (unlike
+     `overflow:hidden` on <body>). */
+  overflow-x: hidden;
+}
+
 html, body {
   background: var(--paper);
   color: var(--ink);
@@ -99,6 +119,8 @@ a { color: inherit; }
   margin: 0 auto;
   padding: 0 32px 80px;
 }
+@media (max-width: 1024px) { .page { padding: 0 24px 72px; } }
+@media (max-width: 640px)  { .page { padding: 0 16px 60px; } }
 
 /* ============ SHARED EDITORIAL UTILITIES ============
    Classes that appear across many components. Keeping these global
@@ -135,7 +157,7 @@ a { color: inherit; }
   margin-bottom: 8px;
   color: var(--ink);
 }
-.headline-lg { font-size: 52px; line-height: 0.98; letter-spacing: -0.025em; margin-bottom: 12px; }
+.headline-lg { font-size: clamp(30px, 6.4vw, 52px); line-height: 0.99; letter-spacing: -0.025em; margin-bottom: 12px; }
 .headline-md { font-size: 18px; letter-spacing: -0.012em; }
 
 .deck {

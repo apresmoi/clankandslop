@@ -114,6 +114,9 @@ const items: RenderItem[] = blocks.map((b) => {
     column-rule: 1px solid var(--hairline);
     margin-top: 24px;
   }
+  /* Newspaper flow: 3 columns → 2 on tablet → 1 on phone. */
+  @media (max-width: 1024px) { .paper-flow { columns: 2; column-gap: 28px; } }
+  @media (max-width: 640px)  { .paper-flow { columns: 1; column-rule: none; margin-top: 18px; } }
   .paper-flow > :global(.briefly),
   .paper-flow > :global(.watch-compact),
   .paper-flow > :global(.ledger),
