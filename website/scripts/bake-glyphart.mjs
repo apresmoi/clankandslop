@@ -20,6 +20,21 @@ function fitToUnitBbox(polys) {
   return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [(v[0] - cx) * k, (v[1] - cy) * k, (v[2] - cz) * k]) }));
 }
 
+// Crop the rendered grid to the shape's bounding box (+pad cells) so there's
+// no dead margin — the illustration then fills its cell tightly.
+function trim(ascii, pad = 1) {
+  let lines = ascii.split('\n');
+  const filled = lines.map((l) => l.search(/\S/));
+  const rowsWith = filled.map((i) => i !== -1);
+  const top = rowsWith.indexOf(true), bot = rowsWith.lastIndexOf(true);
+  if (top === -1) return ascii;
+  let minL = Infinity, maxR = 0;
+  for (const l of lines) { const i = l.search(/\S/); if (i !== -1) { minL = Math.min(minL, i); maxR = Math.max(maxR, l.replace(/\s+$/, '').length); } }
+  minL = Math.max(0, minL - pad); maxR += pad;
+  return lines.slice(Math.max(0, top - pad), bot + 1 + pad)
+    .map((l) => l.slice(minL, maxR).replace(/\s+$/, '')).join('\n');
+}
+
 function bake(name, polygons, camOpts, cols, rows, shadows = false) {
   const camera = createGlyphPerspectiveCamera({ distance: 100, ...camOpts });
   const ctx = buildRasterizeContext({
@@ -38,14 +53,15 @@ function bake(name, polygons, camOpts, cols, rows, shadows = false) {
       receiveShadowFlags: polygons.map(() => true),
     } : {}),
   });
-  const ascii = rasterize(ctx).replace(/[ \t]+$/gm, '');
+  const ascii = trim(rasterize(ctx).replace(/[ \t]+$/gm, ''), name === 'play' ? 1 : 0);
   writeFileSync(resolve(OUT_DIR, `glyphart-${name}.txt`), ascii + '\n');
-  console.log(`${name} → src/data/glyphart-${name}.txt (${cols}x${rows}, ${ascii.length} chars)`);
+  const w = Math.max(...ascii.split('\n').map((l) => l.length)), h = ascii.split('\n').length;
+  console.log(`${name} → src/data/glyphart-${name}.txt (trimmed ${w}x${h}, ${ascii.length} chars)`);
 }
 
 // ── Coliseum: the model, zoomed out for margin, self-shadowed ──────────────
 bake('coliseum', fitToUnitBbox(parseObj(readFileSync(OBJ, 'utf8')).polygons),
-  { rotX: 1.12, rotY: 0.5, zoom: 0.3 }, 108, 58, true);
+  { rotX: 1.42, rotY: 0.5, zoom: 0.3 }, 120, 56, true);
 
 // ── Play: an extruded ring + a separate, smaller extruded triangle well
 //    inside it (a clear gap so the two shapes never fuse), angled for depth. ──
