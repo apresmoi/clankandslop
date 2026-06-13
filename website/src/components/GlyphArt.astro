@@ -28,24 +28,19 @@ const rows = lines.length;
 </figure>
 
 <style>
-  .glyphart { margin: 0; height: 100%; display: flex; flex-direction: column; }
-  /* Mobile: stacked, the cell has no fixed height — fill the column width only
-     (cqw). Desktop overrides below with container-type:size for height-match. */
-  .glyphart-stage { flex: 1 1 auto; min-height: 0; container-type: inline-size; display: flex; }
+  .glyphart { margin: 0; }
+  .glyphart-stage { container-type: inline-size; }
+  /* Fill the column width, but cap the height so a tall shape stays a tidy
+     accent and is always fully visible (no clipping). Centred in its column. */
   .glyphart-pre {
     font-family: var(--font-mono);
-    font-size: calc(100cqw / (var(--cols) * 0.6));
+    font-size: min(calc(100cqw / (var(--cols) * 0.6)), calc(var(--cap, 300px) / var(--rows)));
     line-height: 1;
     white-space: pre;
-    margin: auto;
+    width: fit-content;
+    margin: 0 auto;
     color: var(--ink);
     letter-spacing: 0;
-  }
-  /* Desktop: the row stretches the cell to the text height, so contain-fit
-     (the binding axis) makes the illustration match that height. */
-  @media (min-width: 880px) {
-    .glyphart-stage { container-type: size; }
-    .glyphart-pre { font-size: min(calc(100cqw / (var(--cols) * 0.6)), calc(100cqh / var(--rows))); }
   }
   .glyphart-play .glyphart-pre { color: var(--accent); }
   .glyphart-caption {

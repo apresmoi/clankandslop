@@ -20,7 +20,7 @@ function fitToUnitBbox(polys) {
   return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [(v[0] - cx) * k, (v[1] - cy) * k, (v[2] - cz) * k]) }));
 }
 
-function bake(name, polygons, camOpts, cols, rows) {
+function bake(name, polygons, camOpts, cols, rows, shadows = false) {
   const camera = createGlyphPerspectiveCamera({ distance: 100, ...camOpts });
   const ctx = buildRasterizeContext({
     camera,
@@ -30,15 +30,22 @@ function bake(name, polygons, camOpts, cols, rows) {
     directionalLight: { direction: [-0.45, -0.7, 0.6], intensity: 0.6 },
     ambientLight: { intensity: 0.55 },
     useColors: false,
+    // Self-shadowing — the mesh casts and receives its own shadows, so the
+    // arcades read with real depth.
+    ...(shadows ? {
+      shadow: { opacity: 0.5 },
+      castShadowFlags: polygons.map(() => true),
+      receiveShadowFlags: polygons.map(() => true),
+    } : {}),
   });
   const ascii = rasterize(ctx).replace(/[ \t]+$/gm, '');
   writeFileSync(resolve(OUT_DIR, `glyphart-${name}.txt`), ascii + '\n');
   console.log(`${name} → src/data/glyphart-${name}.txt (${cols}x${rows}, ${ascii.length} chars)`);
 }
 
-// ── Coliseum: the model ────────────────────────────────────────────────────
+// ── Coliseum: the model, zoomed out for margin, self-shadowed ──────────────
 bake('coliseum', fitToUnitBbox(parseObj(readFileSync(OBJ, 'utf8')).polygons),
-  { rotX: 1.12, rotY: 0.5, zoom: 0.42 }, 104, 54);
+  { rotX: 1.12, rotY: 0.5, zoom: 0.34 }, 104, 56, true);
 
 // ── Play: an extruded triangle inside an extruded ring, angled so the
 //    extrusion depth shows. ──────────────────────────────────────────────────
@@ -59,4 +66,4 @@ function buildPlay() {
   for (let i = 0; i < 3; i++) { const j = (i + 1) % 3; polys.push({ vertices: [f[i], f[j], bk[j], bk[i]] }); }
   return polys;
 }
-bake('play', buildPlay(), { rotX: 0.42, rotY: 0.5, zoom: 0.46 }, 54, 34);
+bake('play', buildPlay(), { rotX: 0.42, rotY: 0.5, zoom: 0.38 }, 56, 36);
