@@ -31,7 +31,9 @@ const caption = worldDesk
 const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
 ---
 <figure class="worldglyph">
-  <div class="worldglyph-host" data-worldglyph data-config={config}></div>
+  <div class="worldglyph-stage" data-worldglyph-stage>
+    <div class="worldglyph-host" data-worldglyph data-config={config}></div>
+  </div>
   {caption && <figcaption class="worldglyph-caption">{caption}</figcaption>}
 </figure>
 
@@ -147,6 +149,33 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     // invert: -1 matches the upstream landing globe's drag feel.
     const controls = createGlyphOrbitControls(scene, { drag: true, wheel: false, invert: -1 });
     scenes.set(host, { destroy: () => { controls.destroy(); scene.destroy(); } });
+    // The globe is sized for a wide desktop column; its eastern hotspot labels
+    // run off narrow screens. Scale the whole host (sphere + labels together,
+    // so alignment is preserved) down to the container, then re-center.
+    requestAnimationFrame(() => fitGlobe(host));
+  }
+
+  function fitGlobe(host: HTMLElement) {
+    const stage = host.closest<HTMLElement>('[data-worldglyph-stage]');
+    if (!stage) return;
+    host.style.transform = 'none';
+    host.style.marginLeft = '0';
+    stage.style.height = 'auto';
+    const avail = stage.clientWidth;
+    const hb = host.getBoundingClientRect();
+    let minL = hb.left, maxR = hb.right;
+    host.querySelectorAll<HTMLElement>('.worldglyph-spot').forEach((s) => {
+      const r = s.getBoundingClientRect();
+      if (r.width) { minL = Math.min(minL, r.left); maxR = Math.max(maxR, r.right); }
+    });
+    const contentW = maxR - minL;
+    if (contentW <= avail + 0.5) return;            // already fits
+    const scale = avail / contentW;
+    host.style.transformOrigin = 'top left';
+    host.style.transform = `scale(${scale})`;
+    // Center the true content (labels included) within the column.
+    host.style.marginLeft = `${(avail - contentW * scale) / 2 - (minL - hb.left) * scale}px`;
+    stage.style.height = `${host.offsetHeight * scale}px`;
   }
 
   const hosts = [...document.querySelectorAll<HTMLElement>('[data-worldglyph]')];
@@ -156,11 +185,21 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     attributes: true,
     attributeFilter: ['data-theme'],
   });
+
+  let rt: ReturnType<typeof setTimeout>;
+  addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => hosts.forEach((h) => fitGlobe(h)), 150);
+  });
 </script>
 
 <style>
   .worldglyph {
     margin: 0;
+  }
+  .worldglyph-stage {
+    /* fitGlobe() scales the host to fit and sets this height to match. */
+    position: relative;
   }
   .worldglyph-host {
     font-family: var(--font-mono);
@@ -168,6 +207,8 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     line-height: 1;
     color: var(--ink-soft);
     cursor: grab;
+    width: max-content;
+    margin: 0 auto;
   }
   .worldglyph-host:active {
     cursor: grabbing;

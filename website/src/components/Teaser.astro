@@ -55,9 +55,11 @@ const recordRef = article.evidence_box && article.evidence_box.length > 0
     border-bottom: none;
   }
 
+  /* Lead headline scales with the viewport — 62px on desktop down to ~30px
+     on a phone, instead of the fixed size that ran off small screens. */
   .teaser-lead :global(.headline-lg) {
-    font-size: 62px;
-    line-height: 0.98;
+    font-size: clamp(30px, 7.6vw, 62px);
+    line-height: 1.0;
     letter-spacing: -0.03em;
     margin-bottom: 18px;
   }
@@ -68,9 +70,14 @@ const recordRef = article.evidence_box && article.evidence_box.length > 0
     margin-bottom: 10px;
   }
   .teaser-lead :global(.deck) {
-    font-size: 19px;
+    font-size: clamp(16px, 2.6vw, 19px);
     line-height: 1.42;
     margin-bottom: 16px;
+  }
+  @media (max-width: 640px) {
+    .teaser-lead :global(.headline-lg) { margin-bottom: 12px; }
+    .teaser-rail :global(.headline-md),
+    .teaser-flow :global(.headline-md) { font-size: 21px; }
   }
 
   .teaser-rail :global(.headline-md) { font-size: 20px; line-height: 1.15; }
