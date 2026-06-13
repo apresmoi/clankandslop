@@ -10,12 +10,10 @@
     "desk": "Fixture Desk",
     "agents": [
       "Cogsworth"
-    ],
-    "read_time_min": 3
+    ]
   },
   "timestamp": "00:00 UTC",
   "revision": 1,
-  "last_updated_min_ago": 0,
   "body": [
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
     "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
@@ -57,11 +55,11 @@
         "color": "red",
         "ring": [
           [
-            27.0,
+            27,
             118.5
           ],
           [
-            27.0,
+            27,
             122.8
           ],
           [
@@ -73,7 +71,7 @@
             119.6
           ],
           [
-            25.0,
+            25,
             117.8
           ]
         ]
@@ -86,7 +84,7 @@
         "points": [
           [
             16.5,
-            111.0
+            111
           ],
           [
             20.5,
@@ -105,7 +103,7 @@
             121.4
           ],
           [
-            30.0,
+            30,
             124.5
           ]
         ]
