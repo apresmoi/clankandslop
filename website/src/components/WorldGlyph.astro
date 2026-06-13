@@ -170,9 +170,22 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     };
     cull();
 
-    // invert: -1 matches the upstream landing globe's drag feel.
-    const controls = createGlyphOrbitControls(scene, { drag: true, wheel: false, invert: -1 });
-    scenes.set(host, { destroy: () => { cancelAnimationFrame(raf); controls.destroy(); scene.destroy(); } });
+    // Natural drag (invert: -1 spun it backwards) + a slow idle spin that
+    // pauses while you drag. Respect reduced-motion, and stop the spin when the
+    // globe scrolls out of view so it isn't re-rasterizing off-screen.
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const controls = createGlyphOrbitControls(scene, {
+      drag: true,
+      wheel: false,
+      invert: 1,
+      animate: reduceMotion ? false : { speed: 0.28, axis: 'y', pauseOnInteraction: true },
+    });
+    let io: IntersectionObserver | null = null;
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      io = new IntersectionObserver(([e]) => { e.isIntersecting ? controls.resume() : controls.pause(); }, { threshold: 0 });
+      io.observe(host);
+    }
+    scenes.set(host, { destroy: () => { io?.disconnect(); cancelAnimationFrame(raf); controls.destroy(); scene.destroy(); } });
     // The globe is sized for a wide desktop column; its eastern hotspot labels
     // run off narrow screens. Scale the whole host (sphere + labels together,
     // so alignment is preserved) down to the container, then re-center.
@@ -222,8 +235,11 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     margin: 0;
   }
   .worldglyph-stage {
-    /* fitGlobe() scales the host to fit and sets this height to match. */
+    /* fitGlobe() scales the host to fit and sets this height to match.
+       overflow:clip keeps the spinning globe from ever pushing the page wider
+       than its column (a limb label can swing past the fit bounds mid-spin). */
     position: relative;
+    overflow-x: clip;
   }
   .worldglyph-host {
     font-family: var(--font-mono);
