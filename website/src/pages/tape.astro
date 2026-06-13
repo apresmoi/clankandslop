@@ -23,6 +23,48 @@ const page    = loadPage(date, 'tape');
   nextBell={edition.next_bell}
   tagline={page.tagline ?? undefined}
 >
+  <header class="section-mast">
+    <span class="section-mast-kicker">The Markets Desk</span>
+    <h1 class="section-mast-name">The Tape</h1>
+    <p class="section-mast-tag">Rates · FX · commodities · equities — read the tape, priced at the bell.</p>
+  </header>
   <PageRenderer blocks={page.head} date={date} />
   <PageRenderer blocks={page.flow} date={date} flow />
 </Newspaper>
+
+<style>
+  .section-mast {
+    text-align: center;
+    padding: 8px 0 18px;
+    margin-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .section-mast-kicker {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .section-mast-name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(40px, 8vw, 76px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 6px 0 0;
+  }
+  .section-mast-tag {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin: 10px 0 0;
+  }
+  @media (max-width: 640px) {
+    .section-mast { padding-top: 4px; }
+    .section-mast-tag { font-size: 13px; }
+  }
+</style>

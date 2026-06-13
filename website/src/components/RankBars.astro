@@ -81,7 +81,7 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
   }
   .rankbars-row {
     display: grid;
-    grid-template-columns: minmax(11em, 15em) 1fr auto;
+    grid-template-columns: max-content minmax(0, 1fr) auto;
     gap: 0 14px;
     align-items: center;
   }
@@ -91,8 +91,7 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
     letter-spacing: 0.04em;
     color: var(--ink-soft);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    text-align: right;
   }
   .rankbars-note { color: var(--accent); font-style: italic; letter-spacing: 0; }
   .rankbars-track { min-width: 0; overflow: hidden; }
