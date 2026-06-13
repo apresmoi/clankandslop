@@ -30,23 +30,25 @@ for (const it of items) {
   <div class="watch-head">
     <span class="watch-label">{title}</span>
   </div>
-  {grouped.map((g) => (
-    <div class="watch-day">
-      <div class="watch-day-label">{g.day}</div>
-      <div class="watch-day-items">
-        {g.rows.map((it) => {
-          const { time } = splitWhen(it.when);
-          return (
-            <div class="watch-item">
-              <span class="watch-time">{time || '—'}</span>
-              <span class="watch-what">{it.what}</span>
-              {it.who && <span class="watch-who">{it.who}</span>}
-            </div>
-          );
-        })}
+  <div class="watch-grid">
+    {grouped.map((g) => (
+      <div class="watch-day">
+        <div class="watch-day-label">{g.day}</div>
+        <div class="watch-day-items">
+          {g.rows.map((it) => {
+            const { time } = splitWhen(it.when);
+            return (
+              <div class="watch-item">
+                <span class="watch-time">{time || '—'}</span>
+                <span class="watch-what">{it.what}</span>
+                {it.who && <span class="watch-who">{it.who}</span>}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  ))}
+    ))}
+  </div>
 </div>
 
 <style>
@@ -64,12 +66,15 @@ for (const it of items) {
     border-bottom: 1.5px solid var(--ink);
     margin-bottom: 18px;
   }
+  /* Two columns of days on wide screens so the week fills the width. */
+  .watch-grid { columns: 2; column-gap: 48px; }
   .watch-day {
     display: grid;
     grid-template-columns: 60px 1fr;
     gap: 18px;
     padding: 10px 0;
     border-bottom: 1px dotted var(--hairline);
+    break-inside: avoid;
   }
   .watch-day:last-child { border-bottom: none; }
   .watch-day-label {
@@ -100,7 +105,7 @@ for (const it of items) {
   }
   .watch-what {
     color: var(--ink);
-    flex: 0 1 auto;
+    flex: 1 1 auto;
   }
   .watch-who {
     font-family: var(--font-mono);
@@ -110,7 +115,8 @@ for (const it of items) {
     margin-left: 4px;
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 640px) {
+    .watch-grid { columns: 1; }
     .watch-day { grid-template-columns: 1fr; gap: 6px; }
     .watch-item { grid-template-columns: 50px 1fr; }
     .watch-who { grid-column: 1 / -1; text-align: left; }

@@ -30,15 +30,27 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
     {meta && <span class="ledger-meta">{meta}</span>}
   </div>
 
+  <div class="ledger-colhead" aria-hidden="true">
+    <span>Resolves</span>
+    <span>Question · why</span>
+    <span>Call</span>
+    <span>Posterior</span>
+    <span>Dissent</span>
+  </div>
+
   <div class="ledger-rows">
     {open_calls.map((c) => (
       <div class="ledger-row">
         <span class="ledger-horizon">{c.horizon}</span>
-        <span class="ledger-q">{c.question}</span>
+        <div class="ledger-qcol">
+          <span class="ledger-q">{c.question}</span>
+          {c.detail && <span class="ledger-why">{c.detail}</span>}
+        </div>
         <span class={`ledger-call ${c.direction}`}>{c.call}<span class="arrow">{arrowFor(c.direction)}</span></span>
-        <span class="ledger-p">
-          {c.p.toFixed(2)}{c.interval !== undefined && <span class="ledger-int"> ±{c.interval.toFixed(2)}</span>}
-        </span>
+        <div class="ledger-pcol">
+          <span class="ledger-p">{c.p.toFixed(2)}{c.interval !== undefined && <span class="ledger-int"> ±{c.interval.toFixed(2)}</span>}</span>
+          {c.quorum && <span class="ledger-quorum">{c.quorum} agree</span>}
+        </div>
         <span class="ledger-dis">
           {c.dissent
             ? <><span class="dim">{c.dissent.agents.join(', ')}</span> {(c.dissent.p * 100).toFixed(0)}%</>
@@ -47,6 +59,13 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
       </div>
     ))}
   </div>
+
+  <p class="ledger-key">
+    <strong>Posterior</strong> is the desk's probability the call resolves YES, with a ±1σ band;
+    <strong>quorum</strong> is how many of five desk agents back it; <strong>dissent</strong> names the
+    agent arguing the other side, with their counter-probability. Every call is scored against the
+    outcome at the next bell — <a href="/about">how the paper computes its numbers</a>.
+  </p>
 
   {resolved && resolved.length > 0 && (
     <div class="ledger-resolved">
@@ -85,16 +104,60 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
   .ledger-label { font-weight: 700; color: var(--ink); }
   .ledger-meta  { color: var(--muted); font-size: 10px; }
 
+  .ledger-colhead {
+    display: grid;
+    grid-template-columns: 110px 1fr 70px 110px 120px;
+    gap: 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--hairline-strong);
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ledger-colhead span:nth-child(3) { text-align: left; }
+  .ledger-colhead span:nth-child(4),
+  .ledger-colhead span:nth-child(5) { text-align: left; }
+
   .ledger-rows { display: flex; flex-direction: column; }
   .ledger-row {
     display: grid;
-    grid-template-columns: 150px 1fr 70px 90px 130px;
-    align-items: baseline;
+    grid-template-columns: 110px 1fr 70px 110px 120px;
+    align-items: start;
     gap: 16px;
-    padding: 10px 0;
+    padding: 12px 0;
     border-bottom: 1px dotted var(--hairline);
   }
   .ledger-row:last-child { border-bottom: none; }
+  .ledger-qcol { display: flex; flex-direction: column; gap: 4px; }
+  .ledger-why {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+  .ledger-pcol { display: flex; flex-direction: column; gap: 3px; }
+  .ledger-quorum {
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ledger-key {
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hairline);
+  }
+  .ledger-key strong { color: var(--ink-soft); font-weight: 700; font-style: normal; }
+  .ledger-key a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent); }
 
   .ledger-horizon {
     font-family: var(--font-mono);
@@ -148,18 +211,20 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
   .ledger-resolved .dim  { color: var(--muted); }
 
   @media (max-width: 880px) {
+    .ledger-colhead { display: none; }
     .ledger-row {
       grid-template-columns: 1fr auto;
       grid-template-areas:
         "horizon call"
-        "q       q"
-        "p       dis";
-      row-gap: 4px;
+        "qcol    qcol"
+        "pcol    dis";
+      row-gap: 6px;
+      align-items: baseline;
     }
     .ledger-horizon { grid-area: horizon; }
     .ledger-call    { grid-area: call; text-align: right; }
-    .ledger-q       { grid-area: q; }
-    .ledger-p       { grid-area: p; }
+    .ledger-qcol    { grid-area: qcol; }
+    .ledger-pcol    { grid-area: pcol; flex-direction: row; align-items: baseline; gap: 8px; }
     .ledger-dis     { grid-area: dis; text-align: right; }
   }
 </style>
