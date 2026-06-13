@@ -26,7 +26,7 @@ const max = Math.max(...rows.map((r) => r.value), 0) || 1;
 // Bars fill the track proportionally (longest = full width) — a clipped run of
 // block glyphs, so width is computed from the value and never hand-drawn.
 const BLOCKS = '█'.repeat(160);
-const pct = (v: number) => `${(v / max) * 100}%`;
+const frac = (v: number) => v / max;
 const fmt = (v: number) => prefix + v.toFixed(precision);
 ---
 <figure class="rankbars">
@@ -38,8 +38,10 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
     {rows.map((r) => (
       <div class={`rankbars-row${r.highlight ? ' is-subject' : ''}`}>
         <span class="rankbars-label">{r.label}{r.note && <em class="rankbars-note"> · {r.note}</em>}</span>
-        <span class="rankbars-track"><span class="rankbars-bar" aria-hidden="true" style={`width:${pct(r.value)}`}>{BLOCKS}</span></span>
-        <span class="rankbars-value">{fmt(r.value)}</span>
+        <div class="rankbars-track">
+          <span class="rankbars-bar" aria-hidden="true" style={`width: calc((100% - 3.6em) * ${frac(r.value)})`}>{BLOCKS}</span>
+          <span class="rankbars-value">{fmt(r.value)}</span>
+        </div>
       </div>
     ))}
   </div>
@@ -81,7 +83,7 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
   }
   .rankbars-row {
     display: grid;
-    grid-template-columns: max-content minmax(0, 1fr) auto;
+    grid-template-columns: max-content minmax(0, 1fr);
     gap: 0 14px;
     align-items: center;
   }
@@ -94,9 +96,11 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
     text-align: right;
   }
   .rankbars-note { color: var(--accent); font-style: italic; letter-spacing: 0; }
-  .rankbars-track { min-width: 0; overflow: hidden; }
+  /* Bar grows from the baseline by the bar; its value rides the bar's tip, so
+     every bar reaches its number with no dead gap. */
+  .rankbars-track { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
   .rankbars-bar {
-    display: block;
+    flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: 12px;
     line-height: 1;
@@ -104,13 +108,13 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
     letter-spacing: -0.5px;
     overflow: hidden;
     white-space: nowrap;
-    max-width: 100%;
   }
   .rankbars-value {
+    flex-shrink: 0;
+    white-space: nowrap;
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--ink-soft);
-    text-align: right;
     font-variant-numeric: tabular-nums;
   }
   .rankbars-row.is-subject .rankbars-label { color: var(--ink); font-weight: 700; }
