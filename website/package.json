@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "validate": "node ../ops/validate-content.mjs",
     "build": "npm run validate && astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "favicon": "node scripts/make-favicon.mjs",
+    "og": "node scripts/make-og.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",
@@ -18,6 +20,7 @@
     "glyphcss": "^0.0.3"
   },
   "devDependencies": {
-    "playwright": "^1.60.0"
+    "playwright": "^1.60.0",
+    "sharp": "^0.34.5"
   }
 }

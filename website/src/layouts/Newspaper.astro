@@ -17,6 +17,9 @@ interface Props {
   /** Next bell, e.g. "14:30 UTC" — from edition chrome (caslon.chrome.json). */
   nextBell: string;
   tagline?: string;
+  /** Social card path (site-absolute, e.g. `/og/<slug>.png`). Articles pass
+      their generated card; other pages fall back to the default site card. */
+  ogImage?: string;
   /** Skip the big CLANK & SLOP masthead and use only the condensed top
       bar. Default true — only the front page should be `compact: false`. */
   compact?: boolean;
@@ -34,6 +37,7 @@ const {
   date,
   nextBell,
   tagline,
+  ogImage,
   compact   = true,
   ears,
 } = Astro.props;
@@ -47,6 +51,8 @@ for (const [k, v] of Object.entries({ edition, editionNo, volume, date, nextBell
 // so canonical and og:url are absolute. News stories are og:type=article.
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
 const ogType = Astro.url.pathname.startsWith('/articles/') ? 'article' : 'website';
+const imagePath = ogImage ?? '/og/default.png';
+const ogImageUrl = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
 ---
 <!doctype html>
 <html lang="en">
@@ -70,9 +76,13 @@ const ogType = Astro.url.pathname.startsWith('/articles/') ? 'article' : 'websit
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
 
     <!-- Anti-flash: read theme before paint so the page doesn't flicker.
          Priority: ?theme=… > localStorage > prefers-color-scheme > light. -->

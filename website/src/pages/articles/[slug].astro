@@ -46,6 +46,7 @@ const topicChips = (article.topics ?? []).map((s) => getTopic(s)).filter((t) => 
 <Newspaper
   title={`${article.headline} — Clank & Slop`}
   description={article.deck || article.headline}
+  ogImage={`/og/${slug}.png`}
   active={backHref}
   edition={fmtEditionLine(edition)}
   editionNo={edition.edition_no}
