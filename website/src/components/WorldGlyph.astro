@@ -40,12 +40,9 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
   import landmask from '../data/landmask.json';
 
   const D = Math.PI / 180;
-  // Z-up, X-right, +Y sin(lon). East reads to the right ONLY from the
-  // northern-side camera (rotX ~1.25, rotY ~1.05); tipping toward rotX < 1.2 /
-  // rotY > 1.1 swings the view to the southern face, which reads east-west
-  // mirrored (Africa left of South America). Verified with labeled reference
-  // cities (lon +45 right of lon -45). Land quads and markers share this
-  // function, so they stay registered — keep page cameras near 1.25 / 1.05.
+  // Z-up, X-right, +Y sin(lon) — a right-handed Earth, east CCW from the pole.
+  // Correct at every drag angle; the quad winding below (not the camera) is
+  // what keeps it unmirrored.
   const toVec3 = (lat: number, lon: number, r = 1): [number, number, number] => [
     r * Math.cos(lat * D) * Math.cos(lon * D),
     r * Math.cos(lat * D) * Math.sin(lon * D),
@@ -83,8 +80,11 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     return `#${c(ar, br)}${c(ag, bg)}${c(ab, bb)}`;
   };
 
-  // One quad per cell, wound NW→NE→SE→SW. Ocean cells are a faint paper-ink
-  // blend (gives the sphere its disc silhouette); land is full ink.
+  // One quad per cell, wound SW→SE→NE→NW so its screen-space winding is
+  // front-facing under glyphcss's backface cull — otherwise the cull keeps the
+  // far hemisphere and the globe renders mirrored (Africa left of South
+  // America). Ocean cells are a faint paper-ink blend (gives the sphere its
+  // disc silhouette); land is full ink.
   function buildGlobePolygons(step: number, land: string, ocean: string) {
     const polygons = [];
     for (let lat = -90; lat < 90; lat += step)
@@ -92,10 +92,10 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
         const color = landFraction(lat, lon, step) >= 0.3 ? land : ocean;
         polygons.push({
           vertices: [
-            toVec3(lat + step, lon),
-            toVec3(lat + step, lon + step),
-            toVec3(lat, lon + step),
             toVec3(lat, lon),
+            toVec3(lat, lon + step),
+            toVec3(lat + step, lon + step),
+            toVec3(lat + step, lon),
           ],
           color,
         });
