@@ -30,11 +30,11 @@ const rows = lines.length;
 <style>
   .glyphart { margin: 0; }
   .glyphart-stage { container-type: inline-size; }
-  /* Fill the column width, but cap the height so a tall shape stays a tidy
-     accent and is always fully visible (no clipping). Centred in its column. */
+  /* Fill the column width; the baked art carries its own margin so it's whole.
+     Height follows the art's aspect — centred in its column. */
   .glyphart-pre {
     font-family: var(--font-mono);
-    font-size: min(calc(100cqw / (var(--cols) * 0.6)), calc(var(--cap, 300px) / var(--rows)));
+    font-size: calc(100cqw / (var(--cols) * 0.6));
     line-height: 1;
     white-space: pre;
     width: fit-content;

@@ -45,13 +45,13 @@ function bake(name, polygons, camOpts, cols, rows, shadows = false) {
 
 // ── Coliseum: the model, zoomed out for margin, self-shadowed ──────────────
 bake('coliseum', fitToUnitBbox(parseObj(readFileSync(OBJ, 'utf8')).polygons),
-  { rotX: 1.12, rotY: 0.5, zoom: 0.34 }, 104, 56, true);
+  { rotX: 1.12, rotY: 0.5, zoom: 0.3 }, 108, 58, true);
 
-// ── Play: an extruded triangle inside an extruded ring, angled so the
-//    extrusion depth shows. ──────────────────────────────────────────────────
+// ── Play: an extruded ring + a separate, smaller extruded triangle well
+//    inside it (a clear gap so the two shapes never fuse), angled for depth. ──
 function buildPlay() {
   const polys = [];
-  const rz = 0.17, tz = 0.27, ri = 0.58, ro = 0.92, seg = 72;
+  const rz = 0.16, tz = 0.24, ri = 0.6, ro = 0.92, seg = 80;
   const pt = (a, r, z) => [Math.cos(a) * r, Math.sin(a) * r, z];
   for (let i = 0; i < seg; i++) {
     const a0 = (i / seg) * 2 * Math.PI, a1 = ((i + 1) / seg) * 2 * Math.PI;
@@ -60,10 +60,12 @@ function buildPlay() {
     polys.push({ vertices: [pt(a0, ro, -rz), pt(a1, ro, -rz), pt(a1, ro, rz), pt(a0, ro, rz)] });     // outer
     polys.push({ vertices: [pt(a0, ri, rz), pt(a1, ri, rz), pt(a1, ri, -rz), pt(a0, ri, -rz)] });     // inner
   }
-  const tri = [[-0.32, -0.42], [-0.32, 0.42], [0.46, 0]];
+  // Triangle kept well within the ring's inner radius (0.6) — corners reach
+  // ~0.42 from center, leaving a clear ring of empty space around it.
+  const tri = [[-0.26, -0.3], [-0.26, 0.3], [0.34, 0]];
   const f = tri.map(([x, y]) => [x, y, tz]), bk = tri.map(([x, y]) => [x, y, -tz]);
   polys.push({ vertices: f }, { vertices: [...bk].reverse() });
   for (let i = 0; i < 3; i++) { const j = (i + 1) % 3; polys.push({ vertices: [f[i], f[j], bk[j], bk[i]] }); }
   return polys;
 }
-bake('play', buildPlay(), { rotX: 0.42, rotY: 0.5, zoom: 0.38 }, 56, 36);
+bake('play', buildPlay(), { rotX: 0.42, rotY: 0.5, zoom: 0.32 }, 60, 40);
