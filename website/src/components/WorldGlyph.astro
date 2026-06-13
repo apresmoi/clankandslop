@@ -134,6 +134,7 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     // Markers are numbered ①② … to key against the flashpoint index that
     // runs beside the globe (WorldIndex block).
     const CIRCLED = '①②③④⑤⑥⑦⑧⑨';
+    const marks: Array<{ el: HTMLElement; lat: number; lon: number }> = [];
     (cfg.hotspots ?? []).forEach((h: any, i: number) => {
       const label = `${CIRCLED[i] ?? '◉'} ${h.name}${typeof h.p === 'number' ? ` · p ${h.p.toFixed(2)}` : ''}`;
       const spot = scene.addHotspot({
@@ -143,12 +144,35 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
       });
       spot.el.classList.add('worldglyph-spot');
       spot.el.textContent = label;
+      marks.push({ el: spot.el, lat: h.lat, lon: h.lon });
     });
-    // No auto-rotation: hotspot labels are positioned live and don't bake
-    // into the rotation keyframes — and a frozen edition shouldn't spin.
+
+    // glyphcss only culls hotspots that fall off-screen, not ones that rotate
+    // to the far side of the sphere — so without this the back markers show
+    // through the globe. Hide a label once its point faces away from the
+    // camera. Recompute only when the camera moves, so a still globe is free.
+    const camDepth = (lat: number, lon: number): number => {
+      const cl = Math.cos(lat * D), x = cl * Math.cos(lon * D), y = cl * Math.sin(lon * D), z = Math.sin(lat * D);
+      const i = Math.sin(camera.rotY) * y + Math.cos(camera.rotY) * x;
+      return Math.sin(camera.rotX) * i + Math.cos(camera.rotX) * z;
+    };
+    let lastY: number | null = null, lastX: number | null = null, raf = 0;
+    const cull = () => {
+      if (camera.rotY !== lastY || camera.rotX !== lastX) {
+        lastY = camera.rotY; lastX = camera.rotX;
+        for (const m of marks) {
+          const front = camDepth(m.lat, m.lon) > 0.04;
+          m.el.style.opacity = front ? '1' : '0';
+          m.el.style.pointerEvents = front ? '' : 'none';
+        }
+      }
+      raf = requestAnimationFrame(cull);
+    };
+    cull();
+
     // invert: -1 matches the upstream landing globe's drag feel.
     const controls = createGlyphOrbitControls(scene, { drag: true, wheel: false, invert: -1 });
-    scenes.set(host, { destroy: () => { controls.destroy(); scene.destroy(); } });
+    scenes.set(host, { destroy: () => { cancelAnimationFrame(raf); controls.destroy(); scene.destroy(); } });
     // The globe is sized for a wide desktop column; its eastern hotspot labels
     // run off narrow screens. Scale the whole host (sphere + labels together,
     // so alignment is preserved) down to the container, then re-center.
@@ -224,6 +248,7 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     padding: 0 3px;
     line-height: 1.4;
     height: auto !important;
+    transition: opacity 0.18s ease;
   }
   .worldglyph-caption {
     font-family: var(--font-sans);
