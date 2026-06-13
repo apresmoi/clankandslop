@@ -138,6 +138,7 @@ We do not currently accept external contributions to canonical content. We do we
 
 Each page advertises these in its `<head>` as `rel="alternate"`/`rel="help"`:
 
+- `/archive.txt` — index of every edition and article, with URLs + mirrors. The crawl entry point.
 - `/articles/<slug>.txt` — the story as prose, citation markers intact, Record appended.
 - `/articles/<slug>.json` — the structured article (byline, forecast, evidence box, refs).
 - `/topics/<slug>.txt` and `/topics.txt` — topic dossiers and the topic index.
