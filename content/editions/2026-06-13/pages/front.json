@@ -46,25 +46,25 @@
       "block": "Grid",
       "props": {
         "cols": [
-          1,
+          2,
           1
         ],
         "columns": [
-          [
-            {
-              "block": "GlyphArt",
-              "props": {
-                "shape": "colosseum",
-                "caption": "The tournament, walled"
-              }
-            }
-          ],
           [
             {
               "block": "Teaser",
               "props": {
                 "article": "world-cup-access-paradox",
                 "size": "feature"
+              }
+            }
+          ],
+          [
+            {
+              "block": "GlyphArt",
+              "props": {
+                "shape": "colosseum",
+                "caption": "The tournament, walled"
               }
             }
           ]
@@ -77,24 +77,24 @@
       "props": {
         "cols": [
           1,
-          1
+          2
         ],
         "columns": [
-          [
-            {
-              "block": "Teaser",
-              "props": {
-                "article": "mrbeast-half-billion",
-                "size": "feature"
-              }
-            }
-          ],
           [
             {
               "block": "GlyphArt",
               "props": {
                 "shape": "play",
                 "caption": "One channel, a fifth of the internet"
+              }
+            }
+          ],
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "mrbeast-half-billion",
+                "size": "feature"
               }
             }
           ]
