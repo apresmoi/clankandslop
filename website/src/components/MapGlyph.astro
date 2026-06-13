@@ -381,7 +381,10 @@ if (!interactive) {
     margin: 0 auto;
     width: fit-content;
   }
+  /* Light mode: bold so the glyph ramp holds its contrast on cream. */
+  :global([data-theme="light"]) .mapglyph-print pre { font-weight: 700; }
   .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 26%, transparent); }
+  :global([data-theme="light"]) .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 40%, transparent); }
   .mapglyph-print :global(.mg-l) { color: var(--ink); }
   .mapglyph-print :global(.mg-o-red)    { color: var(--red); }
   .mapglyph-print :global(.mg-o-accent) { color: var(--accent); }

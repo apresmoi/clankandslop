@@ -51,6 +51,9 @@ const rows = lines.length;
     }
   }
   .glyphart-play .glyphart-pre { color: var(--accent); }
+  /* Light mode: sparse glyphs read faint on cream — bold them for ink coverage
+     (monospace bold keeps the same advance width, so layout is unchanged). */
+  :global([data-theme="light"]) .glyphart-pre { font-weight: 700; }
   .glyphart-caption {
     flex: 0 0 auto;
     font-family: var(--font-sans);

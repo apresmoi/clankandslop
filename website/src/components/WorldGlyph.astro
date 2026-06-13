@@ -250,6 +250,9 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     width: max-content;
     margin: 0 auto;
   }
+  /* Light mode: bold the glyphs so the sparse density ramp keeps its contrast
+     on cream paper (same mono advance, so the projection is unchanged). */
+  :global([data-theme="light"]) .worldglyph-host { font-weight: 700; }
   .worldglyph-host:active {
     cursor: grabbing;
   }
