@@ -11,7 +11,8 @@
     "build": "npm run validate && astro build",
     "preview": "astro preview",
     "favicon": "node scripts/make-favicon.mjs",
-    "og": "node scripts/make-og.mjs"
+    "og": "node scripts/make-og.mjs",
+    "bake:glyphart": "node scripts/bake-glyphart.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",
