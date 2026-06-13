@@ -177,9 +177,14 @@ const heroMap = mapArt ? loadMap(lead.edition_date, mapArt.hero_map ?? mapArt.ma
 
   @media (max-width: 880px) {
     .hero-grid { grid-template-columns: 1fr; border-bottom: 0; }
-    .hero-lead { border-right: 0; border-bottom: 1px solid var(--hairline-strong); padding: 24px 4px; }
-    .hero-rail { padding: 24px 4px; }
+    .hero-lead { border-right: 0; border-bottom: 1px solid var(--hairline-strong); padding: 24px 0; }
+    .hero-rail { padding: 24px 0; }
     .hero-grid-split { grid-template-columns: 1fr; }
     .hero-grid-split .hero-lead + .hero-lead { border-left: 0; border-top: 1px solid var(--ink); }
+    /* Stacked: reset the desktop two-column asymmetric padding so the map and
+       the lead center on the page instead of hugging one side. */
+    .hero-grid-art { grid-template-columns: 1fr; }
+    .hero-art { padding: 8px 0 16px; border-right: 0; }
+    .hero-grid-art .hero-lead { padding: 16px 0 24px; border-bottom: 0; }
   }
 </style>
