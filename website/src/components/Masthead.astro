@@ -279,7 +279,9 @@ const {
       transform: translate(-50%, -50%);
     }
   }
-  @media (max-width: 380px) {
+  /* Archive lives in the section nav on small screens, so drop it from the
+     strip — it otherwise collides with the centered mini-nameplate. */
+  @media (max-width: 640px) {
     .meta-archive { display: none; }
   }
 </style>

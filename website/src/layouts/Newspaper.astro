@@ -117,9 +117,7 @@ const isArticle = path.startsWith('/articles/');
   <body>
     <Masthead edition={edition} date={date} tagline={tagline} compact={compact} ears={ears} />
     <div class="page">
-      {/* Section nav hidden for launch — Front Page · About don't earn the row yet.
-          Restore by uncommenting when more navigable sections exist. */}
-      {/* <SectionNav active={active} /> */}
+      <SectionNav active={active} />
       <slot />
       <Colophon editionNo={editionNo} volume={volume} nextBell={nextBell} />
     </div>
