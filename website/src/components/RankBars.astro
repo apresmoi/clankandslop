@@ -39,9 +39,9 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
       <div class={`rankbars-row${r.highlight ? ' is-subject' : ''}`}>
         <span class="rankbars-label">{r.label}{r.note && <em class="rankbars-note"> · {r.note}</em>}</span>
         <div class="rankbars-track">
-          <span class="rankbars-bar" aria-hidden="true" style={`width: calc((100% - 3.6em) * ${frac(r.value)})`}>{BLOCKS}</span>
-          <span class="rankbars-value">{fmt(r.value)}</span>
+          <span class="rankbars-bar" aria-hidden="true" style={`width:${frac(r.value) * 100}%`}>{BLOCKS}</span>
         </div>
+        <span class="rankbars-value">{fmt(r.value)}</span>
       </div>
     ))}
   </div>
@@ -81,10 +81,12 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
     flex-direction: column;
     gap: 4px;
   }
+  /* Row spans the full width: label pinned left, value pinned right, and the
+     bar right-aligned in the middle so its tip sits against the value. */
   .rankbars-row {
     display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    gap: 0 14px;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    gap: 0 12px;
     align-items: center;
   }
   .rankbars-label {
@@ -93,12 +95,9 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
     letter-spacing: 0.04em;
     color: var(--ink-soft);
     white-space: nowrap;
-    text-align: right;
   }
   .rankbars-note { color: var(--accent); font-style: italic; letter-spacing: 0; }
-  /* Bar grows from the baseline by the bar; its value rides the bar's tip, so
-     every bar reaches its number with no dead gap. */
-  .rankbars-track { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .rankbars-track { display: flex; justify-content: flex-end; min-width: 0; overflow: hidden; }
   .rankbars-bar {
     flex-shrink: 0;
     font-family: var(--font-mono);
@@ -110,8 +109,8 @@ const fmt = (v: number) => prefix + v.toFixed(precision);
     white-space: nowrap;
   }
   .rankbars-value {
-    flex-shrink: 0;
     white-space: nowrap;
+    text-align: right;
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--ink-soft);

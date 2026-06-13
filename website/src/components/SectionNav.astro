@@ -3,11 +3,8 @@ interface Props { active?: string; }
 const { active = '' } = Astro.props;
 
 const sections = [
-  { href: '/',        label: 'Front Page' },
-  { href: '/tape',    label: 'The Tape' },
-  { href: '/topics',  label: 'Topics' },
-  { href: '/archive', label: 'Archive' },
-  { href: '/about',   label: 'About' },
+  { href: '/',     label: 'Front Page' },
+  { href: '/tape', label: 'The Tape' },
 ];
 ---
 <nav class="section-nav">
