@@ -12,12 +12,15 @@ interface Props {
   /** 'stretch' makes both columns equal height (so an illustration matches the
       text beside it); default 'start' lets each column size to its content. */
   align?: 'start' | 'stretch';
+  /** Default true draws the column rule between columns; false for rows where
+      a divider between art and text would be wrong. */
+  rule?: boolean;
   date: string;
 }
-const { cols, columns, finance = false, align = 'start', date } = Astro.props;
+const { cols, columns, finance = false, align = 'start', rule = true, date } = Astro.props;
 const template = cols.map((n) => `${n}fr`).join(' ');
 ---
-<div class={`cns-grid${finance ? ' cns-grid-finance' : ''}`} style={`grid-template-columns: ${template}; align-items: ${align};`}>
+<div class={`cns-grid${finance ? ' cns-grid-finance' : ''}${rule ? '' : ' cns-grid-norule'}`} style={`grid-template-columns: ${template}; align-items: ${align};`}>
   {columns.map((col, i) => (
     <div class={`cns-grid-col cns-grid-col-${i}`}>
       <PageRenderer blocks={col} date={date} />
@@ -43,6 +46,9 @@ const template = cols.map((n) => `${n}fr`).join(' ');
     gap: 24px;
     min-width: 0;
   }
+
+  /* No column rule — for art+text rows where a divider reads wrong. */
+  .cns-grid-norule > .cns-grid-col { border: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
 
   /* [1,2,1] middle column → centered well with side rules */
   .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-1 {

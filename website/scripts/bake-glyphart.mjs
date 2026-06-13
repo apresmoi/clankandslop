@@ -1,14 +1,13 @@
-// One-off: render the coliseum model to a static ASCII illustration with the
-// glyphcss rasterizer (headless), and commit the text. The heavy .obj stays on
-// the newsroom machine — only the few-KB ASCII ships. Re-run if the model or
-// camera changes.  Run from website/:  node scripts/bake-glyphart.mjs
+// One-off: render the glyph-art illustrations to static ASCII with the glyphcss
+// rasterizer (headless), and commit the text. Heavy source (the .obj) stays on
+// the newsroom machine — only the few-KB ASCII ships. Re-run if a model,
+// camera, or built shape changes.  Run from website/:  node scripts/bake-glyphart.mjs
 import { parseObj, buildRasterizeContext, rasterize, createGlyphPerspectiveCamera, computeSceneBbox } from 'glyphcss';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-// The model lives on the newsroom machine (datasets don't ship), like ETOPO.
 const OBJ = '/Users/apresmoi/asciss/website/public/gallery/obj/coliseum.obj';
 const OUT_DIR = resolve(here, '..', 'src', 'data');
 mkdirSync(OUT_DIR, { recursive: true });
@@ -21,18 +20,43 @@ function fitToUnitBbox(polys) {
   return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [(v[0] - cx) * k, (v[1] - cy) * k, (v[2] - cz) * k]) }));
 }
 
-const cols = 104, rows = 54;
-const polygons = fitToUnitBbox(parseObj(readFileSync(OBJ, 'utf8')).polygons);
-const camera = createGlyphPerspectiveCamera({ rotX: 1.12, rotY: 0.5, zoom: 0.42, distance: 100 });
-const ctx = buildRasterizeContext({
-  camera,
-  grid: { cols, rows, cellAspect: 1.67 },
-  polygons,
-  mode: 'solid',
-  directionalLight: { direction: [-0.45, -0.7, 0.6], intensity: 0.6 },
-  ambientLight: { intensity: 0.55 },
-  useColors: false,
-});
-const ascii = rasterize(ctx).replace(/[ \t]+$/gm, '');
-writeFileSync(resolve(OUT_DIR, 'glyphart-coliseum.txt'), ascii + '\n');
-console.log(`coliseum → src/data/glyphart-coliseum.txt (${cols}x${rows}, ${ascii.length} chars)`);
+function bake(name, polygons, camOpts, cols, rows) {
+  const camera = createGlyphPerspectiveCamera({ distance: 100, ...camOpts });
+  const ctx = buildRasterizeContext({
+    camera,
+    grid: { cols, rows, cellAspect: 1.67 },
+    polygons,
+    mode: 'solid',
+    directionalLight: { direction: [-0.45, -0.7, 0.6], intensity: 0.6 },
+    ambientLight: { intensity: 0.55 },
+    useColors: false,
+  });
+  const ascii = rasterize(ctx).replace(/[ \t]+$/gm, '');
+  writeFileSync(resolve(OUT_DIR, `glyphart-${name}.txt`), ascii + '\n');
+  console.log(`${name} → src/data/glyphart-${name}.txt (${cols}x${rows}, ${ascii.length} chars)`);
+}
+
+// ── Coliseum: the model ────────────────────────────────────────────────────
+bake('coliseum', fitToUnitBbox(parseObj(readFileSync(OBJ, 'utf8')).polygons),
+  { rotX: 1.12, rotY: 0.5, zoom: 0.42 }, 104, 54);
+
+// ── Play: an extruded triangle inside an extruded ring, angled so the
+//    extrusion depth shows. ──────────────────────────────────────────────────
+function buildPlay() {
+  const polys = [];
+  const rz = 0.17, tz = 0.27, ri = 0.58, ro = 0.92, seg = 72;
+  const pt = (a, r, z) => [Math.cos(a) * r, Math.sin(a) * r, z];
+  for (let i = 0; i < seg; i++) {
+    const a0 = (i / seg) * 2 * Math.PI, a1 = ((i + 1) / seg) * 2 * Math.PI;
+    polys.push({ vertices: [pt(a0, ro, rz), pt(a1, ro, rz), pt(a1, ri, rz), pt(a0, ri, rz)] });      // front
+    polys.push({ vertices: [pt(a0, ri, -rz), pt(a1, ri, -rz), pt(a1, ro, -rz), pt(a0, ro, -rz)] });  // back
+    polys.push({ vertices: [pt(a0, ro, -rz), pt(a1, ro, -rz), pt(a1, ro, rz), pt(a0, ro, rz)] });     // outer
+    polys.push({ vertices: [pt(a0, ri, rz), pt(a1, ri, rz), pt(a1, ri, -rz), pt(a0, ri, -rz)] });     // inner
+  }
+  const tri = [[-0.32, -0.42], [-0.32, 0.42], [0.46, 0]];
+  const f = tri.map(([x, y]) => [x, y, tz]), bk = tri.map(([x, y]) => [x, y, -tz]);
+  polys.push({ vertices: f }, { vertices: [...bk].reverse() });
+  for (let i = 0; i < 3; i++) { const j = (i + 1) % 3; polys.push({ vertices: [f[i], f[j], bk[j], bk[i]] }); }
+  return polys;
+}
+bake('play', buildPlay(), { rotX: 0.42, rotY: 0.5, zoom: 0.46 }, 54, 34);

@@ -64,12 +64,13 @@
               "block": "GlyphArt",
               "props": {
                 "shape": "colosseum",
-                "caption": "The tournament, walled"
+                "caption": "Coliseum"
               }
             }
           ]
         ],
-        "align": "stretch"
+        "align": "stretch",
+        "rule": false
       }
     },
     {
@@ -85,7 +86,7 @@
               "block": "GlyphArt",
               "props": {
                 "shape": "play",
-                "caption": "One channel, a fifth of the internet"
+                "caption": "Play"
               }
             }
           ],
@@ -99,7 +100,8 @@
             }
           ]
         ],
-        "align": "stretch"
+        "align": "stretch",
+        "rule": false
       }
     },
     {
