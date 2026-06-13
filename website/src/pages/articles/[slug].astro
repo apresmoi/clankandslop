@@ -98,7 +98,8 @@ const topicChips = (article.topics ?? []).map((s) => getTopic(s)).filter((t) => 
         value={conf.value}
         interval={conf.interval}
         revision={article.revision}
-        lastUpdatedMinAgo={article.last_updated_min_ago}
+        editionDate={article.edition_date}
+        timestamp={article.timestamp}
         nextUpdateUtc={article.next_update_utc}
       />
     )}

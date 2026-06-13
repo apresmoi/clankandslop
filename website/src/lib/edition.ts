@@ -55,7 +55,16 @@ export function loadEdition(date: string): Edition {
  */
 export function loadArticle(date: string, slug: string): Article {
   const path = resolve(scopeDir(date), 'articles', `${slug}.json`);
-  return JSON.parse(readFileSync(path, 'utf-8')) as Article;
+  const article = JSON.parse(readFileSync(path, 'utf-8')) as Article;
+  // Reading time is computed from the body, never hand-authored — ~220 words a
+  // minute over the prose, citation markers stripped.
+  const words = (article.body ?? [])
+    .join(' ')
+    .replace(/\[E\d+\]/g, '')
+    .split(/\s+/)
+    .filter(Boolean).length;
+  if (article.byline) article.byline.read_time_min = Math.max(1, Math.round(words / 220));
+  return article;
 }
 
 /**
@@ -186,7 +195,8 @@ export interface Article {
   };
   timestamp: string;
   revision: number;
-  last_updated_min_ago: number;
+  /** @deprecated computed live from `timestamp`; no longer authored. */
+  last_updated_min_ago?: number;
   next_update_utc?: string;
   confidence?: {
     label: string;

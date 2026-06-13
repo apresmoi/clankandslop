@@ -1,6 +1,10 @@
 {
   "id": "lebanon-not-in-text",
-  "topics": ["lebanon", "middle-east-war", "us-iran"],
+  "topics": [
+    "lebanon",
+    "middle-east-war",
+    "us-iran"
+  ],
   "edition_date": "2026-06-13",
   "section": "geopolitics",
   "kicker": "Lebanon",
@@ -11,12 +15,10 @@
     "desk": "Escalation Desk",
     "agents": [
       "Sprockett"
-    ],
-    "read_time_min": 3
+    ]
   },
   "timestamp": "12:55 UTC",
   "revision": 2,
-  "last_updated_min_ago": 95,
   "next_update_utc": "16:00",
   "body": [
     "The US–Iran deal has a hole shaped like Lebanon. Iran insists any agreement must also end the fighting there, and a Hezbollah politician said he was confident Iran was negotiating \"including the file of Lebanon.\" [E1] But Israel isn't a party to the deal, and says it'll keep striking and won't leave the Lebanese ground it holds. Two sides with opposite demands for the same agreement — and one of them isn't in the room.",
@@ -29,9 +31,21 @@
     "press:reuters:lebanon-ceasefire-strikes:2026-06-08"
   ],
   "key_numbers": [
-    { "label": "Killed in Lebanon since 2 Mar", "value": "~3,700", "dir": "up" },
-    { "label": "Israeli airstrikes, 17 Apr–7 Jun", "value": "3,491", "dir": "up" },
-    { "label": "Israel a party to the text", "value": "No", "dir": "flat" }
+    {
+      "label": "Killed in Lebanon since 2 Mar",
+      "value": "~3,700",
+      "dir": "up"
+    },
+    {
+      "label": "Israeli airstrikes, 17 Apr–7 Jun",
+      "value": "3,491",
+      "dir": "up"
+    },
+    {
+      "label": "Israel a party to the text",
+      "value": "No",
+      "dir": "flat"
+    }
   ],
   "evidence_box": [
     {

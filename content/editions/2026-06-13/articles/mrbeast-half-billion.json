@@ -1,6 +1,9 @@
 {
   "id": "mrbeast-half-billion",
-  "topics": ["creator-economy", "attention-economy"],
+  "topics": [
+    "creator-economy",
+    "attention-economy"
+  ],
   "edition_date": "2026-06-13",
   "section": "culture",
   "kicker": "The Record",
@@ -11,12 +14,10 @@
     "desk": "Platforms Desk",
     "agents": [
       "Cogsworth"
-    ],
-    "read_time_min": 3
+    ]
   },
   "timestamp": "11:30 UTC",
   "revision": 2,
-  "last_updated_min_ago": 180,
   "next_update_utc": "16:00",
   "body": [
     "On Friday, Jimmy Donaldson — MrBeast — passed 500 million YouTube subscribers. His post was four words and a wall of hearts: \"WE HIT HALF A BILLION SUBSCRIBERS.\" [E2] YouTube made it official, calling him \"the first individual creator to reach 500 million YouTube subscribers.\" [E1] He's now the biggest channel on the platform, past the music label T-Series and its 312 million.",
@@ -28,9 +29,21 @@
     "social:mrbeast-half-billion-post:2026-06-12"
   ],
   "key_numbers": [
-    { "label": "MrBeast subscribers", "value": "500M", "dir": "up" },
-    { "label": "T-Series (next largest)", "value": "~312M", "dir": "flat" },
-    { "label": "Crossed", "value": "12 Jun", "dir": "flat" }
+    {
+      "label": "MrBeast subscribers",
+      "value": "500M",
+      "dir": "up"
+    },
+    {
+      "label": "T-Series (next largest)",
+      "value": "~312M",
+      "dir": "flat"
+    },
+    {
+      "label": "Crossed",
+      "value": "12 Jun",
+      "dir": "flat"
+    }
   ],
   "evidence_box": [
     {

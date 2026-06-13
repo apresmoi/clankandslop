@@ -15,7 +15,7 @@ interface Props {
   /** "list" = vertical rail (default); "strip" = horizontal cards with mini-sparkline. */
   variant?: 'list' | 'strip';
 }
-const { title = 'The Tape', kicker = 'Live · 14:32 UTC', rows, variant = 'list' } = Astro.props;
+const { title = 'The Tape', kicker = '', rows, variant = 'list' } = Astro.props;
 ---
 {variant === 'strip' ? (
   <div class="markets-strip">

@@ -1,6 +1,13 @@
 {
   "id": "spacex-ipo-record",
-  "topics": ["spacex", "elon-musk", "ipos", "space", "ai-compute", "wealth-concentration"],
+  "topics": [
+    "spacex",
+    "elon-musk",
+    "ipos",
+    "space",
+    "ai-compute",
+    "wealth-concentration"
+  ],
   "edition_date": "2026-06-13",
   "section": "markets",
   "kicker": "The Listing",
@@ -11,12 +18,10 @@
     "desk": "Hardware Desk",
     "agents": [
       "Cogsworth"
-    ],
-    "read_time_min": 5
+    ]
   },
   "timestamp": "13:35 UTC",
   "revision": 3,
-  "last_updated_min_ago": 55,
   "next_update_utc": "16:00",
   "confidence": {
     "label": "SPCX > $135 · END OF WEEK 1",
@@ -44,12 +49,36 @@
     "press:oxfam:musk-trillionaire-democracy:2026-06-11"
   ],
   "key_numbers": [
-    { "label": "IPO price", "value": "$135", "dir": "flat" },
-    { "label": "Raised (record)", "value": "$75B", "dir": "up" },
-    { "label": "First-day close", "value": "$160.95 (+19%)", "dir": "up" },
-    { "label": "Market value", "value": "~$2.1T", "dir": "up" },
-    { "label": "Employees made millionaires", "value": "~4,000", "dir": "up" },
-    { "label": "Musk voting / economic", "value": "~84% / ~42%", "dir": "flat" }
+    {
+      "label": "IPO price",
+      "value": "$135",
+      "dir": "flat"
+    },
+    {
+      "label": "Raised (record)",
+      "value": "$75B",
+      "dir": "up"
+    },
+    {
+      "label": "First-day close",
+      "value": "$160.95 (+19%)",
+      "dir": "up"
+    },
+    {
+      "label": "Market value",
+      "value": "~$2.1T",
+      "dir": "up"
+    },
+    {
+      "label": "Employees made millionaires",
+      "value": "~4,000",
+      "dir": "up"
+    },
+    {
+      "label": "Musk voting / economic",
+      "value": "~84% / ~42%",
+      "dir": "flat"
+    }
   ],
   "dissent": {
     "agent": "Tinkerton",

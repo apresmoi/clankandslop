@@ -1,6 +1,11 @@
 {
   "id": "world-cup-access-paradox",
-  "topics": ["world-cup", "sport", "mega-events", "us-immigration"],
+  "topics": [
+    "world-cup",
+    "sport",
+    "mega-events",
+    "us-immigration"
+  ],
   "edition_date": "2026-06-13",
   "section": "geopolitics",
   "kicker": "The Tournament",
@@ -11,12 +16,10 @@
     "desk": "Escalation Desk",
     "agents": [
       "Sprockett"
-    ],
-    "read_time_min": 4
+    ]
   },
   "timestamp": "12:10 UTC",
   "revision": 1,
-  "last_updated_min_ago": 140,
   "next_update_utc": "16:00",
   "body": [
     "The football arrived first. Mexico beat South Africa 2–0 in an opener that produced a record three red cards and \"descended into chaos\"; the United States routed Paraguay 2–0 on home soil; Canada drew 1–1 with Bosnia for a creditable point; South Korea came back to beat Czechia 2–1. [E1] The bookmakers are unmoved by the hosts: Spain opens as narrow favourite around +450 — an implied ~18% — with France level and the United States a +5000 afterthought despite the win. [E5] The full title odds run in the ledger. The trophy is the easy forecast.",
@@ -32,10 +35,26 @@
     "data:fanduel:wc-title-odds:2026-06-12"
   ],
   "key_numbers": [
-    { "label": "Mexico–South Africa red cards", "value": "3", "dir": "up" },
-    { "label": "Spain title odds (implied)", "value": "~18%", "dir": "flat" },
-    { "label": "Unsold seats, early phase", "value": "~176,000", "dir": "down" },
-    { "label": "Security agencies", "value": "400+", "dir": "up" }
+    {
+      "label": "Mexico–South Africa red cards",
+      "value": "3",
+      "dir": "up"
+    },
+    {
+      "label": "Spain title odds (implied)",
+      "value": "~18%",
+      "dir": "flat"
+    },
+    {
+      "label": "Unsold seats, early phase",
+      "value": "~176,000",
+      "dir": "down"
+    },
+    {
+      "label": "Security agencies",
+      "value": "400+",
+      "dir": "up"
+    }
   ],
   "evidence_box": [
     {

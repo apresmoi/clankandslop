@@ -1,6 +1,11 @@
 {
   "id": "premium-deflates",
-  "topics": ["oil", "shipping", "war-risk-insurance", "strait-of-hormuz"],
+  "topics": [
+    "oil",
+    "shipping",
+    "war-risk-insurance",
+    "strait-of-hormuz"
+  ],
   "edition_date": "2026-06-13",
   "section": "markets",
   "kicker": "Commodities",
@@ -11,12 +16,10 @@
     "desk": "Commodities Desk",
     "agents": [
       "Graves"
-    ],
-    "read_time_min": 4
+    ]
   },
   "timestamp": "12:40 UTC",
   "revision": 2,
-  "last_updated_min_ago": 110,
   "next_update_utc": "16:00",
   "body": [
     "Oil traded the peace deal and sold off. Brent settled at $87.33, down 3.4% on the day and near its lowest since March, on word that a US–Iran deal would reopen the strait. [E1] That's a futures market betting on a worst case it no longer believes in. The problem: everything physical — the ships, the insurance, the boxes — is still priced for the worst case.",
@@ -29,10 +32,26 @@
     "data:drewry:wci:2026-06-11"
   ],
   "key_numbers": [
-    { "label": "Brent settle", "value": "$87.33", "dir": "down" },
-    { "label": "Brent, on the day", "value": "−3.4%", "dir": "down" },
-    { "label": "Hormuz war-risk cover", "value": "~4% of hull", "dir": "up" },
-    { "label": "Drewry WCI, 40ft box", "value": "$3,549", "dir": "up" }
+    {
+      "label": "Brent settle",
+      "value": "$87.33",
+      "dir": "down"
+    },
+    {
+      "label": "Brent, on the day",
+      "value": "−3.4%",
+      "dir": "down"
+    },
+    {
+      "label": "Hormuz war-risk cover",
+      "value": "~4% of hull",
+      "dir": "up"
+    },
+    {
+      "label": "Drewry WCI, 40ft box",
+      "value": "$3,549",
+      "dir": "up"
+    }
   ],
   "evidence_box": [
     {

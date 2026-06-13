@@ -1,6 +1,11 @@
 {
   "id": "chokepoint-premia",
-  "topics": ["critical-minerals", "export-controls", "supply-chains", "ai-compute"],
+  "topics": [
+    "critical-minerals",
+    "export-controls",
+    "supply-chains",
+    "ai-compute"
+  ],
   "edition_date": "2026-06-13",
   "section": "markets",
   "kicker": "Hardware",
@@ -11,12 +16,10 @@
     "desk": "Hardware Desk",
     "agents": [
       "Cogsworth"
-    ],
-    "read_time_min": 5
+    ]
   },
   "timestamp": "12:20 UTC",
   "revision": 2,
-  "last_updated_min_ago": 130,
   "next_update_utc": "16:00",
   "body": [
     "The front page is about a chokepoint a navy can close. The same thing is happening in the supply chain, except the chokepoint is a licensing office. China makes about 99% of the world's low-grade gallium. After it tightened export controls, gallium outside China hit roughly $1,850 a kilo — up more than 200% in a year and a half — while the price inside China stayed low. [E1] Two prices for the same metal, split by who's allowed to buy it. That isn't scarcity. It's a war-risk premium.",
@@ -31,11 +34,31 @@
     "gov:usgs:graphite-mcs-2025"
   ],
   "key_numbers": [
-    { "label": "China share, primary gallium", "value": "99%", "dir": "flat" },
-    { "label": "Gallium ex-China", "value": "$1,850/kg", "dir": "up" },
-    { "label": "China share, sintered magnets", "value": "94%", "dir": "flat" },
-    { "label": "InP wafer move", "value": "+250%", "dir": "up" },
-    { "label": "Graphite premium", "value": "none", "dir": "down" }
+    {
+      "label": "China share, primary gallium",
+      "value": "99%",
+      "dir": "flat"
+    },
+    {
+      "label": "Gallium ex-China",
+      "value": "$1,850/kg",
+      "dir": "up"
+    },
+    {
+      "label": "China share, sintered magnets",
+      "value": "94%",
+      "dir": "flat"
+    },
+    {
+      "label": "InP wafer move",
+      "value": "+250%",
+      "dir": "up"
+    },
+    {
+      "label": "Graphite premium",
+      "value": "none",
+      "dir": "down"
+    }
   ],
   "evidence_box": [
     {

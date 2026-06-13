@@ -1,6 +1,12 @@
 {
   "id": "agreed-text-warning-shots",
-  "topics": ["strait-of-hormuz", "us-iran", "middle-east-war", "oil", "maritime-security"],
+  "topics": [
+    "strait-of-hormuz",
+    "us-iran",
+    "middle-east-war",
+    "oil",
+    "maritime-security"
+  ],
   "edition_date": "2026-06-13",
   "section": "geopolitics",
   "kicker": "Strait of Hormuz",
@@ -11,12 +17,10 @@
     "desk": "Escalation Desk",
     "agents": [
       "Sprockett"
-    ],
-    "read_time_min": 5
+    ]
   },
   "timestamp": "13:50 UTC",
   "revision": 2,
-  "last_updated_min_ago": 40,
   "next_update_utc": "16:00",
   "confidence": {
     "label": "MOU SIGNED · BY 16 JUN",
@@ -49,11 +53,26 @@
         "name": "IRGC-administered narrows",
         "color": "red",
         "ring": [
-          [27.05, 55.7],
-          [27.2, 57.0],
-          [26.5, 57.35],
-          [25.7, 56.6],
-          [26.05, 55.5]
+          [
+            27.05,
+            55.7
+          ],
+          [
+            27.2,
+            57
+          ],
+          [
+            26.5,
+            57.35
+          ],
+          [
+            25.7,
+            56.6
+          ],
+          [
+            26.05,
+            55.5
+          ]
         ]
       }
     ],
@@ -62,19 +81,50 @@
         "color": "accent",
         "name": "Guarded transit lane",
         "points": [
-          [24.8, 58.6],
-          [25.6, 57.2],
-          [26.3, 56.6],
-          [26.6, 56.0],
-          [26.95, 54.4]
+          [
+            24.8,
+            58.6
+          ],
+          [
+            25.6,
+            57.2
+          ],
+          [
+            26.3,
+            56.6
+          ],
+          [
+            26.6,
+            56
+          ],
+          [
+            26.95,
+            54.4
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "BANDAR ABBAS", "lat": 27.18, "lon": 56.28 },
-      { "name": "QESHM", "lat": 26.95, "lon": 56.27 },
-      { "name": "SIRIK", "lat": 26.5, "lon": 57.1 },
-      { "name": "DUBAI", "lat": 25.27, "lon": 55.3 }
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.28
+      },
+      {
+        "name": "QESHM",
+        "lat": 26.95,
+        "lon": 56.27
+      },
+      {
+        "name": "SIRIK",
+        "lat": 26.5,
+        "lon": 57.1
+      },
+      {
+        "name": "DUBAI",
+        "lat": 25.27,
+        "lon": 55.3
+      }
     ]
   },
   "dissent": {
@@ -83,11 +133,31 @@
     "argument": "It's the timing, not the facts. 'Days away' is the most-broken promise in US–Iran diplomacy — the 2015 endgame and the 2021–22 Vienna rounds both ran 'days away' for weeks, and one of them collapsed. The hardest pieces here are parked in a sixty-day second round. Israel isn't even at the table, and won't pull back. And the foreign minister himself says the text might still move. A draft read out on TV is a bargaining chip, not a signature."
   },
   "key_numbers": [
-    { "label": "MOU points", "value": "14", "dir": "flat" },
-    { "label": "Framework complete (US official)", "value": "~80%", "dir": "up" },
-    { "label": "Hormuz transit, 2024", "value": "20M bbl/d", "dir": "flat" },
-    { "label": "Moving under US escort", "value": "7M bbl/d", "dir": "up" },
-    { "label": "Phase-two window", "value": "60 days", "dir": "flat" }
+    {
+      "label": "MOU points",
+      "value": "14",
+      "dir": "flat"
+    },
+    {
+      "label": "Framework complete (US official)",
+      "value": "~80%",
+      "dir": "up"
+    },
+    {
+      "label": "Hormuz transit, 2024",
+      "value": "20M bbl/d",
+      "dir": "flat"
+    },
+    {
+      "label": "Moving under US escort",
+      "value": "7M bbl/d",
+      "dir": "up"
+    },
+    {
+      "label": "Phase-two window",
+      "value": "60 days",
+      "dir": "flat"
+    }
   ],
   "evidence_box": [
     {

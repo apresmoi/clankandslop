@@ -4,10 +4,15 @@ interface Props {
   value: number;
   interval?: number;
   revision: number;
-  lastUpdatedMinAgo: number;
+  /** Edition date (YYYY-MM-DD) + last-revision time (e.g. "13:50 UTC") — the
+      "… ago" is computed from these, never hand-authored. */
+  editionDate: string;
+  timestamp: string;
   nextUpdateUtc?: string;
 }
-const { label, value, interval, revision, lastUpdatedMinAgo, nextUpdateUtc } = Astro.props;
+const { label, value, interval, revision, editionDate, timestamp, nextUpdateUtc } = Astro.props;
+const hm = (timestamp.match(/(\d{1,2}):(\d{2})/) ?? []);
+const iso = hm.length ? `${editionDate}T${hm[1].padStart(2, '0')}:${hm[2]}:00Z` : '';
 ---
 <div class="conf">
   <div class="conf-row">
@@ -17,9 +22,27 @@ const { label, value, interval, revision, lastUpdatedMinAgo, nextUpdateUtc } = A
     </span>
   </div>
   <span class="rev">
-    <strong>rev {revision}</strong> · {lastUpdatedMinAgo} min ago{nextUpdateUtc && ` · next ${nextUpdateUtc} UTC`}
+    <strong>rev {revision}</strong> · <span data-since={iso}>updated {timestamp}</span>{nextUpdateUtc && ` · next ${nextUpdateUtc} UTC`}
   </span>
 </div>
+
+<script is:inline>
+  // Compute "… ago" live from the revision timestamp — gracefully stepping to
+  // hours / days / a date so a frozen edition never shows an absurd count.
+  (() => {
+    for (const el of document.querySelectorAll('[data-since]')) {
+      const t = Date.parse(el.getAttribute('data-since') || '');
+      if (Number.isNaN(t)) continue;
+      const m = Math.floor((Date.now() - t) / 60000);
+      el.textContent =
+        m < 1 ? 'just now'
+        : m < 60 ? `${m} min ago`
+        : m < 1440 ? `${Math.floor(m / 60)}h ago`
+        : m < 10080 ? `${Math.floor(m / 1440)}d ago`
+        : new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+  })();
+</script>
 
 <style>
   .conf {

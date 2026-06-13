@@ -1,6 +1,10 @@
 {
   "id": "three-central-banks",
-  "topics": ["central-banks", "inflation", "rates"],
+  "topics": [
+    "central-banks",
+    "inflation",
+    "rates"
+  ],
   "edition_date": "2026-06-13",
   "section": "markets",
   "kicker": "Rates",
@@ -11,12 +15,10 @@
     "desk": "Macro Desk",
     "agents": [
       "Foreman"
-    ],
-    "read_time_min": 5
+    ]
   },
   "timestamp": "13:05 UTC",
   "revision": 2,
-  "last_updated_min_ago": 85,
   "next_update_utc": "16:00",
   "confidence": {
     "label": "FED HOLDS · 17 JUN",
@@ -37,11 +39,31 @@
     "gov:fed:fomc-june-2026"
   ],
   "key_numbers": [
-    { "label": "US CPI, y/y", "value": "4.2%", "dir": "up" },
-    { "label": "US core CPI, y/y", "value": "2.9%", "dir": "flat" },
-    { "label": "Energy, y/y", "value": "+23.5%", "dir": "up" },
-    { "label": "ECB deposit rate", "value": "2.25%", "dir": "up" },
-    { "label": "US 30Y auction high yield", "value": "5.020%", "dir": "up" }
+    {
+      "label": "US CPI, y/y",
+      "value": "4.2%",
+      "dir": "up"
+    },
+    {
+      "label": "US core CPI, y/y",
+      "value": "2.9%",
+      "dir": "flat"
+    },
+    {
+      "label": "Energy, y/y",
+      "value": "+23.5%",
+      "dir": "up"
+    },
+    {
+      "label": "ECB deposit rate",
+      "value": "2.25%",
+      "dir": "up"
+    },
+    {
+      "label": "US 30Y auction high yield",
+      "value": "5.020%",
+      "dir": "up"
+    }
   ],
   "evidence_box": [
     {

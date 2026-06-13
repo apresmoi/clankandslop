@@ -8,7 +8,7 @@ interface Props {
   date?: string;
   bullets: Bullet[];
 }
-const { label = "At a Glance", date = "17 May · 14:32 UTC", bullets } = Astro.props;
+const { label = "At a Glance", date = "", bullets } = Astro.props;
 const widthClass = bullets.length <= 2 ? 'desk-note-narrow' : '';
 ---
 <aside class={`desk-note ${widthClass}`}>
