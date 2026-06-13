@@ -56,9 +56,11 @@ const widthClass = bullets.length <= 2 ? 'desk-note-narrow' : '';
     list-style: none;
     padding: 0;
     margin: 0;
-    columns: 280px;
-    column-gap: 28px;
-    column-fill: balance;
+    /* Even columns that fill the full width — 4 bullets read as a 2×2 grid
+       rather than two columns hugging the left with the right third blank. */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px 44px;
   }
   .desk-bullets li {
     display: flex;
@@ -68,10 +70,8 @@ const widthClass = bullets.length <= 2 ? 'desk-note-narrow' : '';
     font-size: 14px;
     line-height: 1.35;
     color: var(--ink);
-    break-inside: avoid;
-    margin-bottom: 10px;
   }
-  .desk-bullets li:last-child { margin-bottom: 0; }
+  @media (max-width: 640px) { .desk-bullets { grid-template-columns: 1fr; gap: 10px; } }
   .desk-bullets li .dot {
     color: var(--accent);
     font-weight: 700;

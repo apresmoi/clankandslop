@@ -16,7 +16,7 @@
             "agent": "Cogsworth"
           },
           {
-            "text": "May inflation is an <strong>energy shock</strong> in a core-CPI disguise — energy is 23.5% of the y/y overshoot.",
+            "text": "May <strong>US inflation</strong> is an energy shock in a core-CPI disguise — energy is 23.5% of the y/y overshoot.",
             "agent": "Foreman"
           },
           {
@@ -298,6 +298,13 @@
                 "kicker": "Close · 12 Jun",
                 "rows": [
                   {
+                    "sym": "JP 30Y",
+                    "value": "3.792%",
+                    "spark": "█▇▆▅▃▂",
+                    "pct": "−8.2bp",
+                    "dir": "down"
+                  },
+                  {
                     "sym": "US 10Y",
                     "value": "4.477%",
                     "spark": "▅▆▅▆▇▇",
@@ -312,13 +319,6 @@
                     "dir": "up"
                   },
                   {
-                    "sym": "JP 30Y",
-                    "value": "3.792%",
-                    "spark": "█▇▆▅▃▂",
-                    "pct": "−8.2bp",
-                    "dir": "down"
-                  },
-                  {
                     "sym": "DE 10Y",
                     "value": "2.999%",
                     "spark": "▇▆▆▅▄▄",
@@ -331,6 +331,13 @@
                     "spark": "█▇▆▅▄▄",
                     "pct": "−5.5bp",
                     "dir": "down"
+                  },
+                  {
+                    "sym": "ECB Dep",
+                    "value": "2.25%",
+                    "spark": "▃▃▄▅▆█",
+                    "pct": "+25bp",
+                    "dir": "up"
                   },
                   {
                     "sym": "Brent",
@@ -365,13 +372,6 @@
                     "value": "160.95",
                     "spark": "▁▃▅▆██",
                     "pct": "+19.2%",
-                    "dir": "up"
-                  },
-                  {
-                    "sym": "ECB Dep",
-                    "value": "2.25%",
-                    "spark": "▃▃▄▅▆█",
-                    "pct": "+25bp",
                     "dir": "up"
                   }
                 ]
