@@ -1,0 +1,95 @@
+---
+/** Built ASCII glyph-art illustrations, typeset server-side (no JS). glyphcss
+    is great for organic masses like the globe, but flat icons render as line
+    noise — so these are computed character grids instead.
+      colosseum — an elliptical, arcaded amphitheatre (the World Cup "fortress")
+      play      — a play triangle inside a ring (YouTube / MrBeast) */
+interface Props {
+  shape: 'colosseum' | 'play';
+  caption?: string;
+}
+const { shape, caption = '' } = Astro.props;
+
+// ── play: a right-pointing triangle inside a ring ──────────────────────────
+function buildPlay(): string {
+  const W = 40, H = 20;
+  const rows: string[] = [];
+  for (let r = 0; r < H; r++) {
+    let line = '';
+    for (let c = 0; c < W; c++) {
+      const nx = (c / (W - 1)) * 2 - 1;
+      const ny = (r / (H - 1)) * 2 - 1;
+      const d = Math.hypot(nx, ny);
+      const inRing = d <= 0.98 && d >= 0.83;
+      // triangle: apex at x=+0.46, base at x=-0.34
+      const inTri = nx >= -0.34 && nx <= 0.46 && Math.abs(ny) <= ((0.46 - nx) / 0.8) * 0.46;
+      line += inRing || inTri ? '█' : ' ';
+    }
+    rows.push(line.replace(/\s+$/, ''));
+  }
+  return rows.join('\n');
+}
+
+// ── colosseum: the amphitheatre from above — concentric tiers, the ring of
+//    entrances, the pitch. Clean bands read better than tiny arches. ─────────
+function buildColosseum(): string {
+  const W = 62, H = 24;
+  const ENTRANCES = 14;
+  const rows: string[] = [];
+  for (let r = 0; r < H; r++) {
+    let line = '';
+    for (let c = 0; c < W; c++) {
+      const nx = (c / (W - 1)) * 2 - 1;            // -1..1
+      const ny = (r / (H - 1)) * 2 - 1;
+      const e = Math.hypot(nx, ny / 0.7);           // elliptical radius (wide)
+      const ang = Math.atan2(ny / 0.7, nx);
+      // Radial entrances (vomitoria) cut through the outer stands.
+      const slot = Math.abs(((ang / (2 * Math.PI)) * ENTRANCES) % 1 - 0.5) < 0.12;
+      if (e > 1.0) line += ' ';
+      else if (e >= 0.84) line += slot ? ' ' : '█'; // outer stands + entrances
+      else if (e >= 0.62) line += '▓';              // upper tier
+      else if (e >= 0.40) line += '▒';              // lower tier
+      else if (e >= 0.34) line += '█';              // pitch rail
+      else line += Math.abs(nx) < 0.02 ? '│' : '·'; // pitch + halfway line
+    }
+    rows.push(line.replace(/\s+$/, ''));
+  }
+  return rows.join('\n');
+}
+
+const art = shape === 'play' ? buildPlay() : buildColosseum();
+const cls = `glyphart glyphart-${shape}`;
+---
+<figure class={cls}>
+  <pre class="glyphart-pre">{art}</pre>
+  {caption && <figcaption class="glyphart-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .glyphart { margin: 0; container-type: inline-size; }
+  .glyphart-pre {
+    font-family: var(--font-mono);
+    /* Fill the frame: cell ≈ 0.6em wide, grids are 40 (play) / 62 (colosseum)
+       columns. Cap so it never gets gawky. */
+    font-size: clamp(4px, calc(100cqw / (var(--cols) * 0.6)), 13px);
+    line-height: 1.04;
+    white-space: pre;
+    margin: 0 auto;
+    width: fit-content;
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+  .glyphart-play .glyphart-pre { --cols: 40; color: var(--accent); }
+  .glyphart-colosseum .glyphart-pre { --cols: 62; }
+  .glyphart-caption {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--hairline);
+    text-align: center;
+  }
+</style>

@@ -15,6 +15,7 @@ import WorldGlyph from './WorldGlyph.astro';
 import MapGlyph from './MapGlyph.astro';
 import WorldIndex from './WorldIndex.astro';
 import RankBars from './RankBars.astro';
+import GlyphArt from './GlyphArt.astro';
 import Grid from './Grid.astro';
 import { loadArticle, loadAgent, loadMap, loadEdition, type Article, type Agent } from '../lib/edition.ts';
 import type { Block } from '../lib/page.ts';
@@ -35,7 +36,7 @@ const { blocks, date, flow = false } = Astro.props;
 const REGISTRY: Record<string, any> = {
   Hero, Teaser, DeskNote, Briefly, WhatToWatch,
   SplitVote, ForecastLedger, TrackRecord, MarketsRail,
-  AgentRoster, AgentCard, Divider, WorldGlyph, MapGlyph, WorldIndex, RankBars,
+  AgentRoster, AgentCard, Divider, WorldGlyph, MapGlyph, WorldIndex, RankBars, GlyphArt,
 };
 
 const articleCache = new Map<string, Article>();

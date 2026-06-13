@@ -12,7 +12,7 @@ const contentRoot = resolve(root, 'content');
 const BLOCKS = new Set([
   'Hero', 'Teaser', 'DeskNote', 'Briefly', 'WhatToWatch',
   'SplitVote', 'ForecastLedger', 'TrackRecord', 'MarketsRail',
-  'AgentRoster', 'AgentCard', 'Divider', 'WorldGlyph', 'MapGlyph', 'WorldIndex', 'RankBars', 'SectionHeader', 'Grid',
+  'AgentRoster', 'AgentCard', 'Divider', 'WorldGlyph', 'MapGlyph', 'WorldIndex', 'RankBars', 'GlyphArt', 'SectionHeader', 'Grid',
 ]);
 
 const EPISTEMIC = new Set(['fact', 'inference', 'forecast']);
