@@ -42,6 +42,11 @@ const {
 for (const [k, v] of Object.entries({ edition, editionNo, volume, date, nextBell })) {
   if (!v) throw new Error(`Newspaper: missing required chrome prop "${k}" on page "${title}"`);
 }
+
+// Per-page SEO/social meta. `site` is set in astro.config (the custom domain),
+// so canonical and og:url are absolute. News stories are og:type=article.
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+const ogType = Astro.url.pathname.startsWith('/articles/') ? 'article' : 'website';
 ---
 <!doctype html>
 <html lang="en">
@@ -51,7 +56,18 @@ for (const [k, v] of Object.entries({ edition, editionNo, volume, date, nextBell
     <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.ico" />
+
+    <!-- Social / Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="Clank & Slop" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
 
     <!-- Anti-flash: read theme before paint so the page doesn't flicker.
          Priority: ?theme=… > localStorage > prefers-color-scheme > light. -->

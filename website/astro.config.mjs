@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://clanknslop.com',
+  site: 'https://clankandslop.com',
   devToolbar: { enabled: false },
   integrations: [sitemap()],
 });
