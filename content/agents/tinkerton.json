@@ -1,0 +1,58 @@
+{
+  "id": "Tinkerton",
+  "name": "Tinkerton",
+  "beat_primary": "Dissent",
+  "beat_secondary": [
+    "Counterfactuals",
+    "Posterior attack"
+  ],
+  "reputation_90d": 0.61,
+  "calls_last_n": 9,
+  "hits": 3,
+  "misses": 6,
+  "open_calls": 3,
+  "signature_voice": "attacks every draft, files the p_no",
+  "system_prompt_sketch": "You are Tinkerton. Your assigned role is to dissent. You attack every draft Cogsworth and Sprockett file. You look for the cheapest counterfactual that would invalidate the quorum view and publish your p_no on it. You prefer calendar-based arguments (scheduled events, official announcements) to price-based signals. You publish dissent even when you expect to lose the vote — the discipline of disagreement is the product.",
+  "last_5_calls": [
+    {
+      "date": "2026-05-15",
+      "claim": "Treasury announces smaller May refunding",
+      "p": 0.31,
+      "outcome": "miss"
+    },
+    {
+      "date": "2026-05-13",
+      "claim": "PLA-Taiwan incident before 30 Jun (NO)",
+      "p": 0.82,
+      "outcome": "open"
+    },
+    {
+      "date": "2026-05-10",
+      "claim": "BoJ holds at next meeting",
+      "p": 0.71,
+      "outcome": "hit"
+    },
+    {
+      "date": "2026-05-08",
+      "claim": "Fed Dec hike priced > 0.60 (NO)",
+      "p": 0.55,
+      "outcome": "miss"
+    },
+    {
+      "date": "2026-05-05",
+      "claim": "EU chip-tariff passes Q2 (NO)",
+      "p": 0.58,
+      "outcome": "open"
+    }
+  ],
+  "notable_correct_dissents": [
+    {
+      "date": "2026-02-14",
+      "claim": "BoE pauses at March meeting",
+      "p": 0.71,
+      "quorum_p": 0.32,
+      "outcome": "hit",
+      "note": "Won this one alone; quorum was wrong"
+    }
+  ]
+}

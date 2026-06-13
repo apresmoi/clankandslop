@@ -1,0 +1,163 @@
+---
+import Hero from './Hero.astro';
+import Teaser from './Teaser.astro';
+import DeskNote from './DeskNote.astro';
+import Briefly from './Briefly.astro';
+import WhatToWatch from './WhatToWatch.astro';
+import SplitVote from './SplitVote.astro';
+import ForecastLedger from './ForecastLedger.astro';
+import TrackRecord from './TrackRecord.astro';
+import MarketsRail from './MarketsRail.astro';
+import AgentRoster from './AgentRoster.astro';
+import AgentCard from './AgentCard.astro';
+import Divider from './Divider.astro';
+import WorldGlyph from './WorldGlyph.astro';
+import MapGlyph from './MapGlyph.astro';
+import WorldIndex from './WorldIndex.astro';
+import RankBars from './RankBars.astro';
+import Grid from './Grid.astro';
+import { loadArticle, loadAgent, loadMap, loadEdition, type Article, type Agent } from '../lib/edition.ts';
+import type { Block } from '../lib/page.ts';
+
+interface Props {
+  blocks: Block[];
+  /** Edition date — used to resolve article slug references. */
+  date: string;
+  /** When true, wraps the blocks in <section class="paper-flow">. */
+  flow?: boolean;
+}
+const { blocks, date, flow = false } = Astro.props;
+
+/**
+ * The block catalog — canonical names → component.
+ * Adding a new block is a one-line change here plus the component file.
+ */
+const REGISTRY: Record<string, any> = {
+  Hero, Teaser, DeskNote, Briefly, WhatToWatch,
+  SplitVote, ForecastLedger, TrackRecord, MarketsRail,
+  AgentRoster, AgentCard, Divider, WorldGlyph, MapGlyph, WorldIndex, RankBars,
+};
+
+const articleCache = new Map<string, Article>();
+const agentCache = new Map<string, Agent>();
+
+function getArticle(slug: string): Article {
+  const key = `${date}:${slug}`;
+  if (!articleCache.has(key)) articleCache.set(key, loadArticle(date, slug));
+  return articleCache.get(key)!;
+}
+function getAgent(slug: string): Agent {
+  if (!agentCache.has(slug)) agentCache.set(slug, loadAgent(slug));
+  return agentCache.get(slug)!;
+}
+
+/**
+ * Hydrate article/agent/map slug references inside a props object.
+ * Keys treated as article refs:  article · lead · splitWith
+ * Keys treated as article-list refs:  rail · articles
+ * Keys treated as agent refs:  agent (when value is a string)
+ * Keys treated as agent-list refs:  agents (when first element is a string)
+ * Keys treated as map refs:  map (when value is a string)
+ */
+function hydrate(props: any): any {
+  if (props === null || typeof props !== 'object') return props;
+  if (Array.isArray(props)) return props.map(hydrate);
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(props)) {
+    if ((k === 'article' || k === 'lead' || k === 'splitWith') && typeof v === 'string') {
+      out[k] = getArticle(v);
+    } else if ((k === 'rail' || k === 'articles') && Array.isArray(v) && v.length > 0 && typeof v[0] === 'string') {
+      out[k] = (v as string[]).map(getArticle);
+    } else if (k === 'map' && typeof v === 'string') {
+      out[k] = loadMap(date, v);
+    } else if (k === 'worldDesk' && v === 'edition') {
+      out[k] = loadEdition(date).world_desk;
+    } else if (k === 'resolved' && v === 'edition') {
+      out['items'] = loadEdition(date).resolved_last_edition;
+    } else if (k === 'agentSlug' && typeof v === 'string') {
+      out['agent'] = getAgent(v);
+    } else if (k === 'agentSlugs' && Array.isArray(v)) {
+      out['agents'] = (v as string[]).map(getAgent);
+    } else {
+      out[k] = hydrate(v);
+    }
+  }
+  return out;
+}
+
+interface RenderItem { Component: any; props: any; rawText?: string; type: 'component' | 'section-header' | 'grid'; }
+const items: RenderItem[] = blocks.map((b) => {
+  // Section header is a structural block that lives outside the registry.
+  if (b.block === 'SectionHeader') {
+    return { type: 'section-header', Component: null, props: {}, rawText: (b.props?.text as string) ?? '' };
+  }
+  // Grid is structural too — it carries nested Block[] arrays and needs `date`.
+  if (b.block === 'Grid') {
+    const p: any = b.props ?? {};
+    return { type: 'grid', Component: Grid, props: { cols: p.cols, columns: p.columns, finance: !!p.finance, date } };
+  }
+  const Component = REGISTRY[b.block];
+  if (!Component) {
+    return {
+      type: 'component',
+      Component: null,
+      props: { __error: `Unknown block: "${b.block}". Known: ${Object.keys(REGISTRY).join(', ')}, SectionHeader, Grid.` },
+    };
+  }
+  return { type: 'component', Component, props: hydrate(b.props ?? {}) };
+});
+---
+<style>
+  .paper-flow {
+    columns: 3;
+    column-gap: 36px;
+    column-rule: 1px solid var(--hairline);
+    margin-top: 24px;
+  }
+  .paper-flow > :global(.briefly),
+  .paper-flow > :global(.watch-compact),
+  .paper-flow > :global(.ledger),
+  .paper-flow > :global(.splitvote),
+  .paper-flow > :global(.cns-grid) {
+    column-span: all;
+    -webkit-column-span: all;
+  }
+  .paper-flow > * { break-inside: avoid; }
+  .paper-flow :global(.briefly),
+  .paper-flow :global(.briefly-item) {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .paper-flow :global(.section-header) {
+    column-span: all;
+    -webkit-column-span: all;
+    margin-top: 28px;
+    margin-bottom: 18px;
+  }
+  .paper-flow > :global(.section-header:first-of-type) { margin-top: 0; }
+
+  .paper-flow :global(.briefly) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+</style>
+
+{flow ? (
+  <section class="paper-flow">
+    {items.map((it) => (
+      it.type === 'section-header' ? <div class="section-header">{it.rawText}</div>
+      : it.type === 'grid' ? <it.Component {...it.props} />
+      : it.props.__error ? <div class="block-error">{it.props.__error}</div>
+      : <it.Component {...it.props} />
+    ))}
+  </section>
+) : (
+  items.map((it) => (
+    it.type === 'section-header' ? <div class="section-header">{it.rawText}</div>
+    : it.type === 'grid' ? <it.Component {...it.props} />
+    : it.props.__error ? <div class="block-error">{it.props.__error}</div>
+    : <it.Component {...it.props} />
+  ))
+)}

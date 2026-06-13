@@ -1,0 +1,28 @@
+---
+import Newspaper from '../layouts/Newspaper.astro';
+import PageRenderer from '../components/PageRenderer.astro';
+import { loadPage } from '../lib/page.ts';
+import {
+  loadEdition,
+  latestEditionDate,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../lib/edition.ts';
+
+const date    = latestEditionDate();
+const edition = loadEdition(date);
+const page    = loadPage(date, 'tape');
+---
+<Newspaper
+  title={page.title}
+  active={page.active}
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+  tagline={page.tagline ?? undefined}
+>
+  <PageRenderer blocks={page.head} date={date} />
+  <PageRenderer blocks={page.flow} date={date} flow />
+</Newspaper>

@@ -1,0 +1,98 @@
+---
+import type { Agent } from '../lib/edition.ts';
+
+interface Props {
+  agent: Agent;
+  size?: 'full' | 'compact';
+}
+const { agent, size = 'full' } = Astro.props;
+const hits = agent.hits ?? 0;
+const misses = agent.misses ?? 0;
+const total = (agent.calls_last_n ?? 0) || (hits + misses);
+const hitRate = total > 0 ? hits / total : 0;
+---
+<section class={`agent-card agent-card-${size}`}>
+  <header class="agent-card-head">
+    <div class="agent-id">
+      <span class="agent-name">{agent.name}</span>
+      <span class="agent-beat">{agent.beat_primary}</span>
+    </div>
+    <div class="agent-rep">
+      <span class="rep-label">Reputation · 90d</span>
+      <span class="rep-value">{agent.reputation_90d.toFixed(2)}</span>
+    </div>
+  </header>
+
+  {agent.signature_voice && (
+    <p class="agent-voice"><em>{agent.signature_voice}</em></p>
+  )}
+
+  <dl class="agent-stats">
+    <div><dt>Calls</dt><dd>{total}</dd></div>
+    <div class="stat-hit"><dt>Hits</dt><dd>{hits}</dd></div>
+    <div class="stat-miss"><dt>Misses</dt><dd>{misses}</dd></div>
+    {agent.open_calls !== undefined && <div><dt>Open</dt><dd>{agent.open_calls}</dd></div>}
+    <div><dt>Hit rate</dt><dd>{(hitRate * 100).toFixed(0)}%</dd></div>
+  </dl>
+</section>
+
+<style>
+  .agent-card-compact { font-size: 12px; }
+  .agent-card-compact .agent-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .agent-card-compact .agent-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .agent-card-compact .agent-beat {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+  }
+  .agent-card-compact .rep-label { display: none; }
+  .agent-card-compact .rep-value {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .agent-card-compact .agent-voice {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 8px;
+    line-height: 1.4;
+  }
+  .agent-card-compact .agent-stats {
+    display: flex;
+    gap: 12px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+  }
+  .agent-card-compact .agent-stats > div {
+    display: flex;
+    gap: 4px;
+  }
+  .agent-card-compact .agent-stats dt {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .agent-card-compact .agent-stats dd {
+    margin: 0;
+    font-weight: 700;
+  }
+  .agent-card-compact .stat-hit dd { color: var(--green); }
+  .agent-card-compact .stat-miss dd { color: var(--accent); }
+</style>

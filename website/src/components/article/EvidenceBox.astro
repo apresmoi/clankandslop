@@ -1,0 +1,176 @@
+---
+import { evidenceRowId } from '../../lib/edition.ts';
+import type { Article } from '../../lib/edition.ts';
+
+type Evidence = NonNullable<Article['evidence_box']>[number];
+
+interface Props {
+  articleId: string;
+  items: Evidence[];
+}
+const { articleId, items } = Astro.props;
+---
+<div class="evidence-box">
+  <div class="head">The Record · Provenance for this story</div>
+  {items.map((e, i) => {
+    const eid = `E${i + 1}`;
+    const rowId = evidenceRowId(articleId, i);
+    const n = e.source_note;
+    return (
+      <div class="evidence-row" id={rowId}>
+        <a class="eid" href={`#${rowId}-cite`} title="Back to citation">{eid} ↩</a>
+        <span class="src">{e.source}</span>
+        <span class="frag">{e.fragment}</span>
+        <span class="as-of">{e.as_of}</span>
+        {n && (
+          <>
+            <details><summary>source</summary></details>
+            <div class="source-note">
+              <dl>
+                {n.raw_excerpt     && <><dt>Excerpt</dt><dd class="excerpt">"{n.raw_excerpt}"</dd></>}
+                {n.source_kind     && <><dt>Kind</dt><dd>{n.source_kind.replace('_', ' ')}</dd></>}
+                {(n.source_url || n.source_id) && (
+                  <><dt>Source</dt>
+                    <dd class="mono">{n.source_url
+                      ? <a href={n.source_url} rel="noopener" target="_blank">{n.source_url}</a>
+                      : n.source_id}</dd>
+                  </>
+                )}
+                {n.archive_hash   && <><dt>Hash</dt><dd class="mono">{n.archive_hash}</dd></>}
+                {n.retrieved_at   && <><dt>Retrieved</dt><dd class="mono">{n.retrieved_at}</dd></>}
+                {n.transformation && <><dt>Transform</dt><dd>{n.transformation}</dd></>}
+                {n.used_by_agent  && <><dt>Used by</dt><dd class="mono">{n.used_by_agent}</dd></>}
+              </dl>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .evidence-box {
+    margin: 16px 0 18px;
+    padding: 12px 0 14px;
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .head {
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .evidence-row {
+    display: grid;
+    grid-template-columns: 42px 1.1fr 3.4fr 0.9fr 60px;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--hairline);
+    align-items: baseline;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    line-height: 1.4;
+    scroll-margin-top: 24px;
+  }
+  .evidence-row:last-child { border-bottom: none; }
+  .evidence-row:target { background: rgba(184, 132, 30, 0.10); }
+
+  .eid {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  a.eid:hover { color: var(--ink); }
+  .src {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-variant: small-caps;
+    text-transform: lowercase;
+    color: var(--ink);
+  }
+  .frag { color: var(--ink); }
+  .as-of {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    text-align: right;
+    letter-spacing: 0;
+  }
+
+  .evidence-row details { text-align: right; }
+  .evidence-row details summary {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .evidence-row details summary::-webkit-details-marker { display: none; }
+  .evidence-row details summary::before { content: "▸ "; color: var(--accent); margin-right: 2px; }
+  .evidence-row details[open] summary::before { content: "▾ "; }
+  .evidence-row details summary:hover { color: var(--accent); }
+
+  .evidence-row > .source-note {
+    grid-column: 1 / -1;
+    display: none;
+    margin-top: 10px;
+    padding: 12px 14px 12px 40px;
+    background: var(--paper-shade);
+    border-left: 2px solid var(--accent);
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink);
+    text-align: left;
+  }
+  .evidence-row > details[open] ~ .source-note { display: block; }
+
+  .source-note dl { display: grid; grid-template-columns: 110px 1fr; gap: 4px 14px; }
+  .source-note dt {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 1px;
+  }
+  .source-note dd {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .source-note dd.excerpt { font-style: italic; }
+  .source-note dd.mono { font-family: var(--font-mono); font-size: 11.5px; word-break: break-all; }
+
+  @media (max-width: 600px) {
+    .evidence-row {
+      grid-template-columns: 32px 1fr auto;
+      grid-template-rows: auto auto auto;
+      gap: 4px 10px;
+      padding: 10px 0;
+    }
+    .eid { grid-row: 1; grid-column: 1; }
+    .src { grid-row: 1; grid-column: 2; font-size: 9.5px; }
+    .as-of { grid-row: 1; grid-column: 3; font-size: 9.5px; }
+    .frag { grid-row: 2; grid-column: 1 / -1; padding-left: 42px; font-size: 12.5px; line-height: 1.4; }
+    .evidence-row details { grid-row: 3; grid-column: 1 / -1; padding-left: 42px; text-align: left; }
+    .evidence-row > .source-note { padding: 10px 12px 10px 18px; font-size: 12px; }
+    .source-note dl { grid-template-columns: 88px 1fr; gap: 3px 10px; }
+  }
+</style>

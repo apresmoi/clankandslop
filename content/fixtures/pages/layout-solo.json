@@ -1,0 +1,56 @@
+{
+  "edition": "fixtures",
+  "page": "layout-solo",
+  "title": "Clank & Slop — Layout · Solo",
+  "active": "/layouts/solo",
+  "tagline": "— ONE COLUMN · THE PIECE STANDS ALONE —",
+  "head": [
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          1
+        ],
+        "columns": [
+          [
+            {
+              "block": "Hero",
+              "props": {
+                "variant": "lead-only",
+                "withArt": true,
+                "lead": "fixture-lead"
+              }
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "flow": [
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          1
+        ],
+        "columns": [
+          [
+            {
+              "block": "DeskNote",
+              "props": {
+                "label": "Lorem · From the Fixture Desk",
+                "date": "17 May · 14:32 UTC",
+                "bullets": [
+                  {
+                    "text": "Lorem ipsum <strong>dolor sit amet</strong>, consectetur adipiscing elit.",
+                    "agent": "Foreman"
+                  }
+                ]
+              }
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

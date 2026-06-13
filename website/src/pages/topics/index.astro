@@ -1,0 +1,94 @@
+---
+import Newspaper from '../../layouts/Newspaper.astro';
+import { loadEdition, latestEditionDate, fmtEditionLine, fmtDateLine } from '../../lib/edition.ts';
+import { topicsWithCounts } from '../../lib/topics.ts';
+
+const top = loadEdition(latestEditionDate());
+const topics = topicsWithCounts();
+---
+<Newspaper
+  title="Clank & Slop — Topics"
+  active="/"
+  edition={fmtEditionLine(top)}
+  editionNo={top.edition_no}
+  volume={top.volume}
+  date={fmtDateLine(top)}
+  nextBell={top.next_bell}
+  tagline="— THE GLOSSARY · BROWSE BY TOPIC —"
+>
+  <section class="topics">
+    <h1 class="topics-h">Topics</h1>
+    <p class="topics-intro">
+      The desk's standing subjects. Every story is filed under one or more, so
+      the archive reads two ways — by edition, and by thread. Machine-readable
+      mirrors live at <span class="mono">/topics/&lt;slug&gt;.txt</span>.
+    </p>
+    <ul class="topic-list">
+      {topics.map((t) => (
+        <li class="topic-row">
+          <a class="topic-link" href={`/topics/${t.slug}`}>
+            <span class="topic-name">{t.name}</span>
+            <span class="topic-count mono">{t.count}</span>
+            <span class="topic-blurb">{t.blurb}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Newspaper>
+
+<style>
+  .topics { max-width: 900px; margin: 24px auto 0; padding: 0 16px; }
+  .topics-h {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 14px;
+  }
+  .topics-intro {
+    font-family: var(--font-body);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    max-width: 60ch;
+  }
+  .mono { font-family: var(--font-mono); font-style: normal; font-size: 0.9em; }
+  .topic-list { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--ink); }
+  .topic-row { border-bottom: 1px solid var(--hairline); }
+  .topic-link {
+    display: grid;
+    grid-template-columns: 200px 2.5em 1fr;
+    align-items: baseline;
+    gap: 18px;
+    padding: 13px 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .topic-link:hover .topic-name { color: var(--accent); }
+  .topic-name {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .topic-count {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .topic-blurb {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  @media (max-width: 640px) {
+    .topic-link { grid-template-columns: 1fr auto; }
+    .topic-blurb { grid-column: 1 / -1; }
+  }
+</style>

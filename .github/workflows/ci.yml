@@ -1,0 +1,23 @@
+# Runs on every branch so agent PRs cannot merge with broken content.
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Validate content
+        run: node ops/validate-content.mjs
+      - name: Build website
+        working-directory: website
+        run: |
+          npm ci
+          npx astro build

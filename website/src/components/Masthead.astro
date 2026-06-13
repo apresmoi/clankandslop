@@ -1,0 +1,249 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  edition?: string;
+  date: string;
+  tagline?: string;
+  /** When true, skip the big nameplate block and show the condensed
+      top-bar straight away. Use on every page except the front. */
+  compact?: boolean;
+  /** Nameplate ears — the small stacks flanking the big nameplate, like a
+      broadsheet's weather/edition ear. `right` line 3 renders italic
+      (the agent-of-day caveat). */
+  ears?: { left: string[]; right: string[] };
+}
+const {
+  date,
+  tagline = "— ALL THE SLOP THAT'S FIT TO PRINT —",
+  compact = false,
+  ears,
+} = Astro.props;
+---
+<div class="meta-strip" data-meta-strip data-compact={compact ? '' : undefined}>
+  <div class="meta-strip-inner">
+    <div class="meta-left">
+      <span class="meta-date">{date}</span>
+      <a href="/archive" class="meta-archive">Archive ↗</a>
+    </div>
+    <a href="/" class="meta-nameplate" aria-hidden="true">CLANK<span class="amp">&</span>SLOP</a>
+    <ThemeToggle />
+  </div>
+</div>
+
+{!compact && (
+  <header class="masthead" data-masthead>
+    <div class:list={['masthead-inner', { 'has-ears': !!ears }]}>
+      {ears && (
+        <div class="ear ear-left">
+          {ears.left.map((line) => <span class="ear-line">{line}</span>)}
+        </div>
+      )}
+      <div class="masthead-center">
+        <a href="/" class="nameplate">CLANK<span class="amp">&</span>SLOP</a>
+        <div class="tagline">{tagline}</div>
+      </div>
+      {ears && (
+        <div class="ear ear-right">
+          {ears.right.map((line, i) => (
+            <span class:list={['ear-line', { 'ear-label': i === 0, 'ear-caveat': i === 2 }]}>{line}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  </header>
+)}
+
+<script is:inline>
+  // Two jobs here:
+  //   1. Keep --strip-h in sync with the meta-strip's actual height so the
+  //      sticky section-nav lines up flush below it (no floating gap).
+  //   2. Fade the mini-nameplate into the strip when the full nameplate
+  //      scrolls out of view (front page only; compact pages have it on
+  //      via [data-compact] from the start).
+  (() => {
+    const strip = document.querySelector('[data-meta-strip]');
+    if (!strip) return;
+
+    function syncStripHeight() {
+      const h = strip.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--strip-h', `${h}px`);
+    }
+    syncStripHeight();
+    if ('ResizeObserver' in window) new ResizeObserver(syncStripHeight).observe(strip);
+    addEventListener('resize', syncStripHeight);
+
+    const masthead = document.querySelector('[data-masthead]');
+    if (masthead) {
+      const io = new IntersectionObserver(([entry]) => {
+        strip.toggleAttribute('data-collapsed', !entry.isIntersecting);
+      }, { rootMargin: '-32px 0px 0px 0px', threshold: 0 });
+      io.observe(masthead);
+    }
+  })();
+</script>
+
+<style>
+  .meta-strip {
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .meta-strip-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 8px 32px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .meta-left {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    justify-self: start;
+  }
+  .meta-date {
+    white-space: nowrap;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .meta-archive {
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--hairline-strong);
+    padding-bottom: 1px;
+    font-weight: 500;
+  }
+  .meta-archive:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .meta-strip :global(.theme-toggle) {
+    justify-self: end;
+  }
+
+  .meta-nameplate {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+    text-transform: none;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    pointer-events: none;
+  }
+  .meta-nameplate .amp {
+    color: var(--accent);
+    font-style: italic;
+    margin: 0 -1px;
+    font-size: 0.9em;
+  }
+  /* Reveal the mini-nameplate when the big masthead has scrolled out
+     of view (front page) or when the page renders compact (every other).
+     The matching border-bottom on the strip appears with the nameplate so
+     the strip reads as a single bar when the title is visible inside it. */
+  .meta-strip[data-collapsed] .meta-nameplate {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .meta-strip[data-compact] .meta-nameplate {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  /* Divider sits on the .meta-strip-inner so its width matches the
+     page-content gutter (same as the masthead's bottom rule), not the
+     full viewport. */
+  .meta-strip[data-collapsed] .meta-strip-inner { border-bottom: 1px solid var(--hairline); }
+  .meta-strip[data-compact]   .meta-strip-inner { border-bottom: 1px solid var(--hairline); }
+
+  .masthead {
+    padding: 18px 0 0;
+    text-align: center;
+  }
+  /* Inner wrapper sits inside the .page max-width so the divider below
+     it lines up with the page gutters instead of full-bleed. */
+  .masthead-inner {
+    max-width: 1240px;
+    margin: 0 auto 24px;
+    padding: 0 32px 20px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .masthead-inner.has-ears {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .ear {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .ear-left  { text-align: left; }
+  .ear-right { text-align: right; }
+  .ear-label {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .ear-caveat {
+    font-family: var(--font-body);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    .masthead-inner.has-ears { grid-template-columns: 1fr; }
+    .ear { display: none; }
+  }
+
+  .nameplate {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 96px;
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .nameplate .amp {
+    color: var(--accent);
+    font-style: italic;
+    margin: 0 -2px 0 -4px;
+    font-size: 0.88em;
+    letter-spacing: -0.04em;
+  }
+
+  .tagline {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    margin-top: 12px;
+    color: var(--ink-soft);
+  }
+</style>

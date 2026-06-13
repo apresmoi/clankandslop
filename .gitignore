@@ -1,0 +1,17 @@
+.DS_Store
+node_modules/
+website/dist/
+website/.astro/
+website/.screenshots/
+.env
+.env.local
+*.log
+.claude/
+
+# Local geo data sources (large, vendored locally, not committed)
+*.gdb/
+*.gpkg
+*.shp
+*.dbf
+*.shx
+

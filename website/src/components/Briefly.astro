@@ -1,0 +1,193 @@
+---
+interface Item {
+  kicker: string;
+  what: string;
+  agent?: string;
+  p?: string;
+  p_label?: string;
+}
+interface Desk {
+  label: string;
+  lead: Item;
+  rest: Item[];
+}
+interface Props {
+  title?: string;
+  desks?: Desk[];
+  items?: Item[];  // fallback: ungrouped list (chunks into 3 desks unless flat)
+  /** When true, skip desk grouping entirely — render a single flat list.
+      Use in narrow rails where the layered labels create line-clutter. */
+  flat?: boolean;
+}
+const { title = 'Briefly Noted', desks, items, flat = false } = Astro.props;
+
+const flatList: Item[] | null = flat ? (items ?? desks?.flatMap((d) => [d.lead, ...d.rest]) ?? []) : null;
+
+// If no desks provided and not flat, chunk items into 3 with first item as lead.
+const finalDesks: Desk[] = flat ? [] : (desks ?? (() => {
+  if (!items || items.length === 0) return [];
+  const labels = ['Politics', 'Geopolitics', 'Markets'];
+  const chunkSize = Math.ceil(items.length / 3);
+  return labels.map((label, i) => {
+    const chunk = items.slice(i * chunkSize, (i + 1) * chunkSize);
+    return { label, lead: chunk[0], rest: chunk.slice(1) };
+  });
+})());
+---
+<div class="briefly">
+  {title && <div class="head">{title}</div>}
+  {flat && flatList && (
+    <div class="briefly-flat">
+      {flatList.map((it) => (
+        <div class="briefly-item">
+          <span class="kicker">{it.kicker}</span>
+          <span class="what" set:html={it.what} />
+          {(it.agent || it.p) && (
+            <span class="meta">
+              {it.agent && <span class="agent">{it.agent}</span>}
+              {it.agent && it.p && ' · '}
+              {it.p && <><span>{it.p_label || 'prior'}</span> <span class="p">{it.p}</span></>}
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  )}
+  {!flat && (
+  <div class="briefly-desks">
+    {finalDesks.map((d) => (
+      <div class="briefly-desk">
+        <div class="briefly-desk-label">{d.label}</div>
+        {d.lead && (
+          <div class="briefly-item lead">
+            <span class="kicker">{d.lead.kicker}</span>
+            <span class="what" set:html={d.lead.what} />
+            {(d.lead.agent || d.lead.p) && (
+              <span class="meta">
+                {d.lead.agent && <span class="agent">{d.lead.agent}</span>}
+                {d.lead.agent && d.lead.p && ' · '}
+                {d.lead.p && <><span>{d.lead.p_label || 'prior'}</span> <span class="p">{d.lead.p}</span></>}
+              </span>
+            )}
+          </div>
+        )}
+        {d.rest.map((it) => (
+          <div class="briefly-item">
+            <span class="kicker">{it.kicker}</span>
+            <span class="what" set:html={it.what} />
+            {(it.agent || it.p) && (
+              <span class="meta">
+                {it.agent && <span class="agent">{it.agent}</span>}
+                {it.agent && it.p && ' · '}
+                {it.p && <><span>{it.p_label || 'prior'}</span> <span class="p">{it.p}</span></>}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+  )}
+</div>
+
+<style>
+  .briefly {
+    margin-top: 8px;
+    padding-top: 0;
+    border-top: none;
+  }
+  .briefly .head {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .briefly-desks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 32px;
+  }
+  .briefly-flat {
+    display: flex;
+    flex-direction: column;
+  }
+  .briefly-desk {
+    display: flex;
+    flex-direction: column;
+  }
+  .briefly-desk-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .briefly-item.lead {
+    padding: 0 0 16px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+  .briefly-item.lead .kicker {
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+    display: block;
+  }
+  .briefly-item.lead .what {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.1;
+    color: var(--ink);
+    font-style: normal;
+    letter-spacing: -0.01em;
+  }
+  .briefly-item {
+    padding: 8px 0 10px;
+    border-bottom: 1px dotted var(--hairline-strong);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    line-height: 1.42;
+    color: var(--ink);
+    position: relative;
+  }
+  .briefly-item:last-child { border-bottom: none; }
+  .briefly-item .kicker {
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+    display: block;
+  }
+  .briefly-item .what { color: var(--ink); }
+  .briefly-item .meta {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 6px;
+    display: block;
+    letter-spacing: 0;
+  }
+  .briefly-item .meta .agent { color: var(--ink); font-weight: 700; }
+  .briefly-item .meta .p { color: var(--accent); }
+
+  @media (max-width: 700px) {
+    .briefly-desks { grid-template-columns: 1fr; gap: 0; }
+    .briefly-desk { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--hairline-strong); }
+    .briefly-desk:last-child { border-bottom: none; }
+    .briefly-item.lead .what { font-size: 18px; }
+  }
+</style>

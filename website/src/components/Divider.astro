@@ -1,0 +1,44 @@
+---
+interface Props {
+  label?: string;
+  style?: 'thin' | 'thick' | 'double';
+}
+const { label, style = 'thin' } = Astro.props;
+const chars = style === 'double' ? '═' : style === 'thick' ? '━' : '─';
+---
+<div class={`divider divider-${style}`}>
+  {label ? (
+    <>
+      <span class="divider-rule">{chars.repeat(8)}</span>
+      <span class="divider-label">{label}</span>
+      <span class="divider-rule">{chars.repeat(8)}</span>
+    </>
+  ) : (
+    <span class="divider-rule-full">{chars.repeat(60)}</span>
+  )}
+</div>
+
+<style>
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 32px 0 24px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-soft);
+  }
+  .divider-label {
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .divider-rule-full {
+    flex: 1;
+    letter-spacing: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,92 @@
+{
+  "edition": "fixtures",
+  "page": "layout-twothirds",
+  "title": "Clank & Slop — Layout · 2/3 + 1/3",
+  "active": "/layouts/twothirds",
+  "tagline": "— TWO COLUMNS · MAIN COLUMN + RAIL —",
+  "head": [
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          2,
+          1
+        ],
+        "columns": [
+          [
+            {
+              "block": "Hero",
+              "props": {
+                "variant": "lead-only",
+                "lead": "fixture-lead"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-second",
+                "size": "flow"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-fourth",
+                "size": "flow"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-second",
+                "size": "flow"
+              }
+            }
+          ],
+          [
+            {
+              "block": "Briefly",
+              "props": {
+                "title": "",
+                "flat": true,
+                "items": [
+                  {
+                    "kicker": "Loremville",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Cogsworth"
+                  },
+                  {
+                    "kicker": "Ipsumburg",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Graves"
+                  },
+                  {
+                    "kicker": "Dolor City",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Tinkerton"
+                  },
+                  {
+                    "kicker": "Sit Amet",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  },
+                  {
+                    "kicker": "Consectetur",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  },
+                  {
+                    "kicker": "Adipiscing",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  }
+                ]
+              }
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "flow": []
+}

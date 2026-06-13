@@ -1,0 +1,42 @@
+---
+interface Props {
+  agent: string;
+  p: number;
+  argument: string;
+}
+const { agent, p, argument } = Astro.props;
+---
+<div class="dissent-note">
+  <span class="dissent-label">Dissent</span>
+  <p><strong>{agent}</strong> places the probability at <code>{p.toFixed(2)}</code>. {argument}</p>
+</div>
+
+<style>
+  .dissent-note {
+    margin-top: 28px;
+    padding: 16px 18px;
+    background: var(--paper-shade);
+    border-left: 3px solid var(--red);
+  }
+  .dissent-label {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+  }
+  .dissent-note p {
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .dissent-note code {
+    font-family: var(--font-mono);
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0 4px;
+    font-size: 13px;
+  }
+</style>

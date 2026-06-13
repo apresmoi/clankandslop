@@ -1,0 +1,37 @@
+---
+import Newspaper from '../../layouts/Newspaper.astro';
+import PageRenderer from '../../components/PageRenderer.astro';
+import { loadPage, listLayoutNames } from '../../lib/page.ts';
+import {
+  loadEdition,
+  latestEditionDate,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../../lib/edition.ts';
+
+export async function getStaticPaths() {
+  return listLayoutNames('fixtures').map((fullName) => ({
+    params: { name: fullName.replace(/^layout-/, '') },
+    props: { fullName },
+  }));
+}
+
+const { fullName } = Astro.props as { fullName: string };
+const date = latestEditionDate();
+const edition = loadEdition(date);
+const page    = loadPage('fixtures', fullName);
+
+---
+<Newspaper
+  title={page.title}
+  active={page.active}
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+  tagline={page.tagline ?? undefined}
+>
+  <PageRenderer blocks={page.head} date="fixtures" />
+  <PageRenderer blocks={page.flow} date="fixtures" flow />
+</Newspaper>

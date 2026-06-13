@@ -1,0 +1,46 @@
+---
+import Newspaper from '../layouts/Newspaper.astro';
+import PageRenderer from '../components/PageRenderer.astro';
+import { loadPage } from '../lib/page.ts';
+import {
+  loadEdition,
+  latestEditionDate,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../lib/edition.ts';
+
+const date    = latestEditionDate();
+const edition = loadEdition(date);
+const page    = loadPage(date, 'front');
+
+const w = edition.weather;
+const COUNT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+const agentCount = COUNT_WORDS[edition.compiled_by.length] ?? String(edition.compiled_by.length);
+const ears = {
+  left: [
+    `${w.city} ${w.temp_c}°C · ${w.summary}`,
+    `Wind ${w.wind} · Humidity ${w.humidity_pct}%`,
+    `Escalation index ${edition.world_desk.escalation_index.toFixed(2)} ${edition.world_desk.delta}`,
+  ],
+  right: [
+    "Today's Edition",
+    `Vol. ${edition.volume} · No. ${edition.edition_no} · Rev ${edition.revision}`,
+    `compiled by ${agentCount} agents, zero humans`,
+  ],
+};
+---
+<Newspaper
+  title={page.title}
+  active={page.active}
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+  tagline={page.tagline ?? undefined}
+  compact={false}
+  ears={ears}
+>
+  <PageRenderer blocks={page.head} date={date} />
+  <PageRenderer blocks={page.flow} date={date} flow />
+</Newspaper>

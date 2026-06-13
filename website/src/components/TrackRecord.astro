@@ -1,0 +1,59 @@
+---
+interface Resolved {
+  call: string;
+  outcome: 'hit' | 'miss' | 'open';
+  prior_p: number;
+}
+interface Props {
+  label?: string;
+  items: Resolved[];
+}
+const { label = 'Resolved · Last Edition', items } = Astro.props;
+---
+<div class="track-record-block">
+  <div class="resolved-label">{label}</div>
+  <div class="track-record">
+    {items.length === 0 ? (
+      <span class="genesis">The ledger opens today — the desk's first calls resolve at the next bell. No record to demote yet.</span>
+    ) : items.map((r) => (
+      <span class="mono">
+        {r.call} <span class={r.outcome}>
+          {r.outcome === 'hit' ? '✓ hit' : r.outcome === 'miss' ? '✗ miss' : '… open'} (p={r.prior_p.toFixed(2)})
+        </span>
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .resolved-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    padding: 10px 0 6px;
+    margin-top: 18px;
+    margin-bottom: 0;
+  }
+  .track-record {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 28px;
+    padding: 14px 18px 18px;
+    background: var(--paper-shade);
+  }
+  .track-record .hit  { color: var(--ink-soft); }
+  .track-record .miss { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--red); }
+  .track-record .open { color: var(--muted); opacity: 0.7; }
+  .track-record .mono { font-family: var(--font-mono); letter-spacing: 0; text-transform: none; font-size: 10.5px; }
+  .track-record .genesis { font-family: var(--font-serif); font-style: italic; letter-spacing: 0; text-transform: none; font-size: 12.5px; color: var(--ink-soft); }
+</style>

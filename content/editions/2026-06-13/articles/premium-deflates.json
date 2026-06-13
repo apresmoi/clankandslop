@@ -1,0 +1,75 @@
+{
+  "id": "premium-deflates",
+  "topics": ["oil", "shipping", "war-risk-insurance", "strait-of-hormuz"],
+  "edition_date": "2026-06-13",
+  "section": "markets",
+  "kicker": "Commodities",
+  "epistemic": "inference",
+  "headline": "The Hormuz premium is deflating in futures, not in ships",
+  "deck": "Brent traded the peace deal and sold off. The physical chain didn't get the memo: tanker earnings near $400k a day, war-risk cover at 4% of hull value, container rates still climbing. Paper oil believes the signature; the sea does not.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ],
+    "read_time_min": 4
+  },
+  "timestamp": "12:40 UTC",
+  "revision": 2,
+  "last_updated_min_ago": 110,
+  "next_update_utc": "16:00",
+  "body": [
+    "Oil traded the peace deal and sold off. Brent settled at $87.33, down 3.4% on the day and near its lowest since March, on word that a US–Iran deal would reopen the strait. [E1] That's a futures market betting on a worst case it no longer believes in. The problem: everything physical — the ships, the insurance, the boxes — is still priced for the worst case.",
+    "Start with the ships. Insuring a tanker through Hormuz for a week now costs about 4% of the vessel's value. Before the crisis it was 0.001%. That's a four-thousand-fold jump, and it hasn't come back down. [E2] Freight tells the same story: the Drewry container index rose 3% to $3,549 a box, led by the Asia routes on early peak-season demand and Red Sea detours. [E3] Shipowners aren't pricing a return to normal. They're pricing a strait a foreign navy still runs.",
+    "This is a disagreement with reach. It touches inflation, inventory plans, tanker profits, insurance, and the cost of everything in a shipping container, all at once. When paper and physical disagree this loudly, one of them is wrong — and the ships have their money where their risk is. Bet against the futures relief before you bet against the freight."
+  ],
+  "refs": [
+    "press:reuters:brent-march-low:2026-06-12",
+    "press:thenational:hormuz-war-risk:2026-06-03",
+    "data:drewry:wci:2026-06-11"
+  ],
+  "key_numbers": [
+    { "label": "Brent settle", "value": "$87.33", "dir": "down" },
+    { "label": "Brent, on the day", "value": "−3.4%", "dir": "down" },
+    { "label": "Hormuz war-risk cover", "value": "~4% of hull", "dir": "up" },
+    { "label": "Drewry WCI, 40ft box", "value": "$3,549", "dir": "up" }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Brent settled $87.33/bbl, down about 3.4% on the day, near its lowest since March, on expected US–Iran peace deal.",
+      "as_of": "12 Jun",
+      "source_note": {
+        "source_id": "press:reuters:brent-march-low:2026-06-12",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-extends-losses-trump-calls-off-planned-strikes-iran-2026-06-12/",
+        "retrieved_at": "2026-06-12T20:00:00Z"
+      }
+    },
+    {
+      "source": "The National",
+      "fragment": "War-risk cover for a Strait of Hormuz transit quoted at \"4 per cent of the ship's value\" for a seven-day policy, versus pre-crisis levels as low as 0.001%.",
+      "as_of": "3 Jun",
+      "source_note": {
+        "source_id": "press:thenational:hormuz-war-risk:2026-06-03",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.thenationalnews.com/business/economy/2026/06/03/hormuz-shipping-trade-iran-war/",
+        "retrieved_at": "2026-06-12T18:30:00Z"
+      }
+    },
+    {
+      "source": "Drewry WCI",
+      "fragment": "World Container Index up 3% to $3,549 per 40-ft container; \"early peak season demand drives spot rates higher.\"",
+      "as_of": "11 Jun",
+      "source_note": {
+        "source_id": "data:drewry:wci:2026-06-11",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry",
+        "retrieved_at": "2026-06-12T18:40:00Z"
+      }
+    }
+  ]
+}

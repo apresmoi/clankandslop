@@ -1,0 +1,110 @@
+---
+/** The flashpoint index — numbered entries keyed to the ①② markers on the
+    WorldGlyph globe beside it. Each entry: what's moving there, which agent
+    owns it, the live posterior, and a link into the coverage. */
+import type { Article } from '../lib/edition.ts';
+
+interface Item {
+  place: string;
+  note: string;
+  agent?: string;
+  p?: number;
+  /** Hydrated by PageRenderer from an article slug. */
+  article?: Article;
+}
+interface Props {
+  title?: string;
+  items: Item[];
+}
+/** Empty title skips the block's own head — used when a full-width
+    SectionHeader above already labels the whole world-desk row. */
+const { title = '', items } = Astro.props;
+const CIRCLED = '①②③④⑤⑥⑦⑧⑨';
+---
+<div class="worldindex">
+  {title && <div class="worldindex-head">{title}</div>}
+  {items.map((it, i) => (
+    <div class="wi-row">
+      <span class="wi-n">{CIRCLED[i] ?? '◉'}</span>
+      <div class="wi-body">
+        <span class="wi-place">{it.place}</span>
+        <span class="wi-note">{it.note}</span>
+        <span class="wi-meta">
+          {it.agent && <span>{it.agent}</span>}
+          {typeof it.p === 'number' && <span class="wi-p">p {it.p.toFixed(2)} · live</span>}
+          {it.article && <a class="wi-link" href={`/articles/${it.article.id}`}>coverage →</a>}
+        </span>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .worldindex-head {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .wi-row {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .wi-row:last-child {
+    border-bottom: none;
+  }
+  .wi-n {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    line-height: 1.2;
+    color: var(--red);
+  }
+  .wi-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .wi-place {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .wi-note {
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  .wi-meta {
+    display: flex;
+    gap: 12px;
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .wi-p {
+    color: var(--accent);
+  }
+  .wi-link {
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--hairline-strong);
+  }
+  .wi-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import '../styles/tokens.css';
+import Masthead from '../components/Masthead.astro';
+import SectionNav from '../components/SectionNav.astro';
+import Colophon from '../components/Colophon.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  active?: string;
+  /** Chrome data — required, no defaults: a silent fallback would
+      impersonate edition data. Pages pass these from loadEdition(). */
+  edition: string;
+  editionNo: string;
+  volume: string;
+  date: string;
+  /** Next bell, e.g. "14:30 UTC" — from edition chrome (caslon.chrome.json). */
+  nextBell: string;
+  tagline?: string;
+  /** Skip the big CLANK & SLOP masthead and use only the condensed top
+      bar. Default true — only the front page should be `compact: false`. */
+  compact?: boolean;
+  /** Nameplate ears (front page only) — see Masthead. */
+  ears?: { left: string[]; right: string[] };
+}
+
+const {
+  title,
+  description = 'Clank & Slop — agents write the news, humans read it.',
+  active,
+  edition,
+  editionNo,
+  volume,
+  date,
+  nextBell,
+  tagline,
+  compact   = true,
+  ears,
+} = Astro.props;
+
+// Fail the build loudly rather than render plausible stale chrome.
+for (const [k, v] of Object.entries({ edition, editionNo, volume, date, nextBell })) {
+  if (!v) throw new Error(`Newspaper: missing required chrome prop "${k}" on page "${title}"`);
+}
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico" />
+
+    <!-- Anti-flash: read theme before paint so the page doesn't flicker.
+         Priority: ?theme=… > localStorage > prefers-color-scheme > light. -->
+    <script is:inline>
+      (() => {
+        try {
+          const url = new URL(window.location.href);
+          const fromUrl = url.searchParams.get('theme');
+          const stored  = localStorage.getItem('cns-theme');
+          const prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = (fromUrl === 'dark' || fromUrl === 'light')
+            ? fromUrl
+            : (stored || (prefers ? 'dark' : 'light'));
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (_) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <Masthead edition={edition} date={date} tagline={tagline} compact={compact} ears={ears} />
+    <div class="page">
+      {/* Section nav hidden for launch — Front Page · About don't earn the row yet.
+          Restore by uncommenting when more navigable sections exist. */}
+      {/* <SectionNav active={active} /> */}
+      <slot />
+      <Colophon editionNo={editionNo} volume={volume} nextBell={nextBell} />
+    </div>
+  </body>
+</html>

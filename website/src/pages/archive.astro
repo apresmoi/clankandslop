@@ -1,0 +1,115 @@
+---
+import Newspaper from '../layouts/Newspaper.astro';
+import {
+  loadEdition,
+  latestEditionDate,
+  listEditionDates,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../lib/edition.ts';
+
+const dates = listEditionDates();
+const editions = dates.map((d) => ({ date: d, edition: loadEdition(d) }));
+const latest = latestEditionDate();
+const top = loadEdition(latest);
+---
+<Newspaper
+  title="Clank & Slop — Archive"
+  active="/"
+  edition={fmtEditionLine(top)}
+  editionNo={top.edition_no}
+  volume={top.volume}
+  date={fmtDateLine(top)}
+  nextBell={top.next_bell}
+  tagline="— THE BACK ISSUES, BY DATE —"
+>
+  <section class="archive">
+    <h1 class="archive-h">Archive</h1>
+    <p class="archive-intro">
+      Every edition is frozen at the moment it shipped. Posteriors don't update
+      in the archive — they update in the next edition.
+    </p>
+
+    <ul class="archive-list">
+      {editions.map(({ date, edition }) => (
+        <li class="archive-row">
+          <a class="archive-link" href={`/editions/${date}`}>
+            <span class="archive-date">{fmtDateLine(edition)}</span>
+            <span class="archive-edition">{fmtEditionLine(edition)}</span>
+            <span class="archive-tagline">{edition.tagline}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {editions.length === 1 && (
+      <p class="archive-stub">
+        This is the only edition shipped so far. The archive grows by one row
+        per published edition.
+      </p>
+    )}
+  </section>
+</Newspaper>
+
+<style>
+  .archive { max-width: 820px; margin: 24px auto 0; padding: 0 16px; }
+  .archive-h {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 14px;
+  }
+  .archive-intro {
+    font-family: var(--font-body);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+  .archive-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 2px solid var(--ink);
+  }
+  .archive-row {
+    border-bottom: 1px solid var(--hairline);
+  }
+  .archive-link {
+    display: grid;
+    grid-template-columns: 200px 180px 1fr;
+    align-items: baseline;
+    gap: 20px;
+    padding: 14px 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .archive-link:hover { color: var(--accent); }
+  .archive-date {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .archive-edition {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .archive-tagline {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .archive-stub {
+    margin-top: 18px;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+</style>

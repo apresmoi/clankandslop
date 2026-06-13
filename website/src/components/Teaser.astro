@@ -1,0 +1,93 @@
+---
+import type { Article } from '../lib/edition.ts';
+
+interface Props {
+  article: Article;
+  size?: 'lead' | 'rail' | 'flow';
+}
+const { article, size = 'flow' } = Astro.props;
+const href = `/articles/${article.id}`;
+const desk = article.byline.desk.toUpperCase();
+const agent = article.byline.agents[0];
+const recordRef = article.evidence_box && article.evidence_box.length > 0
+  ? `RECORD E1-E${article.evidence_box.length}`
+  : 'SOURCE TRAIL';
+---
+<article class={`teaser teaser-${size}`}>
+  <a href={href} class="teaser-link">
+    <div class="kicker">{article.kicker}</div>
+    {size === 'lead' ? (
+      <h2 class="headline headline-lg">{article.headline}</h2>
+    ) : (
+      <h3 class="headline headline-md">{article.headline}</h3>
+    )}
+    {article.deck && (
+      <p class="deck">{article.deck}</p>
+    )}
+    <div class="byline-row">
+      <span>{agent} · {desk}</span>
+      <span>~ {article.byline.read_time_min ?? 4} MIN · {recordRef}</span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .teaser-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .teaser-link:hover :global(.headline) { color: var(--accent); }
+  .teaser :global(.kicker)   { margin-bottom: 6px; }
+  .teaser :global(.headline) { margin-bottom: 8px; }
+  .teaser :global(.deck) {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .teaser :global(.byline-row) {
+    margin-top: 4px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .teaser-lead :global(.headline-lg) {
+    font-size: 62px;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin-bottom: 18px;
+  }
+  .teaser-lead :global(.kicker.lead) {
+    color: var(--accent);
+    font-size: 10.5px;
+    letter-spacing: 0.26em;
+    margin-bottom: 10px;
+  }
+  .teaser-lead :global(.deck) {
+    font-size: 19px;
+    line-height: 1.42;
+    margin-bottom: 16px;
+  }
+
+  .teaser-rail :global(.headline-md) { font-size: 20px; line-height: 1.15; }
+
+  .teaser-flow {
+    break-inside: avoid;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+  }
+  .teaser-flow :global(.headline-md) {
+    font-size: 22px;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+  .teaser-flow :global(.deck) {
+    font-size: 14.5px;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+</style>

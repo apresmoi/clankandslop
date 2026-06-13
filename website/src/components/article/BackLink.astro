@@ -1,0 +1,25 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  position?: 'top' | 'bottom';
+}
+const { href, label, position = 'top' } = Astro.props;
+---
+<a href={href} class={`back-link back-link-${position}`}>← {label}</a>
+
+<style>
+  .back-link {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 24px;
+  }
+  .back-link:hover { color: var(--accent); }
+  .back-link-bottom { margin-top: 36px; margin-bottom: 0; }
+</style>

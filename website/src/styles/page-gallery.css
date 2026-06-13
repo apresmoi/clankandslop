@@ -1,0 +1,122 @@
+/* ============================================================
+   Layout Gallery · /layouts/ index page
+   Grid of iframe previews so each composition can be compared
+   side-by-side. The iframe is zoomed-out so a full page fits
+   inside the thumbnail frame.
+   ============================================================ */
+.layout-gallery-intro {
+  margin: 28px 0 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hairline);
+  max-width: 720px;
+}
+.layout-gallery-h {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.layout-gallery-p {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.layout-gallery-p code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--paper-mute);
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+.layout-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 36px;
+}
+
+.layout-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.layout-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.layout-thumb-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;     /* portrait newspaper feel */
+  overflow: hidden;
+  background: var(--paper);
+  border-bottom: 1px solid var(--ink);
+}
+/* Render the iframe at full desktop width, then scale it down so
+   the user sees the whole page composition at a glance. The scale
+   factor is tuned so a typical 1440-wide page fits a ~320px card. */
+.layout-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1440px;
+  height: 1920px;
+  border: 0;
+  transform: scale(0.222);            /* 320 / 1440 */
+  transform-origin: top left;
+  pointer-events: none;               /* card is the click target */
+}
+
+.layout-card-body {
+  padding: 14px 16px 18px;
+}
+.layout-card-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: 0;
+}
+.layout-card-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+.layout-card-tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+.layout-card-summary {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  padding-top: 8px;
+  border-top: 1px dashed var(--hairline);
+}
+
+@media (max-width: 600px) {
+  .layout-gallery {
+    grid-template-columns: 1fr;
+  }
+  .layout-thumb { transform: scale(0.31); }   /* fit ~440px-wide card */
+}
+

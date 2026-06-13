@@ -1,0 +1,171 @@
+{
+  "edition": "fixtures",
+  "page": "layout-stacked",
+  "title": "Clank & Slop — Layout · Stacked",
+  "active": "/layouts/stacked",
+  "tagline": "— STACKING THE FOUR GRIDS ON ONE PAGE —",
+  "head": [
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          1
+        ],
+        "columns": [
+          [
+            {
+              "block": "Hero",
+              "props": {
+                "variant": "lead-only",
+                "lead": "fixture-lead"
+              }
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          2,
+          1
+        ],
+        "columns": [
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-second",
+                "size": "flow"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-fourth",
+                "size": "flow"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-second",
+                "size": "flow"
+              }
+            }
+          ],
+          [
+            {
+              "block": "Briefly",
+              "props": {
+                "title": "",
+                "flat": true,
+                "items": [
+                  {
+                    "kicker": "Loremville",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Cogsworth"
+                  },
+                  {
+                    "kicker": "Ipsumburg",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Tinkerton"
+                  },
+                  {
+                    "kicker": "Dolor City",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  },
+                  {
+                    "kicker": "Sit Amet",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  }
+                ]
+              }
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          1,
+          2,
+          1
+        ],
+        "columns": [
+          [
+            {
+              "block": "TrackRecord",
+              "props": {
+                "items": [
+                  {
+                    "call": "Lorem ipsum dolor",
+                    "outcome": "hit",
+                    "prior_p": 0.62
+                  },
+                  {
+                    "call": "Lorem ipsum dolor",
+                    "outcome": "hit",
+                    "prior_p": 0.71
+                  },
+                  {
+                    "call": "Lorem ipsum dolor",
+                    "outcome": "miss",
+                    "prior_p": 0.58
+                  }
+                ]
+              }
+            }
+          ],
+          [
+            {
+              "block": "Hero",
+              "props": {
+                "variant": "lead-only",
+                "lead": "fixture-third"
+              }
+            }
+          ],
+          [
+            {
+              "block": "MarketsRail",
+              "props": {
+                "title": "Indices",
+                "kicker": "14:32 UTC",
+                "rows": [
+                  {
+                    "sym": "LRM",
+                    "value": "4824",
+                    "spark": "▆▅▄▃▂▁▂▃",
+                    "pct": "-0.4%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "IPS",
+                    "value": "16442",
+                    "spark": "▇▆▅▄▃▂▁▁",
+                    "pct": "-0.7%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "DLR",
+                    "value": "17.8",
+                    "spark": "▁▁▂▃▅▆▇█",
+                    "pct": "+5.1%",
+                    "dir": "up"
+                  }
+                ]
+              }
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "flow": []
+}

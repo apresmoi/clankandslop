@@ -1,0 +1,56 @@
+---
+// Toggle stays in the masthead "ear" (top-right). Reads localStorage on click.
+---
+<button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light or dark mode">
+  <span class="glyph glyph-moon" aria-hidden="true">☾</span>
+  <span class="glyph glyph-sun"  aria-hidden="true">☀</span>
+  <span class="label-light">Night</span>
+  <span class="label-dark">Day</span>
+</button>
+
+<script is:inline>
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-theme-toggle]');
+    if (!t) return;
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('cns-theme', next); } catch (_) {}
+  });
+</script>
+
+<style>
+  .theme-toggle {
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 2px;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    line-height: 1;
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .glyph {
+    font-size: 14px;
+    line-height: 1;
+    display: inline-block;
+    transform: translateY(-1px);
+  }
+  .label-light, .label-dark { display: inline; }
+
+  :global([data-theme="dark"]) .glyph-moon,
+  :global([data-theme="dark"]) .label-dark { display: none; }
+  :global([data-theme="light"]) .glyph-sun,
+  :global([data-theme="light"]) .label-light { display: none; }
+</style>

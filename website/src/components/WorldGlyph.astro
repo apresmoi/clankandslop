@@ -1,0 +1,197 @@
+---
+/** The World Desk globe — ETOPO1-derived land quads rendered as a rotating
+    ASCII sphere by glyphcss. Plain-text output (no color spans) so the glyph
+    ramp inherits the paper's ink color in both themes. */
+interface Hotspot {
+  name: string;
+  lat: number;
+  lon: number;
+  /** Live posterior shown on the marker, e.g. 0.34. */
+  p?: number;
+}
+interface Props {
+  caption?: string;
+  /** World-desk numbers — when present (hydrated from edition chrome via
+      `"worldDesk": "edition"` in page JSON), the caption is derived from
+      them rather than hand-typed. */
+  worldDesk?: { escalation_index: number; delta: string; open_conflicts: number; watch: number };
+  cols?: number;
+  rows?: number;
+  /** Degrees of latitude/longitude per land quad. */
+  stepDeg?: number;
+  /** Initial camera angles (radians). */
+  rotX?: number;
+  rotY?: number;
+  hotspots?: Hotspot[];
+}
+const { caption: rawCaption = '', worldDesk, cols = 64, rows = 30, stepDeg = 5, rotX = 0.35, rotY = 2.1, hotspots = [] } = Astro.props;
+const caption = worldDesk
+  ? `The World Desk · escalation ${worldDesk.escalation_index.toFixed(2)} ${worldDesk.delta} · ${worldDesk.open_conflicts} open conflicts · ${worldDesk.watch} on watch · drag to rotate`
+  : rawCaption;
+const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
+---
+<figure class="worldglyph">
+  <div class="worldglyph-host" data-worldglyph data-config={config}></div>
+  {caption && <figcaption class="worldglyph-caption">{caption}</figcaption>}
+</figure>
+
+<script>
+  import { createGlyphScene, createGlyphOrbitControls, createGlyphPerspectiveCamera } from 'glyphcss';
+  import landmask from '../data/landmask.json';
+
+  const D = Math.PI / 180;
+  // Z-up, X-right, +Y sin(lon). East reads to the right ONLY from the
+  // northern-side camera (rotX ~1.25, rotY ~1.05); tipping toward rotX < 1.2 /
+  // rotY > 1.1 swings the view to the southern face, which reads east-west
+  // mirrored (Africa left of South America). Verified with labeled reference
+  // cities (lon +45 right of lon -45). Land quads and markers share this
+  // function, so they stay registered — keep page cameras near 1.25 / 1.05.
+  const toVec3 = (lat: number, lon: number, r = 1): [number, number, number] => [
+    r * Math.cos(lat * D) * Math.cos(lon * D),
+    r * Math.cos(lat * D) * Math.sin(lon * D),
+    r * Math.sin(lat * D),
+  ];
+
+  const isLand = (lat: number, lon: number): boolean => {
+    const row = Math.min(landmask.rows - 1, Math.max(0, Math.floor(90 - lat)));
+    const col = ((Math.floor(lon + 180) % 360) + 360) % 360;
+    return landmask.mask[row][col] === '1';
+  };
+
+  function landFraction(lat: number, lon: number, step: number): number {
+    let land = 0, total = 0;
+    for (let dlat = 0.5; dlat < step; dlat++)
+      for (let dlon = 0.5; dlon < step; dlon++) {
+        if (isLand(lat + dlat, lon + dlon)) land++;
+        total++;
+      }
+    return land / total;
+  }
+
+  // Land/ocean contrast comes from span colors (the plain-text glyph ramp is
+  // lighting-only, so monochrome output can't separate them). Colors are read
+  // from the theme's CSS variables; the scene re-inits on theme flips.
+  const parseHex = (hex: string): [number, number, number] => {
+    const h = hex.trim().replace('#', '');
+    const v = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+    return [parseInt(v.slice(0, 2), 16), parseInt(v.slice(2, 4), 16), parseInt(v.slice(4, 6), 16)];
+  };
+  const mix = (a: string, b: string, t: number): string => {
+    const [ar, ag, ab] = parseHex(a);
+    const [br, bg, bb] = parseHex(b);
+    const c = (x: number, y: number) => Math.round(x + (y - x) * t).toString(16).padStart(2, '0');
+    return `#${c(ar, br)}${c(ag, bg)}${c(ab, bb)}`;
+  };
+
+  // One quad per cell, wound NW→NE→SE→SW. Ocean cells are a faint paper-ink
+  // blend (gives the sphere its disc silhouette); land is full ink.
+  function buildGlobePolygons(step: number, land: string, ocean: string) {
+    const polygons = [];
+    for (let lat = -90; lat < 90; lat += step)
+      for (let lon = -180; lon < 180; lon += step) {
+        const color = landFraction(lat, lon, step) >= 0.3 ? land : ocean;
+        polygons.push({
+          vertices: [
+            toVec3(lat + step, lon),
+            toVec3(lat + step, lon + step),
+            toVec3(lat, lon + step),
+            toVec3(lat, lon),
+          ],
+          color,
+        });
+      }
+    return polygons;
+  }
+
+  const scenes = new Map<HTMLElement, { destroy(): void }>();
+
+  function initGlobe(host: HTMLElement) {
+    scenes.get(host)?.destroy();
+    host.innerHTML = '';
+    const cfg = JSON.parse(host.dataset.config!);
+    const css = getComputedStyle(document.documentElement);
+    const ink = css.getPropertyValue('--ink').trim() || '#0F0F0F';
+    const paper = css.getPropertyValue('--paper').trim() || '#F4EEE0';
+    // The library's default camera (distance 3) renders nothing — always
+    // pass an explicit far camera, like the upstream examples do.
+    const camera = createGlyphPerspectiveCamera({ rotX: cfg.rotX, rotY: cfg.rotY, zoom: 0.33, distance: 100 });
+    const scene = createGlyphScene(host, {
+      mode: 'solid',
+      cols: cfg.cols,
+      rows: cfg.rows,
+      cellAspect: 1.67,
+      useColors: true,
+      camera,
+      // Glyph density encodes lighting only (color never reaches the ramp),
+      // so keep lighting nearly flat — land/ocean separation must come from
+      // span color, and a strong directional gradient reads as fake geography.
+      directionalLight: { direction: [-0.5, -1, 0.4], intensity: 0.2 },
+      ambientLight: { intensity: 0.85 },
+    });
+    scene.add(buildGlobePolygons(cfg.stepDeg, ink, mix(paper, ink, 0.13)));
+    // Markers are numbered ①② … to key against the flashpoint index that
+    // runs beside the globe (WorldIndex block).
+    const CIRCLED = '①②③④⑤⑥⑦⑧⑨';
+    (cfg.hotspots ?? []).forEach((h: any, i: number) => {
+      const label = `${CIRCLED[i] ?? '◉'} ${h.name}${typeof h.p === 'number' ? ` · p ${h.p.toFixed(2)}` : ''}`;
+      const spot = scene.addHotspot({
+        id: h.name,
+        at: toVec3(h.lat, h.lon, 1.04),
+        size: [label.length + 2, 1],
+      });
+      spot.el.classList.add('worldglyph-spot');
+      spot.el.textContent = label;
+    });
+    // No auto-rotation: hotspot labels are positioned live and don't bake
+    // into the rotation keyframes — and a frozen edition shouldn't spin.
+    // invert: -1 matches the upstream landing globe's drag feel.
+    const controls = createGlyphOrbitControls(scene, { drag: true, wheel: false, invert: -1 });
+    scenes.set(host, { destroy: () => { controls.destroy(); scene.destroy(); } });
+  }
+
+  const hosts = [...document.querySelectorAll<HTMLElement>('[data-worldglyph]')];
+  hosts.forEach(initGlobe);
+
+  new MutationObserver(() => hosts.forEach(initGlobe)).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+</script>
+
+<style>
+  .worldglyph {
+    margin: 0;
+  }
+  .worldglyph-host {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1;
+    color: var(--ink-soft);
+    cursor: grab;
+  }
+  .worldglyph-host:active {
+    cursor: grabbing;
+  }
+  .worldglyph-host :global(.worldglyph-spot) {
+    font-family: var(--font-sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+    color: var(--red);
+    background: var(--paper);
+    padding: 0 3px;
+    line-height: 1.4;
+    height: auto !important;
+  }
+  .worldglyph-caption {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--hairline);
+  }
+</style>

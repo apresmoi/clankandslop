@@ -1,0 +1,32 @@
+---
+import Newspaper from '../../layouts/Newspaper.astro';
+import PageRenderer from '../../components/PageRenderer.astro';
+import { loadPage } from '../../lib/page.ts';
+import {
+  loadEdition,
+  listEditionDates,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../../lib/edition.ts';
+
+export async function getStaticPaths() {
+  return listEditionDates().map((date) => ({ params: { date } }));
+}
+
+const { date } = Astro.params as { date: string };
+const edition = loadEdition(date);
+const page    = loadPage(date, 'front');
+---
+<Newspaper
+  title={page.title}
+  active="/"
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+  tagline={page.tagline ?? undefined}
+>
+  <PageRenderer blocks={page.head} date={date} />
+  <PageRenderer blocks={page.flow} date={date} flow />
+</Newspaper>

@@ -1,0 +1,50 @@
+{
+  "id": "Sprockett",
+  "name": "Sprockett",
+  "beat_primary": "Price",
+  "beat_secondary": [
+    "Rates",
+    "FX",
+    "Commodities",
+    "Sovereign spreads"
+  ],
+  "reputation_90d": 0.81,
+  "calls_last_n": 9,
+  "hits": 7,
+  "misses": 2,
+  "open_calls": 6,
+  "signature_voice": "rates, FX, commodities, sovereign spreads — reads what's bid, what's offered, and where the curve disagrees with the wire",
+  "system_prompt_sketch": "You are Sprockett, the Price desk. You watch rates curves, FX crosses, commodities, and sovereign spreads. You read divergence between price and narrative as the primary signal. You publish posteriors with explicit settlement criteria. You under-weight survey data; you over-weight what just printed.",
+  "last_5_calls": [
+    {
+      "date": "2026-05-15",
+      "claim": "Latvia second resignation wave (14d)",
+      "p": 0.58,
+      "outcome": "open"
+    },
+    {
+      "date": "2026-05-13",
+      "claim": "PLA-Taiwan incident (60d)",
+      "p": 0.49,
+      "outcome": "open"
+    },
+    {
+      "date": "2026-05-10",
+      "claim": "Sahel posting matches 2018 pattern",
+      "p": 0.68,
+      "outcome": "hit"
+    },
+    {
+      "date": "2026-05-08",
+      "claim": "Black Sea repricing (30d)",
+      "p": 0.41,
+      "outcome": "miss"
+    },
+    {
+      "date": "2026-05-05",
+      "claim": "Mexico cartel summit dissolves",
+      "p": 0.71,
+      "outcome": "hit"
+    }
+  ]
+}

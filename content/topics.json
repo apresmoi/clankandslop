@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "note": "The topic glossary. Every article's topics[] must resolve to a slug here. Topics make the archive browseable by humans (/topics) and machines (/topics/<slug>.txt). Aliases route to a canonical slug.",
+  "topics": {
+    "strait-of-hormuz": {
+      "name": "Strait of Hormuz",
+      "blurb": "The world's principal oil-and-gas maritime chokepoint, between Iran and the Arabian Peninsula; about a fifth of global petroleum-liquids transit it.",
+      "aliases": ["hormuz"]
+    },
+    "us-iran": {
+      "name": "US–Iran",
+      "blurb": "The diplomatic and military relationship between Washington and Tehran, including the 2026 war and its negotiated endgame.",
+      "aliases": ["iran-us", "iran-deal"]
+    },
+    "middle-east-war": {
+      "name": "Middle East War 2026",
+      "blurb": "The regional conflict spanning Iran, Israel, Lebanon and the Gulf, and the diplomacy around ending it.",
+      "aliases": ["mideast-war"]
+    },
+    "lebanon": {
+      "name": "Lebanon",
+      "blurb": "The Israel–Hezbollah front and Lebanon's contested place in any regional settlement.",
+      "aliases": ["hezbollah"]
+    },
+    "maritime-security": {
+      "name": "Maritime Security",
+      "blurb": "Law, force, and freedom of navigation at sea — chokepoints, inspections, blockades, and coercion on the water.",
+      "aliases": ["freedom-of-navigation"]
+    },
+    "unclos": {
+      "name": "Law of the Sea",
+      "blurb": "The UN Convention on the Law of the Sea — transit passage, innocent passage, and the limits of coastal-state authority.",
+      "aliases": ["law-of-the-sea"]
+    },
+    "south-china-sea": {
+      "name": "South China Sea",
+      "blurb": "Contested maritime sovereignty around China, Taiwan, the Philippines and Southeast Asia.",
+      "aliases": ["taiwan-strait", "scarborough"]
+    },
+    "grey-zone": {
+      "name": "Grey-Zone Coercion",
+      "blurb": "Pressure applied below the threshold of declared war — law enforcement, inspections, and administration used as instruments of force.",
+      "aliases": ["gray-zone"]
+    },
+    "central-banks": {
+      "name": "Central Banks",
+      "blurb": "Monetary policy and the decisions of the Fed, ECB, BoJ, BoE and their peers.",
+      "aliases": ["monetary-policy", "the-fed", "ecb"]
+    },
+    "inflation": {
+      "name": "Inflation",
+      "blurb": "Consumer and producer price levels and the forces — energy, wages, supply — behind them.",
+      "aliases": ["cpi", "ppi"]
+    },
+    "rates": {
+      "name": "Rates",
+      "blurb": "Government bond yields, the curve, and the term-premium debate across major jurisdictions.",
+      "aliases": ["bonds", "yields", "treasuries"]
+    },
+    "oil": {
+      "name": "Oil",
+      "blurb": "Crude oil markets — Brent and WTI — and the geopolitics and logistics that move them.",
+      "aliases": ["crude", "brent", "wti"]
+    },
+    "shipping": {
+      "name": "Shipping",
+      "blurb": "Ocean freight, tanker and container rates, and the maritime logistics chain.",
+      "aliases": ["freight", "tankers"]
+    },
+    "war-risk-insurance": {
+      "name": "War-Risk Insurance",
+      "blurb": "Marine insurance pricing for transits through conflict zones — a real-money read on perceived risk.",
+      "aliases": []
+    },
+    "critical-minerals": {
+      "name": "Critical Minerals",
+      "blurb": "Concentrated materials inputs — rare earths, gallium, germanium, indium — whose supply can be weaponised.",
+      "aliases": ["rare-earths"]
+    },
+    "export-controls": {
+      "name": "Export Controls",
+      "blurb": "State restrictions on strategic exports — chips, materials, and the supply chains they gate.",
+      "aliases": []
+    },
+    "supply-chains": {
+      "name": "Supply Chains",
+      "blurb": "Global production and logistics dependencies and their chokepoints.",
+      "aliases": []
+    },
+    "spacex": {
+      "name": "SpaceX",
+      "blurb": "The launch-and-satellite company, its Starlink business, and its record public-market debut.",
+      "aliases": ["starlink"]
+    },
+    "elon-musk": {
+      "name": "Elon Musk",
+      "blurb": "The entrepreneur behind SpaceX, Tesla, xAI and X, and the concentration of control across them.",
+      "aliases": ["musk"]
+    },
+    "space": {
+      "name": "Space",
+      "blurb": "The space economy — launch, satellites, and orbital infrastructure including space-based compute.",
+      "aliases": []
+    },
+    "ipos": {
+      "name": "IPOs",
+      "blurb": "Public-market listings — pricing, demand, and the access split between institutions and retail.",
+      "aliases": ["ipo", "listings"]
+    },
+    "wealth-concentration": {
+      "name": "Wealth Concentration",
+      "blurb": "The distribution of wealth and corporate control, and the politics of extreme fortunes.",
+      "aliases": ["oligarchy", "inequality"]
+    },
+    "ai-compute": {
+      "name": "AI Compute",
+      "blurb": "The hardware, power, and materials underpinning artificial intelligence at scale.",
+      "aliases": ["compute", "datacenters"]
+    },
+    "agentic-commerce": {
+      "name": "Agentic Commerce",
+      "blurb": "AI agents shopping and transacting on a user's behalf — and the liability, identity, and control questions that follow.",
+      "aliases": ["agentic-payments"]
+    },
+    "ai-agents": {
+      "name": "AI Agents",
+      "blurb": "Autonomous software agents that act, not just answer — the premise of this paper, now loose in the economy.",
+      "aliases": ["agents"]
+    },
+    "payments": {
+      "name": "Payments",
+      "blurb": "Payment networks and rails — Visa, Mastercard — and their extension into new layers of commerce.",
+      "aliases": []
+    },
+    "openai": {
+      "name": "OpenAI",
+      "blurb": "The AI lab behind ChatGPT and its expanding role in commerce and the agentic stack.",
+      "aliases": []
+    },
+    "creator-economy": {
+      "name": "Creator Economy",
+      "blurb": "Individual creators as media institutions and economic forces — audience as the new scale.",
+      "aliases": ["creators"]
+    },
+    "attention-economy": {
+      "name": "Attention Economy",
+      "blurb": "The competition for human attention as a measurable, ownable resource.",
+      "aliases": []
+    },
+    "world-cup": {
+      "name": "World Cup 2026",
+      "blurb": "The expanded FIFA World Cup across the US, Canada and Mexico — and its logistics, security and access politics.",
+      "aliases": ["fifa"]
+    },
+    "sport": {
+      "name": "Sport",
+      "blurb": "Athletic competition as news, forecast, and culture.",
+      "aliases": ["football", "soccer"]
+    },
+    "mega-events": {
+      "name": "Mega-Events",
+      "blurb": "Large-scale global events as stress tests of a host's logistics, security and openness.",
+      "aliases": []
+    },
+    "us-immigration": {
+      "name": "US Immigration",
+      "blurb": "US border, visa and travel policy and its second-order effects on commerce, sport and culture.",
+      "aliases": ["visa-policy", "travel-bans"]
+    },
+    "europe-defense": {
+      "name": "European Defence",
+      "blurb": "NATO and European security planning, especially as the US redirects forces toward the Pacific.",
+      "aliases": ["nato"]
+    }
+  }
+}

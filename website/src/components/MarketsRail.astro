@@ -1,0 +1,164 @@
+---
+interface Row {
+  sym: string;
+  value: string;
+  spark: string;
+  pct: string;
+  /** Absolute change in points/dollars, e.g. "-20.41" or "+1.18". Optional. */
+  change?: string;
+  dir: 'up' | 'down';
+}
+interface Props {
+  title?: string;
+  kicker?: string;
+  rows: Row[];
+  /** "list" = vertical rail (default); "strip" = horizontal cards with mini-sparkline. */
+  variant?: 'list' | 'strip';
+}
+const { title = 'The Tape', kicker = 'Live · 14:32 UTC', rows, variant = 'list' } = Astro.props;
+---
+{variant === 'strip' ? (
+  <div class="markets-strip">
+    {rows.map((r) => (
+      <div class="ticker-card">
+        <div class="ticker-card-text">
+          <div class="sym">{r.sym}</div>
+          <div class="value">{r.value}</div>
+          <div class={`delta ${r.dir}`}>
+            {r.change && <span class="abs">{r.change}</span>}
+            {r.change && <span class="sep">·</span>}
+            <span class="pct">{r.pct}</span>
+          </div>
+        </div>
+        <div class={`ticker-card-spark ${r.dir}`}>{r.spark}</div>
+      </div>
+    ))}
+  </div>
+) : (
+  <div class="story markets-rail">
+    <div class="kicker muted">{kicker}</div>
+    <div class="headline">{title}</div>
+    <div class="markets-rows">
+      {rows.map((r) => (
+        <div class="ticker-row">
+          <span class="sym">{r.sym}</span>
+          <span>{r.value}</span>
+          <span class={`spark ${r.dir}`}>{r.spark}</span>
+          <span class={`pct ${r.dir}`}>{r.pct}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .markets-rail { padding-top: 4px; }
+  .markets-rail .markets-rows { margin-top: 10px; }
+  /* Inside a grid column, the muted timestamp duplicates the masthead's. */
+  :global(.cns-grid-col) .markets-rail :global(.kicker.muted) { display: none; }
+
+  .ticker-row {
+    display: grid;
+    grid-template-columns: 56px auto 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .ticker-row:last-child { border-bottom: none; }
+  .ticker-row .sym { font-weight: 700; }
+  .ticker-row :global(.spark) {
+    text-align: left;
+    overflow: hidden;
+  }
+  .ticker-row .pct {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .ticker-row .pct.up   { color: var(--green); }
+  .ticker-row .pct.down { color: var(--red); }
+
+  /* Horizontal strip variant — 5 cards across, mini sparkline on right. */
+  .markets-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--hairline-strong);
+    margin: 8px 0 18px;
+  }
+  .ticker-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border-right: 1px solid var(--hairline);
+    min-width: 0;
+  }
+  .ticker-card:last-child { border-right: none; }
+  .ticker-card:nth-child(5n) { border-right: none; }
+
+  .ticker-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .markets-strip .sym {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .value {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .delta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .delta .sep { color: var(--muted); }
+  .delta.up   { color: var(--green); }
+  .delta.down { color: var(--red); }
+
+  .ticker-card-spark {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .ticker-card-spark.up   { color: var(--green); }
+  .ticker-card-spark.down { color: var(--red); }
+
+  @media (max-width: 1024px) {
+    .markets-strip { grid-template-columns: repeat(3, 1fr); }
+    .ticker-card:nth-child(5n)   { border-right: 1px solid var(--hairline); }
+    .ticker-card:nth-child(3n)   { border-right: none; }
+  }
+  @media (max-width: 640px) {
+    .markets-strip { grid-template-columns: repeat(2, 1fr); }
+    .ticker-card:nth-child(2n)   { border-right: none; }
+    .ticker-card:nth-child(2n+1) { border-right: 1px solid var(--hairline); }
+  }
+</style>

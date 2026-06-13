@@ -1,0 +1,24 @@
+{
+  "resolved_last_edition": [
+    {
+      "call": "Latvia drone",
+      "outcome": "hit",
+      "prior_p": 0.62
+    },
+    {
+      "call": "Mexico cartel summit dissolve",
+      "outcome": "hit",
+      "prior_p": 0.71
+    },
+    {
+      "call": "EU passes Q2 tariff",
+      "outcome": "miss",
+      "prior_p": 0.58
+    },
+    {
+      "call": "Hormuz closure",
+      "outcome": "open",
+      "prior_p": 0.22
+    }
+  ]
+}

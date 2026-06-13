@@ -1,0 +1,200 @@
+{
+  "edition": "fixtures",
+  "page": "layout-maps",
+  "title": "Clank & Slop — Layout: Glyph Maps",
+  "active": "/layouts",
+  "tagline": "— MAP DESK STRESS TEST · BAKED FROM ETOPO1 · OVERLAYS FROM PAGE JSON —",
+  "head": [
+    {
+      "block": "SectionHeader",
+      "props": {
+        "text": "The Map Desk · Fixture Strait"
+      }
+    },
+    {
+      "block": "MapGlyph",
+      "props": {
+        "map": "fixture-strait",
+        "cols": 110,
+        "rows": 44,
+        "caption": "Zone Alpha (red) · lane Bravo (amber) · drag to tilt · Terrain: NOAA",
+        "overlays": [
+          {
+            "name": "Zone Alpha",
+            "color": "red",
+            "ring": [
+              [
+                27.0,
+                118.5
+              ],
+              [
+                27.0,
+                122.8
+              ],
+              [
+                24.8,
+                122.4
+              ],
+              [
+                23.2,
+                119.6
+              ],
+              [
+                25.0,
+                117.8
+              ]
+            ]
+          }
+        ],
+        "routes": [
+          {
+            "color": "accent",
+            "points": [
+              [
+                16.5,
+                111.0
+              ],
+              [
+                20.5,
+                115.5
+              ],
+              [
+                22.2,
+                117.8
+              ],
+              [
+                24.2,
+                119.6
+              ],
+              [
+                26.4,
+                121.4
+              ],
+              [
+                30.0,
+                124.5
+              ]
+            ],
+            "name": "Lane Bravo"
+          }
+        ],
+        "spots": [
+          {
+            "name": "PORT A",
+            "lat": 25.05,
+            "lon": 121.5
+          },
+          {
+            "name": "PORT B",
+            "lat": 22.62,
+            "lon": 120.27
+          },
+          {
+            "name": "PORT C",
+            "lat": 24.48,
+            "lon": 118.1
+          }
+        ],
+        "title": "Fixture Region · Interactive"
+      }
+    },
+    {
+      "block": "SectionHeader",
+      "props": {
+        "text": "The Map Desk · Fixture Gulf"
+      }
+    },
+    {
+      "block": "MapGlyph",
+      "props": {
+        "map": "fixture-gulf",
+        "cols": 110,
+        "rows": 38,
+        "caption": "Zone Alpha (red) · lane Bravo (amber) · drag to tilt · Terrain: NOAA",
+        "overlays": [
+          {
+            "name": "Zone Alpha",
+            "color": "red",
+            "ring": [
+              [
+                28.2,
+                50.5
+              ],
+              [
+                28.6,
+                57.2
+              ],
+              [
+                26.9,
+                57.6
+              ],
+              [
+                26.2,
+                53.5
+              ],
+              [
+                26.8,
+                50.2
+              ]
+            ]
+          }
+        ],
+        "routes": [
+          {
+            "color": "accent",
+            "points": [
+              [
+                24.2,
+                59.5
+              ],
+              [
+                26.0,
+                57.2
+              ],
+              [
+                26.55,
+                56.5
+              ],
+              [
+                26.7,
+                55.6
+              ],
+              [
+                26.2,
+                53.4
+              ],
+              [
+                27.2,
+                50.8
+              ],
+              [
+                29.2,
+                48.6
+              ]
+            ],
+            "name": "Lane Bravo"
+          }
+        ],
+        "spots": [
+          {
+            "name": "PORT A",
+            "lat": 27.18,
+            "lon": 56.28
+          },
+          {
+            "name": "PORT B",
+            "lat": 25.2,
+            "lon": 55.3
+          },
+          {
+            "name": "PORT C",
+            "lat": 23.6,
+            "lon": 58.4
+          }
+        ],
+        "title": "Fixture Region · Interactive"
+      }
+    }
+  ],
+  "flow": []
+}

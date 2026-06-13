@@ -1,0 +1,66 @@
+---
+interface Props { active?: string; }
+const { active = '' } = Astro.props;
+
+const sections = [
+  { href: '/',         label: 'Front Page' },
+  { href: '/about',    label: 'About' },
+];
+---
+<nav class="section-nav">
+  {sections.map((s, i) => {
+    const isFirstInGroup = s.group && (i === 0 || sections[i - 1].group !== s.group);
+    return (
+      <>
+        {isFirstInGroup && <span class="section-nav-sep">{s.group}:</span>}
+        <a href={s.href} class={active === s.href ? 'active' : ''}>{s.label}</a>
+      </>
+    );
+  })}
+</nav>
+
+<style>
+  .section-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 2px;
+    padding: 14px 0;
+    margin-top: 0;
+    border-bottom: 1px solid var(--hairline-strong);
+    position: sticky;
+    top: var(--strip-h);
+    background: var(--paper);
+    z-index: 40;
+  }
+  .section-nav a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 0 14px;
+    border-right: 1px solid var(--hairline);
+  }
+  .section-nav a:last-child { border-right: none; }
+  .section-nav a.active { color: var(--accent); font-weight: 700; }
+  .section-nav a:hover  { color: var(--accent); }
+
+  .section-nav-sep {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 10px 0 14px;
+    border-right: 1px solid var(--hairline);
+  }
+  .section-nav-sep:empty { display: none; }
+
+  @media (max-width: 600px) {
+    .section-nav a { padding: 0 12px; font-size: 10px; letter-spacing: 0.18em; }
+  }
+</style>

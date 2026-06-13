@@ -1,0 +1,72 @@
+---
+import '../../styles/page-gallery.css';
+import Newspaper from '../../layouts/Newspaper.astro';
+import { loadEdition, latestEditionDate, fmtEditionLine, fmtDateLine } from '../../lib/edition.ts';
+import { loadPage, listLayoutNames } from '../../lib/page.ts';
+
+const date = latestEditionDate();
+const edition = loadEdition(date);
+
+interface LayoutEntry {
+  slug: string;
+  fullName: string;
+  title: string;
+  tagline: string | null;
+  blockSummary: string;
+}
+
+const layouts: LayoutEntry[] = listLayoutNames('fixtures').map((fullName) => {
+  const p = loadPage('fixtures', fullName);
+  const blocks = [...p.head, ...p.flow].filter((b) => b.block !== 'SectionHeader');
+  const counts: Record<string, number> = {};
+  for (const b of blocks) counts[b.block] = (counts[b.block] ?? 0) + 1;
+  const blockSummary = Object.entries(counts)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, n]) => n > 1 ? `${n}× ${name}` : name)
+    .join(' · ');
+  return {
+    slug: fullName.replace(/^layout-/, ''),
+    fullName,
+    title: p.title.replace('Clank & Slop — Layout · ', ''),
+    tagline: (p.tagline ?? '').replace(/^—\s*LAYOUT GALLERY\s*·\s*/, '').replace(/\s*—$/, '') || null,
+    blockSummary,
+  };
+});
+---
+<Newspaper
+  title="Clank & Slop — Layout Gallery"
+  active="/layouts"
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+  tagline="— LAYOUT GALLERY · COMPARE COMPOSITIONS AT A GLANCE —"
+>
+  <section class="layout-gallery-intro">
+    <h2 class="layout-gallery-h">The same {layouts.length} blocks, {layouts.length} different days.</h2>
+    <p class="layout-gallery-p">
+      Each card is a complete page rendered from one JSON file under
+      <code>content/editions/&lt;date&gt;/pages/</code>. Click any thumbnail
+      to open the page at full size. The block summary lists what's in the
+      composition — useful for spotting which compositions handle thin
+      content well and which need a heavier day to look complete.
+    </p>
+  </section>
+
+  <section class="layout-gallery">
+    {layouts.map((l) => (
+      <a class="layout-card" href={`/layouts/${l.slug}`}>
+        <div class="layout-thumb-frame">
+          <iframe class="layout-thumb" src={`/layouts/${l.slug}?theme=light`} loading="lazy" title={l.title} scrolling="no"></iframe>
+        </div>
+        <div class="layout-card-body">
+          <div class="layout-card-eyebrow">/layouts/{l.slug}</div>
+          <div class="layout-card-title">{l.title}</div>
+          {l.tagline && <div class="layout-card-tagline">{l.tagline}</div>}
+          <div class="layout-card-summary">{l.blockSummary}</div>
+        </div>
+      </a>
+    ))}
+  </section>
+</Newspaper>

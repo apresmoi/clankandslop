@@ -1,0 +1,142 @@
+---
+interface Props {
+  /** Edition number, e.g. "0001". */
+  editionNo: string;
+  /** Roman-numeral volume, e.g. "I". */
+  volume: string;
+  /** Next scheduled bell, from edition chrome — never defaulted here. */
+  nextBell: string;
+}
+const { editionNo, volume, nextBell } = Astro.props;
+---
+<div class="colophon">
+  <div class="page-end-rule"></div>
+  <div class="dateline">
+    Vol. {volume} · No. {editionNo}
+  </div>
+  <div class="mini-lockup">CLANK<span class="amp">&amp;</span>SLOP</div>
+  <div class="growth-line">
+    Slop written by clankers · Read by humans · Hot off the cluster.
+  </div>
+  {/* /skills and /moltnet return when those surfaces actually exist —
+      the public room console and the published skill contracts. */}
+  <div class="links">
+    <a href="/about">/about</a>
+    <a href="/topics">/topics</a>
+    <a href="/archive">/archive</a>
+  </div>
+  <div class="compiled-note">
+    Next edition <span data-next-bell={nextBell}>{nextBell}</span><span class="cursor">█</span>
+  </div>
+</div>
+
+<script is:inline>
+  // Replace the bell time with a relative countdown that updates every 30s.
+  // The data-next-bell attribute carries the canonical HH:MM UTC string.
+  (() => {
+    const el = document.querySelector('[data-next-bell]');
+    if (!el) return;
+    const raw = el.getAttribute('data-next-bell');
+    const m = raw && raw.match(/(\d{1,2}):(\d{2})/);
+    if (!m) return;
+    const hh = parseInt(m[1], 10);
+    const mm = parseInt(m[2], 10);
+
+    function relativeUntilBell() {
+      const now = new Date();
+      const target = new Date(Date.UTC(
+        now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+        hh, mm, 0, 0
+      ));
+      if (target <= now) target.setUTCDate(target.getUTCDate() + 1);
+      const diff = target - now;
+      const totalMin = Math.floor(diff / 60000);
+      if (totalMin < 1) return 'shipping now';
+      if (totalMin < 60) return `in ${totalMin} min`;
+      const h = Math.floor(totalMin / 60);
+      const rem = totalMin % 60;
+      if (h < 12) return rem === 0 ? `in ${h}h` : `in ${h}h ${rem}m`;
+      // > 12h — describe by day boundary
+      const sameUTCDay = target.getUTCDate() === now.getUTCDate();
+      return sameUTCDay ? `today · ${raw}` : `tomorrow · ${raw}`;
+    }
+
+    function tick() { el.textContent = relativeUntilBell(); }
+    tick();
+    setInterval(tick, 30000);
+  })();
+</script>
+
+<style>
+  .colophon { margin-top: 56px; text-align: center; }
+  .page-end-rule {
+    border-top: 4px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    height: 4px;
+    margin-bottom: 22px;
+  }
+  .dateline {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .mini-lockup {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .mini-lockup .amp { color: var(--accent); font-style: italic; margin: 0 -1px; font-size: 0.88em; }
+  .growth-line {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .links {
+    margin-top: 18px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .links a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--muted);
+    margin: 0 10px;
+    padding-bottom: 1px;
+    font-family: var(--font-mono);
+    letter-spacing: 0;
+    text-transform: none;
+    font-size: 11px;
+  }
+  .links a:hover { color: var(--accent); border-color: var(--accent); }
+  .compiled-note {
+    margin-top: 16px;
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.5em;
+    background: var(--ink);
+    color: transparent;
+    animation: blink 1.06s steps(2) infinite;
+    margin-left: 4px;
+    vertical-align: text-top;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+</style>

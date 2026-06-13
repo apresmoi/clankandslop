@@ -1,0 +1,451 @@
+---
+/** Regional glyph map — a baked terrain raster (ops/bake-map.mjs) with
+    editorial overlays: tinted areas of influence, routes, labeled spots.
+    All overlay geometry is lat/lon in content JSON; the heavy source
+    dataset never ships.
+
+    Two render paths:
+    - print (interactive: false) — typeset server-side, one <span> run per
+      color, zero JS. Glyph and color are chosen per cell, so coastlines,
+      zones and routes stay crisp. This is the story-illustration mode.
+    - desk (interactive: true) — glyphcss 3D plane with a drag camera, for
+      standalone map-desk panels. */
+import type { RegionMap } from '../lib/edition.ts';
+
+interface Spot { name: string; lat: number; lon: number; }
+interface Overlay { name?: string; color?: 'red' | 'accent' | 'green'; ring: Array<[number, number]>; }
+interface Route { name?: string; color?: 'red' | 'accent' | 'green'; points: Array<[number, number]>; }
+interface Props {
+  map: RegionMap;
+  /** Small-caps title in the frame head, e.g. "Taiwan Strait". */
+  title?: string;
+  caption?: string;
+  cols?: number;
+  rows?: number;
+  rotX?: number;
+  rotY?: number;
+  zoom?: number;
+  overlays?: Overlay[];
+  routes?: Route[];
+  spots?: Spot[];
+  /** False renders a fixed typeset illustration — no camera, no JS. */
+  interactive?: boolean;
+}
+const {
+  map: m, title = '', caption = '', cols = 80, rows = 38,
+  rotX = 0.45, rotY = 0, zoom = 0.42,
+  overlays = [], routes = [], spots = [],
+  interactive = true,
+} = Astro.props;
+
+const config = interactive
+  ? JSON.stringify({ map: m, cols, rows, rotX, rotY, zoom, overlays, routes, spots })
+  : undefined;
+
+// ── Print path: typeset the band grid directly ──────────────────────────
+const toCell = (lat: number, lon: number): [number, number] => [
+  ((m.north - lat) / (m.north - m.south)) * m.rows,
+  ((lon - m.west) / (m.east - m.west)) * m.cols,
+];
+
+const inRing = (lat: number, lon: number, ring: Array<[number, number]>): boolean => {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [latI, lonI] = ring[i];
+    const [latJ, lonJ] = ring[j];
+    if (lonI > lon !== lonJ > lon && lat < ((latJ - latI) * (lon - lonI)) / (lonJ - lonI) + latI) inside = !inside;
+  }
+  return inside;
+};
+
+// band → glyph: water gets a sparse dot texture, land densifies with height.
+const LAND_RAMP = ' ░░▒▒▓▓██';
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+let printHtml = '';
+let legend: Array<{ color: string; glyph: string; label: string }> = [];
+let printSpots: Array<{ name: string; leftPct: number; topPct: number }> = [];
+
+if (!interactive) {
+  type Cell = { ch: string; cls: string };
+  const grid: Cell[][] = [];
+  for (let r = 0; r < m.rows; r++) {
+    const row: Cell[] = [];
+    const lat = m.north - ((r + 0.5) / m.rows) * (m.north - m.south);
+    for (let c = 0; c < m.cols; c++) {
+      const lon = m.west + ((c + 0.5) / m.cols) * (m.east - m.west);
+      const band = Number(m.bands[r][c]);
+      let cell: Cell = band === 0
+        ? { ch: (r + c) % 2 ? '·' : ' ', cls: 'w' }
+        : { ch: LAND_RAMP[band], cls: 'l' };
+      for (const o of overlays) {
+        if (!inRing(lat, lon, o.ring)) continue;
+        cell = { ch: band === 0 ? '░' : LAND_RAMP[band], cls: `o-${o.color ?? 'red'}` };
+      }
+      row.push(cell);
+    }
+    grid.push(row);
+  }
+
+  // Routes draw over terrain: sample each segment finer than the cell size.
+  for (const route of routes) {
+    const cls = `r-${route.color ?? 'accent'}`;
+    const pts = route.points.map(([lat, lon]) => toCell(lat, lon));
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [r1, c1] = pts[i];
+      const [r2, c2] = pts[i + 1];
+      const steps = Math.ceil(Math.max(Math.abs(r2 - r1), Math.abs(c2 - c1)) * 2) + 1;
+      for (let s = 0; s <= steps; s++) {
+        const r = Math.floor(r1 + ((r2 - r1) * s) / steps);
+        const c = Math.floor(c1 + ((c2 - c1) * s) / steps);
+        if (grid[r]?.[c]) grid[r][c] = { ch: '•', cls };
+      }
+    }
+  }
+
+  for (const s of spots) {
+    const [r, c] = toCell(s.lat, s.lon);
+    const ri = Math.floor(r), ci = Math.floor(c);
+    if (grid[ri]?.[ci]) grid[ri][ci] = { ch: '◉', cls: 's' };
+    printSpots.push({ name: s.name, leftPct: (c / m.cols) * 100, topPct: (r / m.rows) * 100 });
+  }
+
+  // Merge adjacent same-class cells into one span per run.
+  printHtml = grid.map((row) => {
+    let html = '';
+    let run = '';
+    let cls = row[0].cls;
+    for (const cell of row) {
+      if (cell.cls !== cls) {
+        html += `<span class="mg-${cls}">${esc(run)}</span>`;
+        run = '';
+        cls = cell.cls;
+      }
+      run += cell.ch;
+    }
+    return html + `<span class="mg-${cls}">${esc(run)}</span>`;
+  }).join('\n');
+
+  legend = [
+    ...overlays.filter((o) => o.name).map((o) => ({ color: o.color ?? 'red', glyph: '▓', label: o.name! })),
+    ...routes.filter((r) => r.name).map((r) => ({ color: r.color ?? 'accent', glyph: '•••', label: r.name! })),
+  ];
+}
+---
+<figure class:list={['mapglyph', interactive ? 'is-card' : 'is-print']}>
+  {(title || legend.length > 0) && (
+    <div class:list={['mapglyph-head', { 'no-title': !title }]}>
+      {title && <span class="mapglyph-title">{title}</span>}
+      {legend.length > 0 && (
+        <span class="mapglyph-legend">
+          {legend.map((item) => (
+            <span class="legend-item">
+              <span class={`legend-glyph mg-${item.glyph === '▓' ? 'o' : 'r'}-${item.color}`}>{item.glyph}</span>
+              {item.label}
+            </span>
+          ))}
+        </span>
+      )}
+    </div>
+  )}
+
+  {interactive ? (
+    <div class="mapglyph-host is-interactive" data-mapglyph data-config={config}></div>
+  ) : (
+    <div class="mapglyph-print" style={`--map-cols: ${m.cols};`}>
+      <pre set:html={printHtml} />
+      {printSpots.map((s) => (
+        <span class="mg-label" style={`left: ${s.leftPct}%; top: ${s.topPct}%;`}>{s.name}</span>
+      ))}
+    </div>
+  )}
+
+  {caption && <figcaption class="mapglyph-caption">{caption}</figcaption>}
+</figure>
+
+<script>
+  import { createGlyphScene, createGlyphOrbitControls, createGlyphPerspectiveCamera } from 'glyphcss';
+
+  const parseHex = (hex: string): [number, number, number] => {
+    const h = hex.trim().replace('#', '');
+    const v = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+    return [parseInt(v.slice(0, 2), 16), parseInt(v.slice(2, 4), 16), parseInt(v.slice(4, 6), 16)];
+  };
+  const mix = (a: string, b: string, t: number): string => {
+    const [ar, ag, ab] = parseHex(a);
+    const [br, bg, bb] = parseHex(b);
+    const c = (x: number, y: number) => Math.round(x + (y - x) * t).toString(16).padStart(2, '0');
+    return `#${c(ar, br)}${c(ag, bg)}${c(ab, bb)}`;
+  };
+
+  const inRing = (lat: number, lon: number, ring: Array<[number, number]>): boolean => {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [latI, lonI] = ring[i];
+      const [latJ, lonJ] = ring[j];
+      if (lonI > lon !== lonJ > lon && lat < ((latJ - latI) * (lon - lonI)) / (lonJ - lonI) + latI) inside = !inside;
+    }
+    return inside;
+  };
+
+  const scenes = new Map<HTMLElement, { destroy(): void }>();
+
+  function initMap(host: HTMLElement) {
+    scenes.get(host)?.destroy();
+    host.innerHTML = '';
+    const cfg = JSON.parse(host.dataset.config!);
+    const m = cfg.map;
+    const css = getComputedStyle(document.documentElement);
+    const cvar = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback;
+    const ink = cvar('--ink', '#0F0F0F');
+    const paper = cvar('--paper', '#F4EEE0');
+    const palette: Record<string, string> = {
+      red: cvar('--red', '#A91D1D'),
+      accent: cvar('--accent', '#B8841E'),
+      green: cvar('--green', '#2D6B3A'),
+    };
+
+    // Plane: y = east [-1,1], x = south [-sy,sy] (screen-up is -X under the
+    // top-down camera), proportions corrected by cos(mid-latitude).
+    const midLat = ((m.north + m.south) / 2) * (Math.PI / 180);
+    const sy = (m.north - m.south) / ((m.east - m.west) * Math.cos(midLat));
+    const toPlane = (lat: number, lon: number, z = 0): [number, number, number] => [
+      -(((lat - m.south) / (m.north - m.south)) * 2 - 1) * sy,
+      ((lon - m.west) / (m.east - m.west)) * 2 - 1,
+      z,
+    ];
+
+    const HEIGHT = 0.018;
+    const polygons = [];
+    // Print-resolution bakes are too dense for the 3D path — subsample.
+    const stride = Math.max(1, Math.round(m.cols / 76));
+    const dLat = ((m.north - m.south) / m.rows) * stride;
+    const dLon = ((m.east - m.west) / m.cols) * stride;
+    for (let r = 0; r < m.rows; r += stride) {
+      const latN = m.north - (r / stride) * dLat;
+      const latS = latN - dLat;
+      for (let c = 0; c < m.cols; c += stride) {
+        const lonW = m.west + (c / stride) * dLon;
+        const lonE = lonW + dLon;
+        const band = Number(m.bands[r][c]);
+        const z = band * HEIGHT;
+        const color = band === 0 ? mix(paper, ink, 0.08) : mix(paper, ink, 0.48 + band * 0.05);
+        // NW→SW→SE→NE — CCW toward the camera at our top-down-ish view.
+        polygons.push({
+          vertices: [toPlane(latN, lonW, z), toPlane(latS, lonW, z), toPlane(latS, lonE, z), toPlane(latN, lonE, z)],
+          color,
+        });
+        // Influence overlays tint the cell from slightly above the terrain.
+        for (const o of cfg.overlays ?? []) {
+          if (!inRing(latN - dLat / 2, lonW + dLon / 2, o.ring)) continue;
+          const tint = mix(paper, palette[o.color ?? 'red'], 0.78);
+          const zo = z + 0.02;
+          polygons.push({
+            vertices: [toPlane(latN, lonW, zo), toPlane(latS, lonW, zo), toPlane(latS, lonE, zo), toPlane(latN, lonE, zo)],
+            color: tint,
+          });
+        }
+      }
+    }
+
+    // Routes: thin quad per segment, both windings so view angle can't cull.
+    for (const route of cfg.routes ?? []) {
+      const color = palette[route.color ?? 'accent'];
+      const pts = (route.points ?? []).map(([lat, lon]: [number, number]) => toPlane(lat, lon, 0.34 * HEIGHT + 0.03));
+      const W = 0.012;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [x1, y1, z1] = pts[i];
+        const [x2, y2, z2] = pts[i + 1];
+        const len = Math.hypot(x2 - x1, y2 - y1) || 1;
+        const nx = (-(y2 - y1) / len) * W;
+        const ny = ((x2 - x1) / len) * W;
+        const quad = [
+          [x1 + nx, y1 + ny, z1], [x2 + nx, y2 + ny, z2],
+          [x2 - nx, y2 - ny, z2], [x1 - nx, y1 - ny, z1],
+        ];
+        polygons.push({ vertices: quad, color }, { vertices: [...quad].reverse(), color });
+      }
+    }
+
+    const camera = createGlyphPerspectiveCamera({ rotX: cfg.rotX, rotY: cfg.rotY, zoom: cfg.zoom, distance: 100 });
+    const scene = createGlyphScene(host, {
+      mode: 'solid',
+      cols: cfg.cols,
+      rows: cfg.rows,
+      cellAspect: 1.67,
+      useColors: true,
+      camera,
+      directionalLight: { direction: [-0.4, -0.6, -1], intensity: 0.35 },
+      ambientLight: { intensity: 0.75 },
+    });
+    scene.add(polygons);
+
+    for (const s of cfg.spots ?? []) {
+      const spot = scene.addHotspot({ id: s.name, at: toPlane(s.lat, s.lon, 0.08), size: [s.name.length + 2, 1] });
+      spot.el.classList.add('mapglyph-spot');
+      spot.el.textContent = `◉ ${s.name}`;
+    }
+
+    const controls = createGlyphOrbitControls(scene, { drag: true, wheel: false, invert: -1 });
+    scenes.set(host, { destroy: () => { controls.destroy(); scene.destroy(); } });
+  }
+
+  const hosts = [...document.querySelectorAll<HTMLElement>('[data-mapglyph]')];
+  hosts.forEach(initMap);
+
+  if (hosts.length > 0) {
+    new MutationObserver(() => hosts.forEach(initMap)).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  }
+</script>
+
+<style>
+  .mapglyph {
+    margin: 0;
+    container-type: inline-size;
+  }
+  /* Interactive desk panels read as an instrument — they keep the card.
+     Print illustrations sit naked in the grid like a newspaper graphic:
+     a single ink rule on top, source line below, nothing else. */
+  .mapglyph.is-card {
+    border: 1px solid var(--hairline-strong);
+    border-top: 3px solid var(--ink);
+    padding: 12px 14px 10px;
+    background: var(--paper-shade);
+  }
+  .mapglyph.is-print {
+    border-top: 2px solid var(--ink);
+    padding-top: 10px;
+  }
+
+  .mapglyph-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .mapglyph-title {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .mapglyph-legend {
+    display: flex;
+    gap: 16px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+  }
+  .legend-item {
+    white-space: nowrap;
+  }
+  .legend-glyph {
+    font-family: var(--font-mono);
+    margin-right: 5px;
+    letter-spacing: 0;
+  }
+  /* Narrow placements (hero illustration): the legend can't fit — the
+     caption carries the key instead. Must come after the base legend rule.
+     A head left with neither title nor legend disappears entirely, so the
+     figure's top rule doesn't double up with the head's bottom hairline. */
+  @container (max-width: 480px) {
+    .mapglyph-legend { display: none; }
+    .mapglyph-head.no-title { display: none; }
+  }
+
+  /* ── Print path ── */
+  .mapglyph-print {
+    position: relative;
+    container-type: inline-size;
+    line-height: 0;
+  }
+  .mapglyph-print {
+    overflow-x: clip;
+  }
+  .mapglyph-print pre {
+    font-family: var(--font-mono);
+    /* Fill the frame width: cell width ≈ 0.6em in JetBrains Mono. The cap
+       (--map-font-max) is the placement's size dial — articles set it low
+       so graphics stay modest, NYT-style. */
+    font-size: clamp(3px, calc(100cqw / (var(--map-cols, 76) * 0.6)), var(--map-font-max, 11px));
+    line-height: 1;
+    white-space: pre;
+    margin: 0 auto;
+    width: fit-content;
+  }
+  .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 26%, transparent); }
+  .mapglyph-print :global(.mg-l) { color: var(--ink); }
+  .mapglyph-print :global(.mg-o-red)    { color: var(--red); }
+  .mapglyph-print :global(.mg-o-accent) { color: var(--accent); }
+  .mapglyph-print :global(.mg-o-green)  { color: var(--green); }
+  .mapglyph-print :global(.mg-r-red)    { color: var(--red); font-weight: 700; }
+  .mapglyph-print :global(.mg-r-accent) { color: var(--accent); font-weight: 700; }
+  .mapglyph-print :global(.mg-r-green)  { color: var(--green); font-weight: 700; }
+  .mapglyph-print :global(.mg-s) { color: var(--red); font-weight: 700; }
+  .mg-o-red    { color: var(--red); }
+  .mg-o-accent { color: var(--accent); }
+  .mg-o-green  { color: var(--green); }
+  .mg-r-red    { color: var(--red); }
+  .mg-r-accent { color: var(--accent); }
+  .mg-r-green  { color: var(--green); }
+
+  .mg-label {
+    position: absolute;
+    transform: translate(8px, -50%);
+    font-family: var(--font-sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    line-height: 1.3;
+    white-space: nowrap;
+    color: var(--red);
+    background: var(--paper);
+    padding: 0 4px;
+    border: 1px solid var(--hairline);
+  }
+
+  /* ── Desk path ── */
+  .mapglyph-host {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1;
+    color: var(--ink-soft);
+  }
+  .mapglyph-host.is-interactive {
+    cursor: grab;
+  }
+  .mapglyph-host.is-interactive:active {
+    cursor: grabbing;
+  }
+  .mapglyph-host :global(.mapglyph-spot) {
+    font-family: var(--font-sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+    color: var(--red);
+    background: var(--paper);
+    padding: 0 3px;
+    line-height: 1.4;
+    height: auto !important;
+  }
+
+  .mapglyph-caption {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--hairline);
+  }
+</style>

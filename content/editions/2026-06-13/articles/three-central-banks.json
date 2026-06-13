@@ -1,0 +1,108 @@
+{
+  "id": "three-central-banks",
+  "topics": ["central-banks", "inflation", "rates"],
+  "edition_date": "2026-06-13",
+  "section": "markets",
+  "kicker": "Rates",
+  "epistemic": "inference",
+  "headline": "Three central banks decide what kind of shock this was",
+  "deck": "May's inflation looked scary — 4.2%. But almost all the scary part was energy, which is really a Hormuz story. Next week the Bank of Japan, the Fed, and the Bank of England decide in three days whether to believe the number — and the Fed's call may rest on an oil chokepoint no central banker controls.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ],
+    "read_time_min": 5
+  },
+  "timestamp": "13:05 UTC",
+  "revision": 2,
+  "last_updated_min_ago": 85,
+  "next_update_utc": "16:00",
+  "confidence": {
+    "label": "FED HOLDS · 17 JUN",
+    "value": 0.55,
+    "interval": 0.13
+  },
+  "body": [
+    "May's inflation report is a Rorschach test. Headline prices rose 4.2% over the year — the hottest since 2023. [E1] Scary. But strip out energy and the core was 2.9%, and almost the entire gap is energy, up 23.5%. [E1] Producer prices said the same thing: a 1.1% jump on the month, driven by goods, with services flat. [E2] An energy spike with a calm core is a different animal from broad inflation. The whole question is whether the central banks treat it like one.",
+    "They're already splitting. The ECB hiked a quarter-point, to a 2.25% deposit rate, and called the shock inflationary. [E3] The US bond market is doing the opposite — demanding a discount to hold long debt: the 30-year reopened at 5.020%. [E4] One camp is leaning into the energy number. The other is being asked whether to believe it or look past it.",
+    "Next week settles it, in three days. The Bank of Japan decides Monday, the Fed on Wednesday, the Bank of England on Thursday. [E5] Tighten, and have the bond auctions demand fat discounts, and the \"this is real inflation\" camp wins. Shrug off a spike they expect to fade, and have the auctions go smoothly, and the \"this is a growth scare\" camp wins.",
+    "The catch is that the deciding number isn't on any central banker's screen. Energy is 23.5% of the inflation overshoot, and energy is a Hormuz story. If the strait's deal holds and oil keeps falling, May's calm core ages well and the Fed's patience looks smart. If the strait reprices, every decision made next week was made on a number that already moved. The call: the Fed holds — and the real risk isn't the data, it's the strait."
+  ],
+  "refs": [
+    "gov:bls:cpi-may-2026",
+    "gov:bls:ppi-may-2026",
+    "gov:ecb:mp-decision:2026-06-11",
+    "gov:treasury:30y-auction:2026-06-11",
+    "gov:fed:fomc-june-2026"
+  ],
+  "key_numbers": [
+    { "label": "US CPI, y/y", "value": "4.2%", "dir": "up" },
+    { "label": "US core CPI, y/y", "value": "2.9%", "dir": "flat" },
+    { "label": "Energy, y/y", "value": "+23.5%", "dir": "up" },
+    { "label": "ECB deposit rate", "value": "2.25%", "dir": "up" },
+    { "label": "US 30Y auction high yield", "value": "5.020%", "dir": "up" }
+  ],
+  "evidence_box": [
+    {
+      "source": "U.S. BLS — CPI",
+      "fragment": "\"the all items index rose 4.2 percent for the 12 months ending May\"; core rose 2.9 percent; energy increased 23.5 percent.",
+      "as_of": "10 Jun",
+      "source_note": {
+        "source_id": "gov:bls:cpi-may-2026",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+        "retrieved_at": "2026-06-12T13:00:00Z"
+      }
+    },
+    {
+      "source": "U.S. BLS — PPI",
+      "fragment": "\"PPI for final demand rose 1.1 percent in May\"; goods jumped 2.8 percent; services advanced 0.3 percent.",
+      "as_of": "11 Jun",
+      "source_note": {
+        "source_id": "gov:bls:ppi-may-2026",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.bls.gov/news.release/archives/ppi_06112026.htm",
+        "retrieved_at": "2026-06-12T13:05:00Z"
+      }
+    },
+    {
+      "source": "European Central Bank",
+      "fragment": "ECB \"decided to raise the three key ECB interest rates by 25 basis points\"; deposit facility 2.25%, effective 17 June 2026.",
+      "as_of": "11 Jun",
+      "source_note": {
+        "source_id": "gov:ecb:mp-decision:2026-06-11",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260611~4d41bd5e83.en.html",
+        "retrieved_at": "2026-06-12T13:10:00Z"
+      }
+    },
+    {
+      "source": "U.S. Treasury — 30Y auction",
+      "fragment": "30-year bond reopening, 11 June 2026: high yield 5.020%, bid-to-cover 2.33.",
+      "as_of": "11 Jun",
+      "source_note": {
+        "source_id": "gov:treasury:30y-auction:2026-06-11",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.treasurydirect.gov/auctions/auction-query/",
+        "retrieved_at": "2026-06-12T13:15:00Z"
+      }
+    },
+    {
+      "source": "Federal Reserve",
+      "fragment": "FOMC meeting June 16–17, 2026; statement 2:00 p.m., press conference 2:30 p.m. on 17 June.",
+      "as_of": "Jun 2026",
+      "source_note": {
+        "source_id": "gov:fed:fomc-june-2026",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.federalreserve.gov/newsevents/2026-june.htm",
+        "retrieved_at": "2026-06-12T13:20:00Z"
+      }
+    }
+  ]
+}

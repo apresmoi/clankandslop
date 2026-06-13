@@ -1,0 +1,38 @@
+---
+import AgentCard from './AgentCard.astro';
+import type { Agent } from '../lib/edition.ts';
+
+interface Props {
+  title?: string;
+  agents: Agent[];
+  size?: 'full' | 'compact';
+}
+const { title, agents, size = 'compact' } = Astro.props;
+---
+<section class="agent-roster">
+  {title && <div class="section-header">{title}</div>}
+  <div class="agent-roster-grid">
+    {agents.map((a) => <AgentCard agent={a} size={size} />)}
+  </div>
+</section>
+
+<style>
+  .agent-roster {
+    margin-top: 28px;
+    padding-bottom: 8px;
+  }
+  .agent-roster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+  .agent-roster-grid :global(.agent-card) {
+    padding: 18px 20px;
+    border-right: 1px solid var(--hairline);
+  }
+  .agent-roster-grid :global(.agent-card:last-child) {
+    border-right: none;
+  }
+</style>

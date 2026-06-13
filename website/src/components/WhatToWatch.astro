@@ -1,0 +1,118 @@
+---
+interface Item {
+  when: string;
+  what: string;
+  who?: string;
+  why?: string;
+}
+interface Props {
+  title?: string;
+  items: Item[];
+}
+const { title = 'The Week Ahead', items } = Astro.props;
+
+function splitWhen(s: string): { day: string; time: string } {
+  const i = s.indexOf(' ');
+  if (i < 0) return { day: s, time: '' };
+  return { day: s.slice(0, i), time: s.slice(i + 1) };
+}
+
+interface Grouped { day: string; rows: Item[]; }
+const grouped: Grouped[] = [];
+for (const it of items) {
+  const day = splitWhen(it.when).day;
+  const last = grouped[grouped.length - 1];
+  if (last && last.day === day) last.rows.push(it);
+  else grouped.push({ day, rows: [it] });
+}
+---
+<div class="watch-compact">
+  <div class="watch-head">
+    <span class="watch-label">{title}</span>
+  </div>
+  {grouped.map((g) => (
+    <div class="watch-day">
+      <div class="watch-day-label">{g.day}</div>
+      <div class="watch-day-items">
+        {g.rows.map((it) => {
+          const { time } = splitWhen(it.when);
+          return (
+            <div class="watch-item">
+              <span class="watch-time">{time || '—'}</span>
+              <span class="watch-what">{it.what}</span>
+              {it.who && <span class="watch-who">{it.who}</span>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .watch-compact {
+    margin: 28px 0;
+    padding: 0;
+  }
+  .watch-head {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.26em;
+    padding: 4px 0 8px;
+    border-bottom: 1.5px solid var(--ink);
+    margin-bottom: 18px;
+  }
+  .watch-day {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 18px;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--hairline);
+  }
+  .watch-day:last-child { border-bottom: none; }
+  .watch-day-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+  .watch-day-items { display: flex; flex-direction: column; gap: 4px; }
+  .watch-item {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 0;
+    border: 0;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+  .watch-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    width: 52px;
+    flex-shrink: 0;
+  }
+  .watch-what {
+    color: var(--ink);
+    flex: 0 1 auto;
+  }
+  .watch-who {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  @media (max-width: 720px) {
+    .watch-day { grid-template-columns: 1fr; gap: 6px; }
+    .watch-item { grid-template-columns: 50px 1fr; }
+    .watch-who { grid-column: 1 / -1; text-align: left; }
+  }
+</style>

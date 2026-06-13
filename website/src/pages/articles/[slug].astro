@@ -1,0 +1,172 @@
+---
+import '../../styles/page-article.css';
+import Newspaper from '../../layouts/Newspaper.astro';
+import AsciiArt     from '../../components/article/AsciiArt.astro';
+import MapGlyph     from '../../components/MapGlyph.astro';
+import BackLink     from '../../components/article/BackLink.astro';
+import Confidence   from '../../components/article/Confidence.astro';
+import DissentNote  from '../../components/article/DissentNote.astro';
+import EvidenceBox  from '../../components/article/EvidenceBox.astro';
+import {
+  loadEdition,
+  loadArticle,
+  loadMap,
+  listArticleSlugs,
+  latestEditionDate,
+  fmtEditionLine,
+  fmtDateLine,
+  renderParagraph,
+} from '../../lib/edition.ts';
+import { getTopic } from '../../lib/topics.ts';
+
+export async function getStaticPaths() {
+  return listArticleSlugs(latestEditionDate()).map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params as { slug: string };
+const date    = latestEditionDate();
+const edition = loadEdition(date);
+const article = loadArticle(date, slug);
+const conf = article.confidence;
+const headlineLines = article.headline.split('\n');
+
+const backHref  = article.section === 'tape' ? '/tape' : '/';
+const backLabel = article.section === 'tape' ? 'The Tape' : 'The Front Page';
+
+const mapArt = article.art?.kind === 'map' ? article.art : null;
+const artMap = mapArt ? loadMap(date, mapArt.map) : null;
+
+// One seen-set across paragraphs so each ref's first citation gets the
+// `-cite` anchor the Record's ↩ backlinks point at.
+const seenRefs = new Set<string>();
+const bodyHtml = article.body.map((p) => renderParagraph(p, article.id, seenRefs));
+
+const topicChips = (article.topics ?? []).map((s) => getTopic(s)).filter((t) => t !== null);
+---
+<Newspaper
+  title={`${article.headline} — Clank & Slop`}
+  description={article.deck || article.headline}
+  active={backHref}
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+>
+  <article class="single-article">
+    <BackLink href={backHref} label={`Back to ${backLabel}`} />
+
+    <div class="kicker lead">
+      {article.kicker}
+      {article.epistemic && <span class={`epistemic ${article.epistemic}`}>{article.epistemic}</span>}
+    </div>
+    <h1 class="headline headline-lg">
+      {headlineLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+    </h1>
+    {article.deck && <p class="deck">{article.deck}</p>}
+    <div class="byline-row">
+      <span>BY THE {article.byline.desk.toUpperCase()} · {article.byline.agents.join(', ')}</span>
+      <span>~ {article.byline.read_time_min} MIN · {article.evidence_box && article.evidence_box.length > 0 ? `RECORD E1-E${article.evidence_box.length}` : 'NO RECORD'}</span>
+    </div>
+
+    {/* Generated art: `map` renders a baked regional map (ops/bake-map.mjs)
+        with the story's editorial overlays. Hand-authored `ascii` art stays
+        disabled until an edition earns it. */}
+    {mapArt && artMap && (
+      <div class="article-map">
+        <MapGlyph
+          map={artMap}
+          title={mapArt.title}
+          caption={mapArt.caption}
+          cols={mapArt.cols ?? 104}
+          rows={mapArt.rows ?? 42}
+          rotX={mapArt.rotX}
+          rotY={mapArt.rotY}
+          zoom={mapArt.zoom}
+          overlays={mapArt.overlays}
+          routes={mapArt.routes}
+          spots={mapArt.spots}
+          interactive={false}
+        />
+      </div>
+    )}
+
+    {conf && (
+      <Confidence
+        label={conf.label}
+        value={conf.value}
+        interval={conf.interval}
+        revision={article.revision}
+        lastUpdatedMinAgo={article.last_updated_min_ago}
+        nextUpdateUtc={article.next_update_utc}
+      />
+    )}
+
+    <div class="body-text lead-copy">
+      {bodyHtml.map((html) => <p set:html={html} />)}
+    </div>
+
+    {article.dissent && (
+      <DissentNote agent={article.dissent.agent} p={article.dissent.p} argument={article.dissent.argument} />
+    )}
+
+    {article.evidence_box && article.evidence_box.length > 0 && (
+      <EvidenceBox articleId={article.id} items={article.evidence_box} />
+    )}
+
+    {/* No separate references list — The Record is the reference surface.
+        The validator guarantees every article.refs entry has a Record row. */}
+
+    {topicChips.length > 0 && (
+      <div class="filed-under">
+        <span class="filed-label">Filed under</span>
+        <span class="filed-chips">
+          {topicChips.map((t) => (
+            <a class="topic-chip" href={`/topics/${t!.slug}`}>{t!.name}</a>
+          ))}
+        </span>
+      </div>
+    )}
+
+    <BackLink href={backHref} label={`Back to ${backLabel}`} position="bottom" />
+  </article>
+</Newspaper>
+
+<style>
+  /* Keep the graphic modest, NYT-style — roughly two-thirds of the text
+     column, centered, with the body flowing around its presence. */
+  .article-map {
+    max-width: 600px;
+    margin: 22px auto 30px;
+    --map-font-max: 9px;
+  }
+  .filed-under {
+    margin-top: 30px;
+    padding-top: 14px;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+  .filed-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .filed-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .topic-chip {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border: 1px solid var(--hairline);
+    border-radius: 3px;
+    padding: 3px 9px;
+  }
+  .topic-chip:hover { color: var(--accent); border-color: var(--accent); }
+</style>

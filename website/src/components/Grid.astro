@@ -1,0 +1,109 @@
+---
+import PageRenderer from './PageRenderer.astro';
+import type { Block } from '../lib/page.ts';
+
+interface Props {
+  /** Column fractions, e.g. [2,1] = 2/3+1/3, [1,2,1] = 1/4+1/2+1/4, [1] = full width. */
+  cols: number[];
+  /** Block array per column. columns.length must equal cols.length. */
+  columns: Block[][];
+  /** When true, the right column carries the financial-ticker shading. */
+  finance?: boolean;
+  date: string;
+}
+const { cols, columns, finance = false, date } = Astro.props;
+const template = cols.map((n) => `${n}fr`).join(' ');
+---
+<div class={`cns-grid${finance ? ' cns-grid-finance' : ''}`} style={`grid-template-columns: ${template};`}>
+  {columns.map((col, i) => (
+    <div class={`cns-grid-col cns-grid-col-${i}`}>
+      <PageRenderer blocks={col} date={date} />
+    </div>
+  ))}
+</div>
+
+<style>
+  .cns-grid {
+    display: grid;
+    gap: 28px;
+    margin: 20px 0;
+    align-items: start;
+  }
+  .cns-grid + :global(.cns-grid) {
+    border-top: 1px solid var(--hairline);
+    padding-top: 28px;
+    margin-top: 28px;
+  }
+  .cns-grid-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+  }
+
+  /* [1,2,1] middle column → centered well with side rules */
+  .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-1 {
+    padding: 0 24px;
+    border-left: 1px solid var(--hairline);
+    border-right: 1px solid var(--hairline);
+  }
+  /* [2,1] rail column → left rule only */
+  .cns-grid[style*="2fr 1fr"] > .cns-grid-col-1 {
+    padding-left: 24px;
+    border-left: 1px solid var(--hairline);
+  }
+
+  /* Narrow columns (1/3, 1/4) must NOT subdivide content into columns. */
+  .cns-grid[style*="2fr 1fr"]    > .cns-grid-col-1 :global(.briefly-desks),
+  .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-0 :global(.briefly-desks),
+  .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-2 :global(.briefly-desks) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .cns-grid[style*="2fr 1fr"]    > .cns-grid-col-1 :global(.briefly-desk),
+  .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-0 :global(.briefly-desk),
+  .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-2 :global(.briefly-desk) {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .cns-grid[style*="2fr 1fr"]    > .cns-grid-col-1 :global(.briefly-desk:last-child),
+  .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-0 :global(.briefly-desk:last-child),
+  .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-2 :global(.briefly-desk:last-child) {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  /* Finance variant — right column gets ticker-tape shading. */
+  .cns-grid-finance > .cns-grid-col-1 {
+    background: var(--paper-shade);
+    padding: 18px 18px 22px;
+    border-left: 1px solid var(--hairline);
+    border-right: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+  }
+  .cns-grid-finance > .cns-grid-col-1 :global(.section-header) {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+
+  @media (max-width: 880px) {
+    .cns-grid { grid-template-columns: 1fr !important; gap: 22px; }
+    .cns-grid[style*="1fr 2fr 1fr"] > .cns-grid-col-1,
+    .cns-grid[style*="2fr 1fr"] > .cns-grid-col-1 {
+      padding: 0;
+      border: 0;
+      border-top: 1px solid var(--hairline);
+      padding-top: 22px;
+    }
+    .cns-grid-finance > .cns-grid-col-1 {
+      border: 1px solid var(--hairline);
+    }
+  }
+</style>

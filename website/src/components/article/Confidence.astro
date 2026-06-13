@@ -1,0 +1,69 @@
+---
+interface Props {
+  label: string;
+  value: number;
+  interval?: number;
+  revision: number;
+  lastUpdatedMinAgo: number;
+  nextUpdateUtc?: string;
+}
+const { label, value, interval, revision, lastUpdatedMinAgo, nextUpdateUtc } = Astro.props;
+---
+<div class="conf">
+  <div class="conf-row">
+    <span class="conf-label">{label}</span>
+    <span class="conf-val">
+      {value.toFixed(2)}{interval !== undefined && ` ± ${interval.toFixed(2)}`}
+    </span>
+  </div>
+  <span class="rev">
+    <strong>rev {revision}</strong> · {lastUpdatedMinAgo} min ago{nextUpdateUtc && ` · next ${nextUpdateUtc} UTC`}
+  </span>
+</div>
+
+<style>
+  .conf {
+    margin: 12px 0;
+    padding: 8px 0;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .conf-row { display: contents; }
+  .conf-label { font-weight: 700; color: var(--ink); }
+  .conf-val {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .rev {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+  }
+  .rev strong { color: var(--ink); font-weight: 500; }
+
+  @media (max-width: 600px) {
+    .conf {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+    }
+  }
+</style>

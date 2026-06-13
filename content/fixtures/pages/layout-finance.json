@@ -1,0 +1,234 @@
+{
+  "edition": "fixtures",
+  "page": "layout-finance",
+  "title": "Clank & Slop — Layout · Finance",
+  "active": "/layouts/finance",
+  "tagline": "— TWO COLUMNS · NEWS LEFT · TICKERS RIGHT —",
+  "head": [
+    {
+      "block": "MarketsRail",
+      "props": {
+        "variant": "strip",
+        "rows": [
+          {
+            "sym": "LRM",
+            "value": "4824.11",
+            "change": "-20.41",
+            "pct": "-0.42%",
+            "spark": "▆▅▄▃▂▁▂▃",
+            "dir": "down"
+          },
+          {
+            "sym": "IPS",
+            "value": "38211.55",
+            "change": "-118.6",
+            "pct": "-0.31%",
+            "spark": "▅▆▅▄▃▂▁▂",
+            "dir": "down"
+          },
+          {
+            "sym": "DLR",
+            "value": "16442.18",
+            "change": "-109.1",
+            "pct": "-0.66%",
+            "spark": "▇▆▅▄▃▂▁▁",
+            "dir": "down"
+          },
+          {
+            "sym": "AMT",
+            "value": "2018.04",
+            "change": "+2.42",
+            "pct": "+0.12%",
+            "spark": "▂▃▄▅▆▅▆▇",
+            "dir": "up"
+          },
+          {
+            "sym": "CNS",
+            "value": "17.84",
+            "change": "+0.87",
+            "pct": "+5.12%",
+            "spark": "▁▁▂▃▅▆▇█",
+            "dir": "up"
+          }
+        ]
+      }
+    },
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          2,
+          1
+        ],
+        "finance": true,
+        "columns": [
+          [
+            {
+              "block": "Hero",
+              "props": {
+                "variant": "lead-only",
+                "lead": "fixture-lead"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-second",
+                "size": "flow"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-third",
+                "size": "flow"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-third",
+                "size": "flow"
+              }
+            }
+          ],
+          [
+            {
+              "block": "MarketsRail",
+              "props": {
+                "title": "Rates · Sovereigns",
+                "kicker": "Live · 14:32 UTC",
+                "rows": [
+                  {
+                    "sym": "LRM",
+                    "value": "4.611%",
+                    "spark": "▂▃▄▅▆▇▇█",
+                    "pct": "+6 bp",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "IPS",
+                    "value": "4.882%",
+                    "spark": "▂▃▄▅▆▆▇█",
+                    "pct": "+8 bp",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "DLR",
+                    "value": "2.711%",
+                    "spark": "▃▄▄▅▅▆▆▇",
+                    "pct": "+4 bp",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "AMT",
+                    "value": "4.115%",
+                    "spark": "▁▂▃▄▆▇██",
+                    "pct": "+9 bp",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "CNS",
+                    "value": "4.412%",
+                    "spark": "▃▄▅▅▆▆▇▇",
+                    "pct": "+5 bp",
+                    "dir": "up"
+                  }
+                ]
+              }
+            },
+            {
+              "block": "MarketsRail",
+              "props": {
+                "title": "Commodities",
+                "kicker": "Live · 14:32 UTC",
+                "rows": [
+                  {
+                    "sym": "LRM",
+                    "value": "82.41",
+                    "spark": "▂▃▄▅▅▆▇█",
+                    "pct": "+1.94%",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "IPS",
+                    "value": "86.18",
+                    "spark": "▂▃▄▅▅▆▇█",
+                    "pct": "+1.72%",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "DLR",
+                    "value": "2.41",
+                    "spark": "▆▅▄▃▂▂▁▁",
+                    "pct": "-2.81%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "AMT",
+                    "value": "2418.5",
+                    "spark": "▄▅▆▆▇▇██",
+                    "pct": "+0.62%",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "CNS",
+                    "value": "4.812",
+                    "spark": "▃▄▅▆▇▇██",
+                    "pct": "+1.21%",
+                    "dir": "up"
+                  }
+                ]
+              }
+            },
+            {
+              "block": "MarketsRail",
+              "props": {
+                "title": "FX · Crypto",
+                "kicker": "Live · 14:32 UTC",
+                "rows": [
+                  {
+                    "sym": "LRM",
+                    "value": "1.0712",
+                    "spark": "▇▆▅▄▃▃▂▂",
+                    "pct": "-0.31%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "IPS",
+                    "value": "156.41",
+                    "spark": "▂▃▄▅▆▇██",
+                    "pct": "+0.51%",
+                    "dir": "up"
+                  },
+                  {
+                    "sym": "DLR",
+                    "value": "1.2611",
+                    "spark": "▆▅▄▄▃▃▂▂",
+                    "pct": "-0.24%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "AMT",
+                    "value": "62418",
+                    "spark": "▇▆▅▄▃▂▂▂",
+                    "pct": "-1.84%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "CNS",
+                    "value": "3014",
+                    "spark": "▆▅▄▃▂▂▂▁",
+                    "pct": "-2.41%",
+                    "dir": "down"
+                  }
+                ]
+              }
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "flow": []
+}

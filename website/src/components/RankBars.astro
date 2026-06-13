@@ -1,0 +1,131 @@
+---
+/** RankBars — comparative context as glyph art. The desk supplies a ranked
+    list of {label, value}; the block computes the bars (eighth-block glyphs,
+    scaled to the max) so no bar width is ever hand-authored. Used to put a
+    record-breaking number in its place: "biggest ever — and by how much."
+    One subject row can be highlighted (the story's number). */
+interface Row {
+  label: string;
+  value: number;
+  note?: string;
+  highlight?: boolean;
+}
+interface Props {
+  title: string;
+  subtitle?: string;
+  source?: string;
+  /** Decimal places shown on the value (default 1). */
+  precision?: number;
+  /** Prefix on the value, e.g. "$". */
+  prefix?: string;
+  rows: Row[];
+}
+const { title, subtitle, source, precision = 1, prefix = '', rows = [] } = Astro.props;
+
+const max = Math.max(...rows.map((r) => r.value), 0) || 1;
+const CELLS = 34; // bar width budget in monospace cells
+const EIGHTHS = ['', '▏', '▎', '▍', '▌', '▋', '▊', '▉'];
+function bar(v: number): string {
+  const units = (v / max) * CELLS;
+  const full = Math.max(0, Math.floor(units));
+  const rem = Math.round((units - full) * 8);
+  return '█'.repeat(full) + (EIGHTHS[rem] ?? '');
+}
+const fmt = (v: number) => prefix + v.toFixed(precision);
+---
+<figure class="rankbars">
+  <figcaption class="rankbars-head">
+    <span class="rankbars-title">{title}</span>
+    {subtitle && <span class="rankbars-sub">{subtitle}</span>}
+  </figcaption>
+  <div class="rankbars-rows">
+    {rows.map((r) => (
+      <div class={`rankbars-row${r.highlight ? ' is-subject' : ''}`}>
+        <span class="rankbars-label">{r.label}{r.note && <em class="rankbars-note"> · {r.note}</em>}</span>
+        <span class="rankbars-bar" aria-hidden="true">{bar(r.value)}</span>
+        <span class="rankbars-value">{fmt(r.value)}</span>
+      </div>
+    ))}
+  </div>
+  {source && <div class="rankbars-source">{source}</div>}
+</figure>
+
+<style>
+  .rankbars {
+    margin: 22px 0 6px;
+    border-top: 2px solid var(--ink);
+    padding-top: 10px;
+  }
+  .rankbars-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .rankbars-title {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .rankbars-sub {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .rankbars-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rankbars-row {
+    display: grid;
+    grid-template-columns: minmax(11em, 15em) 1fr auto;
+    gap: 0 14px;
+    align-items: center;
+  }
+  .rankbars-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rankbars-note { color: var(--accent); font-style: italic; letter-spacing: 0; }
+  .rankbars-bar {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1;
+    color: var(--muted);
+    letter-spacing: -0.5px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .rankbars-value {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .rankbars-row.is-subject .rankbars-label { color: var(--ink); font-weight: 700; }
+  .rankbars-row.is-subject .rankbars-bar { color: var(--accent); }
+  .rankbars-row.is-subject .rankbars-value { color: var(--ink); font-weight: 700; }
+  .rankbars-source {
+    font-family: var(--font-sans);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 12px;
+    padding-top: 6px;
+    border-top: 1px solid var(--hairline);
+  }
+</style>

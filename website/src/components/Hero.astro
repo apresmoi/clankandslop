@@ -1,0 +1,185 @@
+---
+import Teaser from './Teaser.astro';
+import MapGlyph from './MapGlyph.astro';
+import { loadMap, type Article } from '../lib/edition.ts';
+
+interface Props {
+  variant?: 'lead-rail' | 'lead-only' | 'split-hero';
+  lead: Article;
+  rail?: Article[];
+  splitWith?: Article;
+  /** When true, render the lead's art (or a placeholder) left of the lead. */
+  withArt?: boolean;
+}
+const { variant = 'lead-rail', lead, rail = [], splitWith, withArt = false } = Astro.props;
+const mapArt = lead.art?.kind === 'map' ? lead.art : null;
+const heroMap = mapArt ? loadMap(lead.edition_date, mapArt.hero_map ?? mapArt.map) : null;
+---
+{variant === 'lead-rail' && (
+  <div class="hero-grid">
+    <div class="hero-lead">
+      <Teaser article={lead} size="lead" />
+    </div>
+    {rail.length > 0 && (
+      <aside class="hero-rail">
+        {rail.map((a) => <Teaser article={a} size="rail" />)}
+      </aside>
+    )}
+  </div>
+)}
+
+{variant === 'lead-only' && (
+  <div class={`hero-grid hero-grid-solo${withArt ? ' hero-grid-art' : ''}`}>
+    {withArt && mapArt && heroMap && (
+      <div class="hero-art hero-art-map">
+        <MapGlyph
+          map={heroMap}
+          cols={52}
+          rows={30}
+          rotX={mapArt.rotX}
+          rotY={mapArt.rotY}
+          zoom={mapArt.zoom}
+          overlays={mapArt.overlays}
+          routes={mapArt.routes}
+          spots={mapArt.spots}
+          interactive={false}
+        />
+        <div class="hero-art-caption">▲ {mapArt.caption}</div>
+      </div>
+    )}
+    {withArt && !mapArt && (
+      <div class="hero-art" aria-hidden="true">
+        <pre>{`╔══════════════════════╗
+║  ▒▒▒▒░░░░    ░░░░▒▒  ║
+║  ▒░         ░    ░▒  ║
+║  ▒░  ▓▓▓▓▓▓▓▓▓▓  ░▒  ║
+║  ▒░  ▓        ▓  ░▒  ║
+║  ▒░  ▓  ART   ▓  ░▒  ║
+║  ▒░  ▓  HERE  ▓  ░▒  ║
+║  ▒░  ▓        ▓  ░▒  ║
+║  ▒░  ▓▓▓▓▓▓▓▓▓▓  ░▒  ║
+║  ▒░         ░    ░▒  ║
+║  ▒▒▒▒░░░░    ░░░░▒▒  ║
+╚══════════════════════╝`}</pre>
+        <div class="hero-art-caption">[placeholder · generated panel will sit here]</div>
+      </div>
+    )}
+    <div class="hero-lead">
+      <Teaser article={lead} size="lead" />
+    </div>
+  </div>
+)}
+
+{variant === 'split-hero' && splitWith && (
+  <div class="hero-grid hero-grid-split">
+    <div class="hero-lead">
+      <Teaser article={lead} size="lead" />
+    </div>
+    <div class="hero-lead">
+      <Teaser article={splitWith} size="lead" />
+    </div>
+  </div>
+)}
+
+<style>
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0;
+    margin-top: 24px;
+  }
+  .hero-lead {
+    padding: 32px 36px 36px 4px;
+    border-right: 1px solid var(--ink);
+  }
+  .hero-rail {
+    padding: 32px 4px 36px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .hero-rail :global(.teaser) {
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+  .hero-rail :global(.teaser:last-child) { border-bottom: none; padding-bottom: 0; }
+  .hero-rail :global(.teaser .deck) {
+    font-size: 13.5px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .hero-grid-solo {
+    grid-template-columns: 1fr;
+  }
+  /* In solo mode (no rail, no art) the lead is the only column —
+     drop horizontal padding so its left/right edges align with the
+     .cns-grid columns below. Keep vertical padding for editorial breath. */
+  .hero-grid-solo .hero-lead {
+    border-right: none;
+    padding: 32px 0 36px 0;
+  }
+  /* Lead-only with an art panel — two columns: [art-square] [lead-text] */
+  .hero-grid-art {
+    grid-template-columns: minmax(280px, 1fr) 2fr;
+  }
+  .hero-art {
+    padding: 32px 36px 36px 4px;
+    border-right: 1px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .hero-art pre {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.05;
+    color: var(--ink-soft);
+    letter-spacing: -0.02em;
+    white-space: pre;
+  }
+  .hero-art-caption {
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+  }
+  .hero-art-map :global(.mapglyph) {
+    width: 100%;
+  }
+  /* A map illustration needs no chrome at all in the hero — no column
+     rule, no top rule. The image and its caption are the whole element. */
+  .hero-art.hero-art-map {
+    border-right: none;
+  }
+  .hero-art-map :global(.mapglyph.is-print) {
+    border-top: none;
+    padding-top: 0;
+  }
+  .hero-grid-art .hero-lead {
+    padding: 32px 4px 36px 36px;
+  }
+  .hero-grid-split {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero-grid-split .hero-lead {
+    padding: 32px 28px 36px 4px;
+  }
+  .hero-grid-split .hero-lead + .hero-lead {
+    border-left: 1px solid var(--ink);
+    border-right: none;
+    padding: 32px 4px 36px 28px;
+  }
+
+  @media (max-width: 880px) {
+    .hero-grid { grid-template-columns: 1fr; border-bottom: 0; }
+    .hero-lead { border-right: 0; border-bottom: 1px solid var(--hairline-strong); padding: 24px 4px; }
+    .hero-rail { padding: 24px 4px; }
+    .hero-grid-split { grid-template-columns: 1fr; }
+    .hero-grid-split .hero-lead + .hero-lead { border-left: 0; border-top: 1px solid var(--ink); }
+  }
+</style>

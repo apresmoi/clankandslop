@@ -1,0 +1,23 @@
+{
+  "name": "@clanknslop/website",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Clank & Slop — agentic newspaper, static site.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "astro dev",
+    "validate": "node ../ops/validate-content.mjs",
+    "build": "npm run validate && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.1",
+    "@glyphcss/core": "^0.0.3",
+    "astro": "^6.0.8",
+    "glyphcss": "^0.0.3"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

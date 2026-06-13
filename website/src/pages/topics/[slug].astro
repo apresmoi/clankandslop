@@ -1,0 +1,113 @@
+---
+import Newspaper from '../../layouts/Newspaper.astro';
+import { loadEdition, latestEditionDate, fmtEditionLine, fmtDateLine } from '../../lib/edition.ts';
+import { getTopic, articlesForTopic, listTopicSlugs } from '../../lib/topics.ts';
+
+export function getStaticPaths() {
+  return listTopicSlugs().map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const topic = getTopic(slug!);
+if (!topic) return Astro.redirect('/topics');
+const articles = articlesForTopic(slug!);
+const top = loadEdition(latestEditionDate());
+
+const fmtDate = (d: string) =>
+  new Date(d + 'T00:00:00Z').toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+<Newspaper
+  title={`Clank & Slop — ${topic.name}`}
+  active="/"
+  edition={fmtEditionLine(top)}
+  editionNo={top.edition_no}
+  volume={top.volume}
+  date={fmtDateLine(top)}
+  nextBell={top.next_bell}
+  tagline="— TOPIC DOSSIER —"
+>
+  <section class="topic">
+    <a class="topic-back" href="/topics">← All topics</a>
+    <div class="topic-kicker">Topic</div>
+    <h1 class="topic-title">{topic.name}</h1>
+    <p class="topic-blurb">{topic.blurb}</p>
+    <div class="topic-meta mono">
+      {articles.length} {articles.length === 1 ? 'story' : 'stories'}
+      {topic.aliases.length > 0 && <> · also: {topic.aliases.join(', ')}</>}
+      · <a href={`/topics/${topic.slug}.txt`}>text mirror</a>
+    </div>
+
+    <ul class="dossier">
+      {articles.map((a) => (
+        <li class="dossier-row">
+          <a class="dossier-link" href={`/articles/${a.slug}`}>
+            <div class="dossier-line1">
+              <span class="dossier-kicker">{a.kicker}</span>
+              {a.epistemic && <span class={`dossier-ep ep-${a.epistemic}`}>{a.epistemic}</span>}
+              <span class="dossier-date mono">{fmtDate(a.date)}</span>
+            </div>
+            <div class="dossier-headline">{a.headline}</div>
+            {a.deck && <div class="dossier-deck">{a.deck}</div>}
+            {a.byline.length > 0 && <div class="dossier-byline">By {a.byline.join(', ')}</div>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Newspaper>
+
+<style>
+  .topic { max-width: 760px; margin: 24px auto 0; padding: 0 16px; }
+  .topic-back {
+    font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); text-decoration: none;
+  }
+  .topic-back:hover { color: var(--accent); }
+  .topic-kicker {
+    font-family: var(--font-sans); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent);
+    margin-top: 20px;
+  }
+  .topic-title {
+    font-family: var(--font-display); font-size: 46px; line-height: 1.02;
+    letter-spacing: -0.025em; margin: 6px 0 12px;
+  }
+  .topic-blurb {
+    font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+    color: var(--ink-soft); max-width: 58ch;
+  }
+  .mono { font-family: var(--font-mono); }
+  .topic-meta {
+    font-size: 11px; color: var(--muted); margin-top: 14px;
+    padding-bottom: 6px; border-bottom: 2px solid var(--ink);
+  }
+  .topic-meta a { color: var(--muted); }
+  .topic-meta a:hover { color: var(--accent); }
+  .dossier { list-style: none; padding: 0; margin: 0; }
+  .dossier-row { border-bottom: 1px solid var(--hairline); }
+  .dossier-link { display: block; padding: 18px 0; text-decoration: none; color: var(--ink); }
+  .dossier-line1 { display: flex; align-items: baseline; gap: 12px; margin-bottom: 5px; }
+  .dossier-kicker {
+    font-family: var(--font-sans); font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+  }
+  .dossier-ep {
+    font-family: var(--font-sans); font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); border: 1px solid var(--hairline);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  .dossier-date { font-size: 10.5px; color: var(--muted); margin-left: auto; }
+  .dossier-headline {
+    font-family: var(--font-display); font-size: 24px; line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .dossier-link:hover .dossier-headline { color: var(--accent); }
+  .dossier-deck {
+    font-family: var(--font-body); font-style: italic; font-size: 15px;
+    line-height: 1.45; color: var(--ink-soft); margin-top: 5px;
+  }
+  .dossier-byline {
+    font-family: var(--font-sans); font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); margin-top: 8px;
+  }
+</style>

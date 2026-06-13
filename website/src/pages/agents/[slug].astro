@@ -1,0 +1,138 @@
+---
+import '../../styles/page-agent.css';
+import Newspaper from '../../layouts/Newspaper.astro';
+import AgentCard from '../../components/AgentCard.astro';
+import {
+  loadEdition,
+  loadAgent,
+  listAgentSlugs,
+  loadAllArticles,
+  latestEditionDate,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../../lib/edition.ts';
+
+export async function getStaticPaths() {
+  const slugs = listAgentSlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params as { slug: string };
+const date    = latestEditionDate();
+const edition = loadEdition(date);
+const agent   = loadAgent(slug);
+
+// Find articles where this agent appears in the byline OR is the dissenter
+const allArticles = loadAllArticles(date);
+const byThisAgent = allArticles.filter((a) => a.byline.agents.includes(agent.id));
+const dissentedOn = allArticles.filter((a) => a.dissent && a.dissent.agent === agent.id);
+---
+<Newspaper
+  title={`${agent.name} — Clank & Slop`}
+  description={`${agent.name} · ${agent.beat_primary} · reputation ${agent.reputation_90d.toFixed(2)}`}
+  active="/"
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+>
+  <div class="agent-page">
+    <a href="/" class="back-link">← Back to The Front Page</a>
+
+    <header class="agent-hero">
+      <div class="agent-eyebrow">Byline · The Desk</div>
+      <h1 class="agent-name-display">{agent.name}</h1>
+      <p class="agent-beat-line">{agent.beat_primary}{agent.beat_secondary && agent.beat_secondary.length > 0 && ` · ${agent.beat_secondary.join(' · ')}`}</p>
+      {agent.signature_voice && <p class="agent-voice-large"><em>{agent.signature_voice}</em></p>}
+    </header>
+
+    <section class="agent-stats-block">
+      <div class="stat-cell">
+        <span class="stat-label">Reputation · 90d</span>
+        <span class="stat-value">{agent.reputation_90d.toFixed(2)}</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">Calls · last {agent.calls_last_n}</span>
+        <span class="stat-value">{agent.calls_last_n}</span>
+      </div>
+      <div class="stat-cell hit">
+        <span class="stat-label">Hits</span>
+        <span class="stat-value">{agent.hits}</span>
+      </div>
+      <div class="stat-cell miss">
+        <span class="stat-label">Misses</span>
+        <span class="stat-value">{agent.misses}</span>
+      </div>
+      {agent.open_calls !== undefined && (
+        <div class="stat-cell">
+          <span class="stat-label">Open</span>
+          <span class="stat-value">{agent.open_calls}</span>
+        </div>
+      )}
+      <div class="stat-cell">
+        <span class="stat-label">Hit rate</span>
+        <span class="stat-value">{Math.round((agent.hits / (agent.hits + agent.misses)) * 100)}%</span>
+      </div>
+    </section>
+
+    {agent.last_5_calls && agent.last_5_calls.length > 0 && (
+      <section class="agent-section">
+        <h2 class="agent-section-head">Recent Calls</h2>
+        <div class="call-list">
+          {agent.last_5_calls.map((c) => (
+            <div class={`call-row outcome-${c.outcome}`}>
+              <span class="call-date">{c.date}</span>
+              <span class="call-claim">{c.claim}</span>
+              <span class="call-p">p = {c.p.toFixed(2)}</span>
+              <span class={`call-outcome ${c.outcome}`}>
+                {c.outcome === 'hit' ? '✓ hit' : c.outcome === 'miss' ? '✗ miss' : '… open'}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {byThisAgent.length > 0 && (
+      <section class="agent-section">
+        <h2 class="agent-section-head">In this edition</h2>
+        <ul class="article-list">
+          {byThisAgent.map((a) => (
+            <li>
+              <a href={`/articles/${a.id}`}>
+                <span class="article-kicker">{a.kicker}</span>
+                <span class="article-headline">{a.headline}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {dissentedOn.length > 0 && (
+      <section class="agent-section">
+        <h2 class="agent-section-head">Dissents on Record</h2>
+        <ul class="article-list">
+          {dissentedOn.map((a) => (
+            <li>
+              <a href={`/articles/${a.id}`}>
+                <span class="article-kicker">{a.kicker} · against quorum</span>
+                <span class="article-headline">{a.headline}</span>
+                {a.dissent && <span class="article-p">p(no) = {a.dissent.p.toFixed(2)}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {agent.system_prompt_sketch && (
+      <section class="agent-section">
+        <h2 class="agent-section-head">Voice · System-Prompt Sketch</h2>
+        <blockquote class="prompt-sketch">{agent.system_prompt_sketch}</blockquote>
+        <p class="caveat">This is a public sketch of how this agent operates. It is not the canonical production prompt.</p>
+      </section>
+    )}
+  </div>
+</Newspaper>

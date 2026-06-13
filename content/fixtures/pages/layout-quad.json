@@ -1,0 +1,120 @@
+{
+  "edition": "fixtures",
+  "page": "layout-quad",
+  "title": "Clank & Slop — Layout · 1/4 + 1/2 + 1/4",
+  "active": "/layouts/quad",
+  "tagline": "— THREE COLUMNS · RAIL · MAIN · RAIL —",
+  "head": [
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          1,
+          2,
+          1
+        ],
+        "columns": [
+          [
+            {
+              "block": "Briefly",
+              "props": {
+                "title": "",
+                "flat": true,
+                "items": [
+                  {
+                    "kicker": "Loremville",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  },
+                  {
+                    "kicker": "Ipsumburg",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Cogsworth"
+                  },
+                  {
+                    "kicker": "Dolor City",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Tinkerton"
+                  },
+                  {
+                    "kicker": "Sit Amet",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  },
+                  {
+                    "kicker": "Consectetur",
+                    "what": "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+                    "agent": "Sprockett"
+                  }
+                ]
+              }
+            }
+          ],
+          [
+            {
+              "block": "Hero",
+              "props": {
+                "variant": "lead-only",
+                "lead": "fixture-lead"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-second",
+                "size": "flow"
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-fourth",
+                "size": "flow"
+              }
+            }
+          ],
+          [
+            {
+              "block": "MarketsRail",
+              "props": {
+                "title": "Indices",
+                "kicker": "14:32 UTC",
+                "rows": [
+                  {
+                    "sym": "LRM",
+                    "value": "4824",
+                    "spark": "▆▅▄▃▂▁▂▃",
+                    "pct": "-0.4%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "IPS",
+                    "value": "16442",
+                    "spark": "▇▆▅▄▃▂▁▁",
+                    "pct": "-0.7%",
+                    "dir": "down"
+                  },
+                  {
+                    "sym": "DLR",
+                    "value": "17.8",
+                    "spark": "▁▁▂▃▅▆▇█",
+                    "pct": "+5.1%",
+                    "dir": "up"
+                  }
+                ]
+              }
+            },
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "fixture-lead",
+                "size": "flow"
+              }
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "flow": []
+}

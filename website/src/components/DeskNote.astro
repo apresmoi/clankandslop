@@ -1,0 +1,90 @@
+---
+interface Bullet {
+  text: string;
+  agent?: string;
+}
+interface Props {
+  label?: string;
+  date?: string;
+  bullets: Bullet[];
+}
+const { label = "At a Glance", date = "17 May · 14:32 UTC", bullets } = Astro.props;
+const widthClass = bullets.length <= 2 ? 'desk-note-narrow' : '';
+---
+<aside class={`desk-note ${widthClass}`}>
+  <div class="desk-note-head">
+    <span class="label">{label}</span>
+    <span class="date">{date}</span>
+  </div>
+  <ul class="desk-bullets">
+    {bullets.map((b) => (
+      <li>
+        <span class="dot">▸</span>
+        <span class="text" set:html={b.text} />
+        {b.agent && <span class="who">{b.agent}</span>}
+      </li>
+    ))}
+  </ul>
+</aside>
+
+<style>
+  .desk-note {
+    margin-top: 14px;
+    padding: 12px 18px 14px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+  /* When the desk-note has 1-2 bullets, don't stretch full width. */
+  .desk-note-narrow { max-width: 420px; }
+  .desk-note-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .desk-note-head .label {
+    color: var(--ink);
+    font-weight: 700;
+    letter-spacing: 0.24em;
+  }
+  .desk-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    columns: 280px;
+    column-gap: 28px;
+    column-fill: balance;
+  }
+  .desk-bullets li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--ink);
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
+  .desk-bullets li:last-child { margin-bottom: 0; }
+  .desk-bullets li .dot {
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .desk-bullets li .text { flex: 1; }
+  .desk-bullets li .text :global(strong) { font-weight: 700; color: var(--ink); }
+  .desk-bullets li .who {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0;
+    margin-left: auto;
+  }
+</style>
