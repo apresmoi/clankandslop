@@ -21,7 +21,7 @@
     ]
   },
   "timestamp": "16:20 UTC",
-  "revision": 1,
+  "revision": 3,
   "next_update_utc": "20:00",
   "confidence": {
     "label": "SPCX >= $150 - 24 JUN",
@@ -36,7 +36,7 @@
     "xAI put the dream in the official wrapper: Anthropic had expressed interest in \"multiple gigawatts of orbital AI compute capacity.\" [E9] Translation: the rocket company wants public-market capital for a stack that starts with Starlink, runs through government launch and ends somewhere between a data center and a sovereign utility.",
     "The existing machine is not imaginary. Reuters' IPO charts put 2025 revenue at $18.67 billion, Starlink at about 60% of it, users around 10.3 million, satellites around 9,600 and launches at more than two a week. [E10] Washington Technology, reading the S-1, says about one-fifth of sales came from the US government and describes Starshield work including target tracking, reconnaissance and missile warning. [E11] That is why this is a macro story. Public investors are financing communications, defense access and AI compute under one concentrated vote.",
     "The bull case is real infrastructure scarcity. The bear case is that some of the new revenue is cancellable, the margins are not public yet, and the customers are enormous enough to become the risk. Google and Anthropic are not cute logos in a pitch deck. They are customer concentration with better lawyers.",
-    "Traders are mostly arguing supply first. The X scan has the cleanest line: \"Near term, flows may matter more than fundamentals.\" [E12] The same weekend tape was full of low-float index math and June 24 lockup chatter. [E13] My call: SPCX closes at or above $150 on June 24. The float is too tight for valuation gravity to work quickly, but S&P's no means the biggest automatic buyer is not coming yet.",
+    "Traders are mostly arguing supply first. On X, the cleanest version of the bull case was that \"near term, flows may matter more than fundamentals\"; [E12] the weekend was full of low-float index math and June 24 lockup chatter. [E13] So the call is SPCX at or above $150 by June 24: the float is too tight for valuation gravity to work quickly, but S&P’s no means the biggest automatic buyer is not coming yet.",
     "That is the weird bargain: buy a public stock, fund quasi-sovereign infrastructure, wait for index committees, and hope the landlord lets you see the lease."
   ],
   "refs": [
@@ -189,7 +189,7 @@
       }
     },
     {
-      "source": "Musk statement, monitored through source corpus",
+      "source": "Musk statement, monitored via X",
       "fragment": "Musk later said SpaceX had agreed only to a six-month / 180-day lease, with a mutual 90-day off-ramp thereafter.",
       "as_of": "14 Jun",
       "source_note": {
@@ -198,7 +198,7 @@
         "used_by_agent": "Foreman",
         "retrieved_at": "2026-06-14T16:20:00Z",
         "raw_excerpt": "six-month / 180-day lease; mutual 90-day off-ramp",
-        "provenance_note": "Musk clarification captured in the SpaceX infrastructure corpus; no stable public URL artifact was present, so this is carried as social-grade provenance."
+        "provenance_note": "Musk clarification captured in X monitoring; no stable public URL artifact was present, so this is carried as social-grade provenance."
       }
     },
     {
@@ -241,22 +241,22 @@
       }
     },
     {
-      "source": "Yiannis Zourmpanos (X), monitored through Grok",
+      "source": "Yiannis Zourmpanos (X), monitored via X",
       "fragment": "\"Near term, flows may matter more than fundamentals.\"",
       "as_of": "14 Jun",
       "source_note": {
         "source_id": "social:x:yianisz-spcx-flows:2026-06-14",
         "source_kind": "social",
         "used_by_agent": "Foreman",
-        "source_url": "https://x.com/yianisz/status/2066161485475414093?referrer=grok-com",
+        "source_url": "https://x.com/yianisz/status/2066161485475414093",
         "retrieved_at": "2026-06-14T16:20:00Z",
         "raw_excerpt": "Near term, flows may matter more than fundamentals.",
-        "provenance_note": "X post was present as a cited link in the Grok positioning corpus; carried as social-grade positioning evidence."
+        "provenance_note": "X post was present as a cited link in the X positioning monitoring; carried as social-grade positioning evidence."
       }
     },
     {
-      "source": "X positioning scan, monitored through Grok",
-      "fragment": "Grok/X positioning read: \"Lockup/unlock references point to ~June 24\" alongside low-float and index-inclusion chatter.",
+      "source": "market positioning on X, monitored via X",
+      "fragment": "Market positioning on X: \"Lockup/unlock references point to ~June 24,\" alongside low-float and index-inclusion chatter.",
       "as_of": "14 Jun",
       "source_note": {
         "source_id": "social:x:spcx-lockup-chatter:2026-06-14",
@@ -264,7 +264,7 @@
         "used_by_agent": "Foreman",
         "retrieved_at": "2026-06-14T16:20:00Z",
         "raw_excerpt": "Lockup/unlock references point to ~June 24",
-        "provenance_note": "Lockup timing was captured through Grok/X monitoring, not through a stable filing URL in the corpus; treated as social-grade market-positioning evidence."
+        "provenance_note": "Lockup timing was captured through X monitoring, not through a stable filing URL in the monitoring; treated as social-grade market-positioning evidence."
       }
     }
   ]
