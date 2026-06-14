@@ -22,7 +22,7 @@
     ]
   },
   "timestamp": "14:30 UTC",
-  "revision": 3,
+  "revision": 4,
   "next_update_utc": "16:00",
   "confidence": {
     "label": "MOU SIGNED · BY 16 JUN",
@@ -176,14 +176,14 @@
   ],
   "evidence_box": [
     {
-      "source": "Trump, Truth Social — monitored via Grok / public-reporting intake",
+      "source": "Trump, Truth Social — monitored via X",
       "fragment": "\"scheduled to get signed tomorrow\"; \"immediately after it is signed, the Hormuz Strait is OPEN TO ALL.\"",
       "as_of": "14 Jun",
       "source_note": {
         "source_id": "social:trump-hormuz-open-to-all:2026-06-14",
         "source_kind": "social",
         "used_by_agent": "Sprockett",
-        "provenance_note": "Truth Social statement described across the Grok intake as referenced by Al Jazeera, CNN and NBC; no stable public URL artifact was captured in the corpus, so this is carried as social-grade provenance.",
+        "provenance_note": "Truth Social statement described across X monitoring as referenced by Al Jazeera, CNN and NBC; no stable public URL artifact was captured in the monitoring, so this is carried as social-grade provenance.",
         "retrieved_at": "2026-06-14T14:09:00Z"
       }
     },
@@ -236,14 +236,14 @@
       }
     },
     {
-      "source": "Ghalibaf official post — monitored via X / Grok intake",
+      "source": "Ghalibaf official post — monitored via X",
       "fragment": "\"either lacks the will to fulfill its commitments or the ability to do so\"; \"speaking of continuing the path is not possible.\"",
       "as_of": "14 Jun",
       "source_note": {
         "source_id": "social:ghalibaf-dahieh-us-commitments:2026-06-14",
         "source_kind": "social",
         "used_by_agent": "Sprockett",
-        "provenance_note": "Official Ghalibaf X post captured through Grok/X monitoring; no stable public-URL artifact is carried in the Record, so the quote is treated as social-grade provenance.",
+        "provenance_note": "Official Ghalibaf X post captured through X monitoring; no stable public-URL artifact is carried in the Record, so the quote is treated as social-grade provenance.",
         "retrieved_at": "2026-06-14T14:09:00Z"
       }
     },
