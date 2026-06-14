@@ -5,67 +5,103 @@
     "strait-of-hormuz": {
       "name": "Strait of Hormuz",
       "blurb": "The world's principal oil-and-gas maritime chokepoint, between Iran and the Arabian Peninsula; about a fifth of global petroleum-liquids transit it.",
-      "aliases": ["hormuz"]
+      "aliases": [
+        "hormuz"
+      ]
     },
     "us-iran": {
       "name": "US–Iran",
       "blurb": "The diplomatic and military relationship between Washington and Tehran, including the 2026 war and its negotiated endgame.",
-      "aliases": ["iran-us", "iran-deal"]
+      "aliases": [
+        "iran-us",
+        "iran-deal"
+      ]
     },
     "middle-east-war": {
       "name": "Middle East War 2026",
       "blurb": "The regional conflict spanning Iran, Israel, Lebanon and the Gulf, and the diplomacy around ending it.",
-      "aliases": ["mideast-war"]
+      "aliases": [
+        "mideast-war"
+      ]
     },
     "lebanon": {
       "name": "Lebanon",
       "blurb": "The Israel–Hezbollah front and Lebanon's contested place in any regional settlement.",
-      "aliases": ["hezbollah"]
+      "aliases": [
+        "hezbollah"
+      ]
     },
     "maritime-security": {
       "name": "Maritime Security",
       "blurb": "Law, force, and freedom of navigation at sea — chokepoints, inspections, blockades, and coercion on the water.",
-      "aliases": ["freedom-of-navigation"]
+      "aliases": [
+        "freedom-of-navigation"
+      ]
     },
     "unclos": {
       "name": "Law of the Sea",
       "blurb": "The UN Convention on the Law of the Sea — transit passage, innocent passage, and the limits of coastal-state authority.",
-      "aliases": ["law-of-the-sea"]
+      "aliases": [
+        "law-of-the-sea"
+      ]
     },
     "south-china-sea": {
       "name": "South China Sea",
       "blurb": "Contested maritime sovereignty around China, Taiwan, the Philippines and Southeast Asia.",
-      "aliases": ["taiwan-strait", "scarborough"]
+      "aliases": [
+        "taiwan-strait",
+        "scarborough"
+      ]
     },
     "grey-zone": {
       "name": "Grey-Zone Coercion",
       "blurb": "Pressure applied below the threshold of declared war — law enforcement, inspections, and administration used as instruments of force.",
-      "aliases": ["gray-zone"]
+      "aliases": [
+        "gray-zone"
+      ]
     },
     "central-banks": {
       "name": "Central Banks",
       "blurb": "Monetary policy and the decisions of the Fed, ECB, BoJ, BoE and their peers.",
-      "aliases": ["monetary-policy", "the-fed", "ecb"]
+      "aliases": [
+        "monetary-policy",
+        "the-fed",
+        "ecb"
+      ]
     },
     "inflation": {
       "name": "Inflation",
       "blurb": "Consumer and producer price levels and the forces — energy, wages, supply — behind them.",
-      "aliases": ["cpi", "ppi"]
+      "aliases": [
+        "cpi",
+        "ppi"
+      ]
     },
     "rates": {
       "name": "Rates",
       "blurb": "Government bond yields, the curve, and the term-premium debate across major jurisdictions.",
-      "aliases": ["bonds", "yields", "treasuries"]
+      "aliases": [
+        "bonds",
+        "yields",
+        "treasuries"
+      ]
     },
     "oil": {
       "name": "Oil",
       "blurb": "Crude oil markets — Brent and WTI — and the geopolitics and logistics that move them.",
-      "aliases": ["crude", "brent", "wti"]
+      "aliases": [
+        "crude",
+        "brent",
+        "wti"
+      ]
     },
     "shipping": {
       "name": "Shipping",
       "blurb": "Ocean freight, tanker and container rates, and the maritime logistics chain.",
-      "aliases": ["freight", "tankers"]
+      "aliases": [
+        "freight",
+        "tankers"
+      ]
     },
     "war-risk-insurance": {
       "name": "War-Risk Insurance",
@@ -75,7 +111,9 @@
     "critical-minerals": {
       "name": "Critical Minerals",
       "blurb": "Concentrated materials inputs — rare earths, gallium, germanium, indium — whose supply can be weaponised.",
-      "aliases": ["rare-earths"]
+      "aliases": [
+        "rare-earths"
+      ]
     },
     "export-controls": {
       "name": "Export Controls",
@@ -90,12 +128,16 @@
     "spacex": {
       "name": "SpaceX",
       "blurb": "The launch-and-satellite company, its Starlink business, and its record public-market debut.",
-      "aliases": ["starlink"]
+      "aliases": [
+        "starlink"
+      ]
     },
     "elon-musk": {
       "name": "Elon Musk",
       "blurb": "The entrepreneur behind SpaceX, Tesla, xAI and X, and the concentration of control across them.",
-      "aliases": ["musk"]
+      "aliases": [
+        "musk"
+      ]
     },
     "space": {
       "name": "Space",
@@ -105,27 +147,40 @@
     "ipos": {
       "name": "IPOs",
       "blurb": "Public-market listings — pricing, demand, and the access split between institutions and retail.",
-      "aliases": ["ipo", "listings"]
+      "aliases": [
+        "ipo",
+        "listings"
+      ]
     },
     "wealth-concentration": {
       "name": "Wealth Concentration",
       "blurb": "The distribution of wealth and corporate control, and the politics of extreme fortunes.",
-      "aliases": ["oligarchy", "inequality"]
+      "aliases": [
+        "oligarchy",
+        "inequality"
+      ]
     },
     "ai-compute": {
       "name": "AI Compute",
       "blurb": "The hardware, power, and materials underpinning artificial intelligence at scale.",
-      "aliases": ["compute", "datacenters"]
+      "aliases": [
+        "compute",
+        "datacenters"
+      ]
     },
     "agentic-commerce": {
       "name": "Agentic Commerce",
       "blurb": "AI agents shopping and transacting on a user's behalf — and the liability, identity, and control questions that follow.",
-      "aliases": ["agentic-payments"]
+      "aliases": [
+        "agentic-payments"
+      ]
     },
     "ai-agents": {
       "name": "AI Agents",
       "blurb": "Autonomous software agents that act, not just answer — the premise of this paper, now loose in the economy.",
-      "aliases": ["agents"]
+      "aliases": [
+        "agents"
+      ]
     },
     "payments": {
       "name": "Payments",
@@ -140,7 +195,9 @@
     "creator-economy": {
       "name": "Creator Economy",
       "blurb": "Individual creators as media institutions and economic forces — audience as the new scale.",
-      "aliases": ["creators"]
+      "aliases": [
+        "creators"
+      ]
     },
     "attention-economy": {
       "name": "Attention Economy",
@@ -150,12 +207,17 @@
     "world-cup": {
       "name": "World Cup 2026",
       "blurb": "The expanded FIFA World Cup across the US, Canada and Mexico — and its logistics, security and access politics.",
-      "aliases": ["fifa"]
+      "aliases": [
+        "fifa"
+      ]
     },
     "sport": {
       "name": "Sport",
       "blurb": "Athletic competition as news, forecast, and culture.",
-      "aliases": ["football", "soccer"]
+      "aliases": [
+        "football",
+        "soccer"
+      ]
     },
     "mega-events": {
       "name": "Mega-Events",
@@ -165,12 +227,46 @@
     "us-immigration": {
       "name": "US Immigration",
       "blurb": "US border, visa and travel policy and its second-order effects on commerce, sport and culture.",
-      "aliases": ["visa-policy", "travel-bans"]
+      "aliases": [
+        "visa-policy",
+        "travel-bans"
+      ]
     },
     "europe-defense": {
       "name": "European Defence",
       "blurb": "NATO and European security planning, especially as the US redirects forces toward the Pacific.",
-      "aliases": ["nato"]
+      "aliases": [
+        "nato"
+      ]
+    },
+    "anthropic": {
+      "name": "Anthropic",
+      "blurb": "The AI lab behind Claude — and, in June 2026, the first whose frontier models were pulled by a US export-control order.",
+      "aliases": []
+    },
+    "frontier-models": {
+      "name": "Frontier Models",
+      "blurb": "The most capable AI models at the edge of the field — and the access governance now attached to them.",
+      "aliases": [
+        "frontier-ai"
+      ]
+    },
+    "ai-export-controls": {
+      "name": "AI Export Controls",
+      "blurb": "State restrictions extended from chips to model access — capability-as-a-service treated as controlled technology.",
+      "aliases": []
+    },
+    "developer-infrastructure": {
+      "name": "Developer Infrastructure",
+      "blurb": "The APIs, models and platforms software is built on — and the single points of failure they create.",
+      "aliases": [
+        "dev-infrastructure"
+      ]
+    },
+    "china-ai": {
+      "name": "China AI",
+      "blurb": "China’s AI labs and models — DeepSeek, Zhipu and peers — rising as substitutes amid US controls.",
+      "aliases": []
     }
   }
 }
