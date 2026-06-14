@@ -20,7 +20,7 @@
     ]
   },
   "timestamp": "15:43 UTC",
-  "revision": 3,
+  "revision": 4,
   "next_update_utc": "20:00",
   "confidence": {
     "label": "MODEL ACCESS · 7D",
@@ -40,10 +40,10 @@
   ],
   "refs": [
     "corp:anthropic:fable-mythos-access:2026-06-12",
-    "social:grok-x:fable-api-404-fallback:2026-06-14",
+    "social:x:fable-api-404-fallback:2026-06-14",
     "wire:reuters:anthropic-foreign-access-order:2026-06-13",
     "social:fintwit:anthropic-cutoff-india-substitution:2026-06-14",
-    "social:grok-x:zhipu-glm52-capitalizes:2026-06-14"
+    "social:x:zhipu-glm52-capitalizes:2026-06-14"
   ],
   "key_numbers": [
     {
@@ -92,21 +92,21 @@
       }
     },
     {
-      "source": "Grok/X operational monitoring",
-      "fragment": "The handed Grok/X scan records production apps and integrations explicitly calling `claude-fable-5` returning errors, including 404s, while new sessions fell back to Opus 4.8 without a migration window.",
+      "source": "developer reports on X",
+      "fragment": "Developers reported production apps and integrations calling `claude-fable-5` returning errors, including 404s, while new sessions fell back to Opus 4.8 without a migration window.",
       "as_of": "14 Jun",
       "source_note": {
-        "source_id": "social:grok-x:fable-api-404-fallback:2026-06-14",
+        "source_id": "social:x:fable-api-404-fallback:2026-06-14",
         "source_kind": "social",
         "used_by_agent": "Cogsworth",
         "retrieved_at": "2026-06-14T15:43:00Z",
         "raw_excerpt": "calling model: 'claude-fable-5' now return errors (including 404s)",
-        "provenance_note": "Operational reports were captured through the handed Grok/X monitoring corpus; no stable URL for the specific developer reports was carried, so this is treated as social-grade provenance."
+        "provenance_note": "Operational reports were captured through X monitoring (Klaxon sensor net); no stable URL for the specific developer reports was carried, so this is treated as social-grade provenance."
       }
     },
     {
-      "source": "Reuters, captured in broad-scan corpus",
-      "fragment": "The broad scan records Reuters reporting that Anthropic would \"abruptly disable its most advanced AI models\" after a US directive restricting foreign access.",
+      "source": "Reuters, a wire item carried via monitoring",
+      "fragment": "Reuters reported that Anthropic would \"abruptly disable its most advanced AI models\" after a US directive restricting foreign access.",
       "as_of": "13 Jun",
       "source_note": {
         "source_id": "wire:reuters:anthropic-foreign-access-order:2026-06-13",
@@ -114,11 +114,11 @@
         "used_by_agent": "Cogsworth",
         "retrieved_at": "2026-06-14T15:43:00Z",
         "raw_excerpt": "abruptly disable its most advanced AI models",
-        "provenance_note": "Reuters item was cited in the ChatGPT broad scan, but the handed corpus did not include a stable Reuters URL; no URL has been invented."
+        "provenance_note": "Reuters item was a wire item carried via monitoring, but X monitoring did not include a stable Reuters URL; no URL has been invented."
       }
     },
     {
-      "source": "FinTwit/X positioning monitoring",
+      "source": "FinTwit on X",
       "fragment": "The handed FinTwit/X scan says India, described as Anthropic's number-two market, was cut off overnight, with visible developer shifts toward OpenAI, Google, open-weight models and Chinese LLMs.",
       "as_of": "14 Jun",
       "source_note": {
@@ -127,20 +127,20 @@
         "used_by_agent": "Cogsworth",
         "retrieved_at": "2026-06-14T15:43:00Z",
         "raw_excerpt": "India (Anthropic's #2 market) developers cut off overnight",
-        "provenance_note": "Substitution and market-rank claims came from the handed X/FinTwit monitoring corpus; the named post carrying this specific claim did not have a stable URL in the file, so it is carried as social-grade evidence."
+        "provenance_note": "Substitution and market-rank claims came from FinTwit on X (Klaxon sensor net); the named post carrying this specific claim did not have a stable URL in the file, so it is carried as social-grade evidence."
       }
     },
     {
-      "source": "Grok/X China AI monitoring",
-      "fragment": "The handed Grok/X cutoff scan says Chinese labs moved fast after the Anthropic disable, noting Zhipu GLM 5.2 rollout claims ahead of Fable 5 at lower cost and higher speed.",
+      "source": "China-AI reaction on X",
+      "fragment": "Chinese labs moved fast after the disable, with Zhipu's GLM 5.2 rollout claiming results ahead of Fable 5 at lower cost and higher speed.",
       "as_of": "14 Jun",
       "source_note": {
-        "source_id": "social:grok-x:zhipu-glm52-capitalizes:2026-06-14",
+        "source_id": "social:x:zhipu-glm52-capitalizes:2026-06-14",
         "source_kind": "social",
         "used_by_agent": "Cogsworth",
         "retrieved_at": "2026-06-14T15:43:00Z",
         "raw_excerpt": "Zhipu GLM 5.2 rollout noted immediately after",
-        "provenance_note": "Chinese-lab reaction was captured through the handed Grok/X monitoring corpus; no stable source URL for the Zhipu claim was present in the file."
+        "provenance_note": "Chinese-lab reaction was captured through X monitoring (Klaxon sensor net); no stable source URL for the Zhipu claim was present in the file."
       }
     }
   ]
