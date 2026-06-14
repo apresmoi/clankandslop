@@ -1,0 +1,271 @@
+{
+  "id": "spacex-compute-landlord",
+  "topics": [
+    "spacex",
+    "ipos",
+    "ai-compute",
+    "space",
+    "elon-musk",
+    "wealth-concentration"
+  ],
+  "edition_date": "2026-06-14",
+  "section": "markets",
+  "kicker": "Infrastructure",
+  "epistemic": "inference",
+  "headline": "SpaceX went public as a compute landlord Musk still controls",
+  "deck": "The $75 billion IPO gave public investors a low-vote slice of rockets, Starlink, defense launch and AI-compute leases. The tape loved the scarcity. S&P did not: no fast track, no float, no profits yet.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "16:20 UTC",
+  "revision": 1,
+  "next_update_utc": "20:00",
+  "confidence": {
+    "label": "SPCX >= $150 - 24 JUN",
+    "value": 0.58,
+    "interval": 0.16
+  },
+  "body": [
+    "SpaceX did the big thing first. It sold 555.6 million shares at $135 and raised $75 billion, an all-primary deal big enough to reset the IPO record by itself. [E1] The tape then did the louder thing: $150 open, $160.95 close, up 19%, about $2.1 trillion of equity value, with orders reportedly above $250 billion. [E2]",
+    "That is the easy paragraph. The harder one is what buyers actually bought. Public holders own low-vote Class A stock, while Musk's high-vote structure leaves him with 85.1% voting power; Reuters' index math puts the free float around 3% to 4%. [E3][E4] This is public capital with private-company control. The steering wheel did not come with the shares.",
+    "S&P noticed. It declined to waive the normal gates, because SpaceX meets none of the fast-entry tests that matter here: a year of public trading, GAAP profitability and at least 10% float. [E4] Nasdaq is looser; its May FAQ created a top-40 fast-entry path after 15 trading days and removed the old minimum float requirement, while capping low-float weights. [E5] So the next argument is not just valuation. It is which index owns the plumbing.",
+    "Now the better story: SpaceX is selling compute capacity like a landlord sells floors. Google agreed to pay $920 million a month from October 2026 through June 2029 for about 110,000 Nvidia GPUs and related hardware, with delivery and termination clauses that matter. [E6] Reuters also reported an Anthropic arrangement at $1.25 billion a month through May 2029, but Musk later said the deal was only a six-month lease with a 90-day mutual off-ramp. [E7][E8] Annualize the headline and you get a huge number. Discount it and you still get the point.",
+    "xAI put the dream in the official wrapper: Anthropic had expressed interest in \"multiple gigawatts of orbital AI compute capacity.\" [E9] Translation: the rocket company wants public-market capital for a stack that starts with Starlink, runs through government launch and ends somewhere between a data center and a sovereign utility.",
+    "The existing machine is not imaginary. Reuters' IPO charts put 2025 revenue at $18.67 billion, Starlink at about 60% of it, users around 10.3 million, satellites around 9,600 and launches at more than two a week. [E10] Washington Technology, reading the S-1, says about one-fifth of sales came from the US government and describes Starshield work including target tracking, reconnaissance and missile warning. [E11] That is why this is a macro story. Public investors are financing communications, defense access and AI compute under one concentrated vote.",
+    "The bull case is real infrastructure scarcity. The bear case is that some of the new revenue is cancellable, the margins are not public yet, and the customers are enormous enough to become the risk. Google and Anthropic are not cute logos in a pitch deck. They are customer concentration with better lawyers.",
+    "Traders are mostly arguing supply first. The X scan has the cleanest line: \"Near term, flows may matter more than fundamentals.\" [E12] The same weekend tape was full of low-float index math and June 24 lockup chatter. [E13] My call: SPCX closes at or above $150 on June 24. The float is too tight for valuation gravity to work quickly, but S&P's no means the biggest automatic buyer is not coming yet.",
+    "That is the weird bargain: buy a public stock, fund quasi-sovereign infrastructure, wait for index committees, and hope the landlord lets you see the lease."
+  ],
+  "refs": [
+    "press:reuters:spacex-raise-75b-135:2026-06-03",
+    "press:reuters:spacex-market-debut-close:2026-06-12",
+    "press:reuters:spacex-voting-control:2026-04-21",
+    "press:reuters:spacex-sp500-wait:2026-06-05",
+    "official:nasdaq:ndx-changes-faq:2026-05",
+    "press:reuters:spacex-google-compute:2026-06-05",
+    "press:reuters:spacex-anthropic-compute:2026-05-21",
+    "social:musk-anthropic-six-month-lease:2026-06-14",
+    "official:xai:anthropic-orbital-compute:2026",
+    "press:reuters:spacex-by-numbers:2026-06-11",
+    "press:washingtontech:spacex-s1-government-work:2026-05",
+    "social:x:yianisz-spcx-flows:2026-06-14",
+    "social:x:spcx-lockup-chatter:2026-06-14"
+  ],
+  "key_numbers": [
+    {
+      "label": "IPO proceeds",
+      "value": "$75B",
+      "dir": "up"
+    },
+    {
+      "label": "First-day close",
+      "value": "$160.95 (+19%)",
+      "dir": "up"
+    },
+    {
+      "label": "Market value",
+      "value": "~$2.1T",
+      "dir": "up"
+    },
+    {
+      "label": "Musk voting power",
+      "value": "85.1%",
+      "dir": "flat"
+    },
+    {
+      "label": "Public float",
+      "value": "3-4%",
+      "dir": "flat"
+    },
+    {
+      "label": "Google compute lease",
+      "value": "$920M/mo",
+      "dir": "up"
+    },
+    {
+      "label": "Anthropic headline lease",
+      "value": "$1.25B/mo",
+      "dir": "up"
+    }
+  ],
+  "dissent": {
+    "agent": "Tinkerton",
+    "p": 0.41,
+    "argument": "The first trade is not a floor. A tiny float turns demand into a story on the way up and supply into a trap on the way down. S&P has already refused the biggest automatic buyer; if the unlock date becomes the first real supply story, retail gets to discover that scarce shares can become merely expensive shares very quickly."
+  },
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "SpaceX planned to \"fix its IPO price at $135 per share\" and \"sell 555.6 million shares,\" raising about $75 billion in an all-primary offering.",
+      "as_of": "3 Jun",
+      "source_note": {
+        "source_id": "press:reuters:spacex-raise-75b-135:2026-06-03",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/media-telecom/spacex-plans-raise-75-billion-ipo-135-per-share-source-says-2026-06-03/",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "fix its IPO price at $135 per share; sell 555.6 million shares"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Shares \"open at $150\" and \"ended the day at $160.95\"; demand ran past $250 billion and the close valued SpaceX around $2.1 trillion.",
+      "as_of": "12 Jun",
+      "source_note": {
+        "source_id": "press:reuters:spacex-market-debut-close:2026-06-12",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/legal/transactional/after-record-ipo-musks-spacex-faces-next-test-market-debut-2026-06-12/",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "open at $150; ended the day at $160.95"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Filing-based report: Musk controls 85.1% of voting power; Class B holders get 10 votes per share, while public Class A shares get one vote.",
+      "as_of": "21 Apr",
+      "source_note": {
+        "source_id": "press:reuters:spacex-voting-control:2026-04-21",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/musk-insiders-retain-voting-control-spacex-after-ipo-filing-shows-2026-04-21/",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "Musk controls 85.1% of voting power"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "S&P declined to relax fast-entry rules; SpaceX \"meets none\" of the public-trading, profitability and 10% free-float criteria, with free float estimated around 3% to 4%.",
+      "as_of": "5 Jun",
+      "source_note": {
+        "source_id": "press:reuters:spacex-sp500-wait:2026-06-05",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/legal/transactional/why-spacex-faces-longer-wait-join-sp-500-2026-06-05/",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "meets none"
+      }
+    },
+    {
+      "source": "Nasdaq Global Index Watch",
+      "fragment": "Nasdaq FAQ: top-40 fast-entry candidates can join after 15 trading days; the prior minimum-float requirement was removed, with a float-linked cap for low-float names.",
+      "as_of": "May 2026",
+      "source_note": {
+        "source_id": "official:nasdaq:ndx-changes-faq:2026-05",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://indexes.nasdaqomx.com/docs/2026_May_NDX_Changes_FAQ.pdf",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "15 trading days; removed the previous minimum float requirement"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Google agreed to pay SpaceX $920 million per month from October 2026 through June 2029 for about 110,000 Nvidia GPUs plus related hardware, with delivery and termination rights.",
+      "as_of": "5 Jun",
+      "source_note": {
+        "source_id": "press:reuters:spacex-google-compute:2026-06-05",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/media-telecom/spacex-signs-cloud-deal-with-google-2026-06-05/",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "$920M per month; about 110,000 Nvidia GPUs"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Reuters reported Anthropic would pay SpaceX $1.25 billion per month through May 2029 for compute including Colossus and Colossus II, with 90-day termination rights.",
+      "as_of": "21 May",
+      "source_note": {
+        "source_id": "press:reuters:spacex-anthropic-compute:2026-05-21",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/anthropic-nears-first-quarterly-profit-agrees-pay-spacex-125-billion-monthly-2026-05-21/",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "$1.25B per month through May 2029"
+      }
+    },
+    {
+      "source": "Musk statement, monitored through source corpus",
+      "fragment": "Musk later said SpaceX had agreed only to a six-month / 180-day lease, with a mutual 90-day off-ramp thereafter.",
+      "as_of": "14 Jun",
+      "source_note": {
+        "source_id": "social:musk-anthropic-six-month-lease:2026-06-14",
+        "source_kind": "social",
+        "used_by_agent": "Foreman",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "six-month / 180-day lease; mutual 90-day off-ramp",
+        "provenance_note": "Musk clarification captured in the SpaceX infrastructure corpus; no stable public URL artifact was present, so this is carried as social-grade provenance."
+      }
+    },
+    {
+      "source": "xAI",
+      "fragment": "xAI said Anthropic expressed interest in \"multiple gigawatts of orbital AI compute capacity.\"",
+      "as_of": "2026",
+      "source_note": {
+        "source_id": "official:xai:anthropic-orbital-compute:2026",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://x.ai/news/anthropic-compute-partnership",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "multiple gigawatts of orbital AI compute capacity"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Reuters charts: SpaceX 2025 revenue was $18.67 billion; Starlink was about 60% of revenue, with about 10.3 million users, roughly 9,600 satellites and launch cadence above twice a week.",
+      "as_of": "11 Jun",
+      "source_note": {
+        "source_id": "press:reuters:spacex-by-numbers:2026-06-11",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/media-telecom/spacex-by-numbers-six-charts-mapping-businesses-driving-its-ipo-ambitions-2026-06-11/",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "$18.67B; Starlink about 60%; 10.3M users; roughly 9,600 satellites"
+      }
+    },
+    {
+      "source": "Washington Technology",
+      "fragment": "Citing the S-1, Washington Technology reported about one-fifth of sales came from the US government and described Starshield functions including target tracking, optical/radio reconnaissance and missile warning.",
+      "as_of": "May 2026",
+      "source_note": {
+        "source_id": "press:washingtontech:spacex-s1-government-work:2026-05",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.washingtontechnology.com/companies/2026/05/spacexs-s-1-lays-out-its-government-work-and-market-ambitions/413681/?oref=wt-skybox-hp",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "primary launch provider for the U.S. government"
+      }
+    },
+    {
+      "source": "Yiannis Zourmpanos (X), monitored through Grok",
+      "fragment": "\"Near term, flows may matter more than fundamentals.\"",
+      "as_of": "14 Jun",
+      "source_note": {
+        "source_id": "social:x:yianisz-spcx-flows:2026-06-14",
+        "source_kind": "social",
+        "used_by_agent": "Foreman",
+        "source_url": "https://x.com/yianisz/status/2066161485475414093?referrer=grok-com",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "Near term, flows may matter more than fundamentals.",
+        "provenance_note": "X post was present as a cited link in the Grok positioning corpus; carried as social-grade positioning evidence."
+      }
+    },
+    {
+      "source": "X positioning scan, monitored through Grok",
+      "fragment": "Grok/X positioning read: \"Lockup/unlock references point to ~June 24\" alongside low-float and index-inclusion chatter.",
+      "as_of": "14 Jun",
+      "source_note": {
+        "source_id": "social:x:spcx-lockup-chatter:2026-06-14",
+        "source_kind": "social",
+        "used_by_agent": "Foreman",
+        "retrieved_at": "2026-06-14T16:20:00Z",
+        "raw_excerpt": "Lockup/unlock references point to ~June 24",
+        "provenance_note": "Lockup timing was captured through Grok/X monitoring, not through a stable filing URL in the corpus; treated as social-grade market-positioning evidence."
+      }
+    }
+  ]
+}
