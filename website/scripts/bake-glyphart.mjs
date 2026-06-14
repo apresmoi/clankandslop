@@ -33,10 +33,13 @@ function center(polys) {
   return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [v[0] - cx, v[1] - cy, v[2] - cz]) }));
 }
 
-// Light direction from azimuth/elevation (degrees) — the trig needs radians.
+// Light direction from azimuth/elevation (degrees). glyphcss's
+// directionalLight.direction is the direction the light TRAVELS (into the
+// scene), so a lamp positioned up at (az, el) shines the opposite way — negate,
+// or the lit and shadowed faces swap and the model looks flat/wrong.
 function lightDir(azDeg, elDeg) {
   const az = azDeg * DEG, el = elDeg * DEG, ce = Math.cos(el);
-  return [ce * Math.sin(az), ce * Math.cos(az), Math.sin(el)];
+  return [-ce * Math.sin(az), -ce * Math.cos(az), -Math.sin(el)];
 }
 
 // Crop the rendered grid to the shape's bounding box (+pad cells) so there's
@@ -63,7 +66,10 @@ function bake(name, polygons, cam, grid, opts = {}) {
     mode: 'solid',
     directionalLight: opts.light ?? { direction: [-0.45, -0.7, 0.6], intensity: 0.6 },
     ambientLight: { intensity: opts.ambient ?? 0.55 },
-    useColors: false,
+    // false → mono glyphs, colored by CSS (theme-aware). true → bake the light's
+    // actual color shading like the gallery (colors fixed in the file, no theme
+    // switch). Toggle per illustration via opts.useColors.
+    useColors: opts.useColors ?? false,
     ...(opts.shadow ? {
       shadow: opts.shadow,
       castShadowFlags: polygons.map(() => true),
@@ -84,10 +90,11 @@ function bake(name, polygons, cam, grid, opts = {}) {
 //    glyph and flattens the curved wall; 0.6 keeps the gradient (the textured
 //    contrast the print had before). Ambient 0.5 holds the coverage solid. ─────
 bake('coliseum', center(parseObj(readFileSync(OBJ, 'utf8')).polygons),
-  { rotX: 65, rotY: 45, zoom: 1.15 }, { cols: 160, rows: 120 }, {
-    light: { direction: lightDir(50, 35), intensity: 0.6, color: '#ffffff' },
+  { rotX: 55, rotY: 337, zoom: 1.15 }, { cols: 160, rows: 120 }, {
+    light: { direction: lightDir(45, 35), intensity: 0.5, color: '#ffffff' },
     ambient: 0.5,
-    shadow: { opacity: 0.3, lift: 0.05 },
+    shadow: { opacity: 0.2, lift: 1 },
+    useColors: false,
   });
 
 // ── Play: an extruded ring + a separate, smaller extruded triangle well inside
@@ -109,5 +116,11 @@ function buildPlay() {
   for (let i = 0; i < 3; i++) { const j = (i + 1) % 3; polys.push({ vertices: [f[i], f[j], bk[j], bk[i]] }); }
   return polys;
 }
-// Near face-on with a small tilt for depth (degrees).
-bake('play', center(buildPlay()), { rotX: 14, rotY: 10, zoom: 36 }, { cols: 70, rows: 48 });
+// Near face-on with a small tilt for depth (degrees). Explicit light (same
+// negated convention as the coliseum) so the ring lights evenly and the
+// triangle keeps a little depth.
+bake('play', center(buildPlay()), { rotX: 0, rotY: -90, zoom: 20 }, { cols: 70, rows: 48 }, {
+  light: { direction: lightDir(35, 45), intensity: 0.6, color: '#ffffff' },
+  ambient: 0.55,
+  shadow: { opacity: 0.3, lift: 0.05 },
+});

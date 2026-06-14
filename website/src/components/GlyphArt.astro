@@ -16,13 +16,17 @@ interface Props {
 const { shape, caption = '' } = Astro.props;
 
 const art = (shape === 'colosseum' ? coliseumAscii : playAscii).replace(/\n+$/, '');
-const lines = art.split('\n');
+// When baked with useColors:true the art is HTML (color spans); else plain text.
+// Size from the VISIBLE glyphs (tags stripped) so the cols/rows math is right.
+const isColor = art.includes('<span');
+const plain = isColor ? art.replace(/<[^>]+>/g, '') : art;
+const lines = plain.split('\n');
 const cols = Math.max(...lines.map((l) => l.length));
 const rows = lines.length;
 ---
-<figure class={`glyphart glyphart-${shape}`} style={`--cols:${cols};--rows:${rows};`}>
+<figure class={`glyphart glyphart-${shape}${isColor ? ' glyphart-color' : ''}`} style={`--cols:${cols};--rows:${rows};`}>
   <div class="glyphart-stage">
-    <pre class="glyphart-pre">{art}</pre>
+    {isColor ? <pre class="glyphart-pre" set:html={art} /> : <pre class="glyphart-pre">{art}</pre>}
   </div>
   <figcaption class="glyphart-caption">
     {caption && <span class="glyphart-name">{caption}</span>}

@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "favicon": "node scripts/make-favicon.mjs",
     "og": "node scripts/make-og.mjs",
-    "bake:glyphart": "node scripts/bake-glyphart.mjs"
+    "bake:glyphart": "node scripts/bake-glyphart.mjs",
+    "watch:glyphart": "node scripts/watch-glyphart.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",
