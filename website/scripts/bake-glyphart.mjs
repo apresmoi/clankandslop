@@ -9,13 +9,12 @@
 // The site never ships glyphcss — only the committed ASCII — so its own
 // dependency is untouched.
 //
-// Camera note: the source build's createGlyphPerspectiveCamera defaults to
-// ORTHOGRAPHIC and projects the coliseum disc flat (top-down) at any rotX. To
-// get the recognizable oblique amphitheatre we tip the MESH up (rotate about X)
-// so its height becomes screen-vertical and the bowl faces the camera; the
-// camera then only needs a small downward tilt. Tipping the bowl toward the
-// camera is also what makes the wall's self-shadow fall on a visible surface.
-import { parseObj, buildRasterizeContext, rasterize, createGlyphPerspectiveCamera, computeSceneBbox } from '/Users/apresmoi/glyphcss/packages/glyphcss/dist/index.js';
+// CAMERA UNITS: the source build's camera takes rotX/rotY in DEGREES (the
+// published 0.0.3 build took radians — that unit switch is why a straight
+// port flattened the model to a top-down view). We use createGlyphOrthographic-
+// Camera with the same rotX 65 / rotY 45 the glyphcss gallery preset uses, so
+// the bake matches what the gallery shows.
+import { parseObj, buildRasterizeContext, rasterize, createGlyphOrthographicCamera, computeSceneBbox } from '/Users/apresmoi/glyphcss/packages/glyphcss/dist/index.js';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -27,22 +26,14 @@ mkdirSync(OUT_DIR, { recursive: true });
 
 const DEG = Math.PI / 180;
 
-function fitToBbox(polys, size = 2) {
+// Center the mesh at the origin, keeping its raw scale (zoom sizes it).
+function center(polys) {
   const b = computeSceneBbox(polys);
   const cx = (b.min[0] + b.max[0]) / 2, cy = (b.min[1] + b.max[1]) / 2, cz = (b.min[2] + b.max[2]) / 2;
-  const span = Math.max(b.max[0] - b.min[0], b.max[1] - b.min[1], b.max[2] - b.min[2]) || 1;
-  const k = size / span;
-  return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [(v[0] - cx) * k, (v[1] - cy) * k, (v[2] - cz) * k]) }));
+  return polys.map((p) => ({ ...p, vertices: p.vertices.map((v) => [v[0] - cx, v[1] - cy, v[2] - cz]) }));
 }
 
-// Rotate the mesh about the world X axis (used to stand the coliseum up).
-function meshRotX(polys, deg) {
-  const c = Math.cos(deg * DEG), s = Math.sin(deg * DEG);
-  return polys.map((p) => ({ ...p, vertices: p.vertices.map(([x, y, z]) => [x, y * c - z * s, y * s + z * c]) }));
-}
-
-// Light direction from azimuth/elevation (degrees), matching the glyphcss
-// workbench: [cosEl·sin(az), cosEl·cos(az), sin(el)].
+// Light direction from azimuth/elevation (degrees) — the trig needs radians.
 function lightDir(azDeg, elDeg) {
   const az = azDeg * DEG, el = elDeg * DEG, ce = Math.cos(el);
   return [ce * Math.sin(az), ce * Math.cos(az), Math.sin(el)];
@@ -62,11 +53,9 @@ function trim(ascii, pad = 1) {
     .map((l) => l.slice(minL, maxR).replace(/\s+$/, '')).join('\n');
 }
 
+// cam.rotX / cam.rotY in DEGREES (source-build convention).
 function bake(name, polygons, cam, grid, opts = {}) {
-  const camera = createGlyphPerspectiveCamera({
-    distance: 100, perspective: 0,
-    rotX: cam.rotX * DEG, rotY: cam.rotY * DEG, zoom: cam.zoom,
-  });
+  const camera = createGlyphOrthographicCamera({ rotX: cam.rotX, rotY: cam.rotY, zoom: cam.zoom });
   const ctx = buildRasterizeContext({
     camera,
     grid: { cols: grid.cols, rows: grid.rows, cellAspect: 1.67 },
@@ -87,12 +76,11 @@ function bake(name, polygons, cam, grid, opts = {}) {
   console.log(`${name} → src/data/glyphart-${name}.txt (trimmed ${w}x${h}, ${ascii.length} chars)`);
 }
 
-// ── Coliseum: mesh tipped up 75° so the arched wall stands and the bowl faces
-//    the camera; light az 50 / el 35, key 1, ambient 0.4; self-shadow (cast +
-//    receive) opacity 0.3 / lift 0.05, no floor. The wall casts into the bowl. ─
-bake('coliseum',
-  fitToBbox(meshRotX(parseObj(readFileSync(OBJ, 'utf8')).polygons, 75), 2),
-  { rotX: 25, rotY: 0, zoom: 38 }, { cols: 150, rows: 96 }, {
+// ── Coliseum: the gallery's oblique view (rotX 65 / rotY 45, orthographic);
+//    light az 50 / el 35, key 1, ambient 0.4; self-shadow (cast + receive)
+//    opacity 0.3 / lift 0.05, no floor. ──────────────────────────────────────
+bake('coliseum', center(parseObj(readFileSync(OBJ, 'utf8')).polygons),
+  { rotX: 65, rotY: 45, zoom: 1.15 }, { cols: 160, rows: 120 }, {
     light: { direction: lightDir(50, 35), intensity: 1, color: '#ffffff' },
     ambient: 0.4,
     shadow: { opacity: 0.3, lift: 0.05 },
@@ -117,4 +105,5 @@ function buildPlay() {
   for (let i = 0; i < 3; i++) { const j = (i + 1) % 3; polys.push({ vertices: [f[i], f[j], bk[j], bk[i]] }); }
   return polys;
 }
-bake('play', fitToBbox(buildPlay(), 2), { rotX: 15, rotY: 10, zoom: 18 }, { cols: 70, rows: 48 });
+// Near face-on with a small tilt for depth (degrees).
+bake('play', center(buildPlay()), { rotX: 14, rotY: 10, zoom: 36 }, { cols: 70, rows: 48 });
