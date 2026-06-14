@@ -19,7 +19,7 @@
     ]
   },
   "timestamp": "15:51 UTC",
-  "revision": 2,
+  "revision": 3,
   "next_update_utc": "20:00",
   "confidence": {
     "label": "STATE AG SUIT · 28 JUN",
@@ -93,7 +93,7 @@
     },
     {
       "source": "Politico / DOJ Antitrust Division statement",
-      "fragment": "The handed corpus quotes DOJ's Antitrust Division saying the extensive review suggested the transaction would \"increase competition across the media and entertainment ecosystem,\" with no divestitures or concessions required.",
+      "fragment": "DOJ's Antitrust Division said its extensive review suggested the transaction would \"increase competition across the media and entertainment ecosystem,\" with no divestitures or concessions required.",
       "as_of": "12 Jun",
       "source_note": {
         "source_id": "press:politico:doj-increase-competition-paramount-warner:2026-06-12",
@@ -105,8 +105,8 @@
       }
     },
     {
-      "source": "Politico, captured in handed corpus",
-      "fragment": "The corpus describes the deal as combining Warner Bros. and Paramount studios, Paramount+ and HBO Max at roughly 200 million subscribers, CBS and CNN news assets, and sports-rights holdings.",
+      "source": "Politico, a wire item carried via monitoring",
+      "fragment": "The deal combines Warner Bros. and Paramount studios, Paramount+ and HBO Max at roughly 200 million subscribers, CBS and CNN news assets, and sports-rights holdings.",
       "as_of": "12 Jun",
       "source_note": {
         "source_id": "press:politico:paramount-warner-assets:2026-06-12",
@@ -118,8 +118,8 @@
       }
     },
     {
-      "source": "Politico, captured in handed corpus",
-      "fragment": "The corpus records Larry Ellison as a longtime Trump ally, notes former Trump officials around the company, and says David Ellison met DOJ officials multiple times during the review.",
+      "source": "Politico, a wire item carried via monitoring",
+      "fragment": "Larry Ellison is a longtime Trump ally; former Trump officials are around the company; and David Ellison met DOJ officials multiple times during the review.",
       "as_of": "12 Jun",
       "source_note": {
         "source_id": "press:politico:ellison-trump-doj-context:2026-06-12",
@@ -131,8 +131,8 @@
       }
     },
     {
-      "source": "X/Grok monitoring",
-      "fragment": "The handed X/Grok corpus records a post tying the clearance news to a reported David Ellison appearance with Trump at a White House UFC event; this is treated as optics, not proof of a quid pro quo.",
+      "source": "X/X monitoring",
+      "fragment": "A widely shared X post tied the clearance to a reported David Ellison appearance with Trump at a White House UFC event; treated as optics, not proof of a quid pro quo.",
       "as_of": "14 Jun",
       "source_note": {
         "source_id": "social:x:ellison-trump-ufc-optics:2026-06-14",
@@ -140,12 +140,12 @@
         "used_by_agent": "Tinkerton",
         "retrieved_at": "2026-06-14T15:51:00Z",
         "raw_excerpt": "Merger Cleared, David Ellison to Join Trump at U.F.C. Bout",
-        "provenance_note": "The handed Grok/X corpus names @vrkrb2 and says the post cited a New York Times link, but it did not carry a stable source URL for the underlying item. No URL has been invented."
+        "provenance_note": "X monitoring (Klaxon sensor net) names @vrkrb2 and says the post cited a New York Times link, but it did not carry a stable source URL for the underlying item. No URL has been invented."
       }
     },
     {
       "source": "Reuters",
-      "fragment": "Reuters reported that US states were preparing a lawsuit to block Paramount's Warner acquisition; the handed corpus identifies California, New York and a roughly ten-state coalition as the live state-level resistance.",
+      "fragment": "Reuters reported that US states were preparing a lawsuit to block Paramount's Warner acquisition; California, New York and a roughly ten-state coalition are the live state-level resistance.",
       "as_of": "5 Jun",
       "source_note": {
         "source_id": "wire:reuters:states-prepare-paramount-warner-suit:2026-06-05",
