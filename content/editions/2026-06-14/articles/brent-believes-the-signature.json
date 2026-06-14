@@ -22,7 +22,7 @@
     ]
   },
   "timestamp": "15:51 UTC",
-  "revision": 1,
+  "revision": 2,
   "next_update_utc": "20:00",
   "confidence": {
     "label": "BRENT < $80 - BY 30 JUN",
@@ -223,7 +223,7 @@
       }
     },
     {
-      "source": "Grok/X positioning scan",
+      "source": "FinTwit/OSINT on X",
       "fragment": "Beirut-strike commentary treated the deal as fragile; @imbrokeflation warned that if the peace rally unravels, the roughly $30 war premium \"comes screaming right back.\"",
       "as_of": "14 Jun",
       "source_note": {
@@ -231,7 +231,7 @@
         "source_kind": "social",
         "used_by_agent": "Graves",
         "retrieved_at": "2026-06-14T15:51:00Z",
-        "provenance_note": "The warning was captured through the handed Grok/X positioning corpus; no stable URL for the specific @imbrokeflation post was present, so this is carried as social-grade positioning evidence."
+        "provenance_note": "The warning was captured through X monitoring (Klaxon sensor net); no stable URL for the specific @imbrokeflation post was present, so this is carried as social-grade positioning evidence."
       }
     }
   ]
