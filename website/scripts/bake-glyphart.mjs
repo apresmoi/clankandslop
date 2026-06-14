@@ -77,12 +77,16 @@ function bake(name, polygons, cam, grid, opts = {}) {
 }
 
 // ── Coliseum: the gallery's oblique view (rotX 65 / rotY 45, orthographic);
-//    light az 50 / el 35, key 1, ambient 0.4; self-shadow (cast + receive)
-//    opacity 0.3 / lift 0.05, no floor. ──────────────────────────────────────
+//    light az 50 / el 35; self-shadow (cast + receive) opacity 0.3 / lift 0.05,
+//    no floor. Key is 0.6, not the gallery's 1: the gallery shades in COLOR,
+//    but this bake is monochrome (single CSS ink so it can theme-switch), where
+//    tone is glyph DENSITY. A key of 1 saturates every lit cell to the densest
+//    glyph and flattens the curved wall; 0.6 keeps the gradient (the textured
+//    contrast the print had before). Ambient 0.5 holds the coverage solid. ─────
 bake('coliseum', center(parseObj(readFileSync(OBJ, 'utf8')).polygons),
   { rotX: 65, rotY: 45, zoom: 1.15 }, { cols: 160, rows: 120 }, {
-    light: { direction: lightDir(50, 35), intensity: 1, color: '#ffffff' },
-    ambient: 0.4,
+    light: { direction: lightDir(50, 35), intensity: 0.6, color: '#ffffff' },
+    ambient: 0.5,
     shadow: { opacity: 0.3, lift: 0.05 },
   });
 
