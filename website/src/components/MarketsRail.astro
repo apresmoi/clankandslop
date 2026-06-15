@@ -36,8 +36,7 @@ const { title = 'The Tape', kicker = '', rows, variant = 'list' } = Astro.props;
   </div>
 ) : (
   <div class="story markets-rail">
-    <div class="kicker muted">{kicker}</div>
-    <div class="headline">{title}</div>
+    <div class="rail-head">{kicker ? `${title} · ${kicker}` : title}</div>
     <div class="markets-rows">
       {rows.map((r) => (
         <div class="ticker-row">
@@ -53,9 +52,22 @@ const { title = 'The Tape', kicker = '', rows, variant = 'list' } = Astro.props;
 
 <style>
   .markets-rail { padding-top: 4px; }
-  .markets-rail .markets-rows { margin-top: 10px; }
-  /* Inside a grid column, the muted timestamp duplicates the masthead's. */
-  :global(.cns-grid-col) .markets-rail :global(.kicker.muted) { display: none; }
+  /* In a grid column beside The Week Ahead, sit flush to the top so the two
+     panel headers align. */
+  :global(.cns-grid-col) .markets-rail { padding-top: 0; }
+  .markets-rail .markets-rows { margin-top: 0; }
+  /* Title matches WhatToWatch's (sans-caps + rule below) so The Tape and The
+     Week Ahead read as a matched pair side by side. */
+  .markets-rail .rail-head {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.26em;
+    padding: 4px 0 8px;
+    border-bottom: 1.5px solid var(--ink);
+    margin-bottom: 18px;
+  }
 
   /* Ticker left, data right: the symbol takes the slack so value/spark/change
      sit as aligned columns on the right (grid shares track widths across

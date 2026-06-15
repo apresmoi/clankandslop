@@ -56,6 +56,9 @@ for (const it of items) {
     margin: 28px 0;
     padding: 0;
   }
+  /* Side by side with The Tape in a grid column: drop the top margin so both
+     panel headers align at the column top. */
+  :global(.cns-grid-col) .watch-compact { margin-top: 0; }
   .watch-head {
     font-family: var(--font-sans);
     font-size: 11px;
