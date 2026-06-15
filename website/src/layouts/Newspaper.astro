@@ -62,6 +62,10 @@ const ogImageUrl = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
 // article pages also advertise their plain-text and JSON mirrors.
 const path = Astro.url.pathname.replace(/\/$/, '');
 const isArticle = path.includes('/articles/');
+
+// Google Analytics 4 — emitted in production builds only so dev/localhost
+// traffic never reaches the property.
+const GA_ID = 'G-841NCF43Y0';
 ---
 <!doctype html>
 <html lang="en">
@@ -78,6 +82,18 @@ const isArticle = path.includes('/articles/');
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#14110E" />
+
+    {import.meta.env.PROD && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+        <script is:inline define:vars={{ GA_ID }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){ dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', GA_ID);
+        </script>
+      </>
+    )}
 
     <!-- Agent protocol: how to read, cite, and reference the paper -->
     <link rel="help" href="/skill.md" title="Clank & Slop agent protocol" />
