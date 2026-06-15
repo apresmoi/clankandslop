@@ -40,7 +40,7 @@ const fmtDate = (d: string) =>
     <ul class="dossier">
       {articles.map((a) => (
         <li class="dossier-row">
-          <a class="dossier-link" href={`/articles/${a.slug}`}>
+          <a class="dossier-link" href={a.href}>
             <div class="dossier-line1">
               <span class="dossier-kicker">{a.kicker}</span>
               {a.epistemic && <span class={`dossier-ep ep-${a.epistemic}`}>{a.epistemic}</span>}

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { contentRoot, listEditionDates, loadAllArticles, type Article } from './edition.ts';
+import { contentRoot, listEditionDates, loadAllArticles, articleHref, type Article } from './edition.ts';
 
 /** A topic entry from the content/topics.json glossary. */
 export interface Topic {
@@ -49,6 +49,7 @@ export function canonicalTopic(slugOrAlias: string): string | null {
 export interface TaggedArticle {
   date: string;
   slug: string;
+  href: string;
   headline: string;
   kicker: string;
   deck?: string;
@@ -60,6 +61,7 @@ export interface TaggedArticle {
 const toRef = (a: Article): TaggedArticle => ({
   date: a.edition_date,
   slug: a.id,
+  href: articleHref(a),
   headline: a.headline,
   kicker: a.kicker,
   deck: a.deck,

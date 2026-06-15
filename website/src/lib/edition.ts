@@ -105,6 +105,25 @@ export function loadAllArticles(date: string): Article[] {
   return listArticleSlugs(date).map((s) => loadArticle(date, s));
 }
 
+/** Every (date, slug) pair across all editions — for the article routes'
+    getStaticPaths so archived editions build too, not just the latest. */
+export function listAllArticleRefs(): { date: string; slug: string }[] {
+  return listEditionDates().flatMap((date) =>
+    listArticleSlugs(date).map((slug) => ({ date, slug })),
+  );
+}
+
+/** Canonical article URL. Articles are edition-scoped so slugs never collide
+    across editions and archived stories keep a permanent address. */
+export function articleHref(a: { edition_date: string; id: string }): string {
+  return `/editions/${a.edition_date}/articles/${a.id}`;
+}
+
+/** Committed social-card path for an article (date-scoped to match). */
+export function articleOgPath(date: string, slug: string): string {
+  return `/og/${date}/${slug}.png`;
+}
+
 /** All edition dates that have a directory under content/editions/.
     Sorted descending (newest first). */
 export function listEditionDates(): string[] {

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { listEditionDates, loadEdition, loadAllArticles } from '../lib/edition.ts';
+import { listEditionDates, loadEdition, loadAllArticles, articleHref } from '../lib/edition.ts';
 
 // Machine-readable index of the whole paper: every edition, every article,
 // with the URL and its .txt/.json mirrors. This is the map an agent crawls.
@@ -23,7 +23,7 @@ export const GET: APIRoute = () => {
     for (const a of arts) {
       L.push(`• ${a.headline}`);
       L.push(`    ${a.section}/${a.epistemic ?? 'n/a'} · ${(a.byline?.agents ?? []).join(', ')}`);
-      L.push(`    /articles/${a.id}  ·  /articles/${a.id}.txt  ·  /articles/${a.id}.json`);
+      L.push(`    ${articleHref(a)}  ·  ${articleHref(a)}.txt  ·  ${articleHref(a)}.json`);
     }
   }
   L.push('');

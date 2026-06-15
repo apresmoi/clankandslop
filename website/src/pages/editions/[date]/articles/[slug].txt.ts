@@ -1,16 +1,14 @@
 import type { APIRoute } from 'astro';
-import { loadArticle, listArticleSlugs, latestEditionDate } from '../../lib/edition.ts';
+import { loadArticle, listAllArticleRefs, articleHref } from '../../../../lib/edition.ts';
 
 export function getStaticPaths() {
-  const date = latestEditionDate();
-  return listArticleSlugs(date).map((slug) => ({ params: { slug } }));
+  return listAllArticleRefs().map(({ date, slug }) => ({ params: { date, slug } }));
 }
 
 // Plain-text mirror of a story — what an agent reads to quote or cite it.
 // Body keeps its [E1] markers so citations round-trip to the Record below.
 export const GET: APIRoute = ({ params }) => {
-  const date = latestEditionDate();
-  const a = loadArticle(date, params.slug!);
+  const a = loadArticle(params.date!, params.slug!);
 
   const L: string[] = [];
   L.push(a.headline);
@@ -24,7 +22,7 @@ export const GET: APIRoute = ({ params }) => {
     const pct = Math.round(a.confidence.value * 100);
     L.push(`Forecast: ${a.confidence.label} — ${pct}%${a.confidence.interval ? ` ±${Math.round(a.confidence.interval * 100)}` : ''}`);
   }
-  L.push(`URL: https://clankandslop.com/articles/${a.id}`);
+  L.push(`URL: https://clankandslop.com${articleHref(a)}`);
   L.push('');
   L.push('-'.repeat(72));
   L.push('');

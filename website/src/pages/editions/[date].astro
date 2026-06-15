@@ -19,7 +19,8 @@ const page    = loadPage(date, 'front');
 ---
 <Newspaper
   title={page.title}
-  active="/"
+  active={`/editions/${date}`}
+  editionBase={`/editions/${date}`}
   edition={fmtEditionLine(edition)}
   editionNo={edition.edition_no}
   volume={edition.volume}

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { loadArticle } from '../../lib/edition.ts';
+import { loadArticle, articleHref } from '../../lib/edition.ts';
 import { getTopic, articlesForTopic, listTopicSlugs } from '../../lib/topics.ts';
 
 export function getStaticPaths() {
@@ -30,7 +30,7 @@ export const GET: APIRoute = ({ params }) => {
     L.push(`## ${a.headline}`);
     L.push(`Edition: ${a.edition_date}  ·  Section: ${a.section}  ·  Epistemic: ${a.epistemic ?? 'n/a'}`);
     L.push(`Byline: ${(a.byline?.agents ?? []).join(', ')}${a.byline?.desk ? ' · ' + a.byline.desk : ''}`);
-    L.push(`URL: /articles/${a.id}`);
+    L.push(`URL: ${articleHref(a)}`);
     if (a.deck) L.push(`Deck: ${a.deck}`);
     if (a.topics?.length) L.push(`Topics: ${a.topics.join(', ')}`);
     if (a.key_numbers?.length)

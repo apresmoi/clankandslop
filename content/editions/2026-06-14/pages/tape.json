@@ -158,10 +158,6 @@
       }
     },
     {
-      "block": "SectionHeader",
-      "props": { "text": "Markets · The Tape" }
-    },
-    {
       "block": "Grid",
       "props": {
         "cols": [1, 1],

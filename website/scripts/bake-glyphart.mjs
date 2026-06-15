@@ -61,7 +61,7 @@ function bake(name, polygons, cam, grid, opts = {}) {
   const camera = createGlyphOrthographicCamera({ rotX: cam.rotX, rotY: cam.rotY, zoom: cam.zoom });
   const ctx = buildRasterizeContext({
     camera,
-    grid: { cols: grid.cols, rows: grid.rows, cellAspect: 1.67 },
+    grid: { cols: grid.cols, rows: grid.rows, cellAspect: grid.cellAspect ?? 1.67 },
     polygons,
     mode: 'solid',
     directionalLight: opts.light ?? { direction: [-0.45, -0.7, 0.6], intensity: 0.6 },
@@ -96,6 +96,10 @@ bake('coliseum', center(parseObj(readFileSync(OBJ, 'utf8')).polygons),
     shadow: { opacity: 0.2, lift: 1 },
     useColors: false,
   });
+
+// The 404 flying saucer is baked separately by scripts/bake-saucer.mjs — its
+// poly-pizza .glb needs a browser to decode (texture atlas) and the published
+// glyphcss build reads cleaner than this local source build.
 
 // ── Play: an extruded ring + a separate, smaller extruded triangle well inside
 //    it (a clear gap so the two shapes never fuse), a small tilt for depth. ────

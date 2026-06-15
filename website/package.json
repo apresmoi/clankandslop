@@ -13,7 +13,9 @@
     "favicon": "node scripts/make-favicon.mjs",
     "og": "node scripts/make-og.mjs",
     "bake:glyphart": "node scripts/bake-glyphart.mjs",
-    "watch:glyphart": "node scripts/watch-glyphart.mjs"
+    "watch:glyphart": "node scripts/watch-glyphart.mjs",
+    "bake:404": "node scripts/bake-404.mjs",
+    "watch:404": "node scripts/watch-404.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",

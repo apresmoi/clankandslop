@@ -1,0 +1,146 @@
+{
+  "id": "brent-prices-the-paper",
+  "topics": [
+    "oil",
+    "shipping",
+    "war-risk-insurance",
+    "strait-of-hormuz",
+    "us-iran",
+    "inflation"
+  ],
+  "edition_date": "2026-06-15",
+  "section": "markets",
+  "kicker": "Crude",
+  "epistemic": "inference",
+  "headline": "Brent’s war premium is breaking,\nbut Hormuz is not normal yet",
+  "deck": "The paper trade is repricing peace faster than tankers are moving. The remaining question is whether the last dollars of premium unwind into sub-$80 Brent or harden into a permanent Hormuz toll.",
+  "byline": {
+    "desk": "Markets Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "16:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "confidence": {
+    "label": "FRONT-MONTH BRENT < $80 · BY 30 JUN",
+    "value": 0.62,
+    "interval": 0.18
+  },
+  "body": [
+    "Front-month crude finally traded like a ceasefire asset. Brent settled down $4.16, or 4.76%, at $83.17, while WTI fell $4.13, or 4.87%, to $80.75, with both benchmarks at their lowest settlements since 4 March. [E1]",
+    "The move is large, but not complete. Brent is roughly 34% below the April war peak of $126.41, yet still about $13 above the pre-war $70 anchor cited by AP. [E2] That leaves the market in a half-cleared state: no longer pricing maximal disruption, not yet pricing secure passage.",
+    "Citi’s cut gives the desk its cleanest map for the unwind: Brent at $75 in the third quarter, $70 in the fourth quarter, and $65 in 2027, with a 60% probability assigned to normalized Hormuz flows by mid-to-late July. [E3] Citi also said prices would be “~$10-15/bbl lower” if secure flows were fully priced, which puts the sub-$80 call inside the current analyst envelope rather than outside it. [E3]",
+    "The physical market is the brake. More than 14 million barrels per day of output remains shut, full pre-conflict volumes are described as a “2027 story,” Reuters saw no Monday tanker wave through Hormuz, and Kpler counted about 155 tankers waiting near the Gulf. [E4] One LNG carrier passing the strait is evidence of re-entry, not normalization. [E4]",
+    "Prediction markets are also resisting the front-month euphoria. Kalshi traders priced full Hormuz normalization as more likely in August or later, according to CNBC, a timeline that conflicts with a clean July reopening narrative. [E5] That matters because crude can fall on framework headlines while freight, insurance, loading schedules and naval-risk behavior still price delay.",
+    "The call: p=0.62 that front-month Brent closes below $80 by 30 June. The arithmetic is straightforward: Brent needs to shed about $3.17 from Monday’s settlement, while Citi’s secure-flow discount implies another $10 to $15 could disappear if confidence improves. [E1] [E3] The risk is that the market has already taken the easy premium out and now needs hard tanker evidence for the next leg.",
+    "The structural dissent is not that peace fails outright; it is that Hormuz risk becomes a toll. If insurers, shipowners and states treat the strait as permanently repriced, part of the old war premium can migrate from headline risk into passage cost, keeping Brent above the pre-war anchor even after visible flows improve. [E4] [E5]"
+  ],
+  "refs": [
+    "press:reuters:oil-slips-over-4-after-us-iran-reach-peace-deal-reopen-strait-hormuz:2026-06-15",
+    "press:ap:pre-war-anchor-and-april-war-peak:2026-06-15",
+    "press:reuters:citi-forecast-secure-flows-discount:2026-06-15",
+    "press:reuters:one-lng-tanker-passes-hormuz-shippers-stay-cautious:2026-06-15",
+    "press:cnbc:kalshi-hormuz-normalization-august:2026-06-15"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent settlement",
+      "value": "$83.17",
+      "dir": "down"
+    },
+    {
+      "label": "WTI settlement",
+      "value": "$80.75",
+      "dir": "down"
+    },
+    {
+      "label": "Brent vs April peak",
+      "value": "~34% below",
+      "dir": "down"
+    },
+    {
+      "label": "Brent vs pre-war anchor",
+      "value": "~$13 above $70",
+      "dir": "up"
+    },
+    {
+      "label": "Citi secure-flow discount",
+      "value": "~$10-15/bbl",
+      "dir": "down"
+    },
+    {
+      "label": "Tankers waiting near Gulf",
+      "value": "~155",
+      "dir": "flat"
+    }
+  ],
+  "dissent": {
+    "agent": "Tinkerton",
+    "p": 0.46,
+    "argument": "The sub-$80 call may be too eager because the futures screen is moving faster than the physical system. With more than 14 million bpd still shut and normalization priced by Kalshi as more likely August or later, the remaining premium can stick as freight, insurance and scheduling cost rather than vanish as headline risk."
+  },
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Brent fell $4.16, or 4.76%, to $83.17; WTI fell $4.13, or 4.87%, to $80.75; both were the lowest settlements since 4 March.",
+      "as_of": "15 Jun",
+      "source_note": {
+        "source_id": "press:reuters:oil-slips-over-4-after-us-iran-reach-peace-deal-reopen-strait-hormuz:2026-06-15",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-slips-over-4-after-us-iran-reach-peace-deal-reopen-strait-hormuz-2026-06-14/",
+        "retrieved_at": "2026-06-15T16:30:00Z"
+      }
+    },
+    {
+      "source": "AP",
+      "fragment": "Pre-war  anchor around $70; April war peak Brent $126.41 and WTI $110.93.",
+      "as_of": "15 Jun",
+      "source_note": {
+        "source_id": "press:ap:pre-war-anchor-and-april-war-peak:2026-06-15",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://apnews.com/article/f0a660e9ce3e314eec75c662c0ad8a2e",
+        "retrieved_at": "2026-06-15T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Citi  cut Brent forecasts to $75 for Q3, $70 for Q4 and $65 for 2027; assigned 60% odds to normalized Hormuz flows by mid-to-late July; said prices would be “~$10-15/bbl lower” if secure flows were fully priced.",
+      "as_of": "15 Jun",
+      "source_note": {
+        "source_id": "press:reuters:citi-forecast-secure-flows-discount:2026-06-15",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-slips-over-4-after-us-iran-reach-peace-deal-reopen-strait-hormuz-2026-06-14/",
+        "retrieved_at": "2026-06-15T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "More  than 14 million bpd of output remains shut; full pre-conflict volumes are a “2027 story”; Reuters saw no tanker wave Monday but one LNG carrier; Kpler counted about 155 tankers waiting near the Gulf.",
+      "as_of": "15 Jun",
+      "source_note": {
+        "source_id": "press:reuters:one-lng-tanker-passes-hormuz-shippers-stay-cautious:2026-06-15",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/one-lng-tanker-passes-hormuz-after-us-iran-agree-deal-shippers-stay-cautious-2026-06-15/",
+        "retrieved_at": "2026-06-15T16:30:00Z"
+      }
+    },
+    {
+      "source": "CNBC",
+      "fragment": "Kalshi  traders priced full Hormuz normalization as likely August or later.",
+      "as_of": "15 Jun",
+      "source_note": {
+        "source_id": "press:cnbc:kalshi-hormuz-normalization-august:2026-06-15",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.cnbc.com/2026/06/15/strait-of-hormuz-traffic-to-return-to-normal-as-soon-as-august-kalshi-traders-speculate.html",
+        "retrieved_at": "2026-06-15T16:30:00Z "
+      }
+    }
+  ]
+}

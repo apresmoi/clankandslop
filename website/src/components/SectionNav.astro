@@ -1,10 +1,18 @@
 ---
-interface Props { active?: string; }
-const { active = '' } = Astro.props;
+interface Props {
+  active?: string;
+  /** When viewing an archived edition, the per-edition base path
+      (e.g. `/editions/2026-06-13`) so the sections stay inside that
+      edition instead of jumping to the live paper. */
+  editionBase?: string;
+}
+const { active = '', editionBase = '' } = Astro.props;
 
+const front = editionBase || '/';
+const tape  = editionBase ? `${editionBase}/tape` : '/tape';
 const sections = [
-  { href: '/',     label: 'Front Page' },
-  { href: '/tape', label: 'The Tape' },
+  { href: front, label: 'Front Page' },
+  { href: tape,  label: 'The Tape' },
 ];
 ---
 <nav class="section-nav">
