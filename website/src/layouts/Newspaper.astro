@@ -25,6 +25,9 @@ interface Props {
   compact?: boolean;
   /** Nameplate ears (front page only) — see Masthead. */
   ears?: { left: string[]; right: string[] };
+  /** When rendering an archived edition, the per-edition base path so the
+      section nav stays within that edition (e.g. `/editions/2026-06-13`). */
+  editionBase?: string;
 }
 
 const {
@@ -40,6 +43,7 @@ const {
   ogImage,
   compact   = true,
   ears,
+  editionBase,
 } = Astro.props;
 
 // Fail the build loudly rather than render plausible stale chrome.
@@ -50,14 +54,14 @@ for (const [k, v] of Object.entries({ edition, editionNo, volume, date, nextBell
 // Per-page SEO/social meta. `site` is set in astro.config (the custom domain),
 // so canonical and og:url are absolute. News stories are og:type=article.
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
-const ogType = Astro.url.pathname.startsWith('/articles/') ? 'article' : 'website';
+const ogType = /\/articles\//.test(Astro.url.pathname) ? 'article' : 'website';
 const imagePath = ogImage ?? '/og/default.png';
 const ogImageUrl = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
 
 // Agent-facing alternates: every page points at the skill + llms guides, and
 // article pages also advertise their plain-text and JSON mirrors.
 const path = Astro.url.pathname.replace(/\/$/, '');
-const isArticle = path.startsWith('/articles/');
+const isArticle = path.includes('/articles/');
 ---
 <!doctype html>
 <html lang="en">
@@ -117,7 +121,7 @@ const isArticle = path.startsWith('/articles/');
   <body>
     <Masthead edition={edition} date={date} tagline={tagline} compact={compact} ears={ears} />
     <div class="page">
-      <SectionNav active={active} />
+      <SectionNav active={active} editionBase={editionBase} />
       <slot />
       <Colophon editionNo={editionNo} volume={volume} nextBell={nextBell} />
     </div>

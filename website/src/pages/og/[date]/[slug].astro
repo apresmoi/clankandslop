@@ -1,19 +1,17 @@
 ---
 /* Social/OG card for each article — 1200×630. Not a public destination:
-   scripts/make-og.mjs screenshots these into /og/<slug>.png (committed
+   scripts/make-og.mjs screenshots these into /og/<date>/<slug>.png (committed
    static), and the article <head> points og:image at the PNG. Rendered with
    the real paper fonts + glyph art so the card matches the front page. */
-import '../../styles/tokens.css';
-import MapGlyph from '../../components/MapGlyph.astro';
-import { loadArticle, loadMap, listArticleSlugs, latestEditionDate } from '../../lib/edition.ts';
+import '../../../styles/tokens.css';
+import MapGlyph from '../../../components/MapGlyph.astro';
+import { loadArticle, loadMap, listAllArticleRefs } from '../../../lib/edition.ts';
 
 export async function getStaticPaths() {
-  const date = latestEditionDate();
-  return listArticleSlugs(date).map((slug) => ({ params: { slug } }));
+  return listAllArticleRefs().map(({ date, slug }) => ({ params: { date, slug } }));
 }
 
-const { slug } = Astro.params as { slug: string };
-const date = latestEditionDate();
+const { date, slug } = Astro.params as { date: string; slug: string };
 const article = loadArticle(date, slug);
 
 const mapArt = article.art?.kind === 'map' ? article.art : null;

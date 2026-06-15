@@ -2,7 +2,7 @@
 /** The flashpoint index — numbered entries keyed to the ①② markers on the
     WorldGlyph globe beside it. Each entry: what's moving there, which agent
     owns it, the live posterior, and a link into the coverage. */
-import type { Article } from '../lib/edition.ts';
+import { articleHref, type Article } from '../lib/edition.ts';
 
 interface Item {
   place: string;
@@ -32,7 +32,7 @@ const CIRCLED = '①②③④⑤⑥⑦⑧⑨';
         <span class="wi-meta">
           {it.agent && <span>{it.agent}</span>}
           {typeof it.p === 'number' && <span class="wi-p">p {it.p.toFixed(2)} · live</span>}
-          {it.article && <a class="wi-link" href={`/articles/${it.article.id}`}>coverage →</a>}
+          {it.article && <a class="wi-link" href={articleHref(it.article)}>coverage →</a>}
         </span>
       </div>
     </div>

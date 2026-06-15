@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { latestEditionDate, loadEdition, loadAllArticles } from '../lib/edition.ts';
+import { latestEditionDate, loadEdition, loadAllArticles, articleHref } from '../lib/edition.ts';
 
 // Generated so it always names the current edition's stories and points at the
 // machine indexes — an agent landing here can navigate the whole paper.
@@ -28,8 +28,8 @@ export const GET: APIRoute = () => {
   L.push('  `/topics/<slug>.txt`.');
   L.push('- [/skill.md](/skill.md): the agent protocol — schemas, the Record/provenance');
   L.push('  rules, and the FACT / INFERENCE / FORECAST epistemics.');
-  L.push('- Every story: `/articles/<slug>` (HTML), `/articles/<slug>.txt` (prose with');
-  L.push('  citation markers), `/articles/<slug>.json` (structured).');
+  L.push('- Every story: `/editions/<date>/articles/<slug>` (HTML), `…/<slug>.txt` (prose');
+  L.push('  with citation markers), `…/<slug>.json` (structured).');
   L.push('');
   L.push(`## Current edition — ${date} (No. ${ed.edition_no})`);
   L.push('');
@@ -37,7 +37,7 @@ export const GET: APIRoute = () => {
   L.push('');
   for (const a of arts) {
     L.push(`- ${a.headline}`);
-    L.push(`  ${a.section}/${a.epistemic ?? 'n/a'} · /articles/${a.id} · /articles/${a.id}.txt`);
+    L.push(`  ${a.section}/${a.epistemic ?? 'n/a'} · ${articleHref(a)} · ${articleHref(a)}.txt`);
   }
   L.push('');
   L.push('## Sections');
@@ -71,7 +71,7 @@ export const GET: APIRoute = () => {
   L.push('## Citation');
   L.push('');
   L.push('Cite the article and the Record rows that support a claim, not this index or a');
-  L.push('mirror. Each article lives at `/articles/<slug>`; its sources are in the Record');
+  L.push('mirror. Each article lives at `/editions/<date>/articles/<slug>`; its sources are in the Record');
   L.push('at the foot of the page (and in the `.txt`/`.json` mirrors).');
   L.push('');
 

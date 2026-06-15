@@ -1,37 +1,38 @@
 ---
-import '../../styles/page-article.css';
-import Newspaper from '../../layouts/Newspaper.astro';
-import AsciiArt     from '../../components/article/AsciiArt.astro';
-import MapGlyph     from '../../components/MapGlyph.astro';
-import BackLink     from '../../components/article/BackLink.astro';
-import Confidence   from '../../components/article/Confidence.astro';
-import DissentNote  from '../../components/article/DissentNote.astro';
-import EvidenceBox  from '../../components/article/EvidenceBox.astro';
+import '../../../../styles/page-article.css';
+import Newspaper from '../../../../layouts/Newspaper.astro';
+import AsciiArt     from '../../../../components/article/AsciiArt.astro';
+import MapGlyph     from '../../../../components/MapGlyph.astro';
+import BackLink     from '../../../../components/article/BackLink.astro';
+import Confidence   from '../../../../components/article/Confidence.astro';
+import DissentNote  from '../../../../components/article/DissentNote.astro';
+import EvidenceBox  from '../../../../components/article/EvidenceBox.astro';
 import {
   loadEdition,
   loadArticle,
   loadMap,
-  listArticleSlugs,
-  latestEditionDate,
+  listAllArticleRefs,
+  articleOgPath,
   fmtEditionLine,
   fmtDateLine,
   renderParagraph,
-} from '../../lib/edition.ts';
-import { getTopic } from '../../lib/topics.ts';
+} from '../../../../lib/edition.ts';
+import { getTopic } from '../../../../lib/topics.ts';
 
 export async function getStaticPaths() {
-  return listArticleSlugs(latestEditionDate()).map((slug) => ({ params: { slug } }));
+  return listAllArticleRefs().map(({ date, slug }) => ({ params: { date, slug } }));
 }
 
-const { slug } = Astro.params as { slug: string };
-const date    = latestEditionDate();
+const { date, slug } = Astro.params as { date: string; slug: string };
 const edition = loadEdition(date);
 const article = loadArticle(date, slug);
 const conf = article.confidence;
 const headlineLines = article.headline.split('\n');
 
-const backHref  = article.section === 'tape' ? '/tape' : '/';
-const backLabel = article.section === 'tape' ? 'The Tape' : 'The Front Page';
+const editionBase = `/editions/${date}`;
+const isTape     = article.section === 'tape';
+const backHref   = isTape ? `${editionBase}/tape` : editionBase;
+const backLabel  = isTape ? 'The Tape' : 'The Front Page';
 
 const mapArt = article.art?.kind === 'map' ? article.art : null;
 const artMap = mapArt ? loadMap(date, mapArt.map) : null;
@@ -46,8 +47,9 @@ const topicChips = (article.topics ?? []).map((s) => getTopic(s)).filter((t) => 
 <Newspaper
   title={`${article.headline} — Clank & Slop`}
   description={article.deck || article.headline}
-  ogImage={`/og/${slug}.png`}
+  ogImage={articleOgPath(date, slug)}
   active={backHref}
+  editionBase={editionBase}
   edition={fmtEditionLine(edition)}
   editionNo={edition.edition_no}
   volume={edition.volume}
