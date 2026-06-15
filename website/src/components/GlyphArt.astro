@@ -8,14 +8,16 @@
     the text beside it. */
 import coliseumAscii from '../data/glyphart-coliseum.txt?raw';
 import playAscii from '../data/glyphart-play.txt?raw';
+import notFoundAscii from '../data/glyphart-404.txt?raw';
 
 interface Props {
-  shape: 'colosseum' | 'play';
+  shape: 'colosseum' | 'play' | 'notfound';
   caption?: string;
 }
 const { shape, caption = '' } = Astro.props;
 
-const art = (shape === 'colosseum' ? coliseumAscii : playAscii).replace(/\n+$/, '');
+const sources: Record<string, string> = { colosseum: coliseumAscii, play: playAscii, notfound: notFoundAscii };
+const art = (sources[shape] ?? coliseumAscii).replace(/\n+$/, '');
 // When baked with useColors:true the art is HTML (color spans); else plain text.
 // Size from the VISIBLE glyphs (tags stripped) so the cols/rows math is right.
 const isColor = art.includes('<span');
@@ -58,6 +60,9 @@ const rows = lines.length;
     }
   }
   .glyphart-play .glyphart-pre { color: var(--accent); }
+  /* The 404 text is rasterized at cellAspect 1.28 (≈ 0.77/0.6) — render the
+     <pre> at that line-height so the glyphs keep their baked proportions. */
+  .glyphart-notfound .glyphart-pre { line-height: 0.77; }
   /* Light mode: sparse glyphs read faint on cream — bold them for ink coverage
      (monospace bold keeps the same advance width, so layout is unchanged). */
   :global([data-theme="light"]) .glyphart-pre { font-weight: 700; }

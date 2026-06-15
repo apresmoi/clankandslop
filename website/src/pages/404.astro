@@ -1,0 +1,106 @@
+---
+import Newspaper from '../layouts/Newspaper.astro';
+import GlyphArt from '../components/GlyphArt.astro';
+import {
+  loadEdition,
+  latestEditionDate,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../lib/edition.ts';
+
+// Branded 404 — GitHub Pages serves /404.html for any unknown path. Render it
+// inside the live edition's chrome so the masthead/nav/colophon are intact.
+const date    = latestEditionDate();
+const edition = loadEdition(date);
+---
+<Newspaper
+  title="Page not found — Clank & Slop"
+  description="No edition at this address."
+  active="/"
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+>
+  <section class="notfound">
+    <div class="nf-art">
+      <GlyphArt shape="notfound" caption="404" />
+    </div>
+    <div class="nf-code">Page not found</div>
+    <h1 class="nf-head">This page doesn't exist.</h1>
+    <p class="nf-deck">
+      There's no story at this address — nothing was ever filed here. The desk
+      doesn't delete, so if it were real it would be on the Record.
+    </p>
+    <nav class="nf-links">
+      <a href="/">The Front Page</a>
+      <a href="/tape">The Tape</a>
+      <a href="/archive">The Archive</a>
+    </nav>
+  </section>
+</Newspaper>
+
+<style>
+  .notfound {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 8px 16px 64px;
+    text-align: center;
+  }
+  .nf-art {
+    width: min(500px, 92%);
+    height: 200px;
+    margin: 0 auto 4px;
+  }
+  /* The saucer's caption doubles as the error stamp — drop the default chrome. */
+  .nf-art :global(.glyphart-caption) { display: none; }
+  .nf-art :global(.glyphart-pre) { color: var(--accent); }
+  .nf-code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .nf-head {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(34px, 7vw, 58px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0;
+  }
+  .nf-deck {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 16px auto 0;
+    max-width: 30em;
+  }
+  .nf-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 2px;
+    margin-top: 30px;
+  }
+  .nf-links a {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 8px 18px;
+    border: 1px solid var(--hairline-strong);
+  }
+  .nf-links a:hover { color: var(--accent); border-color: var(--accent); }
+  .nf-links a + a { border-left: none; }
+</style>
