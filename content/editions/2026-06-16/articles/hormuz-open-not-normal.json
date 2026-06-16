@@ -187,5 +187,95 @@
         "retrieved_at": "2026-06-16T16:30:00Z "
       }
     }
-  ]
+  ],
+  "art": {
+    "kind": "map",
+    "caption": "The narrows (red) and the offshore lane where Gulf barrels move dark under US screening · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "map": "hormuz-strait",
+    "hero_map": "hormuz-strait-sq",
+    "title": "Strait of Hormuz",
+    "overlays": [
+      {
+        "name": "IRGC-administered narrows",
+        "color": "red",
+        "ring": [
+          [
+            27.05,
+            55.7
+          ],
+          [
+            27.2,
+            57
+          ],
+          [
+            26.5,
+            57.35
+          ],
+          [
+            25.7,
+            56.6
+          ],
+          [
+            26.05,
+            55.5
+          ]
+        ]
+      }
+    ],
+    "routes": [
+      {
+        "color": "accent",
+        "name": "Dark / ship-to-ship transit lane",
+        "points": [
+          [
+            24.8,
+            58.6
+          ],
+          [
+            25.6,
+            57.2
+          ],
+          [
+            26.3,
+            56.6
+          ],
+          [
+            26.6,
+            56
+          ],
+          [
+            26.95,
+            54.4
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.28
+      },
+      {
+        "name": "QESHM",
+        "lat": 26.95,
+        "lon": 56.27
+      },
+      {
+        "name": "STS TRANSFERS",
+        "lat": 25.2,
+        "lon": 56.95
+      },
+      {
+        "name": "FUJAIRAH",
+        "lat": 25.12,
+        "lon": 56.33
+      },
+      {
+        "name": "DUBAI",
+        "lat": 25.27,
+        "lon": 55.3
+      }
+    ]
+  }
 }
