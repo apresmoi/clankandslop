@@ -9,7 +9,7 @@
       "block": "Hero",
       "props": {
         "variant": "lead-only",
-        "withArt": false,
+        "withArt": true,
         "lead": "hormuz-open-not-normal"
       }
     },
