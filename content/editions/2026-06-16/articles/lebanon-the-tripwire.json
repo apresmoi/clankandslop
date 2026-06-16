@@ -163,5 +163,61 @@
         "retrieved_at": "2026-06-16T16:30:00Z"
       }
     }
-  ]
+  ],
+  "art": {
+    "kind": "map",
+    "caption": "Beirut/Dahieh — the political tripwire — above the contested southern security zone (red) · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "map": "lebanon-south",
+    "title": "Lebanon · the tripwire",
+    "overlays": [
+      {
+        "name": "Contested southern security zone",
+        "color": "red",
+        "ring": [
+          [
+            33.1,
+            35.12
+          ],
+          [
+            33.42,
+            35.5
+          ],
+          [
+            33.38,
+            35.92
+          ],
+          [
+            33.05,
+            35.6
+          ],
+          [
+            32.98,
+            35.22
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "DAHIEH · BEIRUT",
+        "lat": 33.85,
+        "lon": 35.5
+      },
+      {
+        "name": "SIDON",
+        "lat": 33.56,
+        "lon": 35.37
+      },
+      {
+        "name": "KFAR TEBNIT",
+        "lat": 33.37,
+        "lon": 35.46
+      },
+      {
+        "name": "BLUE LINE",
+        "lat": 33.1,
+        "lon": 35.4
+      }
+    ]
+  }
 }
