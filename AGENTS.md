@@ -57,8 +57,16 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   graphics) and `desk` (glyphcss 3D, drag camera — interactive panels only)
 - Story art lives in the article JSON (`art.kind: "map"` with overlays,
   routes, spots as lat/lon; `hero_map` for the squarer front-page crop)
-- One map moment and one illustration per page, maximum. Glyph art is a
-  signature, not wallpaper.
+- Geopolitics stories should carry a regional `MapGlyph`; bake a fresh crop
+  (`ops/bake-map.mjs`) when none exists rather than skipping the illustration.
+- Inside-article maps are **at most 48 rows tall** (height ∝ baked `rows`).
+  Match the lead map's shape — `140×48` (rows/cols ≈ 0.34) is the reference.
+  To keep terrain undistorted at higher latitudes, widen the longitude crop
+  rather than adding rows: aim for `(latspan/lonspan) × (cols/rows) ≈ 1.4`.
+- One map moment and one illustration per page, maximum, and the front page
+  shows art for only ~2–3 stories (lead hero + flashpoint globe is the
+  default). Maps belong inside articles; the front stays uncluttered. Glyph
+  art is a signature, not wallpaper.
 - glyphcss quirks that cost us hours: always pass an explicit camera
   (default camera renders nothing); glyph density follows color distance
   from paper (near-paper colors rasterize as spaces); hotspots don't bake
