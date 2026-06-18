@@ -1,0 +1,234 @@
+{
+  "id": "oils-peace-dividend",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "shipping",
+    "us-iran",
+    "inflation",
+    "war-risk-insurance"
+  ],
+  "edition_date": "2026-06-18",
+  "section": "markets",
+  "kicker": "Oil · the peace dividend",
+  "epistemic": "inference",
+  "headline": "Oil’s peace dividend is also\nan inventory-clearing trade",
+  "deck": "Brent’s fall toward $78 is not only the removal of a war premium. It is also the first repricing of stranded Gulf barrels entering a market where refiners are already covered, Chinese demand is patchy, and the toll question has only been postponed.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "16:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Brent traded at $77.96 and WTI at $74.96 at 0811 GMT on Thursday, back near early-March levels, after the US-Iran de-escalation pushed most of the visible war premium out of front-month crude. Reuters put the market move plainly: “the war risk premium on prices has been largely priced out.” [E1]",
+    "The under-reported part is physical. The reopening is set to release a wave of supply into a softening market, because Asian refiners are largely covered for June-August cargoes and demand is patchy. That makes the Strait of Hormuz story less like a clean geopolitical relief rally and more like an inventory-clearing event arriving into a market that had already bought much of its summer crude. [E2]",
+    "The International Energy Agency’s June report points in the same direction. It said the deal sent oil to its lowest level since early March, but also that prices had already retreated on a surge in Gulf exports and weaker demand, while 2026 refinery runs were cut further. The implication is that the peace dividend landed on a market already losing balance, not on a tight market suddenly flooded by a diplomatic headline. [E4]",
+    "Middle East spot crude has already shown the mechanism. Reuters reported that regional spot grades slipped into discounts as the deal lifted the supply outlook. Discounts in physical crude matter because they show the repricing has moved beyond futures screens into cargo-by-cargo negotiations between producers, traders and refiners. [E5]",
+    "Citi’s revised Brent deck reinforces the direction of travel without requiring a new glut thesis. The bank cut its Q3 Brent forecast to $75, its Q4 view to $70 and its 2027 view to $65 from $80 after the US-Iran MOU pointed toward Hormuz flow normalization. That is a repricing of expected availability, not only a subtraction of missile risk from the barrel. [E3]",
+    "The physical Strait is still not normal. Three Saudi-flagged supertankers carrying about 6 million barrels crossed after the signing, but Reuters reported that a full restart will take weeks. The bottleneck therefore shifts from whether barrels can move to how quickly ships, insurers, ports and buyers can convert political reopening into normal commercial flow. [E6]",
+    "Foreman’s counter-read: this is mostly a clean risk unwind. On that view, Citi and the IEA are repricing the probability distribution, not calling a glut, and the trapped barrels clear quickly once Hormuz normalizes; the “soft market” framing understates how fast demand can absorb cargoes once shipping schedules, insurance and refinery nominations settle.",
+    "The toll issue remains the political tail risk inside the physical trade. The MOU’s Hormuz passage is “with no charge for 60 days only,” which means the fee question was deferred rather than solved. That matters for inflation because a toll dispute would not need to close the Strait to raise delivered crude costs; it would only need to keep freight, war-risk insurance and scheduling abnormal after the initial peace dividend has been priced. [E6]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent crude at 0811 GMT",
+      "value": "$77.96",
+      "dir": "down"
+    },
+    {
+      "label": "WTI crude at 0811 GMT",
+      "value": "$74.96",
+      "dir": "down"
+    },
+    {
+      "label": "Citi Q3 Brent forecast",
+      "value": "$75",
+      "dir": "down"
+    },
+    {
+      "label": "Citi 2027 Brent forecast",
+      "value": "$65",
+      "dir": "down"
+    },
+    {
+      "label": "Hormuz toll-free window",
+      "value": "60 days",
+      "dir": "flat"
+    },
+    {
+      "label": "Saudi supertankers crossed",
+      "value": "3 / ≈6M bbl",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Brent was $77.96 and WTI $74.96 at 0811 GMT on 18 June, back to early-March levels; “the war risk premium on prices has been largely priced out.”",
+      "as_of": "18 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-slips-again-us-iran-sign-peace-deal-2026-06-18/",
+        "retrieved_at": "2026-06-18T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "The  reopening is set to release a wave of supply into a softening market; Asian refiners are largely covered for June-August and demand is patchy.",
+      "as_of": "18 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/hormuz-reopening-release-wave-oil-supply-depress-prices-2026-06-18/",
+        "retrieved_at": "2026-06-18T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Citi  cut Brent forecasts to $75 for Q3 and $70 for Q4, and lowered its 2027 view to $65 from $80 after the US-Iran MOU pointed toward Hormuz flow normalization.",
+      "as_of": "18 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/citi-cuts-brent-forecasts-us-iran-mou-points-strait-hormuz-flow-normalization-2026-06-15/",
+        "retrieved_at": "2026-06-18T16:30:00Z"
+      }
+    },
+    {
+      "source": "IEA",
+      "fragment": "The  June report says the deal sent oil to its lowest since early March, but prices had already retreated on a surge in Gulf exports and weaker demand, and 2026 refinery runs were cut further.",
+      "as_of": "18 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.iea.org/reports/oil-market-report-june-2026",
+        "retrieved_at": "2026-06-18T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Middle  East spot crude has slipped into discounts as the deal lifted the supply outlook.",
+      "as_of": "18 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/middle-east-crude-slips-into-discounts-us-iran-deal-lifts-supply-outlook-2026-06-17/",
+        "retrieved_at": "2026-06-18T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Three  Saudi-flagged supertankers, carrying about 6 million barrels, crossed after signing, but a full restart will take weeks; the MOU’s Hormuz passage is “with no charge for 60 days only.”",
+      "as_of": "18 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/first-tankers-cross-strait-after-iran-deal-israeli-strikes-stir-doubt-lebanon-2026-06-18/",
+        "retrieved_at": "2026-06-18T16:30:00Z "
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "hormuz-strait",
+    "title": "Strait of Hormuz",
+    "caption": "Three Saudi supertankers (~6M barrels) crossed after signing, but a full restart is weeks off — transit is toll-free “for 60 days only” · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "overlays": [
+      {
+        "name": "IRGC-coordinated narrows",
+        "color": "red",
+        "ring": [
+          [
+            27.05,
+            55.7
+          ],
+          [
+            27.2,
+            57
+          ],
+          [
+            26.5,
+            57.35
+          ],
+          [
+            25.7,
+            56.6
+          ],
+          [
+            26.05,
+            55.5
+          ]
+        ]
+      }
+    ],
+    "routes": [
+      {
+        "color": "accent",
+        "name": "Transit lane",
+        "points": [
+          [
+            24.8,
+            58.6
+          ],
+          [
+            25.6,
+            57.2
+          ],
+          [
+            26.3,
+            56.6
+          ],
+          [
+            26.6,
+            56
+          ],
+          [
+            26.95,
+            54.4
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.28
+      },
+      {
+        "name": "QESHM",
+        "lat": 26.95,
+        "lon": 56.27
+      },
+      {
+        "name": "FUJAIRAH",
+        "lat": 25.12,
+        "lon": 56.33
+      },
+      {
+        "name": "DUBAI",
+        "lat": 25.27,
+        "lon": 55.3
+      }
+    ]
+  }
+}

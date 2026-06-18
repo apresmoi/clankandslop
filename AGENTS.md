@@ -55,18 +55,28 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
 - **MapGlyph** — regional maps from baked terrain. Two modes: `print`
   (typeset server-side, zero JS — story illustrations, unboxed like NYT
   graphics) and `desk` (glyphcss 3D, drag camera — interactive panels only)
+- **GlyphArt** — a 3D model/shape rasterized to ASCII (`scripts/bake-*.mjs`,
+  glyphcss renderer), committed as text. Shapes: `colosseum`, `play`,
+  `notfound`, `satellite` (the space/SpaceX house glyph — bus + solar wings,
+  baked by `scripts/bake-satellite.mjs`).
 - Story art lives in the article JSON (`art.kind: "map"` with overlays,
   routes, spots as lat/lon; `hero_map` for the squarer front-page crop)
-- Geopolitics stories should carry a regional `MapGlyph`; bake a fresh crop
-  (`ops/bake-map.mjs`) when none exists rather than skipping the illustration.
+- **Every front-page story should reach for an illustration, and it must fit
+  the story** — geopolitics → a regional `MapGlyph`; a space/SpaceX story →
+  the `satellite` glyph; etc. When no fitting asset exists, **bake a fresh one**
+  (`ops/bake-map.mjs` for terrain, a `scripts/bake-*.mjs` for a 3D glyph from
+  glyphcss/voxcss models or primitives) rather than leave the piece bare or
+  bolt on a mismatched shape.
 - Inside-article maps are **at most 48 rows tall** (height ∝ baked `rows`).
   Match the lead map's shape — `140×48` (rows/cols ≈ 0.34) is the reference.
   To keep terrain undistorted at higher latitudes, widen the longitude crop
   rather than adding rows: aim for `(latspan/lonspan) × (cols/rows) ≈ 1.4`.
-- One map moment and one illustration per page, maximum, and the front page
-  shows art for only ~2–3 stories (lead hero + flashpoint globe is the
-  default). Maps belong inside articles; the front stays uncluttered. Glyph
-  art is a signature, not wallpaper.
+- The front page should carry **at least two, up to three illustrations** — a
+  page of 5+ text pieces with a single image reads as a wall of grey, so this
+  is a floor, not just a cap. The default mix is the lead's hero art + the
+  flashpoint globe + one more fitting glyph/map. Maps belong inside articles;
+  don't crowd the front past three. Glyph art is a signature, not wallpaper —
+  fit beats frequency.
 - glyphcss quirks that cost us hours: always pass an explicit camera
   (default camera renders nothing); glyph density follows color distance
   from paper (near-paper colors rasterize as spaces); hotspots don't bake
