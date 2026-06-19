@@ -27,7 +27,7 @@
     "The verified transit reality is still a fraction of the old Strait. Reuters reported traffic at an average 12 to 15 vessels a day in recent weeks, against 120 to 140 before the war. AP reported that the main central route remains closed with an estimated 80 mines, while ships are using lower-capacity northern and southern alternatives; Lloyd’s List Intelligence put the exit queue at roughly 550 merchant ships, including 160 tankers. [E3][E4]",
     "Iran has bundled the corridor into one bargaining file: tolls, routing, insurance, mines and sovereignty. Reuters said Iran’s Strait body would waive planned fees for 60 days, while still requiring 48-hour transit requests and coordinated routes and times because of mined areas. That waiver sits on top of an earlier Iranian position that the Strait would reopen under new Iran-Oman conditions, including fees for services, which makes the current toll-free period look less like a permanent concession than a suspended price mechanism. [E5][E6]",
     "The legal contradiction is now inside the route itself. Treasury designated PGSA as an Iranian maritime-extortion vehicle aimed at imposing illegitimate tolls and forcing vessels to follow Iranian direction; OFAC also warned that cooperation with the authority may expose participants to sanctions risk. Yet PGSA terms require vessels to seek approval, use PGSA channels and carry PGSA-approved insurance. For compliant owners, the passage document may itself be the compliance problem. [E7][E8][E1]",
-    "FOREMAN, Macro Desk, carries the counter-case: the relief is real. Intertanko told AP the two shoulder routes now seem fully open, Reuters said several tankers had moved, including three Saudi-flagged ships carrying about 6 million barrels, and analysts expect more than 85 million barrels of stranded Gulf oil to return gradually. On that read, oil is not pricing a fake reopening; it is pricing a slow normalization that has already begun. [E4][E9][E10]",
+    "The counter-case is that the relief is real. Intertanko told AP the two shoulder routes now seem fully open, Reuters said several tankers had moved, including three Saudi-flagged ships carrying about 6 million barrels, and analysts expect more than 85 million barrels of stranded Gulf oil to return gradually. On that read, oil is not pricing a fake reopening; it is pricing a slow normalization that has already begun. [E4][E9][E10]",
     "The shipping objection is that slow normalization is not the same thing as normal. Reuters reported that conventional minesweepers and underwater drones could take 40 to 50 days before many insurers, shipowners and oil companies are confident enough to sail, and BIMCO said it still considered transits very risky. That lag is physical, not rhetorical. [E11]",
     "War-risk insurance is a separate market from crude. The Joint War Committee’s Listed Areas regime covers hull war, strikes, terrorism and related perils, and Iran remains on the latest published JWC risk list. A lower Brent tape does not automatically remove war-risk clauses, underwriter caution or charter-party friction. [E12]",
     "The print thesis is therefore narrower than the headline reopening. The screen is trading supply returning; the shipping system is treating the Strait as a mined, permissioned, legally ambiguous corridor. Opaque actors may move faster than compliant tonnage precisely because they are less exposed to transparency, paper trails and insurer review. That does not make the dark signal established; it makes opacity an operating advantage while the legal corridor remains abnormal. [E2][E8][E12]"
@@ -42,10 +42,22 @@
         "name": "Mined central route (closed)",
         "color": "red",
         "ring": [
-          [26.65, 56.2],
-          [26.62, 56.7],
-          [26.35, 56.75],
-          [26.38, 56.25]
+          [
+            26.65,
+            56.2
+          ],
+          [
+            26.62,
+            56.7
+          ],
+          [
+            26.35,
+            56.75
+          ],
+          [
+            26.38,
+            56.25
+          ]
         ]
       }
     ],
@@ -54,17 +66,42 @@
         "color": "accent",
         "name": "Designated route (PGSA / Larak)",
         "points": [
-          [25.3, 56.7],
-          [26.2, 56.6],
-          [26.85, 56.37]
+          [
+            25.3,
+            56.7
+          ],
+          [
+            26.2,
+            56.6
+          ],
+          [
+            26.85,
+            56.37
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "BANDAR ABBAS", "lat": 27.15, "lon": 56.28 },
-      { "name": "LARAK", "lat": 26.85, "lon": 56.37 },
-      { "name": "STRAIT", "lat": 26.57, "lon": 56.30 },
-      { "name": "FUJAIRAH", "lat": 25.12, "lon": 56.34 }
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.15,
+        "lon": 56.28
+      },
+      {
+        "name": "LARAK",
+        "lat": 26.85,
+        "lon": 56.37
+      },
+      {
+        "name": "STRAIT",
+        "lat": 26.57,
+        "lon": 56.3
+      },
+      {
+        "name": "FUJAIRAH",
+        "lat": 25.12,
+        "lon": 56.34
+      }
     ]
   },
   "refs": [
