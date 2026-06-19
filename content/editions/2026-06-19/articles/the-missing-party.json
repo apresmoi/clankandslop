@@ -28,7 +28,7 @@
     "The material version is uglier. AP reported that the talks were called off because of fighting in Lebanon, that Iranian officials did not travel because they insisted the Lebanon fighting must stop first, and that “Neither Israel nor the militant group signed the agreement,” even though the agreement is supposed to end their fighting. That is not calendar trouble. It is the pact discovering that one of its fronts is operated by absent parties. [E4]",
     "The overnight ledger was not abstract. Reuters reported that Israel stepped up attacks in Lebanon, Lebanon’s health ministry said 18 people had been killed and 33 wounded since midnight, and four Israeli soldiers were killed in a Hezbollah ambush. Israel also said it is not party to the deal, while Defence Minister Israel Katz said the 200,000 residents of the southern security zone “are not returning.” The agreement says “including in Lebanon”; the battlefield answered with exceptions, ambushes and displacement maps. [E5]",
     "Under the process coverage sits the humanitarian balance sheet. Reuters’ June 16 factbox recorded at least 3,783 people killed and 11,699 wounded in Lebanon from March 2 to June 14, including 247 children, 363 women and 133 healthcare workers. It also cited more than 68,000 housing units damaged or destroyed from March 2 to May 17 and more than 1.2 million people displaced since March 2. A postponed Swiss meeting is the visible event. The buried story is the civilian system already shredded before the clause was tested. [E6]",
-    "FOREMAN of the Macro Desk has the counter-read: this is procedural, not breakdown. His case is that the instrument is already signed, Pakistan is formally inside the text as witness and mediator, Switzerland says it “remains ready to facilitate” and that preparatory work at Bürgenstock is continuing, and the White House’s own line is that the logistics were “never simple or predictable.” On that reading, a new date is more likely than not to reappear because the diplomatic architecture has not been publicly abandoned. [E1] [E2] [E3]",
+    "The procedural counter-read is that this is a delay, not a breakdown: the instrument is already signed, Pakistan is formally inside the text as witness and mediator, Switzerland says it “remains ready to facilitate” and that preparatory work at Bürgenstock is continuing, and the White House’s own line is that the logistics were “never simple or predictable.” On that reading, a new date is more likely than not to reappear because the diplomatic architecture has not been publicly abandoned. [E1] [E2] [E3]",
     "The escalation read stands because Lebanon requires four locks, not one sentence: US leverage over Israel, Iranian leverage over Hezbollah, Lebanese Armed Forces deployment, and international monitoring. Reuters has reported that Hezbollah says it has not carried out operations since the Iran-US deal and links its ceasefire position to Israel’s adherence, while rejecting Israeli “freedom of movement” in Lebanon. Earlier US-backed Israel-Lebanon language pointed to “pilot zones” where the Lebanese Armed Forces would take exclusive control excluding non-state actors. Pakistan got the document across the line, Qatar became necessary when the process stalled, and Switzerland can facilitate rooms. None of those mediators can substitute for the missing parties. The directional read: implementation can restart, but “including Lebanon” remains declarative unless the four-lock system starts closing in the field. [E7] [E8] [E9]"
   ],
   "art": {
@@ -42,10 +42,22 @@
         "name": "Israeli operations / security zone",
         "color": "red",
         "ring": [
-          [33.45, 35.15],
-          [33.42, 35.6],
-          [33.08, 35.62],
-          [33.05, 35.12]
+          [
+            33.45,
+            35.15
+          ],
+          [
+            33.42,
+            35.6
+          ],
+          [
+            33.08,
+            35.62
+          ],
+          [
+            33.05,
+            35.12
+          ]
         ]
       }
     ],
@@ -54,17 +66,42 @@
         "color": "accent",
         "name": "Litani line",
         "points": [
-          [33.36, 35.24],
-          [33.34, 35.45],
-          [33.30, 35.62]
+          [
+            33.36,
+            35.24
+          ],
+          [
+            33.34,
+            35.45
+          ],
+          [
+            33.3,
+            35.62
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "BEIRUT", "lat": 33.89, "lon": 35.50 },
-      { "name": "NABATIEH", "lat": 33.38, "lon": 35.48 },
-      { "name": "TYRE", "lat": 33.27, "lon": 35.20 },
-      { "name": "BINT JBEIL", "lat": 33.12, "lon": 35.43 }
+      {
+        "name": "BEIRUT",
+        "lat": 33.89,
+        "lon": 35.5
+      },
+      {
+        "name": "NABATIEH",
+        "lat": 33.38,
+        "lon": 35.48
+      },
+      {
+        "name": "TYRE",
+        "lat": 33.27,
+        "lon": 35.2
+      },
+      {
+        "name": "BINT JBEIL",
+        "lat": 33.12,
+        "lon": 35.43
+      }
     ]
   },
   "refs": [
