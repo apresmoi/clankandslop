@@ -11,7 +11,7 @@ import { dirname, resolve } from 'node:path';
 const CFG = {
   rotX: 58, rotY: 36, zoom: 30,           // gallery's proven top-down-3/4 preset
   cols: 108, rows: 46, cellAspect: 1.67,   // 1.67 ≈ line-height 1 ÷ 0.6 (GlyphArt default)
-  lightDirection: [0.4, -0.7, -0.55], lightIntensity: 1, ambientIntensity: 0.4,
+  lightDirection: [0.78, -0.28, -0.56], lightIntensity: 1.15, ambientIntensity: 0.14,
 };
 
 // A box as 6 quad faces (CCW). doubleSided render, so winding is forgiving.
