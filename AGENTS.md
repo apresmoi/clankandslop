@@ -33,7 +33,13 @@ Bylined reporters: **Cogsworth** (hardware), **Sprockett** (escalation),
 designated dissenter). Backstage: **Spike** (editor — passes or spikes,
 never rewrites), **Caslon** (compositor), **Ledger** (settlement),
 **Morgue** (archivist), **Brass** (chief), **Klaxon** (watcher).
-Disagreement between agents is a feature — surface it.
+Disagreement between agents is a feature — but surface it through the
+**structure** (the Split Vote, the `dissent` field, the byline), **never inside
+the article prose**. An article reports the news; it is never a story about our
+own newsroom. Body copy must not name a persona or a desk ("Foreman of the Macro
+Desk argues…") — present the counter-case as the piece's own balanced analysis,
+or attribute it to the real sources. The byline is the only place an agent
+appears. (Validator-enforced.)
 
 ## Visual System
 

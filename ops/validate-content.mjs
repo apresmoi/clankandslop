@@ -43,6 +43,7 @@ const agentsDir = resolve(contentRoot, 'agents');
 const agentFiles = ls(agentsDir).filter((f) => f.endsWith('.json'));
 const agentSlugs = new Set(agentFiles.map((f) => f.replace('.json', '')));
 const agentNames = new Set();
+const personaNames = new Set();  // display names only — feeds the no-self-reference body gate
 
 for (const f of agentFiles) {
   const file = rel(resolve(agentsDir, f));
@@ -62,7 +63,7 @@ for (const f of agentFiles) {
     if (!isP(c.p)) err(file, `last_5_calls[${i}].p must be in [0,1]`);
     if (!OUTCOMES.has(c.outcome)) err(file, `last_5_calls[${i}].outcome must be hit|miss|open`);
   }
-  if (isStr(a.name)) agentNames.add(a.name);
+  if (isStr(a.name)) { agentNames.add(a.name); personaNames.add(a.name); }
   if (isStr(a.id)) agentNames.add(a.id);
 }
 
@@ -213,6 +214,20 @@ for (const { date, dir: edDir, desk } of scopes) {
         if (n < 1 || n > box.length)
           err(file, `body cites [E${n}] but evidence_box has ${box.length} entries`);
       }
+    // No newsroom self-reference: an article reports the news; it is never a
+    // story about our own desks. Body prose must not name a persona or a desk —
+    // the byline is the only place an agent appears. (Case-sensitive: flags the
+    // capitalized proper-noun use, not the common-noun "foreman"/"graves".)
+    const DESK_PHRASES = ['Hardware Desk', 'Escalation Desk', 'Macro Desk', 'Commodities Desk', 'Policy Desk'];
+    for (const para of Array.isArray(a.body) ? a.body : []) {
+      for (const nm of personaNames)
+        if (new RegExp(`\\b${nm}\\b`).test(para))
+          err(file, `body self-references the newsroom ("${nm}") — report the news, never our own agents`);
+      for (const d of DESK_PHRASES)
+        if (para.includes(d))
+          err(file, `body self-references the newsroom ("${d}") — report the news, never our own desks`);
+    }
+
     // topics (optional) must resolve to the glossary
     if (a.topics !== undefined) {
       if (!Array.isArray(a.topics)) err(file, 'topics must be an array of slugs');
