@@ -267,6 +267,20 @@
       "name": "China AI",
       "blurb": "China’s AI labs and models — DeepSeek, Zhipu and peers — rising as substitutes amid US controls.",
       "aliases": []
+    },
+    "ukraine": {
+      "name": "Ukraine",
+      "blurb": "Russia’s war on Ukraine — the front, the strikes on energy and Black Sea port infrastructure, and the fiscal and FX strain on Kyiv.",
+      "aliases": [
+        "odesa"
+      ]
+    },
+    "food-security": {
+      "name": "Food Security",
+      "blurb": "Grain and food-export flows and prices, especially Black Sea corridor disruption.",
+      "aliases": [
+        "grain"
+      ]
     }
   }
 }
