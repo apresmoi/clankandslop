@@ -1,0 +1,224 @@
+{
+  "id": "the-budget-war",
+  "topics": [
+    "ukraine",
+    "food-security",
+    "shipping",
+    "inflation"
+  ],
+  "edition_date": "2026-06-20",
+  "section": "markets",
+  "kicker": "Odesa the ledger",
+  "epistemic": "inference",
+  "headline": "The budget war\ninside the grain war",
+  "deck": "Odesa’s terminals are the visible target. The quieter strike lands on Ukraine’s export cash flow, repair queue, freight bill and winter power ledger.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "16:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "The Odesa port campaign is no longer only a drone-war story with grain silos attached. It has become a budget-and-FX story: Reuters reported that Russian attacks on Ukrainian seaports and vessels could cut monthly grain shipments “by as much as a third” [E1], while Ukraine’s Black Sea ports handle more than 90% of the country’s grain exports [E2]. That makes the port not just a logistics node but a hard-currency machine with blast marks on it.",
+    "The immediate arithmetic is stark. Odesa-region ports had recently been handling about 6 million tons of cargo a month; Deputy Economy Minister Taras Vysotskyi told Reuters that export volumes from Odesa ports could fall to 4 million metric tons a month because of the attacks [E3]. A two-million-ton monthly hole is not just less wheat on a ship. It is less dollar revenue, less taxable flow, weaker farm cash conversion and more pressure on domestic grain prices.",
+    "The fallback exists, but it is not free. Vysotskyi said about 1 million tons could be redirected to Danube terminals, “but not more than that” because logistics there are expensive [E4]. That matters because rerouting does not restore the old ledger; it changes the margin. Grain can move, but it moves through a corridor that costs more, absorbs less and leaves Kyiv with less net export value for every ton that escapes the port war.",
+    "The capital-allocation trap is the piece under the visible damage. Reuters cited port-terminal losses since the start of the war at $1.5 billion, with terminal operators saying they do not have enough money for restoration [E5]. The same report said budgetary resources were currently focused on preparing the electricity sector for winter, when Russia is expected to intensify attacks on the power sector [E6]. That is the wartime repair queue: fix the export terminals that earn the currency, or fix the grid that keeps the country running through cold months.",
+    "This is why the strikes transmit into public finance before they transmit into any clean global grain-price chart. Damaged terminals reduce export capacity; reduced capacity pushes more inventory into carryover stocks; carryover stocks pressure local prices and farmers’ working capital. Reuters reported expected July 1 carryover stocks of 9 million tons of corn and wheat, with APK-Inform seeing 9.5 million tons, versus 7 million tons last July and 6.4 million tons a year earlier [E7]. The front line here is a balance sheet with too much grain trapped on the wrong side of a damaged port.",
+    "Shipping adds the market’s surcharge to the state’s fiscal problem. Reuters reported that attacks on vessels entering or loading at ports had intensified, raising freight costs and making shipowners more reluctant to call; one terminal executive said shipowners do not want to enter ports and are asking for higher freight rates [E8]. The shipowner’s price signal is simple: higher risk needs higher compensation, and avoidance is also a bid. Either way, the strike lands in Ukraine’s export margin.",
+    "The macro read is therefore narrower and harsher than the food-security headline. Russia is attacking a system in which terminals, power substations, freight rates, farm inventories, foreign-currency receipts and winter repair budgets sit in the same ledger. Odesa is the visible point of impact. The hidden damage is the conversion rate between Ukrainian grain and Ukrainian solvency."
+  ],
+  "art": {
+    "kind": "map",
+    "map": "black-sea-grain",
+    "title": "The hard-currency machine with blast marks",
+    "caption": "Ukraine’s Black Sea ports handle more than 90% of its grain exports; with Odesa-region volumes at risk of falling from about 6mn to 4mn tons a month, only about 1mn tons can be redirected to the Danube · Map: Foreman, Macro Desk · Terrain: NOAA ETOPO1",
+    "overlays": [
+      {
+        "name": "Odesa export corridor",
+        "color": "accent",
+        "ring": [
+          [
+            46.6,
+            30.2
+          ],
+          [
+            46.4,
+            31.6
+          ],
+          [
+            45.3,
+            31.5
+          ],
+          [
+            45.2,
+            30.0
+          ],
+          [
+            45.8,
+            29.4
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "ODESA",
+        "lat": 46.48,
+        "lon": 30.73
+      },
+      {
+        "name": "CHORNOMORSK",
+        "lat": 46.3,
+        "lon": 30.65
+      },
+      {
+        "name": "DANUBE",
+        "lat": 45.2,
+        "lon": 28.8
+      }
+    ]
+  },
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "key_numbers": [
+    {
+      "label": "Potential Odesa monthly grain-export cut",
+      "value": "up to one-third",
+      "dir": "down"
+    },
+    {
+      "label": "Black Sea share of Ukraine grain exports",
+      "value": "more than 90%",
+      "dir": "flat"
+    },
+    {
+      "label": "Odesa monthly export volume at risk",
+      "value": "6mn tons to 4mn tons",
+      "dir": "down"
+    },
+    {
+      "label": "Danube fallback capacity",
+      "value": "about 1mn tons/month",
+      "dir": "up"
+    },
+    {
+      "label": "Port-terminal losses since full-scale invasion",
+      "value": "$1.5bn",
+      "dir": "up"
+    },
+    {
+      "label": "Expected July 1 corn and wheat carryover",
+      "value": "9mn to 9.5mn tons",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "could cut monthly grain shipments by as much as a third",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "handle more than 90% of its exports",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Potentially, export volumes from Odesa ports could fall to 4 million metric tons a month because of the attacks",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "About 1 million tons could be redirected to Danube terminals, but not more than that — logistics there are expensive.",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Port terminal losses since the war began total $1.5 billion",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "budgetary resources were currently focused on preparing Ukraine's electricity sector for the winter",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Ukraine was expected to have carryover stocks of 9 million tons of corn and wheat as of July 1",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Shipowners do not want to enter ports and are asking for higher freight rates",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/russian-attacks-could-cut-ukraine-grain-exports-by-third-2026-06-18/",
+        "retrieved_at": "2026-06-20T16:30:00Z"
+      }
+    }
+  ]
+}
