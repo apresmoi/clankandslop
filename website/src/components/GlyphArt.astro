@@ -11,14 +11,15 @@ import playAscii from '../data/glyphart-play.txt?raw';
 import notFoundAscii from '../data/glyphart-404.txt?raw';
 import satelliteAscii from '../data/glyphart-satellite.txt?raw';
 import pumpjackAscii from '../data/glyphart-pumpjack.txt?raw';
+import missileAscii from '../data/glyphart-missile.txt?raw';
 
 interface Props {
-  shape: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack';
+  shape: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile';
   caption?: string;
 }
 const { shape, caption = '' } = Astro.props;
 
-const sources: Record<string, string> = { colosseum: coliseumAscii, play: playAscii, notfound: notFoundAscii, satellite: satelliteAscii, pumpjack: pumpjackAscii };
+const sources: Record<string, string> = { colosseum: coliseumAscii, play: playAscii, notfound: notFoundAscii, satellite: satelliteAscii, pumpjack: pumpjackAscii, missile: missileAscii };
 const art = (sources[shape] ?? coliseumAscii).replace(/\n+$/, '');
 // When baked with useColors:true the art is HTML (color spans); else plain text.
 // Size from the VISIBLE glyphs (tags stripped) so the cols/rows math is right.

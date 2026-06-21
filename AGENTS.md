@@ -63,8 +63,10 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   graphics) and `desk` (glyphcss 3D, drag camera — interactive panels only)
 - **GlyphArt** — a 3D model/shape rasterized to ASCII (`scripts/bake-*.mjs`,
   glyphcss renderer), committed as text. Shapes: `colosseum`, `play`,
-  `notfound`, `satellite` (the space/SpaceX house glyph — bus + solar wings,
-  baked by `scripts/bake-satellite.mjs`).
+  `notfound`, `satellite` (space/SpaceX — bus + solar wings,
+  `scripts/bake-satellite.mjs`), `pumpjack` (oil/energy), `missile` (deep-strike
+  / defence). New glyphs: dial a model in the Glyph Workbench (`scripts/glyph-lab.mjs`)
+  → Copy config → `scripts/bake-from-config.mjs`, or `scripts/bake-glb.mjs` for a one-off.
 - Story art lives in the article JSON (`art.kind: "map"` with overlays,
   routes, spots as lat/lon; `hero_map` for the squarer front-page crop)
 - **Every front-page story should reach for an illustration, and it must fit
