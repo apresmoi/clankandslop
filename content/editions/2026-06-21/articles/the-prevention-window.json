@@ -24,8 +24,8 @@
     "The UN human rights warning was sharper than a generic expression of concern. High Commissioner Volker Türk said an imminent RSF offensive on El Obeid must be halted after reports of a troop build-up around the city, and he tied the risk directly to the El Fasher precedent with the warning: “We have seen this playbook before.” [E2]",
     "By Sunday, the warning had escalated from the Human Rights Council track to the Security Council. Reuters reported that the Council voiced alarm at the imminent risk of mass atrocities and a military offensive on al-Obeid, demanded that the RSF halt, and cited substantial RSF military reinforcements around the city; the reported language matters because it frames El Obeid as an impending human rights disaster, not merely another contested front. [E3]",
     "The El Fasher comparison is not rhetorical ornament. A UN fact-finding mission found that the RSF’s October 2025 takeover of El Fasher followed an 18-month siege and a final three-day offensive, and that the operation was “planned and organised” and bore the “defining characteristics of genocide.” [E4]",
-    "The present pattern is not identical, but it is moving through recognizable preparatory stages: encirclement, reinforcements, drone pressure, and attacks that degrade civilian survival capacity before a ground assault. UN and wire reporting describe ten consecutive days of drone strikes and at least 50 reported civilian deaths across El Obeid and North Kordofan, alongside attacks on fuel, power and medical infrastructure, including a reported RSF drone strike on a fuel station in Kosti, White Nile State, that killed one civilian and injured 10. [E3]",
-    "The under-covered actor problem sits behind the battlefield. AP reported that OHCHR registered more than 1,000 civilian deaths from drone strikes in Sudan in the first five months of 2026, described a crisis “overshadowed first by wars in Gaza and then in Iran,” and reported allegations that drones and support have flowed through external backers, including allegations involving the UAE that the UAE denies. [E5]",
+    "These conditions are not identical, but they are moving through recognizable preparatory stages: encirclement, reinforcements, drone pressure, and attacks that degrade civilian survival capacity before a ground assault. UN and wire reporting describe ten consecutive days of drone strikes and at least 50 reported civilian deaths across El Obeid and North Kordofan, alongside attacks on fuel, power and medical infrastructure, including a reported RSF drone strike on a fuel station in Kosti, White Nile State, that killed one civilian and injured 10. [E3]",
+    "Behind the battlefield sits the under-covered-actor problem. AP reported that OHCHR registered more than 1,000 civilian deaths from drone strikes in Sudan in the first five months of 2026, described a crisis “overshadowed first by wars in Gaza and then in Iran,” and reported allegations that drones and support have flowed through external backers, including allegations involving the UAE that the UAE denies. [E5]",
     "The UAE question should be treated carefully, not laundered into certainty. Reuters reported in December 2024 that UN experts said weapons appeared with the RSF in Sudan after export to the UAE and noted suspicious UAE-linked flight patterns to an airstrip serving Sudan’s rebels, while the UAE denied supplying the RSF; that unresolved external-supply question is one reason El Obeid is a prevention test for diplomacy as well as for the combatants. [E6]"
   ],
   "refs": [
@@ -78,17 +78,41 @@
         "name": "El Obeid · ~500,000 at risk",
         "color": "red",
         "ring": [
-          [13.55, 29.85],
-          [13.5, 30.6],
-          [12.85, 30.6],
-          [12.8, 29.85]
+          [
+            13.55,
+            29.85
+          ],
+          [
+            13.5,
+            30.6
+          ],
+          [
+            12.85,
+            30.6
+          ],
+          [
+            12.8,
+            29.85
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "EL OBEID", "lat": 13.18, "lon": 30.22 },
-      { "name": "KOSTI", "lat": 13.17, "lon": 32.66 },
-      { "name": "KHARTOUM", "lat": 15.55, "lon": 32.53 }
+      {
+        "name": "EL OBEID",
+        "lat": 13.18,
+        "lon": 30.22
+      },
+      {
+        "name": "KOSTI",
+        "lat": 13.17,
+        "lon": 32.66
+      },
+      {
+        "name": "KHARTOUM",
+        "lat": 15.55,
+        "lon": 32.53
+      }
     ]
   },
   "evidence_box": [

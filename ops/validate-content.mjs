@@ -21,6 +21,8 @@ const KEYNUM_DIRS = new Set(['up', 'down', 'flat']);
 
 const errors = [];
 const err = (file, msg) => errors.push(`${file}: ${msg}`);
+const warnings = [];
+const warn = (file, msg) => warnings.push(`${file}: ${msg}`);
 
 function readJson(path) {
   try {
@@ -228,6 +230,22 @@ for (const { date, dir: edDir, desk } of scopes) {
           err(file, `body self-references the newsroom ("${d}") — report the news, never our own desks`);
     }
 
+    // Editorial variety: don't open three or more consecutive paragraphs with the
+    // same word. The composer's default reflex is to start everything with "The";
+    // monotonous openers read as a wall, not a newspaper. (Warning, not a gate —
+    // legacy editions carry the debt; new copy should clear it.)
+    const openers = (Array.isArray(a.body) ? a.body : [])
+      .map((p) => (String(p).trim().match(/^[“"”']?([A-Za-z]+)/) || [])[1] || '');
+    for (let i = 0; i + 2 < openers.length; i++) {
+      const w = openers[i].toLowerCase();
+      if (w && openers[i + 1].toLowerCase() === w && openers[i + 2].toLowerCase() === w) {
+        let run = 3;
+        while (openers[i + run]?.toLowerCase() === w) run++;
+        warn(file, `${run} consecutive paragraphs open with "${openers[i]}" (para ${i + 1}+) — vary the openers`);
+        break;
+      }
+    }
+
     // topics (optional) must resolve to the glossary
     if (a.topics !== undefined) {
       if (!Array.isArray(a.topics)) err(file, 'topics must be an array of slugs');
@@ -298,6 +316,11 @@ function checkRefs(file, path, props, refs) {
 
 // ---- report ----------------------------------------------------------------
 
+if (warnings.length > 0) {
+  console.warn(`editorial warnings — ${warnings.length} (non-blocking):\n`);
+  for (const w of warnings) console.warn(`  ⚠ ${w}`);
+  console.warn('');
+}
 if (errors.length > 0) {
   console.error(`content validation failed — ${errors.length} error(s):\n`);
   for (const e of errors) console.error(`  ✗ ${e}`);

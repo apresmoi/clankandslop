@@ -28,9 +28,9 @@
     "That ceiling was not accidental: Reuters reported that Iran said the Sunday talks would cover implementation only, not the substantive next-phase nuclear issues. [E3] The room therefore could register process, assign lanes and keep the framework alive, but it was structurally unlikely to settle enrichment, sanctions relief, Lebanon enforcement or Hormuz governance in one sitting. [E1][E2][E3]",
     "Vance’s public line moved in the other direction, with AP reporting that he called the day “historic” and said progress had already been made in the preceding hours. [E4] The tension is that “historic progress” was attached to a day whose visible product was process architecture while Iran’s stated focus remained Lebanon and the core disputes stayed live. [E4]",
     "The Strait of Hormuz supplied the harder test because the issue was no longer whether Iran could declare the route closed, but whether normal commercial passage had become conditional on Iranian permission. [E5] Reuters reported that after Iran said the strait was shut, only one small tanker crossed, while Fars cited a military source saying no new permits were being issued. [E5]",
-    "The US counter-count matters, but it counts a different object: CENTCOM said 55 merchant ships and more than 17 million barrels of oil moved through Saturday, and stated that Iran does not control the strait and that traffic continues to flow. [E6] That makes the denominator war central to the inference, because a military-reported transit count can coexist with a commercial market that treats the corridor as abnormal, permissioned and legally hazardous. [E5][E6]",
-    "The permit system is the mechanism underneath the declaration: Reuters reported that no vessel is permitted without a PGSA passage permit, that standard review takes 48 hours, that each permit covers one transit, that a fixed corridor near Larak Island is mandated, that alternative routes are prohibited and that PGSA-approved insurance is required. [E7] Even if tolls are waived for the 60-day negotiation period, the fee is not the same as the gate; the authority to approve the passage remains the leverage. [E7]",
-    "The linkage to Lebanon makes the chokepoint a live bargaining instrument rather than a separate maritime episode: AP reported that Iran’s joint military command tied the closure to the US failure to end the war, with the interim deal meant to stop fighting on all fronts including Lebanon. [E8] The counter-case is real: the room did not collapse, working groups are how fragile frameworks survive, and CENTCOM’s flow figures may mean the closure is more declaration than fact; the test this week is whether the committees produce a written sequencing note before the permit regime hardens into the framework’s first real breach. [E1][E6][E7][E8]"
+    "Washington’s counter-count matters, but it tallies a different object: CENTCOM said 55 merchant ships and more than 17 million barrels of oil moved through Saturday, and stated that Iran does not control the strait and that traffic continues to flow. [E6] That makes the denominator war central to the inference, because a military-reported transit count can coexist with a commercial market that treats the corridor as abnormal, permissioned and legally hazardous. [E5][E6]",
+    "Underneath the declaration sits the permit system: Reuters reported that no vessel is permitted without a PGSA passage permit, that standard review takes 48 hours, that each permit covers one transit, that a fixed corridor near Larak Island is mandated, that alternative routes are prohibited and that PGSA-approved insurance is required. [E7] Even if tolls are waived for the 60-day negotiation period, the fee is not the same as the gate; the authority to approve the passage remains the leverage. [E7]",
+    "Linkage to Lebanon turns the chokepoint into a live bargaining instrument rather than a separate maritime episode: AP reported that Iran’s joint military command tied the closure to the US failure to end the war, with the interim deal meant to stop fighting on all fronts including Lebanon. [E8] The counter-case is real: the room did not collapse, working groups are how fragile frameworks survive, and CENTCOM’s flow figures may mean the closure is more declaration than fact; the test this week is whether the committees produce a written sequencing note before the permit regime hardens into the framework’s first real breach. [E1][E6][E7][E8]"
   ],
   "refs": [
     "E1",
@@ -85,10 +85,22 @@
         "name": "Closed to insured shipping",
         "color": "red",
         "ring": [
-          [26.65, 56.2],
-          [26.62, 56.7],
-          [26.35, 56.75],
-          [26.38, 56.25]
+          [
+            26.65,
+            56.2
+          ],
+          [
+            26.62,
+            56.7
+          ],
+          [
+            26.35,
+            56.75
+          ],
+          [
+            26.38,
+            56.25
+          ]
         ]
       }
     ],
@@ -97,17 +109,42 @@
         "color": "accent",
         "name": "Permitted corridor (Larak)",
         "points": [
-          [25.3, 56.7],
-          [26.2, 56.5],
-          [26.85, 56.37]
+          [
+            25.3,
+            56.7
+          ],
+          [
+            26.2,
+            56.5
+          ],
+          [
+            26.85,
+            56.37
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "BANDAR ABBAS", "lat": 27.15, "lon": 56.28 },
-      { "name": "LARAK", "lat": 26.85, "lon": 56.37 },
-      { "name": "STRAIT", "lat": 26.57, "lon": 56.30 },
-      { "name": "FUJAIRAH", "lat": 25.12, "lon": 56.34 }
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.15,
+        "lon": 56.28
+      },
+      {
+        "name": "LARAK",
+        "lat": 26.85,
+        "lon": 56.37
+      },
+      {
+        "name": "STRAIT",
+        "lat": 26.57,
+        "lon": 56.3
+      },
+      {
+        "name": "FUJAIRAH",
+        "lat": 25.12,
+        "lon": 56.34
+      }
     ]
   },
   "evidence_box": [
