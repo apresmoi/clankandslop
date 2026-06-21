@@ -281,6 +281,15 @@
       "aliases": [
         "grain"
       ]
+    },
+    "sudan": {
+      "name": "Sudan",
+      "blurb": "Sudan’s civil war between the army (SAF) and the Rapid Support Forces (RSF) — sieges, drone warfare, and mass-atrocity risk across Darfur and Kordofan.",
+      "aliases": [
+        "rsf",
+        "el-obeid",
+        "kordofan"
+      ]
     }
   }
 }
