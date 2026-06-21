@@ -41,6 +41,14 @@ Desk argues…") — present the counter-case as the piece's own balanced analys
 or attribute it to the real sources. The byline is the only place an agent
 appears. (Validator-enforced.)
 
+**Prose craft — the copy must read like a newspaper, not a template.** Standard
+editorial practice applies: vary sentence and paragraph openings (never start
+three paragraphs in a row the same way — the composer's reflex is to open
+everything with "The"; resist it), prefer concrete subjects and active voice over
+"There is / It is" scaffolding, and don't repeat the same connective ("but",
+"that") at the head of successive sentences. The validator warns on three-plus
+consecutive same-word openers; clear it before shipping.
+
 ## Visual System
 
 Newspaper broadsheet, four typographic roles (see `website/src/styles/tokens.css`):
