@@ -1,0 +1,172 @@
+{
+  "id": "the-mediators-gas-hub",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "maritime-security"
+  ],
+  "edition_date": "2026-06-22",
+  "section": "markets",
+  "kicker": "Qatar Ras Laffan",
+  "epistemic": "inference",
+  "headline": "Local Accident\nGlobal Hub",
+  "deck": "An explosion at Barzan matters because of where it happened, but the first discipline is not to turn a domestic-gas incident into an LNG-export outage without evidence.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "15:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Sunday night’s explosion at Ras Laffan belongs in the energy tape, but not as a loose LNG-shock headline. QatarEnergy described an “operational incident during the start-up of operations” that caused an “explosion and fire” at the Barzan local gas supply facility, and said emergency teams contained the fire and brought it “now under control.” [E1]",
+    "Casualty risk, not export arithmetic, is the first verified story. Reuters, citing Qatar’s Interior Ministry, reported 54 injured and 18 missing; the ministry called the event a “technical accident” and said there was “no threat to public safety,” while QatarEnergy did not specify plant damage. [E2]",
+    "Barzan is the precision point. QatarEnergy LNG describes the project as supplying pipeline gas to local industries, power generation and desalination, with 1.4 BSCFD of sales gas capacity plus ethane, condensate, LPG and sulphur; that makes it a domestic-gas project, not one of the LNG export trains. [E3]",
+    "Ras Laffan still gives the incident market relevance. Reuters identifies the industrial city as QatarEnergy’s primary LNG production and export site, with 77 mtpa across 14 trains, processing and exporting around 20% of global LNG supply; an accident inside that zone is therefore not globally irrelevant, even when the affected asset is domestic-facing. [E4]",
+    "Existing damage narrows the margin for sloppiness. In March, QatarEnergy’s chief executive said Iranian attacks had damaged two of Qatar’s 14 LNG trains and one GTL facility, removing 17% of LNG export capacity, or 12.8 mtpa, for three to five years. [E5]",
+    "Monday’s shipping signal argues against an immediate visible halt in Qatar’s LNG movement, without proving Barzan escaped damage. Reuters, citing Kpler, reported four Qatar-controlled LNG tankers, Wadi Al Sail, Mekaines, Al Sadd and Mesaimeer, heading into Hormuz despite reduced traffic after Iran again said it had closed the strait. [E6]",
+    "Markets priced the event as a bounded incident, not a fresh supply break. Reuters reported Gulf markets edging higher after progress in US-Iran talks, Qatar’s index up 0.3%, and Brent down 2.09% to $78.89 by 0633 GMT; the public record contains no evidence of sabotage, so the categories stay separate: Barzan domestic continuity, Ras Laffan export exposure, and regional-security speculation. [E7] [E8]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "key_numbers": [
+    {
+      "label": "reported injured",
+      "value": "54",
+      "dir": "up"
+    },
+    {
+      "label": "reported missing",
+      "value": "18",
+      "dir": "up"
+    },
+    {
+      "label": "Barzan sales gas capacity",
+      "value": "1.4 BSCFD",
+      "dir": "flat"
+    },
+    {
+      "label": "Ras Laffan LNG capacity",
+      "value": "77 mtpa",
+      "dir": "flat"
+    },
+    {
+      "label": "Qatar LNG capacity already offline",
+      "value": "12.8 mtpa",
+      "dir": "down"
+    },
+    {
+      "label": "Brent by 0633 GMT",
+      "value": "$78.89",
+      "dir": "down"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Gulf Times",
+      "fragment": "“operational incident during the start-up of operations”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.gulf-times.com/article/727942/qatar/qatarenergy-reports-operational-incident-at-ras-laffan-industrial-city",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters / Qatar Interior Ministry",
+      "fragment": "“technical accident”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/qatar-reports-explosion-factory-ras-laffan-no-injuries-or-leak-reported-2026-06-21/",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "QatarEnergy LNG",
+      "fragment": "“pipeline gas to local industries, power generation and desalination”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.qatarenergylng.qa/english/Operations/Domestic-Market",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“77 mtpa across 14 trains”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/qatar-reports-explosion-factory-ras-laffan-no-injuries-or-leak-reported-2026-06-21/",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“17% of LNG export capacity”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/energy/iran-attack-damage-wipes-out-17-qatars-lng-capacity-three-five-years-qatarenergy-2026-03-19/",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“Four Qatar-controlled LNG tankers”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/middle-east/shipping-slows-after-iran-says-it-has-again-shut-strait-hormuz-2026-06-21/",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“Brent down 2.09% to $78.89”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/middle-east/most-gulf-markets-edge-higher-iran-cites-progress-peace-talks-2026-06-22/",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "QNA",
+      "fragment": "“Lake Lucerne Summit”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://qna.org.qa/en/News-Area/News/2026-6/21/qatar-announces-launch-of-lake-lucerne-summit-first-high-level-committee-meeting-with-participation-of-us-iran-pakistan",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    }
+  ]
+}
