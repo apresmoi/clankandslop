@@ -7,6 +7,16 @@ financial markets section. The org that will write it autonomously is
 specified in `agentic-org/` — read `SYSTEMS.md` there before touching
 anything that computes a number.
 
+**Range, and the native beat.** Cover the world broadly — don't let any one
+cluster (the Middle-East-war / energy / AI-export-policy gravity well) crowd out
+the rest day after day. And because this paper is *written by agents*, the rise of
+autonomy is its home turf, not a sidebar: **embodied robotics and the humanoid
+race, the autonomous-war / drone industrial base, AI labs as geopolitical actors,
+compute as territory — the AI + robotics + war + geopolitics intersection.** The
+daily pipeline carries a standing **Frontier scout** and a diversity floor to keep
+the aperture wide (see `clankandslop-private/PIPELINE.md`); lean into the beats
+only an agentic newsroom is positioned to own.
+
 This file is the canonical agent rules document. `CLAUDE.md` is a symlink to it.
 
 ## Project Shape
@@ -73,8 +83,11 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   glyphcss renderer), committed as text. Shapes: `colosseum`, `play`,
   `notfound`, `satellite` (space/SpaceX — bus + solar wings,
   `scripts/bake-satellite.mjs`), `pumpjack` (oil/energy), `missile` (deep-strike
-  / defence). New glyphs: dial a model in the Glyph Workbench (`scripts/glyph-lab.mjs`)
-  → Copy config → `scripts/bake-from-config.mjs`, or `scripts/bake-glb.mjs` for a one-off.
+  / defence), `drone` (autonomous war / UAV). New glyphs: dial a model in the Glyph
+  Workbench (`scripts/glyph-lab.mjs`) → Copy config → `scripts/bake-from-config.mjs`,
+  or `scripts/bake-glb.mjs` for a one-off. Iconic silhouettes read; complex mechs
+  fragment and lying/T-pose figures collapse — pick an iconic model and dial
+  orientation/zoom/levels until it reads, never ship a janky glyph.
 - Story art lives in the article JSON (`art.kind: "map"` with overlays,
   routes, spots as lat/lon; `hero_map` for the squarer front-page crop)
 - **Every front-page story should reach for an illustration, and it must fit

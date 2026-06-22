@@ -290,6 +290,43 @@
         "el-obeid",
         "kordofan"
       ]
+    },
+    "robotics": {
+      "name": "Robotics",
+      "blurb": "Embodied AI and general-purpose machines — humanoid and industrial robots, the labs and factories racing to deploy them, and the US-China contest over who builds the body for the model.",
+      "aliases": [
+        "humanoid",
+        "humanoid-robots",
+        "optimus",
+        "embodied-ai"
+      ]
+    },
+    "autonomous-weapons": {
+      "name": "Autonomous Weapons",
+      "blurb": "Lethal autonomy and the drone industrial base — loitering munitions, counter-drone systems, autonomy in targeting, and the policy fight over machines that decide.",
+      "aliases": [
+        "drone-warfare",
+        "loitering-munitions",
+        "lethal-autonomy",
+        "drones"
+      ]
+    },
+    "defense-tech": {
+      "name": "Defense Tech",
+      "blurb": "The new defense-industrial base — Anduril, Shield AI, Helsing and the software-first contractors rebuilding how war is supplied and fought.",
+      "aliases": [
+        "anduril",
+        "military-tech"
+      ]
+    },
+    "compute": {
+      "name": "Compute",
+      "blurb": "Compute as territory — datacenter mega-builds, power and grid constraints, chips, and sovereign-compute deals; the physical buildout underneath AI.",
+      "aliases": [
+        "datacenters",
+        "ai-infrastructure",
+        "sovereign-compute"
+      ]
     }
   }
 }
