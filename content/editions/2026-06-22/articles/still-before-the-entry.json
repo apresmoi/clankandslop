@@ -1,0 +1,176 @@
+{
+  "id": "still-before-the-entry",
+  "topics": [
+    "sudan"
+  ],
+  "edition_date": "2026-06-22",
+  "section": "geopolitics",
+  "kicker": "Sudan El Obeid",
+  "epistemic": "inference",
+  "headline": "El Obeid Stays Beyond RSF Urban Reach\nDrone Strikes and Encirclement Fuel Mass-Atrocity Warnings",
+  "deck": "El Obeid in North Kordofan faces sustained aerial attacks and encirclement by Rapid Support Forces without verified ground incursion into the city, as UN and regional warnings highlight imminent risks of mass atrocities echoing patterns from El Fasher.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "15:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Repeated RSF drone attacks have continued to batter El Obeid, with an overnight wave killing at least 15 people in strikes that included areas around a cemetery and a gas station while drones remained overhead. [E1]",
+    "Local reporting constraints stemming from reprisal risks and information blackouts mean the lack of verified ground entry functions as a sourcing limit rather than an assurance of security for residents.",
+    "Security Council members registered their alarm in a press statement over substantial military reinforcements around the city and the imminent risk of mass atrocities, explicitly demanding that the RSF immediately halt its assault and allow safe humanitarian access. [E2]",
+    "Regional body IGAD issued its own statement the same day citing significant military mobilisations and drone attacks targeting the city while calling on all parties to stop military operations in and around El Obeid and to protect civilians together with civilian infrastructure. [E3]",
+    "Western countries backing a coalition statement at the Human Rights Council joined by 21 others placed the number of civilians at risk at roughly 500,000 including more than 100,000 IDPs and highlighted ten consecutive days of drone strikes that left at least 50 civilians dead across El Obeid and North Kordofan, with the RSF warned it could imminently escalate an assault. [E4]",
+    "Events documented by an OHCHR fact-finding mission in and around El Fasher revealed defining characteristics of genocide and hallmarks of genocide under a similar modus operandi that investigators now see shifting into Kordofan, prompting calls to enforce and expand arms restrictions and deploy diplomatic tools before additional mass violence occurs. [E5]",
+    "High Commissioner Volker Türk stated that “We have seen this playbook before” and that states possessing influence hold the duty to exercise it without delay. [E4]",
+    "Questions over external arms flows to the RSF, including U.S. intelligence findings on UAE-supplied Chinese drones that Abu Dhabi has categorically rejected while describing related flights as aid deliveries, have drawn limited scrutiny as the Sudan story remains overshadowed by wars in Gaza and then Iran. [E6] [E7]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7"
+  ],
+  "key_numbers": [
+    {
+      "label": "Estimated civilians at risk",
+      "value": "roughly 500,000",
+      "dir": "flat"
+    },
+    {
+      "label": "Internally displaced at risk",
+      "value": "more than 100,000",
+      "dir": "flat"
+    },
+    {
+      "label": "Drone-related civilian deaths since January",
+      "value": "over 1,000",
+      "dir": "up"
+    },
+    {
+      "label": "Deaths in latest El Obeid drone wave",
+      "value": "at least 15",
+      "dir": "up"
+    },
+    {
+      "label": "Days of consecutive drone strikes reported",
+      "value": "10",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "AP",
+      "fragment": "RSF drone strikes killed at least 15 people in El Obeid, including strikes around a cemetery and a gas station",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://apnews.com/article/3f386e1367848038bb9348a29ba40422",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "UN News",
+      "fragment": "imminent risk of mass atrocities",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.ungeneva.org/en/news-media/news/2026/06/119874/sudan-security-council-warns-mass-atrocity-risk-el-obeid",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "IGAD",
+      "fragment": "significant military mobilisations and drone attacks targeting the city",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://igad.int/igad-expresses-grave-concern-over-escalating-hostilities-in-el-obeid-sudan/",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "We have seen this playbook before",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/middle-east/un-nuclear-watchdog-chief-welcomes-iran-us-peace-deal-says-technical-work-starts-2026-06-18/",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "OHCHR",
+      "fragment": "defining characteristics of genocide",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.ohchr.org/sites/default/files/documents/hrbodies/hrcouncil/sessions-regular/session61/advance-version/a-hrc-61-77-advanceeditedversion.pdf",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "AP",
+      "fragment": "U.S. intelligence assessments found the UAE had been sending weapons to the RSF, including Chinese armed and unarmed drones",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://apnews.com/article/sudan-war-uae-egypt-f1cb024e79c9b35aa10db7dd348ede4f",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    },
+    {
+      "source": "AP",
+      "fragment": "overshadowed first by wars in Gaza and then in Iran.",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://apnews.com/article/85b79539f9e4b18e25dd6ef82d5b53ee",
+        "retrieved_at": "2026-06-22T15:30:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "el-obeid",
+    "title": "Still before the entry",
+    "caption": "El Obeid in North Kordofan faces ten days of RSF drone strikes and encirclement without verified ground entry into the city; the Security Council has demanded the RSF halt an imminent assault on a place the Human Rights Council says puts roughly 500,000 civilians at risk, with the El Fasher playbook of reinforcement and aerial pressure running again · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "overlays": [
+      {
+        "name": "El Obeid · ~500,000 at risk",
+        "color": "red",
+        "ring": [
+          [13.55, 29.85],
+          [13.5, 30.6],
+          [12.85, 30.6],
+          [12.8, 29.85]
+        ]
+      }
+    ],
+    "spots": [
+      { "name": "EL OBEID", "lat": 13.18, "lon": 30.22 },
+      { "name": "KOSTI", "lat": 13.17, "lon": 32.66 },
+      { "name": "KHARTOUM", "lat": 15.55, "lon": 32.53 }
+    ]
+  }
+}
