@@ -1,0 +1,211 @@
+{
+  "id": "the-tollbooth",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "shipping",
+    "war-risk-insurance"
+  ],
+  "edition_date": "2026-06-23",
+  "section": "markets",
+  "kicker": "Hormuz the toll",
+  "epistemic": "inference",
+  "headline": "Hormuz reopens\nas a tollbooth",
+  "deck": "Traffic is returning through the strait, and oil is pricing the reopening. Passage, however, is being rebuilt as an administered privilege: permits first, one route, Iranian-approved insurance now free, and fees planned later.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "15:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Hormuz is moving again, which is not the same as normal. CENTCOM said on June 20 that “55 merchant ships” crossed the strait carrying “more than 17 million barrels of oil” to global markets, while Reuters’ pre-war denominator was roughly 125–140 daily passages and about 20% of world energy supplies moving through the channel. A single strong print proves reopening pressure, not restored routine. [E1][E2]",
+    "Reuters’ June 23 ship-tracking report sharpened the rebound without erasing the gap. Two stranded VLCCs were exiting Hormuz: Dubai Energy with about 2 million barrels of Abu Dhabi and Saudi crude for Taiwan, and Universal Glory with about 2 million barrels of Saudi crude for South Korea. Seven QatarEnergy-controlled empty LNG tankers also entered the Gulf between June 11 and June 22, the first Qatar-linked ballast return since February 28. Some Qatar-linked LNG tankers had tracking systems off, so visible traffic can undercount real movement while making normalization harder to verify. [E3]",
+    "India’s cargo evidence adds a demand-side check. Reuters, citing the Indian government, reported that four fertilizer cargo ships crossed Hormuz last week toward Indian ports, after India had said 16 India-bound fertilizer ships were stranded. That supports a directional reopening across energy-adjacent bulk flows, while still leaving the larger queue and daily passage denominator unresolved. [E4]",
+    "Oil priced the opening, not the tollbooth. Brent settled Monday down 3.31% at $77.90 after U.S.-Iran talks, the 60-day waiver and early shipping resumption cut the supply-disruption premium; Reuters had Brent near $77.64 Tuesday, roughly steady. PVM’s Tamas Varga warned Reuters that shipowners still need assurance mine threats are eliminated, while damaged ports, debris and congestion complicate an unconditional return. [E5]",
+    "Tehran’s move is more durable than a closure threat because it survives traffic. Iran’s ambassador to Moscow said Hormuz would be open under “new conditions” determined by Iran and Oman, and that “fees will be charged” for strait-linked services. Reuters reported Iran’s view that a permanent settlement should let it demand fees varying by ship type, cargo and conditions. [E6]",
+    "During the 60-day negotiation window, the toll is not yet being collected. Reuters reported that Iran’s Persian Gulf Strait Authority would waive planned fees during the interim, while ships must submit transit requests at least 48 hours before arrival and coordinate routes and transit times because of mine and safe-navigation risks. The waiver covers security, safety, environmental services and related insurance only during the interim. Registration and routing begin now; fee collection remains planned and unverified. [E7]",
+    "Lloyd’s List describes the mechanism underneath the claim: mandatory PGSA-approved insurance, initially “provided free of charge,” with Iran reserving the right to “introduce insurance fees in the future.” Passage is permitted only through the designated route near Larak Island, deviation is prohibited, and PGSA presents itself as the authority processing transit applications and issuing permits. This is the administrative form of leverage: not a closed gate, but a gate with paperwork, route control and future charges attached. [E8]",
+    "Washington has already treated the fee architecture as a sanctions problem. Reuters reported in May that Treasury Secretary Scott Bessent warned Oman that the United States “will not tolerate” a tolling system and would target actors “facilitating tolls.” The U.S. waiver allowing Iranian oil and petrochemical sales through August 21 does not automatically resolve payment exposure for PGSA transit fees or Iranian insurance premiums. The compliance question survives the reopening because the gate is becoming financial, not only nautical. [E9]"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "hormuz-strait",
+    "title": "The administered route",
+    "caption": "Traffic is returning through the chokepoint, but on Iranian terms: passage is permitted only through the designated route near Larak Island, transit requests must be filed at least 48 hours ahead, PGSA-approved insurance is mandatory and provided free during the 60-day window, and Iran reserves the right to introduce fees later · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "routes": [
+      {
+        "color": "accent",
+        "name": "Traffic resumes · now permitted + tolled",
+        "points": [
+          [25.2, 56.7],
+          [26.2, 56.5],
+          [26.85, 56.37],
+          [27.0, 56.0]
+        ]
+      }
+    ],
+    "spots": [
+      { "name": "BANDAR ABBAS", "lat": 27.15, "lon": 56.28 },
+      { "name": "LARAK", "lat": 26.85, "lon": 56.37 },
+      { "name": "STRAIT", "lat": 26.57, "lon": 56.30 },
+      { "name": "FUJAIRAH", "lat": 25.12, "lon": 56.34 }
+    ]
+  },
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "key_numbers": [
+    {
+      "label": "CENTCOM one-day transit print",
+      "value": "55 merchant ships",
+      "dir": "up"
+    },
+    {
+      "label": "CENTCOM oil volume",
+      "value": "more than 17 million barrels",
+      "dir": "up"
+    },
+    {
+      "label": "Pre-war daily passage denominator",
+      "value": "125–140 daily passages",
+      "dir": "flat"
+    },
+    {
+      "label": "Brent Monday settlement",
+      "value": "$77.90, down 3.31%",
+      "dir": "down"
+    },
+    {
+      "label": "PGSA request lead time",
+      "value": "at least 48 hours",
+      "dir": "up"
+    },
+    {
+      "label": "Negotiation fee waiver window",
+      "value": "60 days",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "CENTCOM",
+      "fragment": "“55 merchant ships”",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4522490/commercial-vessels-flow-through-open-strait-of-hormuz/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“well below”",
+      "as_of": "19 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-shipments-rise-hormuz-although-questions-grow-over-irans-transit-terms-2026-06-19/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“more vessels transit Hormuz”",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/more-vessels-transit-hormuz-qatar-linked-lng-tankers-return-data-show-2026-06-23/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "India (govt)",
+      "fragment": "“four fertilizer cargo ships”",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/india/india-bound-fertilizer-ships-cross-hormuz-government-says-2026-06-22/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“shipowners need assurance”",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-gains-after-selloff-awaits-progress-strait-hormuz-flows-2026-06-23/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“fees will be charged”",
+      "as_of": "8 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/hormuz-strait-will-be-open-with-transit-fees-iran-envoy-moscow-quoted-2026-06-08/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“waive fees”",
+      "as_of": "19 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/iran-says-it-will-waive-fees-hormuz-during-60-day-negotiation-period-2026-06-19/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Lloyd's List",
+      "fragment": "“provided free of charge”",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.lloydslist.com/LL1157571/Iran-imposes-mandatory-insurance-on-ships-transiting-Strait-of-Hormuz-with-fees-likely-to-follow",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“will not tolerate”",
+      "as_of": "28 May",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/us-warns-oman-not-engage-facilitating-tolls-strait-hormuz-2026-05-28/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    }
+  ]
+}
