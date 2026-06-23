@@ -1,0 +1,212 @@
+{
+  "id": "the-first-step",
+  "topics": [
+    "us-iran",
+    "oil",
+    "lebanon",
+    "maritime-security"
+  ],
+  "edition_date": "2026-06-23",
+  "section": "geopolitics",
+  "kicker": "US-Iran the waiver",
+  "epistemic": "inference",
+  "headline": "The waiver moved first\nThe deal split immediately",
+  "deck": "Washington has begun implementing the Lake Lucerne framework through sanctions licensing, while Tehran and Israel exposed the missing sequence: relief, verification, Hormuz and Lebanon are not yet being read from the same page.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "15:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Washington’s first concrete deliverable from the US-Iran framework was not a nuclear step, a maritime step, or a Lebanon step. It was a Treasury license: Reuters reported a temporary general license allowing “the sale of crude oil and petrochemical and petroleum products of Iranian origin through August 21,” with associated “banking transactions, insurances and transportation” covered and payments allowed in US-dollar-denominated funds. Cuba, North Korea and Crimea were excluded. [E1]",
+    "Relief therefore moved in the domain the United States can operate directly: sanctions plumbing. The license turns the framework from communiqué into implementation, but it also front-loads economic permission before a publicly described verification sequence exists. Trump attached the political brake in public, saying, “If Iran doesn’t live up to their agreement, or if they’re not behaving, I will do what I have to do,” while also saying Iran was “supposed to use money to buy food for their people” and buy it “exclusively from us.” [E2]",
+    "Vice President JD Vance framed the next leg as nuclear access. He said, “The Iranians have agreed to invite IAEA inspectors back into their country,” called that “a major milestone,” and described it as “the first step in permanently denuclearizing or permanently ending a nuclear weapons program in Iran.” [E3]",
+    "Tehran immediately disputed the premise. Reuters reported that Foreign Ministry spokesman Esmaeil Baghaei said Iran had not met IAEA chief Rafael Grossi in Switzerland and had “no plans” for IAEA inspections of damaged nuclear facilities; Times of Israel reported that Baghaei said Tehran “did not negotiate on its nuclear program” and “did not accept any new commitments.” [E4]",
+    "Asset control split the reading further. Iran’s UN envoy Ali Bahreini rejected the US framing of what unfrozen or newly available funds would finance, saying, “Iran is the only country to decide what to do with its assets,” and adding that no other country would influence those decisions. [E5]",
+    "Lake Lucerne’s machinery remains real. The Qatar-Pakistan joint statement said the parties created a High-Level Committee, working groups, a 60-day roadmap, a Hormuz line and a “de-confliction cell” with Lebanon “to ensure the adherence of the termination of military operations in Lebanon.” [E6]",
+    "Lebanon also shows the limit of the machinery. Times of Israel reported that the mechanism would include the US, Iran, Lebanon, Qatar and Pakistan “but not Israel,” while Netanyahu said Israeli forces in southern Lebanon retain “full freedom of action” against direct or emerging threats and that “the IDF faces no restrictions in this regard.” [E7] [E8]",
+    "Tuesday supplied the stress test before the cell could become the answer. Reuters, cited in the Times of Israel liveblog, reported that Lebanon’s Civil Defence and state media said Israeli gunfire killed two people near Nabatieh; Hezbollah called it a ceasefire violation, while the IDF said it struck gunmen posing a threat. A fifth round of direct Israel-Lebanon talks was due in Washington from Tuesday to Thursday. [E9]"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "lebanon",
+    "hero_map": "lebanon",
+    "title": "The fracture line",
+    "caption": "Washington moved first through sanctions licensing while the southern front stayed live: the Lake Lucerne de-confliction cell brings in the US, Iran, Lebanon, Qatar and Pakistan but excludes Israel, which holds full freedom of action, and Israeli gunfire killed two people near Nabatieh on Tuesday as a fifth round of direct Israel-Lebanon talks opened in Washington · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "overlays": [
+      {
+        "name": "Strikes continue · the cell excludes Israel",
+        "color": "red",
+        "ring": [
+          [33.5, 35.15],
+          [33.5, 35.7],
+          [33.1, 35.6],
+          [33.1, 35.25]
+        ]
+      }
+    ],
+    "spots": [
+      { "name": "BEIRUT", "lat": 33.89, "lon": 35.50 },
+      { "name": "SIDON", "lat": 33.56, "lon": 35.37 },
+      { "name": "TYRE", "lat": 33.27, "lon": 35.20 },
+      { "name": "NABATIEH", "lat": 33.38, "lon": 35.48 }
+    ]
+  },
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "key_numbers": [
+    {
+      "label": "Treasury license duration",
+      "value": "60 days",
+      "dir": "up"
+    },
+    {
+      "label": "License expiry",
+      "value": "21 Aug 2026",
+      "dir": "flat"
+    },
+    {
+      "label": "Roadmap window",
+      "value": "60 days",
+      "dir": "flat"
+    },
+    {
+      "label": "Excluded jurisdictions",
+      "value": "3",
+      "dir": "flat"
+    },
+    {
+      "label": "Lebanon deaths reported Tuesday",
+      "value": "2",
+      "dir": "up"
+    },
+    {
+      "label": "Direct Israel-Lebanon talks window",
+      "value": "Tue-Thu",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "the sale of crude oil and petrochemical and petroleum products of Iranian origin through August 21",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/business/energy/us-issues-iran-related-general-license-oil-sales-2026-06-22/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Times of Israel",
+      "fragment": "If Iran doesn’t live up to their agreement, or if they’re not behaving, I will do what I have to do.",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.timesofisrael.com/trump-if-iran-doesnt-abide-by-deal-i-will-do-what-i-have-to-do-to-prevent-nuke/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Times of Israel",
+      "fragment": "The Iranians have agreed to invite IAEA inspectors back into their country",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.timesofisrael.com/vance-iran-invited-un-nuclear-inspectors-back-into-country-in-major-milestone/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters / Times of Israel",
+      "fragment": "no plans",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/trump-insists-iran-has-agreed-nuclear-inspections-2026-06-23/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Iran is the only country to decide what to do with its assets",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/middle-east/irans-un-ambassador-cites-good-progress-peace-talks-denies-us-commodity-purchase-2026-06-23/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Qatar MOFA",
+      "fragment": "de-confliction cell",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://mofa.gov.qa/en/latest-articles/statements/joint-statement-by-the-state-of-qatar-and-the-islamic-republic-of-pakistan-regarding-the-conclusion-of-lake-lucerne-summit--first-high-level-committee-meeting-with-participation-of-the-united-states-of-america-and-the-islamic-republic-of-iran",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Times of Israel",
+      "fragment": "but not Israel",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.timesofisrael.com/us-iran-lebanon-mechanism-to-include-iran-qatar-pakistan-excluding-israel-report/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Times of Israel",
+      "fragment": "full freedom of action",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.timesofisrael.com/on-eve-of-direct-jerusalem-beirut-talks-netanyahu-vows-to-maintain-presence-in-lebanon/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters / Times of Israel",
+      "fragment": "Israeli gunfire killed two people Tuesday near Nabatieh",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.timesofisrael.com/liveblog-june-23-2026/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    }
+  ]
+}

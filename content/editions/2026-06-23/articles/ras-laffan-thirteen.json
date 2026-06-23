@@ -1,0 +1,146 @@
+{
+  "id": "ras-laffan-thirteen",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "maritime-security"
+  ],
+  "edition_date": "2026-06-23",
+  "section": "markets",
+  "kicker": "Qatar Ras Laffan",
+  "epistemic": "inference",
+  "headline": "Qatar Raises Death Toll to Thirteen in Ras Laffan Explosion\nBarzan Domestic Facility Blast Leaves LNG Exports Unaffected",
+  "deck": "Qatar reported a revised toll of thirteen killed and sixty-six injured from the Barzan explosion inside Ras Laffan Industrial City while confirming that LNG facilities sustained no impact and classifying the event as a technical accident with no public safety threat.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "15:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Qatar raised the confirmed death toll from the Ras Laffan blast to thirteen killed and sixty-six injured after previously missing workers were declared dead. [E1] The energy minister stated that “Qatar's LNG facilities were not impacted.”",
+    "QatarEnergy characterized the explosion and fire at the Barzan local gas supply facility as an “operational incident during the start-up of operations” on Sunday evening, with emergency teams containing the fire and bringing it under control. [E2] The Interior Ministry called the event a “technical accident” that posed “no threat to public safety.”",
+    "Barzan operates as a domestic-market facility that supplies 1.4 BSCFD of sales gas to local power generation, desalination, and industry along with ethane, condensate, LPG, and sulphur, distinct from any LNG export train. [E3]",
+    "Ras Laffan serves as Qatar's primary site for LNG production and export, handling around 20% of global LNG supply through 77 mtpa capacity across 14 trains, and the blast struck inside this industrial city. [E4]",
+    "Iranian strikes in March had already damaged two of the fourteen LNG trains and one GTL facility, removing 17% of LNG export capacity or 12.8 mtpa from service for three to five years. [E5]",
+    "Qatar launched the Lake Lucerne Summit and a first high-level committee meeting with the United States, Iran, and Pakistan to advance implementation of de-confliction talks. [E6]",
+    "No confirmed disruption to LNG export loadings has emerged from the Barzan blast, and authorities have presented no evidence of sabotage while describing the occurrence as a technical accident. [E1] [E2] [E4]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "key_numbers": [
+    {
+      "label": "Killed",
+      "value": "13",
+      "dir": "down"
+    },
+    {
+      "label": "Injured",
+      "value": "66",
+      "dir": "down"
+    },
+    {
+      "label": "Barzan sales gas",
+      "value": "1.4 BSCFD",
+      "dir": "flat"
+    },
+    {
+      "label": "Ras Laffan capacity",
+      "value": "77 mtpa / 14 trains",
+      "dir": "flat"
+    },
+    {
+      "label": "Share of global LNG",
+      "value": "~20%",
+      "dir": "flat"
+    },
+    {
+      "label": "March outage",
+      "value": "17% / 12.8 mtpa",
+      "dir": "down"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Qatar's LNG facilities were not impacted.",
+      "as_of": "23 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/qatar-says-ras-laffan-lng-complex-blast-killed-13-injured-66-2026-06-22/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Gulf Times",
+      "fragment": "operational incident during the start-up of operations",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.gulf-times.com/article/727942/qatar/qatarenergy-reports-operational-incident-at-ras-laffan-industrial-city",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "QatarEnergy LNG",
+      "fragment": "1.4 BSCFD of sales gas",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.qatarenergylng.qa/english/Operations/Domestic-Market",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "around 20% of global LNG supply",
+      "as_of": "21 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/qatar-reports-explosion-factory-ras-laffan-no-injuries-or-leak-reported-2026-06-21/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "knocking out 17% of LNG export capacity, or 12.8 mtpa, for three to five years",
+      "as_of": "19 Mar",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/energy/iran-attack-damage-wipes-out-17-qatars-lng-capacity-three-five-years-qatarenergy-2026-03-19/",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    },
+    {
+      "source": "QNA",
+      "fragment": "launch of the Lake Lucerne Summit",
+      "as_of": "21 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://qna.org.qa/en/News-Area/News/2026-6/21/qatar-announces-launch-of-lake-lucerne-summit-first-high-level-committee-meeting-with-participation-of-us-iran-pakistan",
+        "retrieved_at": "2026-06-23T15:30:00Z"
+      }
+    }
+  ]
+}
