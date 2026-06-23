@@ -24,12 +24,12 @@
     {
       "block": "Grid",
       "props": {
-        "cols": [2, 1],
+        "cols": [1, 2],
         "rule": false,
         "align": "stretch",
         "columns": [
-          [ { "block": "Teaser", "props": { "article": "the-fill-line", "size": "feature" } } ],
-          [ { "block": "GlyphArt", "props": { "shape": "drone", "caption": "The warhead end of autonomy" } } ]
+          [ { "block": "GlyphArt", "props": { "shape": "drone", "caption": "The warhead end of autonomy" } } ],
+          [ { "block": "Teaser", "props": { "article": "the-fill-line", "size": "feature" } } ]
         ]
       }
     },

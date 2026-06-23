@@ -106,6 +106,11 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   flashpoint globe + one more fitting glyph/map. Maps belong inside articles;
   don't crowd the front past three. Glyph art is a signature, not wallpaper —
   fit beats frequency.
+- **Alternate the illustration side down the page.** When two illustrated
+  feature pieces stack below the hero, their art must sit on opposite sides —
+  e.g. first feature's glyph on the right, the next on the left (`cols:[2,1]`
+  then `cols:[1,2]`, art column flipped) — so the images zig-zag down the column
+  instead of stacking in one rail. The hero's own art side sets the rhythm.
 - glyphcss quirks that cost us hours: always pass an explicit camera
   (default camera renders nothing); glyph density follows color distance
   from paper (near-paper colors rasterize as spaces); hotspots don't bake
