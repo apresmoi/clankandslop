@@ -83,7 +83,7 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   glyphcss renderer), committed as text. Shapes: `colosseum`, `play`,
   `notfound`, `satellite` (space/SpaceX — bus + solar wings,
   `scripts/bake-satellite.mjs`), `pumpjack` (oil/energy), `missile` (deep-strike
-  / defence), `drone` (autonomous war / UAV). New glyphs: dial a model in the Glyph
+  / defence), `drone` (autonomous war / UAV), `chip` (compute / semiconductors). New glyphs: dial a model in the Glyph
   Workbench (`scripts/glyph-lab.mjs`) → Copy config → `scripts/bake-from-config.mjs`,
   or `scripts/bake-glb.mjs` for a one-off. Iconic silhouettes read; complex mechs
   fragment and lying/T-pose figures collapse — pick an iconic model and dial
