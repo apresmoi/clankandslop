@@ -58,11 +58,32 @@ const inRing = (lat: number, lon: number, ring: Array<[number, number]>): boolea
   return inside;
 };
 
-// band → glyph: water gets a sparse dot texture, land densifies with height.
+import landmask from '../data/landmask.json';
+const isLandWorld = (lat: number, lon: number): boolean => {
+  const row = Math.min(landmask.rows - 1, Math.max(0, Math.floor(90 - lat)));
+  const col = ((Math.floor(lon + 180) % 360) + 360) % 360;
+  return landmask.mask[row]?.[col] === '1';
+};
+
+// band → glyph: water gets a sparse dot texture; land densifies with height,
+// with a NW-light hillshade so slopes, ridges and coastlines read as relief
+// rather than a flat elevation tint (a uniform plateau otherwise renders as a blob).
 const LAND_RAMP = ' ░░▒▒▓▓██';
+const bandAt = (rr: number, cc: number, fallback: number) => {
+  const v = m.bands[rr]?.[cc];
+  return v === undefined ? fallback : Number(v);
+};
+const shadedBand = (rr: number, cc: number, band: number) => {
+  // Light from the NW: a cell higher than its west/north neighbours faces away
+  // from the light → shadow (one level darker); lower than them → lit (one lighter).
+  const slope = (band - bandAt(rr, cc - 1, band)) + (band - bandAt(rr - 1, cc, band));
+  return Math.max(1, Math.min(8, band + (slope > 0 ? 1 : slope < 0 ? -1 : 0)));
+};
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 let printHtml = '';
+let locatorHtml = '';
+let locatorCorner = 'br';
 let legend: Array<{ color: string; glyph: string; label: string }> = [];
 let printSpots: Array<{ name: string; leftPct: number; topPct: number }> = [];
 
@@ -77,10 +98,10 @@ if (!interactive) {
       const band = Number(m.bands[r][c]);
       let cell: Cell = band === 0
         ? { ch: (r + c) % 2 ? '·' : ' ', cls: 'w' }
-        : { ch: LAND_RAMP[band], cls: 'l' };
+        : { ch: LAND_RAMP[shadedBand(r, c, band)], cls: 'l' };
       for (const o of overlays) {
         if (!inRing(lat, lon, o.ring)) continue;
-        cell = { ch: band === 0 ? '░' : LAND_RAMP[band], cls: `o-${o.color ?? 'red'}` };
+        cell = { ch: band === 0 ? '░' : LAND_RAMP[shadedBand(r, c, band)], cls: `o-${o.color ?? 'red'}` };
       }
       row.push(cell);
     }
@@ -130,6 +151,54 @@ if (!interactive) {
     ...overlays.filter((o) => o.name).map((o) => ({ color: o.color ?? 'red', glyph: '▓', label: o.name! })),
     ...routes.filter((r) => r.name).map((r) => ({ color: r.color ?? 'accent', glyph: '•••', label: r.name! })),
   ];
+
+  // Locator inset: a regional zoom-OUT around this map (continental context, not
+  // the whole planet), with the map's own footprint drawn as a box so you can see
+  // where on Earth it sits.
+  const LC = 40, LR = 20;
+  const cLat = (m.north + m.south) / 2;
+  const cLon = (m.west + m.east) / 2;
+  const lonSpan = Math.min(170, Math.max(56, (m.east - m.west) * 6));
+  const latSpan = Math.min(120, Math.max(38, (m.north - m.south) * 6));
+  const wW = cLon - lonSpan / 2, wE = cLon + lonSpan / 2;
+  const wN = Math.min(89, cLat + latSpan / 2), wS = Math.max(-89, cLat - latSpan / 2);
+  const locLines: string[] = [];
+  for (let r = 0; r < LR; r++) {
+    const lat = wN - ((r + 0.5) / LR) * (wN - wS);
+    let run = '', cls = '', html = '';
+    for (let c = 0; c < LC; c++) {
+      const lon = wW + ((c + 0.5) / LC) * (wE - wW);
+      const here = lat <= m.north && lat >= m.south && lon >= m.west && lon <= m.east;
+      const land = isLandWorld(lat, lon);
+      const k = here ? 'm' : land ? 'l' : 'w';
+      const ch = here ? (land ? '▓' : '▒') : land ? '▒' : '·';
+      if (k !== cls) { if (run) html += `<span class="lc-${cls}">${esc(run)}</span>`; run = ''; cls = k; }
+      run += ch;
+    }
+    locLines.push(html + `<span class="lc-${cls}">${esc(run)}</span>`);
+  }
+  locatorHtml = locLines.join('\n');
+
+  // Drop the inset into whichever corner is clearest of spot labels. Each label is
+  // a dot at (leftPct, topPct) with text running to the right; the inset's footprint
+  // is roughly the bottom/top ~38% × side ~26% of the raster.
+  const locW = 27, locH = 40;
+  const overlap = (a: number[], b: number[]) =>
+    Math.max(0, Math.min(a[1], b[1]) - Math.max(a[0], b[0])) *
+    Math.max(0, Math.min(a[3], b[3]) - Math.max(a[2], b[2]));
+  const labelBoxes = printSpots.map((s) => [s.leftPct - 3, s.leftPct + 26, s.topPct - 5, s.topPct + 5]);
+  const corners: Array<[string, number[]]> = [
+    ['br', [100 - locW, 100, 100 - locH, 100]],
+    ['bl', [0, locW, 100 - locH, 100]],
+    ['tr', [100 - locW, 100, 0, locH]],
+    ['tl', [0, locW, 0, locH]],
+  ];
+  let bestScore = Infinity;
+  for (const [name, box] of corners) {
+    const score = labelBoxes.reduce((s, lb) => s + overlap(box, lb), 0);
+    if (score < bestScore) { bestScore = score; locatorCorner = name; }
+    if (score === 0) { locatorCorner = name; break; }
+  }
 }
 ---
 <figure class:list={['mapglyph', interactive ? 'is-card' : 'is-print']}>
@@ -157,6 +226,11 @@ if (!interactive) {
       {printSpots.map((s) => (
         <span class="mg-label" style={`left: ${s.leftPct}%; top: ${s.topPct}%;`}>{s.name}</span>
       ))}
+      {locatorHtml && (
+        <div class={`mapglyph-locator loc-${locatorCorner}`} aria-hidden="true" title="Where in the world">
+          <pre set:html={locatorHtml} />
+        </div>
+      )}
     </div>
   )}
 
@@ -393,6 +467,26 @@ if (!interactive) {
   .mapglyph-print :global(.mg-r-accent) { color: var(--accent); font-weight: 700; }
   .mapglyph-print :global(.mg-r-green)  { color: var(--green); font-weight: 700; }
   .mapglyph-print :global(.mg-s) { color: var(--red); font-weight: 700; }
+
+  /* World-locator inset — a regional "you are here" map, an opaque box in the
+     bottom-right corner of the raster (a proper cartographic inset). */
+  .mapglyph-locator {
+    position: absolute;
+    padding: 3px 4px;
+    background: var(--paper);
+    border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+    box-shadow: 0 1px 5px color-mix(in srgb, var(--ink) 14%, transparent);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .mapglyph-locator.loc-br { right: 6px; bottom: 6px; }
+  .mapglyph-locator.loc-bl { left: 6px; bottom: 6px; }
+  .mapglyph-locator.loc-tr { right: 6px; top: 6px; }
+  .mapglyph-locator.loc-tl { left: 6px; top: 6px; }
+  .mapglyph-locator pre { margin: 0; font-size: 4.5px; line-height: 1; letter-spacing: 0; white-space: pre; }
+  .mapglyph-locator :global(.lc-w) { color: color-mix(in srgb, var(--ink) 10%, transparent); }
+  .mapglyph-locator :global(.lc-l) { color: color-mix(in srgb, var(--ink) 32%, transparent); }
+  .mapglyph-locator :global(.lc-m) { color: var(--accent); font-weight: 700; }
   .mg-o-red    { color: var(--red); }
   .mg-o-accent { color: var(--accent); }
   .mg-o-green  { color: var(--green); }

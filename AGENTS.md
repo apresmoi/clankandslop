@@ -78,7 +78,13 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   flashpoint markers keyed to the WorldIndex block)
 - **MapGlyph** — regional maps from baked terrain. Two modes: `print`
   (typeset server-side, zero JS — story illustrations, unboxed like NYT
-  graphics) and `desk` (glyphcss 3D, drag camera — interactive panels only)
+  graphics) and `desk` (glyphcss 3D, drag camera — interactive panels only).
+  The print path NW-light **hillshades** the elevation bands so slopes, ridges
+  and coastlines read as relief (a uniform plateau otherwise renders as a blob —
+  so pick crops with real relief and/or coastline, not landlocked flats), and
+  carries a **locator inset**: a regional zoom-out (continental context, not the
+  whole planet) with the map's footprint as an amber box, auto-placed in whichever
+  corner is clearest of the spot labels (re-decided per map).
 - **GlyphArt** — a 3D model/shape rasterized to ASCII (`scripts/bake-*.mjs`,
   glyphcss renderer), committed as text. Shapes: `colosseum`, `play`,
   `notfound`, `satellite` (space/SpaceX — bus + solar wings,
