@@ -246,6 +246,13 @@ for (const { date, dir: edDir, desk } of scopes) {
       }
     }
 
+    // The "X, not Y" / "not X, it's Y" binary-contrast reflex — a machine tic the
+    // headline/deck over-reach for. Fine once; flag it so it doesn't become the house
+    // formula. (Warning, not a gate.)
+    const hd = `${isStr(a.headline) ? a.headline : ''} ${isStr(a.deck) ? a.deck : ''}`.replace(/\n/g, ' ');
+    if (/,\s*not\s|\bnot\b[^.]{0,40}\b(?:but|it['’]?s|its)\b|\bno longer\b|\bisn['’]?t\b[^.]{0,30}\bit['’]?s\b/i.test(hd))
+      warn(file, `headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form`);
+
     // topics (optional) must resolve to the glossary
     if (a.topics !== undefined) {
       if (!Array.isArray(a.topics)) err(file, 'topics must be an array of slugs');

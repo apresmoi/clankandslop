@@ -59,6 +59,30 @@ everything with "The"; resist it), prefer concrete subjects and active voice ove
 "that") at the head of successive sentences. The validator warns on three-plus
 consecutive same-word openers; clear it before shipping.
 
+**Cut the AI tells.** Beyond varied openers, the copy must not fall into the
+machine's favourite ruts:
+
+- **The "not X, it's Y" reflex.** Roughly a quarter of our headlines have leaned on
+  the binary-contrast reframe ("The Screen Is Calm / The Water Is Not"; "Machinery,
+  not compliance"; "Lebanon, not Hormuz, is the tripwire"). It lands once; as a habit
+  it reads as a tic. Use it rarely — far more often, state the point straight.
+  (Validator-warned on the headline/deck.)
+- **Name the actor — no false agency.** People and institutions act; abstractions
+  don't. "The market rewards", "the framework fails", "the decision emerges", "the
+  complaint becomes a fix" all hide who did what. Write "buyers paid", "the council
+  decided", "Tehran refused". (A strait genuinely reopens; a metaphor does not act.)
+- **No throat-clearing or meta-commentary.** Drop "Here's what/why…", "The truth
+  is…", "It's worth noting", "It turns out", "Make no mistake". State the content.
+- **Lead with the subject, not a Wh- word.** "What makes this hard is the permit
+  regime" → name the obstacle directly: "The permit regime is the gate."
+- **Plain words, not jargon.** handle/address (not navigate), explain (not unpack),
+  significant (not game-changer), reconsider (not take a step back).
+- **Vary the rhythm.** Mix sentence lengths; don't end every paragraph on a clipped
+  one-liner; two examples beat a reflexive three.
+- Empty adverbs go (really, just, genuinely, simply, actually, fundamentally);
+  adverbs that carry meaning stay. The voice is always neutral third person —
+  never "you", never addressing the reader.
+
 ## Visual System
 
 Newspaper broadsheet, four typographic roles (see `website/src/styles/tokens.css`):
