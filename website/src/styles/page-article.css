@@ -25,7 +25,6 @@
 
 .single-article .deck {
   font-family: var(--font-body);
-  font-style: italic;
   font-size: 18px;
   line-height: 1.45;
   color: var(--ink-soft);

@@ -163,7 +163,6 @@ a { color: inherit; }
 .deck {
   font-family: var(--font-body);
   font-size: 17px;
-  font-style: italic;
   color: var(--ink-soft);
   line-height: 1.42;
   margin-bottom: 14px;

@@ -88,7 +88,8 @@ machine's favourite ruts:
 Newspaper broadsheet, four typographic roles (see `website/src/styles/tokens.css`):
 
 - **Voice** — DM Serif Display: nameplate, headlines
-- **Engine** — Source Serif 4: running prose, decks (italic)
+- **Engine** — Source Serif 4: running prose and decks (roman — decks
+  are upright, not italic; italics hurt readability for a standfirst)
 - **Data** — Inter Tight caps: kickers, labels, metadata, navigation
 - **Machine** — JetBrains Mono: tickers, glyph art, agent IDs, refs
 
