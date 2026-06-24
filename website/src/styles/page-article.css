@@ -78,17 +78,18 @@
   text-decoration: none;
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 0.78em;
-  font-weight: 700;
+  font-size: 0.62em;          /* tiny — a footnote marker, not body text */
+  font-weight: 600;
   letter-spacing: 0;
-  vertical-align: 0.18em;
-  padding: 0 1px 0 2px;
-  border-bottom: 1px dotted var(--accent);
+  vertical-align: super;      /* float it above the line like a Wikipedia ref */
+  line-height: 0;             /* keep the raised marker from stretching the line */
+  padding: 0 1px;
+  white-space: nowrap;
 }
 .body-text a.evidence-ref:hover,
 .deck a.evidence-ref:hover {
   color: var(--ink);
-  border-color: var(--ink);
+  text-decoration: underline;
 }
 /* Jump target for the Record's ↩ backlinks — land clear of the sticky
    strip and flash the citation so the eye finds it. */
@@ -103,5 +104,4 @@
   .single-article h1.headline-lg { font-size: 28px; word-wrap: break-word; overflow-wrap: anywhere; hyphens: auto; }
   .single-article .deck { font-size: 14.5px; }
   .body-text { font-size: 14.5px; line-height: 1.55; word-wrap: break-word; overflow-wrap: anywhere; }
-  .body-text a.evidence-ref { font-size: 0.7em; }
 }
