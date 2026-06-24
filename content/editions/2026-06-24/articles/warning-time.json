@@ -22,10 +22,10 @@
   "revision": 1,
   "next_update_utc": "16:00",
   "body": [
-    "Taiwan’s warning problem is no longer only a Strait problem. Britain, France and Germany have put the new geography in public view, saying they “noted with concern novel Chinese activity in the waters east of Taiwan,” the Pacific-facing side that matters if the western approaches become contested. [E1]",
+    "Taiwan’s warning problem now reaches well past the Strait. Britain, France and Germany have put the new geography in public view, saying they “noted with concern novel Chinese activity in the waters east of Taiwan,” the Pacific-facing side that matters if the western approaches become contested. [E1]",
     "That eastern side is the side Taiwan needs when the obvious map gets closed. It is the route-set for resupply, dispersal, submarine access, allied approach and continuity under pressure; Reuters reported that China’s coast guard entered waters off Taiwan’s east coast in early June for what Beijing called a “special maritime traffic law-enforcement operation.” [E2]",
     "European language moved beyond routine concern because the activity touches navigation, shipping and coercive access control. The E3 warned that the actions “threaten regional stability and the freedom of navigation and safety of international shipping,” then added that navigational rights and the safety of seafarers and vessels must be guaranteed and respected. [E3]",
-    "Taipei framed the same activity as unlawful enforcement, not ordinary presence. Taiwan’s foreign ministry said “China has no right to engage in law enforcement activities in Taiwan’s eastern waters under any pretext,” and accused China of having “illegally harassed cargo ships” exercising freedom of navigation around Taiwan. [E4]",
+    "Taipei framed the same activity as unlawful enforcement and rejected the routine-presence framing. Taiwan’s foreign ministry said “China has no right to engage in law enforcement activities in Taiwan’s eastern waters under any pretext,” and accused China of having “illegally harassed cargo ships” exercising freedom of navigation around Taiwan. [E4]",
     "Meanwhile, the clock is compressing. Defence minister Wellington Koo said that “given the current threat situation from the enemy” and Taiwan’s belief that “the warning time is shortening,” the military needs to verify that it can respond immediately; Reuters said Taiwan is running immediate-combat-readiness drills based on a regular exercise around the island turning into a real attack. [E5]",
     "Normalization is the mechanism. Taiwan’s defence ministry has described PLA activity as compressing its “early-warning and response time” and raising the risk of “transitioning from training to exercises, from exercises to actual war,” while its live baseline for 6 a.m. June 23 to 6 a.m. June 24 recorded 11 PLA aircraft sorties, 6 PLAN ships and 7 official ships around Taiwan. [E6]",
     "The hardware consequence is global. Reuters describes Taiwan as crucial to the AI supply chain through TSMC; TSMC chairman C.C. Wei said demand is so high the company is trying not to become “a bottleneck,” while President Lai Ching-te said the world’s growing AI need also raises its need for a Taiwan that is “stable, trustworthy, and capable of shouldering responsibility.” [E7]"
@@ -40,17 +40,41 @@
         "name": "Novel Chinese activity east of Taiwan",
         "color": "red",
         "ring": [
-          [25.4, 121.8],
-          [25.4, 123.3],
-          [22.2, 123.0],
-          [22.2, 121.7]
+          [
+            25.4,
+            121.8
+          ],
+          [
+            25.4,
+            123.3
+          ],
+          [
+            22.2,
+            123
+          ],
+          [
+            22.2,
+            121.7
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "TAIPEI", "lat": 25.03, "lon": 121.56 },
-      { "name": "TSMC·HSINCHU", "lat": 24.81, "lon": 120.97 },
-      { "name": "KAOHSIUNG", "lat": 22.62, "lon": 120.31 }
+      {
+        "name": "TAIPEI",
+        "lat": 25.03,
+        "lon": 121.56
+      },
+      {
+        "name": "TSMC·HSINCHU",
+        "lat": 24.81,
+        "lon": 120.97
+      },
+      {
+        "name": "KAOHSIUNG",
+        "lat": 22.62,
+        "lon": 120.31
+      }
     ]
   },
   "refs": [
