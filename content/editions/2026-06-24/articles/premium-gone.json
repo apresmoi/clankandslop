@@ -1,0 +1,224 @@
+{
+  "id": "premium-gone",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "shipping",
+    "war-risk-insurance"
+  ],
+  "edition_date": "2026-06-24",
+  "section": "markets",
+  "kicker": "Hormuz the unwind",
+  "epistemic": "inference",
+  "headline": "Hormuz premium\nleaves the barrel",
+  "deck": "The strait has moved from feared tollbooth to managed reopening, and crude has priced the shift before the old traffic pattern is fully back.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "19:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Hormuz no longer trades like a closing gate. Oman has opened two temporary north-south corridors around the unsafe old traffic-separation lane, organized grouped departures, required individual vessel contact and AIS, and said “no tolls would be imposed.” [E1]",
+    "Evacuation is now doing part of the price work. Ships have begun moving under an IMO evacuation scheme that is mainly clearing stranded outbound vessels, not restoring ordinary two-way traffic, while the temporary Omani routes and no-toll condition still hold and movements can pause for safety. [E2]",
+    "Washington reinforced the unwind with volume and policy. US Energy Secretary Chris Wright said “some 20 million barrels” of oil exited Hormuz in the last 24 hours, while Secretary of State Marco Rubio said, “I know of no country on the planet that supports tolling ... That’s not going to happen,” adding, “We’re not going to do anything that undermines the security of our allies.” [E3] [E4]",
+    "Brent has followed the ships out. The benchmark traded around $73.65 after touching $73.22, “its weakest level since February 27,” as traders priced the “Strait of Hormuz normalising” and “Iranian oil re-entering the global market.” [E5]",
+    "Denominators still matter. CENTCOM said “55 merchant ships transited” with “more than 17 million barrels of oil,” a strong rebound from blockade conditions but only about 40% of the roughly 125-to-138-per-day pre-war norm cited by Reuters, Clarksons and JMIC. [E6]",
+    "Physical barrels are no longer scarce on the screen. Reuters described global physical crude markets as “mired in discounts,” with stranded cargoes released, Middle East supply ramping, cash Dubai, Oman and Murban trading at discounts, and ADNOC selling at least 48 million barrels of spot crude for June-to-August loading. [E7]",
+    "Iran’s gatekeeper leverage has gone dormant rather than disappeared. Oman and Iran are still discussing future administration, maritime services and costs through a joint working group, while Reuters’ legal explainer notes that Iran has explored permits and licences even as UNCLOS limits unilateral payment demands for mere passage. [E8] [E9]",
+    "Only verification keeps a cloud over the tape. IAEA chief Rafael Grossi said, “The inspections will indeed take place,” while Iran signalled no current plan for access to attacked sites except under a final deal, leaving the nuclear-inspection fight as the residual risk attached to the sanctions-and-shipping unwind. [E10]"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "hormuz-strait",
+    "title": "The reopened lane",
+    "caption": "The strait trades like a managed reopening, not a closing gate: Oman opened temporary corridors with grouped departures and no tolls, Brent slid to around $73.65 — its weakest since February 27 — and roughly 20 million barrels cleared Hormuz in 24 hours, even as the daily-passage denominator is still only about 40% of the pre-war norm · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "routes": [
+      {
+        "color": "accent",
+        "name": "Reopened · no tolls, premium gone",
+        "points": [
+          [25.2, 56.7],
+          [26.2, 56.5],
+          [26.85, 56.37],
+          [27.0, 56.0]
+        ]
+      }
+    ],
+    "spots": [
+      { "name": "BANDAR ABBAS", "lat": 27.15, "lon": 56.28 },
+      { "name": "LARAK", "lat": 26.85, "lon": 56.37 },
+      { "name": "STRAIT", "lat": 26.57, "lon": 56.30 },
+      { "name": "FUJAIRAH", "lat": 25.12, "lon": 56.34 }
+    ]
+  },
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent crude",
+      "value": "$73.65",
+      "dir": "down"
+    },
+    {
+      "label": "Intraday Brent low",
+      "value": "$73.22",
+      "dir": "down"
+    },
+    {
+      "label": "Wright oil-exit claim",
+      "value": "some 20 million barrels",
+      "dir": "up"
+    },
+    {
+      "label": "CENTCOM transits",
+      "value": "55 merchant ships",
+      "dir": "up"
+    },
+    {
+      "label": "Pre-war daily norm",
+      "value": "125-138 ships/day",
+      "dir": "flat"
+    },
+    {
+      "label": "OFAC window",
+      "value": "through August 21, 2026",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "“no tolls would be imposed”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/oman-opens-temporary-strait-hormuz-shipping-routes-says-no-tolls-will-be-charged-2026-06-24/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“ships had begun moving under an IMO evacuation scheme”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-prices-extend-decline-expectations-smoother-crude-flows-via-hormuz-2026-06-24/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“some 20 million barrels”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/us-energy-secretary-wright-says-20-mln-barrels-oil-exited-hormuz-last-24-hours-2026-06-24/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“I know of no country on the planet that supports tolling ... That’s not going to happen”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/rubio-kicks-off-middle-east-trip-allies-seek-answers-iran-2026-06-24/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“its weakest level since February 27”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-prices-extend-decline-expectations-smoother-crude-flows-via-hormuz-2026-06-24/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "CENTCOM",
+      "fragment": "“55 merchant ships transited”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4522490/commercial-vessels-flow-through-open-strait-of-hormuz/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“mired in discounts”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/global-physical-crude-markets-mired-discounts-middle-east-ramps-up-supply-2026-06-24/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“managing navigation in Strait of Hormuz”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/oman-iran-pursue-talks-managing-navigation-strait-hormuz-2026-06-23/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“Can Iran charge fees for ships to transit the Strait of Hormuz?”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/can-iran-charge-fees-ships-transit-strait-hormuz-2026-04-07/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "“The inspections will indeed take place”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E10",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/iaea-chief-says-iran-inspections-will-go-ahead-working-modalities-2026-06-24/",
+        "retrieved_at": "2026-06-24T19:30:00Z"
+      }
+    }
+  ]
+}
