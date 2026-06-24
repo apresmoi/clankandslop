@@ -16,15 +16,14 @@ function polysFor(modelPath, orient) {
 }
 
 const PRESETS = [
-  ['key ★', '/tmp/models/key-ipoly.glb'],
-  ['sputnik', '/tmp/models/sputnik.glb'],
+  ['★ predator (fixed-wing)', '/tmp/models/predator.glb'],
+  ['drone1 (quad)', '/tmp/models/drone1.glb'],
+  ['drone2 (quad)', '/tmp/models/drone2.glb'],
+  ['drone3 (quad)', '/tmp/models/drone3.glb'],
+  ['stinger', '/tmp/models/drone.glb'],
   ['missile', '/tmp/models/missile.glb'],
-  ['satellite', '/tmp/models/satellite-g1.glb'],
-  ['hubble', '/tmp/models/hubble.glb'],
-  ['anchor', '/tmp/models/anchor-g.glb'],
+  ['sputnik', '/tmp/models/sputnik.glb'],
   ['oil pump', '/tmp/models/oilpump.glb'],
-  ['ship', '/tmp/models/ship.glb'],
-  ['coliseum', '/Users/apresmoi/glyphcss/website/public/gallery/obj/coliseum.obj'],
 ];
 
 // slider defs: id,label,min,max,step,default — defaults tuned to the detail-rich
@@ -85,27 +84,31 @@ const SL=${JSON.stringify(SLIDERS.map((s) => s[0]))};
 const togs={doubleSided:true,smoothShading:true};
 function cfg(){const c={modelPath:$('modelPath').value,autoFrame:false,...togs};for(const id of SL)c[id]=+$(id).value;return c;}
 function labels(){for(const id of SL)$(id+'v').textContent=$(id).value;}
-let t=null,busy=false;
+let busy=false,pending=false,pendingAF=false;
 async function draw(autoFrame){
  labels();const c=cfg();if(!c.modelPath)return;
  if(autoFrame)c.autoFrame=true;
  $('cfg').value=JSON.stringify(cfg(),null,0);
- if(busy){clearTimeout(t);t=setTimeout(()=>draw(autoFrame),60);return;}
+ if(busy){pending=true;if(autoFrame)pendingAF=true;return;}   // render in flight → keep only the latest frame
  busy=true;
  try{
   const r=await fetch('/render',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(c)});
-  const j=await r.json();busy=false;
-  if(j.error){$('status').textContent='ERR: '+j.error;return;}
-  const pre=$('out');pre.textContent=j.full;
-  const lh=+$('lineHeight').value;pre.style.lineHeight=lh;
-  // size the box so the whole grid fits the stage; char cell ~0.6em wide
-  const stage=$('stage');const fw=(stage.clientWidth-60)/(j.cols*0.62);const fh=(stage.clientHeight-60)/(j.rows*lh);
-  pre.style.fontSize=Math.max(3,Math.min(fw,fh,18)).toFixed(2)+'px';
-  if(autoFrame)$('zoom').value=j.zoom.toFixed(1);
-  $('status').textContent='grid '+j.cols+'×'+j.rows+' · art '+j.w+'×'+j.h+' · zoom '+j.zoom.toFixed(1);
- }catch(e){busy=false;$('status').textContent='ERR '+e.message;}
+  const j=await r.json();
+  if(j.error){$('status').textContent='ERR: '+j.error;}
+  else{
+   const pre=$('out');pre.textContent=j.full;
+   const lh=+$('lineHeight').value;pre.style.lineHeight=lh;
+   // size the box so the whole grid fits the stage; char cell ~0.6em wide
+   const stage=$('stage');const fw=(stage.clientWidth-60)/(j.cols*0.62);const fh=(stage.clientHeight-60)/(j.rows*lh);
+   pre.style.fontSize=Math.max(3,Math.min(fw,fh,18)).toFixed(2)+'px';
+   if(autoFrame)$('zoom').value=j.zoom.toFixed(1);
+   $('status').textContent='grid '+j.cols+'×'+j.rows+' · art '+j.w+'×'+j.h+' · zoom '+j.zoom.toFixed(1);
+  }
+ }catch(e){$('status').textContent='ERR '+e.message;}
+ finally{busy=false;if(pending){const af=pendingAF;pending=false;pendingAF=false;draw(af);}}   // flush the latest frame requested while busy
 }
-function schedule(){clearTimeout(t);t=setTimeout(()=>draw(false),70);}
+// live throttle: render as fast as the server allows, always showing the latest config (drops intermediate frames)
+function schedule(){draw(false);}
 SL.forEach(id=>$(id).addEventListener('input',schedule));
 document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{$('modelPath').value=b.dataset.path;draw(true);});
 $('modelPath').addEventListener('change',()=>draw(true));
