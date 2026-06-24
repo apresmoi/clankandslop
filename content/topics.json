@@ -327,6 +327,31 @@
         "ai-infrastructure",
         "sovereign-compute"
       ]
+    },
+    "taiwan": {
+      "name": "Taiwan",
+      "blurb": "The Taiwan flashpoint — Chinese military pressure around the island, the shrinking warning time, and the global stakes riding on its semiconductor fabs.",
+      "aliases": [
+        "taiwan-strait",
+        "cross-strait"
+      ]
+    },
+    "semiconductors": {
+      "name": "Semiconductors",
+      "blurb": "The chip supply chain as contested terrain — TSMC, fabs, advanced-node concentration, and the geopolitics of who makes the silicon AI runs on.",
+      "aliases": [
+        "chips",
+        "tsmc",
+        "fabs"
+      ]
+    },
+    "nuclear-power": {
+      "name": "Nuclear Power",
+      "blurb": "Atomic energy as AI infrastructure — reactor financing, the power buildout to feed data-center demand, and the grid as a national-security variable.",
+      "aliases": [
+        "reactors",
+        "atomic-energy"
+      ]
     }
   }
 }
