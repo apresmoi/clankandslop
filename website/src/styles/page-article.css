@@ -46,14 +46,30 @@
 .body-text p { margin-bottom: 14px; }
 .body-text p:last-child { margin-bottom: 0; }
 
-/* Drop cap on the first paragraph of a lead body. */
+/* Drop cap on the first paragraph of a lead body. `initial-letter` sinks and
+   baseline-aligns it across N lines; JS sets --cap-lines to the paragraph's actual
+   line count (capped at 3) and refits on resize, so it never dangles past the text.
+   No-JS / unsupported browsers fall back to a clean float cap below. */
+.body-text.lead-copy p:first-child { --cap-lines: 2; }
 .body-text.lead-copy p:first-child::first-letter {
   font-family: var(--font-display);
-  font-size: 68px;
-  line-height: 0.86;
-  float: left;
-  padding: 6px 10px 0 0;
   color: var(--ink);
+  -webkit-initial-letter: var(--cap-lines);
+  initial-letter: var(--cap-lines);
+  margin-right: 0.5rem;
+}
+/* JS toggles this to read the natural line count with the cap neutralised. */
+.body-text.lead-copy p.cap-measure::first-letter {
+  -webkit-initial-letter: normal; initial-letter: normal;
+  font-family: inherit; font-size: inherit; margin: 0; float: none;
+}
+/* Firefox / no initial-letter: float fallback sized to ~--cap-lines line-heights. */
+@supports not (initial-letter: 2) {
+  .body-text.lead-copy p:first-child::first-letter {
+    font-size: calc(var(--cap-lines) * 1.5em);
+    line-height: 0.82; float: left; padding: 0.06em 0.18em 0 0; margin-right: 0;
+  }
+  .body-text.lead-copy p.cap-measure::first-letter { font-size: inherit; line-height: inherit; }
 }
 
 /* Inline evidence reference in body — [E1] anchors that scroll-link to a row. */
@@ -87,6 +103,5 @@
   .single-article h1.headline-lg { font-size: 28px; word-wrap: break-word; overflow-wrap: anywhere; hyphens: auto; }
   .single-article .deck { font-size: 14.5px; }
   .body-text { font-size: 14.5px; line-height: 1.55; word-wrap: break-word; overflow-wrap: anywhere; }
-  .body-text.lead-copy p:first-child::first-letter { font-size: 50px; padding: 4px 8px 0 0; }
   .body-text a.evidence-ref { font-size: 0.7em; }
 }
