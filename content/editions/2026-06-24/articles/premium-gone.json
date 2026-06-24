@@ -22,12 +22,12 @@
   "revision": 1,
   "next_update_utc": "16:00",
   "body": [
-    "Hormuz no longer trades like a closing gate. Oman has opened two temporary north-south corridors around the unsafe old traffic-separation lane, organized grouped departures, required individual vessel contact and AIS, and said “no tolls would be imposed.” [E1]",
-    "Evacuation is now doing part of the price work. Ships have begun moving under an IMO evacuation scheme that is mainly clearing stranded outbound vessels, not restoring ordinary two-way traffic, while the temporary Omani routes and no-toll condition still hold and movements can pause for safety. [E2]",
+    "Hormuz has stopped trading like a closing gate. Oman has opened two temporary north-south corridors around the unsafe old traffic-separation lane, organized grouped departures, required individual vessel contact and AIS, and said “no tolls would be imposed.” [E1]",
+    "Evacuation is now doing part of the price work. Ships have begun moving under an IMO evacuation scheme that is mainly clearing stranded outbound vessels while ordinary two-way traffic stays thin, while the temporary Omani routes and no-toll condition still hold and movements can pause for safety. [E2]",
     "Washington reinforced the unwind with volume and policy. US Energy Secretary Chris Wright said “some 20 million barrels” of oil exited Hormuz in the last 24 hours, while Secretary of State Marco Rubio said, “I know of no country on the planet that supports tolling ... That’s not going to happen,” adding, “We’re not going to do anything that undermines the security of our allies.” [E3] [E4]",
     "Brent has followed the ships out. The benchmark traded around $73.65 after touching $73.22, “its weakest level since February 27,” as traders priced the “Strait of Hormuz normalising” and “Iranian oil re-entering the global market.” [E5]",
     "Denominators still matter. CENTCOM said “55 merchant ships transited” with “more than 17 million barrels of oil,” a strong rebound from blockade conditions but only about 40% of the roughly 125-to-138-per-day pre-war norm cited by Reuters, Clarksons and JMIC. [E6]",
-    "Physical barrels are no longer scarce on the screen. Reuters described global physical crude markets as “mired in discounts,” with stranded cargoes released, Middle East supply ramping, cash Dubai, Oman and Murban trading at discounts, and ADNOC selling at least 48 million barrels of spot crude for June-to-August loading. [E7]",
+    "On the screen, physical barrels look plentiful again. Reuters described global physical crude markets as “mired in discounts,” with stranded cargoes released, Middle East supply ramping, cash Dubai, Oman and Murban trading at discounts, and ADNOC selling at least 48 million barrels of spot crude for June-to-August loading. [E7]",
     "Iran’s gatekeeper leverage has gone dormant rather than disappeared. Oman and Iran are still discussing future administration, maritime services and costs through a joint working group, while Reuters’ legal explainer notes that Iran has explored permits and licences even as UNCLOS limits unilateral payment demands for mere passage. [E8] [E9]",
     "Only verification keeps a cloud over the tape. IAEA chief Rafael Grossi said, “The inspections will indeed take place,” while Iran signalled no current plan for access to attacked sites except under a final deal, leaving the nuclear-inspection fight as the residual risk attached to the sanctions-and-shipping unwind. [E10]"
   ],
@@ -41,18 +41,46 @@
         "color": "accent",
         "name": "Reopened · no tolls, premium gone",
         "points": [
-          [25.2, 56.7],
-          [26.2, 56.5],
-          [26.85, 56.37],
-          [27.0, 56.0]
+          [
+            25.2,
+            56.7
+          ],
+          [
+            26.2,
+            56.5
+          ],
+          [
+            26.85,
+            56.37
+          ],
+          [
+            27,
+            56
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "BANDAR ABBAS", "lat": 27.15, "lon": 56.28 },
-      { "name": "LARAK", "lat": 26.85, "lon": 56.37 },
-      { "name": "STRAIT", "lat": 26.57, "lon": 56.30 },
-      { "name": "FUJAIRAH", "lat": 25.12, "lon": 56.34 }
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.15,
+        "lon": 56.28
+      },
+      {
+        "name": "LARAK",
+        "lat": 26.85,
+        "lon": 56.37
+      },
+      {
+        "name": "STRAIT",
+        "lat": 26.57,
+        "lon": 56.3
+      },
+      {
+        "name": "FUJAIRAH",
+        "lat": 25.12,
+        "lon": 56.34
+      }
     ]
   },
   "refs": [

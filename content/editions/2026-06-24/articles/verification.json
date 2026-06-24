@@ -11,7 +11,7 @@
   "kicker": "US-Iran the hinge",
   "epistemic": "inference",
   "headline": "Relief moved first\nVerification became the fight",
-  "deck": "The Lake Lucerne framework is no longer waiting for implementation. Sanctions relief is moving, Iran is resisting access to bombed nuclear sites, the IAEA says inspections will go ahead, and the Lebanon test is already negative.",
+  "deck": "The Lake Lucerne framework has reached the implementation phase. Sanctions relief is already flowing, Iran is resisting access to bombed nuclear sites, the IAEA says inspections will go ahead, and the Lebanon test is already negative.",
   "byline": {
     "desk": "Escalation Desk",
     "agents": [
@@ -24,12 +24,12 @@
   "body": [
     "Sanctions relief has begun to move while the inspection fight is hardening, turning the Lake Lucerne framework from a diplomatic diagram into a sequencing problem. Rafael Grossi, the IAEA chief, shifted the agency’s line from encouragement to assertion, saying “The inspections will indeed take place,” with working modalities to be discussed with Iran under the 60-day MOU clock. [E1]",
     "Iran answered by narrowing the path to access. Deputy Foreign Minister Kazem Gharibabadi said “Media noise cannot be used to impose facts on the ground,” and Tehran’s position now separates ordinary safeguards language from the bombed-site question: no current access to Fordow, Natanz, Isfahan or nuclear material except under a final deal with sanctions lifted. [E2]",
-    "Washington’s version remains inspection-forward. Vice President JD Vance told the Times of Israel that “The Iranians have agreed to invite IAEA inspectors back into their country,” framing the commitment as a milestone. That claim now sits opposite Iran’s hardened conditionality, not beside it. [E3]",
+    "Washington’s version remains inspection-forward. Vice President JD Vance told the Times of Israel that “The Iranians have agreed to invite IAEA inspectors back into their country,” framing the commitment as a milestone. That claim now sits opposite Iran’s hardened conditionality. [E3]",
     "Tehran’s foreign ministry made the same divide explicit on its own terms, publishing the line “No plans for IAEA inspections of Iran’s nuclear facilities” and tying access to facilities suspended after the US and Israeli attacks to the negotiation outcome. The dispute is therefore not over whether the IAEA matters, but over whether damaged or attacked sites fall inside the present implementation phase. [E4]",
     "OFAC has already issued the relief instrument. The temporary general license authorizes transactions involving Iranian-origin crude oil, petroleum products and petrochemical products through 21 August 2026, while Reuters framed the step as a 60-day license tied to Iran permitting IAEA inspectors. Relief is now visible in the part Washington controls directly, while verification is still being fought over in the part Tehran can delay. [E5]",
     "Lebanon, billed as the framework’s first regional test, moved in the same direction. Israeli Defence Minister Israel Katz said “we are not withdrawing,” Reuters reported that an Israeli drone strike on a car in southern Lebanon killed at least two people on Wednesday, and no public de-confliction-cell meeting produced a stabilizing counterweight. [E6]",
     "Tuesday’s Nabatieh al-Fawqa deaths remain a warning about how fast the test can become an attribution fight. Israel called the dead men Hezbollah terrorists operating under civilian cover; Hezbollah and Lebanese accounts described them as civilians clearing rubble. That dispute now feeds into Wednesday’s harder Israeli line and fresh strike. [E7]",
-    "Rubio’s Gulf trip shows the other half of implementation: allied reassurance, not just Iranian compliance. His pledge that “We’re not going to do anything that undermines the security of our allies” runs beside the inspection dispute, because the framework must now convince regional partners that sanctions relief is not arriving ahead of enforceable limits. [E8]"
+    "Rubio’s Gulf trip shows the other half of implementation: allied reassurance as much as Iranian compliance. His pledge that “We’re not going to do anything that undermines the security of our allies” runs beside the inspection dispute, because the framework must now convince regional partners that sanctions relief is not arriving ahead of enforceable limits. [E8]"
   ],
   "art": {
     "kind": "map",
@@ -42,18 +42,46 @@
         "name": "Inspectors barred from the bombed sites",
         "color": "red",
         "ring": [
-          [35.2, 50.6],
-          [35.2, 52.1],
-          [32.3, 52.0],
-          [32.4, 50.7]
+          [
+            35.2,
+            50.6
+          ],
+          [
+            35.2,
+            52.1
+          ],
+          [
+            32.3,
+            52
+          ],
+          [
+            32.4,
+            50.7
+          ]
         ]
       }
     ],
     "spots": [
-      { "name": "FORDOW", "lat": 34.88, "lon": 50.99 },
-      { "name": "NATANZ", "lat": 33.72, "lon": 51.73 },
-      { "name": "ISFAHAN", "lat": 32.65, "lon": 51.67 },
-      { "name": "BUSHEHR", "lat": 28.83, "lon": 50.89 }
+      {
+        "name": "FORDOW",
+        "lat": 34.88,
+        "lon": 50.99
+      },
+      {
+        "name": "NATANZ",
+        "lat": 33.72,
+        "lon": 51.73
+      },
+      {
+        "name": "ISFAHAN",
+        "lat": 32.65,
+        "lon": 51.67
+      },
+      {
+        "name": "BUSHEHR",
+        "lat": 28.83,
+        "lon": 50.89
+      }
     ]
   },
   "refs": [
