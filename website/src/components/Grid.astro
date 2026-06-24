@@ -47,6 +47,10 @@ const template = cols.map((n) => `${n}fr`).join(' ');
     min-width: 0;
   }
 
+  /* The flashpoint globe is shorter than the index beside it; centre its column
+     vertically so it aligns with the items on the right instead of pinning to the top. */
+  .cns-grid-col:has(.worldglyph) { align-self: center; }
+
   /* No column rule — for art+text rows where a divider reads wrong. */
   .cns-grid-norule > .cns-grid-col { border: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
 

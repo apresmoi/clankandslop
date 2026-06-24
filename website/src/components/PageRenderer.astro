@@ -122,7 +122,10 @@ const items: RenderItem[] = blocks.map((b) => {
   .paper-flow > :global(.watch-compact),
   .paper-flow > :global(.ledger),
   .paper-flow > :global(.splitvote),
-  .paper-flow > :global(.cns-grid) {
+  .paper-flow > :global(.cns-grid),
+  /* A lone news teaser under the fold spans the page rather than sitting in one
+     column with two empties beside it. (We never column-flow multiple teasers.) */
+  .paper-flow > :global(.teaser) {
     column-span: all;
     -webkit-column-span: all;
   }
