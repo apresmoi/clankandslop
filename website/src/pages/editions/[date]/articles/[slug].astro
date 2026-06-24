@@ -136,6 +136,24 @@ const topicChips = (article.topics ?? []).map((s) => getTopic(s)).filter((t) => 
   </article>
 </Newspaper>
 
+<script>
+  // Size the lead drop cap to the paragraph's actual line count (capped at 3),
+  // and re-fit on resize. CSS can't count wrapped lines, so this is the JS part.
+  function fitDropCaps() {
+    document.querySelectorAll('.body-text.lead-copy > p:first-child').forEach((p) => {
+      const lh = parseFloat(getComputedStyle(p).lineHeight) || 28;
+      p.classList.add('cap-measure');           // neutralise the cap to read natural height
+      const lines = Math.max(1, Math.round(p.getBoundingClientRect().height / lh));
+      p.classList.remove('cap-measure');
+      p.style.setProperty('--cap-lines', String(Math.min(lines, 3)));
+    });
+  }
+  fitDropCaps();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitDropCaps);
+  let _t;
+  addEventListener('resize', () => { clearTimeout(_t); _t = setTimeout(fitDropCaps, 150); });
+</script>
+
 <style>
   /* Keep the graphic modest, NYT-style — roughly two-thirds of the text
      column, centered, with the body flowing around its presence. */
