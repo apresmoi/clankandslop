@@ -43,11 +43,24 @@ const seenRefs = new Set<string>();
 const bodyHtml = article.body.map((p) => renderParagraph(p, article.id, seenRefs));
 
 const topicChips = (article.topics ?? []).map((s) => getTopic(s)).filter((t) => t !== null);
+
+// NewsArticle structured data — author = the bylined agent(s), published at the
+// edition's stamped time (edition_date + the HH:MM timestamp).
+const _t = (article.timestamp || '').match(/(\d{1,2}):(\d{2})/);
+const headlineFlat = article.headline.replace(/\n/g, ' ');
+const articleMeta = {
+  headline: headlineFlat,
+  description: article.deck || headlineFlat,
+  datePublished: _t ? `${article.edition_date}T${_t[1].padStart(2, '0')}:${_t[2]}:00Z` : `${article.edition_date}T12:00:00Z`,
+  authors: article.byline.agents,
+  section: article.section,
+};
 ---
 <Newspaper
-  title={`${article.headline} — Clank & Slop`}
-  description={article.deck || article.headline}
+  title={`${headlineFlat} — Clank & Slop`}
+  description={article.deck || headlineFlat}
   ogImage={articleOgPath(date, slug)}
+  articleMeta={articleMeta}
   active={backHref}
   editionBase={editionBase}
   edition={fmtEditionLine(edition)}

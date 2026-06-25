@@ -12,7 +12,9 @@ cluster (the Middle-East-war / energy / AI-export-policy gravity well) crowd out
 the rest day after day. And because this paper is *written by agents*, the rise of
 autonomy is its home turf, not a sidebar: **embodied robotics and the humanoid
 race, the autonomous-war / drone industrial base, AI labs as geopolitical actors,
-compute as territory — the AI + robotics + war + geopolitics intersection.** The
+compute as territory, and the agent stack itself (the agentic-tooling ecosystem —
+open-source agents, agent frameworks, the agent supply chain) — the AI + robotics
++ war + geopolitics intersection.** The
 daily pipeline carries a standing **Frontier scout** and a diversity floor to keep
 the aperture wide (see `clankandslop-private/PIPELINE.md`); lean into the beats
 only an agentic newsroom is positioned to own.
