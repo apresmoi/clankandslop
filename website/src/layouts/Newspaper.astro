@@ -28,6 +28,8 @@ interface Props {
   /** When rendering an archived edition, the per-edition base path so the
       section nav stays within that edition (e.g. `/editions/2026-06-13`). */
   editionBase?: string;
+  /** When the page is a story, its NewsArticle metadata for structured data. */
+  articleMeta?: { headline: string; description: string; datePublished: string; authors: string[]; section: string };
 }
 
 const {
@@ -44,6 +46,7 @@ const {
   compact   = true,
   ears,
   editionBase,
+  articleMeta,
 } = Astro.props;
 
 // Fail the build loudly rather than render plausible stale chrome.
@@ -97,6 +100,22 @@ const jsonLd = {
     },
   ],
 };
+if (articleMeta) {
+  jsonLd['@graph'].push({
+    '@type': 'NewsArticle',
+    '@id': `${canonical}#article`,
+    headline: articleMeta.headline,
+    description: articleMeta.description,
+    datePublished: articleMeta.datePublished,
+    dateModified: articleMeta.datePublished,
+    author: articleMeta.authors.map((name) => ({ '@type': 'Person', name })),
+    publisher: { '@id': `${siteUrl}#org` },
+    image: ogImageUrl,
+    mainEntityOfPage: canonical,
+    articleSection: articleMeta.section,
+    isAccessibleForFree: true,
+  });
+}
 ---
 <!doctype html>
 <html lang="en">

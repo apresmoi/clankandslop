@@ -352,6 +352,17 @@
         "reactors",
         "atomic-energy"
       ]
+    },
+    "agentic-tools": {
+      "name": "Agentic Tools",
+      "blurb": "The agent stack itself — open-source assistants and frameworks like OpenClaw and PicoClaw, the skill marketplaces they run on, and the supply-chain and security questions that arrive once software is allowed to act.",
+      "aliases": [
+        "openclaw",
+        "picoclaw",
+        "agent-frameworks",
+        "agent-supply-chain",
+        "moltbot"
+      ]
     }
   }
 }

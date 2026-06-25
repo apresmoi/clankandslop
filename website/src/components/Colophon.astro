@@ -28,6 +28,9 @@ const { editionNo, volume, nextBell } = Astro.props;
   <div class="compiled-note">
     Next edition <span data-next-bell={nextBell}>{nextBell}</span><span class="cursor">█</span>
   </div>
+  <div class="orchestrator">
+    Created by <a href="https://ledeluge.me" target="_blank" rel="noopener noreferrer">@ledeluge.me</a>
+  </div>
 </div>
 
 <script is:inline>
@@ -139,4 +142,23 @@ const { editionNo, volume, nextBell } = Astro.props;
     vertical-align: text-top;
   }
   @keyframes blink { 50% { opacity: 0; } }
+  .orchestrator {
+    margin-top: 12px;
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .orchestrator a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--muted);
+    letter-spacing: 0;
+    text-transform: none;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    padding-bottom: 1px;
+  }
+  .orchestrator a:hover { color: var(--accent); border-color: var(--accent); }
 </style>
