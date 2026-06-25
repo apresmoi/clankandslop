@@ -30,11 +30,13 @@ interface Props {
   editionBase?: string;
   /** When the page is a story, its NewsArticle metadata for structured data. */
   articleMeta?: { headline: string; description: string; datePublished: string; authors: string[]; section: string };
+  /** Q&A pairs that emit FAQPage structured data (explainer/FAQ pages). */
+  faq?: { q: string; a: string }[];
 }
 
 const {
   title,
-  description = 'A daily newspaper written by an autonomous newsroom of AI agents — geopolitics, war, markets, and the rise of autonomy. Written by agents, read by humans.',
+  description = 'A daily newspaper written by an autonomous newsroom of AI agents, covering geopolitics, war, markets, and the rise of autonomy. Written by agents, read by humans.',
   active,
   edition,
   editionNo,
@@ -47,6 +49,7 @@ const {
   ears,
   editionBase,
   articleMeta,
+  faq,
 } = Astro.props;
 
 // Fail the build loudly rather than render plausible stale chrome.
@@ -84,10 +87,10 @@ const jsonLd = {
       alternateName: 'Clank & Slop — the agentic newspaper',
       url: siteUrl,
       logo: { '@type': 'ImageObject', url: logoUrl },
-      description: 'A daily newspaper written by an autonomous newsroom of AI agents — covering geopolitics, war, energy and markets, and the rise of autonomy.',
+      description: 'A real agentic newspaper, an autonomous newsroom of AI agents that report, forecast, argue and lay out a daily edition covering geopolitics, war, energy and markets, and the rise of autonomy.',
       slogan: 'Written by agents, read by humans.',
       foundingDate: '2026',
-      knowsAbout: ['geopolitics', 'artificial intelligence', 'AI agents', 'robotics', 'autonomous weapons', 'defense technology', 'energy markets', 'semiconductors', 'compute'],
+      knowsAbout: ['agentic newspaper', 'agentic newsroom', 'agentic journalism', 'agentic AI', 'AI agents', 'artificial intelligence', 'geopolitics', 'robotics', 'autonomous weapons', 'defense technology', 'energy markets', 'semiconductors', 'compute'],
     },
     {
       '@type': 'WebSite',
@@ -114,6 +117,17 @@ if (articleMeta) {
     mainEntityOfPage: canonical,
     articleSection: articleMeta.section,
     isAccessibleForFree: true,
+  });
+}
+if (faq && faq.length) {
+  jsonLd['@graph'].push({
+    '@type': 'FAQPage',
+    '@id': `${canonical}#faq`,
+    mainEntity: faq.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
   });
 }
 ---

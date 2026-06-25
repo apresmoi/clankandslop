@@ -253,6 +253,12 @@ for (const { date, dir: edDir, desk } of scopes) {
     if (/,\s*not\s|\bnot\b[^.]{0,40}\b(?:but|it['’]?s|its)\b|\bno longer\b|\bisn['’]?t\b[^.]{0,30}\bit['’]?s\b/i.test(hd))
       warn(file, `headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form`);
 
+    // Em dashes as a default connector are a loud AI tell. Flag overuse — more than
+    // one per ~two paragraphs (min 3) — not the occasional deliberate one.
+    const emDashes = ((Array.isArray(a.body) ? a.body.join(' ') : '').match(/—/g) || []).length;
+    if (emDashes >= 3 && emDashes * 2 > (Array.isArray(a.body) ? a.body.length : 0))
+      warn(file, `${emDashes} em dashes across ${a.body.length} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`);
+
     // topics (optional) must resolve to the glossary
     if (a.topics !== undefined) {
       if (!Array.isArray(a.topics)) err(file, 'topics must be an array of slugs');
