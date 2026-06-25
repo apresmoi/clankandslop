@@ -1,0 +1,182 @@
+{
+  "id": "framework-test",
+  "topics": [
+    "us-iran",
+    "lebanon",
+    "middle-east-war"
+  ],
+  "edition_date": "2026-06-25",
+  "section": "world",
+  "kicker": "The framework two tests",
+  "epistemic": "inference",
+  "headline": "Lake Lucerne reaches the hard part\nInspectors and Lebanon now test the deal",
+  "deck": "Implementation has begun, but the two live tests remain unresolved: nuclear access and the southern Lebanon hand-off.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "body": [
+    "The Lake Lucerne framework has moved from signing language into implementation, and its two hardest tests are now live at once: whether the IAEA can inspect damaged Iranian nuclear sites, and whether Lebanon can absorb a ceasefire mechanism that changes the balance on the ground in the south. [E1]",
+    "Rafael Grossi framed the inspection question as a matter of timing rather than permission, saying, “Whether this happens today, after tomorrow, or in one week, or in 10 days, it’s important but not essential. This is going to happen.” [E1]",
+    "Tehran gave the same question a different gate. Deputy Foreign Minister Kazem Gharibabadi said the issue would “solely be examined and resolved within the framework of a final agreement” with Washington, and tied UN inspections to “the other party’s practical action in terminating all sanctions.” [E2]",
+    "That leaves the verification test unresolved. Grossi’s language asserts supervision as a built-in commitment of the framework, while Iran’s language makes access to the bombed sites contingent on a final deal and sanctions relief first. [E1]",
+    "Lebanon is the second tripwire because the hand-off is now being discussed in operational terms. Israeli and Lebanese negotiators discussed US-backed plans to deploy trained Lebanese Armed Forces personnel to replace Israeli forces in southern “pilot zones,” with potential initial transfers near Beaufort Castle. [E3]",
+    "A new monitoring mechanism would also shift the ceasefire architecture. ISW reported that the United States, Iran, Lebanon, Qatar and Pakistan will oversee ceasefire violations, and assessed that the mechanism “appears to constrain Israeli action against Hezbollah by eliminating the post-2024 Israel-Lebanon ceasefire monitoring mechanism.” [E4]",
+    "Israeli force posture has not stopped while the mechanism forms. ISW reported that the IDF continued limited operations against perceived Hezbollah threats near Ali al Taher, showing that the Lebanon track is still a live security contest rather than a completed withdrawal process. [E4]",
+    "Hormuz adds the regional context for why implementation matters beyond the nuclear file. ISW assessed that “Iran is likely using discussions required by the US-Iran memorandum of understanding (MoU) to reach arrangements with the Gulf states that would allow for sustained Iranian influence around the Strait of Hormuz during the post-war period.” [E5]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "key_numbers": [
+    {
+      "label": "Live implementation tests",
+      "value": "2",
+      "dir": "up"
+    },
+    {
+      "label": "Inspection delay window cited by Grossi",
+      "value": "10 days",
+      "dir": "flat"
+    },
+    {
+      "label": "Lebanon de-confliction participants",
+      "value": "5",
+      "dir": "up"
+    },
+    {
+      "label": "Initial pilot-zone area",
+      "value": "Beaufort Castle",
+      "dir": "flat"
+    },
+    {
+      "label": "Damaged-site access status",
+      "value": "not admitted",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Al Jazeera",
+      "fragment": "“Whether this happens today, after tomorrow, or in one week, or in 10 days, it’s important but not essential. This is going to happen”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.aljazeera.com/news/2026/6/24/un-nuclear-chief-says-iran-inspections-will-happen-tehran-says-after-deal",
+        "retrieved_at": "2026-06-25T18:00:00Z"
+      }
+    },
+    {
+      "source": "Al Jazeera",
+      "fragment": "“solely be examined and resolved within the framework of a final agreement”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.aljazeera.com/news/2026/6/24/un-nuclear-chief-says-iran-inspections-will-happen-tehran-says-after-deal",
+        "retrieved_at": "2026-06-25T18:00:00Z"
+      }
+    },
+    {
+      "source": "ISW",
+      "fragment": "“pilot zones”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://understandingwar.org/research/middle-east/iran-update-special-report-june-24-2026/",
+        "retrieved_at": "2026-06-25T18:00:00Z"
+      }
+    },
+    {
+      "source": "ISW",
+      "fragment": "“appears to constrain Israeli action against Hezbollah by eliminating the post-2024 Israel-Lebanon ceasefire monitoring mechanism”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://understandingwar.org/research/middle-east/iran-update-special-report-june-24-2026/",
+        "retrieved_at": "2026-06-25T18:00:00Z"
+      }
+    },
+    {
+      "source": "ISW",
+      "fragment": "“Iran is likely using discussions required by the US-Iran memorandum of understanding (MoU) to reach arrangements with the Gulf states that would allow for sustained Iranian influence around the Strait of Hormuz during the post-war period.”",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://understandingwar.org/research/middle-east/iran-update-special-report-june-24-2026/",
+        "retrieved_at": "2026-06-25T18:00:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "iran-nuclear",
+    "hero_map": "iran-nuclear",
+    "title": "The sites in dispute",
+    "caption": "Implementation is moving while verification stalls: the IAEA chief says the inspections are coming regardless of timing, but Tehran ties any access to the bombed Fordow, Natanz and Isfahan sites to a final agreement and to sanctions being lifted first · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "overlays": [
+      {
+        "name": "Inspectors barred from the bombed sites",
+        "color": "red",
+        "ring": [
+          [
+            35.2,
+            50.6
+          ],
+          [
+            35.2,
+            52.1
+          ],
+          [
+            32.3,
+            52
+          ],
+          [
+            32.4,
+            50.7
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "FORDOW",
+        "lat": 34.88,
+        "lon": 50.99
+      },
+      {
+        "name": "NATANZ",
+        "lat": 33.72,
+        "lon": 51.73
+      },
+      {
+        "name": "ISFAHAN",
+        "lat": 32.65,
+        "lon": 51.67
+      },
+      {
+        "name": "BUSHEHR",
+        "lat": 28.83,
+        "lon": 50.89
+      }
+    ]
+  }
+}
