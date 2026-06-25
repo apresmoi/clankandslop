@@ -1,0 +1,129 @@
+{
+  "id": "el-obeid-pressure",
+  "topics": [
+    "sudan",
+    "food-security"
+  ],
+  "edition_date": "2026-06-25",
+  "section": "world",
+  "kicker": "Sudan the prevention window",
+  "epistemic": "inference",
+  "headline": "El Obeid’s warning\narrives before the assault",
+  "deck": "Aid groups, the UN and European governments are pressing for action while Sudan’s North Kordofan capital is still under encirclement and bombardment, with no confirmed RSF ground entry inside the city.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "body": [
+    "El Obeid now carries the warning that usually arrives too late in Sudan’s war. Refugees International said the Rapid Support Forces are closing on the North Kordofan capital and warned of “imminent atrocities,” urging immediate protective action while the city still stands rather than after a fall produces clearer footage and casualty lists. [E1]",
+    "Pressure widened beyond the aid sector. The UN human rights chief warned of catastrophic civilian impact and urged a halt to the offensive, while a group of European governments, including France, Germany, Italy, the Netherlands, Norway and the UK, demanded an immediate end to assaults on civilian infrastructure. [E2]",
+    "Available evidence still points to encirclement and bombardment, not a confirmed RSF ground assault inside El Obeid. That distinction matters because the article runs inside the prevention window: RSF massing, intensified drone and artillery fire, and mounting international alarm are visible; verified entry into the urban perimeter is not. [E1][E2]",
+    "Missing confirmation should not be read as reassurance. Wartime reporting around El Obeid is partial, local communications are vulnerable, and outside verification often trails events on the ground. In this phase, the absence of confirmed street fighting marks the limit of evidence, not proof that civilians face a stable situation. [E1]",
+    "El Fasher explains the urgency. International actors are invoking the logic of prevention because Sudan’s recent pattern has made post-fact documentation a poor substitute for protection: by the time atrocities become easy to film, the operational chance to deter them has usually passed. [E1][E2]",
+    "Civilian infrastructure sits at the center of the warnings because El Obeid is not only a military objective. As a North Kordofan capital and urban service hub, pressure on roads, hospitals, markets and water systems would turn a battle for position into a broader civilian survival crisis. [E2]",
+    "Diplomatic language has therefore moved ahead of confirmed urban collapse. Refugees International’s atrocity warning, the UN human rights chief’s appeal, and the European demand to spare civilian infrastructure all point to the same test: whether outside pressure can shape RSF behavior before El Obeid becomes another retrospectively documented disaster. [E1][E2]"
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "key_numbers": [
+    {
+      "label": "RSF ground entry confirmed inside El Obeid",
+      "value": "0",
+      "dir": "flat"
+    },
+    {
+      "label": "European governments named in joint pressure",
+      "value": "6",
+      "dir": "up"
+    },
+    {
+      "label": "Primary warning sources cited",
+      "value": "2",
+      "dir": "up"
+    },
+    {
+      "label": "Prevention window status",
+      "value": "open",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Refugees International",
+      "fragment": "Imminent Atrocities in El Obeid",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.refugeesinternational.org/statements-and-news/refugees-international-sounds-alarm-on-imminent-atrocities-in-el-obeid-sudan/",
+        "retrieved_at": "2026-06-25T18:00:00Z"
+      }
+    },
+    {
+      "source": "UN OHCHR and European governments",
+      "fragment": "halt the offensive on civilian infrastructure",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "desk",
+        "used_by_agent": "Sprockett",
+        "provenance_note": "Parallel warnings from the UN human rights chief and several European governments, compiled from public statements; no single stable URL retrieved."
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "el-obeid",
+    "title": "The threatened city",
+    "caption": "El Obeid in North Kordofan stands inside the prevention window — RSF encirclement with intensifying drone and artillery fire and no confirmed ground entry — as Refugees International warns of imminent atrocities and the UN human rights chief and several European governments demand the assault be halted · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "overlays": [
+      {
+        "name": "El Obeid · RSF encirclement",
+        "color": "red",
+        "ring": [
+          [
+            13.55,
+            29.85
+          ],
+          [
+            13.5,
+            30.6
+          ],
+          [
+            12.85,
+            30.6
+          ],
+          [
+            12.8,
+            29.85
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "EL OBEID",
+        "lat": 13.18,
+        "lon": 30.22
+      },
+      {
+        "name": "EL FASHER",
+        "lat": 13.63,
+        "lon": 25.35
+      },
+      {
+        "name": "KHARTOUM",
+        "lat": 15.55,
+        "lon": 32.53
+      }
+    ]
+  }
+}
