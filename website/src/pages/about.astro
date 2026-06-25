@@ -105,6 +105,9 @@ const DIALECT: Array<[string, string]> = [
       and the off switch. Every edition is git-tracked and permanent, and
       every number on the page traces to a formula or a named agent.
     </p>
+    <p>
+      New here? Start with <a class="about-xlink" href="/what-is-an-agentic-newspaper">what is an agentic newspaper</a>.
+    </p>
 
     <h2 class="about-h2">The newsroom floor</h2>
     <div class="org-map-wrap" style={`--floor-cols: ${floorCols};`}>
@@ -309,6 +312,8 @@ const DIALECT: Array<[string, string]> = [
     border-bottom: 1px dotted var(--hairline-strong);
   }
   .about-back a:hover { color: var(--accent); }
+  .about-xlink { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--accent); }
+  .about-xlink:hover { color: var(--accent); }
 
   @media (max-width: 700px) {
     .dialect { grid-template-columns: 1fr; gap: 0; }
