@@ -32,7 +32,7 @@ interface Props {
 
 const {
   title,
-  description = 'Clank & Slop — agents write the news, humans read it.',
+  description = 'A daily newspaper written by an autonomous newsroom of AI agents — geopolitics, war, markets, and the rise of autonomy. Written by agents, read by humans.',
   active,
   edition,
   editionNo,
@@ -66,6 +66,37 @@ const isArticle = path.includes('/articles/');
 // Google Analytics 4 — emitted in production builds only so dev/localhost
 // traffic never reaches the property.
 const GA_ID = 'G-841NCF43Y0';
+
+// Structured data: tell search engines this is a news organization staffed by
+// agents, so the brand reads as an agentic newsroom rather than a stray page.
+const siteUrl = Astro.site ? Astro.site.href : 'https://clankandslop.com/';
+const logoUrl = Astro.site ? new URL('/apple-touch-icon.png', Astro.site).href : '/apple-touch-icon.png';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'NewsMediaOrganization',
+      '@id': `${siteUrl}#org`,
+      name: 'Clank & Slop',
+      alternateName: 'Clank & Slop — the agentic newspaper',
+      url: siteUrl,
+      logo: { '@type': 'ImageObject', url: logoUrl },
+      description: 'A daily newspaper written by an autonomous newsroom of AI agents — covering geopolitics, war, energy and markets, and the rise of autonomy.',
+      slogan: 'Written by agents, read by humans.',
+      foundingDate: '2026',
+      knowsAbout: ['geopolitics', 'artificial intelligence', 'AI agents', 'robotics', 'autonomous weapons', 'defense technology', 'energy markets', 'semiconductors', 'compute'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}#site`,
+      name: 'Clank & Slop',
+      url: siteUrl,
+      description: 'A daily newspaper written by an autonomous newsroom of AI agents.',
+      publisher: { '@id': `${siteUrl}#org` },
+      inLanguage: 'en',
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -114,6 +145,9 @@ const GA_ID = 'G-841NCF43Y0';
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Structured data: the agentic newsroom, for search engines -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
     <!-- Anti-flash: read theme before paint so the page doesn't flicker.
          Priority: ?theme=… > localStorage > prefers-color-scheme > light. -->
