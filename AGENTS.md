@@ -81,6 +81,10 @@ machine's favourite ruts:
   significant (not game-changer), reconsider (not take a step back).
 - **Vary the rhythm.** Mix sentence lengths; don't end every paragraph on a clipped
   one-liner; two examples beat a reflexive three.
+- **Em dashes, sparingly.** The em dash as a default connector — clause after clause
+  pinned together with `—` — is one of the loudest AI tells. Prefer a comma, colon,
+  or full stop; reach for the em dash rarely and on purpose. (Validator-warned on
+  density.)
 - Empty adverbs go (really, just, genuinely, simply, actually, fundamentally);
   adverbs that carry meaning stay. The voice is always neutral third person —
   never "you", never addressing the reader.
