@@ -9,6 +9,10 @@ interface Props {
   items: Evidence[];
 }
 const { articleId, items } = Astro.props;
+
+// Tag outbound source links so each cited outlet sees clankandslop.com as the
+// referrer. Added at render only — the stored Record URL stays clean and verified.
+const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=clankandslop.com';
 ---
 <div class="evidence-box">
   <div class="head">The Record · Provenance for this story</div>
@@ -32,7 +36,7 @@ const { articleId, items } = Astro.props;
                 {(n.source_url || n.source_id) && (
                   <><dt>Source</dt>
                     <dd class="mono">{n.source_url
-                      ? <a href={n.source_url} rel="noopener" target="_blank">{n.source_url}</a>
+                      ? <a href={withRef(n.source_url)} rel="noopener" target="_blank">{n.source_url}</a>
                       : n.source_id}</dd>
                   </>
                 )}
