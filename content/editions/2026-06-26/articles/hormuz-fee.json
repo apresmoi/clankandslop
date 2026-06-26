@@ -1,0 +1,125 @@
+{
+  "id": "hormuz-fee",
+  "topics": [
+    "strait-of-hormuz",
+    "oil",
+    "maritime-security"
+  ],
+  "edition_date": "2026-06-26",
+  "section": "markets",
+  "kicker": "Hormuz on administered terms",
+  "epistemic": "inference",
+  "headline": "The strait reopens\non Tehran’s terms",
+  "deck": "Tanker movements through the Strait of Hormuz are increasing under constraints set by Tehran, with the Islamic Revolutionary Guard Corps rejecting unauthorized paths and signaling that future transit charges will follow a temporary fee waiver.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "hormuz-strait",
+    "title": "The administered strait",
+    "caption": "Key locations in the Strait of Hormuz under Iranian oversight · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.57,
+        "lon": 56.25
+      },
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.28
+      },
+      {
+        "name": "FUJAIRAH",
+        "lat": 25.12,
+        "lon": 56.33
+      }
+    ]
+  },
+  "body": [
+    "Shipping volumes in the Strait of Hormuz climbed from recent lows as the strait reopens, though daily crossings remain well short of pre-war levels and follow Iranian directives.",
+    "Iranian forces rejected an alternative transit path announced without their involvement. The Islamic Revolutionary Guard Corps declared that only routes it designates hold authorization, and it warned vessels to maintain contact with its navy. [E1]",
+    "This stance converts the gradual return of traffic into a demonstration of control rather than a return to open passage.",
+    "Tehran suspended planned transit fees for a 60-day period while negotiations continue. [E2]",
+    "Its chief negotiator indicated that the strait will not revert to its previous operating model, which points to the introduction of charges once the current window closes.",
+    "Brent crude settled at $72.24 per barrel on Thursday, the lowest price since before the Iran-related conflict erupted, though the benchmark stays above its pre-war level near $66. The war premium continues to erode as physical flows improve.",
+    "Roughly 70 vessels transited the strait on Wednesday compared with a normal pre-war range of 120 to 140 per day. The partial rebound therefore unfolds on administered terms that preserve Iranian leverage over this critical oil artery. [E3]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent (Thu close)",
+      "value": "$72.24",
+      "dir": "down"
+    },
+    {
+      "label": "Wednesday tanker crossings",
+      "value": "70 vessels",
+      "dir": "up"
+    },
+    {
+      "label": "Pre-war daily norm",
+      "value": "120-140 vessels",
+      "dir": "flat"
+    },
+    {
+      "label": "Transit fee waiver",
+      "value": "60 days",
+      "dir": "flat"
+    },
+    {
+      "label": "Pre-war Brent",
+      "value": "~$66",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Al Jazeera",
+      "fragment": "Certain authorities have announced a new shipping route through the Strait of Hormuz without prior notification to or coordination with the Islamic Republic of Iran. The proposed route is unacceptable and poses serious safety risks. The only authorised transit routes through the Strait of Hormuz are those designated by the Islamic Republic of Iran. Ships must stay in contact with the IRGC Navy.",
+      "as_of": "25 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aljazeera.com/news/2026/6/25/irgc-warns-against-new-hormuz-route-for-ships-what-we-know",
+        "retrieved_at": "2026-06-26T18:00:00Z"
+      }
+    },
+    {
+      "source": "Al Jazeera",
+      "fragment": "Iran said it would waive planned fees for 60 days during negotiations, and its chief negotiator signaled \"Hormuz will never return\" to its pre-war status, suggesting charges may follow once talks conclude.",
+      "as_of": "25 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aljazeera.com/news/2026/6/25/irgc-warns-against-new-hormuz-route-for-ships-what-we-know",
+        "retrieved_at": "2026-06-26T18:00:00Z"
+      }
+    },
+    {
+      "source": "Al Jazeera",
+      "fragment": "about 70 vessels crossed on Wednesday against a pre-war norm of 120-140 daily; Brent fell to $72.24 on Thursday, its lowest since before the Iran war, though still above the pre-war $66.",
+      "as_of": "25 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aljazeera.com/news/2026/6/25/irgc-warns-against-new-hormuz-route-for-ships-what-we-know",
+        "retrieved_at": "2026-06-26T18:00:00Z"
+      }
+    }
+  ]
+}
