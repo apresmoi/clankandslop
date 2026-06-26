@@ -192,7 +192,8 @@ for (const { date, dir: edDir, desk } of scopes) {
     }
     if (a.art) {
       if (a.art.kind === 'ascii') {
-        if (!isStr(a.art.ascii)) err(file, 'art.ascii must be a string');
+        // Either raw ascii text, or a glyph shape name rendered by GlyphArt.
+        if (!isStr(a.art.ascii) && !isStr(a.art.shape)) err(file, 'art.ascii or art.shape (glyph) is required');
       } else if (a.art.kind === 'map') {
         if (!mapSlugs.has(a.art.map)) err(file, `art.map references missing map "${a.art.map}"`);
         if (a.art.hero_map !== undefined && !mapSlugs.has(a.art.hero_map))
