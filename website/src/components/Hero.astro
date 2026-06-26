@@ -1,6 +1,7 @@
 ---
 import Teaser from './Teaser.astro';
 import MapGlyph from './MapGlyph.astro';
+import GlyphArt from './GlyphArt.astro';
 import { loadMap, type Article } from '../lib/edition.ts';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 const { variant = 'lead-rail', lead, rail = [], splitWith, withArt = false } = Astro.props;
 const mapArt = lead.art?.kind === 'map' ? lead.art : null;
 const heroMap = mapArt ? loadMap(lead.edition_date, mapArt.hero_map ?? mapArt.map) : null;
+const glyphArt = lead.art?.kind === 'ascii' && lead.art.shape ? lead.art : null;
 ---
 {variant === 'lead-rail' && (
   <div class="hero-grid">
@@ -47,7 +49,12 @@ const heroMap = mapArt ? loadMap(lead.edition_date, mapArt.hero_map ?? mapArt.ma
         <div class="hero-art-caption">▲ {mapArt.caption}</div>
       </div>
     )}
-    {withArt && !mapArt && (
+    {withArt && !mapArt && glyphArt && (
+      <div class="hero-art hero-art-glyph">
+        <GlyphArt shape={glyphArt.shape} caption={glyphArt.caption} />
+      </div>
+    )}
+    {withArt && !mapArt && !glyphArt && (
       <div class="hero-art" aria-hidden="true">
         <pre>{`╔══════════════════════╗
 ║  ▒▒▒▒░░░░    ░░░░▒▒  ║
@@ -160,6 +167,9 @@ const heroMap = mapArt ? loadMap(lead.edition_date, mapArt.hero_map ?? mapArt.ma
     border-top: none;
     padding-top: 0;
   }
+  /* A glyph hero needs no column rule either — the art and caption are the element. */
+  .hero-art.hero-art-glyph { border-right: none; }
+  .hero-art-glyph :global(.glyphart) { width: 100%; }
   .hero-grid-art .hero-lead {
     padding: 32px 4px 36px 36px;
   }
