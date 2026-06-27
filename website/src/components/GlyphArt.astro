@@ -14,15 +14,40 @@ import pumpjackAscii from '../data/glyphart-pumpjack.txt?raw';
 import missileAscii from '../data/glyphart-missile.txt?raw';
 import droneAscii from '../data/glyphart-drone.txt?raw';
 import chipAscii from '../data/glyphart-chip.txt?raw';
+// Animated "roll" glyphs compile from a committed 3D model at BUILD time
+// (src/models/*.glb → glyphcss compileScene), then cycle with a pure-CSS
+// steps() film-strip (zero JS). The model is the source of truth — nothing is
+// pre-baked or committed as output, same pattern as MapGlyph/WorldGlyph.
+import { bakeRoll } from '../lib/glyphRoll.ts';
+import { join } from 'node:path';
 
 interface Props {
-  shape: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip';
+  shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip';
+  /** When set, render an animated rotating glyph instead of a static shape. */
+  roll?: 'chip';
   caption?: string;
 }
-const { shape, caption = '' } = Astro.props;
+const { shape, roll, caption = '' } = Astro.props;
+
+const ROLLS: Record<string, { model: string; opts: Parameters<typeof bakeRoll>[1] }> = {
+  chip: { model: 'small-microchip.glb', opts: { rotX: 48, frames: 60, zoom: 9, cols: 60, rows: 26, dur: 10 } },
+};
+const cfg = roll ? ROLLS[roll] : null;
+const r = cfg ? await bakeRoll(join(process.cwd(), 'src/models', cfg.model), cfg.opts) : null;
+let rollHtml = '', rRows = 0, rCols = 0, rFrames = 0, rScroll = 0;
+const rAlt = !!(r && r.alternate);   // ping-pong (rock) vs continuous loop (spin)
+const rDur = (r && r.dur) || 9;      // seconds for one full rotation (frame-count-independent)
+if (r) {
+  rollHtml = r.html;
+  rFrames = r.frames;
+  rRows = Math.round(r.frameH / r.fontPx);          // rows per frame
+  rScroll = rFrames * rRows;                         // translateY in em
+  const firstFrame = r.html.replace(/<[^>]+>/g, '').split('\n').slice(0, rRows);
+  rCols = Math.max(...firstFrame.map((l: string) => l.length));
+}
 
 const sources: Record<string, string> = { colosseum: coliseumAscii, play: playAscii, notfound: notFoundAscii, satellite: satelliteAscii, pumpjack: pumpjackAscii, missile: missileAscii, drone: droneAscii, chip: chipAscii };
-const art = (sources[shape] ?? coliseumAscii).replace(/\n+$/, '');
+const art = (sources[shape ?? 'colosseum'] ?? coliseumAscii).replace(/\n+$/, '');
 // When baked with useColors:true the art is HTML (color spans); else plain text.
 // Size from the VISIBLE glyphs (tags stripped) so the cols/rows math is right.
 const isColor = art.includes('<span');
@@ -31,6 +56,15 @@ const lines = plain.split('\n');
 const cols = Math.max(...lines.map((l) => l.length));
 const rows = lines.length;
 ---
+{r ? (
+<figure class={`glyphart glyphart-roll${rAlt ? ' glyphart-rock' : ''}`} style={`--cols:${rCols};--rows:${rRows};--frames:${rFrames};--scroll:${rScroll};--dur:${rDur};`}>
+  <div class="glyphart-stage"><Fragment set:html={rollHtml} /></div>
+  <figcaption class="glyphart-caption">
+    {caption && <span class="glyphart-name">{caption}</span>}
+    <a class="glyphart-credit" href="https://glyphcss.com" target="_blank" rel="noopener">glyphcss.com</a>
+  </figcaption>
+</figure>
+) : (
 <figure class={`glyphart glyphart-${shape}${isColor ? ' glyphart-color' : ''}`} style={`--cols:${cols};--rows:${rows};`}>
   <div class="glyphart-stage">
     {isColor ? <pre class="glyphart-pre" set:html={art} /> : <pre class="glyphart-pre">{art}</pre>}
@@ -40,6 +74,7 @@ const rows = lines.length;
     <a class="glyphart-credit" href="https://glyphcss.com" target="_blank" rel="noopener">glyphcss.com</a>
   </figcaption>
 </figure>
+)}
 
 <style>
   .glyphart { margin: 0; height: 100%; display: flex; flex-direction: column; }
@@ -96,4 +131,38 @@ const rows = lines.length;
     text-decoration: none;
   }
   .glyphart-credit:hover { color: var(--accent); opacity: 1; }
+
+  /* Animated roll glyph — a pure-CSS steps() film-strip of baked frames (zero JS).
+     The bake's px geometry is re-expressed in em so it scales with the responsive
+     font-size, exactly like the static glyphs. */
+  .glyphart-roll :global(.glyph-roll) {
+    /* Mobile/stacked: don't span the whole column — ~70% reads better. Desktop
+       has its own size override below. */
+    font-size: calc(70cqw / (var(--cols) * 0.6));
+    line-height: 1;
+    height: calc(var(--rows) * 1em);
+    width: fit-content;
+    margin: auto;
+    overflow: hidden;
+  }
+  .glyphart-roll :global(.glyph-output) {
+    margin: 0;
+    white-space: pre;
+    font-family: var(--font-mono);
+    line-height: 1;
+    color: var(--ink-soft);
+    animation: glyphart-roll calc(var(--dur, 9) * 1s) steps(var(--frames)) infinite;
+  }
+  .glyphart-roll :global(.glyph-output span) { color: inherit; }
+  @keyframes glyphart-roll { to { transform: translateY(calc(var(--scroll) * -1em)); } }
+  /* Rock glyphs ping-pong the arc (flat objects can't spin a full circle cleanly).
+     Keep the steps() timing from the base rule — only reverse each cycle. Setting
+     a non-steps timing-function here would interpolate and make it scroll. */
+  .glyphart-roll.glyphart-rock :global(.glyph-output) { animation-direction: alternate; }
+  @media (min-width: 880px) {
+    .glyphart-roll :global(.glyph-roll) {
+      font-size: min(calc(100cqw / (var(--cols) * 0.62)), calc(100cqh / (var(--rows) + 1)));
+    }
+  }
+  :global([data-theme="light"]) .glyphart-roll :global(.glyph-output) { font-weight: 700; }
 </style>

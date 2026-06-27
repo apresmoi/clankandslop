@@ -5,47 +5,133 @@
   "active": "/",
   "tagline": null,
   "head": [
-    { "block": "Hero", "props": { "variant": "lead-only", "withArt": true, "lead": "iran-strikes" } },
+    {
+      "block": "Hero",
+      "props": {
+        "variant": "lead-only",
+        "withArt": true,
+        "lead": "iran-strikes"
+      }
+    },
     {
       "block": "Grid",
       "props": {
-        "cols": [2, 1],
+        "cols": [
+          2,
+          1
+        ],
         "rule": false,
         "align": "stretch",
         "columns": [
-          [ { "block": "Teaser", "props": { "article": "agent-stack-week", "size": "feature" } } ],
-          [ { "block": "GlyphArt", "props": { "shape": "chip", "caption": "The open agent layer acquires institutions" } } ]
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "agent-stack-week",
+                "size": "feature"
+              }
+            }
+          ],
+          [
+            {
+              "block": "GlyphArt",
+              "props": {
+                "caption": "The open agent layer acquires institutions",
+                "roll": "chip"
+              }
+            }
+          ]
         ]
       }
     },
     {
       "block": "Grid",
       "props": {
-        "cols": [1, 1, 1],
+        "cols": [
+          1,
+          1,
+          1
+        ],
         "columns": [
-          [ { "block": "Teaser", "props": { "article": "lebanon-framework", "size": "flow" } } ],
-          [ { "block": "Teaser", "props": { "article": "el-obeid-window", "size": "flow" } } ],
-          [ { "block": "Teaser", "props": { "article": "humanoids-factory", "size": "flow" } } ]
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "lebanon-framework",
+                "size": "flow"
+              }
+            }
+          ],
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "el-obeid-window",
+                "size": "flow"
+              }
+            }
+          ],
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "humanoids-factory",
+                "size": "flow"
+              }
+            }
+          ]
         ]
       }
     },
-    { "block": "SectionHeader", "props": { "text": "The Flashpoint Index" } },
+    {
+      "block": "SectionHeader",
+      "props": {
+        "text": "The Flashpoint Index"
+      }
+    },
     {
       "block": "Grid",
       "props": {
-        "cols": [1, 1],
+        "cols": [
+          1,
+          1
+        ],
         "columns": [
           [
             {
               "block": "WorldGlyph",
               "props": {
-                "cols": 84, "rows": 40, "rotX": 1.25, "rotY": 1.05, "worldDesk": "edition",
+                "cols": 84,
+                "rows": 40,
+                "rotX": 1.25,
+                "rotY": 1.05,
+                "worldDesk": "edition",
                 "hotspots": [
-                  { "name": "HORMUZ", "lat": 26.6, "lon": 56.3 },
-                  { "name": "IRAN", "lat": 32.0, "lon": 53.0 },
-                  { "name": "S. LEBANON", "lat": 33.3, "lon": 35.4 },
-                  { "name": "EL OBEID", "lat": 13.18, "lon": 30.22 },
-                  { "name": "TAIWAN", "lat": 23.8, "lon": 121.0 }
+                  {
+                    "name": "HORMUZ",
+                    "lat": 26.6,
+                    "lon": 56.3
+                  },
+                  {
+                    "name": "IRAN",
+                    "lat": 32,
+                    "lon": 53
+                  },
+                  {
+                    "name": "S. LEBANON",
+                    "lat": 33.3,
+                    "lon": 35.4
+                  },
+                  {
+                    "name": "EL OBEID",
+                    "lat": 13.18,
+                    "lon": 30.22
+                  },
+                  {
+                    "name": "TAIWAN",
+                    "lat": 23.8,
+                    "lon": 121
+                  }
                 ]
               }
             }
@@ -82,7 +168,12 @@
     }
   ],
   "flow": [
-    { "block": "SectionHeader", "props": { "text": "Briefly Noted" } },
+    {
+      "block": "SectionHeader",
+      "props": {
+        "text": "Briefly Noted"
+      }
+    },
     {
       "block": "Briefly",
       "props": {
