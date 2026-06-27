@@ -1,0 +1,155 @@
+{
+  "id": "iran-strikes",
+  "topics": [
+    "us-iran",
+    "middle-east-war",
+    "strait-of-hormuz"
+  ],
+  "edition_date": "2026-06-27",
+  "section": "world",
+  "kicker": "The ceasefire under fire",
+  "epistemic": "fact",
+  "headline": "A drone, then a strike\nthe truce holds by a thread",
+  "deck": "Limited US strikes answered an Iranian drone hit on a Singapore-flagged boxship. Neither side reported casualties, and neither side claimed the nuclear file was in play. The exchange still shows how little margin the truce has left.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "hormuz-strait",
+    "title": "Where the exchange happened",
+    "caption": "Thursday’s drone strike and Friday’s retaliatory hits clustered around the Strait of Hormuz and Iran’s southern coast · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.57,
+        "lon": 56.25
+      },
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.28
+      },
+      {
+        "name": "DAHIT (OMAN)",
+        "lat": 24.5,
+        "lon": 56.62
+      }
+    ]
+  },
+  "body": [
+    "Washington answered an Iranian drone strike on commercial traffic in the Strait of Hormuz with a calibrated military reply, testing whether the Lake Lucerne ceasefire can absorb provocation without collapsing into a wider war. U.S. Central Command said its forces “conducted strikes against Iran, June 26, as a powerful response to yesterday’s attack on a commercial ship that was transiting the Strait of Hormuz,” naming Iranian “missile and drone storage facilities and radar sites” as the targets [E1].",
+    "Thursday’s incident centered on the Ever Lovely, a Singapore-flagged container vessel hit “7.5 nautical miles south-east of Oman’s port of Dahit.” Evergreen, the owner, said “All crew members remain safe as does the vessel itself and all cargo” [E3]. No casualties were reported on either side of the subsequent US action, and neither government framed the weekend’s violence as an opening move against nuclear infrastructure.",
+    "CENTCOM cast Iran’s move as a direct breach of the truce. “The unwarranted aggression against commercial shipping by Iranian forces clearly violated the ceasefire,” the command said [E2]. That framing matters: the US is not treating Hormuz as a separate lane where tankers and boxships sail outside diplomatic commitments signed at Lake Lucerne.",
+    "President Trump, posting on Truth Social, called the drone hit “Obviously … a foolish violation of our Ceasefire Agreement” [E4]. Vice President Vance sharpened the deterrence message on X, insisting “Iran signed a ceasefire agreement. We have honored it” and adding that disagreements over how the memorandum of understanding is applied should be handled by phone, not ordnance: “But violence will be met with violence” [E5].",
+    "Iran’s Islamic Revolutionary Guard Corps pushed back through state-linked channels quoted by BBC, branding Washington “the treaty-breaking US regime” and warning that “If the aggression is repeated our response will be more extensive than this” [E6]. Tehran thus accepts the exchange as reciprocal while reserving room to escalate if US strikes continue.",
+    "Analysts reading the sequence see limited strikes by design. Storage sites and coastal radar fit a pattern of disabling launch and tracking capacity without touching the nuclear portfolio that dominated earlier phases of the crisis. On paper, the ceasefire still holds: both capitals reaffirm the agreement even as they accuse each other of breaking it.",
+    "Shipping markets will watch whether insurers and charterers treat Hormuz as a resumed war zone or a corridor where violence is episodic. Crew safety on the Ever Lovely suggests the Iranian hit was meant to signal reach and resolve, not to sink a hull. Yet each cycle of strike and counterstrike narrows the diplomatic space Vance described as a phone call away.",
+    "For now the Lake Lucerne framework survives its first major stress test in the Gulf: limited blows, loud rhetoric, no body count. Whether that equilibrium lasts depends on whether “more extensive” IRGC language stays rhetorical or becomes the next night’s operational plan [E6]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "key_numbers": [
+    {
+      "label": "Distance from Dahit (Oman) where Ever Lovely was struck",
+      "value": "7.5 nautical miles SE",
+      "dir": "flat"
+    },
+    {
+      "label": "US strike date (response)",
+      "value": "26 June",
+      "dir": "flat"
+    },
+    {
+      "label": "Reported casualties (both sides)",
+      "value": "0",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "CENTCOM",
+      "fragment": "conducted strikes against Iran, June 26, as a powerful response to yesterday's attack on a commercial ship",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.cbsnews.com/news/us-strikes-iran-drone-attack-cargo-ship-challenge-ceasefire-trump/",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    },
+    {
+      "source": "CENTCOM",
+      "fragment": "clearly violated the ceasefire",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.cbsnews.com/news/us-strikes-iran-drone-attack-cargo-ship-challenge-ceasefire-trump/",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    },
+    {
+      "source": "BBC / Evergreen",
+      "fragment": "All crew members remain safe as does the vessel itself and all cargo",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.bbc.com/news/articles/ckg54g0ry0vo",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    },
+    {
+      "source": "Trump (Truth Social)",
+      "fragment": "foolish violation of our Ceasefire Agreement",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.bbc.com/news/articles/ckg54g0ry0vo",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    },
+    {
+      "source": "Vance (X)",
+      "fragment": "violence will be met with violence",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.cbsnews.com/news/us-strikes-iran-drone-attack-cargo-ship-challenge-ceasefire-trump/",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    },
+    {
+      "source": "IRGC (via BBC)",
+      "fragment": "If the aggression is repeated our response will be more extensive than this",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.bbc.com/news/articles/ckg590wqxwpo",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    }
+  ]
+}

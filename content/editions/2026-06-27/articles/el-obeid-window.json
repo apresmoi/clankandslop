@@ -1,0 +1,125 @@
+{
+  "id": "el-obeid-window",
+  "topics": [
+    "sudan",
+    "food-security"
+  ],
+  "edition_date": "2026-06-27",
+  "section": "world",
+  "kicker": "Sudan the prevention window",
+  "epistemic": "inference",
+  "headline": "El Obeid still inside the prevention window\nas drones strike and reinforcements mass",
+  "deck": "North Kordofan's capital faces sustained air attack and a tightening RSF ring; the Security Council has flagged imminent atrocity risk, yet no verified urban ground assault has been confirmed.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "el-obeid",
+    "title": "The threatened city",
+    "caption": "El Obeid sits at the hinge between Khartoum's war economy and western Sudan's famine corridors; reported drone strikes and RSF build-up keep the city inside an active prevention window rather than a post-atrocity accounting. · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "overlays": [
+      {
+        "name": "El Obeid · imminent-risk warning",
+        "color": "red",
+        "ring": [
+          [
+            13.55,
+            29.85
+          ],
+          [
+            13.5,
+            30.6
+          ],
+          [
+            12.85,
+            30.6
+          ],
+          [
+            12.8,
+            29.85
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "EL OBEID",
+        "lat": 13.18,
+        "lon": 30.22
+      },
+      {
+        "name": "EL FASHER",
+        "lat": 13.63,
+        "lon": 25.35
+      },
+      {
+        "name": "KHARTOUM",
+        "lat": 15.55,
+        "lon": 32.53
+      }
+    ]
+  },
+  "body": [
+    "UN Security Council members, speaking through President Leonor Zalabata Torres on 20 June, said the body “expressed concern at the imminent risk of mass atrocities” and recorded “substantial military reinforcements by the Rapid Support Forces (RSF) around El Obeid,” the North Kordofan capital that has become a second focal point after the siege logic tested at El Fasher. [E1]",
+    "Drone attacks on El Obeid are endangering civilians and essential services, UN humanitarian officials warned in parallel reporting, which extends the Council's atrocity-risk language into daily damage to power, water, and movement inside the city. [E2]",
+    "Ground forces may be closing the ring, but open-source and agency reporting still describe reinforcement and air attack rather than a confirmed RSF entry into El Obeid's urban core. That gap is a limit of wartime evidence, not a signal that the prevention window has closed: massing and bombardment can precede street fighting by days, and absence of verified entry leaves protective action on the wrong side of the warning curve.",
+    "Council language places El Obeid inside the interval where diplomats still speak of “imminent” harm rather than documenting completed mass killing, which is the bureaucratic name for a window that closes only when violence crosses a threshold observers can no longer dispute. Reinforcement maps and strike logs already meet the Council's concern threshold on paper; what lags is enforcement. [E1]",
+    "Diplomats demanded that the parties “immediately halt the fighting” and called on all sides to “allow and facilitate safe and unhindered humanitarian access,” the standard pair of asks that follow atrocity-risk statements when corridors and pauses remain unrealized. [E1]",
+    "Humanitarian officials tie drone strikes to services civilians need to survive siege conditions, which makes air attack a food-security and public-health story as much as a battlefield one. [E2]",
+    "Taken together, the verified picture is a capital under air pressure with RSF weight building on the perimeter while the Security Council's prevention vocabulary outruns what belligerents or protectors have done on the ground. Until entry is confirmed or a sustained halt holds, El Obeid stays classified here as inside the window, with protective action still trailing the warning."
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "key_numbers": [
+    {
+      "label": "Security Council atrocity-risk statement",
+      "value": "20 Jun",
+      "dir": "up"
+    },
+    {
+      "label": "Confirmed RSF urban entry (El Obeid)",
+      "value": "unverified",
+      "dir": "flat"
+    },
+    {
+      "label": "Reported drone pressure on civilians/services",
+      "value": "ongoing",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "UN Security Council",
+      "fragment": "imminent risk of mass atrocities",
+      "as_of": "20 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://press.un.org/en/2026/sc16392.doc.htm",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    },
+    {
+      "source": "UN News",
+      "fragment": "drone attacks on El Obeid are endangering civilians and essential services",
+      "as_of": "Jun 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://news.un.org/en/story/2026/06/1167781",
+        "retrieved_at": "2026-06-27T18:00:00Z"
+      }
+    }
+  ]
+}
