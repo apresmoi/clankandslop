@@ -1,0 +1,179 @@
+{
+  "id": "europe-heatwave",
+  "topics": [
+    "food-security",
+    "supply-chains",
+    "inflation"
+  ],
+  "edition_date": "2026-06-28",
+  "section": "world",
+  "kicker": "The continent's hottest ledger",
+  "epistemic": "fact",
+  "headline": "Record June heat blankets Western Europe\ninfrastructure and labour take the hit",
+  "deck": "A late-June heatwave broke June temperature marks from Spain to Switzerland, left hundreds dead including an estimated 212 in Spain over four days, and loaded hospitals, farms, power systems and outdoor labour with concurrent strain. WMO ties the pattern to Europe's fastest-in-the-world warming and a roughly 80% El Niño probability this summer.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": null,
+  "body": [
+    "Late June brought a continent-spanning heatwave that shattered June temperature records from the Iberian Peninsula through Western and Central Europe, with the World Meteorological Organization reporting “major impacts on human health, ecosystems, agriculture, infrastructure and labour productivity” [E1]. What began as a meteorological anomaly quickly became a macro stress test for systems that cannot idle when thermometers spike.",
+    "Météo-France said France recorded its hottest day on record on 24 June, with an average national temperature of 30.0° Celsius surpassing marks set in July 2019 and August 2003; Pulluau in western France hit 43.8 °C [E2]. A record 58 departments sat under top-level red alerts as drought deepened wildfire risk, and authorities linked 40 reported drowning deaths to the emergency [E2].",
+    "Spain’s hottest June days on record fell on 23 and 24 June, with Bilbao reaching 42.7°C [E3]. Multiple stations logged stretches above 40°C, turning peak-load power demand, irrigation schedules and outdoor work shifts into same-day economic variables rather than background weather.",
+    "Britain’s Met Office broke the June temperature record on three consecutive days, with a provisional 36.4 °C in southern England on 25 June [E4]. Red warnings for extreme heat ran three straight days for the first time under the current alert system [E4]. Switzerland’s Meteo-Suisse set a June mark of 38°C in Basel [E5].",
+    "Nighttime minimums stayed punishingly high; when recovery sleep fails, “the body remains under strain around the clock,” WMO’s health advisers warn [E1]. Outdoor workers, older adults and the unhoused face elevated risk, and urban heat islands add several degrees above regional readings [E1]. Hospitals and ambulance services absorb the first shock; grids and water utilities face the sustained one.",
+    "WMO climate specialist John Kennedy said Europe as a whole has warmed “around two degrees” since the historic 1976 heatwave and called it “the fastest warming continents” [E6]. That baseline raises the odds that each new extreme becomes a supply-chain event: wilted crops, deferred construction, curtailed factory shifts.",
+    "A developing El Niño adds a second layer. WMO’s June update puts an “80% likelihood of an El Niño event during June–August 2026” [E7], with probabilities near or above 90% through at least November [E7].",
+    "Forecast models suggest the event will be “at least moderate – and possibly strong” [E8]. WMO Secretary-General Celeste Saulo warned planners to prepare for drought, heavy rainfall and heatwaves “both on land and in the ocean” [E8]. For European finance ministries already tallying health spending and lost output, the combination reads as a summer risk budget, not a weather bulletin."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "key_numbers": [
+    {
+      "label": "France national average temperature (24 June, record)",
+      "value": "30.0°C",
+      "dir": "up"
+    },
+    {
+      "label": "Bilbao June temperature record",
+      "value": "42.7°C",
+      "dir": "up"
+    },
+    {
+      "label": "UK provisional June record (southern England)",
+      "value": "36.4°C",
+      "dir": "up"
+    },
+    {
+      "label": "Basel June temperature record",
+      "value": "38°C",
+      "dir": "up"
+    },
+    {
+      "label": "Spain estimated heat-related deaths (~4 days)",
+      "value": "~212",
+      "dir": "up"
+    },
+    {
+      "label": "Europe warming since 1976 (WMO)",
+      "value": "~2°C",
+      "dir": "up"
+    },
+    {
+      "label": "El Niño probability (June–August 2026)",
+      "value": "80%",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "WMO",
+      "fragment": "major impacts on human health, ecosystems, agriculture, infrastructure and labour productivity",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/media/news/records-fall-extreme-heat-grips-europe",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Météo-France (via WMO)",
+      "fragment": "average national temperature of 30.0° Celsius",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/media/news/records-fall-extreme-heat-grips-europe",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "AEMET (via WMO)",
+      "fragment": "Bilbao reached 42.7°C, the highest June temperature recorded there",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/media/news/records-fall-extreme-heat-grips-europe",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "UK Met Office (via WMO)",
+      "fragment": "36.4 °C recorded in southern England on 25 June",
+      "as_of": "25 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/media/news/records-fall-extreme-heat-grips-europe",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Meteo-Suisse (via WMO)",
+      "fragment": "new June temperature record of 38°C in the northern city of Basel",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/media/news/records-fall-extreme-heat-grips-europe",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "WMO / John Kennedy",
+      "fragment": "Europe as a whole has warmed by around two degrees",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/media/news/records-fall-extreme-heat-grips-europe",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "WMO",
+      "fragment": "80% likelihood of an El Niño event during June–August 2026",
+      "as_of": "2 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/news/media-centre/wmo-prepare-el-nino",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "WMO",
+      "fragment": "at least moderate – and possibly strong",
+      "as_of": "2 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://wmo.int/news/media-centre/wmo-prepare-el-nino",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    }
+  ]
+}
