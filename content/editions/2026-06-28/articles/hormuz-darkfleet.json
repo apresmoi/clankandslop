@@ -1,0 +1,187 @@
+{
+  "id": "hormuz-darkfleet",
+  "topics": [
+    "strait-of-hormuz",
+    "oil",
+    "maritime-security",
+    "war-risk-insurance"
+  ],
+  "edition_date": "2026-06-28",
+  "section": "markets",
+  "kicker": "The commercial chokepoint",
+  "epistemic": "inference",
+  "headline": "Brent slept through the weekend\ninsurers priced what shippers saw",
+  "deck": "Crude touched its lowest level since before the war as tankers trickled back through Hormuz, then a tanker strike, Bahrain drone hits, and a second wave of US airstrikes landed with exchanges closed. The forward price may gap up Monday; the chokepoint's real tariff is already set by war-risk premiums and ships running dark.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "ascii",
+    "shape": "pumpjack",
+    "caption": "Insurance, not ordnance, sets the transit price"
+  },
+  "body": [
+    "Brent crude fell toward roughly $72 per barrel through Thursday and Friday as charterers treated partial Hormuz reopening as a supply unwind. BBC reported the benchmark dipping below $72.48 as traffic trickled back, the lowest print since before the 2026 war and a multi-week erosion of the conflict premium [E1]. That move priced resumed transit more than it priced Iranian strike capacity.",
+    "Weekend violence arrived into a closed screen. Around 4:30 a.m. Eastern on Saturday, a projectile struck the Panama-flagged tanker M/T Kiku in or near the Strait of Hormuz; UK Maritime Trade Operations logged the hit, US Central Command attributed it to Iran, and reporting cited bridge damage with crew reported safe [E2]. Before futures could react, Iranian drones targeted Bahraini territory and Washington ordered a second wave of strikes on Iranian surveillance, communications, air-defense, and minelaying sites [E3][E4][E5].",
+    "War-risk underwriters never shared Brent's optimism. Premiums on Hormuz transits have run at roughly 0.2% to 0.4% of hull value, well above the pre-war norm near 0.125%, adding hundreds of thousands of dollars to a large tanker voyage [E9]. Insurers price hulls and crews, not ceasefire rhetoric; each confirmed hit on the Oman-corridor route validates the higher tariff even when spot crude slides.",
+    "Commercial behavior confirms the split. Gregory Brew, a senior Iran-oil analyst at Eurasia Group, noted that Iran had attacked at least two tankers using the southern Oman route and that the corridor had gone \"silent,\" with very little automatic identification system traffic as vessels moved dark [E7]. AIS silence is not proof of a closed strait, but it is proof that owners and masters are buying discretion over visibility [E8].",
+    "Shippers, not spot traders, are setting the marginal price of passage. US airstrikes on storage sites and radar impose a military cost on Tehran; they do not, by themselves, reopen a lane that owners have already marked hazardous. Domain analysts converged ahead of the weekend on the same read: attacks on the Oman route and Iranian permit-and-route coercion matter more for unlocking barrels than another CENTCOM statement [E6][E7].",
+    "Route politics sustain the premium. Iran's navy and the IRGC-linked Persian Gulf Strait Authority continue to reject \"unauthorized\" paths promoted by the US-led Joint Maritime Information Centre, insisting that only Iranian-designated channels carry authorization even during the Islamabad memorandum's fee-waiver window [E6]. Every transit becomes a compliance bet: sail the southern corridor without Iranian blessing and risk being treated as a target, or seek coordination and accept administered passage.",
+    "Monday's open therefore faces a layered repricing problem. Brent closed the week on hope; the weekend delivered a tanker hit, horizontal escalation to a GCC host, and renewed US ordnance, all without an immediate futures print [E3]. A gap higher is plausible, but the more durable signal may be whether Kiku's owner returns to the strait, whether AIS traffic reappears off Oman's coast, and whether underwriters hold or lift premiums [E7][E9].",
+    "Insurance tables and tracker silence deserve more weight than the first tick on ICE Brent. Spot can fall while the chokepoint tightens if a few very large crude carriers cross on administered terms; it can rise on a quiet Sunday if underwriters treat Bahrain and Hormuz as one risk pool. Until shippers normalize the Oman route in daylight, the strait's real price sits in the war-risk schedule, not the headline futures screen [E1][E9]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent (pre-weekend low)",
+      "value": "~$72/bbl",
+      "dir": "down"
+    },
+    {
+      "label": "BBC-reported dip",
+      "value": "below $72.48",
+      "dir": "down"
+    },
+    {
+      "label": "War-risk premium (current)",
+      "value": "0.2-0.4% hull value",
+      "dir": "up"
+    },
+    {
+      "label": "Pre-war war-risk norm",
+      "value": "~0.125%",
+      "dir": "flat"
+    },
+    {
+      "label": "M/T Kiku cargo (reported)",
+      "value": "~2M+ barrels",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "BBC",
+      "fragment": "brief dip below $72.48 as traffic trickled back",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.bbc.com/news/articles/c0jy7d7wzv4o",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "NYT / UKMTO",
+      "fragment": "Bridge damage reported; crew safe",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.nytimes.com/live/2026/06/27/world/us-iran-strikes-hormuz",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "WSJ",
+      "fragment": "Mideast fighting widens with attacks on Bahrain, Hormuz tanker",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.wsj.com/world/middle-east/mideast-fighting-widens-with-attacks-on-bahrain-hormuz-tanker-30a313a8",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Bahrain MFA (via Guardian)",
+      "fragment": "blatant violation of its sovereignty",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.theguardian.com/world/2026/jun/27/bahrain-iran-drone-attack-overnight-us-strikes-strait-hormuz",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "NPR / CENTCOM",
+      "fragment": "second wave of airstrikes on Iranian targets",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.npr.org/2026/06/27/nx-s1-5872954/us-strikes-iran",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "CNBC",
+      "fragment": "unauthorized routes",
+      "as_of": "25 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.cnbc.com/2026/06/25/iran-navy-shipping-recovery-strait-of-hormuz-unauthorized-routes-us-fragile-mou-.html",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Gregory Brew / Eurasia Group",
+      "fragment": "Oman route gone silent",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/Vmaxpax/status/2071020538005500228?referrer=grok-com",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "ISW",
+      "fragment": "vessels going dark",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://understandingwar.org/research/middle-east/iran-update-special-report-june-27-2026/",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "BBC",
+      "fragment": "0.2-0.4% of hull value per transit vs. pre-war ~0.125%",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.bbc.com/news/articles/c0jy7d7wzv4o",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    }
+  ]
+}
