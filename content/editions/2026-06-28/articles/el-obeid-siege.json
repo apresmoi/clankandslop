@@ -1,0 +1,159 @@
+{
+  "id": "el-obeid-siege",
+  "topics": [
+    "sudan",
+    "food-security"
+  ],
+  "edition_date": "2026-06-28",
+  "section": "world",
+  "kicker": "North Kordofan under pressure",
+  "epistemic": "fact",
+  "headline": "RSF forces mass around El Obeid\nas UN officials warn the prevention window is closing",
+  "deck": "Drone strikes by both warring parties have intensified around Sudan's North Kordofan capital as Rapid Support Forces expand their perimeter. No source has confirmed an RSF ground assault on the city, but UN and WFP officials say the interval to prevent mass displacement is narrowing fast.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "el-obeid",
+    "title": "Inside the prevention window",
+    "caption": "Intensifying drone fire and a widening RSF perimeter keep El Obeid inside an active prevention interval; agencies describe pressure and bombardment, not a confirmed urban ground assault · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "EL OBEID",
+        "lat": 13.18,
+        "lon": 30.22
+      }
+    ]
+  },
+  "body": [
+    "Rosemary DiCarlo, UN Under-Secretary-General for Political and Peacebuilding Affairs, told the Security Council on 26 June that the opportunity to prevent a major escalation in El Obeid is “rapidly narrowing” as fighting intensifies in and around North Kordofan's capital [E1].",
+    "Over the past two weeks, drone attacks by both the Sudanese Armed Forces and the Rapid Support Forces have increased significantly in El Obeid, while the RSF have expanded their presence in and around the city, UN reporting confirmed without documenting a verified RSF entry into the urban core [E2].",
+    "Escalation would put hundreds of thousands of civilians at immediate risk of large-scale violence, DiCarlo said, warning that a full-scale battle would trigger fresh displacement into areas already overstretched by Sudan's catastrophic hunger crisis [E1].",
+    "Reports of substantial military activity around El Obeid, combined with intensified drone strikes on civilians and infrastructure, threaten an imminent offensive that could force hundreds of thousands to flee, WFP cautioned; the agency already assists more than 100,000 of the most vulnerable inside the city and is prepositioning aid for more than 250,000 additional people who may be displaced [E3].",
+    "Roughly 500,000 civilians, with children disproportionately exposed, face immediate danger of killing, injury, or displacement, UNICEF's representative told the same briefing, citing El Fasher as a precedent officials must not allow to repeat [E4].",
+    "UN monitors have verified more than 5,700 grave violations against children since the war began, with nearly 80 per cent of reported child casualties in the first four months of 2026 linked to drone attacks [E5].",
+    "Six months of life-saving food work across Sudan now hinges on $646 million WFP says it urgently lacks, noting that stocks redirected toward El Obeid were originally earmarked for rainy-season prepositioning and that emergency pipelines may run dry by September [E6].",
+    "Diplomats still classify El Obeid as inside a prevention window: reinforcement and air attack are verified, ground assault is not. DiCarlo's repeated appeal for restraint and civilian protection remains the operative benchmark until belligerents halt fighting or cross into street warfare observers can no longer dispute [E1][E2]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "key_numbers": [
+    {
+      "label": "Civilians at risk (UN estimate, El Obeid area)",
+      "value": "~500,000",
+      "dir": "up"
+    },
+    {
+      "label": "WFP current food assistance inside El Obeid",
+      "value": "100,000+",
+      "dir": "flat"
+    },
+    {
+      "label": "Additional displaced WFP is prepositioning for",
+      "value": "250,000+",
+      "dir": "up"
+    },
+    {
+      "label": "WFP six-month funding gap (Sudan)",
+      "value": "$646M",
+      "dir": "up"
+    },
+    {
+      "label": "Verified grave violations against children (war to date)",
+      "value": "5,700+",
+      "dir": "up"
+    },
+    {
+      "label": "Confirmed RSF urban ground assault (El Obeid)",
+      "value": "unverified",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "UN News",
+      "fragment": "rapidly narrowing",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://news.un.org/en/story/2026/06/1167821",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "UN News",
+      "fragment": "expanded their presence in and around the city",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://news.un.org/en/story/2026/06/1167821",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "WFP",
+      "fragment": "more than 250,000 people who may be forced to escape the city",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.wfp.org/news/wfp-warns-assault-sudans-el-obeid-area-threatens-deepen-countrys-hunger-crisis-0",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "UN News / UNICEF",
+      "fragment": "500,000 civilians are at risk",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://news.un.org/en/story/2026/06/1167821",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "UN News / UNICEF",
+      "fragment": "more than 5,700 grave violations against children",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://news.un.org/en/story/2026/06/1167821",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "WFP",
+      "fragment": "urgently requires USD 646 million",
+      "as_of": "26 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.wfp.org/news/wfp-warns-assault-sudans-el-obeid-area-threatens-deepen-countrys-hunger-crisis-0",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    }
+  ]
+}

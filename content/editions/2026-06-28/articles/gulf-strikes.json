@@ -1,0 +1,208 @@
+{
+  "id": "gulf-strikes",
+  "topics": [
+    "us-iran",
+    "middle-east-war",
+    "strait-of-hormuz"
+  ],
+  "edition_date": "2026-06-28",
+  "section": "world",
+  "kicker": "The fight spreads to the hosts",
+  "epistemic": "fact",
+  "headline": "Iran targets Bahrain and claims hits on US bases\nWashington strikes back at coastal radar and storage",
+  "deck": "Iran launched drones at Bahrain and said it struck American facilities in Kuwait and Bahrain with missiles and drones. The United States carried out fresh strikes on Iranian coastal sites. Washington reported no major damage or casualties from the Iranian side, and the Pakistan-brokered memorandum has not been declared void.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "gulf",
+    "title": "The war reaches the Gulf hosts",
+    "caption": "Iranian drone attack reached Bahrain and claimed strikes hit US bases in Kuwait and Bahrain; US answered on Sirik and Qeshm · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.57,
+        "lon": 56.25
+      },
+      {
+        "name": "BAHRAIN",
+        "lat": 26.07,
+        "lon": 50.55
+      },
+      {
+        "name": "ALI AL SALEM (KUWAIT)",
+        "lat": 29.35,
+        "lon": 47.52
+      }
+    ],
+    "hero_map": "gulf"
+  },
+  "body": [
+    "Bahrain’s foreign ministry stated that a number of Iranian drones had targeted the country in a blatant violation of its sovereignty and a flagrant threat to the security of citizens and residents [E1].",
+    "Bahraini air defenses intercepted at least one drone while another landed in a remote area, with no immediate damage or casualties reported at the sites [E2]. Reporting placed the attempted strikes near Isa Air Base.",
+    "Iran’s Islamic Revolutionary Guard Corps announced a joint ballistic-missile and drone operation that it said targeted eight US military sites in Kuwait and Bahrain, including Ali al-Salem Air Base and the headquarters of the US Fifth Fleet [E3]. Iranian state television described the action as a decisive response to American strikes on coastal facilities [E4].",
+    "US officials confirmed incidents at facilities linked to American forces in Kuwait and Bahrain but stated there were no reported US casualties or major damage to the sites [E5]. Bahrain, the United Arab Emirates, and the GCC secretariat condemned the Iranian attacks [E6].",
+    "US Central Command carried out a second wave of strikes on Iranian targets and said the action responded directly to continued Iranian aggression against commercial shipping [E7]. The strikes hit missile and drone storage locations along with coastal radar sites, including areas at Sirik and on Qeshm Island [E9].",
+    "President Trump posted that United States aircraft had struck Iranian missile and drone storage locations and coastal radar sites for violating the ceasefire agreement again [E8].",
+    "The sequence extends the Hormuz confrontation to the Gulf monarchies that host US forces, a shift from strikes confined to Iranian territory and shipping in the strait. Both sides continue to reference the Islamabad and Lake Lucerne memorandum while accusing the other of violations [E9].",
+    "The framework has not been declared collapsed, and limited reported effects have left the core terms on paper even as the circle of participants widens [E10]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "key_numbers": [
+    {
+      "label": "Iranian drones reported over Bahrain",
+      "value": "multiple",
+      "dir": "flat"
+    },
+    {
+      "label": "US sites Iran claimed struck",
+      "value": "8",
+      "dir": "flat"
+    },
+    {
+      "label": "Reported US casualties or major damage",
+      "value": "0",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Bahrain Foreign Ministry",
+      "fragment": "a “number of drones” were launched at the country",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.theguardian.com/world/2026/jun/27/bahrain-iran-drone-attack-overnight-us-strikes-strait-hormuz",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "ISW",
+      "fragment": "Bahraini air defenses intercepted one drone, while a second drone landed in a remote area",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://understandingwar.org/research/middle-east/iran-update-special-report-june-27-2026/",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "IRGC",
+      "fragment": "launched a joint missile and drone operation targeting eight US military sites in Kuwait and Bahrain",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.theguardian.com/us-news/2026/jun/27/us-iran-strikes",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Iranian state television",
+      "fragment": "a decisive response",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/asia-pacific/iran-says-it-hits-us-linked-targets-bahrain-reports-drone-attack-2026-06-27/",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "US official",
+      "fragment": "no reported US casualties or major damage to US sites in the Middle East so far",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.theguardian.com/us-news/2026/jun/27/us-iran-strikes",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "CENTCOM",
+      "fragment": "direct response to continued Iranian aggression against commercial shipping",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.theguardian.com/us-news/2026/jun/27/us-iran-strikes",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Trump",
+      "fragment": "United States aircraft just struck Iranian missile and drone storage locations, and coastal radar sites, for violating the Cease Fire Agreement, AGAIN!",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.npr.org/2026/06/27/nx-s1-5872954/us-strikes-iran",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Guardian reporting",
+      "fragment": "Bahrain condemns Iranian drone attack on its territory",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/asia-pacific/iran-says-it-hits-us-linked-targets-bahrain-reports-drone-attack-2026-06-27/",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "CENTCOM via Guardian",
+      "fragment": "targeted Iran’s military surveillance infrastructure, communication systems, air defense sites, drone storage facilities and minelayer capabilities",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.theguardian.com/us-news/2026/jun/27/us-iran-strikes",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    },
+    {
+      "source": "Reporting on framework status",
+      "fragment": "The exchanges underscored the fragility of a Pakistan-brokered peace process",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E10",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.theguardian.com/us-news/2026/jun/27/us-iran-strikes",
+        "retrieved_at": "2026-06-28T18:00:00Z"
+      }
+    }
+  ]
+}
