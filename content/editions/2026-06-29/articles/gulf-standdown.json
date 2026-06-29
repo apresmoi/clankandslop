@@ -1,0 +1,195 @@
+{
+  "id": "gulf-standdown",
+  "topics": [
+    "us-iran",
+    "middle-east-war",
+    "strait-of-hormuz"
+  ],
+  "edition_date": "2026-06-29",
+  "section": "world",
+  "kicker": "The strait goes quiet",
+  "epistemic": "fact",
+  "headline": "Washington and Tehran stand down after the Gulf flare-up\nHormuz transit resumes as talks shift to Doha",
+  "deck": "Senior US officials said both governments agreed to halt reciprocal strikes and let vessels move freely through the Strait of Hormuz. The Switzerland session planned for 29–30 June did not convene; Qatar is set to host a narrower round near 30 June. The mid-June framework remains strained, and Tehran had threatened to halt diplomacy only days earlier.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "gulf",
+    "hero_map": "gulf",
+    "title": "The guns go quiet over the Gulf",
+    "caption": "Mutual stand-down after weekend strikes reached Bahrain and claimed US bases in Kuwait; Hormuz talks move to Doha · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.57,
+        "lon": 56.25
+      },
+      {
+        "name": "BAHRAIN",
+        "lat": 26.07,
+        "lon": 50.55
+      },
+      {
+        "name": "DOHA",
+        "lat": 25.29,
+        "lon": 51.53
+      }
+    ]
+  },
+  "body": [
+    "Iranian drones reached Bahrain and the Islamic Revolutionary Guard Corps claimed joint missile-and-drone strikes on American facilities in Kuwait and Bahrain, including Ali al-Salem Air Base and the Fifth Fleet headquarters, after US forces struck Iranian coastal radar and storage sites in a second wave on 27–28 June [E1].",
+    "Late on 28 June, senior US officials said Washington and Tehran had agreed to “stand down for now” and halt tit-for-tat attacks following that horizontal escalation [E2].",
+    "Washington said commercial vessels could “move freely” through the Strait of Hormuz and that deconfliction channels established after the Lake Lucerne summit remained active [E3].",
+    "Through 29 June, credible reporting recorded no fresh strikes, tanker hits, or new intercepts in the Gulf, suggesting the pause held on the first full day after the weekend exchange [E4].",
+    "Technical talks scheduled for 29–30 June at the Bürgenstock resort in Switzerland did not convene as originally envisioned; senior US officials said broader memorandum work remained “on track” and that “nothing has been canceled,” with a narrowed Hormuz session now expected in Doha around 30 June [E5][E6].",
+    "Days earlier, the Revolutionary Guard had warned that US coastal strikes “violated the ceasefire” and “will result in the complete halt of all diplomatic processes,” and Tehran had not publicly reversed that warning as the stand-down took hold [E7].",
+    "Oil traders priced out part of the weekend war premium, leaving Brent near $72.5–$72.9 per barrel on 29 June rather than chasing the sharper Monday spike many had feared once stand-down reports circulated [E8].",
+    "Pakistan-brokered memorandum terms remain on paper, but the pause is a de-escalation hand-off, not a settlement; another shipping incident or a breakdown in inspection timelines could rupture the framework quickly [E9]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "key_numbers": [
+    {
+      "label": "New Gulf strikes reported on 29 June",
+      "value": "0",
+      "dir": "flat"
+    },
+    {
+      "label": "Brent crude range on 29 June",
+      "value": "~$72.5–72.9",
+      "dir": "down"
+    },
+    {
+      "label": "Hormuz technical-talks venue",
+      "value": "Doha",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Al Jazeera",
+      "fragment": "Iran attacks Bahrain, Kuwait as US strikes near Hormuz",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.aljazeera.com/news/2026/6/28/iran-war-day-121-iran-attacks-bahrain-kuwait-as-us-strikes-near-hormuz",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "US official via RFE/RL",
+      "fragment": "“stand down for now”",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.rferl.org/a/iran-war-us-hormuz-oil-blockade-gulf-israel/33640284.html",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "US official via DW",
+      "fragment": "vessels to “move freely” through Hormuz",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.dw.com/en/us-iran-agree-to-halt-strikes-amid-report-of-fresh-talks/live-77746775",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Al Jazeera",
+      "fragment": "shift to diplomacy",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.aljazeera.com/news/liveblog/2026/6/29/iran-war-live-tehran-insists-on-control-of-hormuz-amid-reports-of-us-talks",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "DW",
+      "fragment": "did not occur as originally envisioned for 29-30 June",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.dw.com/en/us-iran-agree-to-halt-strikes-amid-report-of-fresh-talks/live-77746775",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "US officials via DW",
+      "fragment": "“on track” and “nothing has been canceled”",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.dw.com/en/us-iran-agree-to-halt-strikes-amid-report-of-fresh-talks/live-77746775",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "ISW",
+      "fragment": "“will result in the complete halt of all diplomatic processes”",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://understandingwar.org/research/middle-east/iran-update-special-report-june-28-2026/",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Trading Economics",
+      "fragment": "Brent crude oil",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "The Hindu",
+      "fragment": "threatens to end talks to end war",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.thehindu.com/news/international/iran-attacks-bahrain-kuwait-following-us-strikes-threatens-to-end-talks-to-end-war/article71157259.ece",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    }
+  ]
+}

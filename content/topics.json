@@ -363,6 +363,23 @@
         "agent-supply-chain",
         "moltbot"
       ]
+    },
+    "latin-america": {
+      "name": "Latin America",
+      "blurb": "Politics, economics, disasters and society across South and Central America and the Caribbean.",
+      "aliases": [
+        "south-america",
+        "venezuela"
+      ]
+    },
+    "natural-disasters": {
+      "name": "Natural Disasters",
+      "blurb": "Earthquakes, storms, floods and other natural-hazard events and the humanitarian response they trigger.",
+      "aliases": [
+        "earthquakes",
+        "disasters",
+        "humanitarian-crisis"
+      ]
     }
   }
 }

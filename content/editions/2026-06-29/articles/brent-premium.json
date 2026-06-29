@@ -1,0 +1,174 @@
+{
+  "id": "brent-premium",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "war-risk-insurance",
+    "shipping"
+  ],
+  "edition_date": "2026-06-29",
+  "section": "markets",
+  "kicker": "After the stand-down",
+  "epistemic": "inference",
+  "headline": "Brent holds near $73 as the Hormuz premium bleeds out\nMarkets price de-escalation and freer transit, but war-risk cover keeps a floor under volatility",
+  "deck": "Washington and Tehran agreed to stand down, and Brent traded around $72–$73 a barrel on 29 June, a modest lift inside a sharply lower week. The barrel has given back most of the early-June spike above $90; the tape is betting on resumed Hormuz flows faster than underwriters and AIS data confirm.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "ascii",
+    "shape": "pumpjack",
+    "caption": "The war premium drains out of the barrel"
+  },
+  "body": [
+    "Brent crude traded around $72.5–$73.2 a barrel in early dealings on 29 June, with prints near $73.17 marking a gain of roughly 0.8% after a 28 June settle near $72.35 [E1][E2].",
+    "That lift sat inside a much sharper weekly retreat: benchmarks were down roughly 10% over the week and remained far below early-June crisis peaks that had pushed Brent above $90–$100 [E3].",
+    "West Texas Intermediate tracked the same pattern, settling near $69.86 on 28 June and printing around $70 in early Monday trade [E4].",
+    "Washington and Tehran agreed late on 28 June to “stand down for now,” halting tit-for-tat attacks and allowing vessels to “move freely” through the Strait of Hormuz while technical talks continued [E5].",
+    "No fresh tanker hits or intercepts were reported on 29 June, after Iranian drone strikes on the Panama-flagged oil tanker Kiku around 26–27 June and retaliatory US strikes on Iranian coastal sites had rattled a market closed for the weekend [E6][E8].",
+    "Oilprice and cross-checked energy desks read the price action as a continued bleed-out of the Hormuz war-risk premium built since February, with traders betting on resumed flows after the mid-June memorandum and the latest stand-down [E3][E7].",
+    "Shippers and underwriters have not mirrored that calm on the screen: war-risk premiums stayed extremely elevated relative to pre-crisis baselines even as transit permissions widened, which keeps a floor under volatility should a single new incident re-price the lane overnight [E7].",
+    "For the tape, the working read is de-escalation priced in faster than insurance and AIS confirm; spot Brent near $73 is a relief rally inside a broken weekly trend, and the tell on whether the premium stays drained is freight quotes and vessel tracks through Hormuz, not the headline barrel alone [E3][E5]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent (early 29 Jun)",
+      "value": "~$73/bbl",
+      "dir": "up"
+    },
+    {
+      "label": "Brent weekly change",
+      "value": "~-10%",
+      "dir": "down"
+    },
+    {
+      "label": "Early-Jun Brent peak",
+      "value": "$90–100+",
+      "dir": "down"
+    },
+    {
+      "label": "WTI (early 29 Jun)",
+      "value": "~$70/bbl",
+      "dir": "up"
+    },
+    {
+      "label": "Brent (28 Jun close)",
+      "value": "~$72.35/bbl",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Trading Economics",
+      "fragment": "Brent crude last closed around $72.35/bbl on June 28",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://tradingeconomics.com/commodity/brent-crude-oil",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Yahoo Finance",
+      "fragment": "Brent trading ~73.17, +0.79% early",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://finance.yahoo.com/quote/BZ=F/history/",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Oilprice.com",
+      "fragment": "Brent has erased much of the Iran war/Hormuz premium",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://oilprice.com/",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "CNBC",
+      "fragment": "WTI ~70.01 in early Monday prints",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.cnbc.com/quotes/@CL.1",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "DW",
+      "fragment": "both sides agreed to “stand down for now” and allow vessels to “move freely” through Hormuz",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.dw.com/en/us-iran-agree-to-halt-strikes-amid-report-of-fresh-talks/live-77746775",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Iranian drone hit causing bridge damage on the Panama-flagged oil tanker Kiku",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/asia-pacific/us-carries-out-fresh-strikes-against-iran-after-tanker-struck-hormuz-escalating-2026-06-27/",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "RFE/RL",
+      "fragment": "war-risk premiums remained extremely elevated",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.rferl.org/a/iran-war-us-hormuz-oil-blockade-gulf-israel/33640284.html",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Wikipedia",
+      "fragment": "No major new attacks reported June 28-29",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Strait_of_Hormuz_crisis",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    }
+  ]
+}
