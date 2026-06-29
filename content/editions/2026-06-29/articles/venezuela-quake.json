@@ -1,0 +1,180 @@
+{
+  "id": "venezuela-quake",
+  "topics": [
+    "latin-america",
+    "natural-disasters"
+  ],
+  "edition_date": "2026-06-29",
+  "section": "world",
+  "kicker": "Twin shocks along the San Sebastián fault",
+  "epistemic": "fact",
+  "headline": "Venezuela's death toll passes 1,450 after twin June quakes\nHundreds of buildings collapsed as international rescuers join a strained response",
+  "deck": "Earthquakes measuring about 7.2 and 7.5 struck near Yaracuy on 24 June, the strongest pair in more than a century. Venezuelan officials say confirmed deaths keep rising past 1,450, with thousands injured and tens of thousands still unaccounted for, while foreign governments deploy rescue teams into a country already deep in economic collapse.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "venezuela",
+    "title": "Where the ground gave way",
+    "caption": "Twin tremors along the San Sebastián fault devastated La Guaira and shook Caracas, with search teams focused on Yaracuy state · Map: Foreman, Macro Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "SAN FELIPE",
+        "lat": 10.34,
+        "lon": -68.74
+      },
+      {
+        "name": "CARACAS",
+        "lat": 10.49,
+        "lon": -66.88
+      }
+    ]
+  },
+  "body": [
+    "A magnitude-7.2 foreshock and a magnitude-7.5 mainshock struck northwestern Venezuela on 24 June, separated by about 39 seconds along the San Sebastián fault near Yaracuy and Veroes, according to the U.S. Geological Survey [E1].",
+    "Seismologists classify the pair among the strongest earthquakes to hit the country in more than a century, with shaking felt across Caracas and coastal La Guaira [E2].",
+    "Witness accounts and official assessments from the capital region described pancaked apartment blocks, a closed airport, and hospitals triaging patients outdoors as aftershocks continued [E3].",
+    "Venezuelan officials have raised the confirmed death toll sharply to at least 1,450, with National Assembly President Jorge Rodríguez and Health Minister Carlos Alvarado citing hospital records that keep climbing [E4].",
+    "Earlier counts estimated fatalities in the low hundreds, a gap that officials and outside monitors say reflects both delayed reporting from collapsed districts and the still-open search window [E5].",
+    "Health authorities counted more than 3,150 injured and upward of 12,700 displaced, while government assessments listed roughly 770 collapsed buildings and community trackers tens of thousands of people still unaccounted for [E6].",
+    "Rescue crews from Mexico, El Salvador, the Dominican Republic, the Czech Republic, Switzerland, and the United States have joined Venezuelan military units and volunteers in the rubble as the search window narrows [E7].",
+    "Acting President Delcy Rodríguez announced a $200 million reconstruction fund, but aid groups warn that communication blackouts, substandard construction, and a hollowed economy will slow any rebuild [E8]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "key_numbers": [
+    {
+      "label": "Official confirmed deaths",
+      "value": "1,450+",
+      "dir": "up"
+    },
+    {
+      "label": "Injured",
+      "value": "3,150+",
+      "dir": "up"
+    },
+    {
+      "label": "Displaced",
+      "value": "12,700+",
+      "dir": "up"
+    },
+    {
+      "label": "Mainshock magnitude",
+      "value": "7.5",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "USGS via Wikipedia",
+      "fragment": "Mw 7.2 foreshock followed by Mw 7.5 mainshock",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Venezuela_earthquakes",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Wikipedia synthesis",
+      "fragment": "strongest earthquakes in Venezuela in over a century",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Venezuela_earthquakes",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "NYT live updates",
+      "fragment": "widespread destruction, especially in La Guaira and Caracas",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nytimes.com/live/2026/06/27/world/venezuela-earthquake",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Venezuelan officials via Wikipedia",
+      "fragment": "at least 1,450 deaths",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Venezuela_earthquakes",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Rio Times",
+      "fragment": "Killed an estimated 188–235 people",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.riotimesonline.com/latin-american-pulse-for-saturday-june-27-2026/",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Wikipedia synthesis",
+      "fragment": "3,150+ injured; ~770+ buildings down",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Venezuela_earthquakes",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "NYT live updates",
+      "fragment": "international teams active alongside Venezuelan military",
+      "as_of": "28 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nytimes.com/live/2026/06/27/world/venezuela-earthquake",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    },
+    {
+      "source": "Rio Times",
+      "fragment": "opened a $200 million reconstruction fund",
+      "as_of": "27 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.riotimesonline.com/latin-american-pulse-for-saturday-june-27-2026/",
+        "retrieved_at": "2026-06-29T18:00:00Z"
+      }
+    }
+  ]
+}
