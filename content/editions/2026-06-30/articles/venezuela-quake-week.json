@@ -1,0 +1,223 @@
+{
+  "id": "venezuela-quake-week",
+  "topics": [
+    "latin-america",
+    "natural-disasters"
+  ],
+  "edition_date": "2026-06-30",
+  "section": "world",
+  "kicker": "Seven days along the central coast",
+  "epistemic": "fact",
+  "headline": "Venezuela's confirmed quake dead pass 1,700 as aftershocks persist\nA week on, rising counts and a fresh tremor strain rescue crews and hollowed institutions",
+  "deck": "Seven days after magnitude-7.2 and 7.5 tremors devastated La Guaira and Caracas, official counts place confirmed deaths in the high-1,700s with some agency tallies approaching 1,943, thousands injured and tens of thousands displaced or unaccounted for. A magnitude-4.6 aftershock on 29 June sent residents back into the streets as international search teams comb rubble and foreign aid flows into institutions already weakened by years of economic collapse.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "venezuela-coast",
+    "title": "A week on, the coast still shakes",
+    "caption": "The twin tremors' damage corridor along Venezuela's central coast; a fresh aftershock struck near the La Guaira littoral on 29 June · Map: Foreman, Macro Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "LA GUAIRA",
+        "lat": 10.6,
+        "lon": -66.93
+      },
+      {
+        "name": "CARACAS",
+        "lat": 10.49,
+        "lon": -66.88
+      },
+      {
+        "name": "CARABALLEDA",
+        "lat": 10.61,
+        "lon": -66.85
+      }
+    ]
+  },
+  "body": [
+    "Confirmed deaths from the 24 June twin earthquakes have climbed sharply since this paper's 29 June edition carried an official count above 1,450, with Venezuelan authorities now listing 1,719 fatalities and some independent agency tallies approaching 1,943 as hospital records and collapsed districts continue to be cleared [E1][E2].",
+    "Government figures updated through 29 June counted 5,034 people injured and more than 15,866 displaced, while assessments listed almost 800 buildings badly damaged along the Caracas–La Guaira corridor that bore the heaviest shaking [E3][E4].",
+    "A magnitude-4.6 aftershock early on 29 June rattled Caracas and the devastated port of La Guaira, sending residents who had returned indoors racing back into the streets and briefly halting rubble searches at collapsed apartment blocks [E5].",
+    "Tens of thousands of people remained unaccounted for on citizen registries well past the critical 72-hour rescue window, and the United Nations coordinator for Venezuela said the eventual toll would likely exceed the figures authorities had published so far [E6][E7].",
+    "International search teams from more than two dozen countries continued to work the collapse zones six days on, and field reporting on 30 June described Jordanian rescuers pulling a child alive from rubble as one of the few survivors located that day [E8][E9].",
+    "Hospitals along the capital coast had already been hollowed by years of economic collapse, and post-quake reporting described displaced people lacking sanitation and other basic necessities as disease-outbreak risk rose among those camped in parks and makeshift shelters [E6][E10].",
+    "Foreign governments and United Nations agencies have reopened La Guaira's port for further supply deliveries, but aid groups warn that damaged infrastructure and weakened public services will slow any rebuild even as the aftershock sequence continues [E7][E11]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10",
+    "E11"
+  ],
+  "key_numbers": [
+    {
+      "label": "Official confirmed deaths (updated)",
+      "value": "1,719+",
+      "dir": "up"
+    },
+    {
+      "label": "Agency tallies (upper range)",
+      "value": "~1,943",
+      "dir": "up"
+    },
+    {
+      "label": "Injured",
+      "value": "5,034",
+      "dir": "up"
+    },
+    {
+      "label": "29 June aftershock (USGS)",
+      "value": "M4.6",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Miami Herald",
+      "fragment": "Official death toll reached 1,719 by June 29",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.miamiherald.com/news/nation-world/world/americas/venezuela/article316315169.html",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "Miami Herald",
+      "fragment": "some updates cite ~1,943",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.miamiherald.com/news/nation-world/world/americas/venezuela/article316315169.html",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "Miami Herald",
+      "fragment": "5,034 injured; 15,866+ displaced",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.miamiherald.com/news/nation-world/world/americas/venezuela/article316315169.html",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "The Guardian",
+      "fragment": "5,034 people were injured and almost 800 buildings were badly damaged",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.theguardian.com/world/2026/jun/29/strong-aftershock-terrifies-venezuelans-days-after-devastating-twin-quakes",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "The Guardian",
+      "fragment": "the US Geological Survey measured at a magnitude of 4.6",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.theguardian.com/world/2026/jun/29/strong-aftershock-terrifies-venezuelans-days-after-devastating-twin-quakes",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "The Guardian",
+      "fragment": "Tens of thousands of people are still missing",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.theguardian.com/world/2026/jun/29/strong-aftershock-terrifies-venezuelans-days-after-devastating-twin-quakes",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "The Guardian",
+      "fragment": "we are definitely looking at a number that is higher than the one already reported",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.theguardian.com/world/2026/jun/29/strong-aftershock-terrifies-venezuelans-days-after-devastating-twin-quakes",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "The Guardian",
+      "fragment": "27 countries have deployed more than 2,000 rescuers and personnel, with over 160 search dogs",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.theguardian.com/world/2026/jun/29/strong-aftershock-terrifies-venezuelans-days-after-devastating-twin-quakes",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "Miami Herald",
+      "fragment": "3,000+ rescuers from 45 countries",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.miamiherald.com/news/nation-world/world/americas/venezuela/article316315169.html",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "The Guardian",
+      "fragment": "hollowed out hospitals and public services",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E10",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.theguardian.com/world/2026/jun/29/strong-aftershock-terrifies-venezuelans-days-after-devastating-twin-quakes",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    },
+    {
+      "source": "The Guardian",
+      "fragment": "the port of La Guaira “is now operational",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E11",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.theguardian.com/world/2026/jun/29/strong-aftershock-terrifies-venezuelans-days-after-devastating-twin-quakes",
+        "retrieved_at": "2026-06-30T18:30:00Z"
+      }
+    }
+  ]
+}
