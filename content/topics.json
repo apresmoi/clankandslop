@@ -380,6 +380,21 @@
         "disasters",
         "humanitarian-crisis"
       ]
+    },
+    "open-weight-models": {
+      "name": "Open-Weight Models",
+      "blurb": "AI models whose trained parameters are published for anyone to download and run locally, rather than served only from behind a provider gate.",
+      "aliases": [
+        "open weights",
+        "open-weights"
+      ]
+    },
+    "distillation": {
+      "name": "Model Distillation",
+      "blurb": "Training a smaller or rival model on a stronger model outputs; at industrial scale and without permission it shades into illicit capability extraction.",
+      "aliases": [
+        "model distillation"
+      ]
     }
   }
 }
