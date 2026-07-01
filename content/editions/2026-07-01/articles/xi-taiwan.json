@@ -1,0 +1,142 @@
+{
+  "id": "xi-taiwan",
+  "topics": [
+    "taiwan",
+    "grey-zone",
+    "maritime-security"
+  ],
+  "edition_date": "2026-07-01",
+  "section": "world",
+  "kicker": "Party anniversary ritual",
+  "epistemic": "fact",
+  "headline": "Xi restates Taiwan reunification pledge",
+  "deck": "At the Communist Party’s 105th anniversary in Beijing, Xi Jinping called complete reunification with Taiwan an unshakable commitment. Analysts read it as familiar rhetoric at a set-piece, with no new operational move signalled, as gray-zone maritime pressure and cross-strait decoupling continue.",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": [
+      "Tinkerton"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "taiwan-strait",
+    "hero_map": "taiwan-strait",
+    "title": "The claim, restated across the strait",
+    "caption": "Beijing reaffirms its reunification claim at the party centenary as gray-zone pressure rises across the Taiwan Strait · Map: Tinkerton, Policy Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "TAIPEI",
+        "lat": 25.03,
+        "lon": 121.57
+      },
+      {
+        "name": "XIAMEN",
+        "lat": 24.48,
+        "lon": 118.09
+      },
+      {
+        "name": "KINMEN",
+        "lat": 24.43,
+        "lon": 118.32
+      }
+    ]
+  },
+  "body": [
+    "Xi Jinping told a gathering at the Great Hall of the People on Wednesday that resolving the Taiwan question and realizing China's complete reunification is a historic mission and an unshakable commitment for the Communist Party of China [E1]. Xinhua reported the remarks as Xi addressed a celebration of the party's 105th founding anniversary in Beijing, a date the leadership treats as a showcase of doctrine and discipline [E3].",
+    "Associated Press reporting placed the Taiwan language inside a broader anniversary address that also held up China's rapid industrialization as a pathway for developing nations and advocated building a community with a shared future for humanity [E2]. Ken Moritsugu's dispatch noted that Xi's remarks at the Great Hall echoed many of the themes of his speech on the party's 100th anniversary in 2021, including the importance of a strong military and of bringing Taiwan under China's control [E2].",
+    "Xi also repeated pledges to elevate the armed forces more quickly to world-class standards while upholding Communist Party leadership of the military, language AP said sat alongside the Taiwan passage in a speech that stressed confidence at home and on the world stage [E4]. Neither Xinhua's Taiwan dispatch nor AP's account linked the anniversary rhetoric to an announced exercise, mobilization, or change in cross-strait rules of engagement on July 1 [E1][E2].",
+    "For Beijing, the venue still carries weight. The party stages its July 1 ritual to bind legitimacy at home to doctrine abroad, and placing reunification at the center of that script tells cadres and foreign capitals that the Taiwan file remains non-negotiable party business [E1][E3]. Reporting characterized the line as restatement of standing commitment, which matters for how officials in Taipei, Washington, and Tokyo read continuity versus novelty [E2].",
+    "Across the strait, Taipei has been tracking a separate lane of pressure. Taiwan's Defense Ministry has reported rising Chinese maritime activity and gray-zone harassment around Taiwan, including near Kinmen, with ship numbers involved nearly doubled since 2022 as Beijing uses law-enforcement patrols to assert jurisdiction [E5]. That operational rhythm predates and runs parallel to anniversary rhetoric, giving Taipei's security planners a concrete baseline distinct from a single speech [E5].",
+    "Economic separation has been widening on a similar timeline. Reporting in the research window noted Taiwan further reducing reliance on China for agricultural exports while outbound investment into China fell below 1% of Taiwan's total, a structural shift that narrows everyday cross-strait ties even when leaders avoid new kinetic steps [E5].",
+    "July 1 offered a doctrinal signal without a same-day operational trigger. Alliances and markets will read Xi's restated commitment as continuity of Beijing's reunification claim amid maritime pressure and decoupling, a combination that sharpens vigilance without, on the evidence available July 1, announcing the next escalation [E1][E2][E5]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "key_numbers": [
+    {
+      "label": "CPC founding anniversary marked in speech",
+      "value": "105",
+      "dir": "flat"
+    },
+    {
+      "label": "Xi Jinping's year in power per AP",
+      "value": "14",
+      "dir": "flat"
+    },
+    {
+      "label": "Chinese maritime ships involved vs 2022 (Taiwan MoD)",
+      "value": "~doubled",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Xinhua",
+      "fragment": "an unshakable commitment for the Communist Party of China",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://english.news.cn/20260701/08cfc5fd42344517886dfc20fb1a3ec2/c.html",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "AP",
+      "fragment": "echoed many of the themes of his speech on the party's 100th anniversary",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://apnews.com/article/china-xi-jinping-speech-communist-party-anniversary-c536a28e3e63f75d583322b4a1f22473",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Xinhua",
+      "fragment": "gathering celebrating the 105th founding anniversary of the CPC",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://english.news.cn/20260701/39c37a10b9f44cc3bb36cbc485dfa14f/c.html",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "AP",
+      "fragment": "elevate the military more quickly to world-class standards",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://apnews.com/article/china-xi-jinping-speech-communist-party-anniversary-c536a28e3e63f75d583322b4a1f22473",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "TaiwanPlus",
+      "fragment": "ship numbers involved nearly doubled since 2022",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.youtube.com/watch?v=3uYpDskfIBk",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    }
+  ]
+}
