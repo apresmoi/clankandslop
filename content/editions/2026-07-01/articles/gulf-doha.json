@@ -1,0 +1,195 @@
+{
+  "id": "gulf-doha",
+  "topics": [
+    "us-iran",
+    "middle-east-war",
+    "strait-of-hormuz"
+  ],
+  "edition_date": "2026-07-01",
+  "section": "world",
+  "kicker": "War premium fades",
+  "epistemic": "fact",
+  "headline": "Doha hosts indirect US-Iran talks",
+  "deck": "Qatar and Pakistan are mediating technical sessions on the mid-June memorandum while both capitals insist the channel stays indirect. Twenty-one South Korean-operated vessels have crossed Hormuz safely since the ceasefire as Brent trades near $72. IAEA chief Rafael Grossi says inspections will proceed once modalities are settled.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "hormuz",
+    "hero_map": "hormuz",
+    "title": "The strait quiets as the talks stay indirect",
+    "caption": "US-Iran technical talks run through mediators in Doha as Hormuz traffic normalises and the war premium drains · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.55,
+        "lon": 56.25
+      },
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.27
+      },
+      {
+        "name": "KHASAB",
+        "lat": 26.18,
+        "lon": 56.24
+      }
+    ]
+  },
+  "body": [
+    "US and Iranian technical delegations convened indirect talks in Doha on 1 July, with Reuters confirming the sessions through a source with direct knowledge and an Iranian official [E1]. Steve Witkoff and Jared Kushner were not attending those technical discussions themselves, keeping Washington's senior envoys outside the working-room sessions Qatar and Pakistan mediated [E1].",
+    "Qatar's foreign ministry said no high-level US-Iran meetings were taking place under the agreed mechanism [E2]. US envoys met Qatari intermediaries instead, while Iranian and American technical teams remained in session, directly and indirectly, with those mediators [E2].",
+    "Prime Minister Sheikh Mohammed bin Abdulrahman Al-Thani received Witkoff and Kushner on 30 June as Doha sustained its broker role [E3]. The ministry said the agenda still covered Hormuz shipping, the nuclear file, frozen Iranian funds, and Lebanon alongside broader regional questions [E2].",
+    "President Trump told reporters both governments were “getting along very well” and repeated his claim that Iran had requested a meeting in Doha [E4][E5]. Iranian officials denied that any meeting at any level with the American side had been scheduled, a denial Qatar's public statements aligned with [E5][E6].",
+    "Working groups following up on the mid-June memorandum kept the process alive without delivering a settlement [E1]. Pakistan joined Qatar in hosting the channel Tehran has kept indirect, leaving passage rules, nuclear safeguards, and fund releases on the table without resolution [E1][E2].",
+    "South Korea's oceans ministry said 21 South Korean-operated vessels had passed safely through the strait since the ceasefire was signed two weeks earlier [E7]. The damaged bulk carrier Namu was due to leave Hormuz in mid-July once repairs finished, a timeline Reuters framed as part of a wider shipping normalisation [E7].",
+    "Reuters recorded no cross-verified report of fresh US-Iran strikes or new Hormuz tanker casualties in the past day as the mutual stand-down held into 1 July [E1]. That kinetic quiet coincided with Brent crude trading near $72 per barrel as oil shed much of its Gulf war premium [E8].",
+    "IAEA Director General Rafael Grossi said on 24 June that inspections “will go ahead” while the agency worked out modalities with Tehran [E9]. Through 1 July, no official confirmation placed inspectors back inside the most sensitive affected sites, leaving access agreed in principle but not yet restored [E9]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "key_numbers": [
+    {
+      "label": "South Korean-operated vessels through Hormuz since ceasefire",
+      "value": "21",
+      "dir": "up"
+    },
+    {
+      "label": "Brent crude on 1 July",
+      "value": "~$72",
+      "dir": "down"
+    },
+    {
+      "label": "IAEA inspectors back at struck sites",
+      "value": "0",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "technical talks were underway in Doha",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/asia-pacific/us-iran-enter-technical-talks-secure-peace-deal-restart-shipping-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Qatar MFA",
+      "fragment": "no high-level U.S.-Iran meetings were taking place",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://mofa.gov.qa/en/qatar/latest-articles/latest-news/details/2026/06/30/advisor-to-prime-minister--official-spokesperson-for-foreign-ministry--iran-us-technical-meetings-continue-without-high-level-talks",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Qatar MFA",
+      "fragment": "Prime Minister meets US envoys",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://mofa.gov.qa/en/qatar/latest-articles/latest-news/details/2026/06/30/prime-minister-and-minister-of-foreign-affairs-meets-us-envoys",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "getting along very well",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/middle-east/trump-says-us-iran-getting-along-very-well-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Iran had requested a meeting in Doha",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/middle-east/us-says-trump-envoys-kushner-witkoff-will-travel-iran-meeting-doha-2026-06-29/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "denied that any meeting at any level",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/middle-east/uncertainty-over-qatar-diplomacy-clouds-prospects-us-iran-deal-2026-06-30/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "21 South Korean-operated vessels had passed safely",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/asia-pacific/south-korea-cargo-ship-namu-exit-strait-hormuz-after-attack-gulf-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Brent at $72.00",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/business/energy/oil-prices-dip-market-assesses-ceasefire-iran-israel-conflict-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "inspections will go ahead",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/iaea-chief-says-iran-inspections-will-go-ahead-working-modalities-2026-06-24/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    }
+  ]
+}
