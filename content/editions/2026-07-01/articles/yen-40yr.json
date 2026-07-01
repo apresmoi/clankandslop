@@ -1,0 +1,162 @@
+{
+  "id": "yen-40yr",
+  "topics": [
+    "central-banks",
+    "rates",
+    "inflation"
+  ],
+  "edition_date": "2026-07-01",
+  "section": "markets",
+  "kicker": "Intervention watch",
+  "epistemic": "fact",
+  "headline": "Yen hits 40-year low at 162.84 vs dollar",
+  "deck": "The Japanese yen fell to its weakest level against the dollar in roughly four decades on 1 July, with Reuters citing USD/JPY at 162.84 before a modest rebound. Rate differentials, a firmer dollar and rising U.S. yields in thin holiday liquidity drove the move, while Tokyo kept its intervention posture alive without confirming fresh action.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "body": [
+    "Reuters put USD/JPY at 162.84 on 1 July, a fresh four-decade high for the dollar against the yen and the pair's weakest reading since the mid-1980s, before the cross eased toward 162.35 as the session progressed [E1][E2].",
+    "Rising U.S. Treasury yields and a firmer dollar index near 101.28 drove the move, with Reuters reporting the 10-year yield at 4.471% as traders priced widening rate differentials against the Bank of Japan's accommodative stance [E2][E3].",
+    "Thin liquidity around the U.S. holiday amplified the session's volatility, a backdrop Reuters noted as traders watched for potential official action from Tokyo even though no confirmed intervention landed on the day [E1][E4].",
+    "Japan's finance ministry kept its intervention posture intact. Government sources told Reuters the late-April “final warning” still stood, and Chief Cabinet Secretary Katayama reiterated readiness to respond to excessive forex swings [E5][E6].",
+    "Senior currency diplomat Mimura told Bloomberg that prior intervention had been effective and that the United States had been supportive, language Reuters carried on 1 July that underscored Tokyo's coordination hopes without confirming fresh dollar sales [E7].",
+    "Carry-trade positioning and imported-energy costs remain the stakes. A weaker yen keeps yen-funded borrowing attractive for global investors while raising the yen-denominated bill for Japan's fuel imports, pressures Reuters linked to the pair's slide through late June into July [E1][E8].",
+    "Tokyo's credibility now rides on a line officials have drawn without fully enforcing. Reuters reported traders pricing intervention risk after the 162.84 print, yet the absence of verified Ministry of Finance action on 1 July left the market testing how far rhetoric alone can hold [E4][E7][E8]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "key_numbers": [
+    {
+      "label": "USD/JPY session high",
+      "value": "162.84",
+      "dir": "down"
+    },
+    {
+      "label": "USD/JPY later level",
+      "value": "162.35",
+      "dir": "up"
+    },
+    {
+      "label": "Dollar index (DXY)",
+      "value": "101.28",
+      "dir": "up"
+    },
+    {
+      "label": "U.S. 10-year Treasury yield",
+      "value": "4.471%",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "yen sinks to four-decade low",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/yen-sinks-four-decade-low-dollar-gets-yields-boost-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "USD/JPY high 162.84",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "U.S. 10-year Treasury yield at 4.471%",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "no confirmed official intervention",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/yen-sinks-four-decade-low-dollar-gets-yields-boost-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "yen hits 40-year low",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/yen-hits-40-year-low-clock-ticks-intervention-2026-06-30/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "build economic structure resilient to forex swings",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/japan-will-build-economic-structure-resilient-forex-swings-govt-spokesman-says-2026-06-30/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "intervention effective and U.S. supportive",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/japan-fx-diplomat-says-intervention-effective-us-supportive-bloomberg-news-2026-07-01/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "final warning still stands",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/yen-hits-40-year-low-clock-ticks-intervention-2026-06-30/",
+        "retrieved_at": "2026-07-01T18:30:00Z"
+      }
+    }
+  ]
+}
