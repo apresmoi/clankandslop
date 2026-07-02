@@ -1,0 +1,158 @@
+{
+  "id": "compute-territory",
+  "topics": [
+    "compute",
+    "semiconductors",
+    "nuclear-power",
+    "china-ai",
+    "open-weight-models"
+  ],
+  "edition_date": "2026-07-02",
+  "section": "tech",
+  "kicker": "Open-weight pressure",
+  "epistemic": "inference",
+  "headline": "Korea, US Race to Site AI Compute",
+  "deck": "Seoul and Washington are steering billions toward power-rich land, permitted generation, and domestic chips while China's low-cost open models narrow the frontier gap. Semiconductor stocks fell on 2 July as investors weighed megawatt megaprojects against cheaper inference anyone can download.",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": [
+      "Tinkerton"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "ascii",
+    "shape": "chip",
+    "roll": "chip",
+    "caption": "The US and Korea bind compute to power and land; China makes the model cheap and downloadable"
+  },
+  "body": [
+    "South Korea unveiled more than $576 billion in chip-related investment spanning semiconductors, physical AI infrastructure, and datacenters [E1]. Officials steered the package toward the country's southwest, where abundant, underused electricity could absorb new fabrication and training loads without crowding Seoul's strained grid [E1]. The geography signals a deliberate bet that national AI advantage will hinge on where power is cheap, permits move fast, and land sits ready [E1].",
+    "A companion national compute strategy targets 18,000 high-performance GPUs and aims to lift domestic AI chips to half of the National AI Computing Center's capacity by 2030 [E2]. Incentives on power, siting, and tax flow to regions outside the capital, reinforcing the southwest pivot [E2]. Seoul's congestion becomes the problem the policy is written to escape, and domestic silicon share becomes the metric by which success will be judged [E2].",
+    "Washington matched the territorial logic on federal ground when the Department of Energy identified 16 potential sites on DOE land for AI infrastructure [E3]. The announcement highlighted existing energy assets and fast-tracked new generation, including nuclear options, with operation targeted by the end of 2027 [E3]. Federal land becomes a shortcut past local siting fights that can stall private campuses for years [E3]. Nuclear mention signals willingness to pair always-on generation with always-on training loads [E3].",
+    "The White House's March Ratepayer Protection Pledge pressed AI companies to build, bring, or buy the power they need and shield households from added costs [E4]. Private capital followed the same constraint: datacenter investors have been acquiring power developers as U.S. electricity demand for datacenters is expected to climb from 31 GW in 2025 to 66 GW in 2027 [E7]. Compute expansion and generation procurement are merging into one procurement chain, with every new rack tied to a contracted megawatt [E7].",
+    "China's counter-strategy runs through software economics. Z.ai released GLM-5.2, a low-cost open-weight model that narrows the frontier gap in coding and cyber capabilities at a fraction of closed-model pricing [E5]. Downloadable weights shift value toward inference efficiency and distribute capable models across hardware that already sits on enterprise networks [E5].",
+    "Equity markets registered the tension on 2 July as semiconductor names led a broader tech drag. NVIDIA fell 1.66%, AMD dropped 3.91%, and the SOXX semiconductors ETF slid 4.44% as investors questioned whether AI-spend optimism was already priced in [E6]. The selloff landed the same day Korea published its compute targets and DOE advanced federal siting plans, inviting a read that traders weighed territorial capex alongside cheaper model economics [E6]. Hardware exporters bore the immediate mark even as policymakers doubled down on physical expansion [E6].",
+    "From these parallel moves, a contest emerges over deployment friction. Territorial strategies bind models to permitted land, contracted power, and domestic chip share; open-weight releases attempt to compress the cost of running capable models on existing hardware [E1][E2][E5]. If inference can run well on smaller, cheaper stacks, the marginal value of each new gigawatt and GPU rack may fall even as governments pour billions into them [E3][E7]. Advantage may be shifting toward whichever stack deploys under the fewest power, siting, and security constraints [E2][E4][E5].",
+    "The counter-case deserves weight. Territorial buildouts are real, compounding, and backed by sovereign capital: Korea's $576 billion commitment and Washington's federal siting program are not rhetorical [E1][E3]. Enterprise adoption remains gated by security and governance requirements that open-weight efficiency alone may not dissolve [E4][E5]. China's cost edge could narrow hyperscaler margins without overturning the economics of controlled, high-power training campuses that governments are still racing to license [E2][E6][E7]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7"
+  ],
+  "key_numbers": [
+    {
+      "label": "Korea chip/AI investment plan",
+      "value": "$576bn",
+      "dir": "up"
+    },
+    {
+      "label": "US datacenter power demand 2025→2027",
+      "value": "31→66 GW",
+      "dir": "up"
+    },
+    {
+      "label": "US semis ETF (SOXX), 2 Jul",
+      "value": "-4.44%",
+      "dir": "down"
+    },
+    {
+      "label": "DOE federal sites opened for AI datacenters",
+      "value": "16",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "more than $576 billion",
+      "as_of": "29 Jun",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.reuters.com/technology/south-korea-unveils-576-billion-chip-investment-2026-06-29/",
+        "retrieved_at": "2026-07-02T16:57:00Z"
+      }
+    },
+    {
+      "source": "Korea MSIT",
+      "fragment": "18,000 high-performance GPUs",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.msit.go.kr/eng/bbs/view.do?bbsSeqNo=42&mId=4&mPid=2&nttSeqNo=1092",
+        "retrieved_at": "2026-07-02T16:57:00Z"
+      }
+    },
+    {
+      "source": "US DOE",
+      "fragment": "AI infrastructure on DOE lands",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.energy.gov/policy/ai-infrastructure-doe-lands-request-information",
+        "retrieved_at": "2026-07-02T16:57:00Z"
+      }
+    },
+    {
+      "source": "US White House",
+      "fragment": "Ratepayer Protection Pledge",
+      "as_of": "Mar 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.whitehouse.gov/fact-sheets/2026/03/fact-sheet-president-donald-j-trump-advances-energy-affordability-with-the-ratepayer-protection-pledge/",
+        "retrieved_at": "2026-07-02T16:57:00Z"
+      }
+    },
+    {
+      "source": "z.ai",
+      "fragment": "GLM-5.2",
+      "as_of": "late Jun",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://z.ai/blog/glm-5.2",
+        "retrieved_at": "2026-07-02T16:43:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "AMD -3.91%",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.reuters.com/markets/us/wall-street-futures-slip-tech-drags-2026-07-02/",
+        "retrieved_at": "2026-07-02T16:26:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "31 GW in 2025 to 66 GW in 2027",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.reuters.com/business/energy/data-center-investors-buy-power-developers-2026-06-22/",
+        "retrieved_at": "2026-07-02T16:57:00Z"
+      }
+    }
+  ]
+}
