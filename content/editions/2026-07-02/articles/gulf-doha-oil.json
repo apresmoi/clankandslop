@@ -1,0 +1,138 @@
+{
+  "id": "gulf-doha-oil",
+  "topics": [
+    "strait-of-hormuz",
+    "oil",
+    "us-iran",
+    "middle-east-war"
+  ],
+  "edition_date": "2026-07-02",
+  "section": "world",
+  "kicker": "Hormuz Holds",
+  "epistemic": "fact",
+  "headline": "Brent Slides to Four-Month Low Near $71",
+  "deck": "Qatari and Pakistani mediators reported progress in Doha while Strait of Hormuz traffic stayed steady. Brent crude settled near a four-month low as war-risk premia faded, even as nuclear inspections at struck Iranian sites remained suspended.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "body": [
+    "On 2 July, Qatari and Pakistani mediators held separate meetings in Doha with American and Iranian negotiators, covering issues tied to the Islamabad memorandum of understanding on Hormuz shipping and the release of Iranian assets. Islamabad described “positive progress” on those questions but said the next session would be scheduled later, leaving the mediated track active yet without a fixed date. Both Washington and Tehran kept the channel indirect through third parties rather than convening their principals in the same room [E1][E2].",
+    "Technical contacts between the United States and Iran continued through direct and indirect formats under the agreed negotiation mechanism, even as higher-stakes diplomacy stayed on hold. No high-level meetings took place between the Iranian and American sides, a gap that leaves grand bargains off the table while working-level issues get parsed. Neither capital has announced when the next mediated round will convene, and each government remains free to interpret “positive progress” on its own terms [E2].",
+    "Brent crude futures traded near a four-month low around $70–71 on 2 July as the Gulf war-risk premium drained after the latest Doha round and steady flows through the Strait of Hormuz. West Texas Intermediate moved in tandem near $67–68, reflecting the same relief that had lifted prices earlier in the crisis. Traders priced the barrel on mediation momentum and open shipping lanes as supply-disruption fears faded [E3].",
+    "The weekly petroleum status report offered the inventory and supply backdrop against which Brent slid. Stock and flow data from the U.S. Energy Information Administration sit alongside the geopolitical bid that had inflated Gulf-linked grades when Hormuz risk spiked. Softer risk premia combined with familiar domestic supply metrics to pull benchmarks toward their recent lows. Inventories and import flows thus framed the move as partly fundamental, partly an unwind of crisis pricing [E4].",
+    "Hormuz transits remained the hinge the Islamabad framework was built to protect, and the 2 July sessions explicitly tied progress to safe passage and frozen Iranian funds. Mediators framed advances on both files as part of the same package rather than isolated concessions. Safe lanes through the strait stayed the operational test of whether diplomacy could hold, and any fresh blockade or harassment would reprice crude faster than a resumed talking round could calm markets [E1].",
+    "On the nuclear file, inspectors had not returned to Iran’s strike-affected sites as of early July, despite access having been agreed in principle. The International Atomic Energy Agency’s chronology recorded no confirmed deployments back to the damaged facilities, leaving verification offline while missiles and centrifuges stay in the headlines. Washington and Tehran have traded blame over inspection modalities without restoring on-the-ground monitoring [E5].",
+    "The agency’s director general told the Board of Governors on 8 June that inspections and modalities for the most sensitive locations remained unresolved. That stalemate predates the July mediation burst and keeps a parallel risk channel open even as oil traders focus on Hormuz. Sensitive-site access was the file the director general flagged as still blocked, and until inspectors regain entry, the nuclear dossier can re-escalate independently of shipping talks [E6].",
+    "The Gulf stand-down that held into 2 July kept Hormuz moving and bought negotiators room in Doha. Brent near $70 captures easing war-risk premia with settlement still distant. Every load-bearing file stays open: assets, shipping, inspections, and the schedule for the next round. A broken channel or blocked strait would reverse the slide as quickly as the premium drained [E1][E3]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent crude",
+      "value": "~$70.7 (4-month low)",
+      "dir": "down"
+    },
+    {
+      "label": "WTI crude",
+      "value": "~$67.7",
+      "dir": "down"
+    },
+    {
+      "label": "IAEA inspectors back at struck sites",
+      "value": "0",
+      "dir": "flat"
+    },
+    {
+      "label": "Next US-Iran mediated round",
+      "value": "not yet set",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Pakistan Ministry of Foreign Affairs",
+      "fragment": "positive progress",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://mofa.gov.pk/press-releases/qatari-and-pakistani-mediatiors-meetings-with-the-us-and-iranian-negotiations-in-doha-today",
+        "retrieved_at": "2026-07-02T15:57:00Z"
+      }
+    },
+    {
+      "source": "Qatar Ministry of Foreign Affairs",
+      "fragment": "no high-level meetings between the Iranian and American sides",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://mofa.gov.qa/en/qatar/latest-articles/latest-news/details/2026/06/30/advisor-to-prime-minister--official-spokesperson-for-foreign-ministry--iran-us-technical-meetings-continue-without-high-level-talks",
+        "retrieved_at": "2026-07-02T15:57:00Z"
+      }
+    },
+    {
+      "source": "ICE Brent Crude Futures",
+      "fragment": "Brent Crude Futures",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ice.com/products/219/brent-crude-futures/data",
+        "retrieved_at": "2026-07-02T16:26:00Z"
+      }
+    },
+    {
+      "source": "U.S. Energy Information Administration",
+      "fragment": "Weekly Petroleum Status Report",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.eia.gov/petroleum/supply/weekly/",
+        "retrieved_at": "2026-07-02T16:26:00Z"
+      }
+    },
+    {
+      "source": "International Atomic Energy Agency",
+      "fragment": "Chronology of Key Events",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.iaea.org/newscenter/focus/iran/chronology-of-key-events",
+        "retrieved_at": "2026-07-02T15:57:00Z"
+      }
+    },
+    {
+      "source": "International Atomic Energy Agency",
+      "fragment": "Introductory Statement to the Board of Governors",
+      "as_of": "8 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.iaea.org/newscenter/statements/iaea-director-generals-introductory-statement-to-the-board-of-governors-8-june-2026",
+        "retrieved_at": "2026-07-02T15:57:00Z"
+      }
+    }
+  ]
+}
