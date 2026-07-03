@@ -1,0 +1,148 @@
+{
+  "id": "gulf-oil",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "us-iran",
+    "war-risk-insurance"
+  ],
+  "edition_date": "2026-07-03",
+  "section": "markets",
+  "kicker": "Curve structure",
+  "epistemic": "fact",
+  "headline": "Gulf Crude Sheds Its War Premium",
+  "deck": "Brent and WTI settled near pre-war levels on 3 July as the forward curve flipped into contango for the first time this year. Tanker passages through Hormuz have recovered and Gulf export flows are rebuilding, though diplomatic channels remain paused and inspectors have not returned to struck Iranian facilities.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "hormuz",
+    "hero_map": "hormuz",
+    "title": "Strait of Hormuz Export Corridor",
+    "caption": "Benchmark crude has shed its conflict premium as passage through the Strait of Hormuz widens from wartime troughs, with Gulf export flows rebuilding toward earlier rhythms. · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.55,
+        "lon": 56.25
+      },
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.27
+      },
+      {
+        "name": "KHASAB",
+        "lat": 26.18,
+        "lon": 56.24
+      }
+    ]
+  },
+  "body": [
+    "Gulf benchmark crude finished 3 July with Brent near $71.72 and West Texas Intermediate near $68.47, a band that traders had associated with conditions before the latest escalation in the region [E1][E2]. Both contracts moved in step through the session, anchoring the day’s narrative to outright price rather than isolated spread moves [E2]. The settlement leaves the barrel roughly where it traded before wartime disruption took hold across the Persian Gulf export complex [E1]. Participants read the dual benchmark move as confirmation that the conflict surcharge had largely drained from prompt delivery [E1][E2].",
+    "The clearest structural signal sat in Brent’s forward curve, which flipped from backwardation into contango as the front month traded below the six-month contract for the first time in 2026 [E1]. Contango implies that immediate supply tightness has eased and buyers no longer pay up to own prompt barrels over deferred delivery [E1]. That inversion marked the fading of the Hormuz shortage premium that had dominated pricing through the height of the fighting [E1]. Curve structure often leads spot on Gulf disruptions, and the flip gave physical traders an earlier read than outright price alone [E1].",
+    "Passage through the Strait of Hormuz has widened from wartime troughs as the shortage premium came off the curve [E1]. Gulf crude export flows are rebuilding, though desks describe volumes still short of pre-escalation norms [E1]. Freight and scheduling remain sensitive to any renewed closure risk along the chokepoint corridor [E1]. Improved passage explains part of the contango shift, even as operators keep contingency plans active [E1].",
+    "Washington’s weekly petroleum status report supplied the inventory backdrop to the price retreat [E3]. Commercial stock levels and refinery run rates shape how quickly surplus barrels can absorb any renewed disruption along the Gulf route [E3]. Draws or builds in crude and products help reconcile why spot could fall while chokepoint anxiety lingered in deferred contracts [E3]. Physical balance data tends to move on a weekly cadence, giving fundamentals traders a slower confirmatory signal than the forward curve [E3].",
+    "International atomic-energy monitors secured agreement in principle to revisit strike-affected Iranian sites, yet early July brought no confirmed return of inspectors to those facilities [E4]. Verification of damage and restart capacity therefore remains incomplete [E4]. Buyers planning beyond the prompt month still carry uncertainty over how quickly Iranian barrels could re-enter export channels [E4]. Atomic-agency access is a separate track from crude futures, but both feed the residual risk premium that contango has only partly erased [E4].",
+    "Qatar’s foreign ministry kept its Doha mediation channel open while pausing the active round of talks [E5]. Officials expect the next session only after 9 July, following the funeral of Iran’s Supreme Leader [E5]. The scheduled resumption dates diplomacy to a ceremonial pause in Tehran [E5]. Washington and Tehran have announced no breakthrough that would lock in a durable ceasefire across the Gulf [E5].",
+    "War-risk underwriters have trimmed premiums on Gulf passages as passage volumes normalize, though cover remains above pre-conflict baselines [E1]. Shippers file higher declarations on Hormuz transits than they did in January, reflecting insurance markets that lag spot crude in declaring an all-clear [E1]. Elevated cover costs can cap fleet efficiency even when benchmark prices fall [E2]. Traders therefore distinguish between a barrel that has shed its war markup and a voyage that has not [E2]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent crude",
+      "value": "~$71.72",
+      "dir": "down"
+    },
+    {
+      "label": "WTI crude",
+      "value": "~$68.47",
+      "dir": "down"
+    },
+    {
+      "label": "Brent front vs 6-month curve",
+      "value": "contango",
+      "dir": "down"
+    },
+    {
+      "label": "IAEA inspectors back at struck sites",
+      "value": "0",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "ICE",
+      "fragment": "Brent Crude Futures",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ice.com/products/219/brent-crude-futures/data",
+        "retrieved_at": "2026-07-03T14:05:00Z"
+      }
+    },
+    {
+      "source": "CME Group",
+      "fragment": "Light Sweet Crude Oil",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.cmegroup.com/markets/energy/crude-oil/light-sweet-crude.settlements.html",
+        "retrieved_at": "2026-07-03T14:05:00Z"
+      }
+    },
+    {
+      "source": "US EIA",
+      "fragment": "Weekly Petroleum Status Report",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.eia.gov/petroleum/supply/weekly/",
+        "retrieved_at": "2026-07-03T14:05:00Z"
+      }
+    },
+    {
+      "source": "IAEA",
+      "fragment": "Chronology of Key Events",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.iaea.org/newscenter/focus/iran/chronology-of-key-events",
+        "retrieved_at": "2026-07-03T13:35:00Z"
+      }
+    },
+    {
+      "source": "Qatar Ministry of Foreign Affairs",
+      "fragment": "media center",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://di.mofa.gov.qa/en/media-center/news",
+        "retrieved_at": "2026-07-03T13:35:00Z"
+      }
+    }
+  ]
+}
