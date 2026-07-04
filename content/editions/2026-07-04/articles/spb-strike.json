@@ -1,0 +1,160 @@
+{
+  "id": "spb-strike",
+  "topics": [
+    "ukraine",
+    "autonomous-weapons",
+    "oil"
+  ],
+  "edition_date": "2026-07-04",
+  "section": "world",
+  "kicker": "Baltic Deep Strike",
+  "epistemic": "fact",
+  "headline": "Ukraine Hits St. Petersburg Oil Terminal",
+  "deck": "Overnight drone strikes reached one of Russia's most symbolic cities and its Baltic oil export hub, roughly 1,100 kilometres from Ukraine's border. President Zelensky framed the campaign as “long-range sanctions,” while Russian officials acknowledged a terminal hit but did not confirm claims of damage at the Kronstadt naval base. Neither side has published an independent damage assessment.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "map",
+    "map": "spb",
+    "hero_map": "spb",
+    "title": "Overnight Strikes on Russia's Baltic Coast",
+    "caption": "Confirmed and claimed targets in the 4 July raid: St. Petersburg's Kirovsky oil terminal, the Kronstadt naval base area, and debris reported near Vysotsk port on the Gulf of Finland. · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "ST PETERSBURG",
+        "lat": 59.94,
+        "lon": 30.31
+      },
+      {
+        "name": "KRONSTADT",
+        "lat": 59.99,
+        "lon": 29.77
+      },
+      {
+        "name": "VYSOTSK",
+        "lat": 60.63,
+        "lon": 28.57
+      }
+    ]
+  },
+  "body": [
+    "Ukraine carried its deep-strike campaign into Russia's Baltic heartland overnight, placing one of the country's most symbolic cities inside Kyiv's operational range. President Volodymyr Zelensky said Ukrainian forces struck the St. Petersburg Oil Terminal, roughly 1,100 kilometres from Ukraine's border, and claimed hits on military targets at the Kronstadt naval base. Zelensky described the operation as part of a campaign of “long-range sanctions” aimed at degrading Russian export and military infrastructure far from the front [E1]. St. Petersburg Governor Alexander Beglov separately confirmed that the city faced a large-scale drone attack, narrowing the overlap between the two sides to at least one acknowledged strike on an oil facility [E2].",
+    "Beglov reported that an oil terminal in the city's Kirovsky district was struck during the overnight raid and said authorities recorded no casualties [E2]. The admission marks a rare public confirmation from a senior Russian official that a major urban industrial target in the northern capital sustained damage from Ukrainian weapons. Russia's defence ministry has not corroborated Zelensky's separate claim that military installations at Kronstadt were hit, leaving that portion of the overnight account contested and without independent verification [E1]. No photographs, satellite imagery, or third-party damage assessments have been released by either government to quantify the scale of destruction at the terminal or the naval base [E1][E2].",
+    "In the surrounding Leningrad region, Governor Alexander Drozdenko said debris fell near the port of Vysotsk, a Baltic export hub northwest of St. Petersburg [E3]. Regional air defences downed 72 drones over Leningrad Oblast during the attack, according to Drozdenko's official channel, before authorities later issued an all-clear [E3]. Vysotsk sits on the Gulf of Finland and forms part of the same coastal energy corridor that feeds Russia's northwestern oil trade, extending the geographic footprint of the raid beyond the city limits [E3]. The regional tally offers one localized slice of intercept activity, though it does not by itself establish how many munitions reached their targets [E3].",
+    "Russia's Ministry of Defence said its air defences destroyed 389 Ukrainian drones overnight across multiple regions [E4]. Later statements from the same channel reframed the engagement as a combined cross-regional attack in which more than 500 air targets were downed [E4]. The ministry's figures exceed Drozdenko's regional count and reflect Moscow's habit of aggregating intercept claims across vast airspace during mass drone salvos [E4]. Neither the defence ministry nor Ukrainian commanders have published a reconciled strike-and-intercept ledger that outside analysts could verify [E4].",
+    "The confirmed strike on a St. Petersburg oil terminal extends Ukraine's demonstrated reach to Russia's Baltic export gateway, a lane that carries symbolic weight as the birthplace of the imperial navy and a pillar of northwestern hydrocarbon shipments [E1][E2]. Kyiv has steadily pushed long-range unmanned strikes deeper into Russian rear areas, and the roughly 1,100-kilometre distance cited by Zelensky underscores how far those systems can now project force from Ukraine's border [E1]. Russian officials treated the event as a major security incident while stopping short of validating every Ukrainian battlefield assertion, a pattern that leaves the operational picture split along national lines [E2][E4]. Without open-source damage surveys, outside observers cannot yet judge whether the terminal disruption amounts to a temporary shutdown or a sustained export constraint [E1][E2].",
+    "On Ukraine's eastern front, fighting over territorial control remained disputed on the same day. Kyiv denied Moscow's claim to have captured the city of Kostiantynivka, keeping the ground-war narrative as contested as the overnight strikes in the north [E6]. That parallel dispute illustrates how both governments use competing claims to shape perceptions of momentum while battlefield verification lags [E6]. The northern drone campaign and the eastern ground fight therefore unfolded under the same epistemic fog, with each capital asserting gains the other rejected [E6].",
+    "Overnight accounts from Russian officials and Ukrainian leadership converged on a major drone attack against the St. Petersburg region, including a confirmed hit on a city oil terminal [E5]. Those same statements left the Kronstadt claim unresolved and offered no shared measure of how severely the oil infrastructure was damaged [E5]. For readers weighing significance, the least contested fact remains geographic: a facility in Russia's second city now sits within the proven envelope of Ukraine's long-range campaign [E1][E2][E5]. Everything beyond that shared baseline, from naval-base hits to export losses, still rests on assertions awaiting corroboration [E1][E5]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "key_numbers": [
+    {
+      "label": "Distance from Ukraine's border",
+      "value": "~1,100 km",
+      "dir": "up"
+    },
+    {
+      "label": "Russian drones claimed downed overnight",
+      "value": "389",
+      "dir": "up"
+    },
+    {
+      "label": "Drones downed over Leningrad region",
+      "value": "72",
+      "dir": "up"
+    },
+    {
+      "label": "Deaths reported in St. Petersburg",
+      "value": "0",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "President of Ukraine, Zelensky official channel",
+      "fragment": "long-range sanctions",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://t.me/s/V_Zelenskiy_official/19320",
+        "retrieved_at": "2026-07-04T18:35:00Z"
+      }
+    },
+    {
+      "source": "St. Petersburg city administration / Governor Beglov",
+      "fragment": "gov.spb.ru",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.gov.spb.ru/press/",
+        "retrieved_at": "2026-07-04T18:35:00Z"
+      }
+    },
+    {
+      "source": "Leningrad region Governor Drozdenko official channel",
+      "fragment": "72 drones",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://t.me/s/drozdenko_au_lo?before=10961",
+        "retrieved_at": "2026-07-04T18:35:00Z"
+      }
+    },
+    {
+      "source": "Russian Ministry of Defence official channel",
+      "fragment": "389",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://t.me/s/mod_russia",
+        "retrieved_at": "2026-07-04T18:35:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "St Petersburg region hit by major Ukrainian drone attack",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/st-petersburg-region-hit-by-major-ukrainian-drone-attack-russian-officials-say-2026-07-04/",
+        "retrieved_at": "2026-07-04T18:35:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Ukraine denies Russian capture",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/business/aerospace-defense/ukraine-denies-russian-capture-key-eastern-city-kostiantynivka-2026-07-04/",
+        "retrieved_at": "2026-07-04T18:35:00Z"
+      }
+    }
+  ]
+}
