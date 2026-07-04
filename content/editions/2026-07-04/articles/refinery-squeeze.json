@@ -1,0 +1,110 @@
+{
+  "id": "refinery-squeeze",
+  "topics": [
+    "oil",
+    "ukraine",
+    "autonomous-weapons"
+  ],
+  "edition_date": "2026-07-04",
+  "section": "markets",
+  "kicker": "Long-Range Sanctions",
+  "epistemic": "inference",
+  "headline": "Ukraine Drone Strikes Pinch Russian Fuel",
+  "deck": "Kyiv's drone campaign against Russian refining is rationing coastal pumps and forcing Moscow to source gasoline from India while crude exports continue. Damage to plants deep inside the federation compounds faster than repair crews can restore distillation capacity. The squeeze targets war endurance per barrel alongside any single front.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "ascii",
+    "shape": "pumpjack",
+    "caption": "Ukraine's refinery strikes turn a fuel exporter into a fuel importer at the margin"
+  },
+  "body": [
+    "Ukraine has escalated strikes on Russian energy infrastructure deep inside the federation, hitting an oil refinery and a missile-component plant in the latest wave of President Volodymyr Zelensky's campaign [E1]. Zelensky has framed the operations as “long-range sanctions,” a label that signals intent to bleed Russia's war economy without waiting for front-line advances [E1]. The targets sit far from the battlefield, which suggests Kyiv is betting that refinery downtime compounds faster than Moscow can patch plants or reroute product [E1]. Each successful hit removes domestic distillation capacity that crude exports alone cannot replace at the local pump [E1].",
+    "Drone attacks on the Moscow refinery have inflicted damage severe enough that operators consider a production restart in 2026 unlikely [E2]. Losing a plant that close to the capital carries symbolic weight, but the commodity logic is simpler: fewer barrels refined near Russia's largest demand cluster means more crude must leave as raw feedstock or finished fuel must arrive from elsewhere [E2]. A year-long outage at a major urban refinery tightens the margin between what Russia pumps abroad and what its drivers can buy at home [E2]. Moscow's refining map was already stretched by earlier strikes; another flagship plant idled deepens the cumulative loss [E2].",
+    "NORSI, one of Russia's largest gasoline producers, suspended processing after a drone strike, removing a major source of motor fuel from the domestic chain [E3]. Shortages have spread along the Black Sea coast, where volunteer Cossack patrols helped maintain order at petrol stations as queues lengthened and tempers flared [E3]. Moscow has responded by importing gasoline from as far as India while continuing to ship crude abroad [E3]. Coastal resorts and port cities now compete with the war machine for scarce refined product, a friction that crude export revenue does not immediately soothe [E3].",
+    "Novorossiysk's city administration reported on 4 July that only a limited number of filling stations were dispensing fuel under restrictions [E4]. The municipal monitor is a ground-level confirmation that coastal rationing persists even as federal officials downplay episodic shortages [E4]. Local authorities posting station-by-station availability is an unusual transparency move for a wartime fuel crunch [E4]. The port city's dependence on steady motor fuel for logistics and tourism makes each restricted pump a visible measure of downstream strain [E4].",
+    "Damaged refineries appear to force Russia to export more raw crude because idled distillation capacity cannot convert barrels into domestic gasoline [E2][E3]. Kyiv gains leverage when Moscow must spend foreign exchange, tanker space, and political capital securing imports for drivers while still marketing itself as an energy superpower abroad [E3]. The pattern across Moscow, NORSI, and Novorossiysk reads as attrition aimed at war endurance per refined barrel, a metric distinct from hectares seized on the front [E1][E2][E4]. Battlefield gains measure territory; refinery downtime measures how many future war months each exported crude barrel can finance when home pumps run dry [E2][E3].",
+    "Russia still holds strategic fuel reserves, established import routes, and repair crews that have restored plants after past strikes [E3]. Local shortages along the Black Sea have eased unevenly, and rationing has not yet matched the severity of wartime blockades seen elsewhere [E3][E4]. Crude export revenue, not retail gasoline margins, remains the primary fiscal engine for military spending, which limits how much pump scarcity can starve the front [E3]. Moscow can absorb margin pain longer than a single refinery outage suggests, especially if Indian imports stabilize coastal supply before winter demand peaks [E3].",
+    "Zelensky's “long-range sanctions” label captures the operational theory even as the domestic economic wound deepens [E1]. Ukraine's drone campaign has crossed from episodic harassment into a persistent squeeze on downstream energy assets [E1][E2]. Whether that squeeze outlasts Russian repair capacity and reserve buffers will determine if the strategy rivals a conventional territorial advance in strategic value [E2][E3][E4]. For commodity markets, more crude may leave Russian ports even as fewer liters reach Russian cars [E3]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4"
+  ],
+  "key_numbers": [
+    {
+      "label": "Moscow refinery 2026 restart",
+      "value": "unlikely",
+      "dir": "down"
+    },
+    {
+      "label": "Russia importing gasoline from",
+      "value": "India",
+      "dir": "down"
+    },
+    {
+      "label": "NORSI processing after drone strike",
+      "value": "suspended",
+      "dir": "down"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Ukraine hits Russian oil refinery",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/ukraine-hits-russian-oil-refinery-missile-component-plant-zelenskiy-says-2026-07-01/",
+        "retrieved_at": "2026-07-04T18:11:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "unlikely to resume production this year",
+      "as_of": "24 Jun",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/moscow-oil-refinery-hit-by-drone-attacks-is-unlikely-resume-production-this-year-2026-06-24/",
+        "retrieved_at": "2026-07-04T18:11:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "keep order at petrol stations",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/cossacks-volunteers-help-keep-order-petrol-stations-russian-black-sea-resort-2026-07-03/",
+        "retrieved_at": "2026-07-04T18:11:00Z"
+      }
+    },
+    {
+      "source": "Novorossiysk city administration monitor",
+      "fragment": "Novorossiysk",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://admnvrsk.ru/o-gorode/novosti/glavnye-novosti/news-04072026092146-162194/",
+        "retrieved_at": "2026-07-04T17:35:00Z"
+      }
+    }
+  ]
+}
