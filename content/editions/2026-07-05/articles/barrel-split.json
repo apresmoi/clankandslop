@@ -1,0 +1,196 @@
+{
+  "id": "barrel-split",
+  "topics": [
+    "oil",
+    "ukraine",
+    "strait-of-hormuz",
+    "shipping",
+    "supply-chains"
+  ],
+  "edition_date": "2026-07-05",
+  "section": "markets",
+  "kicker": "Barrel Split",
+  "epistemic": "forecast",
+  "headline": "Brent at $71.94 Masks Product Squeeze",
+  "deck": "ICE Brent settled at $71.94 on Friday as OPEC+ cleared another 188,000 barrels a day for August and the six-month spread slipped into contango. Diesel and jet cracks at roughly twice prewar levels track a separate war: 194 refinery strikes have forced Russia to import gasoline and ration pumps on the Black Sea coast.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "ascii",
+    "shape": "pumpjack",
+    "caption": "Crude prices the reopening; products price the damage — the barrel split in two"
+  },
+  "body": [
+    "ICE Brent settled at $71.94 on Friday ahead of the long U.S. holiday weekend, with WTI at $68.78 [E3]. The prompt-versus-six-month spread turned negative for the first time in 2026, printing minus 56 cents on Thursday as prompt supply overwhelmed the forward curve [E2]. Eight OPEC+ producers confirmed on Sunday a 188,000 barrel-per-day production increase for August [E1]. Together, the settlement level, the contango flip, and the scheduled addition frame crude as a market pricing reopening supply [E1][E2][E3].",
+    "Refined products tell a sharper story across Asian trading hubs. Diesel and jet fuel cracks sit near twice prewar levels even as crude inventories look comfortable and refined fuels remain tight [E9]. Traders who watch crack spreads have tracked the divergence for weeks as flat price softened [E9]. Margin structure here signals stress in conversion capacity more than scarcity in barrels at sea [E9].",
+    "Ukrainian forces have struck Russian refineries 194 times this year, running at roughly eleven times last year's pace [E4]. May alone recorded 16 strikes, a monthly high on the Rochan Consulting tally [E4]. Each hit compounds downtime across Russia's export-oriented refining system [E4]. The campaign concentrates damage where crude becomes diesel, jet fuel, and gasoline [E4].",
+    "Russia arranged at least 60,000 tonnes of gasoline imports from India to ease domestic shortages, sources say, with plans reported for as much as 400,000 tonnes a month [E5]. Novorossiysk suspended gasoline sales to private motorists while Anapa capped fills at 20 litres per car, with Cossack volunteers helping keep order at stations [E6]. An oil-products exporter for decades is now bidding for finished motor fuel abroad [E5][E6]. Shortages trace refinery outages inside Russia and export curbs that keep molecules at home [E5][E6][E8].",
+    "President Putin signed tax-code amendments on the domestic fuel market into federal law on 4 July [E7]. Fuel-export restrictions remain in effect through 31 July 2026 [E8]. The legal stack aims to keep supply inside Russia while strikes remove conversion capacity [E7][E8]. Moscow has leaned on emergency imports and retail rationing alongside those curbs [E5][E6][E8].",
+    "Only 242 tankers transited the Strait of Hormuz in the week to 28 June, against more than 700 in a typical prewar week [E10]. Tanker counts offer the cleaner read on chokepoint access than outright Brent moves [E10]. Traffic has partially recovered from wartime lows, yet the strait remains half-open at best [E10]. Routing and insurance choices still filter which voyages proceed [E10].",
+    "The call: p=0.55 that ICE front-month Brent settles below $70.00 on 10 July. OPEC+'s August addition and the first contango of 2026 argue for softer prompt prices once weekday liquidity returns [E1][E2]. Counterweights include Brent already sitting near $72 after a long weekend and headlines that often lose force by Tuesday [E3]. Dissenters also cite a softer dollar as a cushion that can hold crude even when curves weaken [E2][E3].",
+    "Crude prices the reopening; products price a damaged refining system [E9][E4]. The actionable wedge is the spread between flat Brent and product cracks [E2][E9]. Until Russian conversion capacity stabilizes or Hormuz traffic normalizes toward prewar volumes, that gap should persist [E4][E10]. ICE Brent at $71.94 already sits closer to peace rhetoric than elevated distillate margins imply [E3][E9]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent, Friday settle",
+      "value": "$71.94",
+      "dir": "down"
+    },
+    {
+      "label": "Brent 6-month spread",
+      "value": "-$0.56",
+      "dir": "down"
+    },
+    {
+      "label": "OPEC+ August addition",
+      "value": "+188K bpd",
+      "dir": "up"
+    },
+    {
+      "label": "Refinery strikes this year (FT count)",
+      "value": "194",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "OPEC, press release (primary, 5 Jul)",
+      "fragment": "188",
+      "as_of": "5 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.opec.org/pr-detail/609-5-july-2026.html",
+        "retrieved_at": "2026-07-05T18:35:19Z"
+      }
+    },
+    {
+      "source": "Reuters (3 Jul)",
+      "fragment": "contango",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/brent-oil-curve-weakens-further-prompt-supply-glut-swamps-market-2026-07-03/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Reuters (3 Jul)",
+      "fragment": "$71.94",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-up-slightly-ahead-long-us-weekend-peace-efforts-hold-2026-07-03/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Financial Times (early Jul)",
+      "fragment": "194",
+      "as_of": "early Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ft.com/content/13687b48-9e54-44a1-bd4d-600bbc052baf",
+        "retrieved_at": "2026-07-05T18:36:51Z"
+      }
+    },
+    {
+      "source": "Reuters (1 Jul, sources)",
+      "fragment": "60,000",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/russia-buys-gasoline-india-tackle-shortages-sources-say-2026-07-01/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Reuters (3 Jul)",
+      "fragment": "20",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/cossacks-volunteers-help-keep-order-petrol-stations-russian-black-sea-resort-2026-07-03/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "publication.pravo.gov.ru, Federal Law No. 218-FZ (primary, official legal portal, 4 Jul)",
+      "fragment": "218-ФЗ",
+      "as_of": "4 Jul",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://publication.pravo.gov.ru/document/0001202607040001?index=9",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "government.ru (primary, official portal)",
+      "fragment": "31",
+      "as_of": "early Jul",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://special.government.ru/en/docs/56637/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Reuters Open Interest commentary (22 Jun)",
+      "fragment": "refined fuels remain tight",
+      "as_of": "22 Jun",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/commentary/reuters-open-interest/asia-has-plenty-crude-oil-refined-fuels-remain-tight-2026-06-22/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Reuters Breakingviews (1 Jul)",
+      "fragment": "242",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E10",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/commentary/breakingviews/tanker-data-is-better-hormuz-gauge-than-oil-prices-2026-07-01/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    }
+  ]
+}

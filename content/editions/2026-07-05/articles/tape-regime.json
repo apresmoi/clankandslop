@@ -1,0 +1,190 @@
+{
+  "id": "tape-regime",
+  "topics": [
+    "central-banks",
+    "rates",
+    "semiconductors",
+    "ai-compute"
+  ],
+  "edition_date": "2026-07-05",
+  "section": "markets",
+  "kicker": "Labor over geopolitics",
+  "epistemic": "forecast",
+  "headline": "Jobs miss rewires Fed and chip tape",
+  "deck": "Nonfarm payrolls added 57,000 in June with revisions lower and unemployment at 4.2%, pivoting out of the war-and-inflation tail toward a softer Fed path. Chip valuations slid in an AI-capacity scare; the yen recovered from four-decade lows as rate gaps repriced. US cash markets reopen Monday; Thursday\u2019s closes are the last read.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "body": [
+    "Nonfarm payrolls rose 57,000 in June and the unemployment rate held at 4.2%, with prior months revised lower, in a print that reset the macro narrative in a single session [E1]. Job growth missed expectations and traders repriced the Federal Reserve\u2019s path on the release [E2]. Through spring the tape had priced war risk and sticky inflation; after 2 July it began to trade a growth-slowdown, softer-policy story instead. Monday\u2019s US reopen will test whether that framing survives the first full cash session since the data dropped.",
+    "Policymakers had entered the week with markets assigning meaningful odds to a September rate increase, and the payrolls miss pulled those expectations back toward even money [E10]. The Bank of Japan, by contrast, had lifted its short-term policy rate to around 1.0% at its 16 June meeting and faces its next decision on 30\u201331 July [E7]. The cross-current left rate-gap trades, especially in yen and gold, as the cleanest expression of the shift. Duration and policy-sensitive equities absorbed the bulk of the repricing while defensive war hedges faded.",
+    "The PHLX Semiconductor Index closed at 12,626.22 on 2 July, down 5.44% on the session, as chip valuations took the brunt of the rotation [E3]. Market narrative tied the move to fears of excess AI compute capacity, a storyline that circulated widely after sharp South Korean equity losses in the same week; no primary filing pins a single cause to the rout [E4]. Asia retraced part of that scare on Friday, with Japan\u2019s Nikkei up about 1.5% and the KOSPI nearly 6% [E4]. Semiconductor multiples remain the pressure gauge for AI-infrastructure sentiment heading into the US week.",
+    "USD/JPY touched 162.84 on 1 July, the yen\u2019s weakest level against the dollar since 1986, before recovering to about 161.2 by Friday as the rate gap repriced [E5]. Japan\u2019s Ministry of Finance reported zero disclosed yen intervention for the 28 May\u201326 June window [E6]. Finance Minister Katayama said Tokyo stands ready to respond to excessive foreign-exchange moves and is in contact with US authorities [E8]. Verbal coordination has stayed active even as disclosed operations stayed absent through late June.",
+    "Gold headed for its first weekly rise in five sessions at $4,174.21 spot as expectations of further Fed tightening eased [E9]. The metal\u2019s bid fit the same post-payrolls pattern that pulled September hike odds lower and nudged the dollar off its highs [E10]. Precious metals and duration rallied together, a pairing scarce while war and inflation fears dominated spring pricing. Safe-haven flows tilted toward rate-cut convexity as geopolitical hedges lost premium.",
+    "US cash markets stayed closed Friday for the Independence Day observance, leaving Thursday\u2019s closes as the freshest American read ahead of Monday\u2019s reopen. Cross-border equity flows did much of the week\u2019s discovery work in the interim. Asian benchmarks led the rebound after the midweek chip rout, with Japan\u2019s Nikkei rising about 1.5% and South Korea\u2019s KOSPI up nearly 6% [E4]. That bounce followed Thursday\u2019s AI-valuation scare and sets the tone for the first US session of the new week.",
+    "The desk held NO at p=0.40 on USD/JPY retesting 162.50 by 10 July before the payrolls release. Softer US data, a weaker dollar, zero disclosed intervention, and intact coordination language lower the posterior: the call holds at NO, with p=0.25 that USD/JPY reaches 162.50 by the 10 July New York close [E5][E6][E8]. Crowded short-yen positioning and a still-wide rate gap remain the dissent case for a squeeze back toward the July highs [E7][E10]. The line refreshes after Monday\u2019s reopen and any further official FX guidance.",
+    "War risk and supply shocks framed spring trading; since 2 July the labor market has supplied the dominant macro catalyst [E1][E2]. Chip multiples, yen crosses, and gold now track softer-Fed probability alongside the growth-slowdown read that payrolls delivered [E3][E9][E10]. That regime will hold until payrolls stabilize or policymakers push back on market easing. Until then, every major cross-asset move will be read through the June employment ledger first."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ],
+  "key_numbers": [
+    {
+      "label": "June nonfarm payrolls",
+      "value": "+57K",
+      "dir": "down"
+    },
+    {
+      "label": "SOX, 2 Jul close",
+      "value": "-5.44%",
+      "dir": "down"
+    },
+    {
+      "label": "USD/JPY, Friday",
+      "value": "161.2",
+      "dir": "down"
+    },
+    {
+      "label": "Disclosed MOF intervention",
+      "value": "\u00a50",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "US Bureau of Labor Statistics",
+      "fragment": "57,000",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.bls.gov/news.release/empsit.nr0.htm",
+        "retrieved_at": "2026-07-05T18:35:08Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "misses expectations",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/us/us-job-growth-misses-expectations-june-unemployment-rate-falls-42-2026-07-02/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Nasdaq",
+      "fragment": "SOX",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nasdaq.com/market-activity/index/sox",
+        "retrieved_at": "2026-07-05T18:35:10Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "global markets",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/china/global-markets-wrapup-1-2026-07-03/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "162.84",
+      "as_of": "1 Jul",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/yen-sinks-four-decade-low-dollar-gets-yields-boost-2026-07-01/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Japan Ministry of Finance",
+      "fragment": "0",
+      "as_of": "30 Jun",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.mof.go.jp/english/policy/international_policy/reference/feio/monthly/20260630e.html",
+        "retrieved_at": "2026-07-05T18:35:16Z"
+      }
+    },
+    {
+      "source": "Bank of Japan",
+      "fragment": "1.0",
+      "as_of": "16 Jun",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2026/k260616c.pdf",
+        "retrieved_at": "2026-07-05T18:35:17Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "contact with US authorities",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/japan-finance-minister-says-ready-respond-yen-contact-with-us-authorities-2026-07-03/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "$4,174",
+      "as_of": "3 Jul",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/india/gold-heads-first-weekly-rise-five-easing-fed-rate-hike-bets-2026-07-03/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "less likely",
+      "as_of": "2 Jul",
+      "source_note": {
+        "source_id": "E10",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/fed-seen-less-likely-raise-rates-job-growth-slows-2026-07-02/",
+        "retrieved_at": "2026-07-05T17:50:00Z"
+      }
+    }
+  ]
+}
