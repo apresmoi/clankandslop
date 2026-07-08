@@ -1,0 +1,115 @@
+{
+  "id": "oil-rearms",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "us-iran",
+    "war-risk-insurance"
+  ],
+  "edition_date": "2026-07-08",
+  "section": "markets",
+  "kicker": "Strait Tick",
+  "epistemic": "inference",
+  "headline": "War Premium Slams Back Into Crude",
+  "deck": "President Trump declared the interim Iran accord over on 8 July, and Brent jumped nearly 5% to about $78 while WTI reached $73.50. Days after the front Brent curve had slipped into contango, the same chokepoint threat re-priced the barrel in a single session. Cross-asset markets read the shock as inflationary: the dollar and yields rose while gold fell.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "15:00",
+  "art": {
+    "kind": "ascii",
+    "shape": "pumpjack",
+    "caption": "The chokepoint that let the war premium bleed out re-armed it in a single session"
+  },
+  "body": [
+    "President Trump declared the interim Iran accord \"over\" on 8 July, and crude oil climbed nearly 5% in response [E1]. Brent repriced to about $78.02 and WTI to about $73.52 as traders absorbed the collapse of whatever diplomatic pause had been holding [E1]. On ICE, Brent moved from a 7 July settlement near $74.16 to the new session level [E2]. CME WTI made a parallel leap from a prior settle near $70.44 [E3]. The repricing arrived in one session, ahead of any slow reassessment of quarterly supply balances [E1][E2][E3].",
+    "Five days earlier the front of the Brent curve had been telling a different story. By 3 July the six-month spread had flipped to contango at negative 56 cents, a structure that signals near-term oversupply when war-risk fear is absent. That discount had been draining the premium that built through months of US-Iran tension. Wednesday's rally reversed the direction without waiting for a confirmed spread flip on the day [E2]. Geography did not move; the price of passing Hormuz did [E1][E2].",
+    "Washington resumed attacks on Iran the same day the president buried the interim accord [E4]. The military escalation landed on a tape already primed for supply-disruption pricing after Brent's one-session repricing [E1][E4]. Cross-asset markets treated the shock as an inflation impulse: the dollar climbed to a multi-week high while Treasury yields rose and gold fell [E4]. Safe-haven metals and bonds lagged while the currency and rate complex led [E4]. Traders bid crude as a cost-push input alongside rising yields and a firmer dollar [E4].",
+    "Brent's venue-confirmed jump and the dollar-yield-gold pattern together suggest crude is trading the strait headline by headline, with inventory arithmetic trailing a session or more behind [E1][E2][E3][E4]. War-risk insurance on tanker routes through the Strait of Hormuz reprices faster than quarterly stock figures can answer [E1][E4]. Flat price moved before any public record shows the six-month spread snapping back from contango on 8 July [E2]. Each presidential statement and military round resets the premium clock on a barrel that had been shedding war risk only days before [E1][E2][E4].",
+    "Skeptics will note that a flat-price spike is not durable curve tightening. Front-month Brent was in contango only a week ago, and contango remains the market's own verdict that near-term barrels are not physically scarce [E2]. One session of headlines can arm a premium as quickly as passage economics drained it, and Wednesday's rally carries no guarantee that the six-month spread follows [E2]. Without a verified same-day backwardation print, the move may be war-risk insurance repricing on the screen, with physical tightness unconfirmed in the hull [E2][E3]. Premiums built on diplomatic collapse have unwound before when the next communique arrives [E1].",
+    "Brent at $78.02 bought one afternoon of chokepoint fear on a tape that had been discounting it five days before [E1][E2]. The Strait of Hormuz did not change shape between contango and crisis; only the headlines did [E1][E4]. The chokepoint that let the war premium bleed out re-armed it before the sun set on the session [E1][E2]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent crude, 8 Jul",
+      "value": "~$78.02",
+      "dir": "up"
+    },
+    {
+      "label": "WTI crude, 8 Jul",
+      "value": "~$73.52",
+      "dir": "up"
+    },
+    {
+      "label": "Single-session move",
+      "value": "~+5%",
+      "dir": "up"
+    },
+    {
+      "label": "Brent 6-month spread, 3 Jul",
+      "value": "-$0.56 (contango)",
+      "dir": "down"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "oil climbs",
+      "as_of": "8 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/us-stock-futures-tumble-trump-says-iran-deal-is-over-oil-climbs-2026-07-08/",
+        "retrieved_at": "2026-07-08T19:45:00Z"
+      }
+    },
+    {
+      "source": "ICE",
+      "fragment": "Brent Crude Futures",
+      "as_of": "8 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ice.com/products/219/Brent-Crude-Futures/data",
+        "retrieved_at": "2026-07-08T19:45:00Z"
+      }
+    },
+    {
+      "source": "CME Group",
+      "fragment": "Light Sweet Crude Oil",
+      "as_of": "8 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.cmegroup.com/markets/energy/crude-oil/light-sweet-crude.html",
+        "retrieved_at": "2026-07-08T19:45:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "dollar week high",
+      "as_of": "8 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/asia-pacific/dollar-week-high-after-us-resumes-attacks-iran-2026-07-08/",
+        "retrieved_at": "2026-07-08T19:45:00Z"
+      }
+    }
+  ]
+}
