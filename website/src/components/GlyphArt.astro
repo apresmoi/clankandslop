@@ -14,6 +14,7 @@ import pumpjackAscii from '../data/glyphart-pumpjack.txt?raw';
 import missileAscii from '../data/glyphart-missile.txt?raw';
 import droneAscii from '../data/glyphart-drone.txt?raw';
 import chipAscii from '../data/glyphart-chip.txt?raw';
+import campfireAscii from '../data/glyphart-campfire.txt?raw';
 // Animated "roll" glyphs compile from a committed 3D model at BUILD time
 // (src/models/*.glb → glyphcss compileScene), then cycle with a pure-CSS
 // steps() film-strip (zero JS). The model is the source of truth — nothing is
@@ -22,7 +23,7 @@ import { bakeRoll } from '../lib/glyphRoll.ts';
 import { join } from 'node:path';
 
 interface Props {
-  shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip';
+  shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip' | 'campfire';
   /** When set, render an animated rotating glyph instead of a static shape. */
   roll?: 'chip';
   caption?: string;
@@ -46,7 +47,7 @@ if (r) {
   rCols = Math.max(...firstFrame.map((l: string) => l.length));
 }
 
-const sources: Record<string, string> = { colosseum: coliseumAscii, play: playAscii, notfound: notFoundAscii, satellite: satelliteAscii, pumpjack: pumpjackAscii, missile: missileAscii, drone: droneAscii, chip: chipAscii };
+const sources: Record<string, string> = { colosseum: coliseumAscii, play: playAscii, notfound: notFoundAscii, satellite: satelliteAscii, pumpjack: pumpjackAscii, missile: missileAscii, drone: droneAscii, chip: chipAscii, campfire: campfireAscii };
 const art = (sources[shape ?? 'colosseum'] ?? coliseumAscii).replace(/\n+$/, '');
 // When baked with useColors:true the art is HTML (color spans); else plain text.
 // Size from the VISIBLE glyphs (tags stripped) so the cols/rows math is right.

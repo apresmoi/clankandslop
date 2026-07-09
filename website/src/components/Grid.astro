@@ -46,12 +46,20 @@ const template = cols.map((n) => `${n}fr`).join(' ');
     gap: 24px;
     min-width: 0;
   }
+  .cns-grid[style*="align-items: stretch"] > .cns-grid-col > :global(.splitvote:only-child),
+  .cns-grid[style*="align-items: stretch"] > .cns-grid-col > :global(.glyphart:only-child) {
+    flex: 1 1 auto;
+  }
+  .cns-grid[style*="align-items: stretch"] > .cns-grid-col > :global(.splitvote:only-child) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 
   /* The flashpoint globe is shorter than the index beside it; centre its column
      vertically so it aligns with the items on the right instead of pinning to the top. */
   .cns-grid-col:has(.worldglyph) { align-self: center; }
 
-  /* No column rule — for art+text rows where a divider reads wrong. */
+  /* No column rule: for art+text rows where a divider reads wrong. */
   .cns-grid-norule > .cns-grid-col { border: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
 
   /* [1,2,1] middle column → centered well with side rules */
@@ -87,7 +95,7 @@ const template = cols.map((n) => `${n}fr`).join(' ');
     margin-bottom: 0;
   }
 
-  /* Finance variant — right column gets ticker-tape shading. */
+  /* Finance variant: right column gets ticker-tape shading. */
   .cns-grid-finance > .cns-grid-col-1 {
     background: var(--paper-shade);
     padding: 18px 18px 22px;

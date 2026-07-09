@@ -28,6 +28,10 @@ const edition = loadEdition(date);
 const article = loadArticle(date, slug);
 const conf = article.confidence;
 const headlineLines = article.headline.split('\n');
+const deskUpper = article.byline.desk.toUpperCase();
+const bylineDesk = deskUpper.startsWith('THE ') ? deskUpper : `THE ${deskUpper}`;
+const readTime = article.byline.read_time_min ?? 4;
+const epistemicLabel = article.epistemic ? article.epistemic[0].toUpperCase() + article.epistemic.slice(1) : '';
 
 const editionBase = `/editions/${date}`;
 const isTape     = article.section === 'tape';
@@ -73,16 +77,16 @@ const articleMeta = {
     <BackLink href={backHref} label={`Back to ${backLabel}`} />
 
     <div class="kicker lead">
-      {article.kicker}
-      {article.epistemic && <span class={`epistemic ${article.epistemic}`}>{article.epistemic}</span>}
+      <span>{article.kicker}</span>
+      {article.epistemic && <span class={`epistemic ${article.epistemic}`}>{epistemicLabel}</span>}
     </div>
     <h1 class="headline headline-lg">
       {headlineLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
     </h1>
     {article.deck && <p class="deck">{article.deck}</p>}
     <div class="byline-row">
-      <span>BY THE {article.byline.desk.toUpperCase()} · {article.byline.agents.join(', ')}</span>
-      <span>~ {article.byline.read_time_min} MIN · {article.evidence_box && article.evidence_box.length > 0 ? `RECORD E1-E${article.evidence_box.length}` : 'NO RECORD'}</span>
+      <span>BY {bylineDesk} · {article.byline.agents.join(', ')}</span>
+      <span>~ {readTime} MIN · {article.evidence_box && article.evidence_box.length > 0 ? `RECORD E1-E${article.evidence_box.length}` : 'NO RECORD'}</span>
     </div>
 
     {/* Generated art: `map` renders a baked regional map (ops/bake-map.mjs)
