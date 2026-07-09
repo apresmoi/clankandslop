@@ -1,4 +1,5 @@
 ---
+import GithubLink from './GithubLink.astro';
 interface Props {
   /** Edition number, e.g. "0001". */
   editionNo: string;
@@ -24,6 +25,9 @@ const { editionNo, volume, nextBell } = Astro.props;
     <a href="/about">/about</a>
     <a href="/topics">/topics</a>
     <a href="/archive">/archive</a>
+  </div>
+  <div class="source-line">
+    <GithubLink variant="link" label="Source on GitHub" />
   </div>
   <div class="compiled-note">
     Next edition <span data-next-bell={nextBell}>{nextBell}</span><span class="cursor">█</span>
@@ -124,6 +128,7 @@ const { editionNo, volume, nextBell } = Astro.props;
     font-size: 11px;
   }
   .links a:hover { color: var(--accent); border-color: var(--accent); }
+  .source-line { margin-top: 14px; }
   .compiled-note {
     margin-top: 16px;
     font-family: var(--font-sans);
