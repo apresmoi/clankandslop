@@ -1,0 +1,61 @@
+{
+  "id": "skhynix-record-listing",
+  "topics": [
+    "semiconductors",
+    "ai-compute",
+    "ipos",
+    "compute"
+  ],
+  "edition_date": "2026-07-09",
+  "section": "markets",
+  "kicker": "Markets",
+  "epistemic": "fact",
+  "headline": "A Record Listing Bets on AI Memory",
+  "deck": "SK Hynix set the price for its Nasdaq debut after orders ran more than seven times the shares on offer, sizing the raise near $28 billion. It would rank among the largest share sales ever, and it rests on one bet: that AI's hunger for high-bandwidth memory holds.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "body": [
+    "SK Hynix priced its American depositary receipts ahead of a Nasdaq debut set for 10 July, and demand ran more than seven times the shares on offer [E1]. The stock will trade under the ticker SKHY, and at the offering's size the sale ranks among the largest in market history, positioned to surpass Alibaba's 2014 arrival on US markets [E1].",
+    "The company set out to raise about $28.21 billion, trimmed from an initial $29.65 billion after its Seoul-listed shares slid in the run-up, and it is issuing 17.79 million new shares [E2]. Even at the smaller figure, the Wall Street Journal placed the deal among the biggest share sales ever recorded [E2].",
+    "One number explains the appetite. SK Hynix holds 57 percent of global high-bandwidth-memory revenue, the specialized memory that sits beside AI accelerators, and the listing is capital markets pricing that position at a premium [E2]. Buyers are funding the supply side of the AI build-out directly, at record scale, rather than betting on a single model or chip [E1][E2].",
+    "The timing carries its own signal. In a week when oil jumped on the Gulf and rate-cut hopes faded, investors still oversubscribed a memory-chip offering seven times over [E1]. The read is that AI-memory demand is being treated as more durable than the war premium or the macro chill around it, a supply-side conviction priced against a nervous tape.",
+    "Set against that is the caution the deal itself concedes. Oversubscription is appetite, not performance, and SK Hynix cut the raise precisely because its underlying stock had fallen from June highs [E2]. The discriminators arrive fast, the first sessions' trading after 10 July and whether high-bandwidth-memory pricing holds through the year. A record book is a starting line, not a result [E1][E2]."
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "evidence_box": [
+    {
+      "source": "Yahoo Finance",
+      "fragment": "SK Hynix Nasdaq ADR offering more than seven times oversubscribed; trades 10 July under SKHY; among the largest share sales ever, surpassing Alibaba",
+      "as_of": "8 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://finance.yahoo.com/markets/stocks/articles/sk-hynix-nasdaq-adr-offering-115717222.html",
+        "retrieved_at": "2026-07-09T18:19:00Z"
+      }
+    },
+    {
+      "source": "Yahoo Finance",
+      "fragment": "SK Hynix launches ~$28.21bn Nasdaq ADR listing, revised down from $29.65bn; 17.79m new shares; 57% of global HBM revenue",
+      "as_of": "6 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://finance.yahoo.com/markets/stocks/articles/sk-hynix-launches-28-billion-115850372.html",
+        "retrieved_at": "2026-07-09T18:20:00Z"
+      }
+    }
+  ]
+}
