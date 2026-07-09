@@ -1,0 +1,60 @@
+{
+  "id": "damascus-guarded-visit",
+  "topics": [
+    "middle-east-war",
+    "grey-zone"
+  ],
+  "edition_date": "2026-07-09",
+  "section": "world",
+  "kicker": "Syria",
+  "epistemic": "inference",
+  "headline": "Damascus Keeps The Visit Under Guard",
+  "deck": "Explosions wounded at least 18 during Emmanuel Macron's Syria visit, but French and Syrian officials kept the program alive and pushed the normalization track. The open question is security: whether reconstruction diplomacy can survive an attack staged beside it.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "15:25 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "body": [
+    "Explosions in central Damascus wounded at least 18 people during Emmanuel Macron's visit, according to AP's account of the Syrian authorities and the diplomatic schedule [E1]. Macron was safe, and the visit continued after the blasts [E1]. The trip mattered before the attack because it marked a visible French return to Syria's post-Assad authorities [E1].",
+    "Al Jazeera reported two devices near the Four Seasons Hotel area: one in a parked car and another in or near a garbage bin [E2]. The second blast struck as people gathered around the first scene, a pattern that turns a security incident into a test of crowd control and emergency response [E2]. No group immediately claimed responsibility in the reporting reviewed here [E2].",
+    "The diplomatic script did not stop at the blast line. Macron met President Ahmad al-Sharaa, and the visit carried the language of support for a sovereign and pluralistic Syria after the fall of Bashar al-Assad [E1][E2]. Syrian authorities said an investigation was under way and that the perpetrators would be pursued [E1][E2]. Those are ordinary official words after an attack, but they now sit next to the reconstruction pitch.",
+    "That pairing is the story to watch. A foreign leader can announce normalization in a meeting room, while a bomb outside asks whether the host state can secure the stage around it [E1][E2]. The attack does not prove that reconstruction diplomacy failed, and it does not identify a responsible faction [E2]. It does force the next official move to answer a practical question: who guards the return.",
+    "The null is clear. The blasts may be local violence around a fragile capital, not a referendum on French policy or Syria's new government [E2]. The record reviewed here does not support a claim that France, Syria, regional states, or any named armed group authored the incident [E1][E2]. Tomorrow's discriminator is whether Paris or Damascus announces a concrete security or reconstruction mechanism tied to the visit, rather than another statement of confidence [E1][E2].",
+    "For today's edition, the piece stays in the watch column. It matches the larger week only as staging under pressure: a leader arrives, cameras gather, and the city answers with a security test [E1][E2]. If the follow-on is only investigation language, the story remains a contained attack during a symbolic visit [E2]. If it produces new machinery, the visit becomes an early stress test of Europe's Syria return [E1]."
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "evidence_box": [
+    {
+      "source": "AP",
+      "fragment": "Damascus explosions during Macron visit wounded at least 18; Macron was safe and continued meetings",
+      "as_of": "7 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://apnews.com/article/syria-france-macron-damascus-explosions-4bbe664b13bc1fb18042e9689f4ceab7",
+        "retrieved_at": "2026-07-09T15:28:00Z"
+      }
+    },
+    {
+      "source": "Al Jazeera",
+      "fragment": "what is known about the Damascus explosions: devices, casualties, no immediate claim of responsibility",
+      "as_of": "7 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.aljazeera.com/news/2026/7/7/explosions-in-damascus-during-macron-visit-what-we-know",
+        "retrieved_at": "2026-07-09T15:29:00Z"
+      }
+    }
+  ]
+}
