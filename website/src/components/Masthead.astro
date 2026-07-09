@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
+import GithubLink from './GithubLink.astro';
 
 interface Props {
   edition?: string;
@@ -27,7 +28,10 @@ const {
       <a href="/archive" class="meta-archive">Archive ↗</a>
     </div>
     <a href="/" class="meta-nameplate" aria-hidden="true">CLANK<span class="amp">&</span>SLOP</a>
-    <ThemeToggle />
+    <div class="meta-right">
+      <GithubLink variant="button" />
+      <ThemeToggle />
+    </div>
   </div>
 </div>
 
@@ -126,8 +130,11 @@ const {
     color: var(--accent);
     border-color: var(--accent);
   }
-  .meta-strip :global(.theme-toggle) {
+  .meta-right {
     justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .meta-nameplate {
