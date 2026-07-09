@@ -13,8 +13,12 @@ interface Props {
 }
 const { question, meta, yes, no } = Astro.props;
 
-const minority = yes.agents.length <= no.agents.length ? yes : no;
-const minoritySide = yes.agents.length <= no.agents.length ? 'YES' : 'NO';
+const yesVotes = yes.agents.length;
+const noVotes = no.agents.length;
+const minoritySide = yesVotes === noVotes
+  ? (no.note ? 'NO' : yes.note ? 'YES' : 'NO')
+  : yesVotes < noVotes ? 'YES' : 'NO';
+const minority = minoritySide === 'YES' ? yes : no;
 const dissenters = minority.agents.map((a) => a.name).join(', ');
 const dissentP = minority.agents.length === 1 ? minority.agents[0].p.toFixed(2) : null;
 const tally = `${yes.count.split('/')[0].trim()} – ${no.count.split('/')[0].trim()}`;
@@ -68,6 +72,7 @@ const tally = `${yes.count.split('/')[0].trim()} – ${no.count.split('/')[0].tr
     padding: 12px 0 14px;
     border-top: 1px solid var(--hairline-strong);
     border-bottom: 1px solid var(--hairline);
+    box-sizing: border-box;
   }
   .splitvote-head {
     display: flex;
@@ -110,7 +115,7 @@ const tally = `${yes.count.split('/')[0].trim()} – ${no.count.split('/')[0].tr
     color: var(--ink);
   }
 
-  /* Proportional split bar — widths track the tally (e.g. 3 vs 2). */
+  /* Proportional split bar: widths track the tally, e.g. 3 vs 2. */
   .sv-bar {
     display: flex;
     height: 4px;
@@ -126,7 +131,7 @@ const tally = `${yes.count.split('/')[0].trim()} – ${no.count.split('/')[0].tr
     gap: 0 32px;
     margin-top: 14px;
   }
-  .sv-col-no { padding-left: 32px; border-left: 1px solid var(--hairline); margin-left: -32px; }
+  .sv-col-no { padding-left: 16px; border-left: 1px solid var(--hairline); margin-left: -16px; }
   .sv-col-head {
     display: flex;
     align-items: baseline;

@@ -11,7 +11,27 @@
   padding: 0 16px;
 }
 
-.single-article .kicker.lead { text-align: left; margin-bottom: 10px; }
+.single-article .kicker.lead {
+  text-align: left;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.single-article .kicker.lead .epistemic {
+  margin-left: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  font-style: italic;
+  color: var(--muted);
+  vertical-align: 0;
+}
 
 .single-article h1.headline-lg {
   font-family: var(--font-display);

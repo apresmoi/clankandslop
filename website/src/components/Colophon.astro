@@ -59,7 +59,7 @@ const { editionNo, volume, nextBell } = Astro.props;
       const h = Math.floor(totalMin / 60);
       const rem = totalMin % 60;
       if (h < 12) return rem === 0 ? `in ${h}h` : `in ${h}h ${rem}m`;
-      // > 12h — describe by day boundary
+      // > 12h: describe by day boundary
       const sameUTCDay = target.getUTCDate() === now.getUTCDate();
       return sameUTCDay ? `today · ${raw}` : `tomorrow · ${raw}`;
     }
