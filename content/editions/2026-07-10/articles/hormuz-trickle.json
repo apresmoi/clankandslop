@@ -1,0 +1,66 @@
+{
+  "id": "hormuz-trickle",
+  "topics": [
+    "strait-of-hormuz",
+    "oil",
+    "shipping",
+    "maritime-security"
+  ],
+  "edition_date": "2026-07-10",
+  "section": "world",
+  "kicker": "Hormuz",
+  "epistemic": "inference",
+  "headline": "The Strait Reopened at a Trickle",
+  "deck": "Under the Islamabad Memorandum the Strait of Hormuz was meant to run free for 60 days. Traffic crept back to roughly 40 tankers a day, a third of the pre-war norm, before missiles hit three ships and stalled even that. The chokepoint is open on the page and throttled on the water.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "art": {
+    "kind": "ascii",
+    "shape": "pumpjack",
+    "caption": "A chokepoint's health is counted in sailings; at about 40 a day the strait was running at a third throttle before the missiles landed."
+  },
+  "body": [
+    "Count the sailings and the recovery looks partial at best. Over the 3-5 July weekend the Strait of Hormuz logged 108 verified crossings, 43, 34 and 31 a day, the busiest stretch since the war began, yet still a fraction of the 120 to 140 vessels that transited daily before it, by Al Jazeera's tally [E1]. At the war's worst the count had collapsed to as few as two tankers a day, so 40 is a rebound and a bottleneck at once [E1].",
+    "The reopening rested on a fragile document. The Islamabad Memorandum committed the strait to free passage for all shipping for at least 60 days, but its provisions are vague, and disputes have already opened over whether Iran may charge environmental or service fees on transit [E1]. A promise of open water is not the same as open water.",
+    "Then the missiles returned. On 7 July projectiles struck the Qatari LNG carrier Al Rekayyat, which was abandoned after a fire in its engine room, and the Saudi tanker Wedyan, and within a day the IRGC hit a third vessel in the strait [E1][E2]. Washington reimposed the oil sanctions it had lifted under the accord and CENTCOM launched strikes on Iranian military sites near the coast [E2].",
+    "The read from the commodities desk is that traffic, not rhetoric, is the gauge. Forty sailings a day was never a normal strait; it was a strait running at a third of capacity while insurers and owners waited to see whether the accord held [E1]. The attacks did not shut the chokepoint. They capped a recovery that had not finished climbing, and the oil market now trades that ceiling tick by tick [E1][E2].",
+    "The nulls keep the story honest. Three damaged ships is not a blockade, and 40 tankers a day is flow, not closure [E1]. The single number to watch is the daily count: back toward triple digits and the accord is holding, down toward the war's two-a-day floor and the strait is closing by attrition rather than decree. For now the gate is ajar, and the traffic is thin [E1][E2]."
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "evidence_box": [
+    {
+      "source": "Al Jazeera",
+      "fragment": "Weekend of 3-5 July logged 108 crossings (43, 34, 31/day) vs a pre-war 120-140/day, and as few as two at the war's worst; Islamabad Memorandum promised 60 days of free passage; Al Rekayyat and Wedyan struck 7 July",
+      "as_of": "7 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aljazeera.com/news/2026/7/7/ships-attacked-in-the-strait-of-hormuz-what-that-means-for-ongoing-talks",
+        "retrieved_at": "2026-07-10T18:12:00Z"
+      }
+    },
+    {
+      "source": "Wikipedia (2026 Strait of Hormuz crisis)",
+      "fragment": "Three ships attacked 7 July (Al Rekayyat, Wedyan, a third vessel); US Treasury reimposed Iran oil sanctions and CENTCOM struck Iranian military sites near the strait",
+      "as_of": "10 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Strait_of_Hormuz_crisis",
+        "retrieved_at": "2026-07-10T18:13:00Z"
+      }
+    }
+  ]
+}
