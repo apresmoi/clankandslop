@@ -1,0 +1,100 @@
+{
+  "id": "hormuz-strikes",
+  "topics": [
+    "strait-of-hormuz",
+    "us-iran",
+    "oil",
+    "maritime-security"
+  ],
+  "edition_date": "2026-07-12",
+  "section": "world",
+  "kicker": "Hormuz",
+  "epistemic": "fact",
+  "headline": "US Strikes Again as Iran Claims the Strait",
+  "deck": "US forces struck about 140 Iranian targets in a third round and declared the Strait of Hormuz open to all shipping; Iran's Guard said it had taken control of the water. On Sea Sunday, the Pope named the winds of war blowing over the seas.",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "art": {
+    "kind": "map",
+    "map": "hormuz",
+    "hero_map": "hormuz-hero",
+    "title": "The Strait, Contested",
+    "caption": "US forces struck Iranian coastal and military sites in a third round; Washington calls the Strait of Hormuz open, Tehran claims control · Map: Sprockett, Escalation Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      { "name": "HORMUZ", "lat": 26.55, "lon": 56.25 },
+      { "name": "BANDAR ABBAS", "lat": 27.18, "lon": 56.27 },
+      { "name": "QESHM", "lat": 26.75, "lon": 55.9 }
+    ]
+  },
+  "body": [
+    "The United States and Iran are now telling two irreconcilable stories about the same water. US Central Command said its forces had completed a third round of strikes against Iran, hitting about 140 military targets, and declared the Strait of Hormuz \"open to all vessels\" with American forces positioned to ensure freedom of navigation [E1]. President Trump put his name on that line in a televised interview, saying the strait was open to commercial traffic [E1]. Tehran's answer was the opposite: a parliamentary-security spokesman said Iran had \"taken control\" of the strait and would hold it \"with strength\" [E2].",
+    "The latest round followed an attack on a Cyprus-flagged container ship in the strait, which caught fire and left a crew member missing [E1]. Iran's Revolutionary Guard said it had stopped a second vessel for violating regulations, and Iranian state media relayed a claim that the Guard had closed the strait until further notice [E2]. Between the American \"open\" and the Iranian \"closed\" sits the actual traffic, which owners and insurers have kept well below normal for weeks under a threat level assessed as severe.",
+    "One channel has not shut. Iran's foreign ministry said Tehran and Oman, with Qatar attending part of the talks, would continue political and technical-legal consultations on shipping security, grounding any arrangement in the two coastal states' sovereign rights and the Islamabad accord [E2]. That leaves the day with a coercive military track and a quiet diplomatic one running at the same time, neither yet cancelling the other.",
+    "Washington also kept the economic pressure on its own clock. The Treasury had revoked the temporary licence permitting Iranian oil sales and set a hard wind-down: all previously authorised business must conclude by 17 July [E3]. The sanctions timetable and the strike rounds are being used together, as a single instrument of pressure aimed at a government the president says he is now in \"serious discussions\" with about ending the operations [E1].",
+    "Away from the ordnance, the sharpest counterpoint of the day came from Rome. Marking Sea Sunday, Pope Leo XIV said \"the winds of war are blowing once again in the Middle East, in Ukraine and in many other parts of the world,\" warned against letting them extinguish the flame of peace, and said the only path to a just and lasting settlement was \"dialogue, encounter and diplomacy\" [E4]. He asked the world to remember the sailors, fishermen and port workers whose lives are now shadowed by the fear of conflict at sea [E4].",
+    "The near-term test is plain and dangerous. Whether the strait is open is not a question of press releases but of hulls: how many ships actually transit, and at what insured risk, over the coming days. If the daily count climbs and no fresh vessel is struck, Washington's \"open\" holds; if another ship burns, Tehran's \"control\" is the truer word. For now the world's most consequential energy chokepoint runs on contradiction, and on the nerve of the crews the Pope named [E1][E2][E4]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4"
+  ],
+  "evidence_box": [
+    {
+      "source": "US Central Command",
+      "fragment": "Third round of US strikes on ~140 Iranian military targets; the Strait of Hormuz \"open to all vessels\"; commercial transits continue",
+      "as_of": "11 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.centcom.mil/MEDIA/PRESS-RELEASES/",
+        "retrieved_at": "2026-07-12T14:20:00Z"
+      }
+    },
+    {
+      "source": "IRNA",
+      "fragment": "Iran claims it has \"taken control\" of the strait; IRGC says a second vessel stopped; Iran-Oman-Qatar consultations on shipping security continue",
+      "as_of": "12 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://en.irna.ir/",
+        "retrieved_at": "2026-07-12T14:21:00Z"
+      }
+    },
+    {
+      "source": "US Treasury (OFAC)",
+      "fragment": "OFAC revoked the temporary Iran oil-sales licence with a hard wind-down: authorised business must conclude by 17 July",
+      "as_of": "7 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://ofac.treasury.gov/recent-actions/20260707",
+        "retrieved_at": "2026-07-12T14:22:00Z"
+      }
+    },
+    {
+      "source": "The Holy See",
+      "fragment": "Pope Leo XIV, Sea Sunday Angelus: \"the winds of war are blowing once again\"; only \"dialogue, encounter and diplomacy\" bring a just peace; remember seafarers",
+      "as_of": "12 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.vatican.va/content/leo-xiv/en/angelus.index.html",
+        "retrieved_at": "2026-07-12T14:23:00Z"
+      }
+    }
+  ]
+}
