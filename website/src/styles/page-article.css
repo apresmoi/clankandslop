@@ -65,6 +65,46 @@
 .body-text p { margin-bottom: 14px; }
 .body-text p:last-child { margin-bottom: 0; }
 
+/* ============ GLYPH IMAGE (ops/bake-image.mjs) ============
+   ASCII rasterisation of a source image, floated so prose wraps it.
+   Height is snapped to the body line grid by the component (--gh). */
+.gimg { margin: 0; }
+.gimg .gimg-art {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: var(--gfs, 5px);
+  line-height: var(--gfs, 5px);
+  letter-spacing: 0;
+  white-space: pre;
+  margin: 0;
+  color: var(--ink);
+}
+/* ASCII tone comes from ink density; dark mode flips ink to light, which would
+   invert the photo. Show the density-inverted `artDark` variant in dark mode. */
+.gimg .gimg-dark { display: none; }
+[data-theme="dark"] .gimg .gimg-light { display: none; }
+[data-theme="dark"] .gimg .gimg-dark { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gimg .gimg-light { display: none; }
+  :root:not([data-theme="light"]) .gimg .gimg-dark { display: block; }
+}
+.gimg figcaption {
+  font-family: var(--font-sans, 'Inter Tight', system-ui, sans-serif);
+  font-size: 8.5px;
+  line-height: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #6b6157);
+  margin-top: 5px;
+  padding-top: 4px;
+  border-top: 1px solid var(--rule, #cbbfa8);
+}
+.gimg.left  { float: left;  width: var(--gw); height: var(--gh); margin: 6px 20px 2px 0; }
+.gimg.right { float: right; width: var(--gw); height: var(--gh); margin: 6px 0 2px 20px; }
+.gimg.full  { float: none;  width: var(--gw); max-width: 100%; margin: 10px auto 20px; }
+.gimg.full .gimg-art { overflow-x: auto; }
+/* keep a floated cut from bleeding past the body into the Record */
+.body-text::after { content: ''; display: block; clear: both; }
+
 /* Drop cap on the first paragraph of a lead body. `initial-letter` sinks and
    baseline-aligns it across N lines; JS sets --cap-lines to the paragraph's actual
    line count (capped at 3) and refits on resize, so it never dangles past the text.

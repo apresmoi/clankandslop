@@ -147,6 +147,9 @@ for (const { date, dir: edDir, desk } of scopes) {
   const mapSlugs = new Set(
     ls(mapsDir).filter((f) => f.endsWith('.json')).map((f) => f.replace('.json', '')),
   );
+  const glyphSlugs = new Set(
+    ls(resolve(edDir, 'glyphs')).filter((f) => f.endsWith('.json')).map((f) => f.replace('.json', '')),
+  );
   for (const slug of mapSlugs) {
     const file = rel(resolve(mapsDir, `${slug}.json`));
     const m = readJson(resolve(mapsDir, `${slug}.json`));
@@ -177,8 +180,18 @@ for (const { date, dir: edDir, desk } of scopes) {
       err(file, 'byline.agents must be a non-empty array');
     for (const name of a.byline?.agents ?? []) checkAgentName(file, 'byline.agents', name);
     if (!isNum(a.revision)) err(file, 'revision must be a number');
-    if (!Array.isArray(a.body) || a.body.length === 0 || !a.body.every(isStr))
-      err(file, 'body must be a non-empty array of strings');
+    // Body items are paragraphs (strings) or inline figure blocks
+    // ({ glyph, side?, caption? }) — a floated GlyphImage the prose wraps around.
+    const isFigureItem = (x) => x && typeof x === 'object' && isStr(x.glyph);
+    if (!Array.isArray(a.body) || a.body.length === 0 || !a.body.every((x) => isStr(x) || isFigureItem(x)))
+      err(file, 'body must be a non-empty array of paragraphs (strings) or figure blocks ({ glyph })');
+    for (const item of Array.isArray(a.body) ? a.body : []) {
+      if (isFigureItem(item)) {
+        if (!glyphSlugs.has(item.glyph)) err(file, `body figure references missing glyph "${item.glyph}" (bake with ops/bake-image.mjs)`);
+        if (item.side !== undefined && !['left', 'right', 'full'].includes(item.side))
+          err(file, `body figure side must be left|right|full`);
+      }
+    }
     if (!Array.isArray(a.refs)) err(file, 'missing refs array');
     if (a.confidence && !isP(a.confidence.value)) err(file, 'confidence.value must be in [0,1]');
     if (a.dissent) {
@@ -210,8 +223,10 @@ for (const { date, dir: edDir, desk } of scopes) {
     const recordIds = new Set(box.map((e) => e.source_note?.source_id).filter(Boolean));
     for (const r of a.refs ?? [])
       if (!recordIds.has(r)) err(file, `ref "${r}" has no Record row — references must reference`);
+    // Prose-only view of the body: skip inline figure blocks for the text gates.
+    const bodyParas = (Array.isArray(a.body) ? a.body : []).filter((x) => typeof x === 'string');
     // every [En] marker in body must land on an evidence_box row
-    for (const para of Array.isArray(a.body) ? a.body : [])
+    for (const para of bodyParas)
       for (const m of String(para).matchAll(/\[E(\d+)\]/g)) {
         const n = Number(m[1]);
         if (n < 1 || n > box.length)
@@ -222,7 +237,7 @@ for (const { date, dir: edDir, desk } of scopes) {
     // the byline is the only place an agent appears. (Case-sensitive: flags the
     // capitalized proper-noun use, not the common-noun "foreman"/"graves".)
     const DESK_PHRASES = ['Hardware Desk', 'Escalation Desk', 'Macro Desk', 'Commodities Desk', 'Policy Desk'];
-    for (const para of Array.isArray(a.body) ? a.body : []) {
+    for (const para of bodyParas) {
       for (const nm of personaNames)
         if (new RegExp(`\\b${nm}\\b`).test(para))
           err(file, `body self-references the newsroom ("${nm}") — report the news, never our own agents`);
@@ -235,7 +250,7 @@ for (const { date, dir: edDir, desk } of scopes) {
     // same word. The composer's default reflex is to start everything with "The";
     // monotonous openers read as a wall, not a newspaper. (Warning, not a gate —
     // legacy editions carry the debt; new copy should clear it.)
-    const openers = (Array.isArray(a.body) ? a.body : [])
+    const openers = bodyParas
       .map((p) => (String(p).trim().match(/^[“"”']?([A-Za-z]+)/) || [])[1] || '');
     for (let i = 0; i + 2 < openers.length; i++) {
       const w = openers[i].toLowerCase();
@@ -256,9 +271,9 @@ for (const { date, dir: edDir, desk } of scopes) {
 
     // Em dashes as a default connector are a loud AI tell. Flag overuse — more than
     // one per ~two paragraphs (min 3) — not the occasional deliberate one.
-    const emDashes = ((Array.isArray(a.body) ? a.body.join(' ') : '').match(/—/g) || []).length;
-    if (emDashes >= 3 && emDashes * 2 > (Array.isArray(a.body) ? a.body.length : 0))
-      warn(file, `${emDashes} em dashes across ${a.body.length} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`);
+    const emDashes = (bodyParas.join(' ').match(/—/g) || []).length;
+    if (emDashes >= 3 && emDashes * 2 > bodyParas.length)
+      warn(file, `${emDashes} em dashes across ${bodyParas.length} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`);
 
     // topics (optional) must resolve to the glossary
     if (a.topics !== undefined) {

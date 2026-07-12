@@ -26,7 +26,10 @@ export const GET: APIRoute = ({ params }) => {
   L.push('');
   L.push('-'.repeat(72));
   L.push('');
-  for (const p of a.body) L.push(p, '');
+  for (const p of a.body) {
+    if (typeof p === 'string') L.push(p, '');
+    else if (p && p.glyph) L.push(`[figure: ${p.caption ?? p.glyph}]`, '');
+  }
 
   if (a.dissent) {
     L.push('-'.repeat(72));
