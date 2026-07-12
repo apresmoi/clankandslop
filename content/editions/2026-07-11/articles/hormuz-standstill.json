@@ -1,0 +1,60 @@
+{
+  "id": "hormuz-standstill",
+  "topics": [
+    "strait-of-hormuz",
+    "oil",
+    "shipping",
+    "maritime-security"
+  ],
+  "edition_date": "2026-07-11",
+  "section": "world",
+  "kicker": "Hormuz",
+  "epistemic": "fact",
+  "headline": "The Strait Runs on a Handful of Tankers",
+  "deck": "US strikes on Iranian coastal sites and revoked oil sanctions have left the Strait of Hormuz near standstill, with recent snapshots as low as a couple of tankers a day against a pre-war norm of well over a hundred. Washington's wind-down on Iranian oil sales runs to 17 July.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "body": [
+    "Count the sailings and the strait is barely moving. Trackers put recent daily transits through Hormuz in the low tens, with one early-July snapshot showing only a couple of tankers observed passing, a fraction of the 120 to 140 vessels that crossed each day before the war [E1]. A partial recovery in Japan-bound LNG cargoes is the main sign of life; the overall count stays deep below normal [E1].",
+    "The suppression is policy as much as fear. US forces struck roughly eighty to ninety Iranian military targets across two rounds on 7 and 8 July, hitting air defences, coastal surveillance, missile and drone sites, and the Treasury revoked the temporary Iran oil-sales licence it had granted under the earlier accord, ordering a wind-down to 17 July [E2]. The document that was supposed to keep the strait open is being unwound on a clock.",
+    "One ship has become the picture of the risk. The Qatari LNG carrier Al Rekayyat, struck on 7 July, remains abandoned off the coast of Oman, an emblem of a waterway that owners and insurers are treating as passable only at a price [E1]. Diplomacy is live but unresolved: Iran and Oman are reported to be discussing a protected \"median lane\" for traffic, even as the shooting continues [E1].",
+    "The read from the commodities desk is that traffic, not rhetoric, is the gauge, and traffic says closure by attrition rather than by decree. A couple of tankers a day is not a formal blockade, but it is not an open strait either, and oil holds its war premium while the count stays this thin [E1]. The single number to watch is the daily transit tally as the 17 July wind-down lands: back toward triple digits and the accord is holding, stuck in the low tens and the chokepoint is closing itself [E1][E2]."
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "evidence_box": [
+    {
+      "source": "Japan Times / maritime trackers",
+      "fragment": "Hormuz daily transits in the low tens with an early-July snapshot as low as two tankers, against a pre-war ~120-140/day; partial recovery in Japan-bound LNG; Al Rekayyat abandoned off Oman",
+      "as_of": "10 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.japantimes.co.jp/news/2026/07/10/japan/japan-vessels-transit-hormuz-increase/",
+        "retrieved_at": "2026-07-11T18:15:00Z"
+      }
+    },
+    {
+      "source": "US Treasury (OFAC)",
+      "fragment": "OFAC revoked the temporary Iran oil-sales licence with a wind-down to 17 July, alongside CENTCOM strikes on ~80-90 Iranian military targets on 7-8 July",
+      "as_of": "7 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://ofac.treasury.gov/recent-actions/20260707",
+        "retrieved_at": "2026-07-11T18:16:00Z"
+      }
+    }
+  ]
+}
