@@ -1,0 +1,14 @@
+{
+  "resolved_last_edition": [
+    {
+      "call": "The World Cup's second semi-final is Argentina v England (both win their quarter-finals)",
+      "outcome": "miss",
+      "prior_p": 0.4
+    },
+    {
+      "call": "AFA or a senior Argentina player explicitly ties the Egypt comeback to Independence Day in an official channel",
+      "outcome": "hit",
+      "prior_p": 0.15
+    }
+  ]
+}
