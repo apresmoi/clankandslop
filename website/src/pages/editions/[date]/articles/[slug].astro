@@ -7,10 +7,12 @@ import BackLink     from '../../../../components/article/BackLink.astro';
 import Confidence   from '../../../../components/article/Confidence.astro';
 import DissentNote  from '../../../../components/article/DissentNote.astro';
 import EvidenceBox  from '../../../../components/article/EvidenceBox.astro';
+import GlyphImage   from '../../../../components/article/GlyphImage.astro';
 import {
   loadEdition,
   loadArticle,
   loadMap,
+  loadGlyph,
   listAllArticleRefs,
   articleOgPath,
   fmtEditionLine,
@@ -44,7 +46,15 @@ const artMap = mapArt ? loadMap(date, mapArt.map) : null;
 // One seen-set across paragraphs so each ref's first citation gets the
 // `-cite` anchor the Record's ↩ backlinks point at.
 const seenRefs = new Set<string>();
-const bodyHtml = article.body.map((p) => renderParagraph(p, article.id, seenRefs));
+// Body items are paragraphs (strings) or inline figure blocks
+// ({ glyph, side, caption }) — a floated GlyphImage the prose wraps around.
+type FigureItem = { glyph: string; side?: 'left' | 'right' | 'full'; caption?: string; scale?: number };
+const bodyNodes = (article.body as (string | FigureItem)[]).map((item) => {
+  if (typeof item === 'string') {
+    return { kind: 'p' as const, html: renderParagraph(item, article.id, seenRefs) };
+  }
+  return { kind: 'fig' as const, glyph: loadGlyph(date, item.glyph), side: item.side ?? 'left', caption: item.caption, scale: item.scale };
+});
 
 const topicChips = (article.topics ?? []).map((s) => getTopic(s)).filter((t) => t !== null);
 
@@ -124,7 +134,9 @@ const articleMeta = {
     )}
 
     <div class="body-text lead-copy">
-      {bodyHtml.map((html) => <p set:html={html} />)}
+      {bodyNodes.map((n) => n.kind === 'p'
+        ? <p set:html={n.html} />
+        : <GlyphImage glyph={n.glyph} side={n.side} caption={n.caption} scale={n.scale} />)}
     </div>
 
     {article.dissent && (

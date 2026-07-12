@@ -1,0 +1,106 @@
+{
+  "id": "tape-frozen",
+  "topics": [
+    "semiconductors",
+    "oil",
+    "rates",
+    "central-banks"
+  ],
+  "edition_date": "2026-07-12",
+  "section": "markets",
+  "kicker": "The Tape",
+  "epistemic": "inference",
+  "headline": "SK Hynix Lands at $170 on Its US Debut",
+  "deck": "The memory maker's US shares closed 13% above their $149 offer, a raise above $26 billion for direct AI-memory exposure. The rest of the tape is frozen at Friday's close while the Hormuz strikes run live into Sunday's reopen.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "22:00",
+  "art": {
+    "kind": "ascii",
+    "shape": "chip",
+    "caption": "SK Hynix's US listing drew capital straight to the memory bottleneck; the broad semiconductor index barely moved."
+  },
+  "body": [
+    "The freshest tradable event on the weekend tape was a listing, not a level. SK Hynix's new US depositary shares closed their Friday debut at about $170, roughly 13% above the $149 offer, in one of the largest US share sales on record and a raise valued above $26 billion [E1]. The signal is narrower than \"AI is back\": US capital paid up for direct exposure to the high-bandwidth memory that the AI buildout runs on, even as skepticism about broad AI capital spending persists. The point is reinforced at the company level, with Micron raising planned US investment to more than $250 billion through 2035 and citing memory demand in the AI era [E2].",
+    "That enthusiasm did not spread. The PHLX Semiconductor Index closed at 12,967.16, up 0.06% on the day, so a single hot debut did not lift the whole chip complex [E1]. The rest of the US tape carried the same measured tone. The S&P 500 finished at 7,575.39, up 0.42%, the Nasdaq at 26,281.61 and the Dow at 52,637.01; on the week the S&P and Nasdaq gained while the Dow slipped, a risk-on close without euphoria [E3].",
+    "Every number above needs a date stamp, because the market tape and the news tape are no longer in sync. It is Sunday in New York, and the main US futures do not reopen until the evening, so the prints here are Friday's closes carrying a Sunday dateline. The live input over the weekend was geopolitical: US forces said they struck about 140 Iranian military targets, a development the market had not yet cleared when it last traded [E3]. The honest read is a war premium that is real but incomplete, priced by a market still betting that diplomacy and naval escort prevent a sustained outage.",
+    "Oil shows that bet directly. Brent settled at $76.01 and West Texas Intermediate at $71.41 on Friday, lower on the day yet higher on the week, holding below $80 despite the renewed strikes [E3]. The physical disruption is plain against pre-war norms, and here the desk keeps two kinds of number apart. The claimable flow figures are the International Maritime Organization's averaged monthly transits, which show Hormuz daily crossings recovering through late June [E4]. The far grimmer near-real-time counts, roughly forty tankers a day against a pre-conflict 125 to 140, come from paid ship-tracking feeds this desk does not hold, and with vessels switching off transponders even those are estimates, not facts to quote as our own.",
+    "Rates and the dollar leaned mildly hawkish. The ten-year Treasury yield rose to about 4.56%, the dollar index held near 100.9, and traders were pricing a meaningful chance of a September rate rise, a snapshot to re-check when desks reopen [E3]. The Federal Reserve's own report to Congress supplied the reason, stating that inflation \"stepped up further this spring\" under tariffs, war-related energy costs and the AI buildout [E5]. Gold offered no panic, easing on the week even with the strikes, as firmer rate expectations outweighed the safe-haven bid [E3].",
+    "The yen was the livelier trade. The currency firmed to around 161.7 per dollar after Japan's finance minister pushed to steer pension money toward domestic assets, and Tokyo moved to write central-bank independence into its economic blueprint to calm a jittery government-bond market [E3]. That is support by signal rather than intervention, a government talking its currency up while holding the harder tools in reserve. All of it, though, is Friday's tape. The real test is Sunday evening's bell, when the market finally has to price the strikes it slept through [E3]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "evidence_box": [
+    {
+      "source": "Nasdaq",
+      "fragment": "SK Hynix US depositary shares debut ~$170 vs $149 offer (~+13%); PHLX Semiconductor Index 12,967.16, +0.06%",
+      "as_of": "10 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nasdaq.com/market-activity/stocks/skhy",
+        "retrieved_at": "2026-07-12T14:35:00Z"
+      }
+    },
+    {
+      "source": "Micron",
+      "fragment": "Micron raising planned US investment to more than $250 billion through 2035, citing surging AI-era memory demand",
+      "as_of": "9 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.micron.com/about/newsroom",
+        "retrieved_at": "2026-07-12T14:36:00Z"
+      }
+    },
+    {
+      "source": "Reuters (global markets wrap)",
+      "fragment": "S&P 7,575.39 (+0.42%), Nasdaq 26,281.61, Dow 52,637.01; Brent $76.01, WTI $71.41 Friday settle; 10Y ~4.56%; DXY ~100.9; USD/JPY ~161.7; gold easing on the week; ~140 Iranian targets struck",
+      "as_of": "11 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/markets/",
+        "retrieved_at": "2026-07-12T14:37:00Z"
+      }
+    },
+    {
+      "source": "International Maritime Organization",
+      "fragment": "IMO official Strait of Hormuz page: averaged daily transits, recovering through late June (67.8 on 24 June, 37.7 on 30 June), for general awareness only",
+      "as_of": "Jun",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.imo.org/en/OurWork/Security/Pages/Strait-of-Hormuz.aspx",
+        "retrieved_at": "2026-07-12T14:38:00Z"
+      }
+    },
+    {
+      "source": "US Federal Reserve",
+      "fragment": "Fed Monetary Policy Report: inflation \"stepped up further this spring\" on tariffs, war-related energy costs, and the AI buildout",
+      "as_of": "Jul",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.federalreserve.gov/monetarypolicy/mpr_default.htm",
+        "retrieved_at": "2026-07-12T14:39:00Z"
+      }
+    }
+  ]
+}

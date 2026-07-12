@@ -59,6 +59,7 @@ export function loadArticle(date: string, slug: string): Article {
   // Reading time is computed from the body, never hand-authored — ~220 words a
   // minute over the prose, citation markers stripped.
   const words = (article.body ?? [])
+    .filter((p): p is string => typeof p === 'string')   // skip inline figure blocks
     .join(' ')
     .replace(/\[E\d+\]/g, '')
     .split(/\s+/)
@@ -73,6 +74,19 @@ export function loadArticle(date: string, slug: string): Article {
 export function loadMap(date: string, name: string): RegionMap {
   const path = resolve(scopeDir(date), 'maps', `${name}.json`);
   return JSON.parse(readFileSync(path, 'utf-8')) as RegionMap;
+}
+
+/**
+ * Load a baked glyph image (see ops/bake-image.mjs) by edition + name —
+ * an ASCII rasterisation of a source image, committed as text and cited
+ * back to its source like any other Record artifact.
+ */
+export function loadGlyph(date: string, name: string): {
+  name: string; cols: number; rows: number; art: string; artDark?: string;
+  caption?: string; source?: string; ref?: string;
+} {
+  const path = resolve(scopeDir(date), 'glyphs', `${name}.json`);
+  return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
 /**

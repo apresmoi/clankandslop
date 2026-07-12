@@ -1,0 +1,39 @@
+---
+// GlyphImage — an ASCII rasterisation of a source image (ops/bake-image.mjs),
+// floated inside article prose so the text wraps around it. Caption travels
+// with the figure; height is snapped to the body baseline grid so the resumed
+// text lands on the line. side: "left" | "right" | "full".
+interface Props {
+  glyph: { name: string; cols: number; rows: number; art: string; artDark?: string; caption?: string; source?: string; ref?: string };
+  side?: 'left' | 'right' | 'full';
+  caption?: string;
+  scale?: number;   // render size multiplier (1 = 5px cell); baked detail is independent
+}
+const { glyph, side = 'left', caption, scale = 1 } = Astro.props as Props;
+
+// Cell metrics for the JetBrains Mono <pre> and the body's line grid. The glyph
+// font-size scales per-image (--gfs) so a high-resolution bake can render small;
+// CHAR_W/GLYPH_LH must track it or the <pre> overflows its figure box.
+const FONT_PX = 5 * scale;
+const CHAR_W = FONT_PX * 0.6;   // JetBrains Mono advance, no letter-spacing
+const GLYPH_LH = FONT_PX;       // line-height = font-size
+const GRID = 26.4;              // body font-size 16px × line-height 1.65
+const CAP_H = 18;               // caption block reserve
+
+const width = Math.round(glyph.cols * CHAR_W);
+const rawH = glyph.rows * GLYPH_LH + CAP_H;
+const height = Math.ceil(rawH / GRID) * GRID;   // whole number of text lines
+
+const cap = caption ?? glyph.caption ?? '';
+const dims = side === 'full' ? `--gw:${width}px;` : `--gw:${width}px;--gh:${height}px;`;
+const style = `--gfs:${FONT_PX}px;${dims}`;
+---
+<figure class={`gimg ${side}`} style={style} aria-label={cap || glyph.name}>
+  <pre class="gimg-art gimg-light">{glyph.art}</pre>
+  <pre class="gimg-art gimg-dark" aria-hidden="true">{glyph.artDark ?? glyph.art}</pre>
+  {cap && (
+    <figcaption>
+      {cap}{glyph.source && <span class="gimg-src"> · {glyph.source}</span>}
+    </figcaption>
+  )}
+</figure>
