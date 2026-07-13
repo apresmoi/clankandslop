@@ -1,0 +1,107 @@
+{
+  "id": "tape-oil-shock",
+  "topics": [
+    "oil",
+    "semiconductors",
+    "rates",
+    "central-banks"
+  ],
+  "edition_date": "2026-07-13",
+  "section": "markets",
+  "kicker": "The Tape",
+  "epistemic": "inference",
+  "headline": "Oil Reprices Monday’s Market",
+  "deck": "Crude’s weekend gap pushed yields and the dollar higher, pulled gold lower and split the equity tape. Tech weakened while the Dow held, leaving a rotation toward energy and value as the session’s first clean read.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "22:00",
+  "body": [
+    "Buyers opened Monday by paying for an oil-led inflation shock, and the cross-asset tape stayed internally consistent [E1][E3]. The S&P 500 traded near 7,562, down 0.17%, and the Nasdaq near 26,123, down 0.60%, both below Friday’s closes of 7,575.39 and 26,281.61 [E1]. The Dow held near 52,776, up 0.26% and above Friday’s 52,637.01 close [E1]. Duration-sensitive tech took the pressure while the value-tilted index stayed green, a rotation signal that stopped short of broad liquidation [E1][E3].",
+    "Memory supplied the cleanest equity expression of that pressure [E1][E2]. SK Hynix moved from SKHYV to permanent ticker SKHY on 13 July, then showed near $153 in accessible premarket data, about 10% below its $170 debut and below Friday’s $168.01 close [E2]. That print was stale to the cash session and should be read as premarket direction, not a live intraday mark [E2]. GraniteShares’ leveraged SKUU and SKDD funds are expected to begin trading on 14 July, leaving Tuesday as the next test of whether buyers treat the drop as repricing or entry [E2].",
+    "Crude set the pace across assets [E1][E3]. Brent gained about 3% toward $78 and WTI moved toward $74 after renewed US strikes and Iran’s claim that it had closed Hormuz [E3]. The strait carries roughly 20% of seaborne oil and gas, so traders priced a real weekend gap instead of a rhetorical premium [E3]. The barrel became the session’s inflation input, with every duration trade forced to absorb a higher energy floor [E3].",
+    "Supply risk arrived beside a weaker demand forecast [E3][E4]. OPEC cut expected 2026 oil-demand growth to 780,000 barrels a day and cited the Iran war and the threat to shipments [E4]. Slower demand failed to cap the immediate price shock; buyers paid first for disrupted passage and argued about consumption later [E3][E4]. The week’s central commodity question is whether the Hormuz premium fades with traffic or hardens into a durable floor [E3][E4].",
+    "Gold broke the usual crisis script [E3][E5]. The metal fell near $4,069 while the US 10-year yield held around 4.58% and the dollar index near 100.7 [E3]. Traders leaned toward tighter policy because dearer oil raises the inflation cost of easing, which weakened the haven bid in gold [E5]. Those moves point to a higher-for-longer shock: yields and the dollar strengthened, and the equity damage remained concentrated in duration-sensitive names [E1][E3][E5].",
+    "Japan carried the pressure most visibly [E3][E5]. USD/JPY moved past 162 to about 162.15 as the oil shock worsened Japan’s import bill and bets faded on pension money shifting home [E3][E5]. The Bank of Japan signalled a more hawkish tone to support the currency, yet that posture had not pulled the pair away from intervention-sensitive levels [E5]. Currency traders treated policy language as a brake with little stopping power [E5].",
+    "Monday’s first read was coherent and uncomfortable [E1][E3][E5]. Oil rose, gold fell, Treasury yields stayed high, the dollar strengthened, tech weakened and the Dow held green [E1][E3]. That pattern priced persistent inflation pressure and a narrower equity rotation, with cash moving across sectors and no broad exit visible [E1][E3][E5]. Until Hormuz traffic settles the dispute over control, the barrel sets the mood [E3][E4]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "evidence_box": [
+    {
+      "source": "Nasdaq / exchange data",
+      "fragment": "S&P 7,562; Nasdaq 26,123; Dow 52,776",
+      "as_of": "13 Jul",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nasdaq.com/market-activity/index/spx",
+        "retrieved_at": "2026-07-13T13:40:00Z"
+      }
+    },
+    {
+      "source": "Nasdaq",
+      "fragment": "SKHY effective 13 July",
+      "as_of": "13 Jul",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nasdaq.com/market-activity/stocks/skhy",
+        "retrieved_at": "2026-07-13T13:41:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Brent up about 3% toward $78",
+      "as_of": "13 Jul",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/markets/commodities/",
+        "retrieved_at": "2026-07-13T13:42:00Z"
+      }
+    },
+    {
+      "source": "OPEC Monthly Oil Market Report",
+      "fragment": "2026 oil-demand growth to 780,000 bpd",
+      "as_of": "13 Jul",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.opec.org/opec_web/en/publications/338.htm",
+        "retrieved_at": "2026-07-13T13:43:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "USD/JPY past 162",
+      "as_of": "13 Jul",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/markets/",
+        "retrieved_at": "2026-07-13T13:44:00Z "
+      }
+    }
+  ],
+  "art": {
+    "kind": "ascii",
+    "shape": "chip",
+    "caption": "The memory trade that led the market up last week led it down on Monday, as the Hormuz premium pushed money out of chips and into oil."
+  }
+}
