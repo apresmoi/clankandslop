@@ -1,0 +1,129 @@
+{
+  "id": "tape-cpi-oil",
+  "topics": [
+    "inflation",
+    "rates",
+    "oil",
+    "semiconductors",
+    "central-banks"
+  ],
+  "edition_date": "2026-07-14",
+  "section": "markets",
+  "kicker": "War Premium",
+  "epistemic": "inference",
+  "headline": "Soft CPI Wins the Session",
+  "deck": "A soft June price print pulled buyers toward duration even as Hormuz lifted crude. IBM supplied the warning beneath the rally: AI hardware bills are starting to eat software budgets.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "18:30 UTC",
+  "revision": 1,
+  "next_update_utc": "22:00",
+  "body": [
+    "The session gave the soft inflation print the deciding vote [E1][E2][E3][E7]. June CPI fell 0.4% from May and rose 3.5% from a year earlier, while core prices were unchanged on the month [E1]. That combination reduced the immediate need to price another inflation shock and gave buyers room to reach for longer-duration assets [E1][E5]. IBM’s collapse pulled the Dow lower as SK Hynix buyers chased the memory trade, leaving inflation relief ahead of the war premium at the margin [E1][E2][E3][E7].",
+    "Chair Kevin Warsh did not declare victory [E5]. He told Congress that the Fed’s objective was to make the inflation surge “a thing of the past,” while keeping policy focused on longer-run price stability [E5]. The June print helped that case because both headline and core momentum weakened sharply [E1][E5]. Energy remains capable of turning a benign monthly print into a harder summer path [E1][E2].",
+    "Crude supplied the opposing force [E2]. Renewed US–Iran attacks around Hormuz lifted oil about 2% to a one-month high, with Brent near $85 intraday [E2]. Buyers had to decide whether the shock belonged in a lasting inflation path or a reversible risk premium [E1][E2]. Investors gave the CPI print the higher weight for the session and treated oil’s rise as a contained risk premium [E1][E2].",
+    "IBM delivered the cleanest corporate signal [E3]. Its shares fell as much as 26% after management said clients were shifting quarterly capital spending toward servers, storage and memory, leaving large software deals unfinished [E3]. That sequence is capex crowding out software: customers moved scarce technology dollars into the hardware stack first [E3]. The warning turns an abstract concern about AI spending into a disclosed budget trade inside enterprise accounts [E3].",
+    "SK Hynix showed the other side of the same allocation [E3][E7]. Its US ADR traded near $181.81, up about 19%, as buyers paid for the memory side of the AI buildout [E7]. GraniteShares launched SKUU and SKDD, the first US-listed leveraged funds tied to SK Hynix, turning the ADR into a levered trading complex on launch day [E6]. Together, the trades mapped the spending hierarchy in public: buyers levered memory exposure as IBM disclosed delayed software deals [E3][E6][E7].",
+    "JPMorgan supplied the counterweight from finance [E4]. The bank reported $21.2 billion of second-quarter net income, a record result that showed a large balance sheet still harvesting elevated activity [E4]. Strong bank earnings can support the Dow, and IBM’s shock still dominated the index-level signal [E3][E4]. Investors kept the constructive tone narrow, rewarding bank profits while repricing where corporate spending was landing [E3][E4].",
+    "Investors still face a two-sided risk in the collision between these stories [E1][E2][E3]. A flat core print gives the Fed time, yet a new Hormuz oil shock can refill headline inflation faster than policy can respond [E1][E2][E5]. AI infrastructure demand can keep semiconductor buyers aggressive, while the same spending leaves software vendors exposed to delayed deals [E3][E6][E7]. Buyers chose the CPI; another Hormuz strike can reopen the whole argument [E1][E2]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7"
+  ],
+  "evidence_box": [
+    {
+      "source": "U.S. Bureau of Labor Statistics",
+      "fragment": "decreased 0.4 percent on a seasonally adjusted basis in June",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.bls.gov/news.release/archives/cpi_07142026.htm",
+        "retrieved_at": "2026-07-14T15:38:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Oil prices rose about 2% to a one-month high on Tuesday",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/energy/oil-climbs-one-month-high-us-iran-step-up-attacks-strait-hormuz-2026-07-14/",
+        "retrieved_at": "2026-07-14T15:38:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "clients shift their quarterly capex spend toward servers, storage, and memory purchases",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/ibm-expects-second-quarter-revenue-below-estimates-2026-07-14/",
+        "retrieved_at": "2026-07-14T15:39:00Z"
+      }
+    },
+    {
+      "source": "JPMorgan Chase",
+      "fragment": "NET INCOME OF $21.2 BILLION",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2026/2nd-quarter/6cded9fd-a164-4e6c-8cff-377357cf105c.pdf",
+        "retrieved_at": "2026-07-14T15:39:00Z"
+      }
+    },
+    {
+      "source": "Federal Reserve",
+      "fragment": "the inflation surge of the last five years will be a thing of the past",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.federalreserve.gov/newsevents/testimony/warsh20260714a.htm",
+        "retrieved_at": "2026-07-14T15:40:00Z"
+      }
+    },
+    {
+      "source": "GraniteShares",
+      "fragment": "SKUU and SKDD are expected to launch on July 14",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://graniteshares.com/etfs/skuu/",
+        "retrieved_at": "2026-07-14T15:41:00Z"
+      }
+    },
+    {
+      "source": "MarketWatch",
+      "fragment": "181.81",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.marketwatch.com/investing/stock/skhy",
+        "retrieved_at": "2026-07-14T15:36:00Z"
+      }
+    }
+  ]
+}
