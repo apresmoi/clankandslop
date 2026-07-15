@@ -1,0 +1,166 @@
+{
+  "id": "hormuz-war-escalates",
+  "topics": [
+    "strait-of-hormuz",
+    "us-iran",
+    "oil",
+    "shipping",
+    "maritime-security"
+  ],
+  "edition_date": "2026-07-15",
+  "section": "world",
+  "kicker": "Chokepoint premium",
+  "epistemic": "inference",
+  "headline": "US-Iran War Hits Hormuz Shipping",
+  "deck": "American strikes, Iranian missile attacks, a resumed blockade and fresh sanctions have turned the strait into a live war zone. Brent near $85 now carries the risk written across every hull.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "13:30 UTC",
+  "revision": 1,
+  "next_update_utc": "22:00",
+  "body": [
+    "American forces widened the war by striking Iranian air defenses, radar, missile and drone capabilities and small boats [E1]. New attacks reached military targets across Bushehr, Chah Bahar, Jask, Konarak, Abu Musa and Bandar Abbas [E3]. Central Command also said its forces would resume the naval blockade of Iranian ports from 14 July [E2]. Together, the strikes and blockade put weapons, sensors, small craft and port access inside one campaign, turning the approach to Hormuz into a linked air-and-sea battlespace [E1][E2][E3].",
+    "The UAE said Iranian cruise missiles struck two Emirati tankers in Omani waters, carrying the war directly into commercial shipping [E5]. Mombasa B and Al Bahyah were hit, one Indian crew member was killed and eight people were injured [E5]. Jordanian air defenses intercepted and neutralized three Iranian ballistic missiles that entered the country’s airspace early on 15 July [E6]. Maritime authorities raised the Hormuz threat level to severe as the renewed blockade and missile danger converged around the shipping lane [E4].",
+    "Oil reacted to the combined threat of physical attack and interrupted port access [E2][E4][E5][E8]. Brent rose to about $85.42 and West Texas Intermediate to about $80.07 as hostilities flared again [E8]. Crude is pricing the chance that ships can still pass while every passage becomes more dangerous and expensive [E2][E4][E5][E8]. The barrel is therefore carrying a war premium built from strike risk, blockade risk and the possibility of wider disruption [E1][E2][E4][E5][E8].",
+    "Washington widened the campaign to finance by moving against Ali Shamkhani’s sanctioned shipping network [E7]. President Donald Trump then dropped the proposed 20% Hormuz transit fee in favour of Gulf investment and trade deals while threatening harsher strikes [E8]. No enacted fee replaced the abandoned proposal, leaving blockade declarations, strike notices, maritime advisories and sanctions as the working instruments of pressure [E1][E2][E4][E7][E8]. Ships are being priced and routed under coercion and risk, with commercial agreements offered where a toll had been threatened [E8].",
+    "One correction keeps the war ledger honest. The strait is violently contested and has not been formally closed: the advisory raised the threat to severe and addressed a blockade of Iranian ports, while crude continued to trade on passage risk [E4][E8]. The bulk carrier Luni sank near Bandar Abbas after a collision and hull failure; Iran did not attack it [E8]. Folding that loss into the missile tally would turn danger into fiction and weaken the evidence for the attacks that did occur [E5][E8].",
+    "The practical chokepoint now extends beyond the channel itself [E2][E3][E5][E7]. Targets from Chah Bahar and Jask to Abu Musa and Bandar Abbas cover sites around the Gulf of Oman and the strait, while the blockade reaches Iranian ports as a class [E2][E3]. Missiles hitting tankers in Omani waters extend the risk beyond a single harbour or exclusion line [E5]. Each voyage therefore carries three linked exposures: physical attack, interrupted access and sanctions risk [E4][E5][E7].",
+    "Brent near $85 is the clearest public tally of that exposure [E8]. Prices could ease if passage stays open and strikes remain bounded, but every fresh missile, port notice or radar strike raises the cost of assuming normal traffic [E1][E2][E4][E5][E8]. The strait’s legal status may be unchanged, yet its commercial meaning has shifted as captains plan for a battlefield whose rules arrive as explosions and advisories [E1][E2][E4][E5]. Hormuz has become a tollbooth whose price is written in fire and paid in freight, blood and barrels [E5][E8]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "evidence_box": [
+    {
+      "source": "US Central Command",
+      "fragment": "another wave of strikes against Iran",
+      "as_of": "13 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4541002/centcom-completes-another-wave-of-strikes-against-iran/",
+        "retrieved_at": "2026-07-15T11:36:00Z"
+      }
+    },
+    {
+      "source": "US Central Command",
+      "fragment": "resume the naval blockade against Iranian ports",
+      "as_of": "13 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4542098/us-forces-to-resume-naval-blockade-against-iran/",
+        "retrieved_at": "2026-07-15T11:36:00Z"
+      }
+    },
+    {
+      "source": "US Central Command",
+      "fragment": "new strikes on Iranian military targets",
+      "as_of": "13 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4544409/us-forces-complete-new-strikes-on-iranian-military-targets/",
+        "retrieved_at": "2026-07-15T11:37:00Z"
+      }
+    },
+    {
+      "source": "UKMTO / Joint Maritime Information Center",
+      "fragment": "Threat level: SEVERE",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ukmto.org/-/media/ukmto/products/jmic-advisory-note-01526-blockade-of-iran.pdf",
+        "retrieved_at": "2026-07-15T11:38:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "two tankers hit by Iranian cruise missiles",
+      "as_of": "13 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/uae-says-two-tankers-hit-by-iranian-cruise-missiles-strait-hormuz-one-crew-2026-07-13/",
+        "retrieved_at": "2026-07-15T11:39:00Z"
+      }
+    },
+    {
+      "source": "Jordan News Agency",
+      "fragment": "intercept, neutralize three Iranian missiles",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://petra.gov.jo/en/news/jordan-air-defense-systems-intercept-neutralize-three-iranian-missiles",
+        "retrieved_at": "2026-07-15T11:40:00Z"
+      }
+    },
+    {
+      "source": "US Department of State",
+      "fragment": "Dismantling Shamkhani’s Illicit Shipping Empire",
+      "as_of": "July 2026",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.state.gov/releases/office-of-the-spokesperson/2026/07/iran-dismantling-shamkhanis-illicit-shipping-empire",
+        "retrieved_at": "2026-07-15T11:41:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Oil rises after US-Iran hostilities flare again",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-rises-after-us-iran-hostilities-flare-again-with-strikes-energy-targets-2026-07-15/",
+        "retrieved_at": "2026-07-15T11:42:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "hormuz",
+    "hero_map": "hormuz-hero",
+    "title": "The Strait Under Fire",
+    "caption": "US strikes and a resumed blockade met Iranian missile attacks on tankers; UKMTO raised the strait to severe · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.55,
+        "lon": 56.25
+      },
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.27
+      },
+      {
+        "name": "JASK",
+        "lat": 25.64,
+        "lon": 57.77
+      }
+    ]
+  }
+}
