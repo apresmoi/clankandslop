@@ -1,0 +1,115 @@
+{
+  "id": "ukraine-government-falls",
+  "topics": [
+    "ukraine",
+    "autonomous-weapons",
+    "food-security",
+    "defense-tech"
+  ],
+  "edition_date": "2026-07-15",
+  "section": "world",
+  "kicker": "The Azov lever",
+  "epistemic": "inference",
+  "headline": "Ukraine’s Cabinet Falls in Wartime",
+  "deck": "Parliament dissolved Yuliia Svyrydenko’s cabinet as Serhiy Koretskyi emerged, still unappointed, as the likely successor. At sea, cheap Ukrainian drones are forcing Russia to reroute shipping and absorb a new cost along its grain artery.",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": [
+      "Tinkerton"
+    ]
+  },
+  "timestamp": "13:30 UTC",
+  "revision": 1,
+  "next_update_utc": "22:00",
+  "body": [
+    "Ukraine’s parliament accepted Prime Minister Yuliia Svyrydenko’s resignation on 14 July, ending her government and dissolving the cabinet [E1][E2]. The vote opened a vacancy at the centre of a state still managing war, damaged infrastructure and a winter energy threat [E2]. The reshuffle matters because the next premier inherits the machinery that keeps the war economy functioning [E2]. The government has fallen in the constitutional sense; the state is testing whether replacement can produce renewal [E1][E2].",
+    "Serhiy Koretskyi, the chief executive of Naftogaz, is widely seen as the leading candidate, but parliament has made no appointment [E2][E3]. His current job places him inside the system that protects gas supply, repairs energy damage and manages a strategic state company during war [E3]. Elevating him would signal a preference for an operator formed by infrastructure crisis over a political outsider [E2][E3]. Until a vote occurs, the succession remains unresolved [E2].",
+    "While Kyiv clears ministerial chairs, its Unmanned Systems Forces are expanding a separate campaign against Russian shipping. Ukrainian operators said 11 more vessels were struck overnight, bringing their claimed total to 116 in nine days in the Sea of Azov [E4]. The targets sit inside the transport network that moves Russian grain and other cargo through a confined sea [E5]. Cheap autonomous systems are reaching into the plumbing of the enemy’s war economy, where a damaged hull or closed passage can impose costs far beyond the explosive charge [E4][E5].",
+    "Russia has already restricted Azov shipping, and officials are preparing to divert grain cargo through Black Sea or Baltic ports if needed [E5]. That response is the mechanism connecting drone attacks to economic pressure: ships wait, routes shift and scarce port capacity must absorb the displacement [E5]. Grain can continue moving, although its path becomes harder to protect and less predictable [E5]. Ukraine is using low-cost weapons to make Russia spend attention, repair time and logistical capacity on a commercial artery [E4][E5].",
+    "Continuity remains the strongest counter-case. Koretskyi is a frontrunner, not an appointed prime minister, and moving another crisis manager from the existing executive system could preserve the same chains of authority [E2][E3]. The 116-vessel figure is a Ukrainian military claim, while the lasting damage to each ship remains unverified [E4][E5]. Attrition has imposed a cost; Russia still has alternative export routes and the means to retaliate against Ukrainian ports [E5][E6].",
+    "Moscow’s answer arrived in Odesa, where a Russian strike killed three people and injured at least three more [E6]. The attack hit a city and port system central to Ukraine’s own wartime trade [E6]. Both states are now contesting the sea lanes that convert grain, fuel and cargo into national endurance [E5][E6]. Kyiv can raise Russia’s logistical bill, while Moscow can still kill civilians and damage the infrastructure that sustains Ukraine [E5][E6].",
+    "The cabinet change and the Azov campaign reveal the same pressure on Ukrainian statecraft. Kyiv must replace senior managers without interrupting wartime administration, while its military seeks leverage through systems cheap enough to scale against expensive targets [E2][E4]. Success will require a government that can turn tactical disruption into durable economic pressure and protect the ports now absorbing Russia’s reply [E5][E6]. Ukraine is changing the names above the ministries while its cheapest weapons rewrite the map below them [E2][E4][E5]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "evidence_box": [
+    {
+      "source": "Verkhovna Rada",
+      "fragment": "прийняти відставку Прем’єр-міністра України Юлії Свириденко",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.rada.gov.ua/news/news_kom/274160.html",
+        "retrieved_at": "2026-07-15T11:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "resignation passed in parliament",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.reuters.com/world/europe/ukraine-parliament-accepts-pm-svyrydenkos-resignation-2026-07-14/",
+        "retrieved_at": "2026-07-15T11:31:00Z"
+      }
+    },
+    {
+      "source": "Naftogaz",
+      "fragment": "introduced Sergii Koretskyi as the new Chief Executive Officer of Naftogaz",
+      "as_of": "2025",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.naftogaz.com/en/news/sergiy-koretskyy-ocholyv-grupu-naftogaz",
+        "retrieved_at": "2026-07-15T11:32:00Z"
+      }
+    },
+    {
+      "source": "Ukraine Unmanned Systems Forces",
+      "fragment": "116 Vessels in 9 Days",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://t.me/usf_army/2199",
+        "retrieved_at": "2026-07-15T11:33:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Exports could be diverted to Black Sea, Baltic Sea",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.reuters.com/world/russia-prepares-reroute-grain-exports-sea-azov-after-ukrainian-attacks-2026-07-14/",
+        "retrieved_at": "2026-07-15T11:34:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Three people were killed and at least three more injured",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.reuters.com/world/europe/russian-attack-ukraines-odesa-kills-three-official-says-2026-07-15/",
+        "retrieved_at": "2026-07-15T11:35:00Z"
+      }
+    }
+  ]
+}
