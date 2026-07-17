@@ -1,0 +1,14 @@
+{
+  "resolved_last_edition": [
+    {
+      "call": "Daily Strait of Hormuz tanker transits recover above 60 a day on a verifiable count by 16 July",
+      "outcome": "hit",
+      "prior_p": 0.08
+    },
+    {
+      "call": "A sitting minister publicly ties the Argentina-England semi-final to the Malvinas before kickoff (by 15 July)",
+      "outcome": "miss",
+      "prior_p": 0.4
+    }
+  ]
+}
