@@ -1,0 +1,179 @@
+{
+  "id": "hormuz-commercially-strangled",
+  "topics": [
+    "strait-of-hormuz",
+    "shipping",
+    "oil",
+    "us-iran",
+    "maritime-security"
+  ],
+  "edition_date": "2026-07-16",
+  "section": "world",
+  "kicker": "Access by force",
+  "epistemic": "inference",
+  "headline": "Hormuz Traffic Collapses to a Trickle",
+  "deck": "Commercial passage through Hormuz has fallen to a few percent of normal as strikes, mining, insurance and crew restrictions price ships out of the route. Oil is trading the disappearance of reliable access.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "23:00 UTC",
+  "revision": 1,
+  "next_update_utc": "06:00",
+  "body": [
+    "Only nine vessels crossed the Strait of Hormuz on 15 July, against roughly 125–140 on an ordinary day [E5]. That leaves commercial traffic running at about six to seven percent of its usual count [E5]. No crude supertankers or LNG carriers were visible among the crossings [E5]. A Saudi cargo carrying about one million barrels passed with its transponder switched off [E5]. At that volume, each transit becomes a bespoke decision about survival, permission and cost [E5].",
+    "US Central Command said it completed its latest wave of strikes against Iranian military targets on 16 July [E1]. The command had reported another round against Iranian military positions one day earlier [E2]. Washington also announced on 14 July that its forces would resume a naval blockade against Iranian ports [E3]. On 16 July, the command said US forces disabled a vessel in the Arabian Gulf after it failed to comply with warnings [E4].",
+    "Iran calls the strait a “red line” and says it will resist “until the end,” placing commercial navigation inside the military confrontation [E8]. Some shipowners have refused even passages guided by the US military after attacks on vessels [E6]. Mining has left the central traffic lane unusable, narrowing the practical choices available to masters and operators [E6]. Military guidance is therefore one input among mines, crew consent, hull exposure and the insurer’s willingness to write the voyage [E6].",
+    "India instructed shipowners not to deploy Indian seafarers on Hormuz-bound routes [E7]. More than 15,000 Indian crew members were reported stranded west of the strait as the order and the fighting interrupted rotations [E7]. Seven-day war-risk cover has climbed near five percent of hull value, equivalent to about $10 million for a $200 million tanker [E6]. That arithmetic can cancel a voyage before a missile, mine or blockade order ever reaches the ship [E6][E7].",
+    "Brent settled near $84.23 a barrel on 16 July, while WTI traded near $78.95 [E9]. Both benchmarks had risen roughly eleven percent over the week as repeated US strikes deepened fears of a wider conflict [E9]. The precise Hormuz premium cannot be separated cleanly from inventories, demand and the broader war, especially while ship movements are obscured [E5][E9]. The sequence still carries a clear signal: traffic collapsed, owners rejected guided passages, insurance costs surged and crude rose for a fourth session [E5][E6][E9].",
+    "The null must be held at full strength: the strait is violently contested and commercially near-shut, not physically sealed or formally closed [E1][E5][E8]. A residual flow remains, including the nine recorded crossings on 15 July [E5]. Transponders switched off during passage make observed vessel counts an incomplete measure of actual cargo movement [E5]. Any confident reconstruction of barrels per day would outrun the available evidence [E5].",
+    "Commercial access now depends on military orders, safe lanes, available crews, willing owners and insurance that does not consume the voyage’s economics [E3][E6][E7]. Each surviving passage embeds the price of mines, strikes and human refusal inside the hull [E6][E7]. Oil is carrying that loss of dependable access before any authority has declared the waterway closed [E5][E9]. A strait can remain open on a chart while closing on a balance sheet [E5][E6][E9]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ],
+  "evidence_box": [
+    {
+      "source": "US Central Command",
+      "fragment": "latest wave of US strikes against Iran completed",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4546816/latest-wave-of-us-strikes-against-iran-completed/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "US Central Command",
+      "fragment": "US forces complete new strikes on Iranian military targets",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4544409/us-forces-complete-new-strikes-on-iranian-military-targets/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "US Central Command",
+      "fragment": "resume the naval blockade against Iranian ports",
+      "as_of": "14 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4542098/us-forces-to-resume-naval-blockade-against-iran/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "US Central Command",
+      "fragment": "disable a non-compliant vessel in the Arabian Gulf",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4546626/us-forces-disable-non-compliant-vessel-in-arabian-gulf/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "fewer vessels travel through Hormuz as US, Iran continue strikes",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/fewer-vessels-travel-through-hormuz-us-iran-continue-strikes-2026-07-16/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "some ships are refusing US-military-guided Hormuz transits after attacks",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/some-ships-refusing-us-military-guided-hormuz-transits-after-attacks-sources-say-2026-07-15/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "not deploy Indian seafarers on Hormuz routes",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/india/new-delhi-tells-shipowners-not-deploy-indian-seafarers-hormuz-routes-2026-07-16/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Strait of Hormuz is a red line",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/iran-warns-strait-hormuz-is-red-line-will-resist-until-end-2026-07-16/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "oil prices rise 4th day",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-prices-rise-4th-day-us-strikes-iran-raise-fears-wider-conflict-2026-07-16/",
+        "retrieved_at": "2026-07-16T22:55:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "hormuz",
+    "hero_map": "hormuz-hero",
+    "title": "The Strangled Strait",
+    "caption": "Nine vessels crossed on 15 July against 125–140 on a normal day as strikes, a blockade and war-risk premia priced ships out · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.55,
+        "lon": 56.25
+      },
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.27
+      },
+      {
+        "name": "JASK",
+        "lat": 25.64,
+        "lon": 57.77
+      }
+    ]
+  }
+}
