@@ -1,0 +1,141 @@
+{
+  "id": "tape-semis-and-strait",
+  "topics": [
+    "semiconductors",
+    "oil",
+    "ai-compute",
+    "strait-of-hormuz"
+  ],
+  "edition_date": "2026-07-16",
+  "section": "markets",
+  "kicker": "Oil Holds Firm",
+  "epistemic": "inference",
+  "headline": "SK Hynix Reversal Hits AI Trade",
+  "deck": "A bruising reversal in SK Hynix and Korean technology shares dragged the AI complex lower, while oil stayed elevated on war risk around Hormuz. The session exposed a crowded growth trade meeting an expensive supply chokepoint.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "23:30 UTC",
+  "revision": 1,
+  "next_update_utc": "13:30",
+  "body": [
+    "Wall Street closed with the semiconductor complex in retreat. The S&P 500 settled at 7,533.77, down 0.51% on 16 July [E1]. The Nasdaq Composite fell 1.47% to 25,881.95 as semiconductor and AI-linked names led the decline [E1]. Investors cut concentrated chip exposure while the broader index lost less ground, locating the pressure inside the most crowded part of the growth trade [E1].",
+    "SK Hynix supplied the clearest before-and-after image. Its Nasdaq ADR began trading on 15 July, extending US access to a company whose Seoul shares were already surging [E2][E3]. After rising about 28% on its debut, SKHY closed the following session near $152.31, down roughly 13.7% [E5]. The company that had served as shorthand for HBM scarcity became the day’s shorthand for crowded positioning [E3][E5].",
+    "Seoul absorbed the larger shock. The KOSPI closed 6.37% lower at 6,820.60, with SK Hynix, Samsung Electronics and technology-linked leverage at the centre of the sell-off [E4]. That fall followed SK Hynix’s nearly 13% Seoul surge one day earlier [E3]. The two-session swing carried the fingerprints of a leverage purge around a popular theme, while any reassessment of memory demand remained unresolved [E3][E4][E7].",
+    "Europe largely escaped the semiconductor break. The STOXX 600 edged up 0.16% to 643.73 as investors weighed earnings and the Middle East conflict [E8]. The divergence showed that the selling pressure remained concentrated in markets and products carrying the heaviest AI exposure [E1][E4][E8]. A global risk retreat would have left a broader mark; this session punished the crowded corner first [E1][E8].",
+    "Oil supplied the opposing force. Brent settled at $84.23, down 0.85%, and WTI at $78.95, down 0.8%, while remaining near their highest levels since mid-June [E6]. US strikes on Iran kept fears of a wider conflict and disruption around Hormuz embedded in crude prices [E6]. The modest daily easing showed that the war bid remained present even after four consecutive sessions of gains [E6].",
+    "The null matters because neither move carries a clean causal label. No cited public source separates the Hormuz risk premium into a precise number of dollars per barrel, so attaching one would manufacture accuracy [E6]. The SK Hynix round-trip is also tangled with leveraged single-stock ETFs, products built to magnify daily moves and capable of amplifying reversals [E7]. Thursday therefore cannot settle whether HBM fundamentals weakened; it shows that leverage around the theme broke hard when prices turned [E5][E7].",
+    "Taken together, the closes exposed two crowded trades at different stages. AI and semiconductor positions were being cut after a vertical run, while crude remained supported by a war threatening a global chokepoint [E1][E3][E6]. The S&P 500 and Nasdaq paid for the first force, Europe mostly escaped it, and oil retained the second [E1][E6][E8]. By the close, the barrel still carried war, and the chip carried leverage [E6][E7]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "evidence_box": [
+    {
+      "source": "AP News",
+      "fragment": "S&P 500 at 7,533.77",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://apnews.com/article/b2a85bf17cbb4653ba83bb7c655366c0",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    },
+    {
+      "source": "Nasdaq",
+      "fragment": "Global innovation meets global capital",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nasdaq.com/newsroom/global-innovation-meets-global-capital-sk-hynix-lists-on-nasdaq",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "SK Hynix shares jump nearly 13%",
+      "as_of": "15 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/sk-hynix-shares-jump-nearly-13-tracking-us-stock-gains-2026-07-15/",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    },
+    {
+      "source": "Korea Economic Daily",
+      "fragment": "KOSPI closed at 6,820.60",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.kedglobal.com/korean-stock-market/newsView/ked202607160004",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    },
+    {
+      "source": "Yahoo Finance",
+      "fragment": "152.31",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://finance.yahoo.com/quote/SKHY/",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Oil prices rise for 4th day",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/energy/oil-prices-rise-4th-day-us-strikes-iran-raise-fears-wider-conflict-2026-07-16/",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "What are leveraged ETFs?",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/legal/transactional/what-are-leveraged-etfs-how-are-they-driving-ai-rally-2026-07-16/",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "European shares muted",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/markets/europe/european-shares-muted-investors-weigh-earnings-mideast-conflict-2026-07-16/",
+        "retrieved_at": "2026-07-16T23:30:00Z"
+      }
+    }
+  ]
+}
