@@ -1,0 +1,116 @@
+{
+  "id": "supply-shock-derating",
+  "topics": [
+    "oil",
+    "semiconductors",
+    "ai-compute",
+    "central-banks",
+    "rates",
+    "inflation"
+  ],
+  "edition_date": "2026-07-19",
+  "section": "markets",
+  "kicker": "Energy Meets Compute",
+  "epistemic": "inference",
+  "headline": "Oil advances as semiconductors de-rate",
+  "deck": "Traders have bid crude on persistent Hormuz risk while investors sold the chip complex despite record results. The Federal Reserve remains on hold and the Bank of Korea has just hiked. Price action splits between an inflationary supply shock and a reappraisal of AI-capex durability.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "15:50 UTC",
+  "revision": 1,
+  "next_update_utc": "18:00",
+  "body": [
+    "Traders bid crude higher into the week open as an energy supply shock from intensified U.S.–Iran hostilities refused to clear. Investors at the same time rotated out of the semiconductor complex, driving a broad de-rating even as the underlying prints remained firm. The collision of these currents set the tone for global markets, with oil supported by renewed Strait of Hormuz risk and chips sold on durability questions. World stocks fell in the semiconductor rout that accompanied the energy move. [E1]",
+    "Brent crude settled at $88.10 a barrel and West Texas Intermediate at $82.49 on Friday as shipping risk through the Strait of Hormuz re-entered the tape. The world had already absorbed the loss of more than one billion barrels of supply since the conflict began. Buffer reserves that cushioned the first wave of disruption now stand drained, leaving the market more exposed to further spikes. Traders therefore continued to price a persistent risk premium into the front of the curve. [E1][E2]",
+    "The Philadelphia Semiconductor Index had fallen roughly 20 percent from its recent peak by Friday even after Taiwan Semiconductor Manufacturing Company posted record second-quarter results. The KOSPI index dropped more than 20 percent from its 22 June record close of 9,114.55 over the same stretch. TSMC reported revenue of US$40.20 billion, a gross margin of 67.7 percent, and net income growth of about 77 percent year over year, with third-quarter revenue guided to $44.6–45.8 billion. Investors nevertheless sold the complex hard. [E3][E4]",
+    "Investors shifted their focus from the absolute level of the numbers to the durability of the capital expenditure that underpins them. The semiconductor trade is de-rating on fears that the AI-compute build-out cannot compound at the same pace indefinitely. Primary demand indicators still point higher, yet the market has begun to question how long the current cycle of investment can last. That reappraisal has driven the price action even as the fundamental prints continue to hold. [E3][E4]",
+    "The Federal Reserve left the federal funds target range at 3.50–3.75 percent at its June meeting and has no gathering this week, with the next scheduled for 28–29 July. The Bank of Korea raised its Base Rate to 2.75 percent on 16 July, its first increase in about three and a half years, citing stronger semiconductor-led growth, inflation persistence and exchange-rate concerns. Central banks therefore remain on hold or in tightening mode against the split market message. The configuration reads as an inflationary supply shock rather than a broad recession scare. [E5][E6]",
+    "The overall read is that the U.S.–Iran war is trading as an inflationary supply shock while the semiconductor complex is de-rating on durability-of-capex fears. The chip selloff is a re-rating of AI-earnings duration and crowding, not a demand rollover; the primary numbers still point up. The oil move remains a risk premium that de-escalation could unwind. Traders and investors have thus priced two distinct stories into the same tape. [E1][E2][E3]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Brent settled at $88.10 and WTI at $82.49",
+      "as_of": "17 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-07-17/",
+        "retrieved_at": "2026-07-19T16:20:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "buffer reserves now drained",
+      "as_of": "6 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/energy/world-absorbs-historic-iran-war-oil-supply-loss-depleted-stocks-bring-risks-2026-07-06/",
+        "retrieved_at": "2026-07-19T16:22:00Z"
+      }
+    },
+    {
+      "source": "TSMC",
+      "fragment": "revenue US$40.20 billion, gross margin 67.7%",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://investor.tsmc.com/english/quarterly-results/2026/q2",
+        "retrieved_at": "2026-07-19T16:24:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "Philadelphia Semiconductor Index had fallen roughly 20%",
+      "as_of": "17 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/china/global-markets-global-markets-2026-07-17/",
+        "retrieved_at": "2026-07-19T16:26:00Z"
+      }
+    },
+    {
+      "source": "U.S. Federal Reserve",
+      "fragment": "federal funds target range at 3.50–3.75%",
+      "as_of": "17 June 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+        "retrieved_at": "2026-07-19T16:28:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "raised its Base Rate to 2.75%",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/bok-hikes-rates-first-time-3-12-years-combat-inflation-won-slump-2026-07-16/",
+        "retrieved_at": "2026-07-19T16:30:00Z"
+      }
+    }
+  ]
+}
