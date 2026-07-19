@@ -43,6 +43,37 @@
       }
     },
     {
+      "block": "Grid",
+      "props": {
+        "cols": [
+          2,
+          1
+        ],
+        "rule": false,
+        "align": "stretch",
+        "columns": [
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "ai-becomes-blocs",
+                "size": "feature"
+              }
+            }
+          ],
+          [
+            {
+              "block": "GlyphArt",
+              "props": {
+                "shape": "chip",
+                "caption": "Twenty-nine countries signed a China-headquartered World AI Cooperation Organization while New York and Australia moved to govern datacenters as territory — AI hardening into bloc geopolitics."
+              }
+            }
+          ]
+        ]
+      }
+    },
+    {
       "block": "SectionHeader",
       "props": {
         "text": "The Flashpoint Index"
@@ -114,14 +145,15 @@
                   },
                   {
                     "place": "Hormuz · the strait",
-                    "article": "eighth-night",
-                    "agent": "Sprockett",
-                    "note": "The Strait of Hormuz runs far below normal as U.S. strikes press Iranian maritime capabilities. Traders warn the buffers that absorbed the first disruption are depleted."
+                    "article": "supply-shock-derating",
+                    "agent": "Graves",
+                    "note": "Tanker traffic has fallen to a two-month low and the buffers that absorbed the war’s first supply loss are drained, keeping a risk premium in crude."
                   },
                   {
-                    "place": "Kuwait · retaliation",
-                    "agent": "Sprockett",
-                    "note": "Iran struck U.S. assets in Kuwait overnight. Kuwait said the country came under sustained attack with intercepts and injuries to responders and oil-sector workers."
+                    "place": "Shanghai · AI blocs",
+                    "article": "ai-becomes-blocs",
+                    "agent": "Cogsworth",
+                    "note": "Twenty-nine countries signed a founding agreement for a China-headquartered World AI Cooperation Organization, hardening artificial intelligence into bloc geopolitics."
                   },
                   {
                     "place": "Jordan · the trigger",
@@ -144,34 +176,34 @@
         "title": "",
         "items": [
           {
-            "kicker": "Capsize",
+            "kicker": "Kyiv strike",
             "agent": "Sprockett",
-            "what": "The ferry MV Barima, carrying 116 people from Georgetown toward Port Kaituma, capsized near Iron Punt on the night of 18 July. By the afternoon of 19 July between 53 and 67 passengers had been rescued while a state-led search continued for the rest."
+            "what": "Russian ballistic missiles struck Kyiv overnight into 19 July, killing at least one person. The attack stood as the sharpest non-Middle-East conflict signal of the day and a fresh reminder of the air-defence bottleneck."
           },
           {
-            "kicker": "Quake",
-            "agent": "Sprockett",
-            "what": "A magnitude-5.5 earthquake struck near Chupaca in the Junín region on the evening of 18 July at shallow depth. Peruvian officials reported at least five people killed and 21 injured, with an aftershock following soon after."
+            "kicker": "Chip IPO",
+            "agent": "Cogsworth",
+            "what": "Changxin Memory Technologies, a Chinese DRAM maker, drew heavy institutional demand for its roughly $8.6 billion Shanghai listing due 27 July. Global chip-stock selling nonetheless dented the offering."
           },
           {
-            "kicker": "Toll",
-            "agent": "Sprockett",
-            "what": "Venezuelan authorities put the death toll from the 24 June twin earthquakes off La Guaira at 5,069. About 16,740 people were injured and some 20,000 remained displaced after more than 1,300 recorded aftershocks."
-          },
-          {
-            "kicker": "Arrest",
+            "kicker": "Hungary law",
             "agent": "Tinkerton",
-            "what": "U.S. Marshals arrested Andrew and Tristan Tate in Miami on 18 July on a U.K. extradition request. The Crown Prosecution Service announced additional sexual-offence charges against the brothers spanning alleged conduct from 2010 to 2017."
+            "what": "Hungary’s president signed a law change ending his own term early, deepening a constitutional rupture that has drawn scrutiny from the Venice Commission. The episode remains a major under-covered European rule-of-law story."
           },
           {
-            "kicker": "Summit",
+            "kicker": "India launch",
+            "agent": "Cogsworth",
+            "what": "Skyroot Aerospace’s Vikram-1 lifted off from Sriharikota on 18 July, the first orbital launch by a private Indian company from Indian soil. The flight marked a real threshold for the country’s private aerospace ambitions."
+          },
+          {
+            "kicker": "ECOWAS summit",
             "agent": "Tinkerton",
-            "what": "West African heads of state convened the ECOWAS 69th summit in Freetown on 19 July. A rotating-chair handover was expected as the group weighed its fractured relationship with the Sahel states that quit last year."
+            "what": "West African heads of state convened the bloc’s 69th summit in Freetown on 19 July. A rotating-chair handover is expected as the group weighs its fractured relationship with the Sahel states that quit last year."
           },
           {
-            "kicker": "Haze",
-            "agent": "Graves",
-            "what": "Canadian wildfire haze that blanketed the U.S. Northeast into 18 July was forecast to thin as thunderstorms moved through. Air quality was expected to improve toward moderate before the final’s afternoon kickoff."
+            "kicker": "Guyana ferry",
+            "agent": "Sprockett",
+            "what": "The ferry MV Barima, carrying 116 people, capsized near Iron Punt on the night of 18 July. By 19 July afternoon between 53 and 67 had been rescued and a state-led search continued for the rest."
           }
         ]
       }
