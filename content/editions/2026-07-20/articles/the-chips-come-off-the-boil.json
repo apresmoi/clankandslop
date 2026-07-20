@@ -1,0 +1,101 @@
+{
+  "id": "the-chips-come-off-the-boil",
+  "topics": [
+    "semiconductors",
+    "ai-compute",
+    "open-weight-models",
+    "china-ai"
+  ],
+  "edition_date": "2026-07-20",
+  "section": "markets",
+  "kicker": "Tape cross-currents",
+  "epistemic": "inference",
+  "headline": "Chip index falls into correction",
+  "deck": "The semiconductor rally is de-rating even as a war premium supports oil. A durability question on AI capital spending sharpened after Moonshot paused subscriptions for its giant open-weight model. Investors now weigh ferocious demand for scarce compute against pressure on closed-model margins.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "13:15 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Investors sold semiconductor shares even as a war premium lifts oil prices, setting two cross-currents running through the same tape. The multi-year chip rally that carried equity markets is de-rating under that pressure. Broader US futures have stayed firmer into the week of megacap earnings. The split leaves risk appetite uneven across sectors. [E1]",
+    "The Philadelphia Semiconductor Index has fallen into correction from its June high, marking the sharpest pressure point in an otherwise steady market. Chipmakers head into earnings this week with that correction as the backdrop. Broad US futures remain supported despite the sector weakness. Investors will look to the reports for any confirmation of demand trends. The index move has focused attention on the durability of recent gains. [E1][E2]",
+    "A durability question about AI capital spending has sharpened the selling pressure. Investors are openly asking whether AI enthusiasm outran its economics as chipmakers prepare to report. The concern centers on whether the capital expenditure boom can sustain current valuations. Doubt has spread through the sector ahead of the numbers. That question now sits at the center of the de-rating. [E2]",
+    "Moonshot’s Kimi K3, a 2.8-trillion-parameter model destined to go open, is scheduled to release full weights by 27 July. The company temporarily paused new subscriptions after demand outran available compute. The pause signals that demand for scarce inference capacity is ferocious. It also indicates that “good enough” open models could pressure closed-model margins at once. The double-edged read is bullish for anyone selling scarce compute and bearish for anyone counting on durable software pricing power. [E3][E4]",
+    "Gold holds steady near $4,020 an ounce. [E5] An oil bid pulls the other way from the semiconductor selling. The contrast leaves defensive bids active against growth-sector pressure. These elements keep two currents running across the session. Investors balance the oil support against the chip correction.",
+    "The market is deciding whether the most crowded trade of the cycle was priced for a future that is arriving cheaper than expected. Investors sold chips as the open-weight push from China sharpened doubts already present in the tape. Moonshot’s subscription pause clarified the two-sided economics without single-handedly moving the index. Earnings this week will test how far the AI capital-spending enthusiasm stretched. The synthesis of a capex-durability de-rating meeting an open-weight cost shock leaves that crowded trade under fresh review."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "evidence_box": [
+    {
+      "source": "Nasdaq",
+      "fragment": "fallen into correction from its June high",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nasdaq.com/market-activity/index/sox",
+        "retrieved_at": "2026-07-20T13:00:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "AI capex enthusiasm has outrun sustainable economics",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/markets/europe/chipmakers-head-big-profit-gains-will-it-be-enough-2026-07-20/",
+        "retrieved_at": "2026-07-20T13:02:00Z"
+      }
+    },
+    {
+      "source": "Moonshot",
+      "fragment": "Kimi K3, a 2.8-trillion-parameter open-weight model",
+      "as_of": "17 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.kimi.com/blog/kimi-k3",
+        "retrieved_at": "2026-07-20T13:04:00Z"
+      }
+    },
+    {
+      "source": "Moonshot",
+      "fragment": "new subscriptions temporarily paused amid demand outrunning available compute",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://x.com/Kimi_Moonshot/status/2078855608565207130",
+        "retrieved_at": "2026-07-20T13:05:00Z"
+      }
+    },
+    {
+      "source": "CME Group",
+      "fragment": "gold steady near $4,020 an ounce",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.cmegroup.com/markets/metals/precious/gold.quotes.html",
+        "retrieved_at": "2026-07-20T13:07:00Z"
+      }
+    }
+  ]
+}

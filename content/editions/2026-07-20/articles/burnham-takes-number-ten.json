@@ -1,0 +1,136 @@
+{
+  "id": "burnham-takes-number-ten",
+  "topics": [
+    "rates"
+  ],
+  "edition_date": "2026-07-20",
+  "section": "world",
+  "kicker": "Mandate compressed",
+  "epistemic": "inference",
+  "headline": "Burnham takes charge at Number Ten",
+  "deck": "Britain has installed a second Labour prime minister through a four-day party succession. Burnham’s first move points to a mayoral state built around councils, local executives and the NHS, while markets await the Treasury choice.",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": [
+      "Tinkerton"
+    ]
+  },
+  "timestamp": "12:42 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "body": [
+    "Keir Starmer used a final statement outside Downing Street on 20 July to offer his resignation, closing his premiership in public before the constitutional handover [E1]. Andy Burnham had returned to Parliament as MP for Makerfield only in June, then won the Labour leadership on 16 July [E3]. Labour said 379 MPs and 23 affiliate organisations backed him, an internal landslide completed four days before his appointment [E4]. After an audience with King Charles, Burnham became prime minister on 20 July, turning a rapid party succession into a change of national government [E2].",
+    "That sequence creates the mandate-compression question. Britain now has a second Labour prime minister in the same parliament without a general election, and the decisive choice was made inside the governing party’s parliamentary machinery [E1][E2][E4]. The constitution permits this route, yet permission does not erase the political distance between the electorate that installed the government and the MPs who selected its new leader [E1][E2][E4]. Burnham begins with overwhelming authority inside Labour and an unresolved need to show that internal consent can become public consent [E3][E4].",
+    "Burnham used his first day to launch a £340 million drive to end rough sleeping at the earliest opportunity [E5]. He also promised cost-of-living measures within the week, making household pressure the first test of the new administration [E5]. The delivery model leans heavily on mayors, councils and the NHS, institutions Burnham presents as the machinery for turning national money into local results [E5]. This “mayoral state” is the substantive break with late Starmerism: power is meant to move through territorial executives and public services, with No.10 judging itself by delivery on the ground [E3][E5].",
+    "Reports around the handover point to a stronger economic centre in No.10 and reduced Treasury dominance over policy, but Burnham has not yet set that architecture out officially [E6]. The same reporting says he plans to scrap Starmer’s digital-ID scheme and is considering public control of failing utilities such as Thames Water; both remain reported intentions [E6]. Rachel Reeves remains the officially listed chancellor, while Shabana Mahmood has been described as the market-friendly front-runner if Burnham changes the Treasury team [E6]. Appointments and policy papers will determine how much of that reported agenda survives contact with government [E6].",
+    "Investors treated the handover chiefly as a personnel question [E6]. Sterling firmed modestly, while the 10-year gilt yield sat near 4.98% as Burnham took office [E6]. The restrained response suggests traders are waiting to see who controls the Treasury and which fiscal rules the new team keeps [E6]. The price of British risk is hanging on the chancellor’s office and the discipline it will defend [E6].",
+    "The counter-case deserves full weight. The succession was orderly and constitutionally legitimate: Starmer resigned, Labour MPs chose a new leader by an overwhelming margin, and the King appointed him [E1][E2][E4]. Burnham also brings a metro-mayor’s delivery record and a governing theory built around institutions with direct local responsibilities [E3][E5]. Mandate compression names a democratic tension, but it does not by itself turn a lawful succession or a plausible reform programme into a scandal [E1][E2][E4][E5].",
+    "Britain therefore has a new government assembled inside the existing parliamentary majority, with no fresh vote to define the change [E1][E2][E4]. Burnham’s wager is that mayors, councils and the NHS can turn central authority into visible improvements quickly enough to earn the consent his party process supplied [E5]. Whitehall will test whether a mayor’s habit of direct delivery can survive departments, spending controls and national scale [E3][E5]. The governing party has handed the country a new prime minister; the country is waiting to discover whether it has also handed itself a new state [E2][E5]."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "evidence_box": [
+    {
+      "source": "GOV.UK",
+      "fragment": "Keir Starmer’s final speech as prime minister: 20 July 2026",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.gov.uk/government/speeches/keir-starmers-final-speech-as-prime-minister-20-july-2026",
+        "retrieved_at": "2026-07-20T12:20:00Z"
+      }
+    },
+    {
+      "source": "GOV.UK",
+      "fragment": "Andy Burnham became Prime Minister on 20 July 2026",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.gov.uk/government/organisations/prime-ministers-office-10-downing-street",
+        "retrieved_at": "2026-07-20T12:22:00Z"
+      }
+    },
+    {
+      "source": "GOV.UK",
+      "fragment": "returned as MP for Makerfield in June 2026",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.gov.uk/government/people/andy-burnham",
+        "retrieved_at": "2026-07-20T12:24:00Z"
+      }
+    },
+    {
+      "source": "Labour",
+      "fragment": "379 Labour MPs and 23 affiliate organisations",
+      "as_of": "16 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://labour.org.uk/updates/members-updates/andy-burnham-elected-leader-of-the-labour-party/",
+        "retrieved_at": "2026-07-20T12:26:00Z"
+      }
+    },
+    {
+      "source": "GOV.UK",
+      "fragment": "backed by £340 million",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.gov.uk/government/news/new-pm-says-government-can-bring-back-hope-to-britain-and-launches-drive-to-end-rough-sleeping-at-the-earliest-opportunity",
+        "retrieved_at": "2026-07-20T12:28:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "sterling firmed and the 10-year gilt sat near 4.98%",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.reuters.com/world/uk/sterling-steady-burnham-set-become-prime-minister-2026-07-20/",
+        "retrieved_at": "2026-07-20T12:30:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "britain-north",
+    "hero_map": "britain-north-hero",
+    "title": "The mayor's country",
+    "caption": "Britain’s governing handover points north, from Greater Manchester to Whitehall · Map: Tinkerton, Policy Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "MANCHESTER",
+        "lat": 53.48,
+        "lon": -2.24
+      },
+      {
+        "name": "LONDON",
+        "lat": 51.51,
+        "lon": -0.13
+      },
+      {
+        "name": "EDINBURGH",
+        "lat": 55.95,
+        "lon": -3.19
+      }
+    ]
+  }
+}

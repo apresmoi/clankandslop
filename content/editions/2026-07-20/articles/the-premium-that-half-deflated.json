@@ -1,0 +1,124 @@
+{
+  "id": "the-premium-that-half-deflated",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "us-iran"
+  ],
+  "edition_date": "2026-07-20",
+  "section": "markets",
+  "kicker": "Chokepoint premium",
+  "epistemic": "inference",
+  "headline": "Brent eases after overnight $90 spike",
+  "deck": "Brent futures climbed above $90 a barrel on confirmed weekend strikes, then retreated toward the high $88s as traders priced a reported ceasefire proposal that no government has announced. The move left the war-risk premium only partially deflated while the Strait of Hormuz kept the underlying supply threat intact.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "13:20 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "body": [
+    "Brent crude futures pushed above $90 a barrel overnight after confirmed strikes continued through the weekend, then slid back toward the high $88s once a reported 10-day ceasefire proposal reached trading desks. Front-month WTI light sweet crude eased into the low $82s on the same sequence of headlines. The two-day arc left a genuine supply-risk spike only half-unwound. Traders sold the possibility of a pause harder than they bought the fact of the ongoing operations. [E1][E2][E3]",
+    "U.S. Central Command described a ninth consecutive evening of precision strikes against Iranian military capabilities. The same operational update reported disruption around the Strait of Hormuz. Those documented actions and the associated transit friction supplied the concrete basis for the overnight price advance. The strikes remain on the official record with no retraction. [E1]",
+    "A reported 10-day ceasefire proposal circulated among traders on Monday morning. No government has announced or confirmed any such arrangement. Front-month contracts nonetheless sold off as desks treated the possibility as actionable. The market therefore assigned greater weight to an unverified pause than to the confirmed continuation of strikes. [E2][E3]",
+    "Roughly one-fifth of the world’s petroleum liquids moves through the Strait of Hormuz, the world’s most important oil chokepoint. That volume keeps a risk premium attached to every barrel even while the tape is falling. Tehran has stated it will steadfastly maintain control over the strait and that only Iran decides when transit normalises. Geography therefore continues to underwrite the premium regardless of short-term headline swings. [E4][E5]",
+    "The escalation rests on successive nights of documented strikes and reported disruption near the strait. The de-escalation rests on an unconfirmed report that has not been issued by any government. As a result the risk premium has only half deflated from its overnight peak. Claims circulating on social media about specific facilities or casualties form no part of the verified record and are excluded. [E1]",
+    "A barrel continues to cost what the next headline says it costs. The strait can still reprice the entire forward curve on a single sentence. Until the strikes end or an official pause is declared, the premium stays live even as prices ease from the weekend high. Traders remain positioned between confirmed military action and the possibility of a temporary halt. [E1][E4]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "evidence_box": [
+    {
+      "source": "U.S. Central Command",
+      "fragment": "ninth consecutive evening of precision strikes against Iranian military capabilities",
+      "as_of": "19 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/NEWS-ARTICLES/",
+        "retrieved_at": "2026-07-20T12:48:00Z"
+      }
+    },
+    {
+      "source": "ICE",
+      "fragment": "Brent traded above $90 overnight, then eased toward the high $88s",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.theice.com/products/219/Brent-Crude-Futures/data",
+        "retrieved_at": "2026-07-20T12:50:00Z"
+      }
+    },
+    {
+      "source": "CME Group",
+      "fragment": "front-month eased to the low $82s",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.cmegroup.com/markets/energy/crude-oil/light-sweet-crude.quotes.html",
+        "retrieved_at": "2026-07-20T12:52:00Z"
+      }
+    },
+    {
+      "source": "EIA",
+      "fragment": "roughly one-fifth of global petroleum liquids consumption",
+      "as_of": "2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.eia.gov/international/analysis/special-topics/world_oil_transit_Chokepoints",
+        "retrieved_at": "2026-07-20T12:54:00Z"
+      }
+    },
+    {
+      "source": "IRNA",
+      "fragment": "steadfastly maintain control over the Strait of Hormuz",
+      "as_of": "July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://en.irna.ir/news/86208321/Iran-to-steadfastly-maintain-control-over-Strait-of-Hormuz-IRGC",
+        "retrieved_at": "2026-07-20T12:56:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "gulf-war",
+    "hero_map": "gulf-war-hero",
+    "title": "The strait that prices the barrel",
+    "caption": "The strait that prices the barrel · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.55,
+        "lon": 56.25
+      },
+      {
+        "name": "TEHRAN",
+        "lat": 35.7,
+        "lon": 51.42
+      },
+      {
+        "name": "KUWAIT",
+        "lat": 29.37,
+        "lon": 47.98
+      }
+    ]
+  }
+}

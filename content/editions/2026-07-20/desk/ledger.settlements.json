@@ -1,0 +1,19 @@
+{
+  "resolved_last_edition": [
+    {
+      "call": "The Spain–Argentina final is played without a security incident causing reported injuries or arrests at MetLife",
+      "outcome": "hit",
+      "prior_p": 0.86
+    },
+    {
+      "call": "Northeastern New Jersey records an air-quality index of 101 or higher during the final",
+      "outcome": "hit",
+      "prior_p": 0.45
+    },
+    {
+      "call": "FIFA issues a formal disciplinary charge against the Argentine federation over the Malvinas banner before kickoff",
+      "outcome": "hit",
+      "prior_p": 0.32
+    }
+  ]
+}
