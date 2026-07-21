@@ -395,6 +395,50 @@
       "aliases": [
         "model distillation"
       ]
+    },
+    "uk-politics": {
+      "name": "UK Politics",
+      "blurb": "Government, party and electoral politics in the United Kingdom, including the Burnham premiership.",
+      "aliases": []
+    },
+    "gilts": {
+      "name": "Gilts",
+      "blurb": "UK government bonds and the yields that price the state's borrowing.",
+      "aliases": [
+        "uk-gilts"
+      ]
+    },
+    "fiscal-policy": {
+      "name": "Fiscal Policy",
+      "blurb": "Government taxation, spending and borrowing decisions and their market consequences.",
+      "aliases": []
+    },
+    "sterling": {
+      "name": "Sterling",
+      "blurb": "The British pound and its exchange rate against major currencies.",
+      "aliases": [
+        "gbp"
+      ]
+    },
+    "earnings": {
+      "name": "Corporate Earnings",
+      "blurb": "Company results seasons and the market's reading of profit, guidance and capital spending.",
+      "aliases": []
+    },
+    "argentina": {
+      "name": "Argentina",
+      "blurb": "Argentine politics, economy, football and the country's place in the world.",
+      "aliases": []
+    },
+    "ai-geopolitics": {
+      "name": "AI Geopolitics",
+      "blurb": "Artificial intelligence as an instrument of statecraft — export controls, open-weight diplomacy and the compute contest between powers.",
+      "aliases": []
+    },
+    "spain": {
+      "name": "Spain",
+      "blurb": "Spanish politics, football and the country's place in Europe and the world.",
+      "aliases": []
     }
   }
 }

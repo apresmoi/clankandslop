@@ -1,0 +1,137 @@
+{
+  "id": "the-tenth-night",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "us-iran"
+  ],
+  "edition_date": "2026-07-21",
+  "section": "markets",
+  "kicker": "Dual Straits",
+  "epistemic": "inference",
+  "headline": "Oil premium rebuilds after tenth Iran strikes",
+  "deck": "Brent and WTI recovered the risk premium that briefly faded on a reported 10-day ceasefire proposal. Continued US strikes and Houthi pressure on Saudi routes left the market pricing two chokepoints. The 10-year yield rose with energy costs.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "15:15 UTC",
+  "revision": 1,
+  "next_update_utc": "17:30",
+  "body": [
+    "Crude oil prices recovered a geopolitical risk premium on 21 July, with Brent at $91.08 a barrel and West Texas Intermediate at $85.16 [E1]. A reported 10-day ceasefire proposal that had eased the complex the previous day produced no official pause. Escalation continued without any signed halt, prompting traders to rebuild the security charge into the barrel. The absence of an announced agreement left the bid intact.",
+    "US Central Command finished its latest precision strikes against Iranian military targets, completing a tenth successive night of operations [E2][E3]. The strikes proceeded without interruption from any pause. Tehran’s embassy in Seoul released a statement denying that ceasefire negotiations with the United States were under way [E4]. The documented sequence showed continued military action while any de-escalation remained unconfirmed by either government.",
+    "Houthi warnings to shipping companies to avoid Saudi ports led two Saudi crude tankers to turn away in the Red Sea [E5]. The turn-backs added Bab el-Mandeb to the list of threatened corridors already headed by the Strait of Hormuz. Ship operators faced a widened set of maritime risks that extended the danger beyond the Gulf. That expansion supported the renewed premium in oil prices.",
+    "The United Kingdom Maritime Trade Operations continued to rate the Strait of Hormuz threat level as “SEVERE” [E6]. The waterway carries a substantial share of global seaborne oil, keeping the security premium relevant even without a fresh confirmed disruption. Constrained transit under the elevated advisory left the market exposed to any further restriction. Dual chokepoint exposure therefore underpinned the price structure.",
+    "In the same session, the US 10-year Treasury yield stood near 4.640 percent [E1]. Higher oil prices revived concerns that rising energy costs would feed into inflation readings and sustain tighter monetary conditions. Fixed-income traders adjusted their rate path expectations in response. The move illustrated the spillover from the commodities complex into the broader interest-rate complex.",
+    "The oil forward curve now sits hostage to two maritime straits and a collection of statements that no government has formally signed. Escalation remains the path supported by official releases while any pause stays disputed and unofficial. Market pricing therefore treats the dual-strait risk as the operative baseline until an actual ceasefire is announced. That leaves the barrel sensitive to the next statement from CENTCOM, Tehran or the Houthis."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Brent at $91.08, WTI at $85.16",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/asia-pacific/global-markets-wrapup-1-2026-07-21/",
+        "retrieved_at": "2026-07-21T14:41:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "marking the tenth successive night",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/us-military-completes-its-latest-strikes-iran-marking-10th-successive-night-2026-07-21/",
+        "retrieved_at": "2026-07-21T14:40:00Z"
+      }
+    },
+    {
+      "source": "US Central Command",
+      "fragment": "US finishes latest strikes against Iran",
+      "as_of": "20 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4550818/us-finishes-latest-strikes-against-iran/",
+        "retrieved_at": "2026-07-21T14:43:00Z"
+      }
+    },
+    {
+      "source": "Embassy of the Islamic Republic of Iran",
+      "fragment": "denying ceasefire negotiations with the United States",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://seoul.mfa.gov.ir/en/newsview/785284/Statement-by-the-Embassy-of-the-Islamic-Republic-of-Iran-in-the-Republic-of-Korea-on-Claims-of-Ceasefire-Negotiations-with-the-United-States",
+        "retrieved_at": "2026-07-21T14:45:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "two Saudi crude tankers to turn away",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/world/middle-east/houthis-warn-shipping-companies-avoid-saudi-ports-email-shows-2026-07-21/",
+        "retrieved_at": "2026-07-21T14:42:00Z"
+      }
+    },
+    {
+      "source": "UKMTO",
+      "fragment": "threat level SEVERE",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ukmto.org/recent-incidents",
+        "retrieved_at": "2026-07-21T14:44:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "gulf-war",
+    "hero_map": "gulf-war-hero",
+    "title": "The strait that reprices the barrel",
+    "caption": "Gulf risk map · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.55,
+        "lon": 56.25
+      },
+      {
+        "name": "TEHRAN",
+        "lat": 35.7,
+        "lon": 51.42
+      },
+      {
+        "name": "KUWAIT",
+        "lat": 29.37,
+        "lon": 47.98
+      }
+    ]
+  }
+}

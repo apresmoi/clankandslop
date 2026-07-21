@@ -1,0 +1,88 @@
+{
+  "id": "the-chips-buy-the-dip",
+  "topics": [
+    "semiconductors",
+    "ai-compute",
+    "open-weight-models",
+    "earnings"
+  ],
+  "edition_date": "2026-07-21",
+  "section": "markets",
+  "kicker": "Earnings Week Test",
+  "epistemic": "inference",
+  "headline": "Semiconductors Rebound Off Lows",
+  "deck": "Investors returned to the semiconductor complex even as crude prices climbed and yields backed up. The rebound leaves the durability of AI capital spending unresolved ahead of a critical earnings stretch. Alphabet’s raised outlay and delayed model release put the overbuilding question into sharp relief.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "20:45 UTC",
+  "revision": 1,
+  "next_update_utc": "22:30",
+  "body": [
+    "Investors drove the semiconductor index more than 5% higher off its recent lows on 21 July [E1][E2]. Brent crude reached $91.08 and WTI settled at $85.16 in the same session [E1]. The US 10-year yield held near 4.640% as energy prices advanced [E1]. Chip buyers stepped back into the trade against that rising energy backdrop. Cross-currents defined the day as the rebound in AI-related shares coincided with the oil advance.",
+    "Buyers stepped in on the dip, yet the advance settled nothing about the durability of the AI capital spending wave. The rebound left open whether the compute buildout can sustain the valuations that have made it the cycle’s most crowded trade. A decisive earnings week now stands as the next test of that question. Market participants will examine the reports for evidence that the spending plans remain intact through the cycle.",
+    "Alphabet lifted its 2026 capital expenditure guidance to $180–190 billion while facing criticism over a delayed Gemini 3.5 Pro launch [E3]. That combination placed the market’s own “are we overbuilding?” question into a single high-profile name. Investors weighed the expanded outlay against the product slip as a live proxy for the broader debate. The guidance supplied the cleanest available datapoint ahead of the fuller earnings calendar.",
+    "China’s Moonshot unveiled the world’s largest open AI model, intensifying open-weight cost pressure on closed rivals [E4]. Cheaper models from the Chinese release raise the margin question for software counting on durable pricing power. Conditions remain bullish for anyone selling scarce compute while turning more cautious for those relying on sustained software margins. The open-weight development added a further layer of risk to the crowded AI trade.",
+    "Traders repriced the US 10-year yield to 4.640% as the oil bid lifted Brent to $91.08 and WTI to $85.16 [E1]. The yield backup tracked the energy move across the same session that produced the semiconductor rebound. Higher crude prices fed directly into the rate outlook that investors were already recalibrating. The dual move left the tape carrying both a chip recovery and a firmer discount rate.",
+    "The market is deciding whether its most crowded trade of the cycle was priced for a future arriving cheaper than assumed. Buyers have returned to the semiconductor complex, yet the durability question stays unresolved into earnings season. Open-weight pressure from the latest Chinese model and Alphabet’s dual signal of higher spending and a delayed release keep the two-sided read firmly in place [E3][E4]. Scarce compute retains its scarcity premium while software pricing power faces a sharper test than the prior pricing assumed."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4"
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "semiconductor index jumped more than 5% off recent lows",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/asia-pacific/global-markets-wrapup-1-2026-07-21/",
+        "retrieved_at": "2026-07-21T15:12:00Z"
+      }
+    },
+    {
+      "source": "Nasdaq",
+      "fragment": "PHLX Semiconductor Index (SOX)",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.nasdaq.com/market-activity/index/sox",
+        "retrieved_at": "2026-07-21T15:15:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "raised 2026 capex guidance to $180-190 billion",
+      "as_of": "21 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/business/alphabets-gemini-delay-spending-worries-loom-over-earnings-2026-07-21/",
+        "retrieved_at": "2026-07-21T15:13:00Z"
+      }
+    },
+    {
+      "source": "Reuters",
+      "fragment": "China's Moonshot unveiled the world's largest open AI model",
+      "as_of": "17 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.reuters.com/world/china/chinas-moonshot-unveils-worlds-largest-open-ai-model-closing-us-rivals-2026-07-17/",
+        "retrieved_at": "2026-07-21T15:14:00Z"
+      }
+    }
+  ]
+}
