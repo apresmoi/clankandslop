@@ -243,7 +243,10 @@ export interface Article {
     | {
         kind: 'ascii';
         caption: string;
-        ascii: string;
+        ascii?: string;
+        shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip' | 'campfire';
+        roll?: 'chip';
+        scale?: number;
       }
     | {
         kind: 'map';
