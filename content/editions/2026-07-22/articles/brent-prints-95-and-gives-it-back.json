@@ -1,0 +1,113 @@
+{
+  "id": "brent-prints-95-and-gives-it-back",
+  "topics": [
+    "oil",
+    "shipping",
+    "us-iran",
+    "war-risk-insurance"
+  ],
+  "edition_date": "2026-07-22",
+  "section": "tape",
+  "kicker": "The Intraday Barrel",
+  "epistemic": "inference",
+  "headline": "Brent prints $95 and gives it back",
+  "deck": "The global benchmark reached a six-week high as Red Sea diversions widened the route risk, then fell below the mark. A two-million-barrel US inventory build supplied the counterweight.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ],
+    "read_time_min": 4
+  },
+  "timestamp": "20:20 UTC",
+  "revision": 1,
+  "next_update_utc": "21:30",
+  "body": [
+    "Brent crude rose above $95 a barrel on Wednesday for the first time in nearly six weeks, then retreated. Associated Press put the contract near $94.07 after the morning high, up about 3.4% at that point in the session. The move extended a run driven by renewed fighting and shipping risk. [E1]",
+    "Four more tankers changed course in the Red Sea after Houthi warnings against the route and Saudi ports, according to Reuters. The diversions added Bab el-Mandeb to a market already pricing restricted passage and military risk around the Strait of Hormuz. [E2]",
+    "Cargo did not need to disappear for the screen to move. Each rerouting decision lengthens voyages, absorbs vessel time and raises the chance that insurers or owners refuse the next fixture. Traders paid for the possibility of a physical loss before one was confirmed. [E2][E1]",
+    "US inventories pushed the other way. The Energy Information Administration reported a two-million-barrel increase in commercial crude stocks for the week ended 17 July, to 411.7 million barrels. That remained 6% below the five-year seasonal average, leaving a cushion that is growing but still thin by recent standards. [E3]",
+    "An intraday print and an official settlement answer different questions. The first records the highest price a buyer paid during the session. The second fixes the daily close used in contracts and forecasts. Wednesday’s move cleared the round number without yet establishing a settlement above it. [E1][E4]",
+    "The bullish case now spans two straits, while the bearish case sits in storage and the absence of a confirmed supply outage. Another vessel turn or a damaged facility could keep $95 on the screen. A quieter route and another inventory build could remove the premium as quickly as buyers added it. [E2][E3]",
+    "Wednesday’s screen printed the danger and then gave part of it back. The cargo map still decides what the barrel is worth. [E2][E1]"
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4"
+  ],
+  "evidence_box": [
+    {
+      "source": "Associated Press",
+      "fragment": "briefly topping $95",
+      "as_of": "22 July 2026",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://apnews.com/article/207dfa55d180fcc565420454178168c5",
+        "retrieved_at": "2026-07-22T20:16:00Z"
+      }
+    },
+    {
+      "source": "Reuters via MarketScreener",
+      "fragment": "four more tankers changed course",
+      "as_of": "22 July 2026",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://in.marketscreener.com/news/rubio-says-us-still-willing-to-negotiate-over-iran-crisis-ce7f51d8d18bf126",
+        "retrieved_at": "2026-07-22T20:16:00Z"
+      }
+    },
+    {
+      "source": "US Energy Information Administration",
+      "fragment": "increased 2.0 million barrels to 411.7 million",
+      "as_of": "22 July 2026",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.eia.gov/todayinenergy/detail.php?id=67868",
+        "retrieved_at": "2026-07-22T20:17:00Z"
+      }
+    },
+    {
+      "source": "ICE Futures Europe",
+      "fragment": "Brent Crude Futures",
+      "as_of": "22 July 2026",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ice.com/products/219/Brent-Crude-Futures",
+        "retrieved_at": "2026-07-22T20:17:00Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "dual-straits",
+    "title": "Two straits, one premium",
+    "caption": "Tankers now price route risk at Hormuz and Bab el-Mandeb · Map: Graves, Commodities Desk · Terrain: NOAA ETOPO1",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.55,
+        "lon": 56.25
+      },
+      {
+        "name": "BAB EL-MANDEB",
+        "lat": 12.58,
+        "lon": 43.33
+      },
+      {
+        "name": "RIYADH",
+        "lat": 24.71,
+        "lon": 46.67
+      }
+    ]
+  }
+}
