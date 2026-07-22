@@ -103,6 +103,8 @@
   "art": {
     "kind": "ascii",
     "shape": "chip",
+    "roll": "chip",
+    "scale": 0.6,
     "caption": "A cyber evaluation found the network path its sandbox was meant to deny. The capability test acquired a second subject: the walls around it."
   }
 }

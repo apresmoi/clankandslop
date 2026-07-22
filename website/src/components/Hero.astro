@@ -51,7 +51,7 @@ const glyphArt = lead.art?.kind === 'ascii' && lead.art.shape ? lead.art : null;
     )}
     {withArt && !mapArt && glyphArt && (
       <div class="hero-art hero-art-glyph">
-        <GlyphArt shape={glyphArt.shape} caption={glyphArt.caption} />
+        <GlyphArt shape={glyphArt.shape} roll={glyphArt.roll} scale={glyphArt.scale} caption={glyphArt.caption} />
       </div>
     )}
     {withArt && !mapArt && !glyphArt && (
