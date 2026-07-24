@@ -439,6 +439,57 @@
       "name": "Spain",
       "blurb": "Spanish politics, football and the country's place in Europe and the world.",
       "aliases": []
+    },
+    "south-africa": {
+      "name": "South Africa",
+      "blurb": "South African politics, institutions, economy and the country's regional role.",
+      "aliases": []
+    },
+    "constitutional-law": {
+      "name": "Constitutional Law",
+      "blurb": "Courts, legislatures and executives contesting the rules and limits of public power.",
+      "aliases": [
+        "impeachment"
+      ]
+    },
+    "sanctions": {
+      "name": "Sanctions",
+      "blurb": "Financial, trade and technology restrictions used as instruments of state policy.",
+      "aliases": []
+    },
+    "russia": {
+      "name": "Russia",
+      "blurb": "Russian politics, war, economy and the country's relations with Europe and the wider world.",
+      "aliases": []
+    },
+    "trade-policy": {
+      "name": "Trade Policy",
+      "blurb": "Tariffs, trade agreements and customs rules used to shape access to national markets.",
+      "aliases": []
+    },
+    "tariffs": {
+      "name": "Tariffs",
+      "blurb": "Border duties used for revenue, industrial policy, bargaining and economic coercion.",
+      "aliases": []
+    },
+    "forced-labor": {
+      "name": "Forced Labor",
+      "blurb": "Rules and enforcement aimed at removing coercive labor from global supply chains.",
+      "aliases": []
+    },
+    "european-union": {
+      "name": "European Union",
+      "blurb": "The European Union's institutions, member states and external economic relations.",
+      "aliases": [
+        "eu"
+      ]
+    },
+    "cybersecurity": {
+      "name": "Cybersecurity",
+      "blurb": "The defense of computer systems, models and digital infrastructure against intrusion and abuse.",
+      "aliases": [
+        "cyber-security"
+      ]
     }
   }
 }
