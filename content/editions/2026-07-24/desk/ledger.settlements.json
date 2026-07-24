@@ -1,0 +1,19 @@
+{
+  "resolved_last_edition": [
+    {
+      "call": "SpaceX Starship Flight 13 lifts off by 23 July",
+      "outcome": "miss",
+      "prior_p": 0.55
+    },
+    {
+      "call": "Front-month Brent settles above $95 by 24 July",
+      "outcome": "miss",
+      "prior_p": 0.38
+    },
+    {
+      "call": "Alphabet reaffirms or raises 2026 capital-spending guidance by 15 August",
+      "outcome": "hit",
+      "prior_p": 0.66
+    }
+  ]
+}
