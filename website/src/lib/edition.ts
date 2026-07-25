@@ -258,6 +258,7 @@ export interface Article {
         title?: string;
         cols?: number;
         rows?: number;
+        rule?: boolean;
         rotX?: number;
         rotY?: number;
         zoom?: number;

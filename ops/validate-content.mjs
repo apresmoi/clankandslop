@@ -108,6 +108,7 @@ for (const { date, dir: edDir, desk } of scopes) {
   const articleSlugs = new Set(
     ls(articleDir).filter((f) => f.endsWith('.json')).map((f) => f.replace('.json', '')),
   );
+  const articleMapArts = new Map();
 
   // edition chrome — per-owner part files under desk/. Filename = owner +
   // artifact; the set must be complete and assemble into the Edition view.
@@ -211,6 +212,11 @@ for (const { date, dir: edDir, desk } of scopes) {
         if (!mapSlugs.has(a.art.map)) err(file, `art.map references missing map "${a.art.map}"`);
         if (a.art.hero_map !== undefined && !mapSlugs.has(a.art.hero_map))
           err(file, `art.hero_map references missing map "${a.art.hero_map}"`);
+        for (const [i, spot] of (a.art.spots ?? []).entries()) {
+          if (!isStr(spot.name) || !isNum(spot.lat) || !isNum(spot.lon))
+            err(file, `art.spots[${i}] must contain name, lat and lon`);
+        }
+        if (isStr(a.art.map)) articleMapArts.set(a.art.map, { slug, spots: a.art.spots ?? [] });
       } else {
         err(file, 'art.kind must be ascii|map');
       }
@@ -295,7 +301,7 @@ for (const { date, dir: edDir, desk } of scopes) {
     if (!isStr(p.active)) err(file, 'missing active');
     for (const slot of ['head', 'flow']) {
       if (!Array.isArray(p[slot])) { err(file, `missing ${slot} array`); continue; }
-      p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { articleSlugs, mapSlugs }));
+      p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { date, articleSlugs, mapSlugs, articleMapArts }));
     }
   }
 }
@@ -310,6 +316,16 @@ function checkBlock(file, path, b, refs) {
       for (const [i, nested] of (Array.isArray(col) ? col : []).entries())
         checkBlock(file, `${path}.columns[${c}][${i}]`, nested, refs);
     return;
+  }
+  if (b.block === 'MapGlyph' && /^\d{4}-\d{2}-\d{2}$/.test(refs.date) && refs.date >= '2026-07-25' && isStr(b.props?.map)) {
+    const articleArt = refs.articleMapArts.get(b.props.map);
+    if (articleArt) {
+      const normalized = (spots) => (spots ?? [])
+        .map(({ name, lat, lon }) => ({ name, lat, lon }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      if (JSON.stringify(normalized(b.props.spots)) !== JSON.stringify(normalized(articleArt.spots)))
+        err(file, `${path}.spots must match article "${articleArt.slug}" art.spots for map "${b.props.map}"`);
+    }
   }
   checkRefs(file, path, b.props, refs);
 }
