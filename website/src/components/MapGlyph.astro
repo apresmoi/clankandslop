@@ -28,6 +28,7 @@ interface Props {
   overlays?: Overlay[];
   routes?: Route[];
   spots?: Spot[];
+  rule?: boolean;
   /** False renders a fixed typeset illustration — no camera, no JS. */
   interactive?: boolean;
 }
@@ -35,6 +36,7 @@ const {
   map: m, title = '', caption = '', cols = 80, rows = 38,
   rotX = 0.45, rotY = 0, zoom = 0.42,
   overlays = [], routes = [], spots = [],
+  rule = true,
   interactive = true,
 } = Astro.props;
 
@@ -201,7 +203,7 @@ if (!interactive) {
   }
 }
 ---
-<figure class:list={['mapglyph', interactive ? 'is-card' : 'is-print']}>
+<figure class:list={['mapglyph', interactive ? 'is-card' : 'is-print', { 'no-top-rule': !rule }]}>
   {(title || legend.length > 0) && (
     <div class:list={['mapglyph-head', { 'no-title': !title }]}>
       {title && <span class="mapglyph-title">{title}</span>}
@@ -392,6 +394,10 @@ if (!interactive) {
   .mapglyph.is-print {
     border-top: 2px solid var(--ink);
     padding-top: 10px;
+  }
+  .mapglyph.is-print.no-top-rule {
+    border-top: 0;
+    padding-top: 0;
   }
 
   .mapglyph-head {
