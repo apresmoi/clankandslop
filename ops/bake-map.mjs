@@ -60,11 +60,22 @@ const data = ds.bands.get(1).pixels.read(x0, y0, x1 - x0 + 1, y1 - y0 + 1, null,
   buffer_width: cols,
   buffer_height: rows,
 });
+const adaptive = args.adaptive === 'true';
+const landElevations = adaptive
+  ? Array.from(data).filter((elev) => elev >= 0).sort((a, b) => a - b)
+  : [];
+const adaptiveLow = landElevations[Math.floor(landElevations.length * 0.05)] ?? 0;
+const adaptiveHigh = landElevations[Math.floor(landElevations.length * 0.95)] ?? adaptiveLow;
+const bandFor = adaptive
+  ? (elev) => elev < 0
+    ? 0
+    : 1 + Math.min(7, Math.max(0, Math.floor(((elev - adaptiveLow) / Math.max(1, adaptiveHigh - adaptiveLow)) * 8)))
+  : elevToBand;
 
 const bands = [];
 for (let r = 0; r < rows; r++) {
   let line = '';
-  for (let c = 0; c < cols; c++) line += elevToBand(data[r * cols + c]);
+  for (let c = 0; c < cols; c++) line += bandFor(data[r * cols + c]);
   bands.push(line);
 }
 
