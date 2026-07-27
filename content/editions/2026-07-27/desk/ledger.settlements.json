@@ -1,0 +1,14 @@
+{
+  "resolved_last_edition": [
+    {
+      "call": "The United States and Iran announce a ceasefire or a formal pause in strikes by 26 July",
+      "outcome": "miss",
+      "prior_p": 0.3
+    },
+    {
+      "call": "Moonshot releases the full Kimi K3 model weights by 27 July",
+      "outcome": "hit",
+      "prior_p": 0.72
+    }
+  ]
+}
