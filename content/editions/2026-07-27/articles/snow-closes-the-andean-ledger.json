@@ -1,0 +1,155 @@
+{
+  "id": "snow-closes-the-andean-ledger",
+  "topics": ["argentina", "supply-chains", "natural-disasters", "critical-minerals"],
+  "edition_date": "2026-07-27",
+  "section": "world",
+  "kicker": "The waiting account",
+  "epistemic": "inference",
+  "headline": "Snow Closes the Andean Ledger",
+  "deck": "The Cristo Redentor and San Francisco crossings remained closed on Monday. Trucks, mining shifts and mountain communities now carry the cost of a winter storm measured in waiting time.",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": ["Foreman"]
+  },
+  "timestamp": "19:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "body": [
+    "Argentina’s late-July snow closed two separate Andean accounts. Official status pages listed both the Cristo Redentor system between Mendoza and Chile and Catamarca’s San Francisco pass as closed on Monday. [E1][E7] Cargo became stationary inventory on one corridor while rescue and supply work continued on another.",
+    "About 600 trucks were stranded near Uspallata on 22 and 23 July after Cristo Redentor had been blocked for nearly a week. [E2] Authorities had evacuated 42 people from Puente del Inca, Penitentes and Polvaredas into Uspallata two days earlier. [E3] The town became a holding point for drivers, residents and the agencies deciding when Route 7 could safely climb again.",
+    "Catamarca carried a different balance. A multi-day operation recovered 23 tourists and mining workers stranded in the Puna. [E4] The provincial government sent extraordinary support to Antofagasta de la Sierra for forage, food and related supplies, shifting part of the waiting cost onto the public account. [E5]",
+    "Industry stopped where the road stopped. Rio Tinto suspended work at the Fénix and Sal de Vida projects until conditions were safe. [E6] The official San Francisco page still showed preventive closure because snow had accumulated on both the Argentine and Chilean approaches. [E7]",
+    "No official source in the retrieved record certified a national snowfall record. Standing pass closures, rescues and supply protocols are designed for a strong Andean winter, and they were functioning. The boring case is a severe but seasonal interruption whose queues clear with the next safe weather window.",
+    "Delay still has an owner. Truck operators hold cargo and equipment in place; mining companies lose scheduled work; provincial authorities move food and forage to communities cut off from ordinary replenishment. The ledger starts moving again with the first convoy through the pass."
+  ],
+  "refs": ["E1", "E2", "E3", "E4", "E5", "E6", "E7"],
+  "key_numbers": [
+    {
+      "label": "Trucks near Uspallata · 22–23 Jul",
+      "value": "About 600",
+      "dir": "flat"
+    },
+    {
+      "label": "Evacuated to Uspallata · 21 Jul",
+      "value": "42",
+      "dir": "flat"
+    },
+    {
+      "label": "Rescued in Catamarca Puna",
+      "value": "23",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Argentina · Cristo Redentor status",
+      "fragment": "CERRADO",
+      "as_of": "2026-07-27",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.argentina.gob.ar/seguridad/pasosinternacionales/detalle/ruta/29/Sistema-Cristo-Redentor",
+        "retrieved_at": "2026-07-27T18:16:04Z"
+      }
+    },
+    {
+      "source": "La Nación · Uspallata truck queue",
+      "fragment": "Unos 600 camiones permanecían varados",
+      "as_of": "2026-07-23",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.lanacion.com.ar/agencias/casi-600-camiones-permanecen-varados-por-temporal-de-nieve-en-la-frontera-entre-la-argentina-y-chile-nid22072026/",
+        "retrieved_at": "2026-07-27T18:22:04Z"
+      }
+    },
+    {
+      "source": "Los Andes · mountain rescue",
+      "fragment": "42 personas",
+      "as_of": "2026-07-21",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.losandes.com.ar/sociedad/temporal-alta-montana-evacuaron-42-personas-un-operativo-rescate-uspallata-n5999361",
+        "retrieved_at": "2026-07-27T18:16:04Z"
+      }
+    },
+    {
+      "source": "El Ancasti · Puna rescue",
+      "fragment": "23 personas",
+      "as_of": "2026-07-22",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.elancasti.com.ar/informacion-general/importante-operativo-permitio-rescatar-las-23-personas-varadas-la-puna-n617679",
+        "retrieved_at": "2026-07-27T18:16:04Z"
+      }
+    },
+    {
+      "source": "El Ancasti · provincial support",
+      "fragment": "forraje y alimentos",
+      "as_of": "2026-07-24",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.elancasti.com.ar/politica-y-economia/el-gobierno-realiza-aporte-extraordinario-antofagasta-la-sierra-n617805",
+        "retrieved_at": "2026-07-27T18:16:04Z"
+      }
+    },
+    {
+      "source": "El Ancasti · Rio Tinto pause",
+      "fragment": "suspendió las actividades",
+      "as_of": "2026-07-24",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.elancasti.com.ar/politica-y-economia/rio-tinto-suspendio-actividades-manera-preventiva-y-revisa-el-incidente-n617842",
+        "retrieved_at": "2026-07-27T18:16:04Z"
+      }
+    },
+    {
+      "source": "Argentina · San Francisco status",
+      "fragment": "CERRADO PREVENTIVAMENTE",
+      "as_of": "2026-07-27",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.argentina.gob.ar/seguridad/pasosinternacionales/detalle/ruta/25/San-Francisco",
+        "retrieved_at": "2026-07-27T18:16:04Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "argentina-andes-snow",
+    "rule": false,
+    "caption": "The closed Cristo Redentor corridor and its Mendoza holding points.",
+    "spots": [
+      {"name": "MENDOZA", "lat": -32.8895, "lon": -68.8458},
+      {"name": "USPALLATA", "lat": -32.5917, "lon": -69.3486},
+      {"name": "PUENTE DEL INCA", "lat": -32.8258, "lon": -69.9117},
+      {"name": "CRISTO REDENTOR", "lat": -32.827, "lon": -70.086},
+      {"name": "SANTIAGO", "lat": -33.4489, "lon": -70.6693}
+    ],
+    "routes": [
+      {
+        "name": "RN7 / CH60",
+        "color": "accent",
+        "points": [
+          [-32.8895, -68.8458],
+          [-32.5917, -69.3486],
+          [-32.8258, -69.9117],
+          [-32.827, -70.086],
+          [-33.4489, -70.6693]
+        ]
+      }
+    ]
+  }
+}

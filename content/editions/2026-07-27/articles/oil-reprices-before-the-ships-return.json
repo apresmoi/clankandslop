@@ -1,0 +1,179 @@
+{
+  "id": "oil-reprices-before-the-ships-return",
+  "topics": [
+    "oil",
+    "strait-of-hormuz",
+    "maritime-security",
+    "shipping",
+    "us-iran"
+  ],
+  "edition_date": "2026-07-27",
+  "section": "world",
+  "kicker": "Barrels and hulls",
+  "epistemic": "inference",
+  "headline": "Oil falls as Hormuz traffic lags",
+  "deck": "Public commodity pages showed Brent at $88.73 and WTI at $82.93 around 17:44 UTC after the informal U.S. strike pause on Iran. JMIC still described physical traffic through the Strait of Hormuz as reduced.",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "19:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "body": [
+    "Public commodity pages showed Brent at $88.73 and WTI at $82.93 around 17:44 UTC on Monday. [E1] Traders had already marked down the barrel after the informal pause in U.S. strikes against Iran.",
+    "The United States paused attacks for a second straight day on Sunday, and Iran also held fire. [E3] The arrangement remained informal, so a quiet weekend did not carry the guarantees of a signed ceasefire.",
+    "JMIC Update 076 of 26 July described Strait traffic as remaining at reduced levels. Volumes sat below pre-conflict levels and at a three-week low. No sustained increase appeared on the southern Omani corridor. [E2]",
+    "U.S. MARAD kept its advisory in force. Risks to commercial vessels remain high. Significant GNSS interference, spoofing and jamming continued. [E4]",
+    "UKMTO Advisory 096-26 reported an incident involving a tanker and military forces in the Gulf of Oman. The investigation remained open. Ships can switch off AIS and interference persists, so public visibility stays incomplete. [E5]",
+    "The strike pause may persist, and traffic may recover with a lag. The first official JMIC statement that removes the word reduced will mark the point when hull counts through the corridors catch the barrel price."
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "key_numbers": [
+    {
+      "label": "Brent",
+      "value": "$88.73",
+      "dir": "down"
+    },
+    {
+      "label": "WTI",
+      "value": "$82.93",
+      "dir": "down"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Markets Insider · oil prices",
+      "fragment": "88.73",
+      "as_of": "2026-07-27T17:44:00Z",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://markets.businessinsider.com/commodities/oil-prices",
+        "retrieved_at": "2026-07-27T18:22:04Z"
+      }
+    },
+    {
+      "source": "JMIC",
+      "fragment": "remained at reduced levels",
+      "as_of": "2026-07-26",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ukmto.org/-/media/ukmto/products/update-076-jmic-advisory-note-26-july.pdf",
+        "retrieved_at": "2026-07-27T18:45:24Z"
+      }
+    },
+    {
+      "source": "Christian Science Monitor · Associated Press",
+      "fragment": "paused its attacks on Iran for a second straight day Sunday",
+      "as_of": "2026-07-26",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.csmonitor.com/World/2026/0726/US-pauses-attacks-on-Iran-for-a-second-day-and-Tehran-does-too",
+        "retrieved_at": "2026-07-27T18:22:04Z"
+      }
+    },
+    {
+      "source": "U.S. MARAD",
+      "fragment": "Risks to commercial vessels remain high",
+      "as_of": "2026-07-27",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.maritime.dot.gov/msci/2026-004-persian-gulf-strait-hormuz-and-gulf-oman-iranian-attacks-commercial-vessels",
+        "retrieved_at": "2026-07-27T18:45:24Z"
+      }
+    },
+    {
+      "source": "UKMTO",
+      "fragment": "incident involving a tanker and military forces",
+      "as_of": "2026-07-25",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ukmto.org/-/media/ukmto/products/20260725-ukmto_advisory-096-26.pdf",
+        "retrieved_at": "2026-07-27T18:45:24Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "hormuz-traffic",
+    "rule": false,
+    "caption": "The Strait transit corridors stayed active at reduced levels after the strike pause.",
+    "spots": [
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.1832,
+        "lon": 56.2666
+      },
+      {
+        "name": "FUJAIRAH",
+        "lat": 25.1288,
+        "lon": 56.3265
+      },
+      {
+        "name": "MUSCAT",
+        "lat": 23.588,
+        "lon": 58.3829
+      },
+      {
+        "name": "TSS WEST",
+        "lat": 26.6,
+        "lon": 56.25
+      },
+      {
+        "name": "TSS EAST",
+        "lat": 26.4667,
+        "lon": 56.3333
+      }
+    ],
+    "routes": [
+      {
+        "name": "HORMUZ TRANSIT",
+        "color": "accent",
+        "points": [
+          [
+            26.6,
+            56.25
+          ],
+          [
+            26.4667,
+            56.3333
+          ],
+          [
+            26.25,
+            56.7
+          ],
+          [
+            26.25,
+            56.8167
+          ],
+          [
+            24.5,
+            58
+          ],
+          [
+            23.588,
+            58.3829
+          ]
+        ]
+      }
+    ]
+  }
+}

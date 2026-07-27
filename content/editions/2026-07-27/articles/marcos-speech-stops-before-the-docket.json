@@ -1,0 +1,102 @@
+{
+  "id": "marcos-speech-stops-before-the-docket",
+  "topics": ["south-china-sea", "unclos", "constitutional-law"],
+  "edition_date": "2026-07-27",
+  "section": "world",
+  "kicker": "Read the instrument",
+  "epistemic": "inference",
+  "headline": "Marcos Stops Before the Docket",
+  "deck": "The Philippine president said cases against former Speaker Martin Romualdez were near filing and reaffirmed the 2016 maritime award. The public record still contains neither a criminal information nor a new operating order.",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": ["Tinkerton"]
+  },
+  "timestamp": "19:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "body": [
+    "President Ferdinand Marcos Jr. used his fifth State of the Nation Address to put former Speaker Martin Romualdez one verb away from court. Marcos said the Ombudsman believed multiple cases were near filing and assigned prosecution to the Ombudsman and the National Prosecution Service. [E1] Near is the operative word.",
+    "The public judicial record remains at preliminary investigation. A Sandiganbayan calendar ties the matter to Ombudsman docket OMB-C-C-APR-26-0044 and lists the application for a precautionary hold departure order. [E2] It does not contain a criminal information.",
+    "Sandiganbayan issued that travel order in a separate docket, E-SB-26-PHDO-0002, without prejudice to the findings of the Ombudsman or Office of the Special Prosecutor. [E3] A court has therefore restricted departure while investigators decide what, if anything, prosecutors can charge. The speech did not complete that sequence.",
+    "Marcos used the same address to call the 2016 South China Sea arbitral award a definitive benchmark for interpreting and applying UNCLOS. [E4] He promised peaceful and legal means, but published no new maritime directive, rule of engagement or operating order with the speech.",
+    "Beijing had answered the award’s anniversary days earlier with its standing position that the ruling has no binding force. [E5] The competing legal baselines were therefore already in public before Marcos took the podium. His address sharpened the Philippine statement without publishing a new instrument.",
+    "The boring case is that both declarations still guide real institutions. Ombudsman investigators may file the promised information, and Philippine maritime agencies may continue to act from the legal baseline without announcing a new rule. The documents available on Monday stop short of proving either new instrument.",
+    "An address can set a clock; it cannot substitute for the thing due at the bell. One side of this speech settles with a criminal docket, the other with a directive. Until either appears, the applause has no filing number."
+  ],
+  "refs": ["E1", "E2", "E3", "E4", "E5"],
+  "key_numbers": [],
+  "evidence_box": [
+    {
+      "source": "GMA News · fifth SONA",
+      "fragment": "malapit na ang paghain",
+      "as_of": "2026-07-27",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.gmanetwork.com/news/topstories/nation/996297/marcos-says-ombudsman-set-to-file-multiple-cases-vs-ex-speaker-martin-romualdez/story/",
+        "retrieved_at": "2026-07-27T18:22:04Z"
+      }
+    },
+    {
+      "source": "Sandiganbayan · Seventh Division calendar",
+      "fragment": "OMB-C-C-APR-26-0044",
+      "as_of": "2026-04-22",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://sb.judiciary.gov.ph/wp-content/uploads/2026/04/Calendar/Cal_7th_Apr_22.pdf",
+        "retrieved_at": "2026-07-27T18:39:35Z"
+      }
+    },
+    {
+      "source": "Sandiganbayan · hold-departure resolution",
+      "fragment": "E-SB-26-PHDO-0002",
+      "as_of": "2026-04-22",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://sb.judiciary.gov.ph/wp-content/uploads/2026/04/Resolutions/E-SB-26-PHDO-0002_People%20vs.%20Rep.%20Ferdinand%20Martin%20Gomez%20Romualdez_04-22-26.pdf",
+        "retrieved_at": "2026-07-27T18:39:35Z"
+      }
+    },
+    {
+      "source": "Philstar · arbitral award in the SONA",
+      "fragment": "definite benchmark",
+      "as_of": "2026-07-27",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.philstar.com/headlines/2026/07/27/2545130/we-do-not-yield-marcos-vows-uphold-2016-arbitral-ruling-sona",
+        "retrieved_at": "2026-07-27T18:22:04Z"
+      }
+    },
+    {
+      "source": "PRC Embassy · 12 July statement",
+      "fragment": "has no binding force",
+      "as_of": "2026-07-12",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://ph.china-embassy.gov.cn/zfgxzgdmgx/202607/t20260712_11980343.htm",
+        "retrieved_at": "2026-07-27T18:39:35Z"
+      }
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "philippines-policy-lines",
+    "rule": false,
+    "caption": "Manila’s legal baseline reaches west into a sea where the speech published no new operating order.",
+    "spots": [
+      {"name": "MANILA", "lat": 14.5995, "lon": 120.9842},
+      {"name": "SCARBOROUGH SHOAL", "lat": 15.1, "lon": 117.75},
+      {"name": "SECOND THOMAS SHOAL", "lat": 9.75, "lon": 115.85},
+      {"name": "PALAWAN", "lat": 10.05, "lon": 118.97}
+    ]
+  }
+}
