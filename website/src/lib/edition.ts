@@ -231,6 +231,10 @@ export interface Article {
   /** @deprecated computed live from `timestamp`; no longer authored. */
   last_updated_min_ago?: number;
   next_update_utc?: string;
+  previous_coverage?: Array<{
+    date: string;
+    slug: string;
+  }>;
   confidence?: {
     label: string;
     value: number;
