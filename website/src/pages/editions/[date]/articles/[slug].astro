@@ -42,6 +42,12 @@ const backLabel  = isTape ? 'The Tape' : 'The Front Page';
 
 const mapArt = article.art?.kind === 'map' ? article.art : null;
 const artMap = mapArt ? loadMap(date, mapArt.map) : null;
+const previousCoverage = (article.previous_coverage ?? []).map((item) => ({
+  ...item,
+  article: loadArticle(item.date, item.slug),
+  label: new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+    .format(new Date(`${item.date}T12:00:00Z`)),
+}));
 
 // One seen-set across paragraphs so each ref's first citation gets the
 // `-cite` anchor the Record's ↩ backlinks point at.
@@ -98,6 +104,19 @@ const articleMeta = {
       <span>BY {bylineDesk} · {article.byline.agents.join(', ')}</span>
       <span>~ {readTime} MIN · {article.evidence_box && article.evidence_box.length > 0 ? `RECORD E1-E${article.evidence_box.length}` : 'NO RECORD'}</span>
     </div>
+
+    {previousCoverage.length > 0 && (
+      <aside class="previous-coverage" aria-label="Earlier coverage">
+        <span class="previous-label">Earlier coverage</span>
+        <span class="previous-links">
+          {previousCoverage.map((item) => (
+            <a href={`/editions/${item.date}/articles/${item.slug}`}>
+              <time datetime={item.date}>{item.label}</time> · {item.article.headline.replace(/\n/g, ' ')}
+            </a>
+          ))}
+        </span>
+      </aside>
+    )}
 
     {/* Generated art: `map` renders a baked regional map (ops/bake-map.mjs)
         with the story's editorial overlays. Hand-authored `ascii` art stays
@@ -191,6 +210,44 @@ const articleMeta = {
     max-width: 600px;
     margin: 22px auto 30px;
     --map-font-max: 9px;
+  }
+  .previous-coverage {
+    margin: 16px 0 22px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 18px;
+    align-items: baseline;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    line-height: 1.45;
+  }
+  .previous-label {
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .previous-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+  .previous-links a {
+    color: var(--ink-soft);
+    text-decoration-color: var(--hairline);
+    text-underline-offset: 3px;
+  }
+  .previous-links a:hover { color: var(--accent); }
+  .previous-links time {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+  }
+  @media (max-width: 640px) {
+    .previous-coverage { grid-template-columns: 1fr; gap: 7px; }
+    .previous-links { display: grid; }
   }
   .filed-under {
     margin-top: 30px;

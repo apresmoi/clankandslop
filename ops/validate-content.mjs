@@ -181,6 +181,15 @@ for (const { date, dir: edDir, desk } of scopes) {
       err(file, 'byline.agents must be a non-empty array');
     for (const name of a.byline?.agents ?? []) checkAgentName(file, 'byline.agents', name);
     if (!isNum(a.revision)) err(file, 'revision must be a number');
+    for (const [i, prior] of (a.previous_coverage ?? []).entries()) {
+      if (!prior || !/^\d{4}-\d{2}-\d{2}$/.test(prior.date) || !isStr(prior.slug)) {
+        err(file, `previous_coverage[${i}] must contain date and slug`);
+        continue;
+      }
+      if (prior.date >= date) err(file, `previous_coverage[${i}] must reference an earlier edition`);
+      if (!ls(resolve(editionsDir, prior.date, 'articles')).includes(`${prior.slug}.json`))
+        err(file, `previous_coverage[${i}] references missing article ${prior.date}/${prior.slug}`);
+    }
     // Body items are paragraphs (strings) or inline figure blocks
     // ({ glyph, side?, caption? }) — a floated GlyphImage the prose wraps around.
     const isFigureItem = (x) => x && typeof x === 'object' && isStr(x.glyph);
