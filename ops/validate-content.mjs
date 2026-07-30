@@ -312,7 +312,44 @@ for (const { date, dir: edDir, desk } of scopes) {
       if (!Array.isArray(p[slot])) { err(file, `missing ${slot} array`); continue; }
       p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { date, articleSlugs, mapSlugs, articleMapArts }));
     }
+    if (date >= '2026-07-30' && p.page === 'front')
+      checkIllustratedRuns(file, p.head);
   }
+}
+
+function illustratedStorySide(block) {
+  if (block?.block === 'Hero' && block.props?.withArt === true) return 'left';
+  if (block?.block !== 'Grid' || !Array.isArray(block.props?.columns)) return null;
+  const kinds = block.props.columns.map((column) => {
+    const blocks = Array.isArray(column) ? column : [];
+    return {
+      art: blocks.some((nested) => nested?.block === 'MapGlyph' || nested?.block === 'GlyphArt'),
+      story: blocks.some((nested) => nested?.block === 'Teaser'),
+    };
+  });
+  const art = kinds.findIndex((kind) => kind.art);
+  const story = kinds.findIndex((kind) => kind.story);
+  if (art < 0 || story < 0 || art === story) return null;
+  return art < story ? 'left' : 'right';
+}
+
+function checkIllustratedRuns(file, blocks) {
+  let run = [];
+  const flush = () => {
+    if (run.length < 2) { run = []; return; }
+    run.forEach(({ index, side }, offset) => {
+      const expected = offset % 2 === 0 ? 'left' : 'right';
+      if (side !== expected)
+        err(file, `head[${index}] illustrated story row must place art ${expected}; adjacent runs alternate left → right`);
+    });
+    run = [];
+  };
+  for (const [index, block] of (blocks ?? []).entries()) {
+    const side = illustratedStorySide(block);
+    if (side) run.push({ index, side });
+    else flush();
+  }
+  flush();
 }
 
 

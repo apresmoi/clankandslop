@@ -1,0 +1,149 @@
+{
+  "id": "damietta-shifts-the-fallback-route",
+  "edition_date": "2026-07-30",
+  "section": "world",
+  "kicker": "Damietta Gas Berth",
+  "headline": "Damietta Shifts the Fallback Route",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "20:00 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "topics": [
+    "maritime-security",
+    "shipping",
+    "middle-east-war"
+  ],
+  "body": [
+    "Damietta’s incident began as an industrial interruption. Egypt’s Petroleum Ministry reported a fire involving two vessels, said there were no casualties and left the cause unstated.[E1] The later cabinet account hardened the physical description: a preliminary investigation found that a drone caused the incident, while responsibility and motive remained unidentified and the investigation continued.[E2] That sequence matters because markets can price a damaged berth before they can price an attacker. Attribution may take weeks; a hose, manifold or safety zone can close in seconds.",
+    "The interrupted asset was part of Egypt’s gas backstop. Energos Winter is a floating storage and regasification unit stationed at Damietta under an EGAS charter, with 138,250 cubic metres of LNG storage and peak send-out capacity of up to 650 million standard cubic feet per day.[E4][E5] Those figures describe optionality rather than guaranteed daily flow: the vessel can receive LNG, hold it and turn it back into pipeline gas when domestic production or another import route comes up short.[E4] A strike at that hull therefore touches more than one cargo. It touches the spare inlet Egypt hired to make shortages less binding.",
+    "Physical stoppage was narrower than the word “explosion” suggested. ISS Shipping reported an explosion during cargo operations, a partial closure at the LNG terminal and the relocation of vessels outside the port.[E3] It did not report a general shutdown of Damietta.[E3] The wider port remained a working node, according to the official account that operations outside the affected area continued.[E2] That is the first mercantile test: count the berths still turning ships, not the adjectives in the communiqué. So far, the incident constrained a piece of gas-handling capacity while leaving the broader harbour available.[E2][E3]",
+    "Damietta’s geography is still consequential. The port sits on Egypt’s Mediterranean coast against shipping routes linked to the Suez corridor.[E6] EGAS’s five-year charter placed Energos Winter there as a second floating regasification option, making the northern berth part of Egypt’s fallback import architecture.[E5] A drone-caused fire at that point extends the risk envelope into the Mediterranean end of the system, beyond the better-watched Red Sea and canal approaches.[E2][E5][E6] That is an inference from location and function, not evidence of a wider strike plan. Insurance clerks have now acquired another map.",
+    "Spare capacity is the immediate commodity question while Energos Winter and the affected berth are assessed. Its nameplate send-out of 650 mmscfd is large enough to matter in a tight gas balance, yet nameplate capacity does not establish lost supply, cargo delay or pipeline shortfall.[E4] ISS recorded relocation and partial closure, without reporting the cancellation of every LNG movement at Damietta.[E3] Egypt also kept the wider port open, preserving unrelated cargo operations around the restricted zone.[E2] Without a published damage survey, berth reopening notice or cargo rescheduling list, the prudent inference is disruption with uncertain duration rather than a quantified national gas deficit.",
+    "Strategically, the reading should remain bounded. A drone reached or affected two vessels during cargo operations, and Egypt’s preliminary investigation identified the weapon without naming a launch point, owner or attacker.[E1][E2][E3] That establishes reach into a Mediterranean gas facility. It does not establish a sustained campaign against Egyptian ports, the Suez Canal or LNG shipping lanes. The contained-incident null has substantial weight because the fire produced no reported casualties, the closure was partial, vessels were moved and the port continued operating beyond the affected area.[E1][E2][E3] One incident can force new patrols and higher premiums while still failing to alter aggregate cargo flow.",
+    "What settles the larger question will be physical and public: a damage assessment for Energos Winter, a dated notice restoring full terminal access, confirmed cargo diversions, or another drone incident against Egypt’s maritime energy chain. Until then, the strongest facts are a drone finding, an unattributed investigation, one FSRU with 138,250 cubic metres of storage, a partial terminal closure and a port that kept working.[E2][E3][E4] Damietta has widened the risk envelope, but it has not yet broken the fallback route.[E2][E3][E5][E6] The molecules still move."
+  ],
+  "key_numbers": [
+    {
+      "label": "vessels involved",
+      "value": "2",
+      "dir": "flat"
+    },
+    {
+      "label": "FSRU storage",
+      "value": "138,250 m³",
+      "dir": "flat"
+    },
+    {
+      "label": "peak send-out",
+      "value": "650 mmscfd",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Egyptian Ministry of Petroleum and Mineral Resources",
+      "fragment": "The first official statement reported a fire involving two vessels, no casualties and no stated cause.",
+      "as_of": "2026-07-30",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.petroleum.gov.eg/en/media-center/news/news-pages/Pages/mop_29072026_1.aspx",
+        "retrieved_at": "2026-07-30T19:47:00Z"
+      }
+    },
+    {
+      "source": "Egyptian cabinet statement mirrored by Iran Watch",
+      "fragment": "The preliminary investigation identified a drone as the cause, named no attacker and remained ongoing.",
+      "as_of": "2026-07-30",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.iranwatch.org/library/governments/egypt/press-statement-regarding-two-vessels-damietta",
+        "retrieved_at": "2026-07-30T19:47:00Z"
+      }
+    },
+    {
+      "source": "ISS Shipping",
+      "fragment": "The advisory recorded an explosion during cargo operations, a partial LNG-terminal closure and vessels relocated outside the port.",
+      "as_of": "2026-07-30",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.iss-shipping.com/advisories/explosion-at-damietta-port-lng-terminal/",
+        "retrieved_at": "2026-07-30T19:47:00Z"
+      }
+    },
+    {
+      "source": "Energos Infrastructure fleet page",
+      "fragment": "Energos identifies Energos Winter as a Damietta FSRU with 138,250 cubic metres of storage and up to 650 mmscfd peak send-out.",
+      "as_of": "2026-07-30",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://energosinfra.com/fleet-assets/",
+        "retrieved_at": "2026-07-30T19:47:00Z"
+      }
+    },
+    {
+      "source": "GIIGNL",
+      "fragment": "The industry notice records EGAS’s five-year charter placing Energos Winter at Damietta as a second FSRU.",
+      "as_of": "2026-07-30",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.giignl.org/news/egypts-egas-to-charter-a-second-fsru-from-nfe",
+        "retrieved_at": "2026-07-30T19:47:00Z"
+      }
+    },
+    {
+      "source": "Damietta Alliance",
+      "fragment": "The port operator describes Damietta’s position on Mediterranean shipping routes and its relation to the Suez corridor.",
+      "as_of": "2026-07-30",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.damiettaalliance.com/",
+        "retrieved_at": "2026-07-30T19:47:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "damietta-corridor",
+    "rule": false,
+    "caption": "The Damietta gas berth sits at the Mediterranean end of Egypt’s fallback energy corridor.",
+    "spots": [
+      {
+        "name": "DAMIETTA",
+        "lat": 31.42,
+        "lon": 31.81
+      },
+      {
+        "name": "AIN SOKHNA",
+        "lat": 29.6002,
+        "lon": 32.3167
+      }
+    ]
+  },
+  "deck": "Egypt says a drone caused the fire at Damietta without naming an attacker. The LNG terminal was only partly closed, vessels were moved and the wider port kept operating, leaving Egypt’s northern gas backstop impaired but unbroken.[E2][E3]"
+}

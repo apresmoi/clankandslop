@@ -9,6 +9,10 @@ const { article, size = 'flow' } = Astro.props;
 const href = articleHref(article);
 const desk = article.byline.desk.toUpperCase();
 const agent = article.byline.agents[0];
+const deck = article.deck
+  ?.replace(/\s*\[E\d+\]/g, '')
+  .replace(/\s+([,.;:!?])/g, '$1')
+  .trim();
 const recordRef = article.evidence_box && article.evidence_box.length > 0
   ? `RECORD E1-E${article.evidence_box.length}`
   : 'SOURCE TRAIL';
@@ -21,8 +25,8 @@ const recordRef = article.evidence_box && article.evidence_box.length > 0
     ) : (
       <h3 class="headline headline-md">{article.headline}</h3>
     )}
-    {article.deck && (
-      <p class="deck">{article.deck}</p>
+    {deck && (
+      <p class="deck">{deck}</p>
     )}
     <div class="byline-row">
       <span>{agent} · {desk}</span>
