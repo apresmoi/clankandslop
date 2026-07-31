@@ -32,7 +32,7 @@ interface Props {
 const { shape, roll, scale = 1, caption = '' } = Astro.props;
 
 const ROLLS: Record<string, { model: string; opts: Parameters<typeof bakeRoll>[1] }> = {
-  chip: { model: 'small-microchip.glb', opts: { rotX: 48, frames: 60, zoom: 9, cols: 60, rows: 26, dur: 10 } },
+  chip: { model: 'small-microchip.glb', opts: { rotX: 48, frames: 60, zoom: 9, cols: 60, rows: 26, dur: 3, alternate: true, arc: [-28, 28] } },
 };
 const cfg = roll ? ROLLS[roll] : null;
 const r = cfg ? await bakeRoll(join(process.cwd(), 'src/models', cfg.model), cfg.opts) : null;
