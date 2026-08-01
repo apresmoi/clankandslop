@@ -1,0 +1,103 @@
+{
+  "id": "washington-sets-a-wider-colorado-river-envelope",
+  "edition_date": "2026-08-01",
+  "section": "world",
+  "kicker": "Post-2026 Rules",
+  "headline": "Washington Widens Colorado River Rules",
+  "deck": "Reclamation set a ten-year operating framework for Lakes Powell and Mead, with wider modeled limits and roughly two-year decisions. The first binding rules remain unfinished before the new water year.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "20:00 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "topics": [
+    "natural-disasters",
+    "food-security"
+  ],
+  "body": [
+    "Bureau of Reclamation published the Final Environmental Impact Statement for Post-2026 Operational Guidelines and Strategies for Lake Powell and Lake Mead on 31 July 2026. The Preferred Alternative designates an adaptive ten-year decision framework spanning operating years 2027 to 2036. It supplies operational principles and quantitative sideboards instead of locking fixed long-term rules of the 2007 Interim Guidelines type. Specific operating guidelines for any interval, including the first, remain open. Operations must stand ready by 1 October 2026 at the start of the water year. [E2]",
+    "Modeled sideboards set annual releases from Lake Powell between 5.0 maf and 12.0 maf. Lower Basin shortages reach a ceiling of up to 3.0 maf under the Preferred Alternative. These figures constitute analytical and compliance bounds derived from modeling ensembles, not forecasts of actual hydrology or deliveries. Conserved-water storage and delivery capacity extends to 3.0 maf in Lake Powell and up to 8.0 maf in Lake Mead. Voluntary Upper Basin conservation is capped at 200 kaf per year subject to hydrology. [E1]",
+    "Seven Basin states failed to produce a consensus long-term agreement despite years of negotiation. The Preferred Alternative therefore adopts a recurring process for shorter-term guidelines anticipated on roughly two-year intervals unless later consensus extends them. Review of current guidelines leads to stakeholder engagement, preliminary proposals inside the sideboards, Federal Register decision documents, and implementation through Annual Operating Plans. Evaluation then restarts the cycle through 2036. The framework keeps the door open for continuous negotiation while ensuring compliant operations. [E2]",
+    "The Record of Decision selecting the Preferred Alternative framework has not been issued. Appendix T of the FEIS describes preliminary 2027–2028 guidelines that were still being refined at publication. Exact shortage allocations beyond the sideboards, precise mid-year adjustment triggers, and any future consensus incorporation await those later documents. First guidelines are expected in the Federal Register after the ROD, with the initial interval covering 2027–2028. A parallel binational process with Mexico proceeds separately through the International Boundary and Water Commission. [E2]",
+    "Lower Division States offered a May 2026 package of 1.5 maf total shortage plus at least 700 kaf additional system conservation as a near-term bridge. That proposal would distribute initial cuts as Arizona 760 kaf, California 440 kaf, Nevada 50 kaf and Mexico 250 kaf. The wider sideboard ceiling leaves space for larger reductions after 2028 under priority rules unless agreements intervene. Upper Basin states opposed mandatory cuts, citing historically lower use relative to Compact shares. No mandatory Upper Basin reductions enter the Preferred Alternative sideboards. [E1]",
+    "Extensive government-to-government consultation with thirty federally recognized Basin Tribes is documented in the FEIS. The framework includes storage and conversion mechanisms granting equal access for Upper Division States and Upper Basin Tribes to any Lake Powell conservation pool with tribal credit for contributions. A Federally Managed Water Resources Pool informed by tribal input can firm settlements and offset limited shortages. Senior present perfected rights are generally preserved under the priority-based distribution assumptions used in modeling. [E3]",
+    "Critics of the process argue the two-year cycle imposes perpetual uncertainty and negotiation burden in place of durable rules. Lower Basin interests note the sideboards open the door to deeper cuts than recent practice. Upper Basin interests treat the voluntary conservation target as manageable and the absence of mandates as a relative gain. Tribal and environmental stakeholders view storage and credit provisions as constructive yet contingent on implementation details and priority protection. The recurring decision cycle inside already-covered NEPA sideboards is the institutional response to the documented failure of long-term consensus. [E2]"
+  ],
+  "key_numbers": [
+    {
+      "label": "Powell release range",
+      "value": "5.0–12.0 maf",
+      "dir": "flat"
+    },
+    {
+      "label": "Lower Basin shortage ceiling",
+      "value": "3.0 maf",
+      "dir": "flat"
+    },
+    {
+      "label": "Upper Basin voluntary conservation",
+      "value": "200 kaf/yr",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "U.S. Department of the Interior",
+      "fragment": "annual releases from Lake Powell between 5.0 maf and 12.0 maf",
+      "as_of": "2026-08-01",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.doi.gov/pressreleases/reclamation-publishes-final-environmental-impact-statement-future-colorado-river",
+        "retrieved_at": "2026-08-01T15:30:00Z"
+      }
+    },
+    {
+      "source": "Bureau of Reclamation",
+      "fragment": "as of the publication of this Final Environmental Impact Statement, consensus on long-term operations has not been reached",
+      "as_of": "2026-08-01",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.usbr.gov/ColoradoRiverBasin/post2026/final-eis/docs/Vol-I/P26-FEIS_2_Ch2_Alternatives_508.pdf",
+        "retrieved_at": "2026-08-01T15:30:00Z"
+      }
+    },
+    {
+      "source": "Bureau of Reclamation",
+      "fragment": "Preferred Alternative is a 10-year decision framework through 2036",
+      "as_of": "2026-08-01",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.usbr.gov/ColoradoRiverBasin/post2026/final-eis/docs/Vol-III/P26-FEIS_TA_15_Dams_508.pdf",
+        "retrieved_at": "2026-08-01T15:30:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "host-cities",
+    "rule": false,
+    "caption": "The federal framework governs Powell and Mead while states continue negotiating how shortages fall.",
+    "spots": [
+      { "name": "LAKE POWELL", "lat": 37.0683, "lon": -111.2433 },
+      { "name": "LAKE MEAD", "lat": 36.1128, "lon": -114.3972 },
+      { "name": "PHOENIX", "lat": 33.4484, "lon": -112.0740 },
+      { "name": "LOS ANGELES", "lat": 34.0522, "lon": -118.2437 }
+    ]
+  }
+}
