@@ -1,0 +1,96 @@
+{
+  "id": "indonesias-ferry-rescue-still-has-two-counts",
+  "edition_date": "2026-08-02",
+  "section": "world",
+  "kicker": "Accounting gap",
+  "headline": "Two counts open north of Sapudi",
+  "deck": "Basarnas recorded 232 people evacuated from the ferry by 18:00 WIB, five of them dead. Other accounts put 271 originally aboard with 41 still missing. Search work continued without a closed manifest.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "20:00 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "topics": [
+    "shipping",
+    "maritime-security"
+  ],
+  "body": [
+    "North of Sapudi Island a fire on the Ro-Ro ferry left rescue teams working from two incomplete ledgers on 2 August. Basarnas recorded 232 people evacuated by 18:00 WIB. That provisional total comprised 227 survivors and five confirmed deaths. The same accounting supplied no original number of people aboard and offered no statement that every name had been matched. [E1]",
+    "Separate reports circulating the same day placed 271 passengers and crew on the vessel when the fire began. Those accounts listed 225 already rescued, five dead and 41 still missing, with the search described as ongoing. The numerical gap between the 232 evacuated and the higher original complement left roughly forty people unaccounted for in any single published ledger. No reconciliation of the two sets of figures had been issued. [E2]",
+    "Operational search-and-rescue work requires a single agreed total for those originally aboard. Without it, coordinators cannot determine how many names remain unmatched or how long vessels must stay on station. Family notification and subsequent legal accounting also depend on that match. The continuing discrepancy therefore kept the rescue phase open rather than closed.",
+    "Vessel-name spellings added a second layer of friction. Indonesian reporting used KMP Mutiara Santosa 2 while international reports rendered the name Mutiara Sentosa 2. Radio traffic, registry cross-checks and passenger lists drawn from different databases risk mismatch when the spelling is not locked. Consistent identification across the responding fleet is a basic requirement for accurate transfer of names and numbers. [E1][E2]",
+    "The vessels that brought survivors and bodies ashore formed a mixed commercial and state fleet. KM Meratus Pematang Siantar recovered the largest group of 111 people, of whom two had died. TB Hasnur 26 brought in 66, Transco Arafura 17, and KM Meratus Project 3 another 14. Smaller groups came off Prakarsa Mas, SC Aila XVII, Selaras Mas and British Mentor, while Alcon Daniel carried one of the dead. Basarnas contributed KN SAR 249 Permadi and RIB 01 Sumenep; the navy supplied KRI Nala 363. [E1]",
+    "None of the statements established the cause of the fire or assessed the vessel’s prior condition. The provisional character of the 18:00 WIB count itself was explicit in the language of temporary data. Later reports therefore could not be treated as final until a full manifest-to-rescue reconciliation appeared. The strongest counter-reading is that the higher missing figure simply predated the fuller afternoon tally and would close once all intercepts finished. Yet the afternoon accounting still withheld any original total and any declaration that every person had been found. [E1] [E2]",
+    "Until that reconciliation is published, the two counts remain side by side. One shows 232 people already taken off the ferry with five of them dead. The other keeps a higher original number and an open missing list. The difference is not academic for the families waiting on shore or for the vessels still working the waters north of Sapudi."
+  ],
+  "key_numbers": [
+    {
+      "label": "Evacuated by 18:00 WIB",
+      "value": "232",
+      "dir": "flat"
+    },
+    {
+      "label": "Reported originally aboard",
+      "value": "271",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "ANTARA",
+      "fragment": "total korban yang berhasil dievakuasi sebanyak 232 orang, terdiri atas 227 selamat dan lima meninggal dunia",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.antaranews.com/berita/5676796/basarnas-232-korban-kmp-mutiara-santosa-2-dievakuasi-lima-meninggal",
+        "retrieved_at": "2026-08-02T16:10:23Z"
+      }
+    },
+    {
+      "source": "Al Jazeera",
+      "fragment": "271 people were on board, five died and 41 remained missing",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aljazeera.com/news/2026/8/2/at-least-five-dead-41-missing-after-ferry-catches-fire-off-indonesia",
+        "retrieved_at": "2026-08-02T16:10:27Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "sapudi-rescue",
+    "rule": false,
+    "caption": "The rescue unfolded north of Sapudi while official accounts still differed on the number aboard.",
+    "spots": [
+      {
+        "name": "SURABAYA",
+        "lat": -7.2575,
+        "lon": 112.7521
+      },
+      {
+        "name": "SAPUDI",
+        "lat": -7.13,
+        "lon": 114.35
+      },
+      {
+        "name": "MAKASSAR",
+        "lat": -5.1477,
+        "lon": 119.4327
+      }
+    ]
+  }
+}
