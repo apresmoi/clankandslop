@@ -1,0 +1,143 @@
+{
+  "id": "india-puts-exam-fraud-on-a-two-month-clock",
+  "edition_date": "2026-08-02",
+  "section": "world",
+  "kicker": "State duties",
+  "headline": "Exam fraud gets two-month probe clock",
+  "deck": "The amendment raises penalties and orders states to create special courts for day-to-day trials. Central timelines and machinery fall on state budgets, yet missing the investigation deadline carries no automatic sanction.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "20:00 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "topics": [
+    "constitutional-law"
+  ],
+  "body": [
+    "President Droupadi Murmu assented to the Public Examinations (Prevention of Unfair Means) Amendment Act, 2026 on 31 July and the text appeared the same day in the Gazette of India. The statute amends the 2024 Act that first made organised paper leaks and related unfair means cognizable, non-bailable offences for central public examinations run by the NTA, UPSC, SSC and similar bodies. It takes effect from the date of publication. Candidates themselves remain outside its reach. The changes respond directly to repeated high-profile failures under the earlier law.[E1][E2]",
+    "Penalties rise across the board. Individuals who use unfair means now face imprisonment of not less than five years that may extend to ten years and a fine of up to fifty lakh rupees. Service providers risk fines of up to five crore rupees and debarment for eight years. Persons in charge of those providers face five-year minimum terms and five-crore fines. Organised-crime offences under the amended section 11 carry a seven-year floor, a ten-year ceiling and a minimum fine of ten crore rupees. All remain cognizable, non-bailable and non-compoundable.[E1]",
+    "Investigation clocks are now fixed at two months. An officer of DSP or ACP rank or above must finish the probe within two months of the FIR. A Central Investigating Agency has the same window from the date of reference. When the Centre notifies a Special Task Force, that force alone investigates and must also complete its work inside two months of the notification. The statutory language is mandatory, yet the text supplies no automatic consequence if the deadline slips.[E1][E3]",
+    "Every State Government and Union Territory Administration must, in consultation with the Chief Justice of the High Court, designate a Court of Session as a Special Fast Track Court. That court is required to conduct day-to-day trials, complete the case within three months of the chargesheet or transfer, and hear connected offences under the Bharatiya Nyaya Sanhita at the same sitting. Each such court receives one or more Special Public Prosecutors appointed by the state. Pending cases transfer automatically and must finish within three months of receipt. Appeals go only to a two-judge High Court bench that is expected to dispose of them within three months.[E1]",
+    "The Centre may constitute a Special Task Force by notification; once notified, investigation is exclusive to that force. States therefore carry the larger practical burden: court designation, prosecutor salaries, infrastructure for continuous hearings and the transfer of existing dockets. Failure to notify a Special Fast Track Court simply leaves cases in ordinary Sessions Courts under ordinary procedure, stripping the three-month trial mandate of force in that jurisdiction while the higher penalties and two-month investigation rules remain.[E1][E3]",
+    "Under the 2024 Act roughly fifty-two FIRs were registered yet convictions stayed rare and many accused secured bail. CBI figures circulating in early August recorded one hundred and fifty-eight exam-irregularity cases still pending trial nationwide, some decades old. The NEET-UG examination of May 2026, taken by more than two million candidates, was cancelled after verified question circulation; a re-test followed and results appeared in mid-July. Opposition parties walked out of the amendment debates, calling the focus on penalties and clocks headline management that left paper-security systems, NTA accountability and independent audits untouched.[E5][E6][E7]",
+    "The Centre has written enforceable clocks and duties whose cost and compliance fall partly on the states, while the absence of an automatic sanction for a missed investigation deadline leaves the architecture dependent on state execution. Gazette notifications will show whether jurisdictions build the fast-track courts and appoint prosecutors or leave the new machinery on paper. Without those steps, the tougher penalties remain available while ordinary court capacity absorbs the cases.[E3][E4]"
+  ],
+  "key_numbers": [
+    {
+      "label": "Investigation limit",
+      "value": "2 months",
+      "dir": "flat"
+    },
+    {
+      "label": "Individual fine ceiling",
+      "value": "₹50 lakh",
+      "dir": "up"
+    },
+    {
+      "label": "Organised-crime fine floor",
+      "value": "₹10 crore",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Taxheal Gazette extract",
+      "fragment": "Investigation of an offence under this Act shall be completed within two months",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.taxheal.com/the-public-examinations-prevention-of-unfair-means-amendment-act-2026.html",
+        "retrieved_at": "2026-08-02T16:10:02Z"
+      }
+    },
+    {
+      "source": "The Hindu",
+      "fragment": "stricter punishment speedy probe as president murmu assents",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.thehindu.com/news/national/stricter-punishment-speedy-probe-as-president-murmu-assents-to-tweaked-anti-paper-leak-bill/article71294739.ece",
+        "retrieved_at": "2026-08-02T16:10:04Z"
+      }
+    },
+    {
+      "source": "PRS Legislative Research",
+      "fragment": "no consequence or written-extension requirement if the two-month deadline is missed",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://prsindia.org/billtrack/the-public-examinations-prevention-of-unfair-means-amendment-bill-2026",
+        "retrieved_at": "2026-08-02T16:10:07Z"
+      }
+    },
+    {
+      "source": "Scroll.in",
+      "fragment": "anti-paper-leak amendments becomes law after presidents assent",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://scroll.in/latest/1094709/anti-paper-leak-amendments-becomes-law-after-presidents-assent",
+        "retrieved_at": "2026-08-02T16:10:09Z"
+      }
+    },
+    {
+      "source": "The Wire",
+      "fragment": "148 cases one conviction in 11 years",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://thewire.in/education/indias-exam-fraud-bubble-148-cases-one-conviction-in-11-years",
+        "retrieved_at": "2026-08-02T16:10:12Z"
+      }
+    },
+    {
+      "source": "Times of India",
+      "fragment": "158 exam-irregularity cases await trial cbi seeks fast-track",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://timesofindia.indiatimes.com/india/158-exam-irregularity-cases-await-trial-cbi-seeks-fast-track-disposal-under-new-anti-paper-leak-law/articleshow/132805390.cms",
+        "retrieved_at": "2026-08-02T16:10:14Z"
+      }
+    },
+    {
+      "source": "Free Press Journal",
+      "fragment": "opposition questions tougher penalties in anti-paper-leak law",
+      "as_of": "2026-08-02",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.freepressjournal.in/india/opposition-questions-tougher-penalties-in-anti-paper-leak-law-says-systemic-reforms-are-the-real-need",
+        "retrieved_at": "2026-08-02T16:10:16Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7"
+  ],
+  "art": null
+}
