@@ -1,0 +1,145 @@
+{
+  "id": "fuego-drives-evacuations-across-five-ravines",
+  "edition_date": "2026-08-04",
+  "section": "world",
+  "kicker": "Hazard geometry",
+  "headline": "Fuego’s five ravines force evacuations",
+  "deck": "Channelled pyroclastic currents down five ravines drove road closures and preventive evacuations around Volcán de Fuego.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "21:00 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "topics": [
+    "latin-america",
+    "natural-disasters"
+  ],
+  "body": [
+    "Five named ravines turned a paroxysm into a set of fast lanes. Pyroclastic density currents of 5–7 km length descended the flanks of Volcán de Fuego during the night of 3–4 August 2026. Lava fountains reached 200–300 m above the crater as the flows advanced. The currents, mixtures of volcanic gas, ash, rock and extreme heat, followed the pre-existing drainage network rather than spreading as sheet flows.[E1]",
+    "That channeling compelled the response. The Institutional Orange Alert continued as pyroclastic currents descended Seca, Taniluyá, Ceniza, Las Lajas and Honda.[E2] RN-14 remained closed in both directions between kilometres 83 and 103.[E4] Residents moved from the most exposed communities while schools suspended in the surrounding municipalities.",
+    "Preventive evacuations began in El Porvenir and Las Lajitas.[E3] Evacuation numbers evolved in public reporting and must be treated as such. Early statements spoke of preventive removal on the order of 50 families, roughly 250 people, into the municipal hall and other temporary sites. Subsequent movements included residents from Morelia toward shelters in Santa Lucía Cotzumalguapa, with later tallies ranging higher still.",
+    "No single primary bulletin supplies a consolidated, time-stamped total at the evening cutoff of 4 August. The defensible picture is therefore one of several hundred people moved preventively, with transfers continuing and the possibility of further communities being added if activity persists or expands. Authorities reported no casualties while evacuations and ash impacts expanded.[E5]",
+    "The same geometry that forced the closures and moves also helps explain the absence of confirmed casualties by cutoff. The currents remained confined to the named barrancas. The most immediate threat zones were identified in real time. Evacuation orders were issued while the flows were still developing rather than after they had already overrun settlements.",
+    "Ashfall and road disruption closed highway segments, suspended classes and covered surfaces and water sources. Channelled pathways and timely preventive action kept the human cost, as reported through the available bulletins and statements, at zero confirmed deaths or injuries. Counter-case: the totals remain fluid, under-counting is possible, and the event is not finished. Currents could travel farther or enter additional ravines if the paroxysm intensifies, while later rain could generate lahars down the same drainages.",
+    "The Orange Alert is not the highest level; a shift to Red would signal a different assessment of residual risk. Those caveats sit inside the same record that shows the five-ravine geometry, the RN-14 closure, and the orderly movement of residents away from the fast lanes. The channeling that defined the night’s flows continues to shape both the hazard and the response."
+  ],
+  "key_numbers": [
+    {
+      "label": "Lava fountain height",
+      "value": "200–300 m",
+      "dir": "flat"
+    },
+    {
+      "label": "Current runout",
+      "value": "5–7 km",
+      "dir": "flat"
+    },
+    {
+      "label": "Confirmed casualties",
+      "value": "0",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "INSIVUMEH",
+      "fragment": "200–300 m lava fountains; pyroclastic currents descended five named ravines for 5–7 km.",
+      "as_of": "2026-08-04",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "social",
+        "used_by_agent": "Foreman",
+        "source_url": "https://x.com/insivumehgt/status/2084508855141081512",
+        "retrieved_at": "2026-08-04T21:32:25Z"
+      }
+    },
+    {
+      "source": "CONRED",
+      "fragment": "The Institutional Orange Alert continued as pyroclastic currents descended Seca, Taniluyá, Ceniza, Las Lajas and Honda.",
+      "as_of": "2026-08-04",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://conred.gob.gt/volcan-de-fuego-mantiene-descenso-de-corrientes-piroclasticas/",
+        "retrieved_at": "2026-08-04T21:32:27Z"
+      }
+    },
+    {
+      "source": "CONRED",
+      "fragment": "Preventive evacuations began in El Porvenir and Las Lajitas.",
+      "as_of": "2026-08-04",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://conred.gob.gt/sistema-conred-realiza-evacuaciones-preventivas-por-actividad-del-volcan-de-fuego/",
+        "retrieved_at": "2026-08-04T21:32:28Z"
+      }
+    },
+    {
+      "source": "PROVIAL",
+      "fragment": "RN-14 remained closed in both directions between kilometres 83 and 103.",
+      "as_of": "2026-08-04",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "social",
+        "used_by_agent": "Foreman",
+        "source_url": "https://x.com/ProvialOficial/status/2084606969545920841",
+        "retrieved_at": "2026-08-04T21:32:30Z"
+      }
+    },
+    {
+      "source": "Prensa Libre",
+      "fragment": "Authorities reported no casualties while evacuations and ash impacts expanded.",
+      "as_of": "2026-08-04",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.prensalibre.com/guatemala/comunitario/erupcion-del-volcan-de-fuego-ceniza-se-dispersa-a-120-kilometros-sobre-el-espacio-aereo-de-tres-departamentos-breaking/",
+        "retrieved_at": "2026-08-04T21:32:33Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "fuego-ravines",
+    "rule": false,
+    "caption": "Five ravines carried pyroclastic currents from Fuego toward roads and communities under preventive evacuation.",
+    "spots": [
+      {
+        "name": "FUEGO",
+        "lat": 14.4747,
+        "lon": -90.8808
+      },
+      {
+        "name": "EL PORVENIR",
+        "lat": 14.45,
+        "lon": -90.82
+      },
+      {
+        "name": "YEPOCAPA",
+        "lat": 14.5,
+        "lon": -90.95
+      },
+      {
+        "name": "RN-14",
+        "lat": 14.46,
+        "lon": -90.8
+      }
+    ]
+  }
+}
