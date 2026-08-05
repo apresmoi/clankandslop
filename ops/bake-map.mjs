@@ -66,10 +66,11 @@ const landElevations = adaptive
   : [];
 const adaptiveLow = landElevations[Math.floor(landElevations.length * 0.05)] ?? 0;
 const adaptiveHigh = landElevations[Math.floor(landElevations.length * 0.95)] ?? adaptiveLow;
+const adaptiveLevels = Math.min(8, Math.max(2, Number(args.adaptiveLevels ?? 8)));
 const bandFor = adaptive
   ? (elev) => elev < 0
     ? 0
-    : 1 + Math.min(7, Math.max(0, Math.floor(((elev - adaptiveLow) / Math.max(1, adaptiveHigh - adaptiveLow)) * 8)))
+    : 1 + Math.min(adaptiveLevels - 1, Math.max(0, Math.floor(((elev - adaptiveLow) / Math.max(1, adaptiveHigh - adaptiveLow)) * adaptiveLevels)))
   : elevToBand;
 
 const bands = [];
