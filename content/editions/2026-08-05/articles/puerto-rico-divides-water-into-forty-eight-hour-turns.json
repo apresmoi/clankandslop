@@ -1,0 +1,138 @@
+{
+  "id": "puerto-rico-divides-water-into-forty-eight-hour-turns",
+  "edition_date": "2026-08-05",
+  "section": "world",
+  "kicker": "Carraízo Rotation",
+  "headline": "Puerto Rico Splits Water Into 48-Hour Turns",
+  "deck": "AAA’s Sergio Cuevas service area will cycle through two zones beginning 7 August, with each side alternating 48 hours of service and interruption. More than 180,000 customers in sectors of seven municipalities are covered, and no fixed end date is published.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "15:30 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "topics": [
+    "natural-disasters",
+    "latin-america"
+  ],
+  "body": [
+    "Puerto Rico’s Aqueduct and Sewer Authority will begin planned service interruptions for customers supplied by the Sergio Cuevas filtration plant on 7 August [E1]. The authority divided the affected service area into Zone 1 and Zone 2 [E2]. Each zone will move through alternating 48-hour periods with and without water service [E1][E5].",
+    "One zone receives service while the other passes through its scheduled interruption, and the positions reverse after the 48-hour turn [E2][E5]. AAA’s published calendar assigns the zones to the successive days of the rotation [E2]. The result is a repeating operating schedule, rather than an isolated shutdown with a single restoration time [E1][E2].",
+    "The mechanism begins at the Carraízo-linked supply and runs through the Sergio Cuevas filtration plant to its neighbourhood service area [E1][E2]. AAA is managing that chain by dividing the plant’s customers into timed groups [E1][E2]. The calendar therefore governs when each listed sector is scheduled to receive water from the shared system [E2][E5].",
+    "More than 180,000 customers are covered by the alternating interruptions [E3]. The footprint reaches sectors in seven municipalities [E3][E4]. That wording matters: the plan covers specified service sectors within those municipalities, not necessarily every customer or neighbourhood inside each municipal boundary [E3][E4].",
+    "The rotation starts on Friday, 7 August [E1][E4]. AAA’s announcement and calendar establish the opening date and the recurring 48-hour cadence [E1][E2]. They do not publish a fixed date on which the alternating regime will end [E1][E2].",
+    "AAA has turned reduced water availability into a timed allocation system across the Sergio Cuevas network [E1][E2]. The two-zone design spreads service across successive 48-hour blocks, with every handoff changing which sectors face interruption [E2][E5]. Customers’ place in the cycle depends on their assigned zone and the official calendar [E2][E5].",
+    "The seven municipalities do not enter the plan as indivisible units; their listed sectors do [E3][E4]. The filtration plant’s service area has been separated into two groups governed by the same repeating timetable [E1][E2]. For more than 180,000 customers, the tap now follows a 48-hour calendar with no published final turn [E1][E2][E3]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Rotation interval",
+      "value": "48 hours",
+      "dir": "flat"
+    },
+    {
+      "label": "Service zones",
+      "value": "2",
+      "dir": "flat"
+    },
+    {
+      "label": "Affected customers",
+      "value": "More than 180,000",
+      "dir": "flat"
+    },
+    {
+      "label": "Municipalities with affected sectors",
+      "value": "7",
+      "dir": "flat"
+    },
+    {
+      "label": "Start date",
+      "value": "7 August",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Puerto Rico Aqueduct and Sewer Authority",
+      "fragment": "alternating planned 48-hour interruptions for the Sergio Cuevas filtration plant beginning 7 August.",
+      "as_of": "2026-08-05",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/AcueductosPR/status/2084827410260799491",
+        "retrieved_at": "2026-08-05T15:14:00Z"
+      }
+    },
+    {
+      "source": "Puerto Rico Aqueduct and Sewer Authority calendar",
+      "fragment": "published the two-zone service calendar for the Carraízo-linked rotation.",
+      "as_of": "2026-08-05",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/AcueductosPR/status/2084830934105272809",
+        "retrieved_at": "2026-08-05T15:14:02Z"
+      }
+    },
+    {
+      "source": "El Nuevo Día",
+      "fragment": "More than 180,000 customers in sectors of seven municipalities face alternating 48-hour interruptions.",
+      "as_of": "2026-08-05",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.elnuevodia.com/english/news/story/starting-friday-puerto-rico-governor-announces-water-rationing-plan-due-to-low-water-levels-at-carraizo/",
+        "retrieved_at": "2026-08-05T15:14:04Z"
+      }
+    },
+    {
+      "source": "Metro Puerto Rico",
+      "fragment": "corroborates the Friday start and the seven-municipality service footprint.",
+      "as_of": "2026-08-05",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.metro.pr/noticias/2026/08/04/gobernadora-anuncia-racionamiento-de-agua-para-siete-municipios-desde-este-viernes/",
+        "retrieved_at": "2026-08-05T15:14:06Z"
+      }
+    },
+    {
+      "source": "TeleOnce",
+      "fragment": "explains how Zone 1 and Zone 2 alternate service by day.",
+      "as_of": "2026-08-05",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://teleonce.com/noticias/locales/cuando-te-tocara-el-racionamiento-asi-funcionara-el-plan-de-agua-por-zonas-y-dias/",
+        "retrieved_at": "2026-08-05T15:14:07Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "carraizo-service-area",
+    "rule": false,
+    "caption": "Carraízo Reservoir feeds the Sergio Cuevas plant; the published rotation divides downstream customers across sectors of seven municipalities.",
+    "spots": [
+      {"name": "LAGO LOÍZA", "lat": 18.3112, "lon": -66.0174},
+      {"name": "SAN JUAN", "lat": 18.3842, "lon": -66.0534},
+      {"name": "JUNCOS", "lat": 18.2067, "lon": -65.9140}
+    ]
+  }
+}
