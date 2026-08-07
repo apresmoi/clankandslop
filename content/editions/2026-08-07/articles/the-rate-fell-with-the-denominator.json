@@ -1,0 +1,100 @@
+{
+  "id": "the-rate-fell-with-the-denominator",
+  "edition_date": "2026-08-07",
+  "section": "markets",
+  "kicker": "Shrinking labor force",
+  "headline": "July Unemployment Rate Falls to 4.1%",
+  "deck": "Payrolls fell 23,000 as the civilian labor force contracted 264,000 and participation slipped to 61.4%. Household employment also fell, so the lower jobless rate came with a smaller pool of people counted in the labor market.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "20:45 UTC",
+  "revision": 1,
+  "next_update_utc": "16:30",
+  "topics": [
+    "rates",
+    "central-banks",
+    "inflation"
+  ],
+  "body": [
+    "July’s headline moved in opposite directions: the unemployment rate fell to 4.1% while nonfarm payroll employment fell by 23,000 [E1]. In the household survey, the civilian labor force contracted by 264,000, employment fell by 87,000, the number outside the labor force rose by 381,000 and participation slipped to 61.4% [E1]. The Bureau of Labor Statistics nevertheless described both payroll employment and the unemployment rate as having “changed little,” restrained language that reflects the sampling uncertainty around monthly estimates [E1].",
+    "The unemployment rate is the number of unemployed people divided by the civilian labor force [E1]. Labor-force exits can reduce the rate when people who had been counted as unemployed move outside the labor force, removing them from both the numerator and denominator [E1]. July’s labor force contracted by substantially more than household employment, so the implied unemployed count also fell and the rate moved down [E1]. The denominator shrinkage is therefore part of the arithmetic, although a smaller denominator alone would not mechanically lower a ratio [E1].",
+    "Industry detail made the payroll decline uneven [E1]. Local-government education employment fell by 50,000, retail lost 19,000 and financial activities declined by 14,000, while healthcare added 22,000 [E1]. The agency summarized the pattern as declines in local-government education and retail alongside a continuing upward trend in healthcare [E1]. A net payroll move of minus 23,000 can therefore sit on top of much larger changes inside individual industries [E1].",
+    "Payroll jobs and household employment come from separate surveys and separate samples [E1]. The household survey measures labor-force status, including unemployment, while the establishment survey measures nonfarm employment, hours and earnings by industry [E1]. Because the samples are separate and the series are revised differently, a 23,000 payroll decline and an 87,000 household-employment decline can diverge in a single month without either figure invalidating the other [E1]. The agency’s own description remained cautious, calling both payroll employment and the unemployment rate measures that “changed little” in July [E1].",
+    "May and June payroll estimates were revised downward by a combined 103,000 [E1]. BLS says monthly revisions result from additional reports received from businesses and government agencies and from recalculated seasonal factors [E1]. Nothing in the July release supports claims of manipulation or impropriety; the 103,000 adjustment belongs to the published revision process [E1].",
+    "Local-government education deserves particular caution because its July employment decline was 50,000 [E1]. That move is a plausible seasonal-adjustment candidate, but the available evidence does not establish that seasonal factors caused it [E1][E2]. Economists cited by the Associated Press likewise treated the public-school decline as a possible statistical glitch associated with seasonal adjustment [E2]. One weak month, concentrated partly in local education and still subject to revision, does not by itself establish a recession [E1][E2].",
+    "Taken together, July showed weaker employment measures alongside a lower participation rate [E1]. The household survey lost 87,000 employed people while its labor force contracted by 264,000; establishment payrolls fell 23,000 after the combined 103,000 downward revision to May and June [E1]. The published 4.1% unemployment rate therefore declined without a stronger employment count in either survey [E1]. The rate fell as the labor force shrank faster than household employment [E1]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Unemployment rate",
+      "value": "4.1%",
+      "dir": "down"
+    },
+    {
+      "label": "Nonfarm payroll change",
+      "value": "-23,000",
+      "dir": "down"
+    },
+    {
+      "label": "Civilian labor force change",
+      "value": "-264,000",
+      "dir": "down"
+    },
+    {
+      "label": "Household employment change",
+      "value": "-87,000",
+      "dir": "down"
+    },
+    {
+      "label": "Not in labor force change",
+      "value": "+381,000",
+      "dir": "up"
+    },
+    {
+      "label": "Participation rate",
+      "value": "61.4%",
+      "dir": "down"
+    },
+    {
+      "label": "May–June combined revision",
+      "value": "-103,000",
+      "dir": "down"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "U.S. Bureau of Labor Statistics — Employment Situation, July 2026",
+      "fragment": "Both nonfarm payroll employment (-23,000) and the unemployment rate (4.1 percent) changed little in July",
+      "as_of": "2026-08-07",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.bls.gov/news.release/archives/empsit_08072026.htm",
+        "retrieved_at": "2026-08-07T18:10:00Z"
+      }
+    },
+    {
+      "source": "Associated Press — U.S. jobs report",
+      "fragment": "the big drop in public school payrolls might have been a statistical glitch",
+      "as_of": "2026-08-07",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://apnews.com/article/economy-jobs-trump-unemployment-rate-jobseekers-9c2d147c14bc428458be5a1e83e54957",
+        "retrieved_at": "2026-08-07T18:10:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2"
+  ],
+  "art": null
+}
