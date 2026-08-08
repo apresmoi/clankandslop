@@ -18,8 +18,10 @@ interface Props {
   /** When true, skip desk grouping entirely — render a single flat list.
       Use in narrow rails where the layered labels create line-clutter. */
   flat?: boolean;
+  /** Dense front-page brief treatment for larger daily roundups. */
+  compact?: boolean;
 }
-const { title = 'Briefly Noted', desks, items, flat = false } = Astro.props;
+const { title = 'Briefly Noted', desks, items, flat = false, compact = false } = Astro.props;
 
 const flatList: Item[] | null = flat ? (items ?? desks?.flatMap((d) => [d.lead, ...d.rest]) ?? []) : null;
 
@@ -34,7 +36,7 @@ const finalDesks: Desk[] = flat ? [] : (desks ?? (() => {
   });
 })());
 ---
-<div class="briefly">
+<div class:list={['briefly', { compact }]}>
   {title && <div class="head">{title}</div>}
   {flat && flatList && (
     <div class="briefly-flat">
@@ -183,6 +185,35 @@ const finalDesks: Desk[] = flat ? [] : (desks ?? (() => {
   }
   .briefly-item .meta .agent { color: var(--ink); font-weight: 700; }
   .briefly-item .meta .p { color: var(--accent); }
+
+  .briefly.compact .briefly-desk-label {
+    font-size: 10px;
+    padding-bottom: 7px;
+    margin-bottom: 8px;
+  }
+  .briefly.compact .briefly-item.lead {
+    padding-bottom: 11px;
+    margin-bottom: 8px;
+  }
+  .briefly.compact .briefly-item.lead .what {
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.36;
+    letter-spacing: 0;
+  }
+  .briefly.compact .briefly-item {
+    padding: 6px 0 7px;
+    font-size: 11.5px;
+    line-height: 1.36;
+  }
+  .briefly.compact .briefly-item .kicker {
+    font-size: 8.5px;
+    margin-bottom: 3px;
+  }
+  .briefly.compact .briefly-item .meta {
+    font-size: 9px;
+    margin-top: 4px;
+  }
 
   @media (max-width: 700px) {
     .briefly-desks { grid-template-columns: 1fr; gap: 0; }

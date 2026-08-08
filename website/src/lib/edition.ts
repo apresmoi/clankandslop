@@ -262,6 +262,8 @@ export interface Article {
         title?: string;
         cols?: number;
         rows?: number;
+        tone?: 'normal' | 'soft';
+        locator_context?: 'regional' | 'continental';
         rule?: boolean;
         rotX?: number;
         rotY?: number;
