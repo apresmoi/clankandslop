@@ -22,6 +22,10 @@ interface Props {
   caption?: string;
   cols?: number;
   rows?: number;
+  /** Reduces terrain ink for very dense, all-land relief crops. */
+  tone?: 'normal' | 'soft';
+  /** Wider locator crop when a tight inland map lacks recognizable context. */
+  locator_context?: 'regional' | 'continental';
   rotX?: number;
   rotY?: number;
   zoom?: number;
@@ -34,6 +38,8 @@ interface Props {
 }
 const {
   map: m, title = '', caption = '', cols = 80, rows = 38,
+  tone = 'normal',
+  locator_context = 'regional',
   rotX = 0.45, rotY = 0, zoom = 0.42,
   overlays = [], routes = [], spots = [],
   rule = true,
@@ -71,6 +77,9 @@ const isLandWorld = (lat: number, lon: number): boolean => {
 // with a NW-light hillshade so slopes, ridges and coastlines read as relief
 // rather than a flat elevation tint (a uniform plateau otherwise renders as a blob).
 const LAND_RAMP = ' ░░▒▒▓▓██';
+const SOFT_LAND_RAMP = ' ▓▓▓▓▓▓▓▓';
+const terrainGlyph = (band: number) => (tone === 'soft' ? SOFT_LAND_RAMP : LAND_RAMP)[band];
+const terrainClass = (band: number) => tone === 'soft' ? `l mg-soft-${Math.ceil(band / 2)}` : 'l';
 const bandAt = (rr: number, cc: number, fallback: number) => {
   const v = m.bands[rr]?.[cc];
   return v === undefined ? fallback : Number(v);
@@ -101,10 +110,13 @@ if (!interactive) {
       const band = Number(m.bands[r][c]);
       let cell: Cell = band === 0
         ? { ch: (r + c) % 2 ? '·' : ' ', cls: 'w' }
-        : { ch: LAND_RAMP[shadedBand(r, c, band)], cls: 'l' };
+        : (() => {
+            const shade = shadedBand(r, c, band);
+            return { ch: terrainGlyph(shade), cls: terrainClass(shade) };
+          })();
       for (const o of overlays) {
         if (!inRing(lat, lon, o.ring)) continue;
-        cell = { ch: band === 0 ? '░' : LAND_RAMP[shadedBand(r, c, band)], cls: `o-${o.color ?? 'red'}` };
+        cell = { ch: band === 0 ? '░' : terrainGlyph(shadedBand(r, c, band)), cls: `o-${o.color ?? 'red'}` };
       }
       row.push(cell);
     }
@@ -161,8 +173,10 @@ if (!interactive) {
   const LC = 40, LR = 20;
   const cLat = (m.north + m.south) / 2;
   const cLon = (m.west + m.east) / 2;
-  const lonSpan = Math.min(170, Math.max(56, (m.east - m.west) * 6));
-  const latSpan = Math.min(120, Math.max(38, (m.north - m.south) * 6));
+  const minLonSpan = locator_context === 'continental' ? 100 : 56;
+  const minLatSpan = locator_context === 'continental' ? 60 : 38;
+  const lonSpan = Math.min(170, Math.max(minLonSpan, (m.east - m.west) * 6));
+  const latSpan = Math.min(120, Math.max(minLatSpan, (m.north - m.south) * 6));
   const wW = cLon - lonSpan / 2, wE = cLon + lonSpan / 2;
   const wN = Math.min(89, cLat + latSpan / 2), wS = Math.max(-89, cLat - latSpan / 2);
   const locLines: string[] = [];
@@ -214,7 +228,7 @@ if (!interactive) {
   }
 }
 ---
-<figure class:list={['mapglyph', interactive ? 'is-card' : 'is-print', { 'no-top-rule': !rule }]}>
+<figure class:list={['mapglyph', interactive ? 'is-card' : 'is-print', `tone-${tone}`, `locator-${locator_context}`, { 'no-top-rule': !rule }]}>
   {(title || legend.length > 0) && (
     <div class:list={['mapglyph-head', { 'no-title': !title }]}>
       {title && <span class="mapglyph-title">{title}</span>}
@@ -478,6 +492,10 @@ if (!interactive) {
   .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 26%, transparent); }
   :global([data-theme="light"]) .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 40%, transparent); }
   .mapglyph-print :global(.mg-l) { color: var(--ink); }
+  .mapglyph-print :global(.mg-soft-1) { color: color-mix(in srgb, var(--ink) 32%, transparent); }
+  .mapglyph-print :global(.mg-soft-2) { color: color-mix(in srgb, var(--ink) 50%, transparent); }
+  .mapglyph-print :global(.mg-soft-3) { color: color-mix(in srgb, var(--ink) 70%, transparent); }
+  .mapglyph-print :global(.mg-soft-4) { color: color-mix(in srgb, var(--ink) 88%, transparent); }
   .mapglyph-print :global(.mg-o-red)    { color: var(--red); }
   .mapglyph-print :global(.mg-o-accent) { color: var(--accent); }
   .mapglyph-print :global(.mg-o-green)  { color: var(--green); }
@@ -511,6 +529,11 @@ if (!interactive) {
     min-width: 5px;
     min-height: 4px;
     border: 1px solid var(--accent);
+  }
+  .mapglyph.locator-continental .locator-footprint {
+    min-width: 7px;
+    min-height: 5px;
+    border-width: 2px;
   }
   .mg-o-red    { color: var(--red); }
   .mg-o-accent { color: var(--accent); }
