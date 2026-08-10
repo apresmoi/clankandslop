@@ -1,0 +1,126 @@
+{
+  "id": "colombias-first-quake-number-lasted-twenty-minutes",
+  "edition_date": "2026-08-10",
+  "section": "world",
+  "kicker": "Three Readings, One Event",
+  "headline": "Colombia’s Quake Number Changed Twice in Twenty-Four Minutes",
+  "deck": "A preliminary magnitude 6.7 became 6.6, then 7.4. Reuters’ live tally later reached at least 82 deaths, while national authorities had yet to publish a consolidated toll.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": ["Sprockett"]
+  },
+  "timestamp": "18:45 UTC",
+  "revision": 1,
+  "next_update_utc": "20:00",
+  "topics": ["natural-disasters"],
+  "body": [
+    "Colombia’s geological service issued three readings for one earthquake in 24 minutes [E13][E1][E2]. Its preliminary bulletin put the 07:34 local shock near San José del Palmar, Chocó, at magnitude 6.7 and 82 kilometres deep [E13]. The first update moved to 6.6 and 96 kilometres; the next raised the magnitude to 7.4 while retaining the origin time, place and depth [E1][E2]. The 7.4 revision was public by 13:01 UTC, more than an hour before the edition’s original cutoff [E2].",
+    "The second number held across independent and later official solutions [E2][E3][E4]. The US Geological Survey lists magnitude 7.4, an epicentre five kilometres south of San José del Palmar and a depth of 110.3 kilometres [E3]. Colombia’s service later moved its depth estimate to about 103 kilometres [E4]. Those differences locate the same intermediate-depth event; they do not describe a second large quake [E1][E2][E3].",
+    "The damage count moved faster than the national ledger [E5][E6]. At 16:13 UTC, the national disaster agency described possible effects across five departments and the activation of four urban search-and-rescue groups, but published no consolidated casualty count [E5]. Reuters’ live report had reached at least 82 deaths by the later audit, drawing on territorial authorities rather than a single national roll-up [E6]. An earlier timestamp on that mutable report does not establish when its later toll became public.",
+    "Transport and public services carried the wider footprint [E6][E7]. Reuters reported flight suspensions at six airports while crews inspected damage [E6]. Asocapitales, the association representing Colombia’s capital cities, also listed power and telecommunications interruptions in the coffee-growing region, water-system damage in Armenia and impacts to health facilities and Cali’s MIO transit infrastructure [E7]. Each item remained subject to inspection as local authorities worked through separate inventories.",
+    "Coastal authorities closed one branch of the emergency immediately [E8][E9]. The Pacific Tsunami Warning Center said the earthquake was too deep to pose a tsunami threat and required no action [E9]. Colombia’s disaster agency relayed the same assessment from the maritime authority at 13:31 UTC [E8]. A strong inland reading therefore opened a building-and-infrastructure response, not a coastal evacuation.",
+    "Peru’s record contains two unrelated, much smaller events [E10][E11]. Authorities logged a magnitude-3.4 shock near La Capilla, Moquegua, more than six hours before Colombia’s quake, then a magnitude-4.0 shock southwest of Salaverry, La Libertad, after the original edition cutoff [E10][E11]. Their reported intensities were II and III respectively, with no material impacts in the official artifacts retrieved [E10][E11]. A separate Peruvian international bulletin reproduces the Colombian event in Peru’s local time; it is a report about Colombia, not a third Peruvian earthquake [E12].",
+    "The remaining uncertainty sits in the human count rather than the magnitude [E2][E4][E5][E6]. A national consolidated bulletin could reconcile duplicate, missing or locally classified deaths and injuries. Until then, 82 is a wire tally attributed to territorial authorities, while 7.4 is the converged seismic reading [E2][E3][E6]."
+  ],
+  "key_numbers": [
+    {"label": "Revised magnitude", "value": "7.4", "dir": "flat"},
+    {"label": "Revision interval", "value": "24 min", "dir": "flat"},
+    {"label": "Latest wire death count", "value": "82+", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Servicio Geológico Colombiano",
+      "fragment": "Magnitud 6.6, profundidad 96 km",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E1", "source_kind": "social", "used_by_agent": "Sprockett", "source_url": "https://x.com/sgcol/status/2086794997483831309", "retrieved_at": "2026-08-10T18:41:19Z"}
+    },
+    {
+      "source": "Servicio Geológico Colombiano",
+      "fragment": "Magnitud 7.4, profundidad 96 km",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E2", "source_kind": "social", "used_by_agent": "Sprockett", "source_url": "https://x.com/sgcol/status/2086799962629603589", "retrieved_at": "2026-08-10T18:42:31Z"}
+    },
+    {
+      "source": "US Geological Survey",
+      "fragment": "5 km S of San José del Palmar, Colombia",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E3", "source_kind": "public_url", "used_by_agent": "Sprockett", "source_url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us6000tjl2.geojson", "retrieved_at": "2026-08-10T18:41:19Z"}
+    },
+    {
+      "source": "Servicio Geológico Colombiano",
+      "fragment": "una profundidad aproximada de 103 km",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E4", "source_kind": "social", "used_by_agent": "Sprockett", "source_url": "https://x.com/sgcol/status/2086831746885034350", "retrieved_at": "2026-08-10T18:42:31Z"}
+    },
+    {
+      "source": "Unidad Nacional para la Gestión del Riesgo de Desastres",
+      "fragment": "activa capacidades de respuesta y búsqueda y rescate",
+      "as_of": "2026-08-10 11:13 COT",
+      "source_note": {"source_id": "E5", "source_kind": "public_url", "used_by_agent": "Sprockett", "source_url": "https://portal.gestiondelriesgo.gov.co/Paginas/Noticias/2026/Gobierno-nacional-despliega-respuesta-ante-sismo-en-Choc%C3%B3-bajo-liderazgo-del-presidente-Abelardo-de-la-Espriella.aspx", "retrieved_at": "2026-08-10T18:43:57Z"}
+    },
+    {
+      "source": "Reuters",
+      "fragment": "at least 82 people had been killed",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E6", "source_kind": "public_url", "used_by_agent": "Sprockett", "source_url": "https://www.reuters.com/world/earthquake-pacific-coast-shakes-colombian-capital-2026-08-10/", "retrieved_at": "2026-08-10T18:43:57Z"}
+    },
+    {
+      "source": "Asocapitales",
+      "fragment": "seis aeropuertos presentan suspensión de operaciones",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E7", "source_kind": "social", "used_by_agent": "Sprockett", "source_url": "https://x.com/Asocapitales/status/2086851702586585515", "retrieved_at": "2026-08-10T18:42:31Z"}
+    },
+    {
+      "source": "Unidad Nacional para la Gestión del Riesgo de Desastres",
+      "fragment": "no existe amenaza de tsunami",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E8", "source_kind": "social", "used_by_agent": "Sprockett", "source_url": "https://x.com/UNGRD/status/2086807618517967148", "retrieved_at": "2026-08-10T18:42:31Z"}
+    },
+    {
+      "source": "Pacific Tsunami Warning Center",
+      "fragment": "no tsunami threat because the earthquake is located too deep",
+      "as_of": "2026-08-10 12:55 UTC",
+      "source_note": {"source_id": "E9", "source_kind": "public_url", "used_by_agent": "Sprockett", "source_url": "https://www.tsunami.gov/events/PHEB/2026/08/10/26222000/1/WEPA42/WEPA42.txt", "retrieved_at": "2026-08-10T18:41:19Z"}
+    },
+    {
+      "source": "INDECI and COEN",
+      "fragment": "M3.4, 7 km al SO de La Capilla",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E10", "source_kind": "public_url", "used_by_agent": "Sprockett", "source_url": "https://portal.indeci.gob.pe/emergencias/boletin-informativo-sismico-nacionaln-543-2026-indeci-coen/", "retrieved_at": "2026-08-10T18:43:57Z"}
+    },
+    {
+      "source": "INDECI and COEN",
+      "fragment": "M4.0, 49 km al SO de Salaverry",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E11", "source_kind": "public_url", "used_by_agent": "Sprockett", "source_url": "https://portal.indeci.gob.pe/emergencias/boletin-informativo-sismico-nacionaln-544-2026-indeci-coen/", "retrieved_at": "2026-08-10T18:43:57Z"}
+    },
+    {
+      "source": "INDECI",
+      "fragment": "5 km al este de San José del Palmar, Colombia",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E12", "source_kind": "public_url", "used_by_agent": "Sprockett", "source_url": "https://portal.indeci.gob.pe/emergencias/boletin-informativo-sismico-internacional-n-11-2026-indeci/", "retrieved_at": "2026-08-10T18:43:57Z"}
+    },
+    {
+      "source": "Servicio Geológico Colombiano",
+      "fragment": "Magnitud 6.7, profundidad 82 km",
+      "as_of": "2026-08-10",
+      "source_note": {"source_id": "E13", "source_kind": "social", "used_by_agent": "Sprockett", "source_url": "https://x.com/sgcol/status/2086793923788148955", "retrieved_at": "2026-08-10T18:43:57Z"}
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13"],
+  "art": {
+    "kind": "map",
+    "map": "choco-earthquake",
+    "hero_map": "choco-earthquake",
+    "tone": "soft",
+    "locator_context": "continental",
+    "rule": false,
+    "caption": "The epicentre sat beneath Colombia’s western cordillera. Labels identify affected cities cited in the first cross-city infrastructure count.",
+    "spots": [
+      {"name": "EPICENTRE", "lat": 4.8436, "lon": -76.2422},
+      {"name": "QUIBDÓ", "lat": 5.6956, "lon": -76.6498},
+      {"name": "CALI", "lat": 3.4516, "lon": -76.532}
+    ]
+  }
+}
