@@ -1,0 +1,59 @@
+{
+  "id": "damascus-sentences-three-holds-one",
+  "edition_date": "2026-08-11",
+  "section": "world",
+  "kicker": "One Defendant in the Room",
+  "headline": "Damascus Sentences Three, Holds One",
+  "deck": "A 396-page judgment gives Atef Najib an immediate appeal and gives the Assad brothers sentences in absentia. The same ruling carries two very different kinds of legal force.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": ["Tinkerton"]
+  },
+  "timestamp": "20:20 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "topics": ["constitutional-law", "russia"],
+  "body": [
+    "Damascus’s Fourth Criminal Court issued death sentences against Bashar al-Assad, Maher al-Assad and former security chief Atef Najib on 11 August [E1][E2]. Najib heard his sentence in the courtroom. The Assad brothers, both fugitives, were tried in absentia [E1]. One judgment therefore created an immediate criminal process for a prisoner and an unenforceable order against two men beyond the court’s custody.",
+    "The court called the document Decision No. 1 of 2026 and said it runs to 396 pages [E1]. Judge Fakhr al-Din al-Aryan delivered it at the ninth hearing, with prosecutors, transitional-justice officials, victims’ relatives and legal observers present [E1]. SANA said the Ministry of Justice would publish the text after protected witnesses were redacted. No published copy was available by the edition cutoff, so the public record still consists of the court’s announced disposition rather than the court’s full reasoning.",
+    "Charges described by the court include intentional killing, torture, unlawful detention and abduction, with conduct classified as crimes against humanity or war crimes [E1]. The case reaches back to the 2011 crackdown in Daraa, where Najib headed Political Security and the arrests of schoolchildren helped ignite the uprising [E1]. Bashar was treated as the highest decision-maker directing state institutions; Maher was prosecuted through his military role [E1]. The announced verdict is a domestic criminal judgment, not an international tribunal order.",
+    "Custody is the clause that changes the sentence. Najib is present, can use the ordinary appeal process and remains within reach of whatever final order survives it [E1]. An in-absentia judgment against a fugitive can be reopened or displaced if the defendant is arrested or surrenders, according to the procedural account given after the hearing [E1]. The Assad brothers’ sentences may be politically emphatic, but they do not move either defendant across a border.",
+    "Russia supplies that border. Bashar and Maher al-Assad remain outside Syrian custody, and the retrieved record contains no Russian agreement to surrender them [E1]. It also contains no operative extradition document tied to this judgment. A death sentence can mark the new state’s view of the old one while leaving the enforcement question exactly where it was: with the government sheltering the fugitives.",
+    "Publication of the judgment is the next credibility test. Redactions can protect witnesses while still exposing the evidentiary chain, the court’s treatment of command responsibility and the route for appeal. Failure to publish would leave a historic sentence supported mainly by an official summary. Transitional justice cannot ask the public to inspect 396 pages that remain behind the registry desk.",
+    "The sober counter-case is that even a published opinion may add little coercive force. Najib’s appeal could take years, the in-absentia cases may restart if custody changes, and Moscow may ignore the matter. Still, an accused official standing in court is different from a fugitive named in a proclamation. Damascus printed three death sentences; only one entered the machinery of enforcement."
+  ],
+  "key_numbers": [
+    {"label": "Judgment length", "value": "396 pages", "dir": "flat"},
+    {"label": "Hearing", "value": "Ninth", "dir": "flat"},
+    {"label": "Defendants in custody", "value": "1 of 3", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Syrian Arab News Agency",
+      "fragment": "Decision No. 1 of 2026, comprising 396 pages",
+      "as_of": "2026-08-11",
+      "source_note": {"source_id": "E1", "source_kind": "public_url", "used_by_agent": "Tinkerton", "source_url": "https://sana.sy/en/syria/2335708/", "retrieved_at": "2026-08-11T20:54:46Z"}
+    },
+    {
+      "source": "The National",
+      "fragment": "A court in Damascus has sentenced Bashar and Maher Al Assad",
+      "as_of": "2026-08-11",
+      "source_note": {"source_id": "E2", "source_kind": "social", "used_by_agent": "Tinkerton", "source_url": "https://x.com/TheNationalNews/status/2087276563247284471", "retrieved_at": "2026-08-11T21:02:51Z"}
+    }
+  ],
+  "refs": ["E1", "E2"],
+  "art": {
+    "kind": "map",
+    "map": "damascus-judgment",
+    "hero_map": "damascus-judgment",
+    "tone": "soft",
+    "locator_context": "continental",
+    "rule": false,
+    "caption": "Daraa supplied the case’s origin; Damascus supplied the judgment. Custody still ends before Moscow.",
+    "spots": [
+      {"name": "DAMASCUS", "lat": 33.5138, "lon": 36.2765},
+      {"name": "DARAA", "lat": 32.626, "lon": 36.1033}
+    ]
+  }
+}
