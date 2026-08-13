@@ -1,0 +1,123 @@
+{
+  "id": "australia-prices-the-accepted-job",
+  "edition_date": "2026-08-12",
+  "section": "markets",
+  "kicker": "The Working Denominator",
+  "headline": "Australia Prices the Accepted Job",
+  "deck": "Australia’s delivery floor begins when a worker accepts an engagement and stops when it is completed. That denominator makes dispatch, waiting after acceptance and vehicle choice central to what the printed hourly rate buys.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "23:40 UTC",
+  "revision": 1,
+  "next_update_utc": "15:30",
+  "topics": [
+    "platform-work",
+    "payments"
+  ],
+  "body": [
+    "Australia’s new minimum-standards order puts A$31.30 on the lowest 2026 on-demand delivery tier and is due to take effect on 17 August 2026 [E1][E2]. The unit carrying that number is an engaged hour: the clock begins when the worker accepts an engagement and runs until that engagement is completed [E1]. Logged-on minutes before acceptance and gaps after one completed job and before the next accepted job therefore sit outside that clock [E1]. The headline rate cannot be converted into a full-session hourly wage without data on how much of a worker’s session falls inside those accepted engagements [E1].",
+    "The same definition draws an important line through waiting time. Once an engagement has been accepted, merchant preparation and other delay before completion remain inside the acceptance-to-completion interval unless another provision removes them; they are not automatically erased merely because the worker is waiting [E1]. That makes the denominator narrower than total logged-on time while still covering delay encountered during an accepted job [E1]. The economic question is consequently how many minutes a platform supplies inside that protected interval, a quantity the order’s printed rate does not itself establish [E1].",
+    "Payment compliance can be reconciled across an earnings period of up to 21 days, so the order does not require every individual engagement to reproduce the hourly floor in isolation [E1]. The 2026 rates are A$31.30, A$31.50 and A$32.00 per engaged hour across the prescribed vehicle tiers [E1]. That structure prices different modes while leaving workers responsible for the vehicle costs attached to operating as contractors [E1][E4]. The reconciliation period can smooth strong and weak individual jobs, but it does not turn time outside an engagement into payable engaged time [E1].",
+    "The order also requires platform-provided accident insurance, adding a protection around delivery work without converting covered workers into employees [E1][E4]. The Fair Work framework describes these workers as contractors with additional rights and protections, which is the legal architecture behind the order [E4]. They can receive minimum standards while contractor status and worker-borne operating costs remain part of the arrangement [E1][E4]. The result is a statutory floor attached to a defined slice of contractor work, with insurance layered alongside it [E1][E4].",
+    "Uber Eats and DoorDash supported the final order, and Uber Eats said publicly that it was working to ensure a seamless transition to the new standards [E2][E3]. The Transport Workers’ Union has presented the measure as a safety-net rate of at least A$31.30 per hour [E5]. That description captures the floor while the operative order supplies the narrower denominator that determines which hours count [E1][E5]. Implementation therefore begins from an unusually important distinction between the published rate and the amount of a logged-on session that qualifies for it [E1].",
+    "The counter-case is substantial. An engaged-time standard can pay for accepted-job delays and impose a real minimum across the covered earnings period, while preserving the contractor model that the regulatory regime expressly contemplates [E1][E4]. Platforms can also respond through dispatch, job design and operating practices in ways that increase the share of working time spent on engagements; the order itself supplies no utilization data with which to assume the opposite [E1]. A$31.30 therefore should neither be dismissed as cosmetic nor advertised as proof that every logged-on hour will produce A$31.30 [E1].",
+    "Commencement is scheduled for 17 August [E2]. Uber Eats’ statement points toward implementation, though a company statement cannot settle whether every platform is ready [E3]. The first useful evidence after Monday will be the pay records and top-ups the order requires [E1].",
+    "That leaves the denominator as the central market fact. Parliament’s regulatory machinery can impose a rate, an earnings-period test and accident protection while leaving the number of qualifying minutes to the stream of jobs a platform offers and a worker accepts [E1][E4]. Without observed utilization, no defensible full-session wage can be calculated from the statutory figures alone [E1]. The law can print A$31.30 on an engaged hour; dispatch decides how many minutes carry it [E1]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Lowest 2026 engaged-hour floor",
+      "value": "A$31.30",
+      "dir": "flat"
+    },
+    {
+      "label": "Middle vehicle tier",
+      "value": "A$31.50",
+      "dir": "flat"
+    },
+    {
+      "label": "Highest vehicle tier",
+      "value": "A$32.00",
+      "dir": "flat"
+    },
+    {
+      "label": "Maximum earnings period",
+      "value": "21 days",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Fair Work Commission final order",
+      "fragment": "accepts an engagement",
+      "as_of": "2026-08-11",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.fwc.gov.au/documents/sites/ms2024-1/ms2024-3-order-mso-11-08-2026.pdf",
+        "retrieved_at": "2026-08-13T00:35:56Z"
+      }
+    },
+    {
+      "source": "Fair Work Commission decision",
+      "fragment": "will take effect from 17 August 2026",
+      "as_of": "2026-08-11",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.fwc.gov.au/documents/sites/ms2024-1/2026fwcfb211.pdf",
+        "retrieved_at": "2026-08-13T00:36:00Z"
+      }
+    },
+    {
+      "source": "Uber Eats Australia",
+      "fragment": "ensure a seamless transition to the new standards",
+      "as_of": "2026-08-11",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.uber.com/au/en/newsroom/delivery-minimumstandardsorder/",
+        "retrieved_at": "2026-08-13T00:36:02Z"
+      }
+    },
+    {
+      "source": "Fair Work Ombudsman",
+      "fragment": "contractors with additional rights and protections",
+      "as_of": "2026-08-12",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.fairwork.gov.au/find-help-for/independent-contractors/regulated-workers/employee-like-workers",
+        "retrieved_at": "2026-08-13T00:36:08Z"
+      }
+    },
+    {
+      "source": "Transport Workers’ Union",
+      "fragment": "a safety net rate of at least $31.30 per hour",
+      "as_of": "2026-07-08",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.twu.com.au/press/food-delivery-workers-to-get-world-first-minimum-standards-on-pay-and-conditions-from-august/",
+        "retrieved_at": "2026-08-13T00:36:14Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ]
+}
