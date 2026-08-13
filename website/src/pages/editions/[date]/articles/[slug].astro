@@ -2,6 +2,7 @@
 import '../../../../styles/page-article.css';
 import Newspaper from '../../../../layouts/Newspaper.astro';
 import AsciiArt     from '../../../../components/article/AsciiArt.astro';
+import GlyphArt     from '../../../../components/GlyphArt.astro';
 import MapGlyph     from '../../../../components/MapGlyph.astro';
 import BackLink     from '../../../../components/article/BackLink.astro';
 import Confidence   from '../../../../components/article/Confidence.astro';
@@ -42,6 +43,8 @@ const backLabel  = isTape ? 'The Tape' : 'The Front Page';
 
 const mapArt = article.art?.kind === 'map' ? article.art : null;
 const artMap = mapArt ? loadMap(date, mapArt.map) : null;
+// Purpose-built motion scenes earn an article stage; stock glyphs stay in compositions.
+const motionArt = article.art?.kind === 'ascii' && article.art.roll === 'eclipse' ? article.art : null;
 const previousCoverage = (article.previous_coverage ?? []).map((item) => ({
   ...item,
   article: loadArticle(item.date, item.slug),
@@ -143,6 +146,12 @@ const articleMeta = {
       </div>
     )}
 
+    {motionArt && (
+      <div class="article-glyph">
+        <GlyphArt shape={motionArt.shape} roll={motionArt.roll} scale={motionArt.scale} caption={motionArt.caption} />
+      </div>
+    )}
+
     {conf && (
       <Confidence
         label={conf.label}
@@ -213,6 +222,11 @@ const articleMeta = {
     margin: 22px auto 30px;
     --map-font-max: 9px;
   }
+  .article-glyph {
+    width: min(600px, 100%);
+    height: 290px;
+    margin: 20px auto 30px;
+  }
   .previous-coverage {
     margin: 16px 0 22px;
     padding: 10px 0;
@@ -248,6 +262,7 @@ const articleMeta = {
     text-transform: uppercase;
   }
   @media (max-width: 640px) {
+    .article-glyph { height: 250px; margin: 14px auto 24px; }
     .previous-coverage { grid-template-columns: 1fr; gap: 7px; }
     .previous-links { display: grid; }
   }

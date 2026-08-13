@@ -15,17 +15,17 @@ import missileAscii from '../data/glyphart-missile.txt?raw';
 import droneAscii from '../data/glyphart-drone.txt?raw';
 import chipAscii from '../data/glyphart-chip.txt?raw';
 import campfireAscii from '../data/glyphart-campfire.txt?raw';
-// Animated "roll" glyphs compile from a committed 3D model at BUILD time
-// (src/models/*.glb → glyphcss compileScene), then cycle with a pure-CSS
-// steps() film-strip (zero JS). The model is the source of truth — nothing is
-// pre-baked or committed as output, same pattern as MapGlyph/WorldGlyph.
+// Animated glyphs compile at BUILD time, then cycle with a pure-CSS steps()
+// film-strip (zero JS). Rolls use committed 3D models; the eclipse is a shared
+// glyphcss scene whose depth buffer resolves the Moon crossing the Sun.
 import { bakeRoll } from '../lib/glyphRoll.ts';
+import { bakeEclipse } from '../lib/glyphEclipse.ts';
 import { join } from 'node:path';
 
 interface Props {
-  shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip' | 'campfire';
-  /** When set, render an animated rotating glyph instead of a static shape. */
-  roll?: 'chip';
+  shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip' | 'campfire' | 'eclipse';
+  /** When set, render an animated glyph instead of a static shape. */
+  roll?: 'chip' | 'eclipse';
   scale?: number;
   caption?: string;
 }
@@ -35,7 +35,9 @@ const ROLLS: Record<string, { model: string; opts: Parameters<typeof bakeRoll>[1
   chip: { model: 'small-microchip.glb', opts: { rotX: 48, frames: 60, zoom: 9, cols: 60, rows: 26, dur: 3, alternate: true, arc: [-28, 28] } },
 };
 const cfg = roll ? ROLLS[roll] : null;
-const r = cfg ? await bakeRoll(join(process.cwd(), 'src/models', cfg.model), cfg.opts) : null;
+const r = roll === 'eclipse'
+  ? await bakeEclipse()
+  : cfg ? await bakeRoll(join(process.cwd(), 'src/models', cfg.model), cfg.opts) : null;
 let rollHtml = '', rRows = 0, rCols = 0, rFrames = 0, rScroll = 0;
 const rAlt = !!(r && r.alternate);   // ping-pong (rock) vs continuous loop (spin)
 const rDur = (r && r.dur) || 9;      // seconds for one full rotation (frame-count-independent)
@@ -59,7 +61,7 @@ const cols = Math.max(...lines.map((l) => l.length));
 const rows = lines.length;
 ---
 {r ? (
-<figure class={`glyphart glyphart-roll${rAlt ? ' glyphart-rock' : ''}`} style={`--cols:${rCols};--rows:${rRows};--frames:${rFrames};--scroll:${rScroll};--dur:${rDur};--glyph-scale:${scale};`}>
+<figure class={`glyphart glyphart-roll glyphart-${roll}${rAlt ? ' glyphart-rock' : ''}`} style={`--cols:${rCols};--rows:${rRows};--frames:${rFrames};--scroll:${rScroll};--dur:${rDur};--glyph-scale:${scale};`}>
   <div class="glyphart-stage"><Fragment set:html={rollHtml} /></div>
   <figcaption class="glyphart-caption">
     {caption && <span class="glyphart-name">{caption}</span>}
@@ -156,6 +158,17 @@ const rows = lines.length;
     animation: glyphart-roll calc(var(--dur, 9) * 1s) steps(var(--frames)) infinite;
   }
   .glyphart-roll :global(.glyph-output span) { color: inherit; }
+  .glyphart-eclipse :global(.glyph-output .glyph-eclipse-sun) { color: var(--accent); }
+  .glyphart-eclipse :global(.glyph-output .glyph-eclipse-moon) { color: #14110e; }
+  .glyphart-eclipse :global(.glyph-output .glyph-eclipse-corona-faint) { color: color-mix(in srgb, var(--accent) 28%, transparent); }
+  .glyphart-eclipse :global(.glyph-output .glyph-eclipse-corona-mid) { color: color-mix(in srgb, var(--accent) 52%, transparent); }
+  .glyphart-eclipse :global(.glyph-output .glyph-eclipse-corona-strong) { color: color-mix(in srgb, var(--accent) 78%, transparent); }
+  @media (max-width: 879px) {
+    .glyphart-roll.glyphart-eclipse .glyphart-stage { container-type: size; }
+    .glyphart-roll.glyphart-eclipse :global(.glyph-roll) {
+      font-size: min(calc(92cqw * var(--glyph-scale) / (var(--cols) * 0.6)), calc(100cqh * var(--glyph-scale) / (var(--rows) + 1)));
+    }
+  }
   @keyframes glyphart-roll { to { transform: translateY(calc(var(--scroll) * -1em)); } }
   /* Rock glyphs ping-pong the arc (flat objects can't spin a full circle cleanly).
      Keep the steps() timing from the base rule — only reverse each cycle. Setting
@@ -167,4 +180,10 @@ const rows = lines.length;
     }
   }
   :global([data-theme="light"]) .glyphart-roll :global(.glyph-output) { font-weight: 700; }
+  @media (prefers-reduced-motion: reduce) {
+    .glyphart-eclipse :global(.glyph-output) {
+      animation-play-state: paused;
+      animation-delay: -3.3s;
+    }
+  }
 </style>

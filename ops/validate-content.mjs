@@ -16,6 +16,7 @@ const BLOCKS = new Set([
 ]);
 
 const EPISTEMIC = new Set(['fact', 'inference', 'forecast']);
+const GLYPH_ROLLS = new Set(['chip', 'eclipse']);
 const OUTCOMES = new Set(['hit', 'miss', 'open']);
 const KEYNUM_DIRS = new Set(['up', 'down', 'flat']);
 
@@ -217,6 +218,8 @@ for (const { date, dir: edDir, desk } of scopes) {
       if (a.art.kind === 'ascii') {
         // Either raw ascii text, or a glyph shape name rendered by GlyphArt.
         if (!isStr(a.art.ascii) && !isStr(a.art.shape)) err(file, 'art.ascii or art.shape (glyph) is required');
+        if (a.art.roll !== undefined && !GLYPH_ROLLS.has(a.art.roll)) err(file, `unknown art.roll "${a.art.roll}"`);
+        if (a.art.roll === 'eclipse' && a.art.shape !== 'eclipse') err(file, 'art.roll "eclipse" requires art.shape "eclipse"');
       } else if (a.art.kind === 'map') {
         if (!mapSlugs.has(a.art.map)) err(file, `art.map references missing map "${a.art.map}"`);
         if (a.art.hero_map !== undefined && !mapSlugs.has(a.art.hero_map))
