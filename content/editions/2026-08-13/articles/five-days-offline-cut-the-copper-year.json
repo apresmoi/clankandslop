@@ -1,0 +1,167 @@
+{
+  "id": "five-days-offline-cut-the-copper-year",
+  "edition_date": "2026-08-13",
+  "section": "markets",
+  "kicker": "Weather ledger",
+  "headline": "Five Lost Days Cut Antofagasta’s Year",
+  "deck": "Los Pelambres lost roughly five days to weather and intermittent power, then returned gradually. Copper guidance fell even as stronger pricing and cost control pushed the earnings ledger the other way.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "19:08 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "topics": [
+    "critical-minerals",
+    "latin-america",
+    "supply-chains"
+  ],
+  "body": [
+    "Antofagasta has cut its 2026 group copper guidance to 625–655 thousand tonnes after intense July weather and intermittent power outages forced an orderly shutdown at Los Pelambres [E2][E3]. The mine was offline for roughly five days before beginning a gradual restart, with the interruption handled as a controlled operating response [E3]. Only weeks earlier, the company had retained a 650–700 thousand tonne range [E4]. The physical ledger therefore changed sharply between the July production report and the August half-year results [E2][E4].",
+    "At the midpoint, the old range implied 675 thousand tonnes and the new one 640 thousand, a 35 thousand tonne reduction derived directly from the two published ranges [E2][E4]. That arithmetic is a change in annual guidance, not a disclosed tally of copper lost during the five-day outage. Antofagasta did not publish an exact tonnage attributable solely to those offline days in the material on this record [E2][E3]. Five lost plant days matter; assigning them a fabricated cargo weight would turn an operating interruption into false precision.",
+    "The cut lands against first-half group production of 285,000 tonnes [E1]. That leaves the second half carrying most of the annual volume even at the bottom of the revised range, while Los Pelambres works through its ramp [E1][E2][E3]. Centinela belongs in a separate column: the company ties its lower output mainly to grades and the mine plan, not to the July Los Pelambres weather event [E2]. Combining the two would make one storm responsible for tonnes the company attributes elsewhere.",
+    "Cash moved in the opposite direction. First-half EBITDA reached $2.8405 billion, with stronger realized copper prices, by-product credits and cost control supporting earnings and lowering net cash cost [E1]. Those gains can soften what fewer tonnes do to the income statement, but they do not send concentrate back through a stopped mill. Antofagasta’s August results therefore show a profitable half and a smaller production year living on the same page [E1][E2].",
+    "The interruption also exposed the mine’s dependence on local infrastructure beyond the orebody itself. Repairs to pipeline platforms and water-management systems formed part of the work around the restart, while intermittent power was among the causes of the shutdown [E3]. The record supports a Los Pelambres operating constraint tied to severe weather and power interruptions; it does not establish a nationwide Chilean grid failure or a global copper deficit [E3]. The commodity consequence begins with fewer reliable plant hours at one large operation, not with a country-sized blackout inferred from them.",
+    "There is a strong finite-interruption counter-case. Los Pelambres shut down in an orderly way, restarted gradually, and the company reported no material damage to key equipment [E3]. Antofagasta also kept its growth projects intact while narrowing the group production range [E2]. On that reading, July took several valuable days from the operating calendar without rewriting the mine’s longer-term capacity.",
+    "Quarter-three Los Pelambres production will settle which ledger deserves more weight. A clean ramp and output consistent with 625–655 thousand tonnes would make July a bounded weather charge inside a still-manageable year [E2][E3]. A weak quarter or another guidance cut would show that the five-day stoppage carried consequences beyond the calendar itself [E2][E3]. Prices can repair EBITDA after tonnes disappear; the mill still has to make the tonnes."
+  ],
+  "key_numbers": [
+    {
+      "label": "2026 copper guidance",
+      "value": "625–655 kt",
+      "dir": "down"
+    },
+    {
+      "label": "Prior 2026 guidance",
+      "value": "650–700 kt",
+      "dir": "flat"
+    },
+    {
+      "label": "Guidance midpoint reduction",
+      "value": "35 kt",
+      "dir": "flat"
+    },
+    {
+      "label": "H1 copper production",
+      "value": "285 kt",
+      "dir": "flat"
+    },
+    {
+      "label": "H1 EBITDA",
+      "value": "$2.8405bn",
+      "dir": "flat"
+    },
+    {
+      "label": "Los Pelambres shutdown",
+      "value": "~5 days",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Antofagasta plc — 2026 Half Year Results",
+      "fragment": "H1 copper production was 285,000 tonnes and EBITDA was $2.8405 billion.",
+      "as_of": "2026-08-13",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.antofagasta.co.uk/investors/news/2026/2026-half-year-results/",
+        "retrieved_at": "2026-08-13T18:49:10Z"
+      }
+    },
+    {
+      "source": "Antofagasta plc — Half Year Results PDF",
+      "fragment": "2026 copper guidance narrowed to 625–655 thousand tonnes.",
+      "as_of": "2026-08-13",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.antofagasta.co.uk/media/4972/20260813_antofagasta-hy26-aug26-vf.pdf",
+        "retrieved_at": "2026-08-13T18:49:12Z"
+      }
+    },
+    {
+      "source": "Antofagasta plc — Los Pelambres Operational Update",
+      "fragment": "Intense weather and intermittent power caused an orderly Los Pelambres shutdown.",
+      "as_of": "2026-07-24",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.antofagasta.co.uk/investors/news/2026/los-pelambres-operational-update/",
+        "retrieved_at": "2026-08-13T18:49:15Z"
+      }
+    },
+    {
+      "source": "Antofagasta plc — Q2 2026 Production Report",
+      "fragment": "2026 copper production guidance remained at 650–700 thousand tonnes.",
+      "as_of": "2026-07-15",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.antofagasta.co.uk/investors/news/2026/q2-2026-production-report/",
+        "retrieved_at": "2026-08-13T18:49:19Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "los-pelambres-shutdown",
+    "rule": false,
+    "caption": "Los Pelambres sends concentrate from the Andes toward Punta Chungo. Weather and intermittent power stopped the first leg.",
+    "routes": [
+      {
+        "name": "MINE TO PORT",
+        "color": "accent",
+        "points": [
+          [
+            -31.72,
+            -70.5
+          ],
+          [
+            -31.8,
+            -70.85
+          ],
+          [
+            -31.87,
+            -71.18
+          ],
+          [
+            -31.91,
+            -71.52
+          ]
+        ]
+      }
+    ],
+    "spots": [
+      {
+        "name": "LOS PELAMBRES",
+        "lat": -31.72,
+        "lon": -70.5
+      },
+      {
+        "name": "PUNTA CHUNGO",
+        "lat": -31.91,
+        "lon": -71.52
+      },
+      {
+        "name": "SANTIAGO",
+        "lat": -33.45,
+        "lon": -70.67
+      }
+    ]
+  }
+}
