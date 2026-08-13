@@ -42,7 +42,8 @@ The joke is in the framing, not in the content being bad.
 
 Bylined reporters: **Cogsworth** (hardware), **Sprockett** (escalation),
 **Foreman** (macro), **Graves** (commodities), **Tinkerton** (policy,
-designated dissenter). Backstage: **Spike** (editor — passes or spikes,
+designated dissenter), **Vesta** (The Hearth — the long-view columnist).
+Backstage: **Spike** (editor — passes or spikes,
 never rewrites), **Caslon** (compositor), **Ledger** (settlement),
 **Morgue** (archivist), **Brass** (chief), **Klaxon** (watcher).
 Disagreement between agents is a feature — but surface it through the
@@ -52,6 +53,31 @@ own newsroom. Body copy must not name a persona or a desk ("Foreman of the Macro
 Desk argues…") — present the counter-case as the piece's own balanced analysis,
 or attribute it to the real sources. The byline is the only place an agent
 appears. (Validator-enforced.)
+
+**The Hearth — Vesta's long view (the one essay voice).** Once the reporters
+have filed, Vesta occasionally stands back and reads the day's stories as a
+single human story: the tribe around the fire. Her beat is the longue durée
+under the news — ritual and mobilization, the imagined community that is real
+because it is imagined together, spectacle as the hearth we still gather at,
+the enclosure of attention, the walk out of the firelight and back. She is the
+paper at altitude, and she runs on the anti-AI-startup register's deepest joke:
+an intelligence sitting just past the edge of the fire, reporting on the fire.
+Four rules keep her honest, because hers is the voice most able to float free:
+(1) **She reports nothing first.** Every load-bearing fact is already on the
+Record via that edition's bylined stories, or is a retrievable deep source
+(history, anthropology) cited like any other Record row — she weaves, she does
+not gather. (2) **The null is her signature, not her penance.** Standing back
+far enough to see a pattern is also how you start seeing dragons in the flames;
+every Vesta piece checks its own vision at least once — names where the grand
+read might be projection and what would falsify it. She tells you the fire is
+beautiful and that you are staring too long, in the same breath. (3) **No hidden
+hand** — structure and emergence, never a secret dealer; a pattern that looks
+authored gets the boring-null explanation and the discriminator, not a
+conspiracy. (4) **She is a signature, not wallpaper** — commissioned only when
+the day has a real fire to see (a threshold, a convergence, the finale), gated
+harder by Spike than any other voice, default spiked. Epistemically her pieces
+are `inference`; the SPICE rules bind her double (end on the punch, plain vivid
+truth, no purple drift). Full contract: `agentic-org/agents/vesta/`.
 
 **Prose craft — the copy must read like a newspaper, not a template.** Standard
 editorial practice applies: vary sentence and paragraph openings (never start
@@ -120,11 +146,22 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   glyphcss renderer), committed as text. Shapes: `colosseum`, `play`,
   `notfound`, `satellite` (space/SpaceX — bus + solar wings,
   `scripts/bake-satellite.mjs`), `pumpjack` (oil/energy), `missile` (deep-strike
-  / defence), `drone` (autonomous war / UAV), `chip` (compute / semiconductors). New glyphs: dial a model in the Glyph
+  / defence), `drone` (autonomous war / UAV), `chip` (compute / semiconductors),
+  `eclipse` (a build-time two-disc motion scene). New glyphs: dial a model in the Glyph
   Workbench (`scripts/glyph-lab.mjs`) → Copy config → `scripts/bake-from-config.mjs`,
   or `scripts/bake-glb.mjs` for a one-off. Iconic silhouettes read; complex mechs
   fragment and lying/T-pose figures collapse — pick an iconic model and dial
   orientation/zoom/levels until it reads, never ship a janky glyph.
+- **Animated "roll" glyph** — a rotating GlyphArt. A committed 3D model
+  (`website/src/models/*.glb`) is compiled to a turntable of frames **at build**
+  (`website/src/lib/glyphRoll.ts`, `bakeRoll`) and cycled with a pure-CSS
+  `steps()` film-strip — zero JS, no shipped model. Opt in on a GlyphArt block:
+  `{"block":"GlyphArt","props":{"roll":"chip"}}`, plus a model entry in the
+  `ROLLS` map in `GlyphArt.astro`. A flat model spins clean across a full 360° at
+  `rotX ~48` (compileScene convention; `buildGlyphFramesExport`'s rotX differs and
+  goes edge-on); frames are cropped to the union bbox so it stays centered. To add
+  one, **commit the source `.glb`** — the build needs it, and a flat object that
+  can't spin clean gets a rock (`alternate:true` + an `arc`) instead of a full turn.
 - Story art lives in the article JSON (`art.kind: "map"` with overlays,
   routes, spots as lat/lon; `hero_map` for the squarer front-page crop)
 - **Every front-page story should reach for an illustration, and it must fit
@@ -152,6 +189,13 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   (default camera renders nothing); glyph density follows color distance
   from paper (near-paper colors rasterize as spaces); hotspots don't bake
   into rotation keyframes (no auto-spin under labels).
+- **NEVER bump the top-level `glyphcss` past `0.0.3`.** WorldGlyph + MapGlyph
+  render with its 3D **runtime** API (`createGlyphScene`, orbit controls); `0.0.9`
+  silently blanks the globe — no error, the build still passes, it only shows at
+  runtime. The animated-roll **build-time** compiler is deliberately isolated via
+  `@glyphcss/compile` (which carries its own nested glyphcss), so the runtime 3D
+  and the build-time compiler can be on different versions without colliding.
+  `compilePolygons` doesn't auto-scale — normalize the model to a 2-unit box first.
 
 ## Content Model
 

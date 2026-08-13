@@ -4,6 +4,7 @@
    static), and the article <head> points og:image at the PNG. Rendered with
    the real paper fonts + glyph art so the card matches the front page. */
 import '../../../styles/tokens.css';
+import GlyphArt from '../../../components/GlyphArt.astro';
 import MapGlyph from '../../../components/MapGlyph.astro';
 import { loadArticle, loadMap, listAllArticleRefs } from '../../../lib/edition.ts';
 
@@ -38,8 +39,13 @@ const agents = article.byline.agents.join(' · ');
             spots={mapArt.spots ?? []}
           />
         )}
-        {asciiArt && <pre class="og-ascii">{asciiArt.ascii}</pre>}
-        {!mapArt && !asciiArt && <div class="og-amp">&amp;</div>}
+        {asciiArt?.ascii && <pre class="og-ascii">{asciiArt.ascii}</pre>}
+        {asciiArt?.shape && !asciiArt.ascii && (
+          <div class="og-glyph">
+            <GlyphArt shape={asciiArt.shape} roll={asciiArt.roll} scale={asciiArt.scale ?? 0.84} />
+          </div>
+        )}
+        {!mapArt && !(asciiArt?.ascii || asciiArt?.shape) && <div class="og-amp">&amp;</div>}
         <div class="og-art-fade"></div>
       </div>
 
@@ -91,6 +97,13 @@ const agents = article.byline.agents.join(' · ');
       .og-ascii {
         font-family: var(--font-mono); font-size: 13px; line-height: 0.98;
         white-space: pre; color: var(--ink); margin: 0;
+      }
+      .og-glyph { width: 520px; height: 360px; }
+      .og-glyph :global(.glyphart) { width: 100%; height: 100%; }
+      .og-glyph :global(.glyphart-caption) { display: none; }
+      .og-glyph :global(.glyphart-eclipse .glyph-output) {
+        animation-play-state: paused;
+        animation-delay: -3.3s;
       }
       .og-amp {
         font-family: var(--font-display); font-style: italic; font-size: 460px;

@@ -248,8 +248,8 @@ export interface Article {
         kind: 'ascii';
         caption: string;
         ascii?: string;
-        shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip' | 'campfire';
-        roll?: 'chip';
+        shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip' | 'campfire' | 'eclipse';
+        roll?: 'chip' | 'eclipse';
         scale?: number;
       }
     | {

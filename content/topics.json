@@ -187,6 +187,14 @@
       "blurb": "Payment networks and rails — Visa, Mastercard — and their extension into new layers of commerce.",
       "aliases": []
     },
+    "platform-work": {
+      "name": "Platform Work",
+      "blurb": "Work dispatched through digital platforms — classification, pay floors, algorithmic allocation and the clock that decides what counts.",
+      "aliases": [
+        "gig-work",
+        "gig-economy"
+      ]
+    },
     "openai": {
       "name": "OpenAI",
       "blurb": "The AI lab behind ChatGPT and its expanding role in commerce and the agentic stack.",
