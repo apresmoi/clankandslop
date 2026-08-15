@@ -12,7 +12,7 @@
       standalone map-desk panels. */
 import type { RegionMap } from '../lib/edition.ts';
 
-interface Spot { name: string; lat: number; lon: number; }
+interface Spot { name: string; lat: number; lon: number; label_side?: 'left' | 'right'; }
 interface Overlay { name?: string; color?: 'red' | 'accent' | 'green'; ring: Array<[number, number]>; }
 interface Route { name?: string; color?: 'red' | 'accent' | 'green'; points: Array<[number, number]>; }
 interface Props {
@@ -97,7 +97,7 @@ let locatorHtml = '';
 let locatorCorner = 'br';
 let locatorFootprintStyle = '';
 let legend: Array<{ color: string; glyph: string; label: string }> = [];
-let printSpots: Array<{ name: string; leftPct: number; topPct: number }> = [];
+let printSpots: Array<{ name: string; leftPct: number; topPct: number; labelSide: 'left' | 'right' }> = [];
 
 if (!interactive) {
   type Cell = { ch: string; cls: string };
@@ -143,7 +143,7 @@ if (!interactive) {
     const [r, c] = toCell(s.lat, s.lon);
     const ri = Math.floor(r), ci = Math.floor(c);
     if (grid[ri]?.[ci]) grid[ri][ci] = { ch: '◉', cls: 's' };
-    printSpots.push({ name: s.name, leftPct: (c / m.cols) * 100, topPct: (r / m.rows) * 100 });
+    printSpots.push({ name: s.name, leftPct: (c / m.cols) * 100, topPct: (r / m.rows) * 100, labelSide: s.label_side ?? 'right' });
   }
 
   // Merge adjacent same-class cells into one span per run.
@@ -251,7 +251,7 @@ if (!interactive) {
     <div class="mapglyph-print" style={`--map-cols: ${m.cols};`}>
       <pre set:html={printHtml} />
       {printSpots.map((s) => (
-        <span class="mg-label" style={`left: ${s.leftPct}%; top: ${s.topPct}%;`}>{s.name}</span>
+        <span class:list={['mg-label', `side-${s.labelSide}`]} style={`left: ${s.leftPct}%; top: ${s.topPct}%;`}>{s.name}</span>
       ))}
       {locatorHtml && (
         <div class={`mapglyph-locator loc-${locatorCorner}`} aria-hidden="true" title="Where in the world">
@@ -555,6 +555,9 @@ if (!interactive) {
     background: var(--paper);
     padding: 0 4px;
     border: 1px solid var(--hairline);
+  }
+  .mg-label.side-left {
+    transform: translate(calc(-100% - 8px), -50%);
   }
 
   /* ── Desk path ── */

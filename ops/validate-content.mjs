@@ -303,6 +303,7 @@ for (const { date, dir: edDir, desk } of scopes) {
 
   // pages
   const pagesDir = resolve(edDir, 'pages');
+  const pageFeatureRefs = new Map();
   for (const f of ls(pagesDir).filter((f) => f.endsWith('.json'))) {
     const file = rel(resolve(pagesDir, f));
     const p = readJson(resolve(pagesDir, f));
@@ -315,9 +316,32 @@ for (const { date, dir: edDir, desk } of scopes) {
       if (!Array.isArray(p[slot])) { err(file, `missing ${slot} array`); continue; }
       p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { date, articleSlugs, mapSlugs, articleMapArts }));
     }
+    pageFeatureRefs.set(p.page, collectFeatureArticleRefs([...(p.head ?? []), ...(p.flow ?? [])]));
     if (date >= '2026-07-30' && p.page === 'front')
       checkIllustratedRuns(file, p.head);
   }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date) && date >= '2026-08-14') {
+    const frontRefs = pageFeatureRefs.get('front') ?? new Set();
+    const tapeRefs = pageFeatureRefs.get('tape') ?? new Set();
+    const repeated = [...frontRefs].filter((slug) => tapeRefs.has(slug));
+    if (repeated.length > 0)
+      err(rel(resolve(pagesDir, 'tape.json')), `front and tape repeat featured article(s): ${repeated.join(', ')} — assign each story to one page`);
+  }
+}
+
+function collectFeatureArticleRefs(blocks, refs = new Set()) {
+  for (const block of blocks ?? []) {
+    if (block?.block === 'Grid') {
+      for (const column of block.props?.columns ?? []) collectFeatureArticleRefs(column, refs);
+      continue;
+    }
+    if (block?.block === 'Hero' && isStr(block.props?.lead)) refs.add(block.props.lead);
+    if (block?.block === 'Teaser' && isStr(block.props?.article)) refs.add(block.props.article);
+    if (block?.block === 'SplitVote') {
+      for (const key of ['lead', 'splitWith']) if (isStr(block.props?.[key])) refs.add(block.props[key]);
+    }
+  }
+  return refs;
 }
 
 function illustratedStorySide(block) {

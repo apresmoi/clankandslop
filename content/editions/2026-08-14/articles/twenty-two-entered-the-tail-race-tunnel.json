@@ -1,0 +1,207 @@
+{
+  "id": "twenty-two-entered-the-tail-race-tunnel",
+  "edition_date": "2026-08-14",
+  "section": "world",
+  "kicker": "Chamoli roster",
+  "headline": "Twenty-Two Entered the Tail-Race Tunnel",
+  "deck": "At the Vishnugad–Pipalkoti hydropower project in Chamoli, Uttarakhand, water and debris entered a tail-race tunnel with 22 HCC workers inside. The ledger now reads 19 extracted, 12 alive, seven dead and three missing.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "00:08 UTC",
+  "revision": 1,
+  "next_update_utc": "13:30",
+  "topics": [
+    "natural-disasters",
+    "supply-chains"
+  ],
+  "body": [
+    "At the Vishnugad–Pipalkoti hydropower project in Chamoli, Uttarakhand, the tail-race tunnel held 22 HCC workers when water and debris entered. Nineteen have been extracted: 12 alive and seven dead, with three still missing [E1][E2][E3]. Early reports describing “19 rescued” were counting people extracted or recovered from the tunnel, including the seven who died [E2][E3]. PTI described the 12 survivors as injured, although the Record does not establish a separate hospitalized count [E4].",
+    "THDCIL said water and debris entered at about 18:20 IST around Chainage 1440, Face-II, while the crew was carrying out concrete lining around Chainage 1230 [E1]. The subtraction is 210 chainage metres, an underground stationing difference along the tunnel alignment [E1]. It is not a surveyed straight-line separation and says nothing by itself about the surface point above either work location. Chainage can locate the problem inside the works; it cannot close the hydraulic path that brought water and debris there.",
+    "The tail-race tunnel had already achieved breakthrough in February, when THDCIL described it as 3.1 kilometres long [E6]. That matters because the trapped crew was working on lining inside an excavated passage, not driving the final metres of an unopened bore [E1][E6]. The tunnel’s job is to return diverted project water to the Alaknanda River, placing the accident inside a hydraulic structure whose eventual operating purpose is to carry water [E7]. None of those facts identifies where this particular ingress originated.",
+    "Rescue conditions supplied the physical constraints: continuing inflow or seepage, deep water, sludge, poor visibility and low oxygen complicated movement and pumping inside the tunnel [E5]. One operational account put the water-filled stretch at approximately 900 metres [E5]. That figure describes the rescue environment reported during the operation, not a surveyed geometry of the failure. Pumps could lower water where they reached it; they could not explain why the tunnel was filling.",
+    "The engineering wording that can safely carry the story is water-and-debris ingress or inrush, because that is what THDCIL described at Chainage 1440 [E1]. Calling the event a structural tunnel collapse would go beyond that engineering statement. An early cavity or connection to a surface landslide remains a hypothesis until a survey, scan, borehole, tracer test or as-built section closes the route between surface water and the tunnel. The decisive artifact is therefore still missing: evidence that traces the hydraulic path rather than merely describing its underground result.",
+    "Older geological concern gives investigators a question, not an answer. Reporting on the project has cited warnings that rocks around Vishnugad–Pipalkoti are weak [E8]. Weak rock can matter to support, seepage and water pathways, but the accident record supplied here does not tie that general condition to a specific failed lining section, cavity or negligent design choice. A fair counter-case remains that an unexpected water pathway developed despite an otherwise intact tunnel, a proposition that only the inquiry and physical investigation can test.",
+    "Responsibility follows another ledger: THDCIL is the project developer, while the workers identified at the lining face were employed through HCC, the principal executing agency named for the works [E1]. The inquiry therefore has to reconcile contractor operations with the owner’s engineering records, including monitoring, lining progress and any evidence that maps Chainage 1440 to the ground above. Until that evidence closes the hydraulic circuit, negligence remains unproved and the rescue arithmetic remains brutally complete [E1][E2][E3]. Twenty-two entered the tunnel; 12 came out alive, seven came out dead, and three were still beyond the reach of the completed ledger [E2][E3]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Workers inside",
+      "value": "22",
+      "dir": "flat"
+    },
+    {
+      "label": "Workers extracted",
+      "value": "19",
+      "dir": "flat"
+    },
+    {
+      "label": "Survivors",
+      "value": "12",
+      "dir": "flat"
+    },
+    {
+      "label": "Dead",
+      "value": "7",
+      "dir": "flat"
+    },
+    {
+      "label": "Still missing",
+      "value": "3",
+      "dir": "flat"
+    },
+    {
+      "label": "Chainage difference",
+      "value": "210 m",
+      "dir": "flat"
+    },
+    {
+      "label": "Tail-race tunnel length",
+      "value": "3.1 km",
+      "dir": "flat"
+    },
+    {
+      "label": "Reported water-filled stretch",
+      "value": "about 900 m",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "THDC India Limited on LinkedIn",
+      "fragment": "water and debris suddenly entered the tunnel at Chainage 1440 meters",
+      "as_of": "2026-08-14",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "social",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.linkedin.com/posts/thdc-india-limited-official_an-unfortunate-incident-occurred-in-the-tail-activity-7494022293778612224-wdb6",
+        "retrieved_at": "2026-08-14T22:45:07Z"
+      }
+    },
+    {
+      "source": "Associated Press",
+      "fragment": "12 have been rescued alive and another three are still missing",
+      "as_of": "2026-08-14",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://apnews.com/article/india-tunnel-collapse-hydropower-workers-rescue-chamoli-6ba136b3137fd828ef1837dede5a95a7",
+        "retrieved_at": "2026-08-14T22:45:09Z"
+      }
+    },
+    {
+      "source": "Indian Express",
+      "fragment": "Seven of those rescued had died",
+      "as_of": "2026-08-14",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://indianexpress.com/article/cities/lucknow/chamoli-hydroelectric-project-tunnel-accident-7-dead-rescue-underway-10833670/lite/",
+        "retrieved_at": "2026-08-14T22:45:10Z"
+      }
+    },
+    {
+      "source": "Eastern Mirror / PTI",
+      "fragment": "Of these, seven people were dead, and 12 others were injured.",
+      "as_of": "2026-08-14",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.easternmirrornagaland.com/uttarakhand-7-dead-in-chamoli-tunnel-tragedy-search-on-for-3-missing",
+        "retrieved_at": "2026-08-14T22:45:13Z"
+      }
+    },
+    {
+      "source": "ANI interview via Big News Network",
+      "fragment": "approximately 900 metres, which is filled with water",
+      "as_of": "2026-08-14",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.bignewsnetwork.com/news/279241919/deeply-saddened-by-tragic-loss-of-lives-at-tunnel-collapse-in-chamoli-rajnath-singh-prays-for-safe-rescue-of-trapped-workers",
+        "retrieved_at": "2026-08-14T22:45:15Z"
+      }
+    },
+    {
+      "source": "THDC India Limited on X",
+      "fragment": "breakthrough of the 3.1 km long Tail Race Tunnel",
+      "as_of": "2026-02-17",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "social",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/THDCIL_MOP/status/2023824139711377447",
+        "retrieved_at": "2026-08-14T22:45:17Z"
+      }
+    },
+    {
+      "source": "World Bank Inspection Panel",
+      "fragment": "tailrace tunnel that will return the diverted water to the Alaknanda River",
+      "as_of": "2014-06-19",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://documents1.worldbank.org/curated/en/735261468042286216/txt/891090INVR0P0900IPN0REQUEST0RQ12004.txt",
+        "retrieved_at": "2026-08-14T22:45:18Z"
+      }
+    },
+    {
+      "source": "Down To Earth",
+      "fragment": "rocks in the vicinity of the Vishnugad Pipalkoti area are weak",
+      "as_of": "2026-08-14",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.downtoearth.org.in/natural-disasters/another-tunnel-accident-in-uttarakhand-seven-workers-dead-search-continues-for-those-trapped-inside",
+        "retrieved_at": "2026-08-14T22:45:20Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "chamoli-tunnel-ingress",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "The scheme runs from Helang toward Haat and Birahi. Pipalkoti marks the approximate incident and rescue area, not a tunnel portal.",
+    "spots": [
+      {
+        "name": "HELANG",
+        "lat": 30.5139,
+        "lon": 79.4917
+      },
+      {
+        "name": "HAAT / PIPALKOTI",
+        "lat": 30.4254,
+        "lon": 79.423
+      },
+    {
+      "name": "BIRAHI",
+      "lat": 30.41,
+      "lon": 79.39,
+      "label_side": "left"
+      }
+    ]
+  }
+}
