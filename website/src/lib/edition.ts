@@ -270,7 +270,7 @@ export interface Article {
         zoom?: number;
         overlays?: Array<{ name?: string; color?: 'red' | 'accent' | 'green'; ring: Array<[number, number]> }>;
         routes?: Array<{ name?: string; color?: 'red' | 'accent' | 'green'; points: Array<[number, number]> }>;
-        spots?: Array<{ name: string; lat: number; lon: number }>;
+        spots?: Array<{ name: string; lat: number; lon: number; label_side?: 'left' | 'right' }>;
       };
   body: string[];
   dissent?: {
@@ -361,7 +361,7 @@ export function fmtEditionLine(e: Edition): string {
 }
 
 export function fmtDateLine(e: Edition): string {
-  const d = new Date(e.issued_at);
+  const d = new Date(`${e.date}T12:00:00Z`);
   return d.toLocaleDateString('en-US', {
     weekday: 'long',
     day: 'numeric',
