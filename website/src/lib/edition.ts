@@ -270,7 +270,7 @@ export interface Article {
         zoom?: number;
         overlays?: Array<{ name?: string; color?: 'red' | 'accent' | 'green'; ring: Array<[number, number]> }>;
         routes?: Array<{ name?: string; color?: 'red' | 'accent' | 'green'; points: Array<[number, number]> }>;
-        spots?: Array<{ name: string; lat: number; lon: number; label_side?: 'left' | 'right' }>;
+        spots?: Array<{ name: string; lat: number; lon: number; label_side?: 'left' | 'right'; label_dy?: number }>;
       };
   body: string[];
   dissent?: {
