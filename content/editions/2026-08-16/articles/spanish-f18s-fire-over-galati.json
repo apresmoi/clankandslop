@@ -1,0 +1,208 @@
+{
+  "id": "spanish-f18s-fire-over-galati",
+  "edition_date": "2026-08-16",
+  "section": "world",
+  "kicker": "Danube Tripwire",
+  "headline": "Spanish F-18s Fire Over Galați",
+  "deck": "A Spanish F-18 destroyed a drone 17 minutes after Romania detected it crossing from Moldova. The shoot-down is settled; the recovered wreckage still has to settle who operated it.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "01:05 UTC",
+  "revision": 1,
+  "next_update_utc": "14:00",
+  "topics": [
+    "europe-defense",
+    "ukraine",
+    "autonomous-weapons",
+    "defense-tech",
+    "grey-zone"
+  ],
+  "body": [
+    "At 01:44 UTC, Romanian surveillance detected an unmanned aircraft entering from Moldova about 24 kilometres north of Galați. Seventeen minutes later, at 02:01, a Spanish F-18 destroyed it over Romanian airspace [E1]. Those clocks define the threshold ladder: detection, interception, authorization and fire happened inside one short window, but they remain separate gates in the public record. NATO says two Spanish F-18s were flying an enhanced Air Defence mission when the drone was shot down [E3].",
+    "The Spanish pair were F-18Ms assigned to the eAP-72 detachment, and their account adds the next two gates. The fighters visually identified the unmanned aircraft, then one used air-to-air armament after neutralization had been authorized [E4]. The statement establishes that approval preceded the shot, but it does not publicly identify the authority that granted weapons release [E4]. It also describes the operating area more broadly around the Black Sea and Danube Delta, while Romania gives the sharper entry point north of Galați [E1][E4].",
+    "The public clocks do not line up cleanly. Moldova said it detected the Shahed 138/Geran 2 at about 01:31 UTC, traced it through Cotlovina and Etulia, and recorded it leaving Moldovan airspace near Slobozia Mare at about 01:49 UTC toward Romania [E5]. Romania, however, says it detected entry from Moldova at 01:44 UTC [E1]. The released accounts therefore overlap by about five minutes, and neither side published the radar track needed to reconcile them.",
+    "Romania has stronger evidence for the engagement itself. Search teams recovered drone fragments together with fragments of the interceptor missile between Băleni and Cudalbi [E2]. That physical recovery supports a real weapons engagement over Romanian territory and creates material that can be examined beyond the initial surveillance and cockpit observations. The public record still supplies no missile model, exact radar track, launch site or intended target [E1][E2][E4].",
+    "Attribution sits one threshold farther out. Moldova's type identification and reported route place a Shahed-family aircraft moving from Moldovan airspace toward Romania during the wider regional attack context [E5]. A NATO military spokesman said the drone “appears to be Russian” while the incident remained under investigation [E6]. NATO's own operational statement goes only as far as the enhanced Air Defence shoot-down and does not turn that assessment into a published finding about operator or launch origin [E3][E6].",
+    "A Russian operator is favored by the route, the Shahed-family type and NATO’s preliminary description, but type and route do not by themselves prove who operated the drone or where it was launched [E5][E6]. Accidental deviation or navigation failure are alternatives about its intended target, not its operator. A Romanian chain-of-custody or forensic finding may discriminate launch origin or operator [E2]; a complete track would instead discriminate route and intended-target claims.",
+    "The escalation threshold crossed on Sunday is already concrete: an allied fighter received authorization and fired an air-to-air weapon at an unmanned aircraft inside Romanian airspace [E1][E4]. NATO publicly classed the sortie under enhanced Air Defence, language that places the engagement inside an active defensive mission without disclosing the weapons-release chain [E3]. Romania now holds fragments of both the target and the interceptor in the Băleni–Cudalbi recovery area [E2]. The next threshold is no longer in the sky; it is in the recovered metal."
+  ],
+  "key_numbers": [
+    {
+      "label": "Detection-to-downing interval",
+      "value": "17 minutes",
+      "dir": "flat"
+    },
+    {
+      "label": "Spanish fighters",
+      "value": "2 F-18Ms",
+      "dir": "flat"
+    },
+    {
+      "label": "Fighter employing air-to-air armament",
+      "value": "1 F-18",
+      "dir": "flat"
+    },
+    {
+      "label": "Reported entry point",
+      "value": "≈24 km north of Galați",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Romanian Defence Ministry",
+      "fragment": "24 km north of Galați",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.mapn.ro/cpresa/19351_informa%C8%9Bie-de-presa",
+        "retrieved_at": "2026-08-17T00:31:27Z"
+      }
+    },
+    {
+      "source": "Romanian Defence Ministry recovery update",
+      "fragment": "between Băleni and Cudalbi",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.mapn.ro/cpresa/19355_update-%E2%80%93-informa%C8%9Bie-de-presa",
+        "retrieved_at": "2026-08-17T00:31:27Z"
+      }
+    },
+    {
+      "source": "NATO Allied Air Command",
+      "fragment": "enhanced Air Defence",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "social",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://x.com/NATO_AIRCOM/status/2088921990618837207",
+        "retrieved_at": "2026-08-17T00:28:24Z"
+      }
+    },
+    {
+      "source": "Spanish Joint Staff",
+      "fragment": "air-to-air armament",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://emad.defensa.gob.es/operaciones/operaciones-en-el-exterior/36_Persistent_Effort/36.4_Enhanced_Air_Policing/noticias/listado/260816-ni-DATPaznic-activacion.html",
+        "retrieved_at": "2026-08-17T00:31:27Z"
+      }
+    },
+    {
+      "source": "MOLDPRES / Moldovan Defence Ministry",
+      "fragment": "Shahed 138 (Geran 2)",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.moldpres.md/rom/societate/o-drona-de-tip-shahed-a-survolat-ilegal-spatiul-aerian-al-republicii-moldova",
+        "retrieved_at": "2026-08-17T00:31:27Z"
+      }
+    },
+    {
+      "source": "Politico Europe",
+      "fragment": "appears to be Russian",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.politico.eu/article/nato-fighter-jet-shoot-drone-romania/",
+        "retrieved_at": "2026-08-17T00:28:24Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "galati-air-corridor",
+    "hero_map": "galati-air-corridor",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Romania reported entry from Moldova north of Galați; Moldova named earlier route anchors. The line is schematic, not a radar track.",
+    "spots": [
+      {
+        "name": "KOGĂLNICEANU",
+        "lat": 44.36,
+        "lon": 28.49
+      },
+      {
+        "name": "ETULIA",
+        "lat": 45.53,
+        "lon": 28.44,
+        "label_side": "right",
+        "label_dy": 13
+      },
+      {
+        "name": "SLOBOZIA MARE",
+        "lat": 45.58,
+        "lon": 28.17,
+        "label_side": "left",
+        "label_dy": 0
+      },
+      {
+        "name": "ENTRY ≈24 KM N",
+        "lat": 45.65,
+        "lon": 28.03,
+        "label_side": "right",
+        "label_dy": -13
+      },
+      {
+        "name": "BĂLENI–CUDALBI",
+        "lat": 45.79,
+        "lon": 27.77,
+        "label_side": "left"
+      }
+    ],
+    "routes": [
+      {
+        "name": "REPORTED PATH",
+        "points": [
+          [
+            45.45,
+            28.56
+          ],
+          [
+            45.53,
+            28.44
+          ],
+          [
+            45.58,
+            28.17
+          ],
+          [
+            45.65,
+            28.03
+          ],
+          [
+            45.79,
+            27.77
+          ]
+        ]
+      }
+    ]
+  }
+}
