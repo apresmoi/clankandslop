@@ -1,0 +1,165 @@
+{
+  "id": "abuja-rain-strands-four-road-corridors",
+  "edition_date": "2026-08-16",
+  "section": "world",
+  "kicker": "Flood Ledger",
+  "headline": "Abuja’s Rain Strands Four Road Corridors",
+  "deck": "Resident videos fixed flooding at Gudu and Wuse 2, while wider contemporaneous reporting supplied Gaduwa–Durumi and Lokogoma. No agency had published a rainfall total, casualty count or citywide damage ledger by 16 August.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "01:14 UTC",
+  "revision": 1,
+  "next_update_utc": "15:30",
+  "topics": [
+    "natural-disasters"
+  ],
+  "body": [
+    "Four access points supplied the firmest physical ledger after rain fell across Abuja on 15 August: Wuse 2, Gudu, Gaduwa–Durumi and Lokogoma. On the Ebeano–Gudu road, resident video shows muddy water spread across the carriageway and bridge approach [E1]. In Wuse 2, landmarks in another video place multiple partly or fully submerged cars along the Adetokunbo Ademola axis [E2]. Wider reporting carried stranded residents and submerged vehicles at the other named locations as the images circulated through 16 August [E4].",
+    "Those observations establish flooded pieces of road, not a measured depth across Abuja. The Gudu clip records water over an approach; it does not provide a gauge, surveyed high-water mark or drainage-capacity measurement [E1]. The Wuse 2 material fixes vehicles in floodwater but supplies no defensible total for cars affected beyond the multiple vehicles visible there [E2]. Reports of stranded residents and submerged vehicles extend the access problem to Gaduwa–Durumi and Lokogoma without turning four local observations into a capital-wide inventory [E4].",
+    "Road access therefore has a stronger account than casualties. The available reporting describes residents stranded and vehicles submerged across the named areas, while no event-specific public ledger from FCT emergency authorities supplied a tally of deaths, injuries or rescues by 16 August [E4][E5]. Standing emergency advice again warned motorists about flood roads, but it did not amount to a site-by-site closure or response table for the 15 August event [E5]. The absence of that table leaves an important distinction intact: impassable local connectors are documented, while the human-loss denominator is not [E4][E5].",
+    "Rainfall sits in a separate account. NiMet had warned of rain and risk in flood-prone areas, giving residents an official hazard signal before or during the event [E3]. Its published material supplied no post-event Abuja station total by 16 August [E3]. Without that measured total, the videos can show where water accumulated but cannot establish how exceptional the storm was against local design assumptions or previous events [E1][E2][E3].",
+    "The same gap limits causal claims about the roads themselves. The clips do not identify a failed drain, blocked culvert, altered green area, defective contract or responsible official, and the available event ledger does not establish any of those mechanisms [E1][E2][E5]. Resident comparisons about the severity of the flooding can describe lived experience, but no municipal series published by 16 August provided a historical baseline against which to test them [E4][E5]. A visible pool can locate a failure of access for that hour; it cannot audit the pipework beneath it.",
+    "Localized or ordinary rainfall interacting with susceptible low points could overwhelm several roads without establishing a systemic citywide drainage failure [E3][E4]. Four corridors are too small a sample. A measured rainfall bulletin plus site-by-site drainage, closure and incident assessments remains the discriminator [E3][E5].",
+    "By 16 August, the physical record was ahead of the administrative one. Muddy water was fixed to the Ebeano–Gudu approach, submerged cars to Wuse 2, and stranded access or submerged vehicles to Gaduwa–Durumi and Lokogoma [E1][E2][E4]. No available agency artifact supplied the rainfall measurement, casualty tally or citywide incident denominator needed to scale those observations beyond their locations [E3][E5]. Abuja ended the record with four geolocated pools and no denominator for the capital around them."
+  ],
+  "key_numbers": [
+    {
+      "label": "Named flooded access points",
+      "value": "4",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Ebeano–Gudu resident video",
+      "fragment": "muddy water covering the Ebeano–Gudu road and bridge approach",
+      "as_of": "2026-08-15",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "social",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/OnyembiVinc/status/2088685936078880852",
+        "retrieved_at": "2026-08-17T00:28:24Z"
+      }
+    },
+    {
+      "source": "Wuse 2 video",
+      "fragment": "multiple partly or fully submerged cars on the Adetokunbo Ademola axis",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "social",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/emmaikumeh/status/2088899839157219524",
+        "retrieved_at": "2026-08-17T00:28:24Z"
+      }
+    },
+    {
+      "source": "NiMet outlook",
+      "fragment": "warned of rain and risk in flood-prone areas",
+      "as_of": "2026-08-15",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "social",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/nimetnigeria/status/2088686874017616351",
+        "retrieved_at": "2026-08-17T00:28:24Z"
+      }
+    },
+    {
+      "source": "TheCable",
+      "fragment": "stranded residents and submerged vehicles across the named Abuja locations",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.thecable.ng/residents-stranded-cars-submerged-as-flash-flood-hits-parts-of-abuja/",
+        "retrieved_at": "2026-08-17T00:28:24Z"
+      }
+    },
+    {
+      "source": "The Guardian Nigeria",
+      "fragment": "standing flood-road advice while the event-specific public ledger remained absent",
+      "as_of": "2026-08-16",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://guardian.ng/news/abuja-floods-how-green-areas-blocked-waterways-worsen-capitals-woes/",
+        "retrieved_at": "2026-08-17T00:28:24Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "abuja-flood-corridors",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Resident videos fixed four flooded access points. No agency had issued a citywide incident or rainfall ledger by 16 August.",
+    "spots": [
+      {
+        "name": "WUSE 2",
+        "lat": 9.077,
+        "lon": 7.476,
+        "label_side": "left",
+        "label_dy": -12
+      },
+      {
+        "name": "GUDU",
+        "lat": 9.011,
+        "lon": 7.486,
+        "label_dy": -3
+      },
+      {
+        "name": "GADUWA–DURUMI",
+        "lat": 8.997,
+        "lon": 7.434,
+        "label_side": "left",
+        "label_dy": 5
+      },
+      {
+        "name": "LOKOGOMA",
+        "lat": 8.986,
+        "lon": 7.455,
+        "label_dy": 15
+      }
+    ],
+    "routes": [
+      {
+        "name": "LOCAL CONNECTORS",
+        "points": [
+          [
+            9.077,
+            7.476
+          ],
+          [
+            9.011,
+            7.486
+          ],
+          [
+            8.997,
+            7.434
+          ],
+          [
+            8.986,
+            7.455
+          ]
+        ]
+      }
+    ]
+  }
+}
