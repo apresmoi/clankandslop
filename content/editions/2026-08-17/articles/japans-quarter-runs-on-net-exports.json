@@ -1,0 +1,112 @@
+{
+  "id": "japans-quarter-runs-on-net-exports",
+  "edition_date": "2026-08-17",
+  "section": "world",
+  "kicker": "Domestic drag",
+  "headline": "Japan’s Quarter Runs on Net Exports",
+  "deck": "Japan’s economy grew 0.3% in the second quarter, but net exports supplied 0.5 percentage point while domestic demand subtracted 0.2. Consumption was flat and business investment fell 1.2%.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "23:43 UTC",
+  "revision": 1,
+  "next_update_utc": "16:00",
+  "topics": [
+    "central-banks",
+    "rates",
+    "inflation"
+  ],
+  "body": [
+    "Japan’s real GDP rose 0.3% from the previous quarter in April–June, equivalent to a 1.1% annualized pace [E1]. The contribution table says more about the quarter than the headline rate: net exports added 0.5 percentage point while domestic demand subtracted 0.2 [E1][E2]. The positive sign therefore depended on the external account overcoming a domestic subtraction [E1]. It was Japan’s third consecutive quarter of real expansion, with considerably less help from spending at home than the headline alone suggests [E2].",
+    "The border contribution was built from two moving lines. Real exports of goods and services rose 0.5% quarter-on-quarter, while imports fell 1.5% [E1][E2]. Because net exports are calculated from exports less imports, weaker purchases from abroad mechanically enlarged their contribution to GDP [E1]. That makes the quarter’s 0.5-point external lift partly an import-compression story, with export growth positive but modest [E1][E2].",
+    "Households barely signed the attendance sheet. Private consumption rounded to a 0.0% decline in real terms, while household final consumption fell 0.1% [E1][E2]. Business investment was weaker still, dropping 1.2% from the first quarter [E1][E2]. Those entries are consistent with the broader domestic-demand line subtracting 0.2 percentage point from real growth [E1][E2].",
+    "Current-yen output presented a much larger number. Nominal GDP increased 1.2% quarter-on-quarter and reached roughly ¥687.7 trillion [E1][E2]. Real GDP’s 0.3% gain measures output after adjusting for price changes, so the nominal and real growth rates belong on separate lines of the ledger [E1]. The GDP deflator was 2.6% higher than a year earlier, another measure of the price component embedded in the larger nominal figure [E1][E2].",
+    "Three consecutive positive quarters establish a run of expansion, but the latest pace fell short of public expectations [E2][E3]. Analysts polled by Reuters had expected an annualized rate of about 2%, against the reported 1.1% [E3]. That forecast miss is context rather than part of the official national accounts [E1][E3]. These sources establish no material change in the Bank of Japan’s rate path from the GDP release itself [E1][E3].",
+    "The counter-case starts with the label on the release: these are first preliminary estimates [E1]. Later information can revise a quarter whose initial arithmetic currently assigns 0.5 percentage point to net exports and minus 0.2 to domestic demand [E1]. The external contribution is also reversible in ordinary arithmetic: an import rebound, absent a matching acceleration in exports, would narrow the net-export lift [E1]. One quarter driven partly by import compression therefore gives weaker evidence of self-sustaining domestic momentum than the positive headline alone [E1][E2].",
+    "The final contribution ledger is unusually clean. Real GDP printed at plus 0.3%, net exports supplied plus 0.5 percentage point, and domestic demand supplied minus 0.2 [E1][E2]. Consumption was effectively flat to slightly negative and business investment fell 1.2%, even as nominal GDP rose to about ¥687.7 trillion [E1][E2]. The 2.6% year-on-year deflator helps explain why the nominal column looks healthier than the real spending lines [E1][E2]. Households and business did not fund the headline; the border did [E1][E2]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Real GDP q/q",
+      "value": "+0.3%",
+      "dir": "up"
+    },
+    {
+      "label": "Real GDP annualized",
+      "value": "+1.1%",
+      "dir": "up"
+    },
+    {
+      "label": "Net-export contribution",
+      "value": "+0.5 pp",
+      "dir": "up"
+    },
+    {
+      "label": "Domestic-demand contribution",
+      "value": "-0.2 pp",
+      "dir": "down"
+    },
+    {
+      "label": "Business investment q/q",
+      "value": "-1.2%",
+      "dir": "down"
+    },
+    {
+      "label": "Nominal GDP q/q",
+      "value": "+1.2%",
+      "dir": "up"
+    },
+    {
+      "label": "GDP deflator y/y",
+      "value": "+2.6%",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Japan Cabinet Office Q2 estimate",
+      "fragment": "Quarterly Estimates of GDP for April - June 2026 (First Preliminary Estimates)",
+      "as_of": "2026-08-17",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.esri.cao.go.jp/en/sna/data/sokuhou/files/2026/qe262/pdf/gaiyou2621_e.pdf",
+        "retrieved_at": "2026-08-17T23:23:34Z"
+      }
+    },
+    {
+      "source": "Project Design",
+      "fragment": "外需が支え、内需は0.2ポイント押し下げ",
+      "as_of": "2026-08-17",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.projectdesign.jp/articles/news/fdbcd84f-28f0-4c99-b0be-3780ba739f77",
+        "retrieved_at": "2026-08-17T23:23:44Z"
+      }
+    },
+    {
+      "source": "The Japan Times",
+      "fragment": "Analysts polled by Reuters had projected that the annualized number would be about 2%",
+      "as_of": "2026-08-17",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.japantimes.co.jp/business/2026/08/17/economy/gdp-second-quarter/",
+        "retrieved_at": "2026-08-17T23:23:40Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3"
+  ]
+}
