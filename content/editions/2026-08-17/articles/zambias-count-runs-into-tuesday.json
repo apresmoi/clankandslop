@@ -1,0 +1,178 @@
+{
+  "id": "zambias-count-runs-into-tuesday",
+  "edition_date": "2026-08-17",
+  "section": "world",
+  "kicker": "National tally",
+  "headline": "Zambia’s Count Runs Into Tuesday",
+  "deck": "At 01:10 CAT, ECZ had announced 192 of 226 constituencies and no winner. Hichilema led by 969,245 votes while the government and opposition disputed an election-night raid without a public court record.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "23:31 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "constitutional-law"
+  ],
+  "body": [
+    "At 23:10 UTC on Monday, 01:10 CAT on Tuesday, ECZ had announced results from 192 of Zambia’s 226 constituencies and had not declared a winner [E1]. Hakainde Hichilema stood on 2,430,702 votes against Brian Mundubile’s 1,461,457, a provisional lead of 969,245 [E1]. About 3,958,620 valid votes had been recorded across those declared constituencies, leaving 34 constituencies outstanding [E1]. Those numbers belonged to the constituencies already announced; they were neither final certified national totals nor a final turnout figure [E1].",
+    "The national count had reached one threshold while its public interface remained at another. Constituency totals were being read from the National Totalling Centre and carried through local reporting, while ECZ’s official results portal still displayed zero of 226 constituencies [E1][E2]. A constituency reading, publication on the portal and a legal declaration of a winner are separate acts, and only the first of those was visibly advancing through the night [E1][E2]. Zambia therefore entered Tuesday with 192 constituencies spoken aloud and zero displayed on the official public screen [E1][E2].",
+    "That split followed a more serious interruption three days earlier. On 14 August, ECZ temporarily suspended the national counting process before counting resumed later the same day [E5]. SADC observers expressly recorded concern over the temporary suspension, even as the tally proceeded afterward [E5]. A resumed count clears the operational tripwire of a stoppage; it does not erase the confidence cost created when a national tally stops in the first place [E5].",
+    "Observer accounts place limits around what can be inferred from that interruption. The European Union described the election as competitive while identifying an uneven political and electoral environment, and observation missions described voting and counting as calm or transparent where they were able to watch them [E4][E5]. They also recorded concern around the suspension and reports of intimidation that remained unverified [E4][E5]. Their findings therefore leave an observed procedural record that was substantially orderly alongside structural complaints and allegations that had not crossed into verified proof [E4][E5].",
+    "Kabulonga introduced a different threshold: security action followed by competing claims about what the action meant. The government said 11 people were apprehended with weapons and linked them to an alleged insurrection plot [E3]. Mundubile called the account a fabrication and said the raid amounted to an attempt on his life [E3]. At 23:10 UTC, no public charge sheet, forensic inventory or court artifact had supplied a judicial record capable of settling those competing claims [E3].",
+    "The strongest counter-case to escalation is administrative lag and caution in a count that observers largely described as transparent where they watched it [E2][E4][E5]. An unsynchronised publishing layer can explain a portal sitting at zero while constituency readings continue from the totalling centre [E1][E2]. Nothing in the available evidence shows that the underlying tally was changed, and the observer accounts do not make that allegation [E4][E5]. The suspension, the delayed public interface and the unresolved security allegations still matter because each sits at a different point between procedural inconvenience and proof of interference [E2][E3][E5].",
+    "Thirty-four constituencies still stood between the announced arithmetic and the national endpoint at the freeze [E1]. Hichilema’s 969,245-vote lead was a large provisional margin, but arithmetic from 192 constituencies could not itself substitute for ECZ’s declaration [E1]. No winner had been declared, and the commission’s public results portal remained at zero of 226 [E1][E2]. Zambia crossed into Tuesday hearing constituency totals from the room while the official screen presented to the country still read zero [E1][E2]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Constituencies announced",
+      "value": "192 of 226",
+      "dir": "flat"
+    },
+    {
+      "label": "Hichilema provisional votes",
+      "value": "2,430,702",
+      "dir": "flat"
+    },
+    {
+      "label": "Mundubile provisional votes",
+      "value": "1,461,457",
+      "dir": "flat"
+    },
+    {
+      "label": "Hichilema provisional lead",
+      "value": "969,245",
+      "dir": "flat"
+    },
+    {
+      "label": "Constituencies outstanding",
+      "value": "34",
+      "dir": "flat"
+    },
+    {
+      "label": "Valid votes in declared constituencies",
+      "value": "about 3,958,620",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Zambia Monitor / ECZ tally",
+      "fragment": "192 out of the 226 constituencies",
+      "as_of": "2026-08-17",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.zambiamonitor.com/hichilema-leads-with-close-to-1-million-votes-as-ecz-releases-results-for-192-of-226-constituencies/",
+        "retrieved_at": "2026-08-17T23:19:07Z"
+      }
+    },
+    {
+      "source": "Electoral Commission results portal",
+      "fragment": "2026 ECZ Election Results",
+      "as_of": "2026-08-17",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://results.elections.org.zm/",
+        "retrieved_at": "2026-08-17T23:19:03Z"
+      }
+    },
+    {
+      "source": "BBC News",
+      "fragment": "11 opposition figures",
+      "as_of": "2026-08-17",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.bbc.co.uk/news/articles/cn0nj3ln8r5o",
+        "retrieved_at": "2026-08-17T23:19:11Z"
+      }
+    },
+    {
+      "source": "European Union Election Observation Mission",
+      "fragment": "competitive political and electoral process",
+      "as_of": "2026-08-15",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.eeas.europa.eu/sites/default/files/2026/documents/EU%20EOM%20Zambia%202026_Preliminary%20Statement%2015_8_FINAL_website2.pdf",
+        "retrieved_at": "2026-08-17T23:19:12Z"
+      }
+    },
+    {
+      "source": "SADC Electoral Observation Mission",
+      "fragment": "temporary suspension of counting",
+      "as_of": "2026-08-15",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.sadc.int/sites/default/files/2026-08/PRELIMINARY%20STATEMENT%20-%20SEOM%20ZAMBIA.pdf",
+        "retrieved_at": "2026-08-17T23:19:15Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "previous_coverage": [
+    {
+      "date": "2026-08-14",
+      "slug": "zambia-pauses-the-national-count"
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "zambia-count-after-pause",
+    "hero_map": "zambia-count-after-pause",
+    "tone": "soft",
+    "locator_context": "continental",
+    "rule": false,
+    "caption": "The national tally remained in Lusaka. Verified election-security incidents reached Kabulonga, Matero, Kalomo and Kasama.",
+    "spots": [
+      {
+        "name": "LUSAKA · TALLY",
+        "lat": -15.42,
+        "lon": 28.27,
+        "label_side": "left",
+        "label_dy": -12
+      },
+      {
+        "name": "KABULONGA · RAID",
+        "lat": -15.42,
+        "lon": 28.32,
+        "label_dy": 12
+      },
+      {
+        "name": "MATERO",
+        "lat": -15.34,
+        "lon": 28.26,
+        "label_side": "left",
+        "label_dy": 8
+      },
+      {
+        "name": "KALOMO",
+        "lat": -17.025,
+        "lon": 26.486
+      },
+      {
+        "name": "KASAMA",
+        "lat": -10.213,
+        "lon": 31.181
+      }
+    ]
+  }
+}
