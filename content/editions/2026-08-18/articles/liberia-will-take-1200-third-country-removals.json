@@ -1,0 +1,70 @@
+{
+  "id": "liberia-will-take-1200-third-country-removals",
+  "edition_date": "2026-08-18",
+  "section": "world",
+  "kicker": "Transfer notes",
+  "headline": "Liberia Will Take 1,200 Third-Country Removals",
+  "deck": "Monrovia’s information ministry said Liberia intends to accept up to 1,200 third-country nationals from the United States within a year. The first group of 20 is scheduled for 20 August. No dollar figure was published.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": ["Foreman"]
+  },
+  "timestamp": "23:48 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["us-immigration"],
+  "body": [
+    "Liberia’s Ministry of Information said on 18 August that the government intends to accept up to 1,200 persons transferred from the United States within a year [E1]. The people to be moved are third-country nationals, including citizens of African and Western Hemisphere countries who are medically authorized to travel [E1]. Some may wish to seek asylum in Liberia [E1]. The first batch of 20 is scheduled to arrive at Roberts International Airport on 20 August 2026 [E1].",
+    "The ministry framed the arrivals as guests, not as a criminal transfer. It said the people are not criminals and are not being prosecuted under United States or Liberian law, shall remain free to depart, and may apply for asylum under Liberian law if they want to stay [E1]. That language is Liberia’s public legal description of the cohort; it is not a U.S. immigration classification [E1]. Operating procedures that the 2025 exchange of notes requires before transfers may begin were still unpublished [E2][E3].",
+    "Money is the other unpublished column. The ministry said the transfer is not a transaction with a quid pro quo and that Liberia has not demanded or received any compensation or promise of reward [E1]. It will receive support to help manage the program and strengthen its migration system more broadly [E1]. No amount, instrument or security package accompanies that sentence [E1].",
+    "The underlying instrument is older than the 1,200 cap. The State Department’s Treaties series records an exchange of notes at Monrovia on 4 and 10 September 2025, in force from 10 September 2025, titled an agreement to cooperate in the examination of protection claims [E2][E3]. The U.S. proposes transfers in its complete discretion; Liberia accepts or declines in its complete discretion; unaccompanied minors are excluded; Liberia agrees not to return a transferred person until a final decision on any pending protection claim [E3]. Those notes contain no headcount and no payment schedule [E3].",
+    "No Department of Homeland Security or State Department statement confirming the 1,200 cap, the 18 August announcement or the 20 August flight was located in open sources at the freeze [E1][E2]. The Liberian text is therefore the only contemporaneous official number. Information Minister Jerolinmek Piah briefed reporters the same day in terms that match the ministry release [E1].",
+    "What remains off the page is the operating manual the 2025 notes say must be signed before any transfer [E3]. Nationalities of the first 20, per-person support, and a U.S. operational confirmation are likewise unpublished [E1][E2]. Liberia has named a cap, a first-flight date and a humanitarian register. The bilateral machinery that would make those three items an executed transfer is still a missing document [E1][E3]."
+  ],
+  "key_numbers": [
+    {"label": "Annual cap", "value": "1,200", "dir": "flat"},
+    {"label": "First scheduled group", "value": "20 on 20 Aug", "dir": "flat"},
+    {"label": "Published compensation", "value": "none", "dir": "flat"},
+    {"label": "Notes in force since", "value": "10 Sep 2025", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Liberia Ministry of Information",
+      "fragment": "accept up to 1,200 persons",
+      "as_of": "2026-08-18",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.micat.gov.lr/media/press-releases/liberia-announces-humanitarian-arrangement-united-states",
+        "retrieved_at": "2026-08-18T22:40:02Z"
+      }
+    },
+    {
+      "source": "U.S. Department of State",
+      "fragment": "Liberia (25-910)",
+      "as_of": "2026-03-01",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.state.gov/liberia-25-910",
+        "retrieved_at": "2026-08-18T22:40:02Z"
+      }
+    },
+    {
+      "source": "U.S. Department of State",
+      "fragment": "dignified, safe, and timely transfer",
+      "as_of": "2025-09-10",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.state.gov/wp-content/uploads/2026/03/64059-Liberia-Migration-and-Refugees.pdf",
+        "retrieved_at": "2026-08-18T22:40:02Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3"]
+}

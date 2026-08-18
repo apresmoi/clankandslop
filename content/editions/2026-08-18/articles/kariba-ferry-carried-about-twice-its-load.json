@@ -1,0 +1,84 @@
+{
+  "id": "kariba-ferry-carried-about-twice-its-load",
+  "edition_date": "2026-08-18",
+  "section": "world",
+  "kicker": "Inland waters",
+  "headline": "Kariba Ferry Carried About Twice Its Load",
+  "deck": "Zimbabwe police put the Lake Kariba death toll at 94 on 18 August. A post-cabinet government statement said the Mbuya Nehanda had about 180 passengers against a capacity of 90. No charge sheet had been filed.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": ["Graves"]
+  },
+  "timestamp": "23:46 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["natural-disasters", "shipping"],
+  "body": [
+    "The Zimbabwe Republic Police said on 18 August that the death toll from the 11 August Lake Kariba ferry sinking was now 94 [E1]. Search and recovery were still under way [E1]. Civil Protection and government statements put the number of people rescued at 77 [E2]. Those two figures describe recovered bodies and living survivors; they do not yet close a reconciled missing list [E1][E2].",
+    "The 18 August ledger is the load, not the first news of the wreck. A government statement after a cabinet meeting said the vessel had about 180 passengers and goods and had exceeded its carrying capacity [E2][E3]. Police statements from the week of the incident had put certified capacity at 90 passengers [E2][E3]. About 180 against 90 is the first clear official admission that the boat left at roughly double its stated limit [E2][E3].",
+    "Earlier partial counts sat lower. Ticket sales and Civil Protection figures circulated at about 114 adult passengers plus crew, with children under ticketing age uncounted [E3]. Local reconstructions put a higher onboard figure from recovered and rescued bodies before the cabinet statement [E3]. The 18 August government number supersedes those reconstructions as the official load admission [E2][E3].",
+    "The boat is the Mbuya Nehanda, operated by the Rural Infrastructure Development Agency, a government operator formerly under the District Development Fund [E3]. Local Government minister Daniel Garwe said the vessel held a valid fitness certificate from the Ministry of Transport and dismissed claims it was unfit [E2]. No inspection log, certificate date or survey extract was published with that assertion [E2].",
+    "Cabinet approved a full inquest into why the late captain sailed against Meteorological Services early warnings [E2]. Garwe attributed the wreck, in preliminary remarks, to human error and negligence by the captain, Sign Patsikadova, who died in the sinking [E2]. No surviving RIDA official, harbour controller or transport inspector had been charged by the freeze, and no licence suspension artifact had been issued [E1][E2].",
+    "The route ran from Kariba town to Chalala on the Zimbabwe side of the lake, with the capsize reported near Long Island [E2][E3]. A full passenger manifest was still unpublished, because tickets covered adults and children under ticketing age were never systematically counted [E3]. Until that manifest and the fitness certificate appear, the official story is a doubled load, a valid-certificate claim, and an inquest that has not yet named a living defendant [E1][E2][E3]."
+  ],
+  "key_numbers": [
+    {"label": "Deaths (ZRP, 18 Aug)", "value": "94", "dir": "up"},
+    {"label": "Rescued", "value": "77", "dir": "flat"},
+    {"label": "Official onboard figure", "value": "about 180", "dir": "flat"},
+    {"label": "Stated capacity", "value": "90", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Zimbabwe Republic Police",
+      "fragment": "The death toll is now 94",
+      "as_of": "2026-08-18",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "social",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/PoliceZimbabwe/status/2089744837331280167",
+        "retrieved_at": "2026-08-18T22:39:53Z"
+      }
+    },
+    {
+      "source": "BBC News",
+      "fragment": "about 180 passengers",
+      "as_of": "2026-08-18",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.bbc.co.uk/news/articles/cjwx58n1153o",
+        "retrieved_at": "2026-08-18T22:39:53Z"
+      }
+    },
+    {
+      "source": "BBC News",
+      "fragment": "exceeded its carrying capacity",
+      "as_of": "2026-08-18",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.bbc.co.uk/news/articles/cjwx58n1153o",
+        "retrieved_at": "2026-08-18T22:39:53Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3"],
+  "art": {
+    "kind": "map",
+    "map": "kariba-ferry",
+    "hero_map": "kariba-ferry",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Kariba town to Chalala. The cabinet statement put about 180 people on a boat certified for 90.",
+    "spots": [
+      {"name": "KARIBA TOWN", "lat": -16.52, "lon": 28.8, "label_side": "left"},
+      {"name": "LONG ISLAND", "lat": -16.58, "lon": 28.88},
+      {"name": "CHALALA", "lat": -16.72, "lon": 28.7, "label_dy": 10}
+    ]
+  }
+}
