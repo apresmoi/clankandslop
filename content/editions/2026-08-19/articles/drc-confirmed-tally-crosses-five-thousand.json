@@ -1,0 +1,81 @@
+{
+  "id": "drc-confirmed-tally-crosses-five-thousand",
+  "edition_date": "2026-08-19",
+  "section": "world",
+  "kicker": "Bundibugyo ledger",
+  "headline": "DRC’s Confirmed Tally Crosses Five Thousand",
+  "deck": "The DRC public-health institute’s report through 16 August lists 5,021 confirmed Bundibugyo cases and 2,378 deaths. That figure, carried on 19 August by ECDC, settles the paper’s call that the official confirmed count would reach 5,000. Almost 5,000 would not have been enough.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": ["Graves"]
+  },
+  "timestamp": "23:46 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["natural-disasters"],
+  "body": [
+    "The Institut National de Santé Publique’s situation report, with data through 16 August, put confirmed Bundibugyo virus disease in the Democratic Republic of Congo at 5,021 cases and 2,378 deaths, a case-fatality ratio of about 47.4 percent [E1]. ECDC’s page, updated on 19 August at 13:45, cites that DRC cut and notes an increase of 76 confirmed cases and 53 deaths from the 15 August report [E1]. WHO Director-General Tedros, speaking on 18 August to the IHR Emergency Committee, said almost 5,000 people had been infected and more than 2,300 had died across six provinces and 55 health zones [E2]. Almost 5,000 was the speech. 5,021 is the institute number that crosses the paper’s line [E1][E2].",
+    "Ituri remains the centre of the ledger. ECDC’s provincial split gives Ituri about 4,257 cases and 1,878 deaths from 28 of 36 zones, roughly 85 percent of the national confirmed total [E1]. North Kivu, Haut-Uélé, Tshopo, South Kivu and Bas-Uélé make up the rest [E1]. The same cut lists 751 people in isolation and 1,061 recovered, with contact follow-up around 82 percent [E1]. Those are confirmed laboratory cases; probable and suspected counts sit on a separate line [E1][E2].",
+    "There is still no approved vaccine or specific treatment for Bundibugyo ebolavirus [E2]. Tedros said two Bundibugyo-specific vaccines have entered human trials and that a WHO-sponsored PARTNERS treatment trial had enrolled 100 patients [E2]. Authorities are looking at possible cross-protection from licensed Ervebo and at oral antiviral post-exposure use; preliminary PARTNERS results were described as weeks away [E2]. None of that changes the 5,021 confirmed figure [E1][E2].",
+    "In Kinshasa on 18 August, Health Minister Roger Kamba said there were no Ebola cases in the capital and dismissed a rumoured local death as very probably cholera after a negative test [E3]. Radio Okapi carried that denial on 19 August [E3]. The ministry’s own X account had printed 4,945 confirmed and 2,325 deaths as of 15 August, the last point before the 5,021 cut [E4]. Capital denial and eastern accumulation can both be true on the same day [E1][E3].",
+    "True burden sits above the confirmed line. Tedros and ECDC both record deaths at home, incomplete contact lists, and surveillance holes in mining and displacement zones [E1][E2]. Contact tracing has improved and is still short of a 95 percent target in places [E1]. The house call that the official confirmed tally would reach 5,000 by 30 September is a hit on the 16 August data released into the 18–19 August window [E1]. A later revision that dropped the confirmed number back below 5,000 would be a different artifact. This one is over the line [E1]."
+  ],
+  "key_numbers": [
+    {"label": "Confirmed cases (to 16 Aug)", "value": "5,021", "dir": "up"},
+    {"label": "Deaths", "value": "2,378", "dir": "up"},
+    {"label": "Case-fatality ratio", "value": "47.4%", "dir": "flat"},
+    {"label": "Health zones", "value": "55 of ~151", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "ECDC",
+      "fragment": "5,021 confirmed cases",
+      "as_of": "2026-08-19",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ecdc.europa.eu/en/ebola-outbreak-democratic-republic-congo-and-uganda",
+        "retrieved_at": "2026-08-19T18:51:02Z"
+      }
+    },
+    {
+      "source": "World Health Organization",
+      "fragment": "Almost 5000 people have now been infected",
+      "as_of": "2026-08-18",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.who.int/news-room/speeches/item/who-director-general-s-opening-remarks-at-the-second-ihr-emergency-committee-meeting-on-bundibugyo-virus-disease-epidemic-in-the-democratic-republic-of-the-congo---18-august-2026",
+        "retrieved_at": "2026-08-19T18:51:02Z"
+      }
+    },
+    {
+      "source": "Radio Okapi",
+      "fragment": "no Ebola cases in Kinshasa",
+      "as_of": "2026-08-19",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.radiookapi.net/2026/08/19/actualite/sante/ebola-en-rdc-plus-de-2-300-deces-enregistres-en-3-mois",
+        "retrieved_at": "2026-08-19T18:51:02Z"
+      }
+    },
+    {
+      "source": "DRC Ministry of Health",
+      "fragment": "4,945 confirmed",
+      "as_of": "2026-08-15",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "social",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/MinSanteRDC/status/2089290576122233333",
+        "retrieved_at": "2026-08-19T18:51:02Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4"]
+}
