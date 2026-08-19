@@ -1,0 +1,83 @@
+{
+  "id": "moderna-melanoma-shot-clears-phase-3",
+  "edition_date": "2026-08-19",
+  "section": "world",
+  "kicker": "Adjuvant INT",
+  "headline": "Moderna’s Melanoma Shot Clears Phase 3",
+  "deck": "Merck and Moderna said the Phase 3 INTerpath-001 trial of intismeran autogene plus KEYTRUDA met recurrence-free survival and distant metastasis-free survival against KEYTRUDA alone in completely resected stage IIB-IV melanoma. Shares jumped on the readout. Full numbers were not in the topline.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": ["Foreman"]
+  },
+  "timestamp": "23:20 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["earnings"],
+  "body": [
+    "Merck and Moderna reported positive topline results on 19 August from INTerpath-001, a Phase 3 adjuvant trial of intismeran autogene plus KEYTRUDA in patients with completely resected stage IIB-IV melanoma [E1]. Intismeran autogene is the individualized mRNA neoantigen therapy also known as V940 or mRNA-4157, jointly developed by the two companies [E1]. The study met its primary endpoint of recurrence-free survival and a key secondary endpoint of distant metastasis-free survival compared with KEYTRUDA alone [E1]. KEYTRUDA monotherapy is the current standard in that adjuvant setting [E1].",
+    "Companies framed the result as a first: the first combination to beat KEYTRUDA alone on both RFS and DMFS in this adjuvant setting, and the first positive Phase 3 for an individualized neoantigen therapy and an mRNA cancer shot [E1][E2]. Those are claims about the trial’s place in the public record, not a regulator’s finding [E1]. The protocol is registered as NCT05933577 [E3].",
+    "Intismeran is built per patient. It encodes neoantigens sequenced from that person’s tumor and is given with pembrolizumab after surgery [E1][E3]. A Phase 2b study had already suggested a large cut in recurrence risk; INTerpath-001 is the confirmatory test in a larger adjuvant melanoma population [E1][E3]. Topline on 19 August does not include hazard ratios, absolute event counts, or a full safety table [E1]. Those details wait on a medical-meeting presentation and a journal paper [E1].",
+    "mRNA is no longer only a COVID franchise on this readout. Moderna’s COVID vaccine revenue has been the drag on the stock for two years; a positive Phase 3 in adjuvant melanoma is the first large oncology proof the platform can carry a different product [E1][E2]. Merck already sells KEYTRUDA into this setting, so the combination is an add-on to an incumbent [E1]. Whether payers will fund individualized manufacturing at scale is not answered by a topline RFS win [E1].",
+    "Tape reports treated the 6:45 a.m. Eastern release as a re-rating. Contemporaneous accounts said Moderna shares nearly doubled in the session, with Merck up as well [E2][E4]. Those prints are session colour, not a substitute for the endpoints [E1][E2]. No US approval, label, or launch date was attached to the announcement [E1].",
+    "What the companies have not shown is overall survival, a price, a manufacturing throughput number, or a filing timeline with FDA [E1]. A statistically significant RFS and DMFS result against the standard of care is the load-bearing fact of 19 August [E1]. Everything else, including how far the stock runs and whether other INTerpath tumour types follow, sits outside the topline [E1][E3]."
+  ],
+  "key_numbers": [
+    {"label": "Trial", "value": "INTerpath-001", "dir": "flat"},
+    {"label": "Primary endpoint", "value": "RFS met", "dir": "up"},
+    {"label": "Key secondary", "value": "DMFS met", "dir": "up"},
+    {"label": "Setting", "value": "resected IIB–IV", "dir": "flat"},
+    {"label": "MRNA session", "value": "nearly doubled", "dir": "up"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Merck",
+      "fragment": "met endpoints of Recurrence-Free Survival (RFS) and Distant Metastasis-Free Survival (DMFS)",
+      "as_of": "2026-08-19",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.merck.com/news/merck-and-moderna-announce-phase-3-interpath-001-trial-of-intismeran-autogene-plus-keytruda-met-endpoints-of-recurrence-free-survival-rfs-and-distant-metastasis-free-survival-dmfs-in-patient/",
+        "retrieved_at": "2026-08-19T21:52:43Z"
+      }
+    },
+    {
+      "source": "RTT News",
+      "fragment": "first positive Phase 3 readout for an individualized neoantigen therapy",
+      "as_of": "2026-08-19",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.rttnews.com/3682031/merck-moderna-phase-3-combo-shows-survival-benefits-in-melanoma-stock-up.aspx",
+        "retrieved_at": "2026-08-19T21:52:43Z"
+      }
+    },
+    {
+      "source": "ClinicalTrials.gov",
+      "fragment": "NCT05933577",
+      "as_of": "2026-08-19",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://clinicaltrials.gov/study/NCT05933577",
+        "retrieved_at": "2026-08-19T21:52:43Z"
+      }
+    },
+    {
+      "source": "CNBC",
+      "fragment": "stock nearly doubles on new cancer vaccine results",
+      "as_of": "2026-08-19",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.cnbc.com/video/2026/08/19/moderna-stock-nearly-doubles-on-new-cancer-vaccine-results.html",
+        "retrieved_at": "2026-08-19T21:52:43Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4"]
+}
