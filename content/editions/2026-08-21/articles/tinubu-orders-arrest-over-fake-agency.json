@@ -1,0 +1,69 @@
+{
+  "id": "tinubu-orders-arrest-over-fake-agency",
+  "edition_date": "2026-08-21",
+  "section": "world",
+  "kicker": "SGF premises",
+  "headline": "Tinubu Orders Arrest Over a Fake Agency",
+  "deck": "ICPC chair Musa Aliyu told State House correspondents that a National Brands Development and Made-in-Nigeria Special Project Office had been allocated space inside the SGF complex without presidential authorisation. The president ordered the promoter arrested and three permanent secretaries suspended.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": ["Tinkerton"]
+  },
+  "timestamp": "18:50 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["constitutional-law"],
+  "body": [
+    "President Bola Tinubu on Friday ordered the immediate arrest of Prince George Buchi Nwabueze after the Independent Corrupt Practices and Other Related Offences Commission told him another fictitious federal office was operating inside the Office of the Secretary to the Government of the Federation [E1]. ICPC chairman Musa Aliyu briefed State House correspondents after a second meeting with the president in two days [E1][E2]. The office carried the name National Brands Development and Made-in-Nigeria Special Project Office and, Aliyu said, had been illegally allocated space on OSGF premises without presidential authorisation [E1][E3].",
+    "Tinubu also suspended three permanent secretaries: M.S. Danjuma, Nadungu Gagare and Richard P. Pheelangwah [E1][E3]. Aliyu said the commission had engaged the SGF’s office for information on the fake unit and had identified suspected collaborators there [E1]. Nwabueze was described as the promoter and as operating under four other name variations, including George Nathan and Honourable George Buchi Nwabueze [E1]. ICPC said investigations continue [E1].",
+    "Friday’s briefing sits on a wider fake-agency file. Aliyu tied the find to the ongoing inquiry into the Presidential Foreign Intervention Promotion Council, whose self-styled director-general Adeniyi Adeyemi Matthew already faces forgery and impersonation charges [E1]. An ICPC interim report submitted on 6 August had named two further fictitious bodies, the FCT Investment Promotion Agency and the Foreign Investment Promotion Agency and Public-Private Partnership [E1]. Punch counted the Brands office as the fourth such unit uncovered since early April [E1].",
+    "The sequence is presidential direction, then a commission briefing, then named suspensions. On Wednesday the Federal Executive Council had already ordered a forensic look at processes after the PFIPC file [E1]. Thursday’s Villa meeting was Aliyu’s first of the two-day pair [E2]. Friday is the day the Brands office and the three permanent secretaries entered the public record [E1][E3].",
+    "What Aliyu did not publish is a charge sheet against the three secretaries, a payroll extract for the Brands office, or a list of bank accounts opened in its name [E1][E3]. Those documents, if they exist, have not been posted. The load-bearing facts of 21 August are the named office, the named promoter, the arrest order, and the three suspensions, all attributed to the ICPC chair at the Villa [E1][E3].",
+    "A fake letterhead in a real SGF courtyard is a control failure, not a rumour from the opposition [E1]. Whether the forensic audit of IPPIS and related systems follows through is a later clock [E1]. Friday’s record is the arrest order and the suspensions [E1][E3]."
+  ],
+  "key_numbers": [
+    {"label": "Perm secs suspended", "value": "3", "dir": "up"},
+    {"label": "Fake units in file", "value": "4", "dir": "up"},
+    {"label": "Villa briefings", "value": "2 days", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Punch",
+      "fragment": "illegally allocated office space within the premises of the OSGF",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://punchng.com/breaking-tinubu-orders-arrest-sacks-three-perm-secs-as-icpc-uncovers-new-fake-agency/",
+        "retrieved_at": "2026-08-21T18:44:50Z"
+      }
+    },
+    {
+      "source": "Punch",
+      "fragment": "Tinubu, ICPC chair in talks at Aso Rock",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://punchng.com/tinubu-icpc-chair-in-talks-at-aso-rock/",
+        "retrieved_at": "2026-08-21T18:44:50Z"
+      }
+    },
+    {
+      "source": "TVC News",
+      "fragment": "National Brands Development and Made in Nigeria Special Project Office",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.tvcnews.tv/breaking-icpc-uncovers-another-fake-agency-in-sgf-office/",
+        "retrieved_at": "2026-08-21T18:44:50Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3"]
+}
