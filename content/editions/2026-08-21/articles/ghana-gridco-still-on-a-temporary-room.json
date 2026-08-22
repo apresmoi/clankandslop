@@ -1,0 +1,108 @@
+{
+  "id": "ghana-gridco-still-on-a-temporary-room",
+  "edition_date": "2026-08-21",
+  "section": "world",
+  "kicker": "Akosombo bypass",
+  "headline": "GRIDCo Is Still on a Temporary Room",
+  "deck": "A 20 August fault on the Akosombo–Volta line tripped hydro and thermal plant and cut supply until 12:03. Energy minister John Jinapor tied the fragility to a temporary control arrangement after the 23 April fire. GRIDCo confirmed restoration on 21 August. There was no new Friday fault.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": ["Foreman"]
+  },
+  "timestamp": "19:00 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["supply-chains"],
+  "body": [
+    "GRIDCo said that at about 04:30 on Thursday 20 August a major fault on the Akosombo–Volta transmission line caused automatic tripping of Akosombo units and some thermal plants, and a loss of supply in parts of the country [E1]. Engineers isolated the line and began systematic restoration [E1]. Full supply to affected areas was restored by 12:03 the same day [E2]. A Friday 21 August GRIDCo note confirmed the mobilisation and thanked the public [E2]. No credible primary describes a second fault on Friday [E1][E2].",
+    "Thursday was the second major disturbance in under three weeks, after 29 July [E1]. The mechanism underneath is older. A 23 April fire wrecked the Akosombo switchyard control room. GRIDCo chose a temporary bypass rather than a six-month shutdown [E2][E3]. Jinapor, at a 20 August PURC event, said that under the temporary measure a frequency disturbance takes Akosombo off immediately to protect the system, and that a permanent control centre was expected next month [E2].",
+    "Ministry communications put a temporary switchyard and control facility at the end of September, with a lasting building 18 to 24 months out [E3]. That is a construction calendar, not a completed room [E3]. The 20 August line fault, on GRIDCo’s own telling, is what the protection system did; the minister’s gloss is why Akosombo comes off so fast when frequency moves [E1][E2].",
+    "Justice Ohene-Akoto of the Africa Sustainable Energy Centre, on TV3 on 21 August, said investment would not save the system without a technical cleanup and that GRIDCo was not telling the public something [E4]. He wants a root-cause paper, not only a restoration statement [E4][E5]. ASEC posted a 21 August call for a comprehensive report covering initiating events, cascades and lessons [E5]. GRIDCo had not published that analysis by the freeze [E1][E4].",
+    "The 21 August public record is therefore commentary and a restoration confirmation, not a new blackout [E2][E4]. The load-bearing claim is that Akosombo is still running through a temporary room four months after the fire, and that a line fault on Thursday showed how that room trips [E1][E2][E3].",
+    "Whether the September temporary facility actually enters service, and whether GRIDCo posts a root-cause note on the 20 August and 29 July events, are later clocks [E3][E5]. Friday’s facts are the restoration statement and the minister’s description of the bypass [E2][E3]."
+  ],
+  "key_numbers": [
+    {"label": "Fault", "value": "04:30 20 Aug", "dir": "flat"},
+    {"label": "Restored", "value": "12:03", "dir": "up"},
+    {"label": "April fire", "value": "23 Apr", "dir": "flat"},
+    {"label": "Temp room due", "value": "Sep", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Graphic Online",
+      "fragment": "major fault on the Akosombo–Volta transmission line",
+      "as_of": "2026-08-20",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.graphic.com.gh/news/general-news/gridco-on-why-there-is-a-second-nationwide-electric-power-outage.html",
+        "retrieved_at": "2026-08-21T18:47:06Z"
+      }
+    },
+    {
+      "source": "MyJoyOnline",
+      "fragment": "akosombo works will be completed next month",
+      "as_of": "2026-08-20",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.myjoyonline.com/jinapor-appeals-for-calm-after-nationwide-power-outage-says-akosombo-works-will-be-completed-next-month/",
+        "retrieved_at": "2026-08-21T18:47:06Z"
+      }
+    },
+    {
+      "source": "MyJoyOnline",
+      "fragment": "Temporary Akosombo power control facility to be ready by September",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.myjoyonline.com/temporary-akosombo-power-control-facility-to-be-ready-by-september-energy-ministry/",
+        "retrieved_at": "2026-08-21T18:47:06Z"
+      }
+    },
+    {
+      "source": "Citi Newsroom",
+      "fragment": "GRIDCo withholding critical information on power outages",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.citinewsroom.com/2026/08/gridco-withholding-critical-information-on-power-outages-energy-analyst/",
+        "retrieved_at": "2026-08-21T18:47:06Z"
+      }
+    },
+    {
+      "source": "TV3 Ghana",
+      "fragment": "Nationwide Power Outage",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://x.com/tv3_ghana/status/2090831222788276297",
+        "retrieved_at": "2026-08-21T18:47:06Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4", "E5"],
+  "art": {
+    "kind": "map",
+    "map": "ghana-akosombo",
+    "hero_map": "ghana-akosombo",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Akosombo to Volta. The April fire left a temporary control room; Thursday’s trip showed how it cuts.",
+    "spots": [
+      {"name": "AKOSOMBO", "lat": 6.3, "lon": 0.06},
+      {"name": "ACCRA", "lat": 5.56, "lon": -0.2, "label_side": "left"},
+      {"name": "TEMA", "lat": 5.67, "lon": 0.02}
+    ]
+  }
+}
