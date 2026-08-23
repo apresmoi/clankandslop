@@ -1,0 +1,81 @@
+{
+  "id": "panama-canal-cuts-daily-slots-to-thirty-four",
+  "edition_date": "2026-08-22",
+  "section": "world",
+  "kicker": "Advisory A-29-2026",
+  "headline": "Panama Canal Cuts Daily Slots to Thirty-Four",
+  "deck": "ACP Advisory A-29-2026 drops bookable transits to 34 a day for reservation dates from 4 September, then 32 from 15 September. Watershed rainfall is 34 percent below the historical average. In May the Authority had said it did not forecast transit restrictions through the end of 2026.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": ["Graves"]
+  },
+  "timestamp": "18:40 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["shipping", "latin-america", "natural-disasters"],
+  "body": [
+    "The Panama Canal Authority, in Advisory to Shipping A-29-2026 dated 20 August, cut the number of daily slots in the Transit Reservation System [E1][E2]. For booking dates beginning 4 September, Neopanamax locks go to nine daily slots and Panamax locks to twenty-five, a total of 34 [E2]. For booking dates beginning 15 September, Panamax locks fall to twenty-three and the daily total to 32 [E2]. A confirmed reservation, the advisory says, is the only mechanism that guarantees a transit date [E2].",
+    "The hydrology is in the same PDF. Cumulative rainfall across the Canal watershed in the current hydrological year, May through August, has been 34 percent below the historical average; watershed inflows are 44 percent below theirs [E2]. Draft reductions previously scheduled are postponed on the current level of Gatun Lake: 14.63 metres (48.0 feet) until 2 September, then 14.48 metres (47.5 feet) until 1 October [E2]. Water-saving measures already in place have not been enough to avoid the slot cut [E1][E2].",
+    "On 18 May the Authority had said current data did not forecast the need for transit restrictions through 31 December 2026, while maintaining 38 daily transits [E3]. A-29-2026 is the opposite instrument. It is a booking-system capacity limit, not a statement that the locks cannot physically move more ships [E2]. Vessels that arrive without a reservation face longer waits. The Authority keeps the right, under Notice N-07, to suspend all or part of the reservation system [E2]. A companion advisory, A-28-2026, regroups auction slots by cargo type [E4].",
+    "Queue lengths, auction clearing prices and diversions to Suez or the Cape are not in the ACP text [E2]. Secondary reports that average transits were already near 34 to 36 are not Authority claims in A-29 [E2]. What is established is the slot table, the rainfall deficit, the Gatun draft postponement, and the reversal of the May no-restriction line [E1][E2][E3].",
+    "Further cuts remain possible. The advisory says the Authority continues to monitor watershed conditions and may announce additional measures [E2]. Whether September’s realised daily transits stay at or below 33, and whether the 1 October draft cut actually lands, are later clocks [E2]. Saturday’s record is the published slot numbers [E1][E2]."
+  ],
+  "key_numbers": [
+    {"label": "Slots from 4 Sep", "value": "34/day", "dir": "down"},
+    {"label": "Slots from 15 Sep", "value": "32/day", "dir": "down"},
+    {"label": "Rainfall vs history", "value": "−34%", "dir": "down"},
+    {"label": "May stance", "value": "38/day", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Panama Canal Authority",
+      "fragment": "additional measures to address reduced precipitation in the Canal watershed",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://pancanal.com/en/panama-canal-adopts-additional-measures-to-address-reduced-precipitation-in-the-canal-watershed/",
+        "retrieved_at": "2026-08-22T20:58:22Z"
+      }
+    },
+    {
+      "source": "ACP Advisory A-29-2026",
+      "fragment": "Total 34",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://pancanal.com/wp-content/uploads/2026/08/ADV-29-2026-Additional-Measures-to-Address-Reduced-Precipitation-in-the-Canal-Watershed.pdf",
+        "retrieved_at": "2026-08-22T20:58:22Z"
+      }
+    },
+    {
+      "source": "Panama Canal Authority",
+      "fragment": "does not forecast the need for transit restrictions through December 31, 2026",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://pancanal.com/en/the-panama-canal-responds-to-the-risk-of-el-nino-with-foresight-and-maintains-operational-stability/",
+        "retrieved_at": "2026-08-22T20:58:22Z"
+      }
+    },
+    {
+      "source": "ACP Advisory A-28-2026",
+      "fragment": "Transit Reservation Booking System Rule modifications",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://pancanal.com/wp-content/uploads/2026/08/ADV-28-2026-Transit-Reservation-Booking-System-Rule-modifications.pdf",
+        "retrieved_at": "2026-08-22T20:58:22Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4"]
+}

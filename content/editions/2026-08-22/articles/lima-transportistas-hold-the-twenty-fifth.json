@@ -1,0 +1,116 @@
+{
+  "id": "lima-transportistas-hold-the-twenty-fifth",
+  "edition_date": "2026-08-22",
+  "section": "world",
+  "kicker": "Mininter split",
+  "headline": "Lima Transportistas Hold the Twenty-Fifth",
+  "deck": "Unión Gremial, the Coordinadora and ANITRA restated a 24-hour apagado de motores in Lima and Callao for Tuesday 25 August after a Saturday meeting at Mininter that they did not attend. CONET and Transportes Unidos met President Keiko Fujimori and said they will not join. No Mininter communiqué on the session was retrieved.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": ["Sprockett"]
+  },
+  "timestamp": "18:20 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["latin-america"],
+  "body": [
+    "Unión Gremial de Lima y Callao, the Coordinadora de Empresas de Transporte Urbano and ANITRA kept Tuesday 25 August as a 24-hour stoppage of urban service in Lima Metropolitana and Callao [E1][E2]. The original comunicado, circulating from 18 August, called the measure a peaceful apagado de motores and said it would lift if the executive granted an audiencia with verifiable results before that date [E3][E4]. Héctor Vargas Egas of the Coordinadora and Martín Valeriano of ANITRA said the callers were not in the Saturday room [E1].",
+    "Keiko Fujimori, interior minister César Astudillo, defence minister Rafael Belaúnde, transport minister Rafael Rey and PNP commander Óscar Arriola received CONET’s Julio Rau Rau and José Quispe of Transportes Unidos at Mininter in San Isidro from about 10:00 [E5]. Rau Rau told RPP the paro would not happen because his side was there; Quispe said his companies had never called a stoppage and would not acatar one [E6]. Valeriano’s line, to Infobae, was that the government had received gremios that were not convening the paro, and that the stoppage goes ahead unless the convocantes are received [E1].",
+    "The mechanism the callers name is daily cupos, sicariato and prison-phone coordination, not a fare dispute [E4][E7]. Plan Escudo, announced earlier in August, puts PNP and armed-forces patrols at patios and paraderos [E7]. Vargas has called that coverage more of the same [E4]. No gob.pe or PNP note on the 22 August meeting itself was retrieved; the named attendance and the split sit in on-the-record local coverage [E1][E5][E6].",
+    "Representation is the contested number. Callers cite more than 80 percent of regular urban service, in some accounts about 15,000 vehicles [E2]. CONET describes itself as nearly the whole sector [E6]. Both cannot be right. Partial adherence on Tuesday is the live possibility [E1][E6].",
+    "Whether Vargas and Valeriano actually shut motors on 25 August, and whether the executive expands Plan Escudo with a counted new coverage figure before then, are the next clocks [E1][E6]. Saturday’s facts are the meeting that excluded the convocantes, and the convocantes holding the date [E1][E5]."
+  ],
+  "key_numbers": [
+    {"label": "Paro date", "value": "25 Aug", "dir": "flat"},
+    {"label": "Claimed fleet", "value": "~15,000", "dir": "flat"},
+    {"label": "Mininter meeting", "value": "22 Aug 10:00", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Infobae",
+      "fragment": "El paro va sí o sí en caso que no seamos atendidos los convocantes",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.infobae.com/peru/2026/08/22/paro-de-transportista-del-25-de-agosto-continua-en-pie-keiko-fujimori-se-reunio-con-gremios-que-no-participaran-en-medida-de-fuerza/",
+        "retrieved_at": "2026-08-22T20:58:18Z"
+      }
+    },
+    {
+      "source": "Infobae",
+      "fragment": "15 mil vehículos paralizarán operaciones en Lima y Callao",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.infobae.com/peru/2026/08/19/paro-de-transportistas-martes-25-de-agosto-15-mil-vehiculos-paralizaran-operaciones-en-lima-y-callao/",
+        "retrieved_at": "2026-08-22T20:58:18Z"
+      }
+    },
+    {
+      "source": "Canal N",
+      "fragment": "anuncian paro 25 agosto",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://canaln.pe/actualidad/sector-transportistas-lima-anuncian-paro-25-agosto-n494323",
+        "retrieved_at": "2026-08-22T20:58:18Z"
+      }
+    },
+    {
+      "source": "Infobae",
+      "fragment": "ante nula comunicación con Keiko Fujimori",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.infobae.com/peru/2026/08/18/anuncian-paro-de-transportistas-para-el-martes-25-de-agosto-ante-nula-comunicacion-con-keiko-fujimori/",
+        "retrieved_at": "2026-08-22T20:58:18Z"
+      }
+    },
+    {
+      "source": "RPP",
+      "fragment": "Keiko Fujimori y ministros se reúnen con dirigentes de transportistas en la sede del Mininter",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://rpp.pe/politica/gobierno/keiko-fujimori-y-ministros-se-reunen-con-dirigentes-de-transportistas-en-la-sede-del-mininter-noticia-1703088",
+        "retrieved_at": "2026-08-22T20:58:18Z"
+      }
+    },
+    {
+      "source": "RPP",
+      "fragment": "Transportistas descartan acatar paro del 25 de agosto",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://rpp.pe/lima/actualidad/transportistas-descartan-acatar-paro-del-25-de-agosto-tras-reunion-con-el-ejecutivo-respaldamos-a-este-gobierno-noticia-1703113",
+        "retrieved_at": "2026-08-22T20:58:18Z"
+      }
+    },
+    {
+      "source": "La República",
+      "fragment": "exigen reunión con Keiko sobre el Plan Escudo",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://larepublica.pe/sociedad/2026/08/20/paro-de-transportistas-se-mantiene-para-el-25-de-agosto-exigen-reunion-con-keiko-sobre-el-plan-escudo-563300",
+        "retrieved_at": "2026-08-22T20:58:18Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]
+}
