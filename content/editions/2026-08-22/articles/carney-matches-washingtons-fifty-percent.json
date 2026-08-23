@@ -1,0 +1,177 @@
+{
+  "id": "carney-matches-washingtons-fifty-percent",
+  "edition_date": "2026-08-22",
+  "section": "world",
+  "kicker": "Section 338",
+  "headline": "Carney Matches Washington’s Fifty Percent",
+  "deck": "Three White House proclamations put an additional 50 percent duty on listed Canadian goods at 12:01 a.m. Eastern on 22 August. Mark Carney recalled Canada’s negotiators and said Ottawa will match the new tariffs dollar for dollar from Tuesday 8 September. No Gazette schedule was posted on Saturday.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": ["Foreman"]
+  },
+  "timestamp": "15:10 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["tariffs", "trade-policy"],
+  "body": [
+    "An additional 50 percent ad valorem duty on specified Canadian HTS lines entered force at 12:01 a.m. Eastern on 22 August, 04:01 UTC [E1]. The clock sits in a White House proclamation that postponed three July Section 338 measures by three days [E1]. Those original proclamations, 11046, 11047 and 11048, used alleged Canadian discrimination on alcoholic beverages, dairy and motor vehicles as the predicate; the operative baskets are the annex lines assigned to 9903.03.12, 9903.03.13 and 9903.03.14 [E2][E3][E4]. A White House fact sheet describes the covered goods as ranging from wine to hockey sticks to cement, and excludes energy, potash, Section 232 goods and certain fish and critical-mineral lines [E5].",
+    "Mark Carney, in remarks on 22 August, said he had directed Canada’s negotiators to return to Ottawa and that Canada would match Washington’s new tariffs dollar for dollar [E6]. The measures, he said, would come into force the Tuesday after Labour Day [E6]. Labour Day 2026 is Monday 7 September, which makes that Tuesday 8 September [E7]. A 21 August PMO statement had already said that at midnight the United States intended to impose a 50 percent tariff on roughly $28 billion of Canadian goods [E8]. That $28 billion is a Canadian official characterisation. It is not an aggregate printed in the three U.S. proclamations, and the PMO sentence does not label the currency [E8][E2].",
+    "Carney named prospective Canadian target sectors: steel, dairy, appliances, agricultural equipment, pulp and paper, and electronics [E6]. He then said the details would be released in the coming days [E6]. Finance Canada’s public counter-tariff product list and tariff-response hub, checked on 22 August, still showed the pre-existing regime [E9][E10]. No 22 August Canada Gazette order, CBSA customs notice or Finance implementing instrument for the new matching tranche was retrieved [E9][E10]. Dollar-for-dollar is a political commitment. It is not yet an executable customs instruction, and it does not establish that every new Canadian line will itself be 50 percent [E6][E9].",
+    "CPKC and IBEW agreed on 21 August to binding arbitration that ends a signal-and-communications strike, with workers expected back on 24 August [E11]. Unifor announced a tentative agreement with General Motors on 22 August and mentioned tariff uncertainty in the bargaining climate [E12]. Neither document is the mechanism of Saturday’s rupture. The CPKC release does not cite Section 338. Unifor’s talks began on 10 August and follow the Ford pattern [E11][E12].",
+    "Midnight and 12:01 a.m. are not the same clock. Carney said midnight; the controlling U.S. text is 12:01 a.m. Eastern [E1][E8]. How much covered merchandise actually cleared after 04:01 UTC, and how Ottawa will define dollar-for-dollar when the schedule appears, are later ledgers [E1][E6]. Saturday’s record is the duty in force on the U.S. side and a dated Canadian promise without a product list [E1][E6][E9]."
+  ],
+  "key_numbers": [
+    {"label": "US additional duty", "value": "50%", "dir": "up"},
+    {"label": "Effective", "value": "04:01 UTC", "dir": "flat"},
+    {"label": "PMO goods figure", "value": "$28bn", "dir": "flat"},
+    {"label": "Canada in force", "value": "8 Sep", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "White House",
+      "fragment": "shall be 12:01 a.m. eastern time on August 22, 2026",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.whitehouse.gov/presidential-actions/2026/08/temporary-suspension-of-additional-duties-to-offset-canadian-discrimination-against-the-commerce-of-the-united-states-with-respect-to-alcoholic-beverages-dairy-and-motor-vehicles/",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "White House",
+      "fragment": "imposing additional duties to offset Canadian discrimination with respect to alcoholic beverages",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.whitehouse.gov/presidential-actions/2026/07/imposing-additional-duties-to-offset-canadian-discrimination-against-the-commerce-of-the-united-states-with-respect-to-alcoholic-beverages/",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "White House",
+      "fragment": "imposing additional duties to offset Canadian discrimination with respect to dairy",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.whitehouse.gov/presidential-actions/2026/07/imposing-additional-duties-to-offset-canadian-discrimination-against-the-commerce-of-the-united-states-with-respect-to-dairy/",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "White House",
+      "fragment": "imposing additional duties to offset Canadian discrimination with respect to motor vehicles",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.whitehouse.gov/presidential-actions/2026/07/imposing-additional-duties-to-offset-canadian-discrimination-against-the-commerce-of-the-united-states-with-respect-to-motor-vehicles/",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "White House",
+      "fragment": "wine to hockey sticks to cement",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.whitehouse.gov/fact-sheets/2026/07/fact-sheet-president-donald-j-trump-imposes-additional-tariffs-on-canada/",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "Prime Minister of Canada",
+      "fragment": "match Washington’s new tariffs dollar for dollar",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.pm.gc.ca/en/news/speeches/2026/08/22/prime-minister-carney-delivers-remarks-canada-us-trade-negotiations",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "Government of Canada",
+      "fragment": "Labour Day",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/revenue-agency/services/tax/public-holidays.html",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "Prime Minister of Canada",
+      "fragment": "50% tariff on roughly $28 billion of Canadian goods",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.pm.gc.ca/en/news/statements/2026/08/21/statement-prime-minister-carney-canada-us-trade-negotiations",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "Finance Canada",
+      "fragment": "complete list of U.S. products subject to counter-tariffs",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/department-finance/programs/international-trade-finance-policy/canadas-response-us-tariffs/complete-list-us-products-subject-to-counter-tariffs.html",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "Finance Canada",
+      "fragment": "Canada’s tariff responses",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E10",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/department-finance/programs/international-trade-finance-policy/canadas-tariff-responses.html",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "CPKC",
+      "fragment": "agree to binding arbitration ending strike",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E11",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.prnewswire.com/news-releases/cpkc-and-ibew-agree-to-binding-arbitration-ending-strike-302857626.html",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    },
+    {
+      "source": "Unifor",
+      "fragment": "Unifor reaches tentative agreements with General Motors",
+      "as_of": "2026-08-22",
+      "source_note": {
+        "source_id": "E12",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.unifor.org/news/all-news/unifor-reaches-tentative-agreements-general-motors",
+        "retrieved_at": "2026-08-22T21:01:35Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12"]
+}
