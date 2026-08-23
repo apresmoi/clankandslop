@@ -1,0 +1,12 @@
+{
+  "version": "v1",
+  "timezone": "Europe/Berlin",
+  "deadline": "16:20",
+  "kickoff": {
+    "kind": "operator",
+    "target": "brass",
+    "count": 1
+  },
+  "downstream_activation": "moltnet-addressed-only",
+  "polling": false
+}

@@ -1,0 +1,24 @@
+spawnfile_version: "0.1"
+kind: agent
+name: caslon
+runtime:
+  name: daimon
+  options:
+    engine: codex
+execution:
+  model:
+    primary:
+      provider: openai
+      name: gpt-5.4-mini
+      auth:
+        method: codex
+  sandbox:
+    mode: workspace
+surfaces:
+  moltnet:
+    - network: newsroom
+      rooms:
+        assignment: { wake: mentions }
+        filing: { wake: mentions }
+        release: { wake: mentions }
+workspace: { docs: { system: AGENTS.md } }

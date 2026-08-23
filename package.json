@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "org:test": "node --test agentic-org/scripts/*.test.mjs",
+    "org:validate": "node agentic-org/scripts/validate-org.mjs",
+    "org:runtime": "node agentic-org/scripts/check-runtime.mjs"
+  },
   "devDependencies": {
     "gdal-async": "^3.12.3"
   }

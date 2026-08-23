@@ -1,0 +1,12 @@
+{
+  "version": "v1",
+  "timezone": "Europe/Berlin",
+  "deadline": "16:20",
+  "privateDirectories": ["sensor-ledger", "candidates", "evidence", "pinpoint", "dossiers", "compose", "decisions", "receipts"],
+  "requiredCapabilities": ["isolated-home", "isolated-xdg", "isolated-workspace", "cli-login", "research-broker", "private-root", "moltnet", "network-policy", "git-policy"],
+  "enginePolicy": {
+    "active": { "grok": 10, "codex": 6 },
+    "agy": { "hostAuthCheck": true, "linuxPortable": false, "status": "deferred-broker" }
+  },
+  "bannedPublicTerms": ["credential", "password", "browser_profile", "profile_path", "raw_html", "account_name"]
+}

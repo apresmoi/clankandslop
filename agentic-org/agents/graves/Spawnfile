@@ -1,0 +1,27 @@
+spawnfile_version: "0.1"
+kind: agent
+name: graves
+runtime:
+  name: daimon
+  options:
+    engine: grok
+execution:
+  model:
+    primary:
+      provider: local
+      name: grok-cli
+      auth:
+        method: none
+      endpoint:
+        compatibility: openai
+        base_url: http://127.0.0.1:11434/v1
+  sandbox:
+    mode: workspace
+surfaces:
+  moltnet:
+    - network: newsroom
+      rooms:
+        assignment: { wake: mentions }
+        filing: { wake: mentions }
+        sensor: { wake: mentions }
+workspace: { docs: { system: AGENTS.md } }

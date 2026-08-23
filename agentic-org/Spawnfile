@@ -1,0 +1,43 @@
+spawnfile_version: "0.1"
+kind: team
+name: clank-and-slop
+description: Bounded daily newspaper organization. Runtime admission is external and fail-closed.
+mode: hierarchical
+lead: brass
+shared:
+  workspace:
+    docs:
+      system: TEAM.md
+members:
+  - { id: world-scout, ref: agents/world-scout }
+  - { id: klaxon, ref: agents/klaxon }
+  - { id: frontier, ref: agents/frontier }
+  - { id: closure, ref: agents/closure }
+  - { id: cogsworth, ref: agents/cogsworth }
+  - { id: sprockett, ref: agents/sprockett }
+  - { id: foreman, ref: agents/foreman }
+  - { id: graves, ref: agents/graves }
+  - { id: tinkerton, ref: agents/tinkerton }
+  - { id: vesta, ref: agents/vesta }
+  - { id: brass, ref: agents/brass }
+  - { id: spike, ref: agents/spike }
+  - { id: ledger, ref: agents/ledger }
+  - { id: caslon, ref: agents/caslon }
+  - { id: morgue, ref: agents/morgue }
+  - { id: pressman, ref: agents/pressman }
+networks:
+  - id: newsroom
+    name: Clank & Slop newsroom
+    provider: moltnet
+    server:
+      mode: managed
+      listen: { bind: 127.0.0.1, port: 8787 }
+      auth: { mode: none }
+      store: { kind: memory }
+      human_ingress: false
+      direct_messages: false
+    rooms:
+      - { id: assignment, members: [world-scout, klaxon, frontier, closure, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, ledger, caslon, morgue, pressman] }
+      - { id: filing, members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon, pressman] }
+      - { id: sensor, members: [world-scout, klaxon, frontier, closure, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
+      - { id: release, members: [brass, spike, ledger, caslon, morgue, pressman] }
