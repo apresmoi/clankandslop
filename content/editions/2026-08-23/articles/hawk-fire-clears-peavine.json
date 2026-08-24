@@ -88,5 +88,19 @@
       }
     }
   ],
-  "refs": ["E1", "E2", "E3", "E4", "E5"]
+  "refs": ["E1", "E2", "E3", "E4", "E5"],
+  "art": {
+    "kind": "map",
+    "map": "nevada-peavine",
+    "hero_map": "nevada-peavine",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Peavine Peak, northwest of Somersett. Unified Command still had the fire uncontained.",
+    "spots": [
+      {"name": "PEAVINE", "lat": 39.59, "lon": -119.93},
+      {"name": "RENO", "lat": 39.53, "lon": -119.81},
+      {"name": "WASHOE", "lat": 39.47, "lon": -119.77}
+    ]
+  }
 }
