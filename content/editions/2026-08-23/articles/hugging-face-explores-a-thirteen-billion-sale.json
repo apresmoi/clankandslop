@@ -51,5 +51,12 @@
       }
     }
   ],
-  "refs": ["E1", "E2"]
+  "refs": ["E1", "E2"],
+  "art": {
+    "kind": "ascii",
+    "shape": "chip",
+    "roll": "chip",
+    "scale": 0.6,
+    "caption": "The hosting layer is for sale. No buyer is named. No deal is signed."
+  }
 }
