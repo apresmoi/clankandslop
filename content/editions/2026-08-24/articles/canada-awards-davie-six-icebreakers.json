@@ -1,0 +1,67 @@
+{
+  "id": "canada-awards-davie-six-icebreakers",
+  "edition_date": "2026-08-24",
+  "section": "world",
+  "kicker": "Lévis",
+  "headline": "Canada Awards Davie Six Icebreakers",
+  "deck": "Public Services and Procurement Canada awarded Chantier Davie a design-and-build contract for six program icebreakers. The yard put the fixed-price figure at $11.3 billion, taxes excluded. Construction is scheduled to start in 2027. No matching-tariff schedule was published the same day.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": ["Foreman"]
+  },
+  "timestamp": "20:48 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["trade-policy", "shipping", "fiscal-policy"],
+  "body": [
+    "Public Services and Procurement Canada recorded the award on 24 August: a design-and-build contract to Chantier Davie Canada Inc. of Lévis, Quebec, for six new program icebreakers [E1]. The PSPC page lists the contract value at $11.3 billion, taxes excluded [E1]. Davie’s own release the same afternoon called it a historic fixed-price contract under the National Shipbuilding Strategy and used the same $11.3 billion figure [E3].",
+    "Prime Minister Mark Carney’s Lévis release framed the same award as an investment of more than $11 billion and as the largest shipbuilding contract in Quebec’s history [E2]. The ships are Polar Class 3 vessels meant to replace aging heavy and medium icebreakers on the Atlantic, the St. Lawrence, the Great Lakes in winter and the Arctic in summer [E2][E3]. All six are to be built at Davie. The releases say they will be built with Canadian steel and other domestic materials under the Buy Canadian Policy [E2].",
+    "Jobs and timing are the elastic numbers. The Prime Minister’s office said the construction phase alone would create nearly 5,000 jobs [E2]. Davie said construction of the first vessel would begin in 2027, with deliveries through the 2030s [E3]. PSPC lists the next work as basic, functional and production design [E1]. Spoken remarks at the event put first steel next fall and a full fleet in service by 2038; those phrases sit beside, and slightly apart from, the formal 2027 start [E2][E3].",
+    "This is a signed NSS contract, not a programme slogan. A $19.6 million initial design award to Davie in 2024 is the prior step on the same page [E1][E2]. No Finance Canada scoring note or new appropriation line was published with the award [E1]. No matching-tariff HS schedule appeared on 24 August either [E1][E2]. The 22 August collapse of talks with Washington is context; Monday’s ledger is the yard, the price and the six hulls [E1][E2][E3]."
+  ],
+  "key_numbers": [
+    {"label": "Contract", "value": "C$11.3bn", "dir": "up"},
+    {"label": "Ships", "value": "6", "dir": "up"},
+    {"label": "Yard jobs", "value": "~5,000", "dir": "up"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Public Services and Procurement Canada",
+      "fragment": "awarded a design and build contract to Chantier Davie Canada Inc.",
+      "as_of": "2026-08-24",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/public-services-procurement/services/acquisitions/defence-marine/national-shipbuilding-strategy/projects/large-vessels/program-icebreakers.html",
+        "retrieved_at": "2026-08-24T23:08:27Z"
+      }
+    },
+    {
+      "source": "Prime Minister of Canada",
+      "fragment": "invest more than $11 billion to build six new program icebreakers",
+      "as_of": "2026-08-24",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.pm.gc.ca/en/news/news-releases/2026/08/24/prime-minister-carney-announces-largest-shipbuilding-contract-quebecs",
+        "retrieved_at": "2026-08-24T23:08:27Z"
+      }
+    },
+    {
+      "source": "Davie Shipbuilding / CNW",
+      "fragment": "The fixed-price contract, valued at $11.3 billion",
+      "as_of": "2026-08-24",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.newswire.ca/news-releases/davie-awarded-historic-contract-to-build-six-program-icebreakers-under-the-national-shipbuilding-strategy-888035960.html",
+        "retrieved_at": "2026-08-24T23:08:27Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3"]
+}
