@@ -9,8 +9,38 @@
       "block": "Hero",
       "props": {
         "variant": "lead-only",
-        "withArt": false,
+        "withArt": true,
         "lead": "hawk-fire-clears-peavine"
+      }
+    },
+    {
+      "block": "Grid",
+      "props": {
+        "cols": [2, 1],
+        "rule": false,
+        "align": "stretch",
+        "columns": [
+          [
+            {
+              "block": "Teaser",
+              "props": {
+                "article": "hugging-face-explores-a-thirteen-billion-sale",
+                "size": "feature"
+              }
+            }
+          ],
+          [
+            {
+              "block": "GlyphArt",
+              "props": {
+                "shape": "chip",
+                "roll": "chip",
+                "scale": 0.6,
+                "caption": "The hosting layer is for sale. No buyer is named. No deal is signed."
+              }
+            }
+          ]
+        ]
       }
     },
     {
@@ -43,43 +73,6 @@
               "props": {
                 "article": "conakry-landfill-kills-thirty",
                 "size": "feature"
-              }
-            }
-          ]
-        ]
-      }
-    },
-    {
-      "block": "Grid",
-      "props": {
-        "cols": [2, 1],
-        "rule": false,
-        "align": "stretch",
-        "columns": [
-          [
-            {
-              "block": "Teaser",
-              "props": {
-                "article": "hugging-face-explores-a-thirteen-billion-sale",
-                "size": "feature"
-              }
-            }
-          ],
-          [
-            {
-              "block": "MapGlyph",
-              "props": {
-                "map": "nevada-peavine",
-                "spots": [
-                  {"name": "PEAVINE", "lat": 39.59, "lon": -119.93},
-                  {"name": "RENO", "lat": 39.53, "lon": -119.81},
-                  {"name": "WASHOE", "lat": 39.47, "lon": -119.77}
-                ],
-                "tone": "soft",
-                "locator_context": "regional",
-                "rule": false,
-                "interactive": false,
-                "caption": "Peavine Peak above Reno. Unified Command still had the Hawk Fire uncontained."
               }
             }
           ]

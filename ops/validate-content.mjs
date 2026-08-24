@@ -319,6 +319,8 @@ for (const { date, dir: edDir, desk } of scopes) {
     pageFeatureRefs.set(p.page, collectFeatureArticleRefs([...(p.head ?? []), ...(p.flow ?? [])]));
     if (date >= '2026-07-30' && p.page === 'front')
       checkIllustratedRuns(file, p.head);
+    if (date >= '2026-08-23' && p.page === 'front')
+      checkFrontIllustrationMix(file, p.head);
   }
   if (/^\d{4}-\d{2}-\d{2}$/.test(date) && date >= '2026-08-14') {
     const frontRefs = pageFeatureRefs.get('front') ?? new Set();
@@ -358,6 +360,27 @@ function illustratedStorySide(block) {
   const story = kinds.findIndex((kind) => kind.story);
   if (art < 0 || story < 0 || art === story) return null;
   return art < story ? 'left' : 'right';
+}
+
+function walkBlocks(blocks, visit) {
+  for (const block of blocks ?? []) {
+    visit(block);
+    if (block?.block === 'Grid') {
+      for (const column of block.props?.columns ?? []) walkBlocks(column, visit);
+    }
+  }
+}
+
+function checkFrontIllustrationMix(file, blocks) {
+  const hero = (blocks ?? []).find((block) => block?.block === 'Hero');
+  let glyph = 0;
+  walkBlocks(blocks, (block) => {
+    if (block?.block === 'GlyphArt') glyph += 1;
+  });
+  if (hero && hero.props?.withArt !== true)
+    warn(file, 'front Hero is lead-only without art — house mix is lead art + globe + one more glyph/map');
+  if (glyph === 0)
+    warn(file, 'front has no GlyphArt — the glyph is the signature; use a fitting roll/shape rather than a second map under a bare lead');
 }
 
 function checkIllustratedRuns(file, blocks) {
