@@ -22,7 +22,7 @@ interface Props {
   caption?: string;
   cols?: number;
   rows?: number;
-  /** Reduces terrain ink for very dense, all-land relief crops. */
+  /** Lighter ink scale for dense all-land crops; relief glyphs stay. */
   tone?: 'normal' | 'soft';
   /** Wider locator crop when a tight inland map lacks recognizable context. */
   locator_context?: 'regional' | 'continental';
@@ -77,18 +77,28 @@ const isLandWorld = (lat: number, lon: number): boolean => {
 // with a NW-light hillshade so slopes, ridges and coastlines read as relief
 // rather than a flat elevation tint (a uniform plateau otherwise renders as a blob).
 const LAND_RAMP = ' ░░▒▒▓▓██';
-const SOFT_LAND_RAMP = ' ▓▓▓▓▓▓▓▓';
-const terrainGlyph = (band: number) => (tone === 'soft' ? SOFT_LAND_RAMP : LAND_RAMP)[band];
-const terrainClass = (band: number) => tone === 'soft' ? `l mg-soft-${Math.ceil(band / 2)}` : 'l';
+let maxLandBand = 0;
+if (!interactive) {
+  for (const row of m.bands) {
+    for (let i = 0; i < row.length; i++) {
+      const b = Number(row[i]);
+      if (b > maxLandBand) maxLandBand = b;
+    }
+  }
+}
+const silhouette = maxLandBand <= 1;
+const terrainGlyph = (band: number) => (silhouette ? '▓' : LAND_RAMP[band]);
+const terrainClass = (band: number) => tone === 'soft' ? `l mg-soft-${band}` : 'l';
 const bandAt = (rr: number, cc: number, fallback: number) => {
   const v = m.bands[rr]?.[cc];
   return v === undefined ? fallback : Number(v);
 };
 const shadedBand = (rr: number, cc: number, band: number) => {
-  // Light from the NW: a cell higher than its west/north neighbours faces away
-  // from the light → shadow (one level darker); lower than them → lit (one lighter).
+  // Light from the NW. Water (band 0) counts, so a coast gets a dark rim;
+  // a two-band drop is a ridge, not a one-step dither.
   const slope = (band - bandAt(rr, cc - 1, band)) + (band - bandAt(rr - 1, cc, band));
-  return Math.max(1, Math.min(8, band + (slope > 0 ? 1 : slope < 0 ? -1 : 0)));
+  const bump = slope >= 2 ? 2 : slope > 0 ? 1 : slope <= -2 ? -2 : slope < 0 ? -1 : 0;
+  return Math.max(1, Math.min(8, band + bump));
 };
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
@@ -489,13 +499,18 @@ if (!interactive) {
   }
   /* Light mode: bold so the glyph ramp holds its contrast on cream. */
   :global([data-theme="light"]) .mapglyph-print pre { font-weight: 700; }
-  .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 26%, transparent); }
-  :global([data-theme="light"]) .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 40%, transparent); }
+  /* Water must stay paler than the lightest land or a peninsula dissolves. */
+  .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 12%, transparent); }
+  :global([data-theme="light"]) .mapglyph-print :global(.mg-w) { color: color-mix(in srgb, var(--ink) 16%, transparent); }
   .mapglyph-print :global(.mg-l) { color: var(--ink); }
-  .mapglyph-print :global(.mg-soft-1) { color: color-mix(in srgb, var(--ink) 32%, transparent); }
-  .mapglyph-print :global(.mg-soft-2) { color: color-mix(in srgb, var(--ink) 50%, transparent); }
-  .mapglyph-print :global(.mg-soft-3) { color: color-mix(in srgb, var(--ink) 70%, transparent); }
-  .mapglyph-print :global(.mg-soft-4) { color: color-mix(in srgb, var(--ink) 88%, transparent); }
+  .mapglyph-print :global(.mg-soft-1) { color: color-mix(in srgb, var(--ink) 44%, transparent); }
+  .mapglyph-print :global(.mg-soft-2) { color: color-mix(in srgb, var(--ink) 52%, transparent); }
+  .mapglyph-print :global(.mg-soft-3) { color: color-mix(in srgb, var(--ink) 60%, transparent); }
+  .mapglyph-print :global(.mg-soft-4) { color: color-mix(in srgb, var(--ink) 68%, transparent); }
+  .mapglyph-print :global(.mg-soft-5) { color: color-mix(in srgb, var(--ink) 76%, transparent); }
+  .mapglyph-print :global(.mg-soft-6) { color: color-mix(in srgb, var(--ink) 84%, transparent); }
+  .mapglyph-print :global(.mg-soft-7) { color: color-mix(in srgb, var(--ink) 92%, transparent); }
+  .mapglyph-print :global(.mg-soft-8) { color: var(--ink); }
   .mapglyph-print :global(.mg-o-red)    { color: var(--red); }
   .mapglyph-print :global(.mg-o-accent) { color: var(--accent); }
   .mapglyph-print :global(.mg-o-green)  { color: var(--green); }
@@ -520,8 +535,8 @@ if (!interactive) {
   .mapglyph-locator.loc-tr { right: 6px; top: 6px; }
   .mapglyph-locator.loc-tl { left: 6px; top: 6px; }
   .mapglyph-locator pre { margin: 0; font-size: 4.5px; line-height: 1; letter-spacing: 0; white-space: pre; }
-  .mapglyph-locator :global(.lc-w) { color: color-mix(in srgb, var(--ink) 10%, transparent); }
-  .mapglyph-locator :global(.lc-l) { color: color-mix(in srgb, var(--ink) 32%, transparent); }
+  .mapglyph-locator :global(.lc-w) { color: color-mix(in srgb, var(--ink) 8%, transparent); }
+  .mapglyph-locator :global(.lc-l) { color: color-mix(in srgb, var(--ink) 48%, transparent); }
   .mapglyph-locator :global(.lc-m) { color: var(--accent); font-weight: 700; }
   .locator-footprint {
     position: absolute;

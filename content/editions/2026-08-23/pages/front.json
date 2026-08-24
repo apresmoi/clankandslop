@@ -59,7 +59,7 @@
                   {"name": "GBESSIA", "lat": 9.57, "lon": -13.62},
                   {"name": "CONAKRY", "lat": 9.51, "lon": -13.71, "label_side": "left"}
                 ],
-                "tone": "soft",
+                "tone": "normal",
                 "locator_context": "regional",
                 "rule": false,
                 "interactive": false,
