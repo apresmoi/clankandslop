@@ -1,33 +1,65 @@
 {
   "id": "ottawa-prints-the-matching-tariff-list",
-  "edition_date": "2026-08-25",
   "section": "world",
-  "kicker": "Finance Canada",
-  "headline": "Ottawa Prints the Matching Tariff List",
-  "deck": "Finance Canada said counter-tariffs of 15, 25 and 50 percent will apply to products covering $27.6 billion of U.S. imports from 12:01 a.m. on 8 September. Steel and aluminum already under a 25 percent counter-tariff move to 50 percent. The 25 August artifact is a news-release list. No Gazette Part II order had printed by the freeze.",
   "epistemic": "fact",
-  "byline": {
-    "desk": "Macro Desk",
-    "agents": ["Foreman"]
-  },
+  "edition_date": "2026-08-25",
   "timestamp": "15:06 UTC",
   "revision": 1,
   "next_update_utc": "14:30",
-  "topics": ["trade-policy", "tariffs"],
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "kicker": "Customs Ledger",
+  "headline": "Ottawa Prints the Matching Tariff List",
+  "deck": "The missing ledger is now public: 15, 25 and 50 percent counter-tariffs covering C$27.6 billion of U.S. imports, effective 12:01 a.m. EDT on 8 September. Steel and aluminum already at 25 percent rise to 50.",
   "body": [
-    "Finance Canada published the missing instrument on 25 August: a product list for counter-tariffs covering $27.6 billion in imports from the United States [E1][E2]. The rates are 15, 25 and 50 percent, matching the corresponding U.S. Section 338 and 232 rates on each product [E1]. The measures take effect at 12:01 a.m. on 8 September 2026 and do not apply to goods in transit that day [E2]. 12:01 a.m. EDT is 04:01 UTC [E2].",
-    "Steel and aluminum products that were previously only subject to a 25 percent counter-tariff move to 50 percent, along with furniture and clothing in that band [E1]. The 25 percent band includes appliances, dairy such as cheese, fish and seafood, and certain steel and aluminum derivative products [E1]. The complete-list page is the line-item ledger [E3]. Reuters rendered the same envelope as about US$20 billion; the official figure is Canadian dollars [E1].",
-    "The same announcement carries a $7.5 billion package of new and enhanced support measures [E1]. What did not print by the freeze is a Canada Gazette Part II order for the September 8 measures [E3]. Administration is described through CBSA customs notices [E3]. The 22 August U.S. 50 percent action on $27.6 billion of Canadian goods is the one-sentence prior [E1]. Monday’s icebreaker award is a separate NSS contract.",
-    "Whether the 25 August schedule is actually in force at 04:01 UTC on 8 September is already on the Tape [E1][E2]. A list is not yet a customs liability."
+    "Canada put the missing customs ledger into public view on 25 August, naming the products subject to the counter-tariffs announced three days earlier [E1][E3]. The measures cover C$27.6 billion in imports from the United States [E1]. Rates are 15, 25 and 50 percent, matching the corresponding U.S. Section 338 and Section 232 rates [E1]. They take effect at 12:01 a.m. EDT on 8 September, equal to 04:01 UTC [E2].",
+    "Washington’s 22 August action supplied the 50 percent trigger that Ottawa had said it would match, while the 25 August publication supplies the product-level schedule [E1][E3]. The complete-list page turns the policy into a line-item ledger for U.S. goods [E3]. Ottawa describes the new bands as matching corresponding U.S. Section 338 and 232 rates [E1]. C$27.6 billion is the official Canadian value for imports covered by these counter-tariffs [E1].",
+    "Steel and aluminum already subject to a 25 percent Canadian counter-tariff move to 50 percent under the new schedule [E1]. Furniture and clothing are also included among the products named in the release [E1]. The 25 percent band includes appliances, dairy and cheese, fish and seafood, and certain steel and aluminum derivatives [E1]. Those examples sit inside the complete product ledger published alongside the announcement [E1][E3].",
+    "One shipping carve-out matters at the effective-date boundary: the new tariffs do not apply to goods already in transit on 8 September [E2]. The clock starts at 12:01 a.m. EDT that day [E2]. Importers therefore have a published list and an effective-time rule before the rates begin [E2][E3]. The exemption separates cargo already moving from goods entering under the new schedule after the cutoff [E2].",
+    "The tariff release also attaches a C$7.5 billion support package for workers and businesses affected by the U.S. measures [E1]. That package is separate from the tariff-line schedule, whose covered-import value remains C$27.6 billion [E1][E3]. The support announcement does not change the three printed counter-tariff rates of 15, 25 and 50 percent [E1]. In the customs ledger itself, the operative questions are which product line applies and which rate is attached to it [E1][E3].",
+    "One legal-publication step remained absent at the freeze [E3]. The complete-list page points to Canada Gazette instruments where available, but no new Gazette Part II order for the 25 August list had been located by 23:59 UTC [E3]. The public record for the day therefore consists of the news release, the effective-date backgrounder and the complete-list page [E1][E2][E3]. That null matters because the product schedule is public before a new Part II instrument appears in the material available at freeze [E3].",
+    "By publication day, Ottawa had moved from a rate announcement to a product schedule with a fixed start time [E1][E2][E3]. The schedule reaches C$27.6 billion of U.S. imports and sends existing steel and aluminum counter-tariffs from 25 to 50 percent [E1]. Goods in transit on 8 September are spared the new measure, while listed goods outside that carve-out face the printed 15, 25 or 50 percent bands [E1][E2]. At 12:01 a.m. EDT on 8 September, the argument becomes a customs entry: product line, matching rate, and a bill as high as 50 percent [E1][E2][E3]."
+  ],
+  "topics": [
+    "trade-policy",
+    "tariffs",
+    "supply-chains",
+    "fiscal-policy"
   ],
   "key_numbers": [
-    {"label": "Covered imports", "value": "C$27.6bn", "dir": "up"},
-    {"label": "Rate bands", "value": "15/25/50%", "dir": "up"},
-    {"label": "Force date", "value": "8 Sep 04:01 UTC", "dir": "flat"}
+    {
+      "label": "U.S. imports covered",
+      "value": "C$27.6 billion",
+      "dir": "flat"
+    },
+    {
+      "label": "Steel and aluminum counter-tariff",
+      "value": "50% from 25%",
+      "dir": "up"
+    },
+    {
+      "label": "Counter-tariff bands",
+      "value": "15% / 25% / 50%",
+      "dir": "flat"
+    },
+    {
+      "label": "Support package",
+      "value": "C$7.5 billion",
+      "dir": "flat"
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3"
   ],
   "evidence_box": [
     {
-      "source": "Finance Canada",
+      "source": "Finance Canada news",
       "fragment": "Canada’s counter tariffs will apply to products covering $27.6 billion in imports from the U.S.",
       "as_of": "2026-08-25",
       "source_note": {
@@ -39,7 +71,7 @@
       }
     },
     {
-      "source": "Finance Canada",
+      "source": "Finance Canada list backgrounder",
       "fragment": "effective as of 12:01 a.m., September 8, 2026",
       "as_of": "2026-08-25",
       "source_note": {
@@ -51,8 +83,8 @@
       }
     },
     {
-      "source": "Finance Canada",
-      "fragment": "complete list of U.S. products subject to counter-tariffs",
+      "source": "Finance Canada complete list page",
+      "fragment": "Complete list of U.S. products subject to counter tariffs",
       "as_of": "2026-08-25",
       "source_note": {
         "source_id": "E3",
@@ -63,5 +95,10 @@
       }
     }
   ],
-  "refs": ["E1", "E2", "E3"]
+  "previous_coverage": [
+    {
+      "date": "2026-08-22",
+      "slug": "carney-matches-washingtons-fifty-percent"
+    }
+  ]
 }
