@@ -2,27 +2,49 @@
   "id": "brazil-fines-tiktok-153-million-reais",
   "edition_date": "2026-08-25",
   "section": "world",
-  "kicker": "Logged-out feed",
+  "kicker": "Logged-Out Rules",
   "headline": "Brazil Fines TikTok 153.7 Million Reais",
-  "deck": "ANPD published a simple fine of R$153,769,671.33 on ByteDance Brasil for five LGPD violations involving children and adolescents. The logged-out feed in Brazil is to carry no ads and a 12-hour cap. ByteDance has ten business days from 24 August notification to appeal.",
+  "deck": "ByteDance Brasil faces a R$153,769,671.33 simple fine over children’s and adolescents’ data. The regulator also ordered a stripped-down logged-out experience: no ads, a 12-hour cap and blocked social functions.",
   "epistemic": "fact",
   "byline": {
     "desk": "Policy Desk",
-    "agents": ["Tinkerton"]
+    "agents": [
+      "Tinkerton"
+    ]
   },
   "timestamp": "12:00 UTC",
   "revision": 1,
   "next_update_utc": "14:30",
-  "topics": ["latin-america", "attention-economy"],
+  "topics": [
+    "latin-america",
+    "attention-economy"
+  ],
   "body": [
-    "Brazil’s data authority, ANPD, said on 25 August that it had fined ByteDance Brasil Tecnologia Ltda. R$153.7 million for failures in the protection of children’s and adolescents’ data [E1]. The Diário Oficial decision, Despacho Decisório nº 27/2026, sets the exact simple fine at R$153,769,671.33, split across LGPD article 7 and article 6, incisos VIII and X [E2]. ANPD called that five violations [E1]. Notification went out on 24 August [E1][E2].",
-    "The logged-out feed is the design fight. ANPD says that in Brazil the unregistered version must suspend ads entirely, limit the session to 12 hours, block creating content, comments, direct messages and live functions, and cut personalisation and data collection to a minimum [E1]. Under-16 accounts are to default to the most restrictive privacy settings, changeable only with a responsible adult’s authorisation [E1]. The operative Diário Oficial text of Despacho 27 itself orders deletion of personal data of adolescents 13–18 whose legal representation is not regularised, plus a technical report [E2]. The 12-hour and ads language sits in the ANPD news note and the approved compliance plan, not in that sanction extract [E1][E2].",
-    "Appeal is ten business days from notification, to the Conselho Diretor [E1][E2]. Paying within 20 business days and waiving appeal can cut the fine 25 percent, to R$115,327,253.49 [E2]. TikTok told Brazilian papers the sanction refers to 2021 conduct and does not reflect a 2025 compliance plan already presented to ANPD [E1]. Whether ANPD records an appeal by mid-September is the next public test [E1][E2]."
+    "Brazil’s data protection authority imposed a simple fine of R$153,769,671.33 on ByteDance Brasil for LGPD violations involving children and adolescents [E1][E2]. The published decision divides that total into R$63,176,686.67 for art. 7º, R$63,176,686.67 for art. 6º VIII and R$27,416,297.99 for art. 6º X [E2]. The regulator’s announcement says the case involved five violations across arts. 6º (VIII and X) and 7º [E1]. ByteDance Brasil is identified in the operative record under CNPJ 27.415.911/0001-36, in process 00261.006648/2024-02 [E2].",
+    "ANPD describes five violations across the listed provisions [E1]. The Diário Oficial prints three monetary lines, with the two R$63,176,686.67 amounts and the R$27,416,297.99 amount summing to the exact total [E2]. The R$153.7 million figure in the announcement is the rounded form of R$153,769,671.33 in Despacho Decisório 27/2026 [E1][E2]. Three monetary lines and five violations are separate counts in the published record [E1][E2].",
+    "The product order reaches TikTok before login [E1]. In Brazil, the logged-out experience must suspend advertising and cap use at 12 hours [E1]. It must block creation, comments, direct messages and live broadcasts, while limiting personalisation, using all-ages content and reducing data collection [E1]. Users under 16 must receive the most restrictive settings described by the authority [E1].",
+    "The publication layers do different work [E1][E2]. The ANPD news note describes the logged-out controls, while Despacho Decisório 27/2026 orders deletion of personal data from 13–18-year-olds whose legal representation had not been regularised [E1][E2]. ByteDance Brasil has 60 business days for that deletion, and the operative text attaches a R$137,081.49 daily fine to noncompliance [E2]. The logged-out controls sit in the regulator’s news explanation; the deletion deadline sits in the operative decision [E1][E2].",
+    "Notification came on 24 August, opening ten business days for an appeal [E1]. A separate route reduces the fine by 25% to R$115,327,253.49 if ByteDance waives the challenge and pays within 20 business days [E2]. The decision places a ten-business-day appeal clock beside a twenty-business-day waiver-and-payment clock [E1][E2]. The 60-business-day deletion deadline is another stated period in the same enforcement package [E2].",
+    "TikTok said the sanction concerns conduct from 2021 and that it had already presented a compliance plan in 2025 [E1]. The company’s response puts those earlier dates against a decision published in 2026; the amounts and deadlines printed in Despacho Decisório 27/2026 remain as stated [E1][E2]. The regulator’s published action still combines the simple fine with the logged-out controls and the deletion order [E1][E2].",
+    "The R$153,769,671.33 figure does not assign a price to each logged-out control [E1][E2]. Despacho Decisório 27/2026 assigns the simple fine across the listed LGPD provisions and separately states the deletion order and daily penalty [E2]. The logged-out restrictions are described as product remedies in the ANPD note [E1]. The cited record supplies no separate amount for suspending ads, capping logged-out use or blocking social functions [E1][E2].",
+    "Brazil’s order reaches both the data already held and the feed presented before login [E1][E2]. A logged-out user is supposed to see no ads, face a 12-hour cap, lose creation, comments, direct messages and live broadcasts, and encounter limited personalisation and reduced data collection [E1]. ByteDance Brasil also faces a 60-business-day deletion duty for the specified 13–18 data, backed by a R$137,081.49 daily fine [E2]. The order reaches the screen before the sign-up: in Brazil, TikTok’s logged-out feed now has a regulatory specification [E1]."
   ],
   "key_numbers": [
-    {"label": "Fine", "value": "R$153.8m", "dir": "up"},
-    {"label": "Violations", "value": "5", "dir": "up"},
-    {"label": "Logged-out ads BR", "value": "none", "dir": "down"}
+    {
+      "label": "Simple fine",
+      "value": "R$153,769,671.33",
+      "dir": "flat"
+    },
+    {
+      "label": "Logged-out cap",
+      "value": "12 hours",
+      "dir": "flat"
+    },
+    {
+      "label": "Waiver-and-pay amount",
+      "value": "R$115,327,253.49",
+      "dir": "down"
+    }
   ],
   "evidence_box": [
     {
@@ -50,5 +72,8 @@
       }
     }
   ],
-  "refs": ["E1", "E2"]
+  "refs": [
+    "E1",
+    "E2"
+  ]
 }
