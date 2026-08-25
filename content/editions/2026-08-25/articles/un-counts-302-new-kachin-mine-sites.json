@@ -1,33 +1,84 @@
 {
   "id": "un-counts-302-new-kachin-mine-sites",
-  "edition_date": "2026-08-25",
   "section": "world",
-  "kicker": "Kachin",
-  "headline": "UN Counts 302 New Kachin Mine Sites",
-  "deck": "OHCHR said satellite images confirmed 302 new rare-earth sites in Kachin since 2021, a 149 percent increase, and Shan sites up from 12 before the coup to 85 after. The press release finds transboundary pollution from mining runoff. It does not name buyers. Civilian-death totals in the same-day wire are not printed in the OHCHR note.",
   "epistemic": "fact",
-  "byline": {
-    "desk": "Commodities Desk",
-    "agents": ["Graves"]
-  },
+  "edition_date": "2026-08-25",
   "timestamp": "10:09 UTC",
   "revision": 1,
   "next_update_utc": "14:30",
-  "topics": ["critical-minerals", "supply-chains"],
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "kicker": "Rare-earth expansion",
+  "headline": "UN Counts 302 New Kachin Mine Sites",
+  "deck": "Satellite analysis in a new OHCHR release says Kachin added 302 rare-earth mining sites since 2021, while Shan rose from 12 pre-coup sites to 85 post-coup. Trade flows peaked at USD 1.4 billion in 2023 amid toxic runoff and transboundary pollution.",
+  "art": {
+    "kind": "map",
+    "map": "kachin-mines",
+    "hero_map": "kachin-mines",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Kachin. OHCHR counted 302 new rare-earth sites since 2021.",
+    "spots": [
+      {
+        "name": "MYITKYINA",
+        "lat": 25.38,
+        "lon": 97.4
+      },
+      {
+        "name": "BHAMO",
+        "lat": 24.27,
+        "lon": 97.23,
+        "label_side": "left"
+      }
+    ]
+  },
   "body": [
-    "The UN human rights office published a 25 August press release on report A/HRC/63/21, covering 1 June 2025 to 31 May 2026 [E1][E2]. The title on the OHCHR page is that the human rights situation in Myanmar has plummeted to a new low amid unrelenting violations and unregulated exploitation of natural resources [E1]. The advance unedited report page is the companion document [E2]. The full PDF body was not retrieved before the freeze [E1][E2].",
-    "Mine counts are in the press release itself. Satellite images, it said, confirmed that Kachin remained the primary mining area, with 302 new sites since 2021, a 149 percent increase [E1]. In Shan, sites increased from 12 pre-coup to 85 post-coup [E1]. Findings indicated a peak in trade flows in 2023 amounting to USD 1.4 billion, with limited official records [E1]. Massive volumes of hazardous leaching agents and toxic mining runoff flow directly into local waterways, resulting in severe chemical and transboundary pollution [E1].",
-    "Thailand is not named in the extracted OHCHR press text [E1]. The press release attributes the illicit economy to a complex web of actors and does not name controllers or buyers [E1]. Civilian killed, IDP and hunger totals that circulated on the wires are not in the OHCHR press extract used here [E1].",
-    "The reportable 25 August ledger is the satellite mine count and the transboundary-pollution finding, not a reconstructed death toll from a wire [E1]. Whether a later UN product names commercial end-buyers is a later clock [E1][E2]."
+    "Satellite analysis counted 302 new rare-earth mining sites in Kachin since 2021, a 149 percent increase [E1]. The same release puts Shan at 12 mining sites before the coup and 85 afterward [E1]. Those counts turn a broad claim of resource exploitation into a mapped expansion of physical extraction [E1]. The 25 August release places that expansion inside its account of unregulated exploitation of Myanmar’s natural resources [E1].",
+    "A/HRC/63/21 is the advance unedited report on the human-rights situation of Rohingya Muslims and other minorities in Myanmar [E2]. Its stated reporting period runs from 1 June 2025 through 31 May 2026 [E2]. The mining series reaches further back, with Kachin measured from 2021 and Shan divided into pre-coup and post-coup site counts [E1]. The release therefore supplies a longer extraction timeline alongside the report’s one-year rights period [E1][E2].",
+    "The money trail is large and thinly documented [E1]. Trade flows linked to the sector peaked at USD 1.4 billion in 2023, while official records were limited [E1]. The release describes a complex web of actors around extraction and trade [E1]. It does not name the buyers behind those flows [E1].",
+    "Mining also leaves a chemical trail [E1]. The release identifies hazardous leaching agents and toxic mining runoff entering local waterways [E1]. It describes severe chemical pollution and pollution crossing national borders [E1]. The press extract does not name Thailand or any other neighboring country in that transboundary passage [E1].",
+    "The two state-level counts show expansion on different baselines [E1]. Kachin’s 302 new sites are presented as a 149 percent increase since 2021 [E1]. Shan’s count rose from 12 sites before the coup to 85 afterward [E1]. Taken together, the printed figures show that the extraction footprint widened across more than one major mining area [E1].",
+    "OHCHR’s press extract leaves several commercial links blank [E1]. It names no end buyers, gives no buyer-by-buyer volumes and does not identify a chain of custody from individual mines to downstream purchasers [E1]. The document page identifies A/HRC/63/21 and its reporting period; the full PDF body is absent from the verified material [E2]. Those gaps keep ownership, destination and country-specific pollution routes unresolved while the site counts themselves remain explicit [E1][E2].",
+    "The sharpest ledger is on the ground [E1]. Kachin has 302 new rare-earth sites since 2021, and Shan moved from 12 pre-coup sites to 85 post-coup sites [E1]. The same extract pairs that expansion with toxic runoff, hazardous leaching agents and transboundary pollution [E1]. The release counts 302 new Kachin sites and names no buyer [E1]."
   ],
   "key_numbers": [
-    {"label": "New Kachin sites", "value": "302", "dir": "up"},
-    {"label": "Shan sites", "value": "12→85", "dir": "up"},
-    {"label": "2023 trade peak", "value": "$1.4bn", "dir": "up"}
+    {
+      "label": "New Kachin sites since 2021",
+      "value": "302",
+      "dir": "up"
+    },
+    {
+      "label": "Kachin site increase",
+      "value": "149%",
+      "dir": "up"
+    },
+    {
+      "label": "Shan sites post-coup",
+      "value": "85",
+      "dir": "up"
+    },
+    {
+      "label": "2023 trade-flow peak",
+      "value": "USD 1.4 billion",
+      "dir": "up"
+    }
+  ],
+  "topics": [
+    "critical-minerals",
+    "supply-chains"
+  ],
+  "refs": [
+    "E1",
+    "E2"
   ],
   "evidence_box": [
     {
-      "source": "OHCHR",
+      "source": "OHCHR press",
       "fragment": "302 new sites since 2021 – a 149 percent increase",
       "as_of": "2026-08-25",
       "source_note": {
@@ -39,8 +90,8 @@
       }
     },
     {
-      "source": "OHCHR",
-      "fragment": "A/HRC/63/21 Situation of human rights of Rohingya Muslims",
+      "source": "OHCHR documents",
+      "fragment": "Rohingya Muslims and other minorities",
       "as_of": "2026-08-25",
       "source_note": {
         "source_id": "E2",
@@ -50,19 +101,5 @@
         "retrieved_at": "2026-08-25T22:01:15Z"
       }
     }
-  ],
-  "refs": ["E1", "E2"],
-  "art": {
-    "kind": "map",
-    "map": "kachin-mines",
-    "hero_map": "kachin-mines",
-    "tone": "soft",
-    "locator_context": "regional",
-    "rule": false,
-    "caption": "Kachin. OHCHR counted 302 new rare-earth sites since 2021.",
-    "spots": [
-      {"name": "MYITKYINA", "lat": 25.38, "lon": 97.4},
-      {"name": "BHAMO", "lat": 24.27, "lon": 97.23, "label_side": "left"}
-    ]
-  }
+  ]
 }
