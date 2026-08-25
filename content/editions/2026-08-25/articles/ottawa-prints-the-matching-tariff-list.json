@@ -1,0 +1,67 @@
+{
+  "id": "ottawa-prints-the-matching-tariff-list",
+  "edition_date": "2026-08-25",
+  "section": "world",
+  "kicker": "Finance Canada",
+  "headline": "Ottawa Prints the Matching Tariff List",
+  "deck": "Finance Canada said counter-tariffs of 15, 25 and 50 percent will apply to products covering $27.6 billion of U.S. imports from 12:01 a.m. on 8 September. Steel and aluminum already under a 25 percent counter-tariff move to 50 percent. The 25 August artifact is a news-release list. No Gazette Part II order had printed by the freeze.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": ["Foreman"]
+  },
+  "timestamp": "15:06 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["trade-policy", "tariffs"],
+  "body": [
+    "Finance Canada published the missing instrument on 25 August: a product list for counter-tariffs covering $27.6 billion in imports from the United States [E1][E2]. The rates are 15, 25 and 50 percent, matching the corresponding U.S. Section 338 and 232 rates on each product [E1]. The measures take effect at 12:01 a.m. on 8 September 2026 and do not apply to goods in transit that day [E2]. 12:01 a.m. EDT is 04:01 UTC [E2].",
+    "Steel and aluminum products that were previously only subject to a 25 percent counter-tariff move to 50 percent, along with furniture and clothing in that band [E1]. The 25 percent band includes appliances, dairy such as cheese, fish and seafood, and certain steel and aluminum derivative products [E1]. The complete-list page is the line-item ledger [E3]. Reuters rendered the same envelope as about US$20 billion; the official figure is Canadian dollars [E1].",
+    "The same announcement carries a $7.5 billion package of new and enhanced support measures [E1]. What did not print by the freeze is a Canada Gazette Part II order for the September 8 measures [E3]. Administration is described through CBSA customs notices [E3]. The 22 August U.S. 50 percent action on $27.6 billion of Canadian goods is the one-sentence prior [E1]. Monday’s icebreaker award is a separate NSS contract.",
+    "Whether the 25 August schedule is actually in force at 04:01 UTC on 8 September is already on the Tape [E1][E2]. A list is not yet a customs liability."
+  ],
+  "key_numbers": [
+    {"label": "Covered imports", "value": "C$27.6bn", "dir": "up"},
+    {"label": "Rate bands", "value": "15/25/50%", "dir": "up"},
+    {"label": "Force date", "value": "8 Sep 04:01 UTC", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Finance Canada",
+      "fragment": "Canada’s counter tariffs will apply to products covering $27.6 billion in imports from the U.S.",
+      "as_of": "2026-08-25",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/department-finance/news/2026/08/canada-announces-targeted-countermeasures-and-substantive-support-for-workers-and-businesses-in-response-to-us-tariffs.html",
+        "retrieved_at": "2026-08-25T22:01:07Z"
+      }
+    },
+    {
+      "source": "Finance Canada",
+      "fragment": "effective as of 12:01 a.m., September 8, 2026",
+      "as_of": "2026-08-25",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/department-finance/news/2026/08/list-of-products-from-the-united-states-subject-to-counter-tariffs-effective-september-8-2026.html",
+        "retrieved_at": "2026-08-25T22:01:07Z"
+      }
+    },
+    {
+      "source": "Finance Canada",
+      "fragment": "complete list of U.S. products subject to counter-tariffs",
+      "as_of": "2026-08-25",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/department-finance/programs/international-trade-finance-policy/canadas-response-us-tariffs/complete-list-us-products-subject-to-counter-tariffs.html",
+        "retrieved_at": "2026-08-25T22:01:07Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3"]
+}
