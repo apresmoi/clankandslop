@@ -1,0 +1,79 @@
+{
+  "id": "douglas-reopens-to-mexican-cattle",
+  "edition_date": "2026-08-24",
+  "section": "world",
+  "kicker": "Agua Prieta",
+  "headline": "Douglas Reopens to Mexican Cattle",
+  "deck": "USDA said it reopened the Douglas, Arizona port to cattle imports from Mexico on 24 August under a joint science-based protocol. Santa Teresa and Columbus remain closed. APHIS will pause openings if risk rises in Sonora or Chihuahua.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": ["Graves"]
+  },
+  "timestamp": "21:30 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["latin-america", "food-security", "supply-chains"],
+  "body": [
+    "The Animal and Plant Health Inspection Service said on 24 August that USDA reopened the Douglas, Arizona port to cattle imports from Mexico, guided by overlapping safeguards and a science-based import protocol jointly agreed with Mexico [E1]. The page calls Douglas the first step in a phased reopening of southern ports [E1]. After that trial, APHIS will consider Santa Teresa and Columbus, New Mexico, for live cattle, bison and horses [E1]. Openings may be paused if USDA finds increased risk in Sonora or Chihuahua through post-opening audits or other observations [E1].",
+    "The protocol is the operating ledger. APHIS published a pocket card and an infographic with the same status page: multi-stage Mexican and APHIS veterinary exams, a New World screwworm-specific exam and approved treatment three to five days before APHIS inspection, tick treatments, detector-dog inspection, a dip vat and official identification [E1][E2]. Any wound or non-compliance removes the animal. A confirmed screwworm case closes the facility and imposes a 90-day export prohibition on the lot [E2]. Only Sonora-origin cattle were eligible at Douglas on the first day [E1].",
+    "Sterile-fly capacity did not get a new 24 August volume. Pacora, Panama, remains listed at about 100 million sterile flies a week. Metapa, Mexico, is operational and ramping toward the same figure. Moore Air Base in Texas can disperse up to 100 million a week; its production plant is still under construction [E3]. A $25 million Arizona dispersal facility announced on 29 July is a site-selection commitment, not an operating plant [E3]. SENASICA’s 20 August Sonora note described one confirmed myiasis in a five-year-old bovine in Álamos, with doramectin treatment and movement controls [E4].",
+    "Monday’s fact is a reopened gate under a written protocol, not a declaration that screwworm is gone [E1][E4]. New Mexico ports stayed shut. Whether APHIS keeps Douglas open through September, and whether a Santa Teresa date appears, are later clocks [E1]."
+  ],
+  "key_numbers": [
+    {"label": "Douglas", "value": "open", "dir": "up"},
+    {"label": "NM ports", "value": "closed", "dir": "flat"},
+    {"label": "Pacora flies/wk", "value": "~100m", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "USDA APHIS",
+      "fragment": "USDA reopened the Douglas, AZ port to cattle imports from Mexico",
+      "as_of": "2026-08-24",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aphis.usda.gov/animals/animal-health/livestock-and-poultry-disease/stop-screwworm/current-status",
+        "retrieved_at": "2026-08-24T23:08:28Z"
+      }
+    },
+    {
+      "source": "USDA APHIS pocket card",
+      "fragment": "NWS-specific exam + approved treatment 3–5 days pre-APHIS inspection",
+      "as_of": "2026-08-24",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aphis.usda.gov/sites/default/files/us-import-protocol-pocket-card.pdf",
+        "retrieved_at": "2026-08-24T23:10:00Z"
+      }
+    },
+    {
+      "source": "USDA APHIS sterile-fly page",
+      "fragment": "Pacora, Panama: ~100 million sterile flies per week",
+      "as_of": "2026-08-24",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.aphis.usda.gov/animals/animal-health/livestock-and-poultry-disease/stop-screwworm/sterile-fly-production-dispersal",
+        "retrieved_at": "2026-08-24T23:10:00Z"
+      }
+    },
+    {
+      "source": "SENASICA",
+      "fragment": "deteccion de caso de gusano barrenador",
+      "as_of": "2026-08-20",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.gob.mx/senasica/prensa/refuerza-senasica-estrategia-de-contencion-en-sonora-tras-deteccion-de-caso-de-gusano-barrenador-433295",
+        "retrieved_at": "2026-08-24T23:10:00Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4"]
+}

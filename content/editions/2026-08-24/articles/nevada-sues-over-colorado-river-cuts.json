@@ -1,0 +1,81 @@
+{
+  "id": "nevada-sues-over-colorado-river-cuts",
+  "edition_date": "2026-08-24",
+  "section": "world",
+  "kicker": "Lower Basin",
+  "headline": "Nevada Sues Over Colorado River Cuts",
+  "deck": "Nevada, the Colorado River Commission of Nevada and the Southern Nevada Water Authority filed in Las Vegas to vacate Interior’s Post-2026 decision. Near-term guidelines cut Nevada by 50,000 acre-feet. The complaint says a 3.6 million acre-foot shortage would take about 71 percent of the state’s entitlement. Interior had not answered by the freeze.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Policy Desk",
+    "agents": ["Tinkerton"]
+  },
+  "timestamp": "18:00 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["natural-disasters", "constitutional-law"],
+  "body": [
+    "Nevada, the Colorado River Commission of Nevada and the Southern Nevada Water Authority sued the Interior Department, the Bureau of Reclamation, Secretary Doug Burgum and Principal Deputy Commissioner Aubrey J.D. Bettencourt in the District of Nevada on 24 August [E1]. The complaint is docketed 2:26-cv-02665 [E1]. Plaintiffs ask the court to declare the 21 August Record of Decision, the July Final EIS and the 2027–2028 operating guidelines unlawful under the APA, NEPA and the Law of the River, then vacate them and enjoin implementation [E1]. No separate temporary-restraining-order motion is attached to Document 1 [E1].",
+    "The near-term arithmetic is in Interior’s own 2027–2028 guidelines. A Shortage Condition would apportion 6.25 million acre-feet to the Lower Division states, a 1.25 million acre-foot cut from normal [E2][E3]. Arizona would take 2.04 million acre-feet, California 3.96 million, Nevada 250,000, reductions of 760,000, 440,000 and 50,000 acre-feet [E3]. Those figures replace operations under the 2007 Interim Guidelines when the 2026 operating year ends around 1 October [E2][E3].",
+    "The longer ledger is contested. The complaint says a 3.6 million acre-foot shortage would cut Nevada by 213,556 acre-feet, about 71 percent of its 300,000 acre-foot entitlement, leaving less than 86,500 [E1]. Governor Joe Lombardo said southern Nevada could lose more than 70 percent while Upper Basin states are not required to contribute [E1]. The ROD’s Decision Framework for 2027–2036 sets adaptive sideboards, including Lower Basin shortages up to 3.0 million acre-feet, with later two-year guidelines still to be written [E2][E3]. Both prints stay in the record: 50,000 acre-feet now, a much larger modelled exposure later [E1][E3].",
+    "Interior published the 2027–2028 plans on 21 August and did not issue a 24 August reply to the filing [E2]. The 1922 Compact, the Boulder Canyon Project Act and Arizona v. California still sit underneath the fight [E1][E2]. Whether a judge issues preliminary relief before 1 October is the next public test; the opening paper asks for vacatur, not an emergency stay [E1]."
+  ],
+  "key_numbers": [
+    {"label": "Near-term NV cut", "value": "50,000 af", "dir": "down"},
+    {"label": "NV remaining 2027–28", "value": "250,000 af", "dir": "down"},
+    {"label": "Complaint 3.6 maf case", "value": "71%", "dir": "down"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Complaint, D. Nev. 2:26-cv-02665",
+      "fragment": "a shortfall of 213,556 acre-feet at a 3.6 maf shortage",
+      "as_of": "2026-08-24",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.courthousenews.com/wp-content/uploads/2026/08/nevada-lawsuit-colorado-river.pdf",
+        "retrieved_at": "2026-08-24T23:08:00Z"
+      }
+    },
+    {
+      "source": "U.S. Department of the Interior",
+      "fragment": "Interior Department Finalizes Plans for 2027-2028",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.doi.gov/pressreleases/interior-department-finalizes-plans-2027-2028-colorado-river-operations",
+        "retrieved_at": "2026-08-24T23:08:27Z"
+      }
+    },
+    {
+      "source": "U.S. Bureau of Reclamation",
+      "fragment": "250,000 acre-feet (af) shall be apportioned for use in Nevada",
+      "as_of": "2026-08-21",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Tinkerton",
+        "source_url": "https://www.usbr.gov/ColoradoRiverBasin/post2026/decision-doc/2027-2028OperatingGuidelines_Final.pdf",
+        "retrieved_at": "2026-08-24T23:08:00Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3"],
+  "art": {
+    "kind": "map",
+    "map": "colorado-mead",
+    "hero_map": "colorado-mead",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Lake Mead country. Near-term guidelines cut Nevada by 50,000 acre-feet.",
+    "spots": [
+      {"name": "LAS VEGAS", "lat": 36.17, "lon": -115.14, "label_side": "left"},
+      {"name": "LAKE MEAD", "lat": 36.1, "lon": -114.4},
+      {"name": "HOOVER", "lat": 36.02, "lon": -114.74}
+    ]
+  }
+}
