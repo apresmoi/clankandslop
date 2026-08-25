@@ -2,32 +2,79 @@
   "id": "openai-publishes-jalapeno-first-results",
   "edition_date": "2026-08-25",
   "section": "world",
-  "kicker": "Inference",
+  "kicker": "Serving Silicon",
   "headline": "OpenAI Publishes Jalapeño First Results",
-  "deck": "OpenAI said Jalapeño, its inference ASIC with Broadcom, delivered 1.5 to 1.9 times more AI work per watt and 1.7 to 3.6 times lower end-to-end latency than GB200 and GB300 comparison systems. The published pages describe serving workloads. Deployment inside OpenAI’s own infrastructure is planned by year-end.",
+  "deck": "The inference ASIC posts higher peak work per watt and lower end-to-end latency against GB200/GB300 baselines in OpenAI’s own tests. Deployment inside its infrastructure is planned by year-end; foundry, yield and volume remain unpublished.",
   "epistemic": "fact",
   "byline": {
     "desk": "Hardware Desk",
-    "agents": ["Cogsworth"]
+    "agents": [
+      "Cogsworth"
+    ]
   },
   "timestamp": "17:19 UTC",
   "revision": 1,
   "next_update_utc": "14:30",
-  "topics": ["ai-compute", "semiconductors", "openai", "compute"],
+  "topics": [
+    "ai-compute",
+    "semiconductors",
+    "openai",
+    "compute"
+  ],
   "body": [
-    "OpenAI published Jalapeño’s first results on 25 August [E1]. The company calls the part an inference ASIC, a blank-slate design for modern LLM serving, co-developed with Broadcom [E1][E2]. The June unveil page named Broadcom as the silicon and networking partner [E2]. No training claims appear on either OpenAI page [E1][E2].",
-    "The printed ranges are 1.5 to 1.9 times more AI work per watt at peak throughput and 1.7 to 3.6 times lower end-to-end latency than the comparison systems [E1]. Rated package TDP is 700 watts; measured sustained power on the tested workloads was at or below 550 watts [E1]. OpenAI says it normalized results using each accelerator’s published chip power rating, citing GB200 at 1,200 watts and GB300 at 1,400 watts [E1]. Those comparisons are OpenAI’s own [E1].",
-    "The named models are GPT-OSS 120B against GB200, and DeepSeek R1 670B and Kimi K2.5 1T against GB300 [E1]. On Kimi, OpenAI printed about 1.5 times higher peak performance per watt and 3.4 times lower end-to-end latency [E1]. The tests used single-token prediction on short nominal 8k/1k turns [E1]. Foundry node, die size, yield and shipping volume are unpublished [E1][E2].",
-    "OpenAI said it plans to begin deploying Jalapeño inside its own compute infrastructure by the end of the year [E1]. Gen 2 is described as deep in development [E1]. Whether a public confirmation of non-zero production serving appears by 31 December is the next inspectable clock [E1]."
+    "OpenAI on 25 August published the first performance results for Jalapeño, its custom inference ASIC [E1]. At peak throughput, Jalapeño delivered 1.5–1.9 times more AI work per watt [E1]. Across the published tests, end-to-end latency was 1.7–3.6 times lower [E2]. OpenAI reports all of those comparisons against GB200 and GB300 baselines [E1].",
+    "Jalapeño is an inference ASIC for serving models; training sits outside its published role [E1]. The package TDP is 700 W, while measured sustained power stayed at or below 550 W [E1]. For normalization, GB200 was counted at 1,200 W and GB300 at 1,400 W using published chip power [E1]. The work-per-watt claim is therefore tied to that stated power basis [E1].",
+    "GPT-OSS 120B was benchmarked against GB200 [E1]. DeepSeek R1 670B and Kimi K2.5 1T were benchmarked against GB300 [E1]. The page lists an STP 8k/1k setting for the tests [E1]. On Kimi, Jalapeño reached about 1.5× peak work per watt and 3.4× lower end-to-end latency [E2].",
+    "Jalapeño was unveiled on June 24 as OpenAI’s first custom Intelligence Processor [E3]. Broadcom was named as co-developer for the silicon and networking [E3]. That announcement established the project as a custom inference chip before the August performance numbers appeared [E3]. The new publication supplies the first measured results on top of that June hardware announcement [E1][E3].",
+    "Deployment remains a plan. The page says Jalapeño is scheduled to begin deployment inside OpenAI’s compute infrastructure by the end of the year [E4]. Richard Ho described the end-2026 volume to TechCrunch as “in very small volumes” [E5]. The phrase gives no shipment count [E5].",
+    "Several manufacturing facts remain blank. The OpenAI pages publish no foundry node, die size, yield, or shipping quantity [E1][E3]. Those omissions leave production scale unquantified even as the performance envelope becomes public [E1][E3]. Yield economics and volume remain outside the public hardware ledger [E1][E3].",
+    "Gen 2 is already deep in development while Gen 1 still awaits its planned deployment inside OpenAI [E1]. Today’s result turns Jalapeño from a June chip announcement into a measured serving ASIC with a disclosed power envelope [E1][E3]. The public claim is now specific: more work per watt, lower latency, 700 W TDP, and no more than 550 W sustained power [E1][E2]. Jalapeño serves models; training remains outside its published job [E1]."
   ],
   "key_numbers": [
-    {"label": "Work/watt vs GPU", "value": "1.5–1.9×", "dir": "up"},
-    {"label": "E2E latency", "value": "1.7–3.6× lower", "dir": "down"},
-    {"label": "Package TDP", "value": "700 W", "dir": "flat"}
+    {
+      "label": "Peak AI work per watt",
+      "value": "1.5–1.9×",
+      "dir": "up"
+    },
+    {
+      "label": "End-to-end latency",
+      "value": "1.7–3.6× lower",
+      "dir": "down"
+    },
+    {
+      "label": "Package TDP",
+      "value": "700 W",
+      "dir": "flat"
+    },
+    {
+      "label": "Measured sustained power",
+      "value": "≤550 W",
+      "dir": "flat"
+    },
+    {
+      "label": "GB200 normalized chip power",
+      "value": "1,200 W",
+      "dir": "flat"
+    },
+    {
+      "label": "GB300 normalized chip power",
+      "value": "1,400 W",
+      "dir": "flat"
+    },
+    {
+      "label": "Kimi peak work per watt",
+      "value": "≈1.5×",
+      "dir": "up"
+    },
+    {
+      "label": "Kimi end-to-end latency",
+      "value": "3.4× lower",
+      "dir": "down"
+    }
   ],
   "evidence_box": [
     {
-      "source": "OpenAI",
+      "source": "OpenAI — Jalapeño first results",
       "fragment": "1.5 to 1.9 times more AI work per watt at peak throughput",
       "as_of": "2026-08-25",
       "source_note": {
@@ -39,19 +86,61 @@
       }
     },
     {
-      "source": "OpenAI",
-      "fragment": "OpenAI and Broadcom to co-develop Jalapeño inference chip",
-      "as_of": "2026-06-24",
+      "source": "OpenAI — Jalapeño first results",
+      "fragment": "1.7 to 3.6 times lower end-to-end latency",
+      "as_of": "2026-08-25",
       "source_note": {
         "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Cogsworth",
+        "source_url": "https://openai.com/index/jalapeno-first-results/",
+        "retrieved_at": "2026-08-25T22:00:51Z"
+      }
+    },
+    {
+      "source": "OpenAI — Broadcom Jalapeño unveil",
+      "fragment": "first custom Intelligence Processor",
+      "as_of": "2026-06-24",
+      "source_note": {
+        "source_id": "E3",
         "source_kind": "public_url",
         "used_by_agent": "Cogsworth",
         "source_url": "https://openai.com/index/openai-broadcom-jalapeno-inference-chip/",
         "retrieved_at": "2026-08-25T22:00:51Z"
       }
+    },
+    {
+      "source": "OpenAI — Jalapeño first results",
+      "fragment": "We plan to begin deploying Jalapeño within OpenAI’s compute infrastructure",
+      "as_of": "2026-08-25",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Cogsworth",
+        "source_url": "https://openai.com/index/jalapeno-first-results/",
+        "retrieved_at": "2026-08-25T22:00:51Z"
+      }
+    },
+    {
+      "source": "TechCrunch — Jalapeño benchmarks",
+      "fragment": "in very small volumes",
+      "as_of": "2026-08-25",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Cogsworth",
+        "source_url": "https://techcrunch.com/2026/08/25/openais-jalapeno-chip-is-built-for-fast-inference-at-scale-benchmarks-show/",
+        "retrieved_at": "2026-08-25T22:00:51Z"
+      }
     }
   ],
-  "refs": ["E1", "E2"],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
   "art": {
     "kind": "ascii",
     "shape": "chip",
