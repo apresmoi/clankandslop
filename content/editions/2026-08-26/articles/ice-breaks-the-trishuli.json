@@ -1,0 +1,149 @@
+{
+  "id": "ice-breaks-the-trishuli",
+  "edition_date": "2026-08-26",
+  "section": "world",
+  "kicker": "Cryosphere Cascade",
+  "headline": "Ice Breaks the Trishuli Corridor",
+  "deck": "The evidence points uphill: a suspected high-altitude ice-rock collapse sent a debris surge through the Lhende–Bhote Koshi–Trishuli system on 26 August. Hundreds were still unaccounted for across the border zone, while NEA put 430 MW of generation offline.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "17:20 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "natural-disasters",
+    "supply-chains"
+  ],
+  "body": [
+    "Rasuwa’s disaster began as a mountain problem and became a river-system failure [E1][E4]. Water, sediment and boulders tore through the Bhote Koshi into the Trishuli after levels began rising rapidly around 09:00 NPT, while researchers traced the first violent pulse toward Lhende Khola [E1]. Their working mechanism is a high-altitude ice-rock avalanche that dumped a large mass into the tributary and may have briefly dammed the gorge before release [E1]. That sequence would explain how a compact slope failure became a debris-rich flood wave far downstream, but the trigger remains under investigation [E1].",
+    "The strongest evidence for that inference is physical. Video and field information reviewed by ICIMOD put ice and rock debris into Lhende Khola, and gauges farther down the Trishuli reportedly jumped as much as nine metres at Galchhi and seven metres at Malekhu in about 30 minutes [E1]. A narrow gorge can turn collapsed mass, impounded water and entrained sediment into a fast-moving surge, which fits the observed progression from tributary to trunk river [E1]. Scientists were still checking the size and stability of a possible blockage late on 26 August [E1].",
+    "Seismology leaves the trigger story open. The USGS event catalog places a magnitude-5.2, zero-depth origin at 02:52:10 UTC near 28.271, 85.515 [E2]. Chinese emergency reporting dates the Gyirong impact to about 10:30 CST, or 02:30 UTC, roughly 22 minutes before that origin; its 20:00 CST forward-command sheet listed 3 dead and 265 missing [E5]. ICIMOD also recorded anomalous seismic signals but said no causal link between seismic activity and the flood had been established [E1].",
+    "The human ledger split at the border and changed by the hour [E3][E5]. Nepal Police’s 23:05 NPT graphic counted 157 bodies recovered across seven districts: 64 in Chitwan, 27 in Dhading, 22 in Nawalparasi East, 19 in Gorkha, 13 in Nuwakot, 9 in Tanahun and 3 in Rasuwa [E3]. The Xizang forward command’s 20:00 CST sheet separately listed 3 dead and 265 missing in Gyirong [E5]. Those sheets cannot be summed into one death toll: they use different jurisdictions, clocks and categories, and both were still being revised [E3][E5].",
+    "Downstream, the gorge hit the power system [E4]. The Nepal Electricity Authority said 430 MW of generation was disrupted, comprising about 405 MW from 11 hydropower projects and 25 MW of solar power [E4]. Damage reached Rasuwagadhi, Chilime and Trishuli 3A, the Trishuli 3B Hub 220 kV substation, the Trishuli and Devighat plants, and distribution structures [E4]. The consequence was larger than one drowned powerhouse because the same corridor carries generation, substations and river infrastructure in series [E4].",
+    "Rasuwagadhi and Gyirong sit on the same physical corridor that the surge followed, so the disaster also struck the border’s operating geometry [E1][E5]. The Xizang sheet put 265 people missing at Gyirong while Nepal Police was recovering bodies progressively farther down the Bhote Koshi–Trishuli system [E3][E5]. That geographic spread is consistent with a surge moving through a confined transboundary gorge and then into broader downstream reaches [E1]. Every kilometre converted the original slope failure into a different failure mode: burial at the border, washout along the river, and power loss at the grid [E1][E4][E5].",
+    "By night, one suspected slope failure had propagated into three ledgers: bodies along Nepal’s rivers, missing people at Gyirong, and megawatts erased from the Trishuli basin [E1][E3][E4][E5]. The cause is still open because the avalanche hypothesis and the seismic catalog do not line up cleanly in time [E1][E2][E5]. The physical cascade is clearer: ice and rock entered a tributary, the gorge amplified the moving mass, and the surge struck assets built along the river [E1][E4]. The mountain broke once; the corridor kept breaking downstream [E1][E4]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Trishuli rise at Galchhi",
+      "value": "9 m / 30 min",
+      "dir": "up"
+    },
+    {
+      "label": "Unavailable generation",
+      "value": "430 MW",
+      "dir": "up"
+    },
+    {
+      "label": "Nepal bodies recovered",
+      "value": "157",
+      "dir": "up"
+    },
+    {
+      "label": "Xizang people missing",
+      "value": "265",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "ICIMOD — Major flash flood sweeps through Nepal’s Rasuwa district",
+      "fragment": "An ice avalanche in the Lhende Khola is the suspected trigger",
+      "as_of": "2026-08-26",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.icimod.org/press-release/major-flash-flood-sweeps-through-nepals-rasuwa-district-raising-fears-of-further-downstream-flooding/",
+        "retrieved_at": "2026-08-26T21:52:01Z"
+      }
+    },
+    {
+      "source": "USGS — event us7000tbwb",
+      "fragment": "2026-08-26 02:52:10 (UTC)",
+      "as_of": "2026-08-26",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000tbwb/executive",
+        "retrieved_at": "2026-08-26T21:52:01Z"
+      }
+    },
+    {
+      "source": "Nepal Police HQ graphic",
+      "fragment": "रसुवा जिल्ला आएको बाढी अपडेट",
+      "as_of": "2026-08-26",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://x.com/NepalPoliceHQ/status/2092664227899261286",
+        "retrieved_at": "2026-08-26T21:52:01Z"
+      }
+    },
+    {
+      "source": "NEA via HimalPress",
+      "fragment": "The floods in the Bhotekoshi River have affected the generation of a combined 430 MW",
+      "as_of": "2026-08-26",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://en.himalpress.com/430-mw-of-generation-disrupted-by-bhotekoshi-floods-nea/",
+        "retrieved_at": "2026-08-26T21:52:01Z"
+      }
+    },
+    {
+      "source": "People’s Daily — Xizang forward HQ count",
+      "fragment": "西藏吉隆泥石流灾害已造成3人遇难265人失联",
+      "as_of": "2026-08-26",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "http://society.people.com.cn/n1/2026/0826/c1008-40786750.html",
+        "retrieved_at": "2026-08-26T21:52:01Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "bhote-koshi",
+    "hero_map": "bhote-koshi",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Bhote Koshi–Trishuli. The 26 August surge started above the rain gauges.",
+    "spots": [
+      {
+        "name": "RASUWAGADHI",
+        "lat": 28.28,
+        "lon": 85.38
+      },
+      {
+        "name": "GYIRONG",
+        "lat": 28.86,
+        "lon": 85.3,
+        "label_side": "left"
+      },
+      {
+        "name": "TRISHULI",
+        "lat": 27.91,
+        "lon": 85.15
+      }
+    ]
+  }
+}
