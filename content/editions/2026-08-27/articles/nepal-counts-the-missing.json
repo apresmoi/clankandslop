@@ -1,0 +1,217 @@
+{
+  "id": "nepal-counts-the-missing",
+  "section": "world",
+  "epistemic": "inference",
+  "edition_date": "2026-08-27",
+  "timestamp": "11:12 UTC",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "kicker": "Day Two Ledger",
+  "headline": "Nepal Counts the Missing Downstream",
+  "deck": "USGS has recast the seismic pulse as a glacial collapse and debris flow. Nepal’s 16:00 ledger reached 289 bodies recovered and 826 missing, while Xizang authorities kept a separate count at Gyirong.",
+  "previous_coverage": [
+    {
+      "date": "2026-08-26",
+      "slug": "ice-breaks-the-trishuli"
+    }
+  ],
+  "art": {
+    "kind": "map",
+    "map": "bhote-koshi",
+    "hero_map": "bhote-koshi",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Bhote Koshi–Trishuli. USGS reclassified the pulse as collapse and debris flow.",
+    "spots": [
+      {
+        "name": "RASUWAGADHI",
+        "lat": 28.28,
+        "lon": 85.38
+      },
+      {
+        "name": "GYIRONG",
+        "lat": 28.86,
+        "lon": 85.3,
+        "label_side": "left"
+      },
+      {
+        "name": "TRISHULI",
+        "lat": 27.91,
+        "lon": 85.15
+      }
+    ]
+  },
+  "body": [
+    "Day two changed the diagnosis before it settled the toll. USGS now says event us7000tbwb was a glacial collapse and debris flow, with no tectonic earthquake behind the seismic signal [E1]. Analysis of nearby stations, long-period waves and satellite imagery drove that reclassification [E1]. The working sequence now starts with the mountain giving way; the seismic pulse records that failure [E1].",
+    "By 16:00 Thursday, Nepali authorities had recovered 289 bodies from the flood-hit corridor [E2]. NDRRMA listed 826 people missing, including 579 tourists and personnel from the police, army, customs office and Armed Police Force [E3]. Those figures describe different administrative states: recovered dead and people still unaccounted for [E2][E3]. Combining them into a single death toll would overstate what Nepal had confirmed at that cutoff [E2][E3].",
+    "Across the border, Gyirong kept its own ledger. Xizang authorities had three confirmed dead and 558 missing at 08:00, including 260 foreign nationals [E4]. That count was compiled for the port area on a different jurisdictional sheet from Nepal’s NDRRMA tally [E3][E4]. No reconciled cross-border list had been published in these updates, so the two counts remain separate [E3][E4].",
+    "Mechanism now lines up with the river geography. Satellite analysis places the debris in the Lhende, where it produced a debris-laden flood after a large avalanche near Rasuwagadhi [E5]. On 26 August, Galchhi on the Trishuli rose as much as nine metres in 30 minutes, while Malekhu gained about seven metres over the same interval [E6]. Taken together, the reclassified seismic trace, debris path and river rise support a cascade: high-altitude ice and rock collapse, possible temporary blockage, then a sediment-heavy surge through the Bhote Koshi into the Trishuli [E1][E5][E6].",
+    "Thursday’s damage accounting sharpened the downstream ledger. The Department of Roads put preliminary damage to swept roads and bridges at Rs 20 billion [E7]. Among the 27 August public updates cited here, none supplied a revised NEA generation-loss total [E7]. The hydro loss therefore remains carried at the roughly 430 MW class from 26 August coverage.",
+    "Upstream risk has not frozen with the first surge. A barrier lake near the Chotchen–Purupe Tsangpo confluence in Tibet held about 2 million cubic metres by Thursday morning, with water already flowing out [E8]. Another 3 million cubic metres could enter over the following three days [E9]. Rescue and repair crews are therefore working beneath a second hydrological clock while the original collapse sequence is still being reconstructed [E8][E9].",
+    "Search crews are working a corridor whose trigger is better constrained than its casualty ledger [E1][E3]. The 289 recovered bodies are a 16:00 count, and the 826 missing are another live sheet [E2][E3]. Gyirong still carries its separate 558-person missing list [E4]. The event first labeled an earthquake is now, in the USGS record, the seismic signature of a mountain coming down [E1]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Nepal bodies recovered",
+      "value": "289",
+      "dir": "up"
+    },
+    {
+      "label": "Nepal missing",
+      "value": "826",
+      "dir": "up"
+    },
+    {
+      "label": "Gyirong missing",
+      "value": "558",
+      "dir": "up"
+    },
+    {
+      "label": "Galchhi water level",
+      "value": "+9 m / 30 min",
+      "dir": "up"
+    },
+    {
+      "label": "Road-and-bridge damage",
+      "value": "Rs 20 billion",
+      "dir": "up"
+    },
+    {
+      "label": "Hydro generation loss (carried)",
+      "value": "~430 MW",
+      "dir": "flat"
+    }
+  ],
+  "topics": [
+    "natural-disasters",
+    "supply-chains"
+  ],
+  "evidence_box": [
+    {
+      "source": "USGS — us7000tbwb",
+      "fragment": "a glacial collapse and debris flow, and that no earthquake had occurred",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000tbwb/executive",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "Nepal News — Bhote Koshi disaster count",
+      "fragment": "bodies of 289 people have been recovered",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://english.nepalnews.com/s/nation/bhote-koshi-disaster-death-toll-reaches-289-infrastructure-damage-escalates-to-rs-20-billion/",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "Nepal News — NDRRMA missing count",
+      "fragment": "826 people are missing so far",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://english.nepalnews.com/s/nation/bhote-koshi-disaster-death-toll-reaches-289-infrastructure-damage-escalates-to-rs-20-billion/",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "Xinhua English — Gyirong rescue",
+      "fragment": "three people dead and 558 others, including 260 foreign nationals, missing",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://english.news.cn/20260827/13004638d3ac40ba9814cafd81a77029/c.html",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "Kathmandu Post — Bhotekoshi flood mechanism",
+      "fragment": "The debris appears to have entered the Lhende river and triggered a debris-laden flood.",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://kathmandupost.com/national/2026/08/27/bhotekoshi-flood-what-happened-in-nepal-s-himalayas-and-what-comes-next",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "ICIMOD — Rasuwa flash flood assessment",
+      "fragment": "rose by as much as nine metres within 30 minutes",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.icimod.org/press-release/major-flash-flood-sweeps-through-nepals-rasuwa-district-raising-fears-of-further-downstream-flooding/",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "Nepal News — infrastructure damage",
+      "fragment": "damage caused by swept-away roads and bridges has reached Rs 20 billion",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://english.nepalnews.com/s/nation/bhote-koshi-disaster-death-toll-reaches-289-infrastructure-damage-escalates-to-rs-20-billion/",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "Kathmandu Post — Tibet barrier lake",
+      "fragment": "about 2 million cubic metres of water had accumulated",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E8",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://kathmandupost.com/national/2026/08/27/bhotekoshi-flood-what-happened-in-nepal-s-himalayas-and-what-comes-next",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    },
+    {
+      "source": "Kathmandu Post — Tibet barrier lake inflow",
+      "fragment": "another 3 million cubic metres could enter the lake over the following three days",
+      "as_of": "2026-08-27",
+      "source_note": {
+        "source_id": "E9",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://kathmandupost.com/national/2026/08/27/bhotekoshi-flood-what-happened-in-nepal-s-himalayas-and-what-comes-next",
+        "retrieved_at": "2026-08-27T23:50:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9"
+  ]
+}
