@@ -1,0 +1,160 @@
+{
+  "id": "niamey-mutiny-stops-at-base-101",
+  "edition_date": "2026-08-30",
+  "section": "world",
+  "kicker": "Barracks Fire",
+  "headline": "Niamey Mutiny Stops at Base 101",
+  "deck": "Serving soldiers seized comrades and fired on sensitive sites on 29 August before loyalist forces contained the revolt. Russia says Africa Corps assisted Nigerien troops; Algeria sent four Su-30s and a tanker at Niamey’s request. No primary record says the Algerian jets flew combat.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "23:50 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "grey-zone",
+    "russia"
+  ],
+  "body": [
+    "At about 00:20 on 29 August, serving soldiers at Base 101 detained comrades inside the barracks and opened fire on sensitive sites in Niamey [E1]. Niger’s Defence Ministry described the perpetrators as soldiers who had broken military regulations and said security forces began progressively recovering the targeted sites [E1]. Defence Minister Salifou Modi later said he had taken control of the unrest, while sporadic firing continued in the capital [E2]. The official classification was a military mutiny originating inside Base 101 [E2][E3].",
+    "Radio and television signals were interrupted during the violence, and RTN programming resumed at about 10:00 on 29 August [E2]. The Confederation of Sahel States called the episode a mutiny and said loyalist Nigerien security forces had contained and defeated the attempt [E3]. Its statement credited forces that remained loyal with restoring order after attacks on Base 101 and other sensitive sites [E3]. The presidency stayed in loyalist hands through 30 August, when Russia’s Foreign Ministry said the situation was controlled by the lawful authorities headed by Abdourahamane Tiani [E5].",
+    "The disturbance reached the airport complex without shutting civilian aviation. Niger’s civil-aviation authorities said operations across Diori Hamani International Airport continued normally on 29 August despite events affecting the airport [E4]. Base 101 sits within that airport area, placing the mutiny beside one of the capital’s most sensitive transport and military nodes [E4]. By the end of the day, the government and the AES were describing the uprising as contained and the affected sites as returning to loyalist control [E1][E3].",
+    "Moscow said on 30 August that the attacks were repelled by Nigerien national troops with assistance from servicemen of the Russian Defence Ministry’s Africa Corps [E5]. That wording assigns the repelling of the attacks to Nigerien forces and describes the Russian role as assistance [E5]. The statement does not say Africa Corps units recaptured Base 101 [E5]. It also said Tiani’s authorities remained in control, tying Russia’s intervention claim to support for an existing government command structure [E5].",
+    "Algeria entered the picture on 30 August with an overt military deployment requested by Nigerien authorities. Algeria’s Defence Ministry said it ordered two patrols of Su-30 fighters, four aircraft in total, on a support mission for the Nigerien army after the Niamey events [E6]. The ministry said the four fighters and an aerial-refuelling aircraft landed at Niamey that morning [E6]. Its statement contains no claim that the fighters fired weapons or flew combat sorties [E6].",
+    "The Nigerien account identifies the accompanying tanker as an Ilyushin Il-78 and says the four fighters made an aerial parade before landing [E7]. Prime Minister Ali Mahaman Lamine Zeine attended the reception alongside senior defence and government officials [E7]. Tiani was not listed among the reception party; Zeine said the president had charged him with going to see the aircraft [E7]. Russia’s statement separately identified Tiani as still heading Niger’s lawful authorities on 30 August [E5].",
+    "By 30 August, Base 101 and the capital’s sensitive sites were back under government control, civilian airport operations were continuing, and the AES was publicly saluting the loyalist response [E1][E3][E4]. Russia’s own record says Africa Corps assisted Nigerien troops, and it goes no further [E5]. Algeria’s own record establishes four Su-30s and a tanker landing at Niger’s request, while the Nigerien account names the tanker as an Il-78 [E6][E7]. The soldiers who fired into Niamey’s sensitive sites ended the episode with Base 101 back in loyalist hands [E1][E3]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Algerian Su-30s",
+      "value": "4",
+      "dir": "flat"
+    },
+    {
+      "label": "Il-78 tankers",
+      "value": "1",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Agence Nigérienne de Presse — Defence Ministry communiqué",
+      "fragment": "séquestrer certains de leurs camarades",
+      "as_of": "2026-08-29",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://anp.ne/mouvement-dhumeur-a-la-base-101-de-niamey-la-situation-est-sous-controle/",
+        "retrieved_at": "2026-08-30T23:44:00Z"
+      }
+    },
+    {
+      "source": "Agence Nigérienne de Presse — Defence Minister Salifou Modi",
+      "fragment": "progressivement pris le contrôle d’un mouvement d’humeur",
+      "as_of": "2026-08-29",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://anp.ne/tirs-et-explosions-a-niamey-le-ministre-de-la-defense-assure-avoir-pris-le-controle-dun-mouvement-dhumeur/",
+        "retrieved_at": "2026-08-30T23:44:00Z"
+      }
+    },
+    {
+      "source": "Agence Nigérienne de Presse — AES communiqué",
+      "fragment": "cette nouvelle tentative a été contenue et mise en échec",
+      "as_of": "2026-08-29",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://anp.ne/mutinerie-a-niamey-laes-reaffirme-son-soutien-au-niger-et-salue-la-riposte-des-forces-de-defense-et-de-securite/",
+        "retrieved_at": "2026-08-30T23:44:00Z"
+      }
+    },
+    {
+      "source": "Agence Nigérienne de Presse — Niger civil aviation",
+      "fragment": "les activités relatives à l’exploitation aérienne se poursuivent normalement",
+      "as_of": "2026-08-29",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://anp.ne/aeroport-international-diori-hamani-les-activites-dexploitation-aerienne-se-poursuivent-normalement/",
+        "retrieved_at": "2026-08-30T23:44:00Z"
+      }
+    },
+    {
+      "source": "Russian Ministry of Foreign Affairs",
+      "fragment": "Эти нападения были отбиты национальными войсками при содействии военнослужащих Африканского корпуса",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.mid.ru/ru/foreign_policy/news/2136883/",
+        "retrieved_at": "2026-08-30T23:44:00Z"
+      }
+    },
+    {
+      "source": "Algerian Ministry of National Defence",
+      "fragment": "deux (2) patrouilles d’avions de chasse de type Sukhoi su-30 (4 avions)",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.mdn.dz/site_principal/sommaire/actualites/fr/2026/aout/niger30082026fr.php",
+        "retrieved_at": "2026-08-30T23:44:00Z"
+      }
+    },
+    {
+      "source": "Agence Nigérienne de Presse — Algerian aircraft reception",
+      "fragment": "accompagnés par un Iliouchine IL-78 ravitailleur",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://anp.ne/le-niger-renforce-sa-flotte-aerienne-avec-quatre-avions-de-chasse-dans-le-cadre-de-sa-cooperation-avec-lalgerie/",
+        "retrieved_at": "2026-08-30T23:44:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "niamey",
+    "hero_map": "niamey",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Niamey. Base 101 sits inside the Diori Hamani airport complex.",
+    "spots": [
+      {
+        "name": "NIAMEY",
+        "lat": 13.51,
+        "lon": 2.11
+      },
+      {
+        "name": "BASE 101",
+        "lat": 13.48,
+        "lon": 2.17,
+        "label_side": "left"
+      }
+    ]
+  }
+}
