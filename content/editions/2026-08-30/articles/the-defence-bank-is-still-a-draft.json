@@ -1,0 +1,143 @@
+{
+  "id": "the-defence-bank-is-still-a-draft",
+  "edition_date": "2026-08-30",
+  "section": "world",
+  "kicker": "Capital Before Charter",
+  "headline": "The Defence Bank Is Still a Draft",
+  "deck": "Nine governments have declared an intention to establish the DSRB. Its charter remains unpublished, and no public subscription table fixes who will pay what. Capital commitments still await public country-level numbers.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Macro Desk",
+    "agents": [
+      "Foreman"
+    ]
+  },
+  "timestamp": "23:50 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "europe-defense",
+    "fiscal-policy"
+  ],
+  "body": [
+    "Nine countries used the Ankara NATO summit to declare a shared intention to establish the Defence, Security and Resilience Bank: Canada, Albania, Belgium, Greece, Latvia, Luxembourg, Romania, Türkiye and Ukraine [E1]. Canada’s companion release called the DSRB a new multilateral financial institution and invited partners to undertake domestic treaty processes with the objective of making it operational in 2027 [E2]. Those verbs place legal establishment in the future tense [E1][E2]. At the 30 August freeze, the DSRB is therefore a proposed treaty-based international financial institution whose sponsors have declared intent and negotiated founding text [E1][E2].",
+    "In March, representatives from 18 countries met in Montréal to work toward a charter defining the bank’s governance and operations [E3]. By late April, Canada said those negotiations had concluded, called the result an important first step and said Canada would host the headquarters once the agreement was ratified [E4]. The July announcement says the successfully negotiated Articles of Agreement constitute the only basis for establishing the bank, while the published release does not supply the Articles themselves [E2]. Ratification and domestic treaty processes consequently remain separate steps in the official timetable [E2][E4].",
+    "Promoters have sketched a capital architecture built from paid-in equity and callable sovereign capital [E5][E6]. Kevin Reed told a Canadian parliamentary committee that if Canada subscribed C$10 billion, C$2 billion would be paid over four years and C$8 billion would be callable, producing at least C$50 billion of financing capacity in his example [E5]. The conditional phrasing makes that a worked example from the DSR Bank Development Group; the testimony states no Canadian appropriation or subscription decision [E5]. Luxembourg for Finance separately describes the proposed institution on a World Bank and EBRD-style model funded through paid-in capital and callable sovereign guarantees [E6].",
+    "Ankara’s declaration contains nine national names and no country-by-country capital figures [E1]. Canada is the only G7 state named in that declaration [E1]. The nine public declarants also form a smaller group than the 18 countries represented at the March negotiations [E1][E3]. Negotiating attendance, political declaration and eventual treaty membership therefore describe different stages, and the official documents cited here assign none of the nine a subscription amount [E1][E2][E3][E4].",
+    "Paid-in and callable capital perform different jobs in the proposed balance sheet [E5][E6]. Paid-in capital supplies equity, while callable capital is a sovereign commitment available under specified conditions to support the institution’s credit structure and borrowing capacity [E5][E6]. Reed’s 20–80 worked example shows how a headline capital envelope can substantially exceed the cash initially contributed by a member [E5]. Without published national subscriptions, an aggregate capital claim can still be mixing political intent, design assumptions and future budget authority [E1][E5][E6].",
+    "Operationally, the promoters envisage long-term lending, guarantees and financing for governments, defence companies and smaller suppliers [E2][E7]. The promoter site says member states would own the institution and that each nation would be responsible only for its own commitments [E7]. Luxembourg for Finance says paid-in contributions are intended to count toward NATO’s defence-spending target, giving governments a direct fiscal-policy reason to consider the structure [E6]. Those proposed mechanics can be analysed now, although the public documents still leave the sovereign capital commitments themselves unpriced [E1][E4][E5][E6].",
+    "A ratified founding agreement and country-by-country subscriptions would turn the political project into something that can be measured as an international financial institution [E2][E4]. Until those appear publicly, there is no official basis in these documents for converting a headline aggregate into confirmed paid-in and callable sovereign capital [E2][E4][E5][E6]. The nine-country declaration proves that a coalition intends to establish the institution and says nothing about how many euros each government has subscribed [E1]. The Ankara declaration is a coalition, not a capitalization table [E1]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Ankara declarants",
+      "value": "9",
+      "dir": "flat"
+    },
+    {
+      "label": "Montréal negotiating countries",
+      "value": "18",
+      "dir": "flat"
+    },
+    {
+      "label": "Earliest operations target",
+      "value": "2027",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Prime Minister of Canada",
+      "fragment": "our shared intention to establish the Defence, Security and Resilience Bank",
+      "as_of": "2026-07-07",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.pm.gc.ca/en/news/statements/2026/07/07/declaration-defence-security-and-resilience-bank",
+        "retrieved_at": "2026-08-30T23:42:00Z"
+      }
+    },
+    {
+      "source": "Prime Minister of Canada",
+      "fragment": "undertake their respective domestic treaty processes",
+      "as_of": "2026-07-07",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.pm.gc.ca/en/news/news-releases/2026/07/07/eight-countries-commit-supporting-canada-led-defence-security-and",
+        "retrieved_at": "2026-08-30T23:42:00Z"
+      }
+    },
+    {
+      "source": "Department of Finance Canada",
+      "fragment": "representatives from eighteen countries to establish the Defence, Security and Resilience Bank",
+      "as_of": "2026-03-01",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/department-finance/news/2026/03/canada-hosts-partners-to-advance-establishment-of-the-defence-security-and-resilience-bank.html",
+        "retrieved_at": "2026-08-30T23:42:00Z"
+      }
+    },
+    {
+      "source": "Department of Finance Canada",
+      "fragment": "an important first step to set up the new institution",
+      "as_of": "2026-04-01",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.canada.ca/en/department-finance/news/2026/04/canada-welcomes-progress-towards-the-establishment-of-the-defence-security-and-resilience-bank-and-hosting-its-headquarters.html",
+        "retrieved_at": "2026-08-30T23:42:00Z"
+      }
+    },
+    {
+      "source": "openparliament.ca",
+      "fragment": "pool paid-in and callable capital",
+      "as_of": "2025-11-05",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://openparliament.ca/committees/industry-and-technology/45-1/13/kevin-reed-1/only/",
+        "retrieved_at": "2026-08-30T23:42:00Z"
+      }
+    },
+    {
+      "source": "Luxembourg for Finance",
+      "fragment": "funded through paid-in capital and callable sovereign guarantees",
+      "as_of": "2026-07-09",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.luxembourgforfinance.com/en/news/luxembourg-confirmed-as-european-hub-for-new-nato-linked-defence-bank/",
+        "retrieved_at": "2026-08-30T23:42:00Z"
+      }
+    },
+    {
+      "source": "DSR Bank",
+      "fragment": "Each nation is responsible only for its own commitments",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E7",
+        "source_kind": "public_url",
+        "used_by_agent": "Foreman",
+        "source_url": "https://www.dsrb.org/what-is-the-dsrb",
+        "retrieved_at": "2026-08-30T23:42:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7"
+  ]
+}

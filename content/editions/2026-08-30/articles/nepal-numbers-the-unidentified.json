@@ -1,0 +1,172 @@
+{
+  "id": "nepal-numbers-the-unidentified",
+  "edition_date": "2026-08-30",
+  "section": "world",
+  "kicker": "Day Four Ledger",
+  "headline": "Nepal Counts the Unidentified",
+  "deck": "Two official Nepali ledgers diverged by 13 recovered bodies within 15 minutes. The state is preserving photographs, clothing records and DNA before burial because identification is what closes a missing-person file.",
+  "epistemic": "inference",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "23:50 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "natural-disasters",
+    "supply-chains"
+  ],
+  "previous_coverage": [
+    {
+      "date": "2026-08-26",
+      "slug": "ice-breaks-the-trishuli"
+    },
+    {
+      "date": "2026-08-27",
+      "slug": "nepal-counts-the-missing"
+    }
+  ],
+  "body": [
+    "Nepal Police put the body-recovery ledger at 794 at 17:45 NPT on Sunday, with bodies recorded across eight districts from Rasuwa to Nawalparasi West [E1]. Fifteen minutes later, NDRRMA’s 18:00 bulletin had 781 recovered and 2,502 missing [E2]. The 13-body gap is small beside the disaster, but analytically decisive: these are parallel official ledgers frozen at different cuts, not interchangeable columns [E1][E2]. Adding 794 to 2,502 would manufacture a hybrid total no Nepali agency published [E1][E2].",
+    "A recovered-body count and a missing-person count are updated through different acts: finding remains and resolving an identity [E1][E2][E3]. Police are photographing remains, recording clothing and identifying marks, and preserving DNA for bodies that cannot yet be named [E3]. Until a body is linked to a missing-person file, one person can remain represented in both ledgers [E2][E3]. That possible overlap is why the Police total and NDRRMA missing total are not additive [E1][E2][E3].",
+    "The Home Ministry’s First Amendment to the unidentified and unclaimed bodies guideline was posted on 29 August, creating the legal frame for disaster burials [E4]. Police implementation requires forensic photographs from multiple angles, records of clothing and marks, coded files, DNA samples, and burial records that preserve location and identity evidence [E3]. District Security Committees can authorize burial after that preservation process, and each grave is to retain a code plus GPS and photographic records [E3]. Burial leaves the identification file alive: the record is built to survive the grave [E3][E4].",
+    "Across the border, Xizang authorities briefed 16 dead and 546 missing as of 18:00 CST on 29 August [E2]. Those figures belong to the Gyirong/Xizang ledger and should remain separate from Nepal’s two unreconciled ledgers [E1][E2]. Any cross-border total must add like categories from timestamped jurisdictions and preserve Nepal’s internal mismatch as a separate caveat [E1][E2]. The clean regional picture on day four is a set of labeled ledgers with timestamps [E1][E2].",
+    "The physical mechanism has not changed with the casualty arithmetic [E5]. USGS still describes a rapid slope failure involving glacier ice that became a debris flow and flood travelling roughly 100 kilometres, with water and ice feeding a boulder-laden surge down existing channels [E5]. That cascade explains how bodies and debris were distributed far downstream across multiple districts, where recovery and identification proceed on different clocks [E1][E5]. It also explains why a recovered-body count can jump ahead of a named-victim list: the river carried remains through a long channel before identification could close the files [E1][E3][E5].",
+    "China’s emergency ministry added a live hazard on 30 August: monitoring found a new landslide 2.8 kilometres downstream of the existing barrier lake, forming another blockage and a new impoundment, and rescuers near Gyirong Port were moved to safety [E6]. That development creates a conditional risk of a second pulse; no second breach is recorded in the 30 August material [E6]. The discriminator is physical: whether the new impoundment stabilizes or fails into the channel [E6]. Until that resolves, search teams are operating beneath a hazard capable of changing the recovery map again [E6].",
+    "By late Sunday, Nepal’s disaster ledger was functioning as an identification machine [E1][E2][E3]. Police had hundreds of recovered bodies, NDRRMA still carried thousands of missing people, and the amended protocol was preserving photographs, clothing, DNA and grave coordinates so those lists could eventually converge [E1][E2][E3][E4]. The 13-body disagreement is evidence of process lag, not evidence that 13 people appeared or vanished between 17:45 and 18:00 [E1][E2]. Until identity closes the file, Nepal can count the dead and still be counting the same person among the missing [E2][E3]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Nepal Police recovered bodies",
+      "value": "794 at 17:45 NPT",
+      "dir": "up"
+    },
+    {
+      "label": "NDRRMA recovered bodies",
+      "value": "781 at 18:00 NPT",
+      "dir": "up"
+    },
+    {
+      "label": "NDRRMA missing",
+      "value": "2,502 at 18:00 NPT",
+      "dir": "up"
+    },
+    {
+      "label": "Police–NDRRMA recovered-body gap",
+      "value": "13",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Nepal Police",
+      "fragment": "आइतबार साँझ १७:४५ बजे सम्म ७ सय ९४ जनाको शव फेला परेको छ",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://nepalpolice.gov.np/news/10281/",
+        "retrieved_at": "2026-08-30T23:48:00Z"
+      }
+    },
+    {
+      "source": "Xinhua",
+      "fragment": "781 bodies had been recovered from mudslide-hit areas, with 2,502 people still missing.",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://english.news.cn/20260830/587d91840ce4402c96a036a87eb0d023/c.html",
+        "retrieved_at": "2026-08-30T23:48:00Z"
+      }
+    },
+    {
+      "source": "Nepal Police",
+      "fragment": "DNA नमूना संकलन गरी सुरक्षित संरक्षण गर्ने व्यवस्था गरिएको",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.nepalpolice.gov.np/news/10273/",
+        "retrieved_at": "2026-08-30T23:48:00Z"
+      }
+    },
+    {
+      "source": "Home Ministry Nepal",
+      "fragment": "पहिचान नभएका तथा बेवारिसे शव व्यवस्थापन (पहिलो संशोधन) निर्देशिका, 2083",
+      "as_of": "2026-08-29",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.moha.gov.np/post/paha-ca-na-nabhaeka-tatha-b-va-ra-sa-shava-va-yavasa-tha-pana-paha-l-sa-sha",
+        "retrieved_at": "2026-08-30T23:48:00Z"
+      }
+    },
+    {
+      "source": "U.S. Geological Survey",
+      "fragment": "The debris flow and flood travelled approximately 100 kilometers",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.usgs.gov/programs/landslide-hazards/science/2026-nepal-debris-avalanche-and-flash-flood",
+        "retrieved_at": "2026-08-30T23:48:00Z"
+      }
+    },
+    {
+      "source": "China Ministry of Emergency Management",
+      "fragment": "形成新的堰塞体，正在形成新的堰塞湖。",
+      "as_of": "2026-08-30",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.mem.gov.cn/xw/yjglbgzdt/202608/t20260830_709481.shtml",
+        "retrieved_at": "2026-08-30T23:48:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "bhote-koshi",
+    "hero_map": "bhote-koshi",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Bhote Koshi–Trishuli. The 30 August story is the identification ledger.",
+    "spots": [
+      {
+        "name": "RASUWAGADHI",
+        "lat": 28.28,
+        "lon": 85.38
+      },
+      {
+        "name": "GYIRONG",
+        "lat": 28.86,
+        "lon": 85.3,
+        "label_side": "left"
+      },
+      {
+        "name": "TRISHULI",
+        "lat": 27.91,
+        "lon": 85.15
+      }
+    ]
+  }
+}
