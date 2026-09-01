@@ -1,9 +1,9 @@
 {
   "version": "v1",
   "timezone": "Europe/Berlin",
-  "deadline": "16:20",
+  "deadline": "16:00",
   "privateDirectories": ["sensor-ledger", "candidates", "evidence", "pinpoint", "dossiers", "compose", "decisions", "receipts"],
-  "requiredCapabilities": ["isolated-home", "isolated-xdg", "isolated-workspace", "cli-login", "research-broker", "private-root", "moltnet", "network-policy", "git-policy"],
+  "requiredCapabilities": ["isolated-home", "isolated-xdg", "isolated-workspace", "cli-login", "research-broker", "private-root", "compiler-workspace-resources", "durable-authenticated-moltnet", "direct-research-sensor", "network-policy", "git-policy"],
   "enginePolicy": {
     "active": { "grok": 10, "codex": 6 },
     "agy": { "hostAuthCheck": true, "linuxPortable": false, "status": "deferred-broker" }

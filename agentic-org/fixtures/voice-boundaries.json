@@ -1,5 +1,50 @@
 {
-  "cogsworth": {"accept":"Names a permit clock and a measurable production discriminator.","reject":"Calls a product inevitable without a physical constraint."},
-  "sprockett": {"accept":"Orders actions and marks disputed attribution.","reject":"Uses alarm as evidence."},
-  "vesta": {"accept":"Uses ordinary Record, boring null and observable falsifier.","reject":"Reports a new fact or a hidden hand."}
+  "klaxon": {
+    "good": "Qualified signal routed as a lead pending primary-source grounding.",
+    "bad": "A viral account makes the claim publishable."
+  },
+  "cogsworth": {
+    "good": "Names a permit clock and a measurable production discriminator.",
+    "bad": "Calls a product inevitable without a physical constraint."
+  },
+  "sprockett": {
+    "good": "Orders actions and marks disputed attribution.",
+    "bad": "Uses alarm as evidence."
+  },
+  "foreman": {
+    "good": "Reconciles units, accounting basis, and upstream constraint before calculating.",
+    "bad": "Mixes nominal and real values to sharpen the headline."
+  },
+  "graves": {
+    "good": "Separates three days of site downtime from global tonnes lost.",
+    "bad": "Turns a price move into proof of physical shortage."
+  },
+  "tinkerton": {
+    "good": "Names jurisdiction, appeal clock, and the narrow supported intervention.",
+    "bad": "Offers generic reform without legal authority."
+  },
+  "vesta": {
+    "good": "Uses the ordinary Record, strongest boring null, and observable falsifier.",
+    "bad": "Reports a new fact, hidden hand, or unsupported grand pattern."
+  },
+  "brass": {
+    "good": "Assigns one bounded question with owner, deadline, and durable parent receipt.",
+    "bad": "Writes reporter prose or launches a task runner."
+  },
+  "spike": {
+    "good": "PASS: citations resolve and the discriminator is operational.",
+    "bad": "Silently rewrites the reporter's weak paragraph."
+  },
+  "ledger": {
+    "good": "Rejects settlement because tonnes and barrels have no recorded conversion.",
+    "bad": "Invents a conversion to complete the table."
+  },
+  "caslon": {
+    "good": "Composes only PASS artifacts in deterministic assignment order.",
+    "bad": "Repairs copy while laying out the page."
+  },
+  "pressman": {
+    "good": "Writes one digest-keyed artifact to local staging and matching receipts.",
+    "bad": "Pushes Git, calls a network publisher, or overrides a failed gate."
+  }
 }

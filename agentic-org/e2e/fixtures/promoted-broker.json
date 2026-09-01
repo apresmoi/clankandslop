@@ -1,0 +1,11 @@
+{
+  "version": "v1",
+  "request_id": "request-20260816",
+  "health": "ok",
+  "sources": [{
+    "url": "https://example.test/qualified-source",
+    "retrieved_at": "2026-08-16T10:00:00.000Z",
+    "capture_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "private_locator": "private:captures/request-20260816/qualified-source.html"
+  }]
+}

@@ -1,0 +1,21 @@
+{
+  "version": "spawnfile.explicit-test-mcp-declaration.v1",
+  "servers": [
+    {
+      "id": "newsroom-brass",
+      "agent_id": "agent:brass",
+      "command": "/usr/local/bin/node",
+      "args": ["/e2e/scripts/newsroom-mcp.mjs"],
+      "tools": ["checkpoint"],
+      "env_names": []
+    },
+    {
+      "id": "newsroom-pressman",
+      "agent_id": "agent:pressman",
+      "command": "/usr/local/bin/node",
+      "args": ["/e2e/scripts/newsroom-mcp.mjs"],
+      "tools": ["checkpoint"],
+      "env_names": []
+    }
+  ]
+}

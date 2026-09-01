@@ -1,8 +1,8 @@
 {
   "version": "v1", "edition": "2026-08-16", "root": "/var/lib/clank-private/2026-08-16",
   "artifacts": [
-    {"kind":"sensor-ledger","path":"sensor-ledger/frontier-summary.json","owner":"frontier","digest":"sha256:3333333333333333333333333333333333333333333333333333333333333333"},
-    {"kind":"pinpoint","path":"pinpoint/chip-source.json","owner":"frontier","digest":"sha256:4444444444444444444444444444444444444444444444444444444444444444"},
+    {"kind":"sensor-ledger","path":"sensor-ledger/frontier-summary.json","owner":"klaxon","digest":"sha256:3333333333333333333333333333333333333333333333333333333333333333"},
+    {"kind":"pinpoint","path":"pinpoint/chip-source.json","owner":"klaxon","digest":"sha256:4444444444444444444444444444444444444444444444444444444444444444"},
     {"kind":"dossiers","path":"dossiers/cogsworth-chip.json","owner":"cogsworth","digest":"sha256:5555555555555555555555555555555555555555555555555555555555555555"},
     {"kind":"receipts","path":"receipts/release.json","owner":"pressman","digest":"sha256:6666666666666666666666666666666666666666666666666666666666666666"}
   ]

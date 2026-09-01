@@ -8,7 +8,7 @@
   "properties": {
     "version": { "const": "v1" }, "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{5,80}$" },
     "type": { "enum": ["ASSIGNMENT", "ACK", "PINPOINT_REQUEST", "PINPOINT_CLAIM", "PINPOINT_RESULT", "PINPOINT_NOT_FOUND", "FILED", "REVISION_REQUEST", "REFILED", "PASS", "HOLD", "SPIKE", "COMPOSITION_ISSUE", "COMPOSED", "RELEASE_HANDOFF"] },
-    "edition": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }, "release": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T16:20:00(?:\\+01:00|\\+02:00)\\[Europe/Berlin\\]$" }, "owner": { "type": "string", "pattern": "^[a-z][a-z-]+$" },
+    "edition": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }, "release": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T16:00:00(?:\\+01:00|\\+02:00)\\[Europe/Berlin\\]$" }, "owner": { "type": "string", "pattern": "^[a-z][a-z-]+$" },
     "recipient": { "type": "string", "pattern": "^[a-z][a-z-]+$" }, "article_owner": { "type": "string", "pattern": "^[a-z][a-z-]+$" },
     "artifact_refs": { "$ref": "#/$defs/refs" }, "derived_from": { "$ref": "#/$defs/refs" }, "revision": { "type": "integer", "minimum": 0 }, "causal_parent": { "type": "string" }, "correlation_id": { "type": "string", "pattern": "^[a-z0-9-]{6,80}$" }, "deadline": { "type": "string", "format": "date-time" }, "terminal_state": { "enum": ["OPEN", "ACKED", "CLAIMED", "FILED", "REVISION_REQUESTED", "REFILED", "PASSED", "HELD", "SPIKED", "COMPOSED", "HANDED_OFF"] }, "summary": { "type": "string", "minLength": 1, "maxLength": 800, "pattern": "^(?!.*(?:credential|password|token|profile|<html|prompt:)).*$" }
   },

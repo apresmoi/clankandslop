@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clank &amp; Slop — newsroom organization</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4EEE0; --paper-2:#ECE3D0; --ink:#0F0F0F; --muted:#6B5F4E; --soft:#8A8172;
+    --rule:rgba(15,15,15,0.16); --rule-solid:rgba(15,15,15,0.42);
+    --accent:#B8841E; --accent-tint:rgba(184,132,30,0.10); --link:#2D6B3A; --stop:#A91D1D;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#14110E; --paper-2:#1C1813; --ink:#E8E0D0; --muted:#8F8470; --soft:#7A705E;
+      --rule:rgba(232,224,208,0.14); --rule-solid:rgba(232,224,208,0.32);
+      --accent:#D9A441; --accent-tint:rgba(217,164,65,0.12); --link:#6EBE85; --stop:#D97766;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:48px clamp(16px,4vw,64px);background:var(--paper);color:var(--ink);
+       font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto}
+  .eyebrow{font-family:'Geist Mono',monospace;font-size:8px;letter-spacing:0.18em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  h1{font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:1.75rem;
+     margin:0 0 8px;letter-spacing:0.01em}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 32px;max-width:68ch;line-height:1.6}
+  svg{width:100%;height:auto;display:block}
+  .cards{display:grid;grid-template-columns:1.1fr 1fr 0.9fr;gap:16px;margin-top:40px}
+  .card{background:var(--paper-2);border:1px solid var(--rule);border-radius:6px;padding:1.25rem}
+  .card h3{font-family:'Geist',sans-serif;font-size:13px;font-weight:600;margin:0}
+  .card-header{display:flex;align-items:center;gap:8px;margin:4px 0 12px}
+  .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .dot.accent{background:var(--accent)} .dot.ink{background:var(--ink)} .dot.stop{background:var(--stop)}
+  .card ul{margin:0;padding-left:16px;color:var(--muted);font-size:12px;line-height:1.7}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
+         font-family:'Geist Mono',monospace;font-size:9px;color:var(--soft);letter-spacing:0.06em}
+  @media (max-width:900px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Agentic organization</p>
+  <h1>How the Clank &amp; Slop newsroom works</h1>
+  <p class="sub">Sixteen Daimon agents share five private Moltnet rooms and one durable edition state.
+     Only Brass holds a schedule; everything else wakes on being mentioned. The release path ends at a
+     local staging volume — no agent holds a credential that can reach <code>main</code>.</p>
+
+<svg viewBox="0 0 1240 720" role="img" aria-labelledby="newsroom-org-title newsroom-org-desc">
+  <title id="newsroom-org-title">Clank &amp; Slop newsroom organization</title>
+  <desc id="newsroom-org-desc">Architecture diagram of a sixteen-agent automated newsroom. Research sensors on a
+    separate workstation hand signals to Klaxon; Brass, woken by a daily schedule, assigns work to six reporter desks;
+    Spike reviews every filing and returns revisions; Brass activates Ledger and Caslon only when five articles pass;
+    Caslon composes and Pressman stages the edition to a local volume and durable edition state. A blocked path shows
+    that Pressman cannot reach the main branch or the live site, because no agent is issued a publishing credential.</desc>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#6B5F4E"/></marker>
+    <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#B8841E"/></marker>
+    <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#2D6B3A"/></marker>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#F4EEE0"/>
+
+  <!-- ── trust zones (painted first) ───────────────────────────────── -->
+  <rect x="32" y="120" width="200" height="144" rx="8" fill="rgba(15,15,15,0.03)" stroke="rgba(15,15,15,0.30)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="48" y="144" fill="#8A8172" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.14em">SENSING · 4090</text>
+
+  <rect x="272" y="88" width="696" height="536" rx="8" fill="rgba(184,132,30,0.05)" stroke="rgba(184,132,30,0.50)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="288" y="112" fill="#B8841E" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.14em">NEWSROOM RUNTIME · ONE CONTAINER, NO GIT CREDENTIAL</text>
+
+  <rect x="1008" y="400" width="200" height="144" rx="8" fill="rgba(15,15,15,0.03)" stroke="rgba(15,15,15,0.30)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="1024" y="424" fill="#8A8172" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.14em">PUBLICATION</text>
+
+  <!-- ── connectors (drawn before boxes) ──────────────────────────── -->
+
+  <!-- 1. sensors ⇢ klaxon : authenticated DM, not currently installed -->
+  <path d="M 208,200 H 248 Q 256,200 256,192 V 180 Q 256,172 264,172 H 304"
+        fill="none" stroke="#6B5F4E" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+
+  <!-- 2. klaxon → brass -->
+  <line x1="464" y1="172" x2="512" y2="172" stroke="#6B5F4E" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- 3. brass → reporters : assignment room -->
+  <line x1="600" y1="208" x2="600" y2="280" stroke="#B8841E" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+
+  <!-- 4. reporters → spike : filing room -->
+  <path d="M 688,300 H 696 Q 704,300 704,292 V 180 Q 704,172 712,172 H 768"
+        fill="none" stroke="#6B5F4E" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- 5. spike ⇢ reporters : REVISION_REQUEST, the return leg -->
+  <path d="M 768,196 H 752 Q 744,196 744,204 V 336 Q 744,344 736,344 H 688"
+        fill="none" stroke="#6B5F4E" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+
+  <!-- 6. brass → ledger·caslon : activation, gated on five PASS -->
+  <path d="M 688,190 H 716 Q 724,190 724,198 V 316 Q 724,324 732,324 H 768"
+        fill="none" stroke="#B8841E" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+
+  <!-- 7. caslon → pressman : release room -->
+  <line x1="848" y1="368" x2="848" y2="432" stroke="#6B5F4E" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- 8. pressman → edition state : durable, digest-keyed -->
+  <line x1="768" y1="468" x2="648" y2="468" stroke="#2D6B3A" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+
+  <!-- 9. FORBIDDEN : stops dead before the publication zone -->
+  <line x1="928" y1="468" x2="972" y2="468" stroke="#A91D1D" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <line x1="976" y1="452" x2="976" y2="484" stroke="#A91D1D" stroke-width="2.4"/>
+  <line x1="984" y1="452" x2="984" y2="484" stroke="#A91D1D" stroke-width="2.4"/>
+
+  <!-- ── arrow labels (masked, 6–10px clear of the stroke) ─────────── -->
+  <rect x="234" y="152" width="44" height="12" rx="2" fill="#F4EEE0"/>
+  <text x="256" y="161" fill="#8A8172" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">DM · IDLE</text>
+
+  <rect x="466" y="150" width="44" height="12" rx="2" fill="#F4EEE0"/>
+  <text x="488" y="159" fill="#8A8172" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">SENSOR</text>
+
+  <rect x="608" y="238" width="60" height="12" rx="2" fill="#F4EEE0"/>
+  <text x="638" y="247" fill="#B8841E" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">ASSIGNMENT</text>
+
+
+
+
+  <rect x="856" y="392" width="44" height="12" rx="2" fill="#F4EEE0"/>
+  <text x="878" y="401" fill="#8A8172" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">RELEASE</text>
+
+  <rect x="672" y="444" width="52" height="12" rx="2" fill="#F4EEE0"/>
+  <text x="698" y="453" fill="#2D6B3A" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">DURABLE</text>
+
+  <rect x="932" y="440" width="76" height="12" rx="2" fill="#F4EEE0"/>
+  <text x="970" y="449" fill="#A91D1D" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.06em">NO CREDENTIAL</text>
+
+  <!-- ── nodes ─────────────────────────────────────────────────────── -->
+
+  <!-- sensors (external) -->
+  <rect x="56" y="168" width="152" height="64" rx="6" fill="#F4EEE0"/>
+  <rect x="56" y="168" width="152" height="64" rx="6" fill="rgba(15,15,15,0.03)" stroke="rgba(15,15,15,0.30)" stroke-width="1"/>
+  <rect x="64" y="176" width="36" height="12" rx="2" fill="transparent" stroke="rgba(15,15,15,0.30)" stroke-width="0.8"/>
+  <text x="82" y="185" fill="#8A8172" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SENSE</text>
+  <text x="132" y="208" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Research sensors</text>
+  <text x="132" y="222" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">chatgpt · grok · 4h</text>
+
+  <!-- klaxon -->
+  <rect x="304" y="136" width="160" height="72" rx="6" fill="#F4EEE0"/>
+  <rect x="304" y="136" width="160" height="72" rx="6" fill="#ffffff" stroke="#0F0F0F" stroke-width="1"/>
+  <rect x="312" y="144" width="30" height="12" rx="2" fill="transparent" stroke="rgba(15,15,15,0.40)" stroke-width="0.8"/>
+  <text x="327" y="153" fill="#6B5F4E" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">GROK</text>
+  <text x="384" y="180" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Klaxon</text>
+  <text x="384" y="196" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">qualify_signal</text>
+
+  <!-- brass — focal 1 -->
+  <rect x="512" y="136" width="176" height="72" rx="6" fill="#F4EEE0"/>
+  <rect x="512" y="136" width="176" height="72" rx="6" fill="rgba(184,132,30,0.10)" stroke="#B8841E" stroke-width="1"/>
+  <rect x="520" y="144" width="52" height="12" rx="2" fill="transparent" stroke="rgba(184,132,30,0.50)" stroke-width="0.8"/>
+  <text x="546" y="153" fill="#B8841E" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">SCHEDULE</text>
+  <text x="600" y="180" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Brass · chief</text>
+  <text x="600" y="196" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">cron 14,15,16 Berlin</text>
+
+  <!-- reporters -->
+  <rect x="512" y="280" width="176" height="88" rx="6" fill="#F4EEE0"/>
+  <rect x="512" y="280" width="176" height="88" rx="6" fill="#ffffff" stroke="#0F0F0F" stroke-width="1"/>
+  <rect x="520" y="288" width="30" height="12" rx="2" fill="transparent" stroke="rgba(15,15,15,0.40)" stroke-width="0.8"/>
+  <text x="535" y="297" fill="#6B5F4E" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">×6</text>
+  <text x="600" y="322" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Reporter desks</text>
+  <text x="600" y="338" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">hardware · escalation</text>
+  <text x="600" y="352" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">macro · commodities · policy</text>
+
+  <!-- spike — the privileged gate -->
+  <rect x="768" y="136" width="160" height="72" rx="6" fill="#F4EEE0"/>
+  <rect x="768" y="136" width="160" height="72" rx="6" fill="#ffffff" stroke="#0F0F0F" stroke-width="1.2"/>
+  <rect x="776" y="144" width="34" height="12" rx="2" fill="transparent" stroke="rgba(15,15,15,0.40)" stroke-width="0.8"/>
+  <text x="793" y="153" fill="#6B5F4E" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">GATE</text>
+  <text x="848" y="180" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Spike · editor</text>
+  <text x="848" y="196" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">PASS · never rewrites</text>
+
+  <!-- ledger · caslon -->
+  <rect x="768" y="280" width="160" height="88" rx="6" fill="#F4EEE0"/>
+  <rect x="768" y="280" width="160" height="88" rx="6" fill="#ffffff" stroke="#0F0F0F" stroke-width="1"/>
+  <rect x="776" y="288" width="34" height="12" rx="2" fill="transparent" stroke="rgba(15,15,15,0.40)" stroke-width="0.8"/>
+  <text x="793" y="297" fill="#6B5F4E" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">DESK</text>
+  <text x="848" y="322" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Ledger · Caslon</text>
+  <text x="848" y="338" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">settlements · compose</text>
+  <text x="848" y="352" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">front + tape</text>
+
+  <!-- pressman — focal 2, the boundary -->
+  <rect x="768" y="432" width="160" height="72" rx="6" fill="#F4EEE0"/>
+  <rect x="768" y="432" width="160" height="72" rx="6" fill="rgba(184,132,30,0.10)" stroke="#B8841E" stroke-width="1"/>
+  <rect x="776" y="440" width="46" height="12" rx="2" fill="transparent" stroke="rgba(184,132,30,0.50)" stroke-width="0.8"/>
+  <text x="799" y="449" fill="#B8841E" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">PRESS</text>
+  <text x="848" y="476" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Pressman</text>
+  <text x="848" y="492" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">stage_release · local FS</text>
+
+  <!-- edition state (store) -->
+  <rect x="304" y="432" width="344" height="72" rx="6" fill="#F4EEE0"/>
+  <rect x="304" y="432" width="344" height="72" rx="6" fill="rgba(15,15,15,0.05)" stroke="#6B5F4E" stroke-width="1"/>
+  <rect x="312" y="440" width="38" height="12" rx="2" fill="transparent" stroke="rgba(107,95,78,0.40)" stroke-width="0.8"/>
+  <text x="331" y="449" fill="#6B5F4E" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing="0.08em">STORE</text>
+  <text x="476" y="476" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Durable edition state</text>
+  <text x="476" y="492" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">filings · verdicts · receipts · maps</text>
+
+  <!-- publication destination -->
+  <rect x="1032" y="448" width="152" height="64" rx="6" fill="#F4EEE0"/>
+  <rect x="1032" y="448" width="152" height="64" rx="6" fill="rgba(15,15,15,0.03)" stroke="rgba(15,15,15,0.30)" stroke-width="1"/>
+  <text x="1108" y="484" fill="#0F0F0F" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">main → live site</text>
+  <text x="1108" y="498" fill="#6B5F4E" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">operator merges</text>
+
+  <!-- ── legend ────────────────────────────────────────────────────── -->
+  <line x1="32" y1="624" x2="1208" y2="624" stroke="rgba(15,15,15,0.10)" stroke-width="0.8"/>
+  <text x="32" y="644" fill="#6B5F4E" font-size="8" font-family="'Geist Mono',monospace" letter-spacing="0.14em">LEGEND</text>
+
+  <rect x="112" y="636" width="18" height="10" rx="2" fill="rgba(184,132,30,0.10)" stroke="#B8841E" stroke-width="1"/>
+  <text x="138" y="645" fill="#6B5F4E" font-size="9" font-family="'Geist',sans-serif">Focal — schedule owner, release boundary</text>
+
+  <rect x="396" y="636" width="18" height="10" rx="2" fill="rgba(15,15,15,0.05)" stroke="#6B5F4E" stroke-width="1"/>
+  <text x="422" y="645" fill="#6B5F4E" font-size="9" font-family="'Geist',sans-serif">Durable store</text>
+
+  <line x1="540" y1="641" x2="574" y2="641" stroke="#6B5F4E" stroke-width="1.2" stroke-dasharray="5,4"/>
+  <text x="582" y="645" fill="#6B5F4E" font-size="9" font-family="'Geist',sans-serif">Return leg or not yet installed</text>
+
+  <line x1="800" y1="641" x2="834" y2="641" stroke="#2D6B3A" stroke-width="1.2"/>
+  <text x="842" y="645" fill="#6B5F4E" font-size="9" font-family="'Geist',sans-serif">Durable write</text>
+
+  <line x1="948" y1="641" x2="974" y2="641" stroke="#A91D1D" stroke-width="1.2" stroke-dasharray="3,3"/>
+  <line x1="978" y1="634" x2="978" y2="648" stroke="#A91D1D" stroke-width="2.4"/>
+  <text x="990" y="645" fill="#6B5F4E" font-size="9" font-family="'Geist',sans-serif">Forbidden — no publishing credential</text>
+</svg>
+
+  <div class="cards">
+    <div class="card">
+      <p class="eyebrow">Wake model</p>
+      <div class="card-header"><span class="dot accent"></span><h3>One schedule, everything else on mention</h3></div>
+      <ul>
+        <li>Brass alone holds cron — 14:00, 15:00, 16:00 Europe/Berlin.</li>
+        <li>Every other agent wakes only on a literal <code>@agent-id</code> mention.</li>
+        <li>No polling, no task orchestrator, no operator kickoff.</li>
+        <li>Mentions queue; they never interrupt a turn in progress.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Gates</p>
+      <div class="card-header"><span class="dot ink"></span><h3>Composition is earned</h3></div>
+      <ul>
+        <li>Spike returns <code>REVISION_REQUEST</code> and never rewrites prose.</li>
+        <li>Brass activates Ledger and Caslon only on five PASS verdicts.</li>
+        <li>Caslon composes exactly <code>front</code> and <code>tape</code>.</li>
+        <li>Diversity floor, one dated forecast, one named dissenter.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Boundary</p>
+      <div class="card-header"><span class="dot stop"></span><h3>The paper stops at staging</h3></div>
+      <ul>
+        <li>Pressman writes a local volume and a digest-keyed receipt.</li>
+        <li>No Git remote, token, or publisher is declared or accepted.</li>
+        <li>Reaching <code>main</code> is an operator action, by design.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>CLANK &amp; SLOP · AGENTIC-ORG · 16 AGENTS · 5 ROOMS · SOURCE: agentic-org/TEAM.md, SYSTEMS.md, SECURITY.md</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://clankandslop.example/schemas/lifecycle-receipt/v1","type":"object","additionalProperties":false,
+  "required":["version","id","kind","edition","release","owner","correlation_id","causal_parent","artifact_digest","receipt_ref","status"],
+  "properties":{
+    "version":{"const":"v1"},"id":{"type":"string","pattern":"^[a-z0-9-]{6,80}$"},"kind":{"enum":["readiness","blocker","finalization","released","staged"]},
+    "edition":{"type":"string","pattern":"^\\d{4}-\\d{2}-\\d{2}$"},"release":{"type":"string","pattern":"^\\d{4}-\\d{2}-\\d{2}T16:00:00(?:\\+01:00|\\+02:00)\\[Europe/Berlin\\]$"},
+    "owner":{"enum":["brass","pressman"]},"correlation_id":{"type":"string","pattern":"^[a-z0-9-]{6,80}$"},"causal_parent":{"type":["string","null"]},
+    "artifact_digest":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},"receipt_ref":{"type":"string","pattern":"^state/edition/receipts/(?!(?:.*\\/)?(?:\\.|\\.\\.)(?:\\/|$))(?!.*\\/\\/)(?:[a-z0-9._-]+\\/)*[a-z0-9._-]+$"},"status":{"enum":["ready","blocked","finalized","released","staged"]}
+  }
+}

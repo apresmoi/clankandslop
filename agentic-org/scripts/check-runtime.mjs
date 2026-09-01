@@ -1,6 +1,6 @@
 import { existsSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { agents, assert, beneath, orgRoot, policy, safeDirectory } from './lib.mjs';
+import { agents, assert, beneath, declaredMoltnetSecretRefs, orgRoot, policy, safeDirectory } from './lib.mjs';
 
 export function checkRuntime(env = process.env) {
   const missing = [];
@@ -18,6 +18,7 @@ export function checkRuntime(env = process.env) {
     }
   }
   for (const capability of ['BROKER', 'MOLTNET', 'NETWORK_POLICY', 'GIT_POLICY']) if (env[`CLANK_${capability}_READY`] !== 'yes') missing.push(capability.toLowerCase().replace('_', '-'));
+  for (const secretRef of declaredMoltnetSecretRefs) if (!env[secretRef]) missing.push(`moltnet-secret:${secretRef}`);
   return { ok: missing.length === 0, missing: [...new Set(missing)], capabilities: policy.requiredCapabilities };
 }
 
