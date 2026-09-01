@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { agents, assert, digest, orgRoot, policy, privateKinds, reporters, sensors, readJson, releaseFor } from './lib.mjs';
+import { validateLifecycleGraph } from './lifecycle-graph.mjs';
+import { isBerlinRelease } from './release-time.mjs';
 
 const TYPES = new Set(['ASSIGNMENT', 'ACK', 'PINPOINT_REQUEST', 'PINPOINT_CLAIM', 'PINPOINT_RESULT', 'PINPOINT_NOT_FOUND', 'FILED', 'REVISION_REQUEST', 'REFILED', 'PASS', 'HOLD', 'SPIKE', 'COMPOSITION_ISSUE', 'COMPOSED', 'RELEASE_HANDOFF']);
 const TERMINALS = { ACK: 'ACKED', PINPOINT_CLAIM: 'CLAIMED', PINPOINT_RESULT: 'CLAIMED', PINPOINT_NOT_FOUND: 'CLAIMED', FILED: 'FILED', REVISION_REQUEST: 'REVISION_REQUESTED', REFILED: 'REFILED', PASS: 'PASSED', HOLD: 'HELD', SPIKE: 'SPIKED', COMPOSED: 'COMPOSED', RELEASE_HANDOFF: 'HANDED_OFF' };
@@ -36,7 +38,7 @@ export function validateMessage(message, prior = []) {
   for (const key of ['version', 'id', 'type', 'edition', 'release', 'owner', 'artifact_refs', 'derived_from', 'revision', 'correlation_id', 'deadline', 'terminal_state', 'summary']) assert(key in message, `message missing ${key}`);
   assert(message.version === 'v1' && TYPES.has(message.type), 'message version/type invalid');
   assert(/^\d{4}-\d{2}-\d{2}$/.test(message.edition), 'edition invalid');
-  assert(message.release === releaseFor(message.edition, message.release.includes('+01:00') ? '+01:00' : '+02:00'), 'release must be Berlin 16:20');
+  assert(isBerlinRelease(message.edition, message.release), 'release must be Berlin 16:00');
   assert(agents.includes(message.owner), 'unknown owner');
   for (const refs of [message.artifact_refs, message.derived_from]) assert(Array.isArray(refs) && refs.every((ref) => digest.test(ref.digest) && !/(credential|profile|html|prompt)/i.test(ref.ref)), 'artifact reference invalid');
   assert(message.artifact_refs.length > 0, 'output artifact missing');
@@ -58,13 +60,94 @@ export function validateMessage(message, prior = []) {
 
 export function validateManifest(manifest) { for (const artifact of manifest.artifacts) { assert(privateKinds.has(artifact.kind), 'unknown private kind'); assert(artifact.path.startsWith(`${artifact.kind}/`) && digest.test(artifact.digest), 'private manifest artifact invalid'); } }
 export const engineByAgent = Object.freeze({
-  'world-scout': 'grok', klaxon: 'grok', frontier: 'grok', closure: 'grok', cogsworth: 'grok', sprockett: 'grok', foreman: 'grok', graves: 'grok', tinkerton: 'grok', vesta: 'grok',
-  brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', morgue: 'codex', pressman: 'codex'
+  klaxon: 'codex', cogsworth: 'codex', sprockett: 'codex', foreman: 'codex', graves: 'codex', tinkerton: 'codex', vesta: 'codex',
+  brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', pressman: 'codex'
 });
 
-const expectedExecution = (engine) => engine === 'codex'
-  ? 'execution:\n  model:\n    primary:\n      provider: openai\n      name: gpt-5.4-mini\n      auth:\n        method: codex\n  sandbox:\n    mode: workspace\n'
-  : `execution:\n  model:\n    primary:\n      provider: local\n      name: ${engine}-cli\n      auth:\n        method: none\n      endpoint:\n        compatibility: openai\n        base_url: http://127.0.0.1:11434/v1\n  sandbox:\n    mode: workspace\n`;
+const corpusAgents = new Set(['klaxon']);
+const publicWriters = new Set(['pressman']);
+const researchMembers = new Set(['gatherer', 'research-sensor', ...reporters, 'brass']);
+const section = (source, name) => {
+  const lines = source.split('\n');
+  const start = lines.findIndex((line) => line === `${name}:`);
+  assert(start >= 0, `missing ${name} section`);
+  const end = lines.findIndex((line, index) => index > start && /^\S/.test(line));
+  return lines.slice(start, end < 0 ? undefined : end).join('\n');
+};
+const resourceLine = (workspace, id) => workspace.split('\n').find((line) => line.includes(`{ id: ${id},`));
+const csv = (value) => value.split(',').map((item) => item.trim()).filter(Boolean);
+
+export function validateAgentDeclaration(agent, bytes) {
+  const engine = engineByAgent[agent];
+  assert(engine, `${agent} runtime assignment missing`);
+  const runtime = section(bytes, 'runtime');
+  const execution = section(bytes, 'execution');
+  const surfaces = section(bytes, 'surfaces');
+  const workspace = section(bytes, 'workspace');
+  assert(runtime.includes(`engine: ${engine}`), `${agent} runtime engine declaration invalid`);
+  assert(execution.includes('sandbox:\n    mode: workspace'), `${agent} workspace sandbox declaration invalid`);
+  if (engine === 'codex') {
+    assert(execution.includes('provider: openai') && execution.includes('method: codex') && !execution.includes('endpoint:'), `${agent} Codex subscription intent invalid`);
+  } else {
+    assert(!/^\s+model:/m.test(execution), `${agent} Daimon ${engine} execution.model must be omitted`);
+  }
+  assert(!bytes.includes('engine: agy'), `${agent} must not declare deferred AGY engine`);
+  assert(!/^policy:/m.test(bytes), `${agent} must not override Spawnfile policy`);
+  assert(surfaces.includes('network: clank-newsroom') && surfaces.includes(`token_id: ${agent}`), `${agent} Moltnet binding invalid`);
+  assert(surfaces.includes('research:') === researchMembers.has(agent), `${agent} research room binding invalid`);
+  const publicResource = resourceLine(workspace, 'public-content');
+  const bundled = line => line?.includes('kind: bundle') && line.includes('source: ../../newsroom-runtime.tar') && /sha256: sha256:[a-f0-9]{64}/u.test(line) && line.includes('mount: ./repos/newsroom') && line.includes('mode: readonly') && !/kind: git|url:|branch:/.test(line);
+  if (publicWriters.has(agent)) {
+    assert(publicResource?.includes('kind: volume') && publicResource.includes('name: clank-release-staging') && publicResource.includes('mount: ./staging') && publicResource.includes('mode: mutable') && publicResource.includes('sharing: per_agent') && !/kind: git|url:|branch:/.test(publicResource), `${agent} public content resource invalid`);
+    assert(bundled(resourceLine(workspace,'newsroom-runtime')), `${agent} newsroom runtime bundle invalid`);
+  } else assert(bundled(publicResource), `${agent} public content resource invalid`);
+  const corpus = resourceLine(workspace, 'private-corpus');
+  if (corpusAgents.has(agent)) {
+    assert(corpus?.includes('kind: volume') && corpus.includes(`name: clank-${agent}-corpus`) && corpus.includes('mount: ./private/corpus') && corpus.includes('mode: mutable') && corpus.includes('sharing: per_agent'), `${agent} private corpus resource invalid`);
+  } else {
+    assert(!corpus, `${agent} must not receive a private corpus resource`);
+  }
+}
+
+export function validateRootDeclaration(bytes) {
+  const shared = section(bytes, 'shared');
+  assert(shared.includes('id: edition-state') && shared.includes('kind: volume') && shared.includes('name: clank-edition-state') && shared.includes('mount: ./state/edition') && shared.includes('mode: mutable') && shared.includes('sharing: team'), 'shared edition state resource invalid');
+  assert(bytes.includes('id: clank-newsroom') && bytes.includes('provider: moltnet'), 'Moltnet network identity invalid');
+  assert(bytes.includes('bind: 0.0.0.0, port: 8787'), 'Moltnet cloud listener invalid');
+  assert(bytes.includes('mode: bearer') && bytes.includes('public_read: false') && bytes.includes('agent_registration: disabled') && bytes.includes('client: { token_id: operator }'), 'Moltnet bearer admission invalid');
+  assert(bytes.includes('kind: sqlite') && bytes.includes('path: /var/lib/spawnfile/moltnet/networks/clank-newsroom/moltnet.sqlite') && bytes.includes('mode: durable') && bytes.includes('mount: /var/lib/spawnfile/moltnet/networks/clank-newsroom'), 'Moltnet durable store invalid');
+  assert(!/auth:\s*\{\s*mode:\s*none/.test(bytes) && !/store:\s*\{\s*kind:\s*memory/.test(bytes), 'Moltnet must not use unauthenticated memory mode');
+  assert(!/^\s+(?:token|value):/m.test(bytes), 'Moltnet declarations must contain secret references only');
+
+  const tokens = new Map();
+  const tokenPattern = /- \{ id: ([a-z-]+), secret: ([A-Z][A-Z0-9_]+), scopes: \[([^\]]+)\](?:, agents: \[([^\]]+)\])? \}/g;
+  for (const match of bytes.matchAll(tokenPattern)) tokens.set(match[1], { secret: match[2], scopes: csv(match[3]), agents: match[4] ? csv(match[4]) : [] });
+  const operator = tokens.get('operator');
+  assert(operator?.secret === 'CLANK_MOLTNET_OPERATOR_TOKEN' && operator.scopes.join(',') === 'admin,observe,write' && operator.agents.length === 0, 'Moltnet topology operator token reference invalid');
+  for (const agent of agents) {
+    const token = tokens.get(agent);
+    const secret = `CLANK_MOLTNET_${agent.toUpperCase().replaceAll('-', '_')}_TOKEN`;
+    assert(token?.secret === secret && token.scopes.join(',') === 'attach,observe,write' && token.agents.join(',') === agent, `${agent} Moltnet token boundary invalid`);
+  }
+  const gatherer = tokens.get('gatherer');
+  assert(gatherer?.secret === 'CLANK_MOLTNET_GATHERER_TOKEN' && gatherer.scopes.join(',') === 'attach,observe,write' && gatherer.agents.join(',') === 'gatherer', 'research intake token boundary invalid');
+  const consoleToken = tokens.get('console');
+  assert(consoleToken?.secret === 'CLANK_MOLTNET_CONSOLE_TOKEN' && consoleToken.scopes.join(',') === 'observe' && consoleToken.agents.length === 0, 'observe-only console token boundary invalid');
+  const researchSensor = tokens.get('research-sensor');
+  assert(researchSensor?.secret === 'CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN' && researchSensor.scopes.join(',') === 'attach,observe,write' && researchSensor.agents.join(',') === 'research-sensor', 'research sensor token boundary invalid');
+  assert(tokens.size === agents.length + 4, 'unexpected Moltnet token declaration');
+  assert(!bytes.includes('pairings:') && !bytes.includes('remote_network_id:') && !bytes.includes('token_secret:'), 'cloud Moltnet must not depend on federation');
+  assert(bytes.includes('id: gatherer') && bytes.includes('network: clank-newsroom') && bytes.includes('auth: { token_id: gatherer }') && bytes.includes('dms: { enabled: true }'), 'research intake participant invalid');
+  assert(bytes.includes('id: research-sensor') && bytes.includes('auth: { token_id: research-sensor }'), 'direct research sensor participant invalid');
+  const roomPattern = /- \{ id: ([a-z-]+), visibility: private, write_policy: members, federation: (none|\[[^\]]+\]), members: \[([^\]]+)\] \}/g;
+  const rooms = new Map([...bytes.matchAll(roomPattern)].map((match) => [match[1], { federation: match[2], members: csv(match[3]) }]));
+  assert(rooms.size === 5, 'Moltnet room federation declarations invalid');
+  assert([...rooms.values()].every((room) => room.federation === 'none'), 'Moltnet rooms must remain cloud-local');
+  assert(rooms.get('assignment')?.members.includes('gatherer'), 'assignment kickoff participant invalid');
+  const research = rooms.get('research');
+  assert(research?.members.includes('research-sensor'), 'research sensor local identity invalid');
+  assert(research && new Set(research.members).size === researchMembers.size && research.members.every((member) => researchMembers.has(member)), 'research room membership invalid');
+}
 
 export function validateRuntimeBindings(root = orgRoot) {
   assert(Object.keys(engineByAgent).length === agents.length, 'runtime assignment incomplete');
@@ -72,26 +155,42 @@ export function validateRuntimeBindings(root = orgRoot) {
   assert(policy.enginePolicy?.agy?.hostAuthCheck === true && policy.enginePolicy?.agy?.linuxPortable === false && policy.enginePolicy?.agy?.status === 'deferred-broker', 'AGY portability policy invalid');
   for (const agent of agents) {
     const bytes = readFileSync(resolve(root, 'agents', agent, 'Spawnfile'), 'utf8');
-    const engine = engineByAgent[agent];
-    assert(engine, `${agent} runtime assignment missing`);
-    assert(bytes.includes(`runtime:\n  name: daimon\n  options:\n    engine: ${engine}\n`), `${agent} runtime engine declaration invalid`);
-    assert(bytes.includes(expectedExecution(engine)), `${agent} execution model declaration invalid`);
-    assert(!bytes.includes('engine: agy'), `${agent} must not declare deferred AGY engine`);
-    assert(!/\npolicy:/.test(bytes), `${agent} must not override Spawnfile policy`);
+    validateAgentDeclaration(agent, bytes);
   }
 }
 
-export function validateTree() { for (const agent of agents) for (const file of ['Spawnfile', 'AGENTS.md', 'CLAUDE.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['credential', 'browser_profile', 'profile_path', 'raw_html', 'account_name', 'policy:']) assert(!root.includes(banned), `banned root field ${banned}`); assert(root.includes('server:\n      mode: managed\n      listen: { bind: 127.0.0.1, port: 8787 }\n      auth: { mode: none }\n      store: { kind: memory }'), 'root Moltnet server declaration invalid'); validateRuntimeBindings(); }
+export function validateTree() { for (const agent of agents) for (const file of ['Spawnfile', 'AGENTS.md', 'CLAUDE.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
 export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
-  assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '16:20', 'schedule zone or deadline invalid');
-  assert(schedule.kickoff?.kind === 'operator' && schedule.kickoff.target === 'brass' && schedule.kickoff.count === 1, 'exactly one operator kickoff to Brass is required');
+  assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '16:00', 'schedule zone or deadline invalid');
+  assert(policy.deadline === schedule.deadline, 'runtime and schedule deadline drift');
+  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'10:00',owner:'reporters'},{id:'conference',time:'10:30',owner:'brass'},{id:'review',time:'14:00',owner:'spike'},{id:'composition',time:'15:00',owner:'caslon'},{id:'release',time:'16:00',owner:'pressman'}]), 'conference checkpoints invalid');
+  assert(schedule.operator_kickoff === false && schedule.task_orchestrator === false, 'operator kickoff and task orchestrators are prohibited');
   assert(schedule.downstream_activation === 'moltnet-addressed-only' && schedule.polling === false, 'downstream work must be addressed through Moltnet without polling');
+  const owners = schedule.spawnfile_schedule?.owners ?? {};
+  assert(schedule.spawnfile_schedule?.status === 'native' && Object.keys(owners).length === 9, 'native schedule roster invalid');
   for (const agent of agents) {
     const bytes = readFileSync(resolve(orgRoot, 'agents', agent, 'Spawnfile'), 'utf8');
-    assert(!/^schedule:/m.test(bytes), `${agent} must not declare a schedule`);
+    assert(Object.hasOwn(owners, agent) === /^schedule:/m.test(bytes), `${agent} schedule authority invalid`);
+    if (Object.hasOwn(owners, agent)) assert(bytes.includes(`cron: "${owners[agent]}"`), `${agent} schedule cron drift`);
   }
+  for (const agent of Object.keys(owners)) {
+    const bytes = readFileSync(resolve(orgRoot, 'agents', agent, 'Spawnfile'), 'utf8');
+    assert(bytes.includes('timezone: Europe/Berlin'), `${agent} schedule timezone invalid`);
+  }
+  const klaxon = readFileSync(resolve(orgRoot, 'agents/klaxon/Spawnfile'), 'utf8'); assert(klaxon.includes('wake: all, allowed_wake_senders: [research-sensor]') && klaxon.includes('sensor: { wake: mentions }'), 'Klaxon selective sensor wake policy invalid');
 }
-export function validateFixtures() { const cycle = readJson(resolve(orgRoot, 'fixtures/daily-cycle.json')); const prior = []; for (const message of cycle.messages) { validateMessage(message, prior); prior.push(message); } validateManifest(readJson(resolve(orgRoot, 'fixtures/corpus-manifest.json'))); const vestaSpike = cycle.messages.find((message) => message.id === 'spike-vesta-20260816'); assert(vestaSpike?.owner === 'spike', 'Spike must own Vesta editorial spike'); }
+export function validateEditorialContracts(vesta, data, voices) {
+  for (const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike']) assert(vesta.includes(phrase), `Vesta constraint missing: ${phrase}`);
+  assert(/ordinary Record.*boring null.*observable falsifier/i.test(voices.vesta.good) && /hidden hand/i.test(voices.vesta.bad), 'Vesta voice boundary invalid');
+  for (const owner of ['World Scout, Klaxon, Frontier, Closure','reporters','Ledger','Caslon','Morgue']) assert(new RegExp(`\\| ${owner} \\|[^\\n]*public content: read-only`).test(data), `${owner} DATA boundary invalid`);
+  assert(/\| Pressman \|[^\n]*public content: mutable[^\n]*\| sole owner/.test(data), 'Pressman DATA ownership invalid');
+}
+export function validateLifecycle(receipts, options = {}) {
+  const keys=['version','id','kind','edition','release','owner','correlation_id','causal_parent','artifact_digest','receipt_ref','status'];
+  const adapt=(receipt)=>{assert(receipt&&Object.keys(receipt).sort().join()===[...keys].sort().join()&&receipt.version==='v1','lifecycle receipt shape invalid');return{id:receipt.id,kind:receipt.kind,parent:receipt.causal_parent,edition:receipt.edition,release:receipt.release,correlation:receipt.correlation_id,digest:receipt.artifact_digest,ref:receipt.receipt_ref,owner:receipt.owner,status:receipt.status};};
+  const nodes=receipts.map(adapt);validateLifecycleGraph(nodes,{mode:options.mode??'full',externalFinalization:options.externalFinalization?adapt(options.externalFinalization):undefined});
+}
+export function validateFixtures() { const cycle = readJson(resolve(orgRoot, 'fixtures/daily-cycle.json')); const prior = []; for (const message of cycle.messages) { validateMessage(message, prior); prior.push(message); } validateManifest(readJson(resolve(orgRoot, 'fixtures/corpus-manifest.json'))); validateLifecycle(readJson(resolve(orgRoot, 'fixtures/lifecycle-receipts.json')).receipts); const voices=readJson(resolve(orgRoot,'fixtures/voice-boundaries.json')); assert(agents.every((agent)=>voices[agent]?.good && voices[agent]?.bad), 'every persona requires concrete good/bad voice examples'); validateEditorialContracts(readFileSync(resolve(orgRoot,'agents/vesta/AGENTS.md'),'utf8'),readFileSync(resolve(orgRoot,'DATA.md'),'utf8'),voices); const vestaSpike = cycle.messages.find((message) => message.id === 'spike-vesta-20260816'); assert(vestaSpike?.owner === 'spike', 'Spike must own Vesta editorial spike'); }
 export function main() { validateTree(); validateSchedule(); validateFixtures(); console.log('organization validation: passed'); }
 if (process.argv[1] === new URL(import.meta.url).pathname) { try { main(); } catch (error) { console.error(`organization validation: failed: ${error.message}`); process.exitCode = 1; } }
