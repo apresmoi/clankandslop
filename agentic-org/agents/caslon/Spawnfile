@@ -14,11 +14,59 @@ execution:
         method: codex
   sandbox:
     mode: workspace
+schedule:
+  kind: cron
+  cron: "0 15 * * *"
+  timezone: Europe/Berlin
+  prompt: "Your working directory is your agent root. PASSed articles and verdicts are under ./state/edition/editions/<edition-date>/{articles,verdicts}/ — read them by path. Decide the visual layer only: which stories go on front and which on tape, which story leads, the map bounds each story needs, and the illustration rhythm. Then call mcp_newsroom_file_desk for caslon.chrome and caslon.weather and mcp_newsroom_compose_edition with exactly front and tape, using this schedule occurrence as event_key. Baking and assembly are scripts; you make the choices, not the bytes."
 surfaces:
   moltnet:
-    - network: newsroom
+    - network: clank-newsroom
+      auth: { token_id: caslon }
       rooms:
         assignment: { wake: mentions }
         filing: { wake: mentions }
         release: { wake: mentions }
-workspace: { docs: { system: AGENTS.md } }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env:
+        CLANK_NEWSROOM_AGENT: caslon
+        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
+        # Relief grid for ops/bake-map.mjs. Read-only source; the decompressed
+        # cache is regenerable scratch and is never an artifact.
+        CLANK_ETOPO_GZ: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/etopo/ETOPO1_Ice_g_gmt4.grd.gz
+        CLANK_ETOPO_GRD: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/etopo-cache/etopo1.grd
+      tools: [file_desk, compose_edition]
+workspace:
+  docs: { system: AGENTS.md }
+  skills:
+    - { ref: ../../skills/article-composition }
+    - { ref: ../../skills/repository-ownership }
+    - { ref: ../../skills/release-validation }
+  resources:
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:260710ab4b8b85231ebae34caf4e5a577e665b5febf853687081efcf535b856d, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
+    # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
+    # every archived map was baked from it, so an edition must not be able to
+    # alter it. Ships outside the newsroom bundle because it is ~395MB.
+    - { id: etopo-relief, kind: bundle, source: ../../etopo-relief.tar, sha256: sha256:ae1177ef2885c339f227c67b4efb27907eae0274a5aa61c1038eaac56ce50eeb, mount: ./etopo, mode: readonly }
+    # Regenerable decompressed cache (~890MB). Scratch, never an artifact.
+    - { id: etopo-cache, kind: volume, name: clank-etopo-cache, mount: ./state/etopo-cache, mode: mutable, sharing: per_agent }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-caslon/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

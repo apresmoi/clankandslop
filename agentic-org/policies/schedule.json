@@ -1,12 +1,30 @@
 {
-  "version": "v1",
+  "version": "v3",
   "timezone": "Europe/Berlin",
-  "deadline": "16:20",
-  "kickoff": {
-    "kind": "operator",
-    "target": "brass",
-    "count": 1
+  "deadline": "16:00",
+  "checkpoints": [
+    {"id":"pitch","time":"10:00","owner":"reporters"},
+    {"id":"conference","time":"10:30","owner":"brass"},
+    {"id":"review","time":"14:00","owner":"spike"},
+    {"id":"composition","time":"15:00","owner":"caslon"},
+    {"id":"release","time":"16:00","owner":"pressman","target":"local/staging"}
+  ],
+  "spawnfile_schedule": {
+    "status": "native",
+    "owners": {
+      "cogsworth": "0 10 * * *",
+      "sprockett": "0 10 * * *",
+      "foreman": "0 10 * * *",
+      "graves": "0 10 * * *",
+      "tinkerton": "0 10 * * *",
+      "vesta": "0 10 * * *",
+      "brass": "30 10 * * *",
+      "spike": "0 14 * * *",
+      "caslon": "0 15 * * *"
+    }
   },
   "downstream_activation": "moltnet-addressed-only",
-  "polling": false
+  "polling": false,
+  "operator_kickoff": false,
+  "task_orchestrator": false
 }

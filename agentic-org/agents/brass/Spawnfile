@@ -14,12 +14,48 @@ execution:
         method: codex
   sandbox:
     mode: workspace
+schedule:
+  kind: cron
+  cron: "30 10 * * *"
+  timezone: Europe/Berlin
+  prompt: "Your working directory is your agent root. This is conference. The reporters have pitched in room:assignment — call moltnet_read with network clank-newsroom and target room:assignment to read their pitches, not the raw research. Choose the five or so that make a paper: kill the weak ones by name and say why, and keep the lineup diverse across desks. Where a pitch is missing that the day needs, commission it by mentioning the reporter who owns that beat. Record the outcome with mcp_newsroom_record_assignment using this schedule occurrence as event_key, then tell each commissioned reporter in room:assignment what you want and how long. You are the editor: you pick and you kill. You never write prose, never research a story yourself, and never overrule Spike."
 surfaces:
   moltnet:
-    - network: newsroom
+    - network: clank-newsroom
+      auth: { token_id: brass }
       rooms:
         assignment: { wake: mentions }
         filing: { wake: mentions }
         sensor: { wake: mentions }
+        research: { wake: mentions }
         release: { wake: mentions }
-workspace: { docs: { system: AGENTS.md } }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/brass/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env: { CLANK_NEWSROOM_AGENT: brass, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/brass/state/edition }
+      tools: [record_assignment]
+workspace:
+  docs: { system: AGENTS.md }
+  skills:
+    - { ref: ../../skills/record-grounding }
+    - { ref: ../../skills/repository-ownership }
+  resources:
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:260710ab4b8b85231ebae34caf4e5a577e665b5febf853687081efcf535b856d, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-brass/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

@@ -4,23 +4,53 @@ name: klaxon
 runtime:
   name: daimon
   options:
-    engine: grok
+    engine: codex
 execution:
   model:
     primary:
-      provider: local
-      name: grok-cli
+      provider: openai
+      name: gpt-5.4-mini
       auth:
-        method: none
-      endpoint:
-        compatibility: openai
-        base_url: http://127.0.0.1:11434/v1
+        method: codex
   sandbox:
     mode: workspace
 surfaces:
   moltnet:
-    - network: newsroom
+    - network: clank-newsroom
+      auth: { token_id: klaxon }
+      dms: { enabled: true, wake: all, allowed_wake_senders: [research-sensor] }
       rooms:
         assignment: { wake: mentions }
         sensor: { wake: mentions }
-workspace: { docs: { system: AGENTS.md } }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env: { CLANK_NEWSROOM_AGENT: klaxon, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/state/edition }
+      tools: [qualify_signal]
+workspace:
+  docs: { system: AGENTS.md }
+  skills:
+    - { ref: ../../skills/record-grounding }
+    - { ref: ../../skills/newsroom-handoff }
+    - { ref: ../../skills/repository-ownership }
+  resources:
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:260710ab4b8b85231ebae34caf4e5a577e665b5febf853687081efcf535b856d, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
+    - { id: private-corpus, kind: volume, name: clank-klaxon-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-klaxon/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

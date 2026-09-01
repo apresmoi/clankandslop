@@ -16,8 +16,39 @@ execution:
     mode: workspace
 surfaces:
   moltnet:
-    - network: newsroom
+    - network: clank-newsroom
+      auth: { token_id: ledger }
       rooms:
         assignment: { wake: mentions }
         release: { wake: mentions }
-workspace: { docs: { system: AGENTS.md } }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env: { CLANK_NEWSROOM_AGENT: ledger, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/state/edition }
+      tools: [file_desk]
+workspace:
+  docs: { system: AGENTS.md }
+  skills:
+    - { ref: ../../skills/newsroom-handoff }
+    - { ref: ../../skills/repository-ownership }
+    - { ref: ../../skills/release-validation }
+  resources:
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:260710ab4b8b85231ebae34caf4e5a577e665b5febf853687081efcf535b856d, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-ledger/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

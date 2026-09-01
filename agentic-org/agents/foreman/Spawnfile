@@ -4,24 +4,53 @@ name: foreman
 runtime:
   name: daimon
   options:
-    engine: grok
+    engine: codex
 execution:
   model:
     primary:
-      provider: local
-      name: grok-cli
+      provider: openai
+      name: gpt-5.4-mini
       auth:
-        method: none
-      endpoint:
-        compatibility: openai
-        base_url: http://127.0.0.1:11434/v1
+        method: codex
   sandbox:
     mode: workspace
+schedule:
+  kind: cron
+  cron: "0 10 * * *"
+  timezone: Europe/Berlin
+  prompt: "Your working directory is your agent root. Overnight research for your macro beat is in ./repos/newsroom-private/<edition-date>/ — read only what is on your beat; never browse other dates. Recall what you have covered before: a story you have chased already is worth more to you than a new one, and your own past filings are what make this beat yours. Pick at most ONE story worth the paper today and pitch it in room:assignment mentioning @brass — the claim, why it matters now, and what would falsify it, in a few sentences of natural language. Send the pitch with moltnet_send to room:assignment. The pitch is a message, not a filing: the article comes later."
 surfaces:
   moltnet:
-    - network: newsroom
+    - network: clank-newsroom
+      auth: { token_id: foreman }
       rooms:
         assignment: { wake: mentions }
         filing: { wake: mentions }
         sensor: { wake: mentions }
-workspace: { docs: { system: AGENTS.md } }
+        research: { wake: mentions }
+environment:
+  mcp_servers:
+    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: foreman, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/state/edition }, tools: [file_article] }
+workspace:
+  docs: { system: AGENTS.md }
+  skills:
+    - { ref: ../../skills/article-composition }
+    - { ref: ../../skills/record-grounding }
+    - { ref: ../../skills/repository-ownership }
+  resources:
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:260710ab4b8b85231ebae34caf4e5a577e665b5febf853687081efcf535b856d, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-foreman/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false
