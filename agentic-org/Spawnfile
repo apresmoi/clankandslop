@@ -8,11 +8,15 @@ shared:
   workspace:
     docs:
       system: TEAM.md
+    resources:
+      - id: edition-state
+        kind: volume
+        name: clank-edition-state
+        mount: ./state/edition
+        mode: mutable
+        sharing: team
 members:
-  - { id: world-scout, ref: agents/world-scout }
   - { id: klaxon, ref: agents/klaxon }
-  - { id: frontier, ref: agents/frontier }
-  - { id: closure, ref: agents/closure }
   - { id: cogsworth, ref: agents/cogsworth }
   - { id: sprockett, ref: agents/sprockett }
   - { id: foreman, ref: agents/foreman }
@@ -23,21 +27,63 @@ members:
   - { id: spike, ref: agents/spike }
   - { id: ledger, ref: agents/ledger }
   - { id: caslon, ref: agents/caslon }
-  - { id: morgue, ref: agents/morgue }
   - { id: pressman, ref: agents/pressman }
+external_participants:
+  - id: gatherer
+    kind: service
+    surfaces:
+      moltnet:
+        - network: clank-newsroom
+          auth: { token_id: gatherer }
+          dms: { enabled: true }
+  - id: research-sensor
+    kind: service
+    surfaces:
+      moltnet:
+        - network: clank-newsroom
+          auth: { token_id: research-sensor }
+          dms: { enabled: true }
 networks:
-  - id: newsroom
+  - id: clank-newsroom
     name: Clank & Slop newsroom
     provider: moltnet
     server:
       mode: managed
-      listen: { bind: 127.0.0.1, port: 8787 }
-      auth: { mode: none }
-      store: { kind: memory }
+      listen: { bind: 0.0.0.0, port: 8787 }
+      auth:
+        mode: bearer
+        public_read: false
+        agent_registration: disabled
+        client: { token_id: operator }
+        tokens:
+          - { id: operator, secret: CLANK_MOLTNET_OPERATOR_TOKEN, scopes: [admin, observe, write] }
+          - { id: klaxon, secret: CLANK_MOLTNET_KLAXON_TOKEN, scopes: [attach, observe, write], agents: [klaxon] }
+          - { id: cogsworth, secret: CLANK_MOLTNET_COGSWORTH_TOKEN, scopes: [attach, observe, write], agents: [cogsworth] }
+          - { id: sprockett, secret: CLANK_MOLTNET_SPROCKETT_TOKEN, scopes: [attach, observe, write], agents: [sprockett] }
+          - { id: foreman, secret: CLANK_MOLTNET_FOREMAN_TOKEN, scopes: [attach, observe, write], agents: [foreman] }
+          - { id: graves, secret: CLANK_MOLTNET_GRAVES_TOKEN, scopes: [attach, observe, write], agents: [graves] }
+          - { id: tinkerton, secret: CLANK_MOLTNET_TINKERTON_TOKEN, scopes: [attach, observe, write], agents: [tinkerton] }
+          - { id: vesta, secret: CLANK_MOLTNET_VESTA_TOKEN, scopes: [attach, observe, write], agents: [vesta] }
+          - { id: brass, secret: CLANK_MOLTNET_BRASS_TOKEN, scopes: [attach, observe, write], agents: [brass] }
+          - { id: spike, secret: CLANK_MOLTNET_SPIKE_TOKEN, scopes: [attach, observe, write], agents: [spike] }
+          - { id: ledger, secret: CLANK_MOLTNET_LEDGER_TOKEN, scopes: [attach, observe, write], agents: [ledger] }
+          - { id: caslon, secret: CLANK_MOLTNET_CASLON_TOKEN, scopes: [attach, observe, write], agents: [caslon] }
+          - { id: pressman, secret: CLANK_MOLTNET_PRESSMAN_TOKEN, scopes: [attach, observe, write], agents: [pressman] }
+          - { id: gatherer, secret: CLANK_MOLTNET_GATHERER_TOKEN, scopes: [attach, observe, write], agents: [gatherer] }
+          - { id: console, secret: CLANK_MOLTNET_CONSOLE_TOKEN, scopes: [observe] }
+          - { id: research-sensor, secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN, scopes: [attach, observe, write], agents: [research-sensor] }
+      store:
+        kind: sqlite
+        path: /var/lib/spawnfile/moltnet/networks/clank-newsroom/moltnet.sqlite
+        persistence:
+          mode: durable
+          mount: /var/lib/spawnfile/moltnet/networks/clank-newsroom
+          name: clank-newsroom-store
       human_ingress: false
-      direct_messages: false
+      direct_messages: true
     rooms:
-      - { id: assignment, members: [world-scout, klaxon, frontier, closure, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, ledger, caslon, morgue, pressman] }
-      - { id: filing, members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon, pressman] }
-      - { id: sensor, members: [world-scout, klaxon, frontier, closure, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
-      - { id: release, members: [brass, spike, ledger, caslon, morgue, pressman] }
+      - { id: assignment, visibility: private, write_policy: members, federation: none, members: [gatherer, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
+      - { id: filing, visibility: private, write_policy: members, federation: none, members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
+      - { id: sensor, visibility: private, write_policy: members, federation: none, members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
+      - { id: research, visibility: private, write_policy: members, federation: none, members: [gatherer, research-sensor, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
+      - { id: release, visibility: private, write_policy: members, federation: none, members: [brass, spike, ledger, caslon, pressman] }
