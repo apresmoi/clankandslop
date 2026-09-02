@@ -18,6 +18,7 @@ schedule:
   kind: cron
   cron: "30 10 * * *"
   timezone: Europe/Berlin
+  jitter_seconds: 900
   prompt: "Your working directory is your agent root. This is conference. The reporters have pitched in room:assignment — call moltnet_read with network clank-newsroom and target room:assignment to read their pitches, not the raw research. Choose the five or so that make a paper: kill the weak ones by name and say why, and keep the lineup diverse across desks. Where a pitch is missing that the day needs, commission it by mentioning the reporter who owns that beat. Record the outcome with mcp_newsroom_record_assignment using this schedule occurrence as event_key, then tell each commissioned reporter in room:assignment what you want and how long. You are the editor: you pick and you kill. You never write prose, never research a story yourself, and never overrule Spike."
 surfaces:
   moltnet:
@@ -43,7 +44,7 @@ workspace:
     - { ref: ../../skills/record-grounding }
     - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9fa68aab60b0d0bf75999ae66f9f3c4ffbdef248a35af5ab848ac9374bf316e5, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:f97871bbcebb0b7a3e434820d512fa7c0fcb5917768e3f5cfee3803c1d8e071c, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

@@ -18,6 +18,7 @@ schedule:
   kind: cron
   cron: "0 10 * * *"
   timezone: Europe/Berlin
+  jitter_seconds: 900
   prompt: "Your working directory is your agent root. Overnight research for your escalation beat is one pull, not a folder to page through: cat ./repos/newsroom-private/<edition-date>/chatgpt/deepen-*.md ./repos/newsroom-private/<edition-date>/grok/closure.md hands you every story the desk deepened overnight plus the settlement sweep, in a single call — don't list the directory first, and never browse other dates. Recall what you have covered before the same way: rg -l Sprockett ./repos/newsroom/content/editions/*/articles/*.json turns up everything with your name on it, one call, no hunting through editions by hand — a story you have chased already is worth more to you than a new one, and that list is what makes this beat yours. This whole wake should cost two or three shell calls, not ten; every one past that is real money out of the paper. Pick at most ONE story worth the paper today and pitch it in room:assignment mentioning @brass — the claim, why it matters now, and what would falsify it, in a few sentences of natural language. Send the pitch with moltnet_send to room:assignment. The pitch is a message, not a filing: the article comes later."
 surfaces:
   moltnet:
@@ -38,7 +39,7 @@ workspace:
     - { ref: ../../skills/record-grounding }
     - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9fa68aab60b0d0bf75999ae66f9f3c4ffbdef248a35af5ab848ac9374bf316e5, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:f97871bbcebb0b7a3e434820d512fa7c0fcb5917768e3f5cfee3803c1d8e071c, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
