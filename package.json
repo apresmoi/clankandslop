@@ -1,8 +1,11 @@
 {
   "scripts": {
-    "org:test": "node --test agentic-org/scripts/*.test.mjs",
+    "org:bundle": "node agentic-org/scripts/build-newsroom-bundle.mjs",
+    "org:test": "node --test agentic-org/scripts/*.test.mjs && node agentic-org/e2e/run.mjs",
+    "org:e2e": "node agentic-org/e2e/run.mjs",
     "org:validate": "node agentic-org/scripts/validate-org.mjs",
-    "org:runtime": "node agentic-org/scripts/check-runtime.mjs"
+    "org:runtime": "node agentic-org/scripts/check-runtime.mjs",
+    "org:preflight": "node agentic-org/scripts/preflight.mjs"
   },
   "devDependencies": {
     "gdal-async": "^3.12.3"
