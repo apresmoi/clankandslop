@@ -48,7 +48,7 @@ workspace:
     - { ref: ../../skills/repository-ownership }
     - { ref: ../../skills/release-validation }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:023ba90443110fbc4c19f4abade4e4039b354053723dbbc2ef179881745daf75, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5a8bc0c125f4be8345965bc055245966491458b60b66e7f217a1884b1f0094fb, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:34ab69f623f4592d3d33fe2e57dfc4e109a75f72bcb2c1c2e57f9838b76fab64, mount: ./repos/newsroom-private, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to

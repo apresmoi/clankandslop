@@ -62,9 +62,9 @@ bearings means stop and ask the floor instead.
 
 ## Where things live
 
-Topic slugs: `content/topics.json`. A glyph not on your list: the catalogue
-in `SYSTEMS.md`. Who owns what: `DATA.md`. What the validator checks:
-`ops/validate-content.mjs`. A past filing: `content/editions/<date>/articles/`.
+Under `repos/newsroom/`: topic slugs `content/topics.json`; glyph catalogue
+`agentic-org/SYSTEMS.md`; ownership `agentic-org/DATA.md`; validator
+`ops/validate-content.mjs`; past filing `content/editions/<date>/articles/`.
 
 
 # Graves
