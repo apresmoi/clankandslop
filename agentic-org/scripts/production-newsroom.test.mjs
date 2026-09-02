@@ -28,9 +28,17 @@ test('production newsroom binds filings, composition content, and local release'
   await Promise.all([qualifySignal(qualified), qualifySignal(qualified)]);
   const assignments = owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and countercase for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] })); await recordAssignment({ edition, event_key: assignmentEvent, assignments });
   process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
-  await assert.rejects(fileArticle({ edition, event_key: 'hostile-bad-id', assignment_event_key: assignmentEvent, article: article('unassigned', 'Cogsworth', edition, 0) }), /assignment/u);
-  await assert.rejects(fileArticle({ edition, event_key: 'hostile-bad-owner', assignment_event_key: assignmentEvent, article: article('story-1', 'Cogsworth', edition, 1) }), /owner/u);
-  const badEvidence = article('story-0', 'Cogsworth', edition, 0); badEvidence.evidence_box[0].source_note.source_url = 'https://wrong.example'; await assert.rejects(fileArticle({ edition, event_key: 'hostile-bad-evidence', assignment_event_key: assignmentEvent, article: badEvidence }), /evidence/u);
+  // A reporter's wake never carries assignment_event_key or the assigned id — file_article
+  // resolves the assignment from (edition, owner) alone and self-corrects a wrong id.
+  const wrongIdArticle = article('story-0', 'Cogsworth', edition, 0); wrongIdArticle.id = 'not-my-assigned-id';
+  const autoResolved = await fileArticle({ edition, event_key: 'auto-resolved-id', article: wrongIdArticle });
+  assert.equal(autoResolved.article_id, 'story-0');
+  assert.match(autoResolved.note, /your assignment today is "story-0"/u);
+  process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+  await assert.rejects(fileArticle({ edition, event_key: 'no-assignment-teaches', article: article('story-0', 'Vesta', edition, 0) }), /you have no assignment for edition/u);
+  process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+  await assert.rejects(fileArticle({ edition, event_key: 'hostile-bad-owner', article: article('story-1', 'Sprockett', edition, 1) }), /filing agent/u);
+  const badEvidence = article('story-0', 'Cogsworth', edition, 0); badEvidence.evidence_box[0].source_note.source_url = 'https://wrong.example'; await assert.rejects(fileArticle({ edition, event_key: 'hostile-bad-evidence', article: badEvidence }), /evidence/u);
   for (let index = 0; index < owners.length; index++) { const owner = owners[index]; process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition, event_key: `filing-${index}`, assignment_event_key: assignmentEvent, article: article(`story-${index}`, owner[0].toUpperCase() + owner.slice(1), edition, index) }); }
   process.env.CLANK_NEWSROOM_AGENT = 'spike'; await reviewArticle({ edition, event_key: 'request-0', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the countercase.' });
   process.env.CLANK_NEWSROOM_AGENT = 'cogsworth'; await fileArticle({ edition, event_key: 'refile-0', assignment_event_key: assignmentEvent, article: { ...article('story-0', 'Cogsworth', edition, 0), revision: 2, deck: 'A revised sourced deck.' } });
