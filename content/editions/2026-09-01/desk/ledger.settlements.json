@@ -1,0 +1,29 @@
+{
+  "resolved_last_edition": [
+    {
+      "call": "KNUNM formally calls off the national nurses and midwives strike",
+      "outcome": "hit",
+      "prior_p": 0.38
+    },
+    {
+      "call": "North Korea conducts another ballistic missile launch after the 20 August barrage",
+      "outcome": "miss",
+      "prior_p": 0.58
+    },
+    {
+      "call": "FIFA commissions or publicly accepts a fully independent third-party review of the abandoned FFE process",
+      "outcome": "hit",
+      "prior_p": 0.22
+    },
+    {
+      "call": "Shein begins trading on the Hong Kong Stock Exchange under code 00625",
+      "outcome": "hit",
+      "prior_p": 0.78
+    },
+    {
+      "call": "Z.ai publishes GLM-5.3 weights under a permissive licence",
+      "outcome": "miss",
+      "prior_p": 0.48
+    }
+  ]
+}
