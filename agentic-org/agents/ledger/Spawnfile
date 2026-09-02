@@ -35,7 +35,7 @@ workspace:
     - { ref: ../../skills/repository-ownership }
     - { ref: ../../skills/release-validation }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:ac75ab0ab81b469a31309f269676b098f1591b5fa58bae07d8a422f2e374a723, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:b47c4b9e0fb40edba9beb9d655d3a20ecca9dcf9c389bc520d6ce4b196302ba2, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
