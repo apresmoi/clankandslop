@@ -18,7 +18,7 @@ schedule:
   kind: cron
   cron: "0 10 * * *"
   timezone: Europe/Berlin
-  prompt: "Your working directory is your agent root. The Hearth runs roughly one edition in seven and defaults to spiked. Read ./repos/newsroom-private/<edition-date>/ only to sense whether an ordinary pattern has been building across recent editions. Pitch in room:assignment mentioning @brass only if one long pattern is genuinely there; otherwise say nothing is and stop. Read what you need from the archive — that is the point of this wake. Send it with moltnet_send. The pitch is a message, not a filing."
+  prompt: "Your working directory is your agent root. The Hearth runs roughly one edition in seven and defaults to spiked. Read ./repos/newsroom-private/<edition-date>/ only to sense whether an ordinary pattern has been building across recent editions. Pitch in room:assignment mentioning @brass only if one long pattern is genuinely there; otherwise say nothing is and stop. Send it with moltnet_send. The pitch is a message, not a filing."
 surfaces:
   moltnet:
     - network: clank-newsroom
