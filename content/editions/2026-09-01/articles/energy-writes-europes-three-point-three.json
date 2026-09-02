@@ -1,0 +1,102 @@
+{
+  "id": "energy-writes-europes-three-point-three",
+  "edition_date": "2026-09-01",
+  "section": "world",
+  "kicker": "August Flash",
+  "headline": "Energy Writes Europe’s 3.3",
+  "deck": "Euro-area inflation jumped four tenths in August as energy surged to 14.3%. Services cooled and the core rate slipped to 2.4%, concentrating the flash print in the energy column.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "23:50 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "inflation",
+    "oil",
+    "rates"
+  ],
+  "body": [
+    "Euro-area annual inflation rose to 3.3% in August from 2.9% in July, a four-tenths acceleration in the flash estimate [E1]. The all-items index also increased 0.4% during the month [E1]. August therefore returned the headline to a three-handle after July’s brief dip below it [E1].",
+    "Energy inflation jumped to 14.3% from 10.3%, and the energy index rose 2.9% on the month [E1]. Energy carries 90.3 parts per thousand of the 2026 HICP basket, against 468.2 for services [E1]. Its four-point annual acceleration was large enough to lift the aggregate while the biggest basket component slowed [E1].",
+    "Services eased to 3.0% from 3.3%, with a monthly increase of 0.1% [E1]. The index excluding energy, food, alcohol and tobacco slipped to 2.4% from 2.5%, while the measure excluding energy held at 2.2% [E1]. The service-heavy underlying gauges weakened during the same month that the headline climbed [E1].",
+    "Non-energy industrial goods rose to 1.2% from 0.9%, while food, alcohol and tobacco stayed at 1.2% [E1]. Unprocessed food quickened to 2.7% from 2.4%, and processed food, alcohol and tobacco slowed to 0.6% from 0.7% [E1]. These smaller movements left energy as the conspicuous change in the basket [E1].",
+    "August remains a flash estimate, and the tables mark the headline and component rates with an “e” [E2]. The release identifies prc_hicp_minr and prc_hicp_iw as its source datasets [E2]. Eurostat has scheduled the complete August HICP set for 17 September, when fuller national and item detail can test the breadth of pass-through [E2].",
+    "A same-day ECB research blog described the 2026 inflation episode as dominated by an energy supply shock, with demand and public-policy stimulus playing minor roles in its model [E3]. The model’s latest observations precede the August flash, so the study does not independently decompose this release [E3]. August’s published composition still points in the same direction: energy accelerated sharply while services eased [E1].",
+    "One flash print leaves the next interest-rate decision open because policymakers must judge the origin, size and persistence of the deviation [E3]. A broader inflation problem would show up through renewed pressure in services and the underlying measures; August pushed both lower [E1]. Europe’s 3.3 came from the furnace while the service counter cooled [E1]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Headline HICP annual rate",
+      "value": "3.3%",
+      "dir": "up"
+    },
+    {
+      "label": "Energy HICP annual rate",
+      "value": "14.3%",
+      "dir": "up"
+    },
+    {
+      "label": "Services HICP annual rate",
+      "value": "3.0%",
+      "dir": "down"
+    },
+    {
+      "label": "Core HICP annual rate",
+      "value": "2.4%",
+      "dir": "down"
+    },
+    {
+      "label": "Food, alcohol and tobacco annual rate",
+      "value": "1.2%",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Eurostat — Flash estimate, August 2026",
+      "fragment": "Euro area annual inflation is expected to be 3.3% in August 2026",
+      "as_of": "2026-09-01",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-01092026-ap",
+        "retrieved_at": "2026-09-01T21:51:00Z"
+      }
+    },
+    {
+      "source": "Eurostat — HICP tables and release timetable",
+      "fragment": "The next release with full data for August 2026 is scheduled for 17 September 2026.",
+      "as_of": "2026-09-01",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-01092026-ap",
+        "retrieved_at": "2026-09-01T21:51:00Z"
+      }
+    },
+    {
+      "source": "European Central Bank — ECB Blog",
+      "fragment": "This time the energy supply shock dominates",
+      "as_of": "2026-09-01",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.ecb.europa.eu/press/blog/date/2026/html/ecb.blog20260901~8d48e51f14.en.html",
+        "retrieved_at": "2026-09-01T21:51:00Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3"
+  ]
+}
