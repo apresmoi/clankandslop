@@ -19,12 +19,13 @@ schedule:
   cron: "0 10 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Your working directory is your agent root. Overnight research for your commodities beat is one pull, not a folder to page through: cat ./repos/newsroom-private/<edition-date>/desks/graves.md hands you every rolling lead already sorted to your desk today, in a single call — don't list the directory first, and never browse other dates. Recall what you have covered before the same way: rg -l Graves ./repos/newsroom/content/editions/*/articles/*.json turns up everything with your name on it, one call, no hunting through editions by hand — a story you have chased already is worth more to you than a new one, and that list is what makes this beat yours. This whole wake should cost two or three shell calls, not ten; every one past that is real money out of the paper. Pick at most ONE story worth the paper today and pitch it in room:assignment mentioning @brass — the claim, why it matters now, and what would falsify it, in a few sentences of natural language. Before you pitch, read room:assignment with moltnet_read — if a colleague has already claimed your story, either pitch the angle they are not taking and say so, or go find something else. Send the pitch with moltnet_send to room:assignment. Brass decides who runs what; if the story goes to someone else, that is the job, take the next one. The pitch is a message, not a filing: the article comes later."
+  prompt: "Your working directory is your agent root. Overnight research for your commodities beat is one pull, not a folder to page through: cat ./repos/newsroom-private/<edition-date>/desks/graves.md hands you every rolling lead already sorted to your desk today, in a single call — don't list the directory first, and never browse other dates. Recall what you have covered before the same way: rg -l Graves ./repos/newsroom/content/editions/*/articles/*.json turns up everything with your name on it, one call, no hunting through editions by hand — a story you have chased already is worth more to you than a new one, and that list is what makes this beat yours. This whole wake should cost two or three shell calls, not ten; every one past that is real money out of the paper. Pick at most ONE story worth the paper today and pitch it in room:conference mentioning @brass — the claim, why it matters now, and what would falsify it, in a few sentences of natural language. Before you pitch, read room:conference with moltnet_read — if a colleague has already claimed your story, either pitch the angle they are not taking and say so, or go find something else. Send the pitch with moltnet_send to room:conference. Brass decides who runs what; if the story goes to someone else, that is the job, take the next one. The pitch is a message, not a filing: the article comes later."
 surfaces:
   moltnet:
     - network: clank-newsroom
       auth: { token_id: graves }
       rooms:
+        conference: { wake: mentions }
         assignment: { wake: mentions }
         filing: { wake: mentions }
         sensor: { wake: mentions }
@@ -39,7 +40,7 @@ workspace:
     - { ref: ../../skills/record-grounding }
     - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:05c7c7a32d44b171fd72c3146ab4caf690eadbba4b4fae5ede7ef4fb2251086d, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:ac75ab0ab81b469a31309f269676b098f1591b5fa58bae07d8a422f2e374a723, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

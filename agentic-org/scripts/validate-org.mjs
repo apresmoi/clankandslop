@@ -141,7 +141,11 @@ export function validateRootDeclaration(bytes) {
   assert(bytes.includes('id: research-sensor') && bytes.includes('auth: { token_id: research-sensor }'), 'direct research sensor participant invalid');
   const roomPattern = /- \{ id: ([a-z-]+), visibility: private, write_policy: members, federation: (none|\[[^\]]+\]), members: \[([^\]]+)\] \}/g;
   const rooms = new Map([...bytes.matchAll(roomPattern)].map((match) => [match[1], { federation: match[2], members: csv(match[3]) }]));
-  assert(rooms.size === 5, 'Moltnet room federation declarations invalid');
+  assert(rooms.size === 6, 'Moltnet room federation declarations invalid');
+  // Conference is where reporters pitch and the editor assigns; it holds the nine
+  // colleagues and klaxon, and deliberately excludes the external research feeds.
+  const conference = rooms.get('conference');
+  assert(conference !== undefined && !conference.members.includes('gatherer') && !conference.members.includes('research-sensor'), 'conference room must exclude external feeds');
   assert([...rooms.values()].every((room) => room.federation === 'none'), 'Moltnet rooms must remain cloud-local');
   assert(rooms.get('assignment')?.members.includes('gatherer'), 'assignment kickoff participant invalid');
   const research = rooms.get('research');

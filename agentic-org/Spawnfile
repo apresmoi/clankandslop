@@ -82,6 +82,7 @@ networks:
       human_ingress: false
       direct_messages: true
     rooms:
+      - { id: conference, visibility: private, write_policy: members, federation: none, members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
       - { id: assignment, visibility: private, write_policy: members, federation: none, members: [gatherer, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
       - { id: filing, visibility: private, write_policy: members, federation: none, members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
       - { id: sensor, visibility: private, write_policy: members, federation: none, members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }

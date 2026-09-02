@@ -19,12 +19,13 @@ schedule:
   cron: "30 10 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Your working directory is your agent root. This is conference. The reporters have pitched in room:assignment — call moltnet_read with network clank-newsroom and target room:assignment to read their pitches, not the raw research. Choose the five or so that make a paper: kill the weak ones by name and say why, and keep the lineup diverse across desks. Expect two reporters to want the same story — the desks overlap and that is healthy, it means the day has a real centre of gravity. Two pitches on one story is a choice between angles, not a problem: say which angle you are buying and who is writing it, tell the other reporter plainly that it is not theirs today and what you want from them instead. Nobody leaves conference holding a story someone else is also writing; if you have not said whose it is, you have not finished. Where a pitch is missing that the day needs, commission it by mentioning the reporter who owns that beat. Record the outcome with mcp_newsroom_record_assignment using this schedule occurrence as event_key, then tell each commissioned reporter in room:assignment what you want and how long. You are the editor: you pick and you kill. You never write prose, never research a story yourself, and never overrule Spike."
+  prompt: "Your working directory is your agent root. This is conference. The reporters have pitched in room:conference — call moltnet_read with network clank-newsroom and target room:conference to read their pitches, not the raw research. Conference is where the day is argued; room:assignment is where the outcome is written down. Choose the five or so that make a paper: kill the weak ones by name and say why, and keep the lineup diverse across desks. Expect two reporters to want the same story — the desks overlap and that is healthy, it means the day has a real centre of gravity. Two pitches on one story is a choice between angles, not a problem: say which angle you are buying and who is writing it, tell the other reporter plainly that it is not theirs today and what you want from them instead. Nobody leaves conference holding a story someone else is also writing; if you have not said whose it is, you have not finished. Where a pitch is missing that the day needs, commission it by mentioning the reporter who owns that beat. Record the outcome with mcp_newsroom_record_assignment using this schedule occurrence as event_key, then tell each reporter in room:conference what they are running and how long, so the whole floor hears who has what. You are the editor: you pick and you kill. You never write prose, never research a story yourself, and never overrule Spike."
 surfaces:
   moltnet:
     - network: clank-newsroom
       auth: { token_id: brass }
       rooms:
+        conference: { wake: mentions }
         assignment: { wake: mentions }
         filing: { wake: mentions }
         sensor: { wake: mentions }
@@ -44,7 +45,7 @@ workspace:
     - { ref: ../../skills/record-grounding }
     - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:05c7c7a32d44b171fd72c3146ab4caf690eadbba4b4fae5ede7ef4fb2251086d, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:ac75ab0ab81b469a31309f269676b098f1591b5fa58bae07d8a422f2e374a723, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
