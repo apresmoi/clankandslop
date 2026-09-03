@@ -4,14 +4,8 @@ name: tinkerton
 runtime:
   name: daimon
   options:
-    engine: codex
+    engine: grok
 execution:
-  model:
-    primary:
-      provider: openai
-      name: gpt-5.4-mini
-      auth:
-        method: codex
   sandbox:
     mode: workspace
 schedule:
@@ -40,7 +34,7 @@ workspace:
     - { ref: ../../skills/record-grounding }
     - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:b47c4b9e0fb40edba9beb9d655d3a20ecca9dcf9c389bc520d6ce4b196302ba2, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:92ccafc3dc3c5709c179a2c16a0026124e71f0addfa09f9ef73f84502c74ba41, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

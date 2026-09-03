@@ -60,7 +60,7 @@ export function validateMessage(message, prior = []) {
 
 export function validateManifest(manifest) { for (const artifact of manifest.artifacts) { assert(privateKinds.has(artifact.kind), 'unknown private kind'); assert(artifact.path.startsWith(`${artifact.kind}/`) && digest.test(artifact.digest), 'private manifest artifact invalid'); } }
 export const engineByAgent = Object.freeze({
-  klaxon: 'codex', cogsworth: 'codex', sprockett: 'codex', foreman: 'codex', graves: 'codex', tinkerton: 'codex', vesta: 'codex',
+  klaxon: 'grok', cogsworth: 'grok', sprockett: 'grok', foreman: 'grok', graves: 'grok', tinkerton: 'grok', vesta: 'grok',
   brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', pressman: 'codex'
 });
 
