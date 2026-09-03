@@ -6,7 +6,14 @@ import path from 'node:path';
 
 const repo=path.resolve(import.meta.dirname,'../..');
 const required=['agentic-org/scripts/production-newsroom.mjs','agentic-org/scripts/production-newsroom-mcp.mjs'];
-const tracked=execFileSync('git',['ls-files','-z'],{cwd:repo}).toString().split('\0').filter(Boolean).filter(name=>!name.startsWith('clankandslop-private/')&&!name.startsWith('website/node_modules/')&&!name.startsWith('website/public/og/')&&!name.endsWith('/Spawnfile')&&name!=='agentic-org/Spawnfile').filter(name=>!lstatSync(path.join(repo,name)).isSymbolicLink());
+// newsroom-runtime-bundle.json describes the archives it is generated from,
+// including this one's own sha256 -- it can never accurately describe its
+// own digest if it is packed inside the archive it is describing (each
+// rebuild would shift the digest by one generation, even from an untouched
+// clean checkout). It is a build-time/repo-level manifest only: no agent
+// reads it from the mounted workspace, so it is excluded here the same way
+// Spawnfile and the other non-payload paths are.
+const tracked=execFileSync('git',['ls-files','-z'],{cwd:repo}).toString().split('\0').filter(Boolean).filter(name=>!name.startsWith('clankandslop-private/')&&!name.startsWith('website/node_modules/')&&!name.startsWith('website/public/og/')&&!name.endsWith('/Spawnfile')&&name!=='agentic-org/Spawnfile'&&name!=='agentic-org/newsroom-runtime-bundle.json').filter(name=>!lstatSync(path.join(repo,name)).isSymbolicLink());
 const sourceEntries=new Set([...tracked,...required]),dependencyEntries=new Set(),assetEntries=new Set();
 
 // Tar headers must not depend on the machine that built the archive. Git

@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { chmodSync, existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 
 // Regression coverage for the machine-local-mode bug: build-newsroom-bundle.mjs
 // used to write `lstatSync(file).mode` straight into the ustar header, so the
@@ -10,47 +11,48 @@ import { resolve } from 'node:path';
 // machine with a different umask or checkout tool. The fix derives every
 // header mode from git's own recorded mode instead, collapsed to 0o644/0o755.
 //
-// This runs the real build script against the real repo (it already requires
-// the clankandslop-private checkout and installed website dependencies to run
-// at all, same as every other consumer of it), so it is skipped rather than
-// failed when those local prerequisites are absent.
-const scriptPath = resolve(import.meta.dirname, 'build-newsroom-bundle.mjs');
+// The build already requires the clankandslop-private checkout and installed
+// website dependencies to run at all (same as every other consumer of it),
+// so this is skipped rather than failed when those local prerequisites are
+// absent. It builds in an isolated clone of HEAD rather than the shared
+// working tree: this repo's own newsroom-runtime.tar/newsroom-runtime-bundle.json
+// are real build outputs other tests (organization.test.mjs) read, and
+// `node --test` runs test files concurrently, so mutating them in place here
+// would race those reads.
 const repoRoot = resolve(import.meta.dirname, '..', '..');
-const manifestPath = resolve(repoRoot, 'agentic-org', 'newsroom-runtime-bundle.json');
-const privateGitDir = resolve(repoRoot, 'clankandslop-private', '.git');
-const targetFile = resolve(repoRoot, 'agentic-org', 'scripts', 'lib.mjs');
+const privateRepoRoot = join(repoRoot, 'clankandslop-private');
+const nodeModulesRoot = join(repoRoot, 'website', 'node_modules');
 
-const prerequisitesReady = existsSync(privateGitDir) && existsSync(resolve(repoRoot, 'website', 'node_modules'));
+const prerequisitesReady = existsSync(join(privateRepoRoot, '.git')) && existsSync(nodeModulesRoot);
 
-const runBuild = () => {
-  execFileSync(process.execPath, [scriptPath], { cwd: repoRoot });
-  return JSON.parse(readFileSync(manifestPath, 'utf8')).source.sha256;
+const createCheckout = () => {
+  const root = mkdtempSync(join(tmpdir(), 'clank-bundle-mode-test-'));
+  const dest = join(root, 'checkout');
+  execFileSync('git', ['clone', '--quiet', '--local', repoRoot, dest]);
+  execFileSync('git', ['clone', '--quiet', '--local', privateRepoRoot, join(dest, 'clankandslop-private')]);
+  // website/node_modules is gitignored (never cloned); website/public/og is
+  // git-tracked, so the clone above already reproduces it.
+  symlinkSync(nodeModulesRoot, join(dest, 'website', 'node_modules'));
+  return { root, dest };
+};
+
+const buildSourceDigest = (dest) => {
+  execFileSync(process.execPath, [join(dest, 'agentic-org', 'scripts', 'build-newsroom-bundle.mjs')], { cwd: dest });
+  return JSON.parse(readFileSync(join(dest, 'agentic-org', 'newsroom-runtime-bundle.json'), 'utf8')).source.sha256;
 };
 
 test(
   'newsroom source bundle digest is stable across a tracked file mode change',
   { skip: !prerequisitesReady && 'clankandslop-private checkout or website/node_modules not available locally' },
   () => {
-    // newsroom-runtime-bundle.json is itself one of the bundled source files
-    // (it describes the bundle it ships in), so each build rewrites its own
-    // input for the next one. Snapshot and restore it around both measured
-    // builds so the only variable between them is the file-mode mutation
-    // below, not that self-description drifting.
-    const manifestBaseline = readFileSync(manifestPath, 'utf8');
-    const originalMode = statSync(targetFile).mode & 0o777;
+    const checkout = createCheckout();
     try {
-      const before = runBuild();
-      writeFileSync(manifestPath, manifestBaseline);
-      chmodSync(targetFile, 0o600);
-      const after = runBuild();
+      const before = buildSourceDigest(checkout.dest);
+      chmodSync(join(checkout.dest, 'agentic-org', 'scripts', 'lib.mjs'), 0o600);
+      const after = buildSourceDigest(checkout.dest);
       assert.equal(after, before, 'archive digest must depend only on git-recorded mode, never on local file mode/umask');
     } finally {
-      // Restore exactly the bytes/mode this test observed on entry -- not a
-      // third build, which would only add another link to the self-describing
-      // manifest's generation chain and leave the working tree one build
-      // ahead of where it started.
-      chmodSync(targetFile, originalMode);
-      writeFileSync(manifestPath, manifestBaseline);
+      rmSync(checkout.root, { recursive: true, force: true });
     }
   }
 );
