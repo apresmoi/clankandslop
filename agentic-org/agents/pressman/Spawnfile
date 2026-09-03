@@ -41,7 +41,7 @@ workspace:
     - { ref: ../../skills/repository-ownership }
     - { ref: ../../skills/release-validation }
   resources:
-    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:92ccafc3dc3c5709c179a2c16a0026124e71f0addfa09f9ef73f84502c74ba41, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:8760077400b43ab7b5bdc094ae7a633f8415f52ba4ef050c87b811aab330024c, mount: ./repos/newsroom, mode: readonly }
     - { id: website-deps-a, kind: bundle, source: ../../newsroom-dependencies-a.tar, sha256: sha256:f056290297c17be2889c857356b6d53f49126d9344abf574f578ecdc23572760, mount: ./deps-a, mode: readonly }
     - { id: website-deps-b, kind: bundle, source: ../../newsroom-dependencies-b.tar, sha256: sha256:5dd1aa92acb63cbabaf4af1adbfcee8a4dfa1e021e6fad62244bf68c626c0495, mount: ./deps-b, mode: readonly }
     - { id: public-assets-a, kind: bundle, source: ../../newsroom-assets-a.tar, sha256: sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a, mount: ./assets-a, mode: readonly }

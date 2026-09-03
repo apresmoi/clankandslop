@@ -2,9 +2,9 @@
   "version": "clank.newsroom-runtime-bundle.v2",
   "source": {
     "archive": "newsroom-runtime.tar",
-    "sha256": "sha256:92ccafc3dc3c5709c179a2c16a0026124e71f0addfa09f9ef73f84502c74ba41",
+    "sha256": "sha256:8760077400b43ab7b5bdc094ae7a633f8415f52ba4ef050c87b811aab330024c",
     "file_count": 1181,
-    "content_bytes": 6532783
+    "content_bytes": 6535729
   },
   "dependencies": [
     {
@@ -43,7 +43,8 @@
     "sha256": "sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e",
     "mount": "repos/newsroom-private",
     "file_count": 3008,
-    "content_bytes": 60504167
+    "content_bytes": 60504167,
+    "commit": "c65e6d375bcaebe53f63d6d2aa4569dc34d38735"
   },
   "lockfile": "website/package-lock.json",
   "entrypoint": "agentic-org/scripts/production-newsroom-mcp.mjs"

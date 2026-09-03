@@ -44,7 +44,7 @@ workspace:
     - { ref: ../../skills/editorial-review }
     - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:92ccafc3dc3c5709c179a2c16a0026124e71f0addfa09f9ef73f84502c74ba41, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:8760077400b43ab7b5bdc094ae7a633f8415f52ba4ef050c87b811aab330024c, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
