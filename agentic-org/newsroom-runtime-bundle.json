@@ -9,17 +9,17 @@
   "dependencies": [
     {
       "archive": "newsroom-dependencies-a.tar",
-      "sha256": "sha256:f056290297c17be2889c857356b6d53f49126d9344abf574f578ecdc23572760",
+      "sha256": "sha256:93e6b34174ee27a059e80f3519d6e522e1fe0705f3aabcd3275507a805c1d768",
       "mount": "deps-a",
-      "file_count": 11074,
-      "content_bytes": 275427508
+      "file_count": 4762,
+      "content_bytes": 55514019
     },
     {
       "archive": "newsroom-dependencies-b.tar",
-      "sha256": "sha256:5dd1aa92acb63cbabaf4af1adbfcee8a4dfa1e021e6fad62244bf68c626c0495",
+      "sha256": "sha256:23f02646bbdc1e778a93c972710fd31dc2db61a92fc0ae4fa39cead8b855fd03",
       "mount": "deps-b",
-      "file_count": 5376,
-      "content_bytes": 69599181
+      "file_count": 2128,
+      "content_bytes": 57248204
     }
   ],
   "assets": [
