@@ -4,8 +4,14 @@ name: vesta
 runtime:
   name: daimon
   options:
-    engine: grok
+    engine: codex
 execution:
+  model:
+    primary:
+      provider: openai
+      name: gpt-5.4-mini
+      auth:
+        method: codex
   sandbox:
     mode: workspace
 schedule:
@@ -34,7 +40,7 @@ workspace:
     - { ref: ../../skills/record-grounding }
     - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:e0c3d8105b101831117400a3b190483afa04f3374c34ace4830e8171d5bcd819, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:4777d63fba08602f379039303d4ede6145c848beda75a980282b941a2438a6e6, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

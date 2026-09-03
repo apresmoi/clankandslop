@@ -46,13 +46,13 @@ test('receipt shape adapter rejects extra and missing fields',()=>{const source=
 test('actual agent Spawnfile bytes select the assigned Daimon CLI engines', () => {
   assert.doesNotThrow(validateRuntimeBindings);
   assert.deepEqual(engineByAgent, {
-    klaxon: 'grok', cogsworth: 'grok', sprockett: 'grok', foreman: 'grok', graves: 'grok', tinkerton: 'grok', vesta: 'grok',
+    klaxon: 'codex', cogsworth: 'codex', sprockett: 'codex', foreman: 'codex', graves: 'codex', tinkerton: 'codex', vesta: 'codex',
     brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', pressman: 'codex'
   });
   const root = mkdtempSync(join(tmpdir(), 'clank-runtime-bindings-'));
   mkdirSync(join(root, 'agents', 'klaxon'), { recursive: true });
   const source = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
-  writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace('engine: grok', 'engine: agy'));
+  writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace('engine: codex', 'engine: agy'));
   assert.throws(() => validateRuntimeBindings(root), /klaxon runtime engine declaration invalid/);
   writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace('execution:', 'policy: { mode: strict, on_degrade: error }\nexecution:'));
   assert.throws(() => validateRuntimeBindings(root), /klaxon must not override Spawnfile policy/);
