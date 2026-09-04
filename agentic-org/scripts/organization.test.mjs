@@ -91,9 +91,40 @@ test('root declaration keeps Moltnet durable, authenticated, direct and secret-b
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [attach, observe, write]', 'scopes: [attach, write]')), /Moltnet token boundary/);
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [observe]', 'scopes: [observe, write]')), /observe-only console token/);
   assert.throws(() => validateRootDeclaration(root.replace('secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN', 'secret: CLANK_MOLTNET_GATHERER_TOKEN')), /research sensor token boundary/);
-  assert.throws(() => validateRootDeclaration(root.replace('federation: none', 'federation: [legacy-peer]')), /cloud-local/);
+  assert.throws(() => validateRootDeclaration(root.replace('federation: none', 'federation: [legacy-peer]')), /federate only to the read-only clank-observer pairing/);
   assert.throws(() => validateRootDeclaration(root.replace(', research-sensor, cogsworth', ', cogsworth')), /research sensor local identity/);
   assert.throws(() => validateRootDeclaration(root.replace('members: [gatherer, klaxon', 'members: [klaxon')), /assignment kickoff participant/);
+});
+test('the observer pairing relaxation still forbids everything else', () => {
+  const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
+  const pairing = '        - id: clank-observer';
+  assert.doesNotThrow(() => validateRootDeclaration(root));
+  // A second pairing — even a well-formed one — reintroduces the federation
+  // dependency the policy exists to prevent.
+  const second = root.replace(pairing, [
+    '        - id: rogue-peer',
+    '          remote_network_id: rogue-peer',
+    '          remote_network_name: Rogue Peer',
+    '          token_secret: CLANK_MOLTNET_PAIR_ROGUE_TOKEN',
+    '          relay: { url: "wss://rogue.invalid", room: rogue-room, token_secret: CLANK_MOLTNET_RELAY_ROGUE_TOKEN }',
+    pairing
+  ].join('\n'));
+  assert.throws(() => validateRootDeclaration(second), /exactly one read-only observer pairing/);
+  // federation: all would silently widen every future pairing.
+  assert.throws(() => validateRootDeclaration(root.replace('federation: [clank-observer]', 'federation: all')), /federate only to the read-only clank-observer pairing/);
+  assert.throws(() => validateRootDeclaration(root.replaceAll('federation: [clank-observer]', 'federation: all')), /federate only to the read-only clank-observer pairing/);
+  // Conference has no counterpart room on the laptop; federating it is a silent no-op.
+  assert.throws(() => validateRootDeclaration(root.replace('id: conference, visibility: private, write_policy: members, federation: none', 'id: conference, visibility: private, write_policy: members, federation: [clank-observer]')), /conference room must remain cloud-local/);
+  // The inbound pair credential must stay agent-free, pair-only, and bound to the pairing secret.
+  assert.throws(() => validateRootDeclaration(root.replace('{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }', '{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair], agents: [brass] }')), /pair-scoped, agent-free/);
+  assert.throws(() => validateRootDeclaration(root.replace('scopes: [pair] }', 'scopes: [pair, admin] }')), /pair-scoped, agent-free/);
+  assert.throws(() => validateRootDeclaration(root.replace('- { id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }\n', '')), /pair-scoped, agent-free|token declaration/);
+  // Pairing identity and transport must keep pointing at the paired laptop.
+  assert.throws(() => validateRootDeclaration(root.replace('remote_network_id: clank-observer', 'remote_network_id: clank-newsroom')), /observer pairing identity invalid/);
+  assert.throws(() => validateRootDeclaration(root.replace('room: VdoP-HC5isGQksHo5dYpnQ', 'room: some-other-room')), /paired laptop coordinates/);
+  assert.throws(() => validateRootDeclaration(root.replace('          relay: { url: "wss://moltnet-relay.alicenet.workers.dev", room: VdoP-HC5isGQksHo5dYpnQ, token_secret: CLANK_MOLTNET_RELAY_OBSERVER_TOKEN }', '          remote_base_url: https://observer.invalid')), /inbound base url|inbound federation peer/);
+  // Secrets stay references: a literal token value in the declaration fails.
+  assert.throws(() => validateRootDeclaration(root.replace('token_secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN', 'token: an-actual-secret-value')), /secret references only|pairing identity/);
 });
 test('runtime and provision fail closed', () => { assert.equal(checkRuntime({}).ok, false); assert.throws(() => provision({ edition: '2026-08-16', privateRoot: '/tmp/nope', env: {} }), /runtime admission denied/); });
 test('runtime rejects a repository private root and shared isolation paths', () => { const bad = { CLANK_PRIVATE_ROOT: process.cwd(), CLANK_WORLD_SCOUT_HOME: process.cwd(), CLANK_KLAXON_HOME: process.cwd() }; assert.match(checkRuntime(bad).missing.join(','), /private-root|not-isolated/); });

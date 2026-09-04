@@ -77,6 +77,35 @@ const section = (source, name) => {
 const resourceLine = (workspace, id) => workspace.split('\n').find((line) => line.includes(`{ id: ${id},`));
 const csv = (value) => value.split(',').map((item) => item.trim()).filter(Boolean);
 
+// The one federation link the newsroom is allowed to declare: a read-only
+// laptop observer reached over the Moltnet relay. Its transport coordinates are
+// pinned here on purpose — a relay room id that silently drifts out of sync with
+// ~/.moltnet/clank-observer/Moltnet produces no error, just an empty console.
+const OBSERVER_PAIRING_ID = 'clank-observer';
+const OBSERVER_NETWORK_ID = 'clank-observer';
+const OBSERVER_NETWORK_NAME = 'Clank & Slop Observer';
+const OBSERVER_PAIR_SECRET = 'CLANK_MOLTNET_PAIR_OBSERVER_TOKEN';
+const OBSERVER_RELAY_SECRET = 'CLANK_MOLTNET_RELAY_OBSERVER_TOKEN';
+const OBSERVER_RELAY_URL = 'wss://moltnet-relay.alicenet.workers.dev';
+const OBSERVER_RELAY_ROOM = 'VdoP-HC5isGQksHo5dYpnQ';
+
+export function declaredPairings(bytes) {
+  const lines = bytes.split('\n');
+  const start = lines.findIndex((line) => /^\s+pairings:\s*$/.test(line));
+  if (start < 0) return [];
+  const indent = lines[start].length - lines[start].trimStart().length;
+  const end = lines.findIndex((line, index) => index > start && line.trim() && (line.length - line.trimStart().length) <= indent);
+  const entries = [];
+  for (const line of lines.slice(start + 1, end < 0 ? undefined : end)) {
+    if (/^\s+- /.test(line)) entries.push({});
+    const field = /^\s+(?:- )?([a-z_]+): (.*)$/.exec(line);
+    if (field && entries.length) entries.at(-1)[field[1]] = field[2].trim();
+  }
+  return entries;
+}
+
+const inlineField = (value, key) => new RegExp(`\\b${key}: "?([^,"}]+)"?`).exec(value ?? '')?.[1]?.trim();
+
 export function validateAgentDeclaration(agent, bytes) {
   const engine = engineByAgent[agent];
   assert(engine, `${agent} runtime assignment missing`);
@@ -135,18 +164,39 @@ export function validateRootDeclaration(bytes) {
   assert(consoleToken?.secret === 'CLANK_MOLTNET_CONSOLE_TOKEN' && consoleToken.scopes.join(',') === 'observe' && consoleToken.agents.length === 0, 'observe-only console token boundary invalid');
   const researchSensor = tokens.get('research-sensor');
   assert(researchSensor?.secret === 'CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN' && researchSensor.scopes.join(',') === 'attach,observe,write' && researchSensor.agents.join(',') === 'research-sensor', 'research sensor token boundary invalid');
-  assert(tokens.size === agents.length + 4, 'unexpected Moltnet token declaration');
-  assert(!bytes.includes('pairings:') && !bytes.includes('remote_network_id:') && !bytes.includes('token_secret:'), 'cloud Moltnet must not depend on federation');
+  assert(tokens.size === agents.length + 5, 'unexpected Moltnet token declaration');
+  // Narrowed federation policy. The newsroom still must not *depend* on
+  // federation: it runs identically whether the laptop observer is connected or
+  // not. What is now permitted is exactly one declared pairing — the read-only
+  // clank-observer relay link — carrying a pair-scoped credential bound to no
+  // agent. A second pairing, a different remote network, an inbound
+  // remote_base_url peer, or a pair token with agents or extra scopes still fails.
+  const pairings = declaredPairings(bytes);
+  assert(pairings.length === 1, 'cloud Moltnet may declare exactly one read-only observer pairing');
+  const [pairing] = pairings;
+  assert(pairing.id === OBSERVER_PAIRING_ID && pairing.remote_network_id === OBSERVER_NETWORK_ID && pairing.remote_network_name === OBSERVER_NETWORK_NAME && pairing.token_secret === OBSERVER_PAIR_SECRET, 'observer pairing identity invalid');
+  assert(pairing.remote_base_url === undefined && pairing.relay !== undefined, 'observer pairing must reach the laptop over the relay, never an inbound base url');
+  assert(inlineField(pairing.relay, 'url') === OBSERVER_RELAY_URL && inlineField(pairing.relay, 'room') === OBSERVER_RELAY_ROOM && inlineField(pairing.relay, 'token_secret') === OBSERVER_RELAY_SECRET, 'observer relay transport must match the paired laptop coordinates');
+  const pairToken = tokens.get(OBSERVER_PAIRING_ID);
+  assert(pairToken?.secret === pairing.token_secret && pairToken.scopes.join(',') === 'pair' && pairToken.agents.length === 0, 'observer pair token must be pair-scoped, agent-free and bound to the pairing secret');
+  assert(!/^\s+remote_base_url:/m.test(bytes), 'cloud Moltnet must not accept an inbound federation peer');
   assert(bytes.includes('id: gatherer') && bytes.includes('network: clank-newsroom') && bytes.includes('auth: { token_id: gatherer }') && bytes.includes('dms: { enabled: true }'), 'research intake participant invalid');
   assert(bytes.includes('id: research-sensor') && bytes.includes('auth: { token_id: research-sensor }'), 'direct research sensor participant invalid');
-  const roomPattern = /- \{ id: ([a-z-]+), visibility: private, write_policy: members, federation: (none|\[[^\]]+\]), members: \[([^\]]+)\] \}/g;
+  const roomPattern = /- \{ id: ([a-z-]+), visibility: private, write_policy: members, federation: (none|all|\[[^\]]+\]), members: \[([^\]]+)\] \}/g;
   const rooms = new Map([...bytes.matchAll(roomPattern)].map((match) => [match[1], { federation: match[2], members: csv(match[3]) }]));
   assert(rooms.size === 6, 'Moltnet room federation declarations invalid');
   // Conference is where reporters pitch and the editor assigns; it holds the nine
   // colleagues and klaxon, and deliberately excludes the external research feeds.
   const conference = rooms.get('conference');
   assert(conference !== undefined && !conference.members.includes('gatherer') && !conference.members.includes('research-sensor'), 'conference room must exclude external feeds');
-  assert([...rooms.values()].every((room) => room.federation === 'none'), 'Moltnet rooms must remain cloud-local');
+  // A room is either cloud-local or federated to the single read-only observer
+  // pairing and nothing else. `federation: all` stays forbidden so that adding a
+  // future pairing can never widen an existing room implicitly.
+  assert([...rooms.values()].every((room) => room.federation === 'none' || room.federation === `[${OBSERVER_PAIRING_ID}]`), `Moltnet rooms must stay cloud-local or federate only to the read-only ${OBSERVER_PAIRING_ID} pairing`);
+  // Conference is the newsroom's own editorial floor and has no counterpart room
+  // on the observer network, so it stays cloud-local: federating a room id the
+  // laptop does not declare is a silent no-op, not an error.
+  assert(conference.federation === 'none', 'conference room must remain cloud-local');
   assert(rooms.get('assignment')?.members.includes('gatherer'), 'assignment kickoff participant invalid');
   const research = rooms.get('research');
   assert(research?.members.includes('research-sensor'), 'research sensor local identity invalid');

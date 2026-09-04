@@ -72,6 +72,15 @@ networks:
           - { id: gatherer, secret: CLANK_MOLTNET_GATHERER_TOKEN, scopes: [attach, observe, write], agents: [gatherer] }
           - { id: console, secret: CLANK_MOLTNET_CONSOLE_TOKEN, scopes: [observe] }
           - { id: research-sensor, secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN, scopes: [attach, observe, write], agents: [research-sensor] }
+          - { id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }
+      # Read-only observer pairing. The newsroom never depends on it: every room
+      # below runs identically whether the observer relay is connected or not.
+      pairings:
+        - id: clank-observer
+          remote_network_id: clank-observer
+          remote_network_name: Clank & Slop Observer
+          token_secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN
+          relay: { url: "wss://moltnet-relay.alicenet.workers.dev", room: VdoP-HC5isGQksHo5dYpnQ, token_secret: CLANK_MOLTNET_RELAY_OBSERVER_TOKEN }
       store:
         kind: sqlite
         path: /var/lib/spawnfile/moltnet/networks/clank-newsroom/moltnet.sqlite
@@ -83,8 +92,8 @@ networks:
       direct_messages: true
     rooms:
       - { id: conference, visibility: private, write_policy: members, federation: none, members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
-      - { id: assignment, visibility: private, write_policy: members, federation: none, members: [gatherer, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
-      - { id: filing, visibility: private, write_policy: members, federation: none, members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
-      - { id: sensor, visibility: private, write_policy: members, federation: none, members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
-      - { id: research, visibility: private, write_policy: members, federation: none, members: [gatherer, research-sensor, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
-      - { id: release, visibility: private, write_policy: members, federation: none, members: [brass, spike, ledger, caslon, pressman] }
+      - { id: assignment, visibility: private, write_policy: members, federation: [clank-observer], members: [gatherer, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
+      - { id: filing, visibility: private, write_policy: members, federation: [clank-observer], members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
+      - { id: sensor, visibility: private, write_policy: members, federation: [clank-observer], members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
+      - { id: research, visibility: private, write_policy: members, federation: [clank-observer], members: [gatherer, research-sensor, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
+      - { id: release, visibility: private, write_policy: members, federation: [clank-observer], members: [brass, spike, ledger, caslon, pressman] }
