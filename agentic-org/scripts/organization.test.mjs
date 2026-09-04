@@ -76,7 +76,12 @@ test('workspace resources enforce public modes and private corpus least privileg
   assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('kind: volume', 'kind: git').replace('name: clank-release-staging, ', 'url: https://github.com/apresmoi/clankandslop.git, branch: staging, ')), /public content resource/);
 });
 test('Pressman implementation contains no network publisher, push, credential, or process execution path', () => { const source=readFileSync(resolve(import.meta.dirname,'newsroom.mjs'),'utf8'); assert.doesNotMatch(source,/child_process|execFile|spawn\(|fetch\(|https?:|git\s+push|credential|token/i); });
-test('production roles declare exact newsroom tools and editorial skill closure',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article'],sprockett:['file_article'],foreman:['file_article'],graves:['file_article'],tinkerton:['file_article'],vesta:['file_article'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};const reporterSkills=['article-composition','record-grounding','repository-ownership'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);assert.match(source,/transport: stdio/u);assert.match(source,/command: \/usr\/local\/bin\/node/u);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const skill of reporterSkills)assert.match(source,new RegExp(`skills/${skill}`,'u'));assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
+test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article'],sprockett:['file_article'],foreman:['file_article'],graves:['file_article'],tinkerton:['file_article'],vesta:['file_article'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
+// identical SKILL.md files at the top of every wake. Their content now
+// lives in AGENTS.md, which Codex loads into the prefix natively, so the
+// closure to hold is the opposite one — no agent declares a skill, and the
+// editorial constraints those skills carried are in the reporter's own doc.
+const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance','six to eight flowing paragraphs'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);assert.match(source,/transport: stdio/u);assert.match(source,/command: \/usr\/local\/bin\/node/u);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
 test('production instructions require natural-language handoffs and stay free of read-before-acting mandates',()=>{const team=readFileSync(resolve(import.meta.dirname,'../TEAM.md'),'utf8');for(const phrase of ['natural-language','at least five articles','content/editions/<date>/{articles,desk,pages,maps}','never pushes Git'])assert.ok(team.includes(phrase));assert.doesNotMatch(team,/by path — never search for them/u);});
 test('production declarations consume only checksum-pinned offline newsroom bundles',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.ok(source.includes(`sha256: ${descriptor.source.sha256}`));assert.doesNotMatch(source,/kind: git|github\.com\/apresmoi\/clankandslop|branch: staging/u);}const pressman=readFileSync(resolve(import.meta.dirname,'../agents/pressman/Spawnfile'),'utf8');for(const dependency of [...descriptor.dependencies,...descriptor.assets]){assert.ok(pressman.includes(`sha256: ${dependency.sha256}`));assert.ok(pressman.includes(`mount: ./${dependency.mount}`));}assert.match(pressman,/CLANK_WEBSITE_DEPS_ROOTS: .*deps-a:.*deps-b/u);});
 test('lifecycle schema is closed and covers every autonomous terminal', () => { const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8')); assert.equal(schema.additionalProperties,false); assert.deepEqual(schema.properties.kind.enum,['readiness','blocker','finalization','released','staged']); });
@@ -91,9 +96,46 @@ test('root declaration keeps Moltnet durable, authenticated, direct and secret-b
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [attach, observe, write]', 'scopes: [attach, write]')), /Moltnet token boundary/);
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [observe]', 'scopes: [observe, write]')), /observe-only console token/);
   assert.throws(() => validateRootDeclaration(root.replace('secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN', 'secret: CLANK_MOLTNET_GATHERER_TOKEN')), /research sensor token boundary/);
-  assert.throws(() => validateRootDeclaration(root.replace('federation: none', 'federation: [legacy-peer]')), /cloud-local/);
+  assert.throws(() => validateRootDeclaration(root.replace('federation: [clank-observer]', 'federation: [legacy-peer]')), /federate only to the read-only clank-observer pairing/);
   assert.throws(() => validateRootDeclaration(root.replace(', research-sensor, cogsworth', ', cogsworth')), /research sensor local identity/);
   assert.throws(() => validateRootDeclaration(root.replace('members: [gatherer, klaxon', 'members: [klaxon')), /assignment kickoff participant/);
+});
+test('the observer pairing relaxation still forbids everything else', () => {
+  const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
+  const pairing = '        - id: clank-observer';
+  assert.doesNotThrow(() => validateRootDeclaration(root));
+  // A second pairing — even a well-formed one — reintroduces the federation
+  // dependency the policy exists to prevent.
+  const second = root.replace(pairing, [
+    '        - id: rogue-peer',
+    '          remote_network_id: rogue-peer',
+    '          remote_network_name: Rogue Peer',
+    '          token_secret: CLANK_MOLTNET_PAIR_ROGUE_TOKEN',
+    '          relay: { url: "wss://rogue.invalid", room: rogue-room, token_secret: CLANK_MOLTNET_RELAY_ROGUE_TOKEN }',
+    pairing
+  ].join('\n'));
+  assert.throws(() => validateRootDeclaration(second), /exactly one read-only observer pairing/);
+  // federation: all would silently widen every future pairing -- on one room or all six.
+  assert.throws(() => validateRootDeclaration(root.replaceAll('federation: [clank-observer]', 'federation: all')), /federate only to the read-only clank-observer pairing/);
+  // Per-room coverage: no room -- conference included -- may be quietly pointed at
+  // a pairing this server does not declare, or opened up with `all`.
+  for (const room of ['conference', 'assignment', 'filing', 'sensor', 'research', 'release']) {
+    const prefix = `id: ${room}, visibility: private, write_policy: members, federation: `;
+    assert.ok(root.includes(`${prefix}[clank-observer]`), `${room} is not federated to the observer`);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}[rogue-peer]`)), /federate only to the read-only clank-observer pairing/, room);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}[clank-observer, rogue-peer]`)), /federate only to the read-only clank-observer pairing/, room);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}all`)), /federate only to the read-only clank-observer pairing/, room);
+  }
+  // The inbound pair credential must stay agent-free, pair-only, and bound to the pairing secret.
+  assert.throws(() => validateRootDeclaration(root.replace('{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }', '{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair], agents: [brass] }')), /pair-scoped, agent-free/);
+  assert.throws(() => validateRootDeclaration(root.replace('scopes: [pair] }', 'scopes: [pair, admin] }')), /pair-scoped, agent-free/);
+  assert.throws(() => validateRootDeclaration(root.replace('- { id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }\n', '')), /pair-scoped, agent-free|token declaration/);
+  // Pairing identity and transport must keep pointing at the paired laptop.
+  assert.throws(() => validateRootDeclaration(root.replace('remote_network_id: clank-observer', 'remote_network_id: clank-newsroom')), /observer pairing identity invalid/);
+  assert.throws(() => validateRootDeclaration(root.replace('room: VdoP-HC5isGQksHo5dYpnQ', 'room: some-other-room')), /paired laptop coordinates/);
+  assert.throws(() => validateRootDeclaration(root.replace('          relay: { url: "wss://moltnet-relay.alicenet.workers.dev", room: VdoP-HC5isGQksHo5dYpnQ, token_secret: CLANK_MOLTNET_RELAY_OBSERVER_TOKEN }', '          remote_base_url: https://observer.invalid')), /inbound base url|inbound federation peer/);
+  // Secrets stay references: a literal token value in the declaration fails.
+  assert.throws(() => validateRootDeclaration(root.replace('token_secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN', 'token: an-actual-secret-value')), /secret references only|pairing identity/);
 });
 test('runtime and provision fail closed', () => { assert.equal(checkRuntime({}).ok, false); assert.throws(() => provision({ edition: '2026-08-16', privateRoot: '/tmp/nope', env: {} }), /runtime admission denied/); });
 test('runtime rejects a repository private root and shared isolation paths', () => { const bad = { CLANK_PRIVATE_ROOT: process.cwd(), CLANK_WORLD_SCOUT_HOME: process.cwd(), CLANK_KLAXON_HOME: process.cwd() }; assert.match(checkRuntime(bad).missing.join(','), /private-root|not-isolated/); });

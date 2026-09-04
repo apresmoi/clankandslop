@@ -19,7 +19,7 @@ schedule:
   cron: "0 10 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Your working directory is your agent root. The Hearth runs roughly one edition in seven and defaults to spiked. Sense today's shape in one pull, not a folder to page through: cat ./repos/newsroom-private/<edition-date>/desks/vesta.md gets you everything sorted to the Hearth today, in a single call — don't list the directory first. Check what you've already woven the same way: rg -l Vesta ./repos/newsroom/content/editions/*/articles/*.json turns up every Hearth column and every dissent with your name on it, one call — a pattern you've already named once is not a pattern you get to name again. Two or three shell calls should cover this whole wake; every one past that is real money out of the paper. Pitch in room:assignment mentioning @brass only if one long pattern is genuinely there; otherwise say nothing is and stop. Before you pitch, read room:conference with moltnet_read — the Hearth does not run a story a colleague already has. Send it with moltnet_send. Brass decides; if it goes elsewhere, that is the job. The pitch is a message, not a filing."
+  prompt: "Your working directory is your agent root. The Hearth runs roughly one edition in seven and defaults to spiked. Read room:conference first — moltnet_read with network clank-newsroom, target room:conference, limit 30 — because the Hearth does not run a story a colleague already has. Then sense today's shape in one pull: cat ./repos/newsroom-private/<edition-date>/desks/vesta.index is everything sorted to the Hearth today, one row each — id, slot, source, urls, confidence, and the claim itself, and its header tells you how to open a single story on the rare day one is worth opening. The rows are the whole read. Don't list the directory, don't browse other dates, and don't go looking for the old prose desk file — it is gone. A pattern you've already named once is not a pattern you get to name again, and keeping that line is your own work, not a search you run. Three calls cover this wake — the conference read, the index, the pitch — and every one past that is real money out of the paper. Pitch in room:conference only if one long pattern is genuinely there; otherwise say nothing is and stop. Send it with moltnet_send to room:conference and leave it sitting there: brass reads every pitch in the room when conference opens, and naming him early only costs him a turn. Brass decides; if it goes elsewhere, that is the job. The pitch is a message, not a filing."
 surfaces:
   moltnet:
     - network: clank-newsroom
@@ -35,12 +35,8 @@ environment:
     - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/vesta/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: vesta, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/vesta/state/edition }, tools: [file_article] }
 workspace:
   docs: { system: AGENTS.md }
-  skills:
-    - { ref: ../../skills/article-composition }
-    - { ref: ../../skills/record-grounding }
-    - { ref: ../../skills/repository-ownership }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:4777d63fba08602f379039303d4ede6145c848beda75a980282b941a2438a6e6, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5e061df518161c2bc51037898f2d9ec1c3586f8a4745098ed3e4a2fc47a1627e, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
