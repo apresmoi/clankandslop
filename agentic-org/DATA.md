@@ -25,3 +25,14 @@ The decompressed grid is a regenerable cache at `CLANK_ETOPO_GRD`, never an
 artifact and never committed. Editions carry only the few-KB baked outputs.
 No agent has network access to fetch a relief dataset or a 3D model, by
 design: the catalogue in `SYSTEMS.md` is the whole permitted surface.
+
+## Where the article schema actually lives
+
+Neither this file nor `SYSTEMS.md` documents the article record. Its keys are
+listed in each reporter's own `AGENTS.md` under "Filing shape", enforced by
+`scripts/production-newsroom-mcp.mjs` (the tool input schema) and
+`scripts/production-newsroom.mjs` (the durable checks), and validated at build
+time by `ops/validate-content.mjs`. The slug field is `id`, and an article
+file's name is always `<id>.json`. A row in
+`state/edition/editions/<date>/INDEX` names that file; nothing else needs to
+enumerate the directory.

@@ -36,10 +36,6 @@ environment:
       tools: [stage_release]
 workspace:
   docs: { system: AGENTS.md }
-  skills:
-    - { ref: ../../skills/newsroom-handoff }
-    - { ref: ../../skills/repository-ownership }
-    - { ref: ../../skills/release-validation }
   resources:
     - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5e061df518161c2bc51037898f2d9ec1c3586f8a4745098ed3e4a2fc47a1627e, mount: ./repos/newsroom, mode: readonly }
     - { id: website-deps-a, kind: bundle, source: ../../newsroom-dependencies-a.tar, sha256: sha256:93e6b34174ee27a059e80f3519d6e522e1fe0705f3aabcd3275507a805c1d768, mount: ./deps-a, mode: readonly }

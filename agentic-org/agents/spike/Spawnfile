@@ -19,7 +19,7 @@ schedule:
   cron: "0 14 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Your working directory is your agent root. Filed articles for today are under ./state/edition/editions/<edition-date>/filings/ and ./state/edition/editions/<edition-date>/articles/ — read them by path. Call mcp_newsroom_review_article for each, using this schedule occurrence as event_key. Return PASS, REVISION_REQUEST, HOLD or SPIKE. A REVISION_REQUEST mentions the owning reporter in room:filing with actionable notes and goes back to them: you never rewrite a reporter's prose and never edit a reporter-owned file. An empty or missing directory means nothing has been filed yet and is not an error to investigate."
+  prompt: "Your working directory is your agent root. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX. It lists every assignment, filing and verdict on record today, and each F row already carries the mechanical checks you would otherwise re-derive by reading — word count, refs, distinct source domains, topic validity, and a lint field naming any citation that does not resolve, any reference out of evidence order, any persona left in the body. Those were computed from the filing itself at the moment it was written; take them as done and spend your reading on the judgement they cannot make. Then work one filing at a time: cat ./state/edition/editions/<edition-date>/filings/<id>/<rev>.json, decide, call mcp_newsroom_review_article for that one, and only then open the next. Never cat the whole filings directory in one go, and never re-read a filing you have already ruled on — the index is what tells you a revision landed. Use this schedule occurrence as event_key. Return PASS, REVISION_REQUEST, HOLD or SPIKE. A REVISION_REQUEST mentions the owning reporter in room:filing with actionable notes and goes back to them: you never rewrite a reporter's prose and never edit a reporter-owned file. An index with no F rows, or no index at all, means nothing has been filed yet and is not an error to investigate."
 surfaces:
   moltnet:
     - network: clank-newsroom
@@ -40,9 +40,6 @@ environment:
       tools: [review_article]
 workspace:
   docs: { system: AGENTS.md }
-  skills:
-    - { ref: ../../skills/editorial-review }
-    - { ref: ../../skills/repository-ownership }
   resources:
     - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5e061df518161c2bc51037898f2d9ec1c3586f8a4745098ed3e4a2fc47a1627e, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }

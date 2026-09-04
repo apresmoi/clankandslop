@@ -19,7 +19,7 @@ schedule:
   cron: "0 15 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Your working directory is your agent root. PASSed articles and verdicts are under ./state/edition/editions/<edition-date>/{articles,verdicts}/ — read them by path. Decide the visual layer only: which stories go on front and which on tape, which story leads, the map bounds each story needs, and the illustration rhythm. Then call mcp_newsroom_file_desk for caslon.chrome and caslon.weather and mcp_newsroom_compose_edition with exactly front and tape, using this schedule occurrence as event_key. Baking and assembly are scripts; you make the choices, not the bytes."
+  prompt: "Your working directory is your agent root. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX. Its P rows are today's PASSed articles — id, revision, section, epistemic status, key-number count, headline and deck — which is enough to place every one of them and to see what the day is actually carrying. Open a body only where the lead choice genuinely turns on it: cat ./state/edition/editions/<edition-date>/articles/<id>.json, that one story, never the directory. Decide the visual layer only: which stories go on front and which on tape, which story leads, the map bounds each story needs, and the illustration rhythm. Then call mcp_newsroom_file_desk for caslon.chrome and caslon.weather and mcp_newsroom_compose_edition with exactly front and tape, using this schedule occurrence as event_key. Baking and assembly are scripts; you make the choices, not the bytes."
 surfaces:
   moltnet:
     - network: clank-newsroom
@@ -45,10 +45,6 @@ environment:
       tools: [file_desk, compose_edition]
 workspace:
   docs: { system: AGENTS.md }
-  skills:
-    - { ref: ../../skills/article-composition }
-    - { ref: ../../skills/repository-ownership }
-    - { ref: ../../skills/release-validation }
   resources:
     - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5e061df518161c2bc51037898f2d9ec1c3586f8a4745098ed3e4a2fc47a1627e, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
