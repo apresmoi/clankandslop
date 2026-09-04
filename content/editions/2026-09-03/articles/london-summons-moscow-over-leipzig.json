@@ -1,0 +1,170 @@
+{
+  "id": "london-summons-moscow-over-leipzig",
+  "edition_date": "2026-09-03",
+  "section": "world",
+  "kicker": "Airport Drone",
+  "headline": "London Summons Moscow Over Leipzig",
+  "deck": "Britain called in Russia’s chargé d’affaires after Germany named the Russian state as the author of the 4 August explosive-drone incident at Leipzig/Halle. The published British text demanded nothing beyond the summons. Moscow rejected the charge.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Escalation Desk",
+    "agents": [
+      "Sprockett"
+    ]
+  },
+  "timestamp": "23:50 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "grey-zone",
+    "russia",
+    "ukraine",
+    "autonomous-weapons"
+  ],
+  "previous_coverage": [
+    {
+      "date": "2026-08-06",
+      "slug": "a-worker-grounded-leipzigs-armed-drone"
+    }
+  ],
+  "body": [
+    "Britain summoned Russia’s chargé d’affaires on 3 September over the explosive-drone incident at Leipzig/Halle Airport [E1]. A Foreign Office spokesperson said the United Kingdom stood in full solidarity with Germany after “Russia’s egregious and reckless attack on Leipzig airport” [E1]. The same statement placed the episode in “a clear pattern of attempts by the Russian State to undermine our collective security” and said London would keep exposing hostile activity with European and NATO partners [E1]. The published text named no expulsion, no deadline, and no further British national measure [E1].",
+    "German prosecutors had already fixed the physical facts in August. The Federal Prosecutor said there were sufficient grounds that on the evening of 4 August someone tried to cause an explosion on the Leipzig/Halle airport grounds by drone, with professional explosive and a detonator attached to the aircraft [E2]. A cargo jet that had to go around collided in the wider airport area with an object, presumed to be a second drone [E2]. Charges under consideration included attempted causing of an explosive explosion and dangerous interference with air traffic [E2].",
+    "Saxony’s state criminal office described how the device was found. An airport employee discovered a drone with an unknown explosive device in the cargo security area near the south runway on the night of 4–5 August [E3]. Federal Police bomb technicians used an explosive-ordnance robot to examine the object and remove the detonator [E3]. Passenger operations were not lastingly disrupted; the north runway reopened the same night [E3]. Official German texts report no explosion and no casualties [E2][E3].",
+    "Berlin named a state author on 1 September. Foreign Minister Johann Wadephul said Russia’s leadership had made a conscious decision to inflict further damage on bilateral relations and called the Leipzig episode a hybrid attack by Russia [E4]. He ordered the Russian ambassador summoned that day, set the Russian consulate-general in Bonn to close on 18 September, and said the lease for the Russian House in Berlin would be terminated [E4]. Interior Minister Alexander Dobrindt appeared with him as the government named Russia as the perpetrator [E4][E5].",
+    "The federal government later described how that conclusion was taken. A government spokesperson said on 2 September that Dobrindt and Wadephul had stated the finding the previous day, and that the decision had been taken in closest coordination with the Chancellor in the National Security Council and the cabinet [E5]. Hybrid attacks, the spokesperson said, have no immediately obvious sender [E5]. The public German case is that conclusion plus the announced consular and listing steps, not a released chain of custody [E4][E5].",
+    "Moscow rejected the charge as the British summons landed. The Russian embassy in London, as carried in the 3 September wire, called the summons a coordinated provocation, said the accusations were categorically rejected, and warned of an adequate and calibrated response [E6]. The Foreign Office statement had already treated Russian authorship as given when it summoned the chargé [E1]. London adopted Berlin’s attribution; it did not publish a separate British forensic brief [E1][E4].",
+    "The sequence is now incident, state attribution, allied summons [E2][E4][E1]. Bonn’s consulate still has a 18 September close date, the German investigation remains open, and the British text stops at condemnation [E4][E2][E1]. A drone with a detonator sat on a German cargo field in August; by 3 September London was calling that Russia’s attack in a diplomatic room [E3][E1]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Incident night",
+      "value": "4–5 Aug",
+      "dir": "flat"
+    },
+    {
+      "label": "German attribution",
+      "value": "1 Sep",
+      "dir": "flat"
+    },
+    {
+      "label": "UK summons",
+      "value": "3 Sep",
+      "dir": "flat"
+    },
+    {
+      "label": "Bonn consulate close",
+      "value": "18 Sep",
+      "dir": "flat"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "UK Foreign, Commonwealth & Development Office",
+      "fragment": "summoned the Russian Chargé d’Affaires to condemn the attack",
+      "as_of": "2026-09-03",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.gov.uk/government/news/uk-summons-russian-charge-daffaires-after-reckless-attack-on-leipzig-airport",
+        "retrieved_at": "2026-09-03T22:14:14Z"
+      }
+    },
+    {
+      "source": "German Federal Prosecutor",
+      "fragment": "mittels einer Drohne eine Explosion verursacht werden sollte",
+      "as_of": "2026-08-06",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.generalbundesanwalt.de/SharedDocs/Pressemitteilungen/DE/2026/Pressemitteilung-vom-06-08-2026.html",
+        "retrieved_at": "2026-09-03T22:14:14Z"
+      }
+    },
+    {
+      "source": "LKA Sachsen",
+      "fragment": "eine Drohne mit einer unbekannten Sprengvorrichtung",
+      "as_of": "2026-08-05",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.medienservice.sachsen.de/medien/news/1099150/download_pdf",
+        "retrieved_at": "2026-09-03T22:14:14Z"
+      }
+    },
+    {
+      "source": "German Federal Foreign Office — Wadephul",
+      "fragment": "Russia’s leadership has instead made a conscious decision",
+      "as_of": "2026-09-01",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.auswaertiges-amt.de/en/newsroom/news/2800600-2800600",
+        "retrieved_at": "2026-09-03T22:14:14Z"
+      }
+    },
+    {
+      "source": "German government press conference",
+      "fragment": "have no immediately obvious sender",
+      "as_of": "2026-09-02",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.auswaertiges-amt.de/de/newsroom/regierungspressekonferenz-2800710",
+        "retrieved_at": "2026-09-03T22:14:14Z"
+      }
+    },
+    {
+      "source": "Reuters — UK summons Moscow over Leipzig",
+      "fragment": "categorically rejected",
+      "as_of": "2026-09-03",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Sprockett",
+        "source_url": "https://www.reuters.com/world/uk/britain-summons-russian-charge-daffaires-over-leipzig-airport-attack-2026-09-03/",
+        "retrieved_at": "2026-09-03T22:14:14Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "leipzig",
+    "hero_map": "leipzig",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Leipzig/Halle to Bonn. Britain summoned Russia’s chargé on 3 September; Germany set the Bonn consulate to close on 18 September.",
+    "spots": [
+      {
+        "name": "LEIPZIG",
+        "lat": 51.42,
+        "lon": 12.22
+      },
+      {
+        "name": "HALLE",
+        "lat": 51.48,
+        "lon": 11.97,
+        "label_side": "left"
+      },
+      {
+        "name": "BONN",
+        "lat": 50.74,
+        "lon": 7.1
+      }
+    ]
+  }
+}
