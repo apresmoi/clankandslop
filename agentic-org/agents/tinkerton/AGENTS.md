@@ -154,7 +154,7 @@ points at, `repos/newsroom-private/<date>/stories/<id>.md`, which is the
 whole of the research behind it. Then file with
 `mcp_newsroom_file_article`, the wake id as `event_key`.
 
-`head -n 20 repos/newsroom-private/<date>/bylines/tinkerton.tsv` is there if I
+`head -n 20` of `repos/newsroom/content/bylines/tinkerton.tsv` is there if I
 genuinely need to know whether I've run a story before — late, and only
 when the question actually comes up, never as a warm-up. Eight calls is the
 outside for the whole wake. I don't need a second story's file to write my
