@@ -91,7 +91,7 @@ test('root declaration keeps Moltnet durable, authenticated, direct and secret-b
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [attach, observe, write]', 'scopes: [attach, write]')), /Moltnet token boundary/);
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [observe]', 'scopes: [observe, write]')), /observe-only console token/);
   assert.throws(() => validateRootDeclaration(root.replace('secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN', 'secret: CLANK_MOLTNET_GATHERER_TOKEN')), /research sensor token boundary/);
-  assert.throws(() => validateRootDeclaration(root.replace('federation: none', 'federation: [legacy-peer]')), /federate only to the read-only clank-observer pairing/);
+  assert.throws(() => validateRootDeclaration(root.replace('federation: [clank-observer]', 'federation: [legacy-peer]')), /federate only to the read-only clank-observer pairing/);
   assert.throws(() => validateRootDeclaration(root.replace(', research-sensor, cogsworth', ', cogsworth')), /research sensor local identity/);
   assert.throws(() => validateRootDeclaration(root.replace('members: [gatherer, klaxon', 'members: [klaxon')), /assignment kickoff participant/);
 });
@@ -110,11 +110,17 @@ test('the observer pairing relaxation still forbids everything else', () => {
     pairing
   ].join('\n'));
   assert.throws(() => validateRootDeclaration(second), /exactly one read-only observer pairing/);
-  // federation: all would silently widen every future pairing.
-  assert.throws(() => validateRootDeclaration(root.replace('federation: [clank-observer]', 'federation: all')), /federate only to the read-only clank-observer pairing/);
+  // federation: all would silently widen every future pairing -- on one room or all six.
   assert.throws(() => validateRootDeclaration(root.replaceAll('federation: [clank-observer]', 'federation: all')), /federate only to the read-only clank-observer pairing/);
-  // Conference has no counterpart room on the laptop; federating it is a silent no-op.
-  assert.throws(() => validateRootDeclaration(root.replace('id: conference, visibility: private, write_policy: members, federation: none', 'id: conference, visibility: private, write_policy: members, federation: [clank-observer]')), /conference room must remain cloud-local/);
+  // Per-room coverage: no room -- conference included -- may be quietly pointed at
+  // a pairing this server does not declare, or opened up with `all`.
+  for (const room of ['conference', 'assignment', 'filing', 'sensor', 'research', 'release']) {
+    const prefix = `id: ${room}, visibility: private, write_policy: members, federation: `;
+    assert.ok(root.includes(`${prefix}[clank-observer]`), `${room} is not federated to the observer`);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}[rogue-peer]`)), /federate only to the read-only clank-observer pairing/, room);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}[clank-observer, rogue-peer]`)), /federate only to the read-only clank-observer pairing/, room);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}all`)), /federate only to the read-only clank-observer pairing/, room);
+  }
   // The inbound pair credential must stay agent-free, pair-only, and bound to the pairing secret.
   assert.throws(() => validateRootDeclaration(root.replace('{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }', '{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair], agents: [brass] }')), /pair-scoped, agent-free/);
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [pair] }', 'scopes: [pair, admin] }')), /pair-scoped, agent-free/);

@@ -188,15 +188,14 @@ export function validateRootDeclaration(bytes) {
   // Conference is where reporters pitch and the editor assigns; it holds the nine
   // colleagues and klaxon, and deliberately excludes the external research feeds.
   const conference = rooms.get('conference');
+  assert(conference !== undefined, 'conference room declaration missing');
   assert(conference !== undefined && !conference.members.includes('gatherer') && !conference.members.includes('research-sensor'), 'conference room must exclude external feeds');
-  // A room is either cloud-local or federated to the single read-only observer
-  // pairing and nothing else. `federation: all` stays forbidden so that adding a
-  // future pairing can never widen an existing room implicitly.
+  // Every room, conference included, is either cloud-local or federated to the
+  // single read-only observer pairing and nothing else. The narrowing is about
+  // *who* may federate, never which room: `federation: all` stays forbidden so
+  // that adding a future pairing can never widen an existing room implicitly,
+  // and a room may never name a pairing this server does not declare.
   assert([...rooms.values()].every((room) => room.federation === 'none' || room.federation === `[${OBSERVER_PAIRING_ID}]`), `Moltnet rooms must stay cloud-local or federate only to the read-only ${OBSERVER_PAIRING_ID} pairing`);
-  // Conference is the newsroom's own editorial floor and has no counterpart room
-  // on the observer network, so it stays cloud-local: federating a room id the
-  // laptop does not declare is a silent no-op, not an error.
-  assert(conference.federation === 'none', 'conference room must remain cloud-local');
   assert(rooms.get('assignment')?.members.includes('gatherer'), 'assignment kickoff participant invalid');
   const research = rooms.get('research');
   assert(research?.members.includes('research-sensor'), 'research sensor local identity invalid');
