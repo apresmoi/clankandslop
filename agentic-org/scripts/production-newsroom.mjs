@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { cp, link, lstat, mkdir, readFile, readdir, rename, rm, symlink, unlink, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
-import { describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
+import { armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
 const stable=value=>JSON.stringify(value,Object.keys(value).sort());
@@ -114,8 +114,9 @@ export async function fileArticle(args){
   // REVISION_REQUEST are refused at filing time, naming the article field at
   // fault, so the reporter fixes them inside the wake that is already holding
   // the draft instead of paying a verdict wake plus a refile wake for it.
-  if(process.env.CLANK_FILE_ARTICLE_HARD_LINT==='1'){
-    const failures=hardLintFlags(lintFiling(resolvedArticle,await knownTopicSlugs()));
+  const armed=armedHardLintNames();
+  if(armed.length>0){
+    const failures=hardLintFlags(lintFiling(resolvedArticle,await knownTopicSlugs()),armed);
     if(failures.length>0)throw new Error(`filing rejected on ${failures.length} mechanical check${failures.length===1?'':'s'} — fix and file again in this wake: ${failures.map(flag=>`${flag} — ${describeLintFlag(flag)}`).join('; ')}`);
   }
   const filing={...resolvedArticle,assignment_ref:{event_key:assignmentEventKey,id:assignment.id}};

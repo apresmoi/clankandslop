@@ -34,9 +34,29 @@ const OPENER_STOPWORDS = new Set(['the', 'a', 'an', 'that', 'this', 'those', 'th
 // source domain standing in for corroboration. `rejectHardLint` in
 // production-newsroom.mjs turns these into a filing-time error; it is off by
 // default. Everything else is advisory and rides the F row for Spike to weigh.
-const HARD_LINT_NAMES = ['refs_subset', 'cite_missing', 'topic_unknown', 'persona_in_body', 'domains<2'];
-export const isHardLintFlag = (flag) => HARD_LINT_NAMES.some((name) => flag === name || flag.startsWith(`${name}:`));
-export const hardLintFlags = (flags) => flags.filter(isHardLintFlag);
+export const HARD_LINT_NAMES = ['refs_subset', 'cite_missing', 'topic_unknown', 'persona_in_body', 'domains<2'];
+const named = (flag, name) => flag === name || flag.startsWith(`${name}:`);
+export const isHardLintFlag = (flag, names = HARD_LINT_NAMES) => names.some((name) => named(flag, name));
+export const hardLintFlags = (flags, names = HARD_LINT_NAMES) => flags.filter((flag) => isHardLintFlag(flag, names));
+
+/**
+ * Reads the arming switch. Absent or "0" means off, which is the default and
+ * the shipped state. "1" arms all five hard flags; a comma-separated list arms
+ * exactly those, which is how this gets turned on one flag at a time.
+ *
+ * Four of the five (refs_subset, cite_missing, topic_unknown, persona_in_body)
+ * fire on zero of the 362 published articles. `domains<2` fires on 25 of them,
+ * so the archive says Spike knowingly passes single-domain pieces — arm that
+ * one only after someone decides whether he should.
+ */
+export function armedHardLintNames(value = process.env.CLANK_FILE_ARTICLE_HARD_LINT) {
+  if (value === undefined || value === '' || value === '0') return [];
+  if (value === '1') return HARD_LINT_NAMES;
+  const requested = value.split(',').map((name) => name.trim()).filter(Boolean);
+  const unknown = requested.filter((name) => !HARD_LINT_NAMES.includes(name));
+  if (unknown.length > 0) throw new Error(`CLANK_FILE_ARTICLE_HARD_LINT names no such hard lint flag: ${unknown.join(', ')} — valid names are ${HARD_LINT_NAMES.join(', ')}`);
+  return requested;
+}
 
 // Field-named explanations, so a rejected filing tells the reporter which key
 // of its own article object to fix rather than making it guess from a verdict.

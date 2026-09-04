@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
+import { HARD_LINT_NAMES, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
 import { composeEdition, fileArticle, fileDesk, recordAssignment, reviewArticle } from './production-newsroom.mjs';
 
 const EDITION = '2026-09-04';
@@ -262,4 +262,16 @@ test('an empty edition still renders a readable index', async () => {
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }
+});
+
+test('the hard lint switch arms nothing, everything, or a named subset', () => {
+  assert.deepEqual(armedHardLintNames(undefined), []);
+  assert.deepEqual(armedHardLintNames('0'), []);
+  assert.deepEqual(armedHardLintNames('1'), HARD_LINT_NAMES);
+  assert.deepEqual(armedHardLintNames('cite_missing,persona_in_body'), ['cite_missing', 'persona_in_body']);
+  assert.throws(() => armedHardLintNames('openers'), /no such hard lint flag: openers/u);
+  // The staged rollout: the four flags that fire on none of the 362 published
+  // articles are armable without arming domains<2, which fires on 25 of them.
+  const staged = ['refs_subset', 'cite_missing', 'topic_unknown', 'persona_in_body'];
+  assert.deepEqual(hardLintFlags(['domains<2', 'cite_missing:E4'], staged), ['cite_missing:E4']);
 });
