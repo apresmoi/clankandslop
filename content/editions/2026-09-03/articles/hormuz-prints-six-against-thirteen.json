@@ -1,0 +1,163 @@
+{
+  "id": "hormuz-prints-six-against-thirteen",
+  "edition_date": "2026-09-03",
+  "section": "world",
+  "kicker": "Wednesday Transit",
+  "headline": "Hormuz Prints Six Against Thirteen",
+  "deck": "Thursday’s public snapshot showed six commodity vessels crossing the strait on Wednesday, against a recent average near thirteen. Brent held a $97 handle at midday in London as Iran added eleven names to a detention list.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": [
+      "Graves"
+    ]
+  },
+  "timestamp": "23:50 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": [
+    "strait-of-hormuz",
+    "oil",
+    "grey-zone"
+  ],
+  "body": [
+    "Six commodity vessels transited the Strait of Hormuz on Wednesday, 2 September, against eleven the previous day and a ten-day average near thirteen [E1][E2]. The Thursday public note timed the underlying cut at 04:05 GMT [E2]. Five of the six were inbound from the Gulf of Oman; one outbound was a laden very large gas carrier [E2]. The same note said craft that switch off transponders drop out of the count, so the six is a floor on what that series could see, not a census of every hull [E2].",
+    "By 12:00 GMT on Thursday, Brent was at $97.29 a barrel, up $1.66 or 1.7 percent, and West Texas Intermediate was at $93.04, up $2.03 or 2.2 percent [E1]. Both were heading for a fourth session of gains and had already printed six-week highs earlier in the day [E1]. That midday handle is the public snapshot this file uses; it is not a claim about the official settle [E1].",
+    "Iran’s Persian Gulf Strait Authority updated its list of non-compliant vessels inside the freeze [E3][E4]. A government-website change added eleven names and took the roster to fifty-six, according to the 2 September wrap [E4]. Mehr, Iran’s official English wire, reported the update on 3 September and restated the penalties: restrictions on future passages, including fines, detention or confiscation [E3]. Any vessel cooperating with listed ships, including by ship-to-ship transfer, can be added [E3].",
+    "The list page itself is the Iranian document [E5]. Public wires did not print the eleven new names or say whether Wednesday’s six movers appear on it [E4][E5]. Cargo owners were told to screen the roster before fixing Gulf voyages [E3]. The original August warning had already named tanker classes among the restricted entries [E4].",
+    "Washington’s Iran sanctions program remains the legal backdrop for any Iranian clearance or detention regime in the strait [E6]. A list maintained in Tehran is not a substitute for a U.S. designation, and a U.S. program page does not measure Wednesday’s six hulls [E6][E2]. Shipowners now face two papers at once: the throughput print and the expanded detention roster [E1][E3].",
+    "Nothing in these documents converts six vessels into barrels delayed [E1][E2]. Names, flags, deadweight and waiting time are missing from the Thursday cut [E2]. The six is a named-wire floor on what that series could see at 04:05 GMT, not a cargo-tonne ledger [E2].",
+    "Wednesday’s strait printed six against a recent thirteen [E1][E2]. Thursday’s London snapshot put Brent on a $97 handle while Tehran’s list moved to fifty-six [E1][E4]. The chokepoint is being counted in hulls and in names; it is not yet being counted in tonnes [E2][E5]."
+  ],
+  "key_numbers": [
+    {
+      "label": "Wednesday transits",
+      "value": "6",
+      "dir": "down"
+    },
+    {
+      "label": "Ten-day average",
+      "value": "~13",
+      "dir": "flat"
+    },
+    {
+      "label": "Brent 12:00 GMT",
+      "value": "$97.29",
+      "dir": "up"
+    },
+    {
+      "label": "PGSA list",
+      "value": "56 vessels",
+      "dir": "up"
+    }
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters — oil wrap, 3 September",
+      "fragment": "six commodity vessels transiting the Strait of Hormuz",
+      "as_of": "2026-09-03",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/oil-edges-down-investors-weigh-uncertainty-over-us-iran-strikes-2026-09-03/",
+        "retrieved_at": "2026-09-03T22:14:33Z"
+      }
+    },
+    {
+      "source": "Oman Observer — Gulf shipping traffic via Hormuz",
+      "fragment": "Gulf shipping traffic via Hormuz below 10-day average",
+      "as_of": "2026-09-03",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.omanobserver.om/article/1195552/world/region/gulf-shipping-traffic-via-hormuz-below-10-day-average-data-shows",
+        "retrieved_at": "2026-09-03T22:14:33Z"
+      }
+    },
+    {
+      "source": "Mehr News — PGSA list update",
+      "fragment": "fines, detention, or confiscation",
+      "as_of": "2026-09-03",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://en.mehrnews.com/news/247421/PGSA-updates-list-of-violating-vessels",
+        "retrieved_at": "2026-09-03T22:14:33Z"
+      }
+    },
+    {
+      "source": "Reuters — Iran blacklists more ships",
+      "fragment": "blacklists more ships trying to sail through Hormuz",
+      "as_of": "2026-09-02",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/energy/iran-blacklists-more-ships-trying-sail-through-hormuz-govt-website-shows-2026-09-02/",
+        "retrieved_at": "2026-09-03T22:14:33Z"
+      }
+    },
+    {
+      "source": "Persian Gulf Strait Authority — non-compliant vessels list",
+      "fragment": "non-compliant vessels list",
+      "as_of": "2026-09-03",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "http://www.pgsa.ir/non-compliant-vessels-list/",
+        "retrieved_at": "2026-09-03T22:14:33Z"
+      }
+    },
+    {
+      "source": "U.S. Treasury — Iran sanctions",
+      "fragment": "Iran sanctions",
+      "as_of": "2026-09-03",
+      "source_note": {
+        "source_id": "E6",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://ofac.treasury.gov/sanctions-programs-and-country-information/iran-sanctions",
+        "retrieved_at": "2026-09-03T22:14:33Z"
+      }
+    }
+  ],
+  "refs": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "art": {
+    "kind": "map",
+    "map": "hormuz",
+    "hero_map": "hormuz",
+    "tone": "soft",
+    "locator_context": "regional",
+    "rule": false,
+    "caption": "Strait of Hormuz. Thursday’s public snapshot counted six commodity vessels on Wednesday against a ten-day average near thirteen.",
+    "spots": [
+      {
+        "name": "HORMUZ",
+        "lat": 26.57,
+        "lon": 56.25
+      },
+      {
+        "name": "BANDAR ABBAS",
+        "lat": 27.18,
+        "lon": 56.27
+      },
+      {
+        "name": "DUBAI",
+        "lat": 25.27,
+        "lon": 55.3,
+        "label_side": "left"
+      }
+    ]
+  }
+}
