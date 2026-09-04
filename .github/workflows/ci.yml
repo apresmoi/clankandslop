@@ -16,6 +16,14 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: Validate content
         run: node ops/validate-content.mjs
+      # content/topics.txt is a generated, committed view of content/topics.json:
+      # the agents read the flat file instead of pulling the 503-line registry
+      # into an expensive context. Regenerate and diff so an edit to topics.json
+      # cannot silently leave the file the reporters actually read stale.
+      - name: Check generated topic index is current
+        run: |
+          node agentic-org/scripts/build-topics-txt.mjs
+          git diff --exit-code -- content/topics.txt
       - name: Build website
         working-directory: website
         run: |
