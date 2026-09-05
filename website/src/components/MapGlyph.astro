@@ -267,6 +267,7 @@ if (!interactive) {
 
 <script>
   import { createGlyphScene, createGlyphOrbitControls, createGlyphPerspectiveCamera } from 'glyphcss';
+  import { GLYPH_PERSPECTIVE, glyphRot, glyphZoom, measureGlyphCellHeight } from '../lib/glyphCamera.ts';
 
   const parseHex = (hex: string): [number, number, number] => {
     const h = hex.trim().replace('#', '');
@@ -369,7 +370,16 @@ if (!interactive) {
       }
     }
 
-    const camera = createGlyphPerspectiveCamera({ rotX: cfg.rotX, rotY: cfg.rotY, zoom: cfg.zoom, distance: 100 });
+    // rotX/rotY/zoom props are in the pre-0.1 glyphcss units (radians, and a
+    // fraction of the smaller grid axis). lib/glyphCamera converts them to
+    // 0.1.x's degrees + CSS px per world unit; passed through unconverted the
+    // whole plane projects into a single character cell.
+    const camera = createGlyphPerspectiveCamera({
+      rotX: glyphRot(cfg.rotX),
+      rotY: glyphRot(cfg.rotY),
+      zoom: glyphZoom(cfg.zoom, cfg.cols, cfg.rows, measureGlyphCellHeight(host)),
+      perspective: GLYPH_PERSPECTIVE,
+    });
     const scene = createGlyphScene(host, {
       mode: 'solid',
       cols: cfg.cols,

@@ -40,8 +40,12 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
 <script>
   import { createGlyphScene, createGlyphOrbitControls, createGlyphPerspectiveCamera } from 'glyphcss';
   import landmask from '../data/landmask.json';
+  import { GLYPH_PERSPECTIVE, glyphRot, glyphZoom, measureGlyphCellHeight } from '../lib/glyphCamera.ts';
 
   const D = Math.PI / 180;
+  /** Old viewport-fraction zoom this globe was framed at; see lib/glyphCamera. */
+  const ZOOM_FRACTION = 0.33;
+
   // Z-up, X-right, +Y sin(lon) — a right-handed Earth, east CCW from the pole.
   // Correct at every drag angle; the quad winding below (not the camera) is
   // what keeps it unmirrored.
@@ -114,9 +118,15 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     const css = getComputedStyle(document.documentElement);
     const ink = css.getPropertyValue('--ink').trim() || '#0F0F0F';
     const paper = css.getPropertyValue('--paper').trim() || '#F4EEE0';
-    // The library's default camera (distance 3) renders nothing — always
-    // pass an explicit far camera, like the upstream examples do.
-    const camera = createGlyphPerspectiveCamera({ rotX: cfg.rotX, rotY: cfg.rotY, zoom: 0.33, distance: 100 });
+    // Props are in the pre-0.1 units (radians, viewport-fraction zoom).
+    // lib/glyphCamera translates them into glyphcss 0.1.x's degrees + absolute
+    // pixels; passing them straight through collapses the globe into one cell.
+    const camera = createGlyphPerspectiveCamera({
+      rotX: glyphRot(cfg.rotX),
+      rotY: glyphRot(cfg.rotY),
+      zoom: glyphZoom(ZOOM_FRACTION, cfg.cols, cfg.rows, measureGlyphCellHeight(host)),
+      perspective: GLYPH_PERSPECTIVE,
+    });
     const scene = createGlyphScene(host, {
       mode: 'solid',
       cols: cfg.cols,
@@ -151,10 +161,13 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
     // to the far side of the sphere — so without this the back markers show
     // through the globe. Hide a label once its point faces away from the
     // camera. Recompute only when the camera moves, so a still globe is free.
+    // camera.rotX/rotY are DEGREES from 0.1.0 on — convert before trigonometry,
+    // or every marker reads as front-facing and the far side shows through.
     const camDepth = (lat: number, lon: number): number => {
       const cl = Math.cos(lat * D), x = cl * Math.cos(lon * D), y = cl * Math.sin(lon * D), z = Math.sin(lat * D);
-      const i = Math.sin(camera.rotY) * y + Math.cos(camera.rotY) * x;
-      return Math.sin(camera.rotX) * i + Math.cos(camera.rotX) * z;
+      const rx = camera.rotX * D, ry = camera.rotY * D;
+      const i = Math.sin(ry) * y + Math.cos(ry) * x;
+      return Math.sin(rx) * i + Math.cos(rx) * z;
     };
     let lastY: number | null = null, lastX: number | null = null, raf = 0;
     const cull = () => {
