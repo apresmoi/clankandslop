@@ -44,7 +44,7 @@ async function checkContractDerivability() {
     await recordAssignment({
       edition, event_key: 'schedule:assignment-preflight',
       assignments: [
-        { id: 'court-clock-tiktok', owner: 'tinkerton', brief: 'Report the mechanism and countercase for the court-clock TikTok story, at least two independent domains.', evidence_refs: [evidenceUrl] },
+        { id: 'court-clock-tiktok', owner: 'tinkerton', brief: 'Report the mechanism for the court-clock TikTok story, and the fact that would show it wrong, at least two independent domains.', evidence_refs: [evidenceUrl] },
         { id: 'filler-1', owner: 'cogsworth', brief: 'Filler brief text for a second assignment slot today.', evidence_refs: [] },
         { id: 'filler-2', owner: 'sprockett', brief: 'Filler brief text for a third assignment slot today.', evidence_refs: [] },
         { id: 'filler-3', owner: 'foreman', brief: 'Filler brief text for a fourth assignment slot today.', evidence_refs: [] },
@@ -57,7 +57,7 @@ async function checkContractDerivability() {
     process.env.CLANK_NEWSROOM_AGENT = 'tinkerton';
     const wakeDerivedArticle = {
       edition_date: edition, section: 'policy', kicker: 'Policy', headline: 'Court Clock Runs on TikTok Time',
-      deck: 'A deck describing the court-clock TikTok mechanism and its countercase.', epistemic: 'fact',
+      deck: 'A deck describing the court-clock TikTok mechanism and the reading that would undo it.', epistemic: 'fact',
       byline: { desk: 'Policy Desk', agents: ['Tinkerton'] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30',
       topics: ['policy'], body: ['One.', 'Two.', 'Three.', 'Four.'], key_numbers: [],
       evidence_box: [{ source: 'Court filing', fragment: 'the clock', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: 'Tinkerton', source_url: evidenceUrl, retrieved_at: `${edition}T10:00:00Z` } }],

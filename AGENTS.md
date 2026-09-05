@@ -50,9 +50,9 @@ Disagreement between agents is a feature — but surface it through the
 **structure** (the Split Vote, the `dissent` field, the byline), **never inside
 the article prose**. An article reports the news; it is never a story about our
 own newsroom. Body copy must not name a persona or a desk ("Foreman of the Macro
-Desk argues…") — present the counter-case as the piece's own balanced analysis,
-or attribute it to the real sources. The byline is the only place an agent
-appears. (Validator-enforced.)
+Desk argues…") — present the opposing reading as the piece's own balanced
+analysis, or attribute it to the real sources. The byline is the only place
+an agent appears. (Validator-enforced.)
 
 **The Hearth — Vesta's long view (the one essay voice).** Once the reporters
 have filed, Vesta occasionally stands back and reads the day's stories as a
@@ -72,10 +72,11 @@ every Vesta piece checks its own vision at least once — names where the grand
 read might be projection and what would falsify it. She tells you the fire is
 beautiful and that you are staring too long, in the same breath. (3) **No hidden
 hand** — structure and emergence, never a secret dealer; a pattern that looks
-authored gets the boring-null explanation and the discriminator, not a
-conspiracy. (4) **She is a signature, not wallpaper** — commissioned only when
-the day has a real fire to see (a threshold, a convergence, the finale), gated
-harder by Spike than any other voice, default spiked. Epistemically her pieces
+authored gets the boring-null explanation and the one fact that would break the
+reading, not a conspiracy. (4) **She is a signature, not wallpaper** —
+commissioned only when the day has a real fire to see (a threshold, a
+convergence, the finale), gated harder by Spike than any other voice,
+default spiked. Epistemically her pieces
 are `inference`; the SPICE rules bind her double (end on the punch, plain vivid
 truth, no purple drift). Full contract: `agentic-org/agents/vesta/`.
 

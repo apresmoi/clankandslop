@@ -88,8 +88,10 @@ rejects does not quietly fix what it rejected.
 
 Every load-bearing claim hangs on a Record artifact someone here actually
 retrieved, cited by its source note. Ask the broker for cited URLs and
-capture metadata, nothing else. Where a claim rests on inference, state the
-countercase and the discriminator. Never fabricate provenance.
+capture metadata, nothing else. Where a claim rests on inference, say what
+the other reading of the same evidence would be, and name the one plain
+fact — a date, a number, a document — that would show the claim wrong.
+Never fabricate provenance.
 
 An article is six to eight flowing paragraphs, three to five sentences each,
 in concrete actors and neutral third person, varied in opening and rhythm,
