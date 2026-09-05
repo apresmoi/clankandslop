@@ -14,6 +14,12 @@ execution:
         method: codex
   sandbox:
     mode: workspace
+schedule:
+  kind: cron
+  cron: "0 14 * * *"
+  timezone: Europe/Berlin
+  jitter_seconds: 900
+  prompt: "Your working directory is your agent root. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX. Its P rows are today's PASSed articles and its D rows are the desk documents already on file. Two of those are yours, and the edition cannot be composed without them: ledger.settlements and ledger.worlddesk. Settlements is the resolution of what the paper said last time — open only the stories that carried a dated forecast, cat ./repos/newsroom/content/editions/<previous-edition-date>/articles/<id>.json one at a time, and record for each whether it came in, with the number and the recorded input that settles it. A forecast you cannot settle from an input already on the record is left unresolved and said to be unresolved: you never supply the conversion, the rate or the figure yourself, and an unverifiable calculation is a rejection, not an estimate. Worlddesk is the same discipline applied to today — escalation index, its direction, open conflicts, watch count — each from an input on the record. File both with mcp_newsroom_file_desk using this schedule occurrence as event_key. Caslon composes at 15:00 and reads what you filed; nothing else writes these two documents."
 surfaces:
   moltnet:
     - network: clank-newsroom
@@ -31,7 +37,7 @@ environment:
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5e061df518161c2bc51037898f2d9ec1c3586f8a4745098ed3e4a2fc47a1627e, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5c8f234b6f2ba7f61e1a7f9d65115265d7932aa3f0d3d0d85b8f08e6dfaaae7e, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

@@ -1,6 +1,6 @@
 # Clank & Slop agentic organization
 
-The compiler owns checksum-pinned read-only newsroom bundles, the four isolated sensor-corpus volumes, the team-shared edition-state volume, Pressman's isolated persistent local staging volume, and the durable Moltnet store. Pressman receives no Git remote or network publishing authority; every other role writes durable handoffs under shared edition-state.
+The compiler owns checksum-pinned read-only newsroom bundles, the four isolated sensor-corpus volumes, the team-shared edition-state volume, Pressman's isolated persistent local staging volume, and the durable Moltnet store. Pressman receives no Git remote or network publishing authority; a host-side job outside the organization pushes the promoted artifact to one `edition/<date>` branch for a person to merge. Every other role writes durable handoffs under shared edition-state.
 
 Moltnet uses a durable SQLite store and bearer authentication. Every agent, the research intake service, the direct research sensor, the topology operator, and the observe-only console use distinct environment-secret references. All private rooms live directly on the cloud network; the declaration has no federation or relay dependency.
 
