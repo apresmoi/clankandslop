@@ -56,6 +56,9 @@ async function driveEdition(state) {
   const afterAssignment = await step('record_assignment', () => recordAssignment({ edition: EDITION, event_key: 'schedule:conference-1', assignments }));
   assert.equal(rows(afterAssignment, 'A').length, 5);
   assert.match(afterAssignment, /^A cogsworth story-0 refs=1 +\| Report the verified mechanism/mu);
+  // All three compose gates are legible from the first write of the day, not
+  // one per failed compose run.
+  assert.match(afterAssignment, /^# compose: passed=0\/5 desks=0\/4 diversity=missing\(forecast\) {2}→ blocked$/mu);
 
   const afterFiling = await step('file_article', async () => {
     for (const [index, owner] of OWNERS.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition: EDITION, event_key: `filing-${index}`, article: article(`story-${index}`, capitalize(owner), index) }); }
@@ -83,6 +86,8 @@ async function driveEdition(state) {
   });
   assert.equal(rows(afterDesk, 'D').length, 4);
   assert.match(afterDesk, /^D caslon\.chrome keys=1$/mu);
+  // Every gate met, and story-1 carries the dated forecast with named dissent.
+  assert.match(afterDesk, /^# compose: passed=5\/5 desks=4\/4 diversity=ok {2}→ ready$/mu);
 
   const ids = OWNERS.map((_, index) => `story-${index}`);
   const afterCompose = await step('compose_edition', () => composeEdition({
@@ -243,20 +248,24 @@ test('a row is one line no matter what the headline carries', () => {
     pages: [{ name: 'front', articles: 1, visuals: 2, papers: 'broad sheet', lead: 'x' }]
   };
   const lines = renderEditionIndex(hostile).trim().split('\n');
-  assert.equal(lines.length, 3 + 6, 'three header lines and exactly one line per record');
+  assert.equal(lines.length, 4 + 6, 'four header lines and exactly one line per record');
   for (const line of lines) assert.doesNotMatch(line, /[\n\r]/u);
-  assert.match(lines[3], /^A foreman x refs=0 +\| A brief split across lines and \/ carrying a separator.*…$/u);
-  assert.match(lines[4], /^F x rev=1 owner=fore-man epi=fa-ct words=1 refs=1 domains=1 topics=unknown:od-d lint=domains<2$/u);
-  assert.match(lines[5], /^V x rev=1 PA-SS by=spike$/u);
-  assert.match(lines[6], /^P x rev=1 section=wo-rld epi=fact key_numbers=0 +\| A Headline Broken Over Three Lines \| A deck \/ with a separator and a newline\.$/u);
+  // No compose status supplied: the forecast floor is reported as unknown
+  // rather than guessed at, and an unknown floor is not a green light.
+  assert.equal(lines[1], '# compose: passed=1/5 desks=1/4 diversity=unknown  → blocked');
+  assert.match(lines[4], /^A foreman x refs=0 +\| A brief split across lines and \/ carrying a separator.*…$/u);
+  assert.match(lines[5], /^F x rev=1 owner=fore-man epi=fa-ct words=1 refs=1 domains=1 topics=unknown:od-d lint=domains<2$/u);
+  assert.match(lines[6], /^V x rev=1 PA-SS by=spike$/u);
+  assert.match(lines[7], /^P x rev=1 section=wo-rld epi=fact key_numbers=0 +\| A Headline Broken Over Three Lines \| A deck \/ with a separator and a newline\.$/u);
 });
 
 test('an empty edition still renders a readable index', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-empty-'));
   try {
     const text = await writeEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS });
-    assert.equal(text.trim().split('\n').length, 3, 'an empty edition is three header lines and nothing else');
+    assert.equal(text.trim().split('\n').length, 4, 'an empty edition is four header lines and nothing else');
     assert.match(text, /assignments=0 filings=0 verdicts=0 passed=0/u);
+    assert.match(text, /^# compose: passed=0\/5 desks=0\/4 diversity=missing\(forecast\) {2}→ blocked$/mu);
     assert.equal(await buildEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS, now: new Date(0) }).then((value) => value.includes('generated=1970-01-01T00:00:00.000Z')), true);
     await assert.rejects(writeEditionIndex(path.join(temporary, 'state'), 'not-a-date'), /must be an ISO date/u);
   } finally {

@@ -13,6 +13,7 @@
 import { mkdir, readFile, readdir, rename, unlink, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
+import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
 
 const INDEX_VERSION = 'clank.edition-index.v1';
 const EDITION_DATE = /^\d{4}-\d{2}-\d{2}$/u;
@@ -208,9 +209,13 @@ const token = (value, fallback = '?') => String(value ?? '').replace(/\s+/gu, '-
 const pad = (value) => (value.length >= COLUMN ? `${value} ` : value.padEnd(COLUMN + 1));
 const row = (left, ...cells) => (cells.length === 0 ? left : `${pad(left)}| ${cells.join(' | ')}`);
 
-export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, articles, desks, pages }) {
+export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, articles, desks, pages, compose }) {
   const lines = [];
   lines.push(`# ${INDEX_VERSION} edition=${edition} generated=${generated} assignments=${assignments.length} filings=${filings.length} verdicts=${verdicts.length} passed=${articles.length}`);
+  // The three compose gates, before anyone spends a wake discovering them one
+  // refusal at a time. A caller that did not evaluate the forecast floor gets
+  // "unknown" rather than a guess.
+  lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length, forecast: undefined, waiver: undefined })));
   lines.push('# rows: A assignment · F filing · V verdict · P passed article · D desk doc · G page');
   lines.push('# read one: cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json');
   for (const item of assignments) lines.push(row(`A ${token(item.owner)} ${token(item.id)} refs=${item.evidence_refs.length}`, clean(item.brief, 120)));
@@ -244,7 +249,8 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     words: countWords(value), refs: strings(value.refs).length, domains: countDomains(value), flags: lintFiling(value, topics)
   }));
   const verdicts = (await readRevisions(base, 'verdicts')).map(({ id, revision, value }) => ({ id, revision, verdict: value.verdict ?? '?' }));
-  const articles = (await readKind(base, 'articles')).map(({ name, value }) => ({
+  const articleRecords = await readKind(base, 'articles');
+  const articles = articleRecords.map(({ name, value }) => ({
     id: name, revision: value.revision ?? '?', section: value.section ?? '?', epistemic: value.epistemic ?? '?',
     key_numbers: (Array.isArray(value.key_numbers) ? value.key_numbers : []).length, headline: value.headline ?? '', deck: value.deck ?? ''
   }));
@@ -254,7 +260,38 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     papers: [...new Set(walkStrings(value, 'paper'))].sort().join(',') || '-',
     lead: walkStrings(value, 'lead')[0] ?? '-'
   }));
-  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, articles, desks, pages });
+  const compose = composeGateStatus({
+    edition, passed: articles.length, desks: desks.length,
+    forecast: hasDatedForecastWithDissent(articleRecords.map((item) => item.value)),
+    waiver: await composeWaiverFor(base, edition)
+  });
+  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, articles, desks, pages, compose });
+}
+
+/**
+ * Which waiver, if any, applies to this edition's forecast floor.
+ *
+ * Prefers the one already recorded in the composed artifact — that is a durable
+ * fact about the paper that shipped, readable by every agent regardless of
+ * which process holds the environment variable. Before composition there is no
+ * artifact, so the environment answers instead.
+ *
+ * A malformed environment value throws in `compose_edition`, where it is the
+ * caller's problem to fix. Here it is swallowed: the index is a report, and
+ * reporting the floor as unmet is both the truthful and the conservative
+ * reading of an unusable waiver. Every write path regenerates this file, so a
+ * throw would take down filings and verdicts that have nothing to do with it.
+ */
+async function composeWaiverFor(base, edition) {
+  // Only the composition receipts are opened: the receipt directory collects
+  // one file per tool call all day, and this runs on every one of them.
+  const names = (await listing(path.join(base, 'receipts'))).filter((name) => name.startsWith('composed-') && name.endsWith('.json')).sort();
+  for (const name of names) {
+    const value = await readJson(path.join(base, 'receipts', name));
+    const recorded = value?.kind === 'composed' && value?.edition === edition ? value.composition?.waiver : undefined;
+    if (recorded?.edition === edition) return recorded;
+  }
+  try { return editionDiversityWaiver(edition); } catch { return undefined; }
 }
 
 // Same shapes production-newsroom.mjs already walks when it checks page

@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { cp, link, lstat, mkdir, readFile, readdir, rename, rm, symlink, unlink, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
+import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
 import { armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
@@ -26,7 +27,11 @@ const location=(edition,kind,name)=>within(root(),'editions',edition,kind,`${nam
 // which costs far more than the failed tool call the agent can simply retry.
 async function convergeIndexed(edition,file,value){const result=await converge(file,value);await writeEditionIndex(root(),edition);return result;}
 const receipt=async(args,kind,data)=>converge(location(args.edition,'receipts',`${kind}-${sha(args.event_key).slice(7,23)}`),{version:'clank.newsroom-receipt.v1',kind,edition:args.edition,event_key:args.event_key,digest:sha(JSON.stringify(data))});
-async function composedResult(args,composition){const value={version:'clank.newsroom-receipt.v1',kind:'composed',edition:args.edition,event_key:args.event_key,digest:sha(JSON.stringify(composition)),composition};await converge(location(args.edition,'receipts',`composed-${sha(args.event_key).slice(7,23)}`),value);return{...composition,receipt:value};}
+// The composed receipt is the durable record of what this edition was composed
+// under — including a diversity waiver, when one applied. The index is
+// regenerated after it lands so the INDEX compose row reports the waiver from
+// the artifact rather than from whichever process happens to hold the env var.
+async function composedResult(args,composition){const value={version:'clank.newsroom-receipt.v1',kind:'composed',edition:args.edition,event_key:args.event_key,digest:sha(JSON.stringify(composition)),composition};await converge(location(args.edition,'receipts',`composed-${sha(args.event_key).slice(7,23)}`),value);await writeEditionIndex(root(),args.edition);return{...composition,receipt:value};}
 const readJson=file=>readFile(file,'utf8').then(JSON.parse);
 const describeAssignment=item=>`"${item.id}": ${item.brief}`;
 async function assignmentsForEdition(edition){const files=await jsonNames(edition,'assignments'),records=[];for(const name of files)records.push(await readJson(location(edition,'assignments',name)));return records;}
@@ -51,7 +56,7 @@ async function resolveAssignment(args,article,owner){
 const walkValues=(value,key,out=[])=>{if(Array.isArray(value))for(const item of value)walkValues(item,key,out);else if(value&&typeof value==='object')for(const[name,item]of Object.entries(value)){if(name===key&&typeof item==='string')out.push(item);walkValues(item,key,out);}return out;};
 const publicArticleRefs=(value,out=new Set())=>{if(Array.isArray(value)){for(const item of value)publicArticleRefs(item,out);return out;}if(!value||typeof value!=='object')return out;for(const[key,item]of Object.entries(value)){if(['article','lead','splitWith'].includes(key)&&typeof item==='string')out.add(item);else if(['rail','articles'].includes(key)){if(typeof item==='string')out.add(item);if(Array.isArray(item))for(const id of item)if(typeof id==='string')out.add(id);}publicArticleRefs(item,out);}return out;};
 export const collectPublicArticleReferences=(value)=>[...publicArticleRefs(value)].sort();
-export const hasDatedForecastWithDissent=(values)=>values.some(value=>value.epistemic==='forecast'&&/^\d{2}:\d{2}$/u.test(value.next_update_utc)&&value.dissent?.agent&&value.dissent?.argument);
+export { hasDatedForecastWithDissent } from './compose-gate.mjs';
 const visualCount=value=>JSON.stringify(value).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu)?.length??0;
 async function editionTree(edition){const articles=await jsonNames(edition,'articles'),reviews=await jsonNames(edition,'reviews'),desk=await jsonNames(edition,'desk'),pages=await jsonNames(edition,'pages'),maps=await jsonNames(edition,'maps');return{articles,desk,pages,maps,reviews};}
 async function digests(edition,kind,names){return Object.fromEntries(await Promise.all(names.map(async name=>[name,sha(JSON.stringify(await readJson(location(edition,kind,name))))])));}
@@ -151,6 +156,10 @@ export async function composeEdition(args){
   if(!Array.isArray(args.pages)||args.pages.length!==2)throw new Error(`pages must be an array of exactly 2 page documents, got ${Array.isArray(args.pages)?args.pages.length:typeof args.pages}`);
   if(new Set(args.pages.map(page=>page.name)).size!==2||args.pages.some(page=>!['front','tape'].includes(page.name)))throw new Error(`pages[].name must be exactly one "front" and one "tape", got ${JSON.stringify(args.pages.map(page=>page.name))}`);
   const articles=await jsonNames(args.edition,'articles'),reviews=await jsonNames(args.edition,'reviews'),desk=await jsonNames(args.edition,'desk');
+  // Read before the gates fire so the waiver's own shape is validated first: a
+  // waiver naming a different edition, or naming nothing datable at all, must
+  // never be able to reach the floor check below.
+  const waiver=editionDiversityWaiver(args.edition);
   if(articles.length<5)throw new Error(`edition tree incomplete — at least 5 PASSed articles required, found ${articles.length}`);
   if(reviews.length!==articles.length)throw new Error(`edition tree incomplete — reviews (${reviews.length}) must match articles (${articles.length})`);
   if(desk.length!==4)throw new Error(`edition tree incomplete — exactly 4 desk documents required (ledger.settlements, ledger.worlddesk, caslon.chrome, caslon.weather), found ${desk.length}`);
@@ -160,7 +169,12 @@ export async function composeEdition(args){
   if(owners.size<5)throw new Error(`edition diversity floor missing — at least 5 distinct byline agents required, found ${owners.size}: ${[...owners].join(', ')}`);
   if(sources.size<3)throw new Error(`edition diversity floor missing — at least 3 distinct evidence sources required, found ${sources.size}`);
   if(domains.size<3)throw new Error(`edition diversity floor missing — at least 3 distinct source_url domains required, found ${domains.size}`);
-  if(!hasDatedForecastWithDissent(values))throw new Error('edition diversity floor missing — at least one "forecast" article with a dated next_update_utc and a dissent {agent, argument} is required');
+  // The floor itself is unchanged and its refusal is word-for-word what it has
+  // always been. The only thing a waiver does is excuse this one gate, for the
+  // one edition it names, and put that fact in the artifact below.
+  const forecast=hasDatedForecastWithDissent(values);
+  const gates=composeGateStatus({edition:args.edition,passed:articles.length,desks:desk.length,forecast,waiver});
+  if(!gates.diversity.ok)throw new Error('edition diversity floor missing — at least one "forecast" article with a dated next_update_utc and a dissent {agent, argument} is required');
   const pageArticles=new Set(),pageMaps=new Set(),papers=new Set();for(const page of args.pages){object(page.document);for(const value of publicArticleRefs(page.document))pageArticles.add(value);for(const value of walkValues(page.document,'map'))pageMaps.add(value);for(const value of walkValues(page.document,'paper'))papers.add(value);}
   if([...pageArticles].sort().join()!==articles.join())throw new Error(`page completeness invalid — pages must reference exactly the PASSed articles [${articles.join(', ')}], got [${[...pageArticles].sort().join(', ')}]`);
   if(papers.size<2)throw new Error(`paper diversity invalid — pages must use at least 2 distinct "paper" values, found ${papers.size}`);
@@ -171,7 +185,7 @@ export async function composeEdition(args){
   if([...pageMaps].some(name=>!articleMaps.has(name)))throw new Error(`maps must exactly match page references — page(s) reference map(s) not in article art.hero_map: ${[...pageMaps].filter(name=>!articleMaps.has(name)).join(', ')}`);
   for(const page of args.pages)await convergeIndexed(args.edition,location(args.edition,'pages',page.name),page.document);for(const map of args.maps??[]){if(!component.test(map.name))throw new Error(`maps[].name ${JSON.stringify(map.name)} must be 1-128 lowercase alphanumeric/hyphen characters, starting with a letter or digit`);await converge(location(args.edition,'maps',map.name),object(map.document));}
   const pageNames=['front','tape'],mapNames=[...suppliedMaps].sort(),tree={articles,desk,pages:pageNames,maps:mapNames,article_digests:await digests(args.edition,'articles',articles),desk_digests:await digests(args.edition,'desk',desk),page_digests:await digests(args.edition,'pages',pageNames),map_digests:await digests(args.edition,'maps',mapNames)};
-  const composition={tree,tree_digest:sha(JSON.stringify(tree))};return composedResult(args,composition);
+  const composition={tree,tree_digest:sha(JSON.stringify(tree)),compose_gates:composeGateLine(gates),...(gates.diversity.waived?{waiver}:{})};return composedResult(args,composition);
 }
 const jsonNames=async(edition,kind)=>{try{return(await readdir(within(root(),'editions',edition,kind))).filter(name=>name.endsWith('.json')).map(name=>name.slice(0,-5)).sort();}catch(error){if(error.code==='ENOENT')return[];throw error;}};
 const run=async(command,args,cwd)=>{const home=path.join(cwd,'.release-home'),temporary=path.join(cwd,'.release-tmp');await mkdir(home,{recursive:true});await mkdir(temporary,{recursive:true});return new Promise((resolve,reject)=>{const child=spawn(command,args,{cwd,stdio:'pipe',env:{CI:'1',HOME:home,TMPDIR:temporary,PATH:'/usr/local/bin:/usr/bin:/bin',LANG:'C.UTF-8',TZ:'UTC'}});let stderr='';child.stderr.on('data',chunk=>{if(stderr.length<65536)stderr+=chunk;});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error(`${command} failed: ${stderr.slice(-2000)}`)));});};
