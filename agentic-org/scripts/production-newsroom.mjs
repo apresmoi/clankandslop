@@ -4,7 +4,6 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
 import { armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
-import { EDITION_PUSH_REMOTE, editionBranch, editionCommitMessage, materializeSshIdentity, pushStagedEditionTree, readDeployKey, remoteUrl } from './release-push.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
 const stable=value=>JSON.stringify(value,Object.keys(value).sort());
@@ -191,41 +190,3 @@ export async function composeEdition(args){
 const jsonNames=async(edition,kind)=>{try{return(await readdir(within(root(),'editions',edition,kind))).filter(name=>name.endsWith('.json')).map(name=>name.slice(0,-5)).sort();}catch(error){if(error.code==='ENOENT')return[];throw error;}};
 const run=async(command,args,cwd)=>{const home=path.join(cwd,'.release-home'),temporary=path.join(cwd,'.release-tmp');await mkdir(home,{recursive:true});await mkdir(temporary,{recursive:true});return new Promise((resolve,reject)=>{const child=spawn(command,args,{cwd,stdio:'pipe',env:{CI:'1',HOME:home,TMPDIR:temporary,PATH:'/usr/local/bin:/usr/bin:/bin',LANG:'C.UTF-8',TZ:'UTC'}});let stderr='';child.stderr.on('data',chunk=>{if(stderr.length<65536)stderr+=chunk;});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error(`${command} failed: ${stderr.slice(-2000)}`)));});};
 export async function stageRelease(args){identity(args);exact(args,['edition','event_key']);if(process.env.CLANK_NEWSROOM_AGENT!=='pressman')throw new Error(`stage_release may only be called by "pressman", got "${process.env.CLANK_NEWSROOM_AGENT}"`);const sourceValue=process.env.CLANK_PUBLIC_SOURCE_ROOT,stagingValue=process.env.CLANK_RELEASE_STAGING_ROOT;if(!sourceValue?.startsWith('/')||!stagingValue?.startsWith('/'))throw new Error(`release roots invalid — CLANK_PUBLIC_SOURCE_ROOT and CLANK_RELEASE_STAGING_ROOT must both be absolute paths, got ${JSON.stringify(sourceValue)} and ${JSON.stringify(stagingValue)}`);const source=path.resolve(sourceValue),staging=path.resolve(stagingValue);if(source===staging)throw new Error(`release roots invalid — CLANK_PUBLIC_SOURCE_ROOT and CLANK_RELEASE_STAGING_ROOT must differ, both were ${JSON.stringify(source)}`);const compositionReceipt=await authenticComposition(args.edition);await mkdir(staging,{recursive:true});const target=within(staging,args.edition+'-'+compositionReceipt.digest.slice(7,23)),temporary=within(staging,`.candidate-${randomUUID()}`);try{await cp(source,temporary,{recursive:true,filter:file=>!['.git','.astro','dist'].includes(path.basename(file))});for(const dependencyRoot of (process.env.CLANK_WEBSITE_DEPS_ROOTS??'').split(':').filter(Boolean)){if(!dependencyRoot.startsWith('/'))throw new Error('dependency root invalid');await cp(path.join(dependencyRoot,'website','node_modules'),path.join(temporary,'website','node_modules'),{recursive:true,force:true});}for(const assetRoot of (process.env.CLANK_PUBLIC_ASSET_ROOTS??'').split(':').filter(Boolean)){if(!assetRoot.startsWith('/'))throw new Error('asset root invalid');await cp(path.join(assetRoot,'website','public','og'),path.join(temporary,'website','public','og'),{recursive:true,force:true});}const editionTarget=within(temporary,'content','editions',args.edition);await mkdir(editionTarget,{recursive:true});for(const kind of ['articles','desk','pages','maps']){if((await jsonNames(args.edition,kind)).length>0)await cp(within(root(),'editions',args.edition,kind),within(editionTarget,kind),{recursive:true,force:true});}await run(process.execPath,['ops/validate-content.mjs'],temporary);await run(process.execPath,[path.join('node_modules','astro','bin','astro.mjs'),'build'],path.join(temporary,'website'));const artifactDigest=await promoteCandidate(temporary,target);if(process.env.CLANK_RELEASE_CRASH_BEFORE_SWITCH==='1')throw new Error('injected crash before promotion');const next=within(staging,`.current-${randomUUID()}`);await symlink(path.basename(target),next);await rename(next,within(staging,'current-edition'));const result={staging_root:target,edition:args.edition,validated:true,built:true,artifact_digest:artifactDigest,composition_digest:compositionReceipt.digest};const stagedReceipt={version:'clank.newsroom-release-receipt.v1',state:'staged',edition:args.edition,event_key:args.event_key,composition_digest:compositionReceipt.digest,artifact_digest:artifactDigest,staging_root:target};await converge(location(args.edition,'receipts','staged-'+compositionReceipt.digest.slice(7,23)),stagedReceipt);return{...result,receipt:stagedReceipt};}finally{await rm(temporary,{recursive:true,force:true});}}
-// Pressman's second and last act. It reads the staged receipt stage_release
-// wrote, copies that artifact's edition directory onto one branch cut from the
-// public repository's main, and fast-forward pushes that one ref. It cannot
-// reach main, cannot force, cannot delete, and cannot open the pull request —
-// a deploy key pushes git and does nothing else, which is exactly the authority
-// this desk is meant to hold. A person opens the PR and merges it.
-export async function pushEdition(args){
-  identity(args);exact(args,['edition','event_key']);
-  if(process.env.CLANK_NEWSROOM_AGENT!=='pressman')throw new Error(`push_edition may only be called by "pressman", got "${process.env.CLANK_NEWSROOM_AGENT}"`);
-  const stagingValue=process.env.CLANK_RELEASE_STAGING_ROOT;
-  if(!stagingValue?.startsWith('/'))throw new Error(`release staging root invalid — CLANK_RELEASE_STAGING_ROOT must be an absolute path, got ${JSON.stringify(stagingValue)}`);
-  const staging=path.resolve(stagingValue);
-  const compositionReceipt=await authenticComposition(args.edition);
-  const key=compositionReceipt.digest.slice(7,23);
-  const staged=await readJson(location(args.edition,'receipts',`staged-${key}`)).catch(()=>{throw new Error(`nothing staged for edition ${args.edition} — call stage_release first; push_edition only ever pushes an artifact stage_release already validated and built`);});
-  if(staged.state!=='staged'||staged.composition_digest!==compositionReceipt.digest)throw new Error(`staged receipt does not describe this composition — re-run stage_release for edition ${args.edition}`);
-  const stagingRoot=path.resolve(staged.staging_root);
-  if(stagingRoot!==staging&&!stagingRoot.startsWith(`${staging}${path.sep}`))throw new Error('staged artifact lies outside the staging volume');
-  const editionPath=path.posix.join('content','editions',args.edition);
-  const editionSource=within(stagingRoot,'content','editions',args.edition);
-  const branch=editionBranch(args.edition),remote=EDITION_PUSH_REMOTE,url=remoteUrl(remote);
-  const identityDirectory=within(staging,`.ssh-${randomUUID()}`),workdir=within(staging,`.push-${randomUUID()}`);
-  let result;
-  try{
-    const material=await readDeployKey(remote);
-    const ssh=await materializeSshIdentity(identityDirectory,remote,material);
-    result=await pushStagedEditionTree({url,branch,editionSource,editionPath,workdir,home:path.join(workdir,'.home'),sshCommand:ssh.sshCommand,message:editionCommitMessage(args.edition)});
-  }finally{
-    await rm(identityDirectory,{recursive:true,force:true});
-    await rm(workdir,{recursive:true,force:true});
-  }
-  // The commit id stays out of the converged body on purpose: a retry after a
-  // network failure must converge, and the receipt is keyed by the composition
-  // it pushed, not by whatever base main happened to be on at the time.
-  const pushedReceipt={version:'clank.newsroom-release-receipt.v1',state:'pushed',edition:args.edition,event_key:args.event_key,composition_digest:compositionReceipt.digest,artifact_digest:staged.artifact_digest,remote,branch};
-  await converge(location(args.edition,'receipts',`pushed-${key}`),pushedReceipt);
-  return{...result,edition:args.edition,remote,pushed:true,published:false,receipt:pushedReceipt};
-}

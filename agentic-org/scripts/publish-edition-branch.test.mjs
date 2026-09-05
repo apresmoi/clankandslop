@@ -1,14 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   BASE_BRANCH, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   assertNoForcedPush, assertNotProtectedRef, assertPushableRef, editionBranch, editionCommitMessage,
-  materializeSshIdentity, pushArgv, pushStagedEditionTree, readDeployKey, remoteUrl, sshConfig
-} from './release-push.mjs';
+  parseArguments, prepareSshIdentity, publishEditionBranch, pushArgv, pushStagedEditionTree,
+  remoteUrl, resolveStagedEdition, sshConfig
+} from './publish-edition-branch.mjs';
 
 const scratch = (label) => mkdtempSync(join(tmpdir(), `clank-${label}-`));
 const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: cwd, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null', GIT_AUTHOR_NAME: 'seed', GIT_AUTHOR_EMAIL: 'seed@example.invalid', GIT_COMMITTER_NAME: 'seed', GIT_COMMITTER_EMAIL: 'seed@example.invalid' } }).trim();
@@ -62,40 +63,82 @@ test('the push argv is fast-forward, single-ref, and refuses every destructive f
 test('the publisher may only ever address the public repository', () => {
   assert.equal(EDITION_PUSH_REMOTE, 'clankandslop');
   assert.equal(remoteUrl(EDITION_PUSH_REMOTE), 'git@clankandslop.deploy:apresmoi/clankandslop.git');
-  assert.equal(PUSH_REMOTES[EDITION_PUSH_REMOTE].secret, 'CLANK_DEPLOY_KEY_PUBLIC');
-  assert.equal(PUSH_REMOTES['clankandslop-private'].secret, 'CLANK_DEPLOY_KEY_PRIVATE');
+  // The private repository is not in the table at all: nothing here reaches it.
+  assert.deepEqual(Object.keys(PUSH_REMOTES), ['clankandslop']);
   for (const name of ['main', 'master', 'staging', 'gh-pages', 'HEAD']) assert.ok(PROTECTED_REFS.includes(name), name);
 });
 
-test('the ssh config binds one key per remote and pins the host key', () => {
-  const rendered = sshConfig('/keys');
+test('the ssh config binds the operator key per remote and pins the host key', () => {
+  const rendered = sshConfig('/scratch', '/keys/clankandslop');
   for (const declared of Object.values(PUSH_REMOTES)) {
-    assert.match(rendered, new RegExp(`Host ${declared.alias}\\n  HostName ${declared.host}\\n  User git\\n  IdentityFile /keys/${declared.key_file}\\n  IdentitiesOnly yes`, 'u'));
+    assert.match(rendered, new RegExp(`Host ${declared.alias}\\n  HostName ${declared.host}\\n  User git\\n  IdentityFile /keys/clankandslop\\n  IdentitiesOnly yes`, 'u'));
   }
   assert.match(rendered, /StrictHostKeyChecking yes/u);
-  assert.match(rendered, /UserKnownHostsFile \/keys\/known_hosts/u);
+  assert.match(rendered, /UserKnownHostsFile \/scratch\/known_hosts/u);
   assert.ok(GITHUB_HOST_KEYS.every((line) => line.startsWith('github.com ssh-ed25519 ')));
 });
 
-test('key material is read from the declared secret, then the mounted file, and never invented', async () => {
-  assert.equal(await readDeployKey('clankandslop', { CLANK_DEPLOY_KEY_PUBLIC: 'INLINE' }), 'INLINE\n');
-  const directory = scratch('keys');
-  writeFileSync(join(directory, 'clankandslop'), 'FROM-VOLUME\n');
-  assert.equal(await readDeployKey('clankandslop', { CLANK_DEPLOY_KEY_DIR: directory }), 'FROM-VOLUME\n');
-  await assert.rejects(readDeployKey('clankandslop', {}), /CLANK_DEPLOY_KEY_PUBLIC nor an absolute CLANK_DEPLOY_KEY_DIR/u);
-  await assert.rejects(readDeployKey('clankandslop', { CLANK_DEPLOY_KEY_DIR: '/nonexistent-clank' }), /is not readable/u);
-  writeFileSync(join(directory, 'clankandslop-private'), '   \n');
-  await assert.rejects(readDeployKey('clankandslop-private', { CLANK_DEPLOY_KEY_DIR: directory }), /is empty/u);
-  await assert.rejects(readDeployKey('somewhere-else', {}), /unknown push remote/u);
+test('the ssh identity references the operator key and never copies it', async () => {
+  const root = scratch('identity');
+  const keyFile = join(root, 'clankandslop');
+  writeFileSync(keyFile, 'PRIVATE-KEY-MATERIAL\n', { mode: 0o600 });
+  const directory = join(root, 'ssh');
+  const identity = await prepareSshIdentity(directory, keyFile);
+  assert.equal(statSync(directory).mode & 0o777, 0o700);
+  assert.equal(statSync(identity.configFile).mode & 0o777, 0o600);
+  assert.match(identity.sshCommand, /^ssh -F .*\/config -o BatchMode=yes$/u);
+  // The key stays exactly where the operator put it: nothing in the scratch
+  // directory contains the material, only a path to it.
+  for (const name of readdirSync(directory)) assert.doesNotMatch(readFileSync(join(directory, name), 'utf8'), /PRIVATE-KEY-MATERIAL/u, name);
+  assert.match(readFileSync(identity.configFile, 'utf8'), new RegExp(`IdentityFile ${keyFile}`, 'u'));
+  await assert.rejects(prepareSshIdentity(directory, join(root, 'absent')), /is not readable/u);
+  await assert.rejects(prepareSshIdentity(directory, 'relative/key'), /must be absolute/u);
+  await assert.rejects(prepareSshIdentity(directory, root), /is not a file/u);
 });
 
-test('the materialized identity is 0600 in a 0700 directory', async () => {
-  const directory = join(scratch('identity'), 'ssh');
-  const identity = await materializeSshIdentity(directory, 'clankandslop', 'KEY\n');
-  assert.equal(statSync(directory).mode & 0o777, 0o700);
-  for (const file of [identity.keyFile, identity.configFile, identity.knownHostsFile]) assert.equal(statSync(file).mode & 0o777, 0o600, file);
-  assert.equal(readFileSync(identity.keyFile, 'utf8'), 'KEY\n');
-  assert.match(identity.sshCommand, /^ssh -F .*\/config -o BatchMode=yes$/u);
+test('only a promoted artifact can be resolved, and the receipt must agree with it', async () => {
+  const root = scratch('staging');
+  await assert.rejects(resolveStagedEdition(root), /no promoted edition/u);
+  await assert.rejects(resolveStagedEdition('relative'), /must be an absolute path/u);
+  const artifact = '2026-09-05-abcdef0123456789';
+  mkdirSync(join(root, artifact, 'content', 'editions', '2026-09-05'), { recursive: true });
+  symlinkSync(artifact, join(root, 'current-edition'));
+  const resolved = await resolveStagedEdition(root);
+  assert.equal(resolved.edition, '2026-09-05');
+  assert.equal(resolved.editionPath, 'content/editions/2026-09-05');
+  // With a state root the durable receipt has to name the same artifact, so a
+  // staging volume edited by hand between the build and the push is caught.
+  const state = scratch('state');
+  const receipts = join(state, 'editions', '2026-09-05', 'receipts');
+  mkdirSync(receipts, { recursive: true });
+  const receipt = { version: 'clank.newsroom-release-receipt.v1', state: 'staged', edition: '2026-09-05', staging_root: join(root, artifact) };
+  writeFileSync(join(receipts, 'staged-abcdef0123456789.json'), JSON.stringify(receipt));
+  assert.equal((await resolveStagedEdition(root, { stateRoot: state })).receipt.state, 'staged');
+  writeFileSync(join(receipts, 'staged-abcdef0123456789.json'), JSON.stringify({ ...receipt, staging_root: '/somewhere/else' }));
+  await assert.rejects(resolveStagedEdition(root, { stateRoot: state }), /but current-edition points at/u);
+  writeFileSync(join(receipts, 'staged-0000000000000000.json'), JSON.stringify(receipt));
+  await assert.rejects(resolveStagedEdition(root, { stateRoot: state }), /exactly one staged receipt/u);
+});
+
+test('the promoted link may not escape the staging volume', async () => {
+  const root = scratch('staging');
+  symlinkSync('/etc', join(root, 'current-edition'));
+  await assert.rejects(resolveStagedEdition(root), /must name a sibling directory/u);
+  const other = scratch('staging');
+  symlinkSync('../elsewhere', join(other, 'current-edition'));
+  await assert.rejects(resolveStagedEdition(other), /must name a sibling directory/u);
+  const undated = scratch('staging');
+  mkdirSync(join(undated, 'not-an-edition'));
+  symlinkSync('not-an-edition', join(undated, 'current-edition'));
+  await assert.rejects(resolveStagedEdition(undated), /does not begin with an edition date/u);
+});
+
+test('the command line refuses to run without a staging volume or a key', () => {
+  assert.throws(() => parseArguments([]), /--staging/u);
+  assert.throws(() => parseArguments(['--staging', '/s']), /--key/u);
+  assert.throws(() => parseArguments(['--staging', '/s', '--nope', 'x']), /unknown argument/u);
+  assert.throws(() => parseArguments(['--staging']), /requires a value/u);
+  assert.deepEqual(parseArguments(['--staging', '/s', '--dry-run']), { dryRun: true, staging: '/s' });
 });
 
 test('a real push creates the edition branch and leaves main exactly where it was', async () => {
@@ -183,4 +226,35 @@ test('the edition path may not escape the branch', async () => {
       workdir: join(work, 'repo'), home: join(work, 'home'), message: 'chore: nope'
     }), /must stay inside the branch/u, editionPath);
   }
+});
+
+test('end to end: a promoted artifact becomes an edition branch on a real remote', async () => {
+  const origin = remote(), before = origin.head();
+  const staging = scratch('staging'), state = scratch('state');
+  const artifact = '2026-09-08-fedcba9876543210';
+  const editionDir = join(staging, artifact, 'content', 'editions', '2026-09-08');
+  mkdirSync(join(editionDir, 'pages'), { recursive: true });
+  writeFileSync(join(editionDir, 'pages', 'front.json'), '{"page":"front"}\n');
+  symlinkSync(artifact, join(staging, 'current-edition'));
+  const receipts = join(state, 'editions', '2026-09-08', 'receipts');
+  mkdirSync(receipts, { recursive: true });
+  writeFileSync(join(receipts, 'staged-fedcba9876543210.json'), JSON.stringify({ state: 'staged', edition: '2026-09-08', staging_root: join(staging, artifact) }));
+
+  const key = join(scratch('keys'), 'clankandslop');
+  writeFileSync(key, 'unused-for-a-file-remote\n', { mode: 0o600 });
+  const result = await publishEditionBranch({ staging, state, key }, origin.url);
+  assert.equal(result.edition, '2026-09-08');
+  assert.equal(result.branch, 'edition/2026-09-08');
+  assert.equal(result.pushed, true);
+  assert.equal(result.published, false);
+  assert.deepEqual(origin.refs().sort(), ['refs/heads/edition/2026-09-08', 'refs/heads/main']);
+  assert.equal(origin.head(), before, 'main moved');
+  assert.equal(execFileSync('git', ['-C', origin.url, 'show', `${result.commit}:content/editions/2026-09-08/pages/front.json`], { encoding: 'utf8' }), '{"page":"front"}\n');
+  // A dry run builds the same commit and touches nothing on the remote.
+  const dry = await publishEditionBranch({ staging, state, dryRun: true }, origin.url);
+  assert.equal(dry.pushed, false);
+  assert.equal(dry.commit, result.commit);
+  // The remote is a compile-time constant: no command line can redirect it.
+  assert.throws(() => parseArguments(['--staging', '/s', '--url', 'git@evil.invalid:x/y.git']), /unknown argument/u);
+  assert.throws(() => parseArguments(['--staging', '/s', '--remote', 'other']), /unknown argument/u);
 });

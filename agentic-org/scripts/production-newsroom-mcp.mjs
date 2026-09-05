@@ -1,5 +1,5 @@
 import { createInterface } from 'node:readline';
-import { composeEdition, fileArticle, fileDesk, pushEdition, qualifySignal, recordAssignment, reviewArticle, stageRelease } from './production-newsroom.mjs';
+import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, reviewArticle, stageRelease } from './production-newsroom.mjs';
 
 // Closed sets mirrored from production-newsroom.mjs's own validation (`desks`,
 // the verdict list in reviewArticle, and the epistemic values used across
@@ -146,15 +146,9 @@ const definitions = {
     required: ['edition', 'event_key'],
     properties: { edition, event_key: eventKey },
     execute: stageRelease
-  },
-  push_edition: {
-    description: 'Push the staged edition to the public repository on one branch, edition/<date>, for a human to open the pull request from. Never reaches main, never force-pushes, never merges, and never publishes.',
-    required: ['edition', 'event_key'],
-    properties: { edition, event_key: eventKey },
-    execute: pushEdition
   }
 };
-const roleTools={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article'],sprockett:['file_article'],foreman:['file_article'],graves:['file_article'],tinkerton:['file_article'],vesta:['file_article'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release','push_edition']};
+const roleTools={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article'],sprockett:['file_article'],foreman:['file_article'],graves:['file_article'],tinkerton:['file_article'],vesta:['file_article'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
 const tools=roleTools[role]??[];
 const schema=definition=>({type:'object',additionalProperties:false,required:definition.required,properties:definition.properties});
 const reply=(id,result,error)=>process.stdout.write(`${JSON.stringify({jsonrpc:'2.0',id,...(error?{error:{code:-32000,message:error}}:{result})})}\n`);

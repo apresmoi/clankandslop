@@ -5,14 +5,14 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { checkRuntime } from './check-runtime.mjs';
 import { provision } from './provision.mjs';
-import { agents, declaredMoltnetSecretRefs, declaredRequiredAgentSecretRefs } from './lib.mjs';
-import { PUBLISHER_SECRETS, PUBLISHER_TOOLS, declaredAgentSecretRefs, engineByAgent, validateAgentDeclaration, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
+import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
+import { PUBLISHER_TOOLS, engineByAgent, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
 
 const messages = () => JSON.parse(readFileSync(new URL('../fixtures/daily-cycle.json', import.meta.url), 'utf8')).messages;
 const validate = (items) => { const prior = []; for (const item of items) { validateMessage(item, prior); prior.push(item); } };
 const admittedEnv = (root) => {
   const env = { CLANK_PRIVATE_ROOT: root, CLANK_BROKER_READY: 'yes', CLANK_MOLTNET_READY: 'yes', CLANK_NETWORK_POLICY_READY: 'yes', CLANK_GIT_POLICY_READY: 'yes' };
-  for (const secretRef of [...declaredMoltnetSecretRefs, ...declaredRequiredAgentSecretRefs]) env[secretRef] = 'opaque';
+  for (const secretRef of declaredMoltnetSecretRefs) env[secretRef] = 'opaque';
   for (const agent of ['WORLD_SCOUT','KLAXON','FRONTIER','CLOSURE','COGSWORTH','SPROCKETT','FOREMAN','GRAVES','TINKERTON','VESTA','BRASS','SPIKE','LEDGER','CASLON','MORGUE','PRESSMAN']) { for (const part of ['HOME','XDG','WORKSPACE']) { const path = join(root, agent, part); mkdirSync(path, { recursive: true }); env[`CLANK_${agent}_${part}`] = path; } env[`CLANK_${agent}_CLI_LOGIN`] = 'opaque'; }
   return env;
 };
@@ -93,13 +93,13 @@ test('workspace resources enforce public modes and private corpus least privileg
   assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('kind: volume', 'kind: git').replace('name: clank-release-staging, ', 'url: https://github.com/apresmoi/clankandslop.git, branch: staging, ')), /public content resource/);
 });
 test('Pressman implementation contains no network publisher, push, credential, or process execution path', () => { const source=readFileSync(resolve(import.meta.dirname,'newsroom.mjs'),'utf8'); assert.doesNotMatch(source,/child_process|execFile|spawn\(|fetch\(|https?:|git\s+push|credential|token/i); });
-test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article'],sprockett:['file_article'],foreman:['file_article'],graves:['file_article'],tinkerton:['file_article'],vesta:['file_article'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release','push_edition']};// Skill documents are gone: six reporters used to `cat` two or three
+test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article'],sprockett:['file_article'],foreman:['file_article'],graves:['file_article'],tinkerton:['file_article'],vesta:['file_article'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
 // identical SKILL.md files at the top of every wake. Their content now
 // lives in AGENTS.md, which Codex loads into the prefix natively, so the
 // closure to hold is the opposite one — no agent declares a skill, and the
 // editorial constraints those skills carried are in the reporter's own doc.
 const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance','six to eight flowing paragraphs'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);assert.match(source,/transport: stdio/u);assert.match(source,/command: \/usr\/local\/bin\/node/u);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
-test('production instructions require natural-language handoffs and stay free of read-before-acting mandates',()=>{const team=readFileSync(resolve(import.meta.dirname,'../TEAM.md'),'utf8');for(const phrase of ['natural-language','at least five articles','content/editions/<date>/{articles,desk,pages,maps}','never reaches `main`','never force-pushes','never deletes a remote ref','never merges','A deploy key can push Git and cannot open a pull request'])assert.ok(team.includes(phrase));assert.doesNotMatch(team,/by path — never search for them/u);});
+test('production instructions require natural-language handoffs and stay free of read-before-acting mandates',()=>{const team=readFileSync(resolve(import.meta.dirname,'../TEAM.md'),'utf8');for(const phrase of ['natural-language','at least five articles','content/editions/<date>/{articles,desk,pages,maps}','never pushes Git','Publishing happens outside this organization','beside the key','a claim rather than a boundary'])assert.ok(team.includes(phrase));assert.doesNotMatch(team,/by path — never search for them/u);});
 test('production declarations consume only checksum-pinned offline newsroom bundles',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.ok(source.includes(`sha256: ${descriptor.source.sha256}`));assert.doesNotMatch(source,/kind: git|github\.com\/apresmoi\/clankandslop|branch: staging/u);}const pressman=readFileSync(resolve(import.meta.dirname,'../agents/pressman/Spawnfile'),'utf8');for(const dependency of [...descriptor.dependencies,...descriptor.assets]){assert.ok(pressman.includes(`sha256: ${dependency.sha256}`));assert.ok(pressman.includes(`mount: ./${dependency.mount}`));}assert.match(pressman,/CLANK_WEBSITE_DEPS_ROOTS: .*deps-a:.*deps-b/u);});
 test('lifecycle schema is closed and covers every autonomous terminal', () => { const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8')); assert.equal(schema.additionalProperties,false); assert.deepEqual(schema.properties.kind.enum,['readiness','blocker','finalization','released','staged']); });
 test('receipt-ref JSON Schema and runtime reject the same hostile components',()=>{const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8'));const pattern=new RegExp(schema.properties.receipt_ref.pattern);const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts;assert.equal(pattern.test('state/edition/receipts/lower-case_1.0/file.json'),true);for(const ref of ['state/edition/receipts/has space','state/edition/receipts/Upper','state/edition/receipts/back\\slash','state/edition/receipts/é','state/edition/receipts/../bad','state/edition/receipts//bad','state/edition/receipts/bad/','state/edition/receipts/./bad']){assert.equal(pattern.test(ref),false,ref);const changed=structuredClone(source);changed[1].receipt_ref=ref;assert.throws(()=>validateLifecycle(changed),/reference/);}});
@@ -160,31 +160,44 @@ test('runtime rejects a private root equal to the repository root', () => { cons
 test('runtime requires Moltnet readiness and declaration-derived secret references', () => { const root = mkdtempSync(join(tmpdir(), 'clank-runtime-')); const env = admittedEnv(root); delete env.CLANK_MOLTNET_READY; delete env.CLANK_MOLTNET_CONSOLE_TOKEN; delete env.CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN; assert.deepEqual(checkRuntime(env).missing, ['moltnet', 'moltnet-secret:CLANK_MOLTNET_CONSOLE_TOKEN', 'moltnet-secret:CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN']); });
 test('provision is dry by default', () => { const root = mkdtempSync(join(tmpdir(), 'clank-private-')); const env = admittedEnv(root); const result = provision({ edition: '2026-08-16', privateRoot: root, env }); assert.equal(result.dryRun, true); assert.equal(existsSync(join(root, '2026-08-16')), false); });
 
-test('the publisher declares a branch push, deploy keys by name, and nothing that reaches main', () => {
+test('no agent declares a publishing credential, the publisher included', () => {
   const pressman = readFileSync(resolve(import.meta.dirname, '../agents/pressman/Spawnfile'), 'utf8');
   assert.doesNotThrow(() => validatePublisherSurface(pressman));
-  assert.deepEqual(declaredAgentSecretRefs(pressman), [...PUBLISHER_SECRETS]);
-  assert.deepEqual([...PUBLISHER_TOOLS], ['stage_release', 'push_edition']);
-  // Losing the push tool, the key declaration, the binaries the push runs, or
-  // the read-only key mount each has to fail on its own.
-  assert.throws(() => validatePublisherSurface(pressman.replace('tools: [stage_release, push_edition]', 'tools: [stage_release]')), /exactly the release tools/u);
-  assert.throws(() => validatePublisherSurface(pressman.replace('tools: [stage_release, push_edition]', 'tools: [stage_release, push_edition, compose_edition]')), /exactly the release tools/u);
-  assert.throws(() => validatePublisherSurface(pressman.replace('    - { name: CLANK_DEPLOY_KEY_PUBLIC, required: true }\n', '')), /deploy key declaration/u);
-  assert.throws(() => validatePublisherSurface(pressman.replace('- { id: openssh-client, manager: apt, name: openssh-client }', '')), /apt package openssh-client/u);
-  assert.throws(() => validatePublisherSurface(pressman.replace('mount: ./secrets/ssh, mode: readonly', 'mount: ./secrets/ssh, mode: mutable')), /read-only per-agent volume/u);
-  assert.throws(() => validatePublisherSurface(pressman.replace('{ id: deploy-keys,', '{ id: deploy-keys-renamed,')), /read-only per-agent volume/u);
-  // A key value in the declaration, or a Git workspace resource, is the exact
-  // shape this desk must never grow.
-  assert.throws(() => validatePublisherSurface(pressman.replace('- { name: CLANK_DEPLOY_KEY_PUBLIC, required: true }', '- { name: CLANK_DEPLOY_KEY_PUBLIC, required: true }\n    # -----BEGIN OPENSSH PRIVATE KEY-----')), /never key material/u);
-  assert.throws(() => validatePublisherSurface(pressman.replace('{ id: deploy-keys, kind: volume', '{ id: deploy-keys, kind: git, url: https://example.invalid/x.git, branch: main, x: volume')), /read-only per-agent volume|Git workspace resource/u);
+  assert.deepEqual([...PUBLISHER_TOOLS], ['stage_release']);
+  assert.doesNotThrow(validateRuntimeBindings);
+  // Each way the key could creep back into a container has to fail on its own.
+  const creep = [
+    ['a push tool', 'tools: [stage_release]', 'tools: [stage_release, push_edition]'],
+    ['a secret reference', 'workspace:\n', '  secrets:\n    - { name: CLANK_DEPLOY_KEY_PUBLIC, required: true }\nworkspace:\n'],
+    ['a key mount', '  resources:\n', '  resources:\n    - { id: deploy-keys, kind: volume, name: clank-pressman-deploy-keys, mount: ./secrets/ssh, mode: readonly, sharing: per_agent }\n'],
+    ['the push binaries', 'workspace:\n', '  packages:\n    - { id: git, manager: apt, name: git }\nworkspace:\n'],
+    ['key material', 'workspace:\n', '  # -----BEGIN OPENSSH PRIVATE KEY-----\nworkspace:\n'],
+    ['an ssh identity path', 'workspace:\n', '  # IdentityFile /keys/id_ed25519\nworkspace:\n'],
+    ['the host-side publisher itself', 'tools: [stage_release]', 'tools: [stage_release]\n      # runs scripts/publish-edition-branch.mjs']
+  ];
+  for (const [label, from, to] of creep) {
+    assert.notEqual(pressman.indexOf(from), -1, label);
+    assert.throws(() => validatePublisherSurface(pressman.replace(from, to)), /release tools|stay on the host/u, label);
+  }
 });
 
-test('no agent but the publisher can reach the branch push or a deploy key', () => {
-  for (const agent of agents.filter((name) => name !== 'pressman')) {
+test('the deploy key and every ref restriction live outside every container', () => {
+  // The host-side job must be unreachable from a compiled workspace: no agent
+  // names it, and no agent declares anything a push would need.
+  for (const agent of agents) {
     const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
-    assert.doesNotMatch(source, /push_edition|CLANK_DEPLOY_KEY/u, agent);
+    assert.doesNotThrow(() => validateNoPublishingCredential(agent, source), agent);
   }
-  assert.throws(() => validateRuntimeBindings(mutatedOrg('ledger', (source) => source.replace('tools: [file_desk]', 'tools: [file_desk, push_edition]'))), /must not reach the publisher/u);
+  const publisher = readFileSync(resolve(import.meta.dirname, 'publish-edition-branch.mjs'), 'utf8');
+  assert.match(publisher, /THIS RUNS ON THE HOST, OUTSIDE EVERY CONTAINER/u);
+  // The MCP surface is the other half: the server can only ever expose
+  // stage_release to pressman, whatever else exists in the tree.
+  const mcp = readFileSync(resolve(import.meta.dirname, 'production-newsroom-mcp.mjs'), 'utf8');
+  assert.match(mcp, /pressman:\['stage_release'\]/u);
+  assert.doesNotMatch(mcp, /push_edition|publish-edition-branch/u);
+  const production = readFileSync(resolve(import.meta.dirname, 'production-newsroom.mjs'), 'utf8');
+  assert.doesNotMatch(production, /push_edition|publish-edition-branch|DEPLOY_KEY|GIT_SSH_COMMAND/u);
+  assert.throws(() => validateRuntimeBindings(mutatedOrg('ledger', (source) => source.replace('tools: [file_desk]', 'tools: [file_desk, push_edition]'))), /stay on the host/u);
 });
 
 test('every scheduled checkpoint owner carries a schedule that actually fires', () => {

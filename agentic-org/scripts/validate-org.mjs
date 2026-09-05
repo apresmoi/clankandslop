@@ -202,42 +202,37 @@ export function validateRootDeclaration(bytes) {
   assert(research && new Set(research.members).size === researchMembers.size && research.members.every((member) => researchMembers.has(member)), 'research room membership invalid');
 }
 
-// What the publisher is allowed to reach. The desk holds a deploy key now, so
-// the declaration is where the authority is bounded: exactly the two release
-// tools, the key names declared as secret references and never as values, the
-// git and ssh binaries the push needs, and a read-only key mount. A deploy key
-// can push git and cannot open a pull request — that asymmetry is the design,
-// not a limitation to work around.
+// What the publisher may NOT reach. The deploy key that pushes an edition
+// branch lives on the host, in `scripts/publish-edition-branch.mjs`, and this
+// is the mechanical statement that it stays there: no agent declares a push
+// tool, a secret reference, the binaries a push needs, or a key mount.
+//
+// The reasoning is worth keeping next to the assertion. A deploy key with
+// write access can push any ref. A ref restriction executing inside the
+// process a model drives is therefore a claim about that process, not a
+// boundary around the credential — so the credential and its restrictions sit
+// outside every container, and what is enforced here is the absence.
 export const PUBLISHER = 'pressman';
-export const PUBLISHER_TOOLS = Object.freeze(['stage_release', 'push_edition']);
-export const PUBLISHER_SECRETS = Object.freeze(['CLANK_DEPLOY_KEY_PUBLIC', 'CLANK_DEPLOY_KEY_PRIVATE']);
+export const PUBLISHER_TOOLS = Object.freeze(['stage_release']);
+export const HOST_ONLY_PUBLISHER = 'scripts/publish-edition-branch.mjs';
+const CREDENTIAL_PATTERNS = Object.freeze([
+  [/push_edition|publish-edition-branch/, 'declares the host-side publisher'],
+  [/^\s{2}secrets:/mu, 'declares an environment secret reference'],
+  [/DEPLOY_KEY|deploy-keys|IdentityFile|id_ed25519/, 'declares deploy key material or an ssh identity'],
+  [/manager: apt, name: (?:git|openssh-client)/, 'declares a package the push would need'],
+  [/kind: git|url:|branch:/, 'declares a Git workspace resource'],
+  [/BEGIN [A-Z ]*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA/, 'carries key material']
+]);
 
-export function declaredAgentSecretRefs(bytes) {
-  const lines = bytes.split('\n');
-  const start = lines.findIndex((line) => /^\s{2}secrets:\s*$/.test(line));
-  if (start < 0) return [];
-  const names = [];
-  for (const line of lines.slice(start + 1)) {
-    if (/^\s+#/.test(line)) continue;
-    if (!/^\s+- /.test(line)) break;
-    const match = /name:\s*([A-Z][A-Z0-9_]*)/.exec(line);
-    assert(match, 'declared secret entry must name an environment variable');
-    names.push(match[1]);
-  }
-  return names;
+export function validateNoPublishingCredential(agent, bytes) {
+  for (const [pattern, reason] of CREDENTIAL_PATTERNS) assert(!pattern.test(bytes), `${agent} ${reason} — the deploy key and every ref restriction stay on the host, outside every container`);
 }
 
 export function validatePublisherSurface(bytes) {
   const environment = section(bytes, 'environment');
-  const workspace = section(bytes, 'workspace');
   const tools = /tools: \[([^\]]+)\]/.exec(environment)?.[1];
   assert(tools && csv(tools).join(',') === PUBLISHER_TOOLS.join(','), `${PUBLISHER} must declare exactly the release tools [${PUBLISHER_TOOLS.join(', ')}]`);
-  assert(declaredAgentSecretRefs(bytes).join(',') === PUBLISHER_SECRETS.join(','), `${PUBLISHER} deploy key declaration must reference exactly [${PUBLISHER_SECRETS.join(', ')}]`);
-  assert(!/(BEGIN [A-Z ]*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA)/.test(bytes), `${PUBLISHER} must reference key names, never key material`);
-  for (const name of ['git', 'openssh-client']) assert(new RegExp(`manager: apt, name: ${name} \\}`).test(environment), `${PUBLISHER} must declare the apt package ${name} the branch push runs`);
-  const keys = resourceLine(workspace, 'deploy-keys');
-  assert(keys?.includes('kind: volume') && keys.includes('name: clank-pressman-deploy-keys') && keys.includes('mount: ./secrets/ssh') && keys.includes('mode: readonly') && keys.includes('sharing: per_agent'), `${PUBLISHER} deploy key mount must be a read-only per-agent volume`);
-  assert(!/kind: git|url:|branch:/.test(workspace), `${PUBLISHER} must not declare a Git workspace resource`);
+  validateNoPublishingCredential(PUBLISHER, bytes);
 }
 
 export function validateRuntimeBindings(root = orgRoot) {
@@ -248,7 +243,7 @@ export function validateRuntimeBindings(root = orgRoot) {
     const bytes = readFileSync(resolve(root, 'agents', agent, 'Spawnfile'), 'utf8');
     validateAgentDeclaration(agent, bytes);
     if (agent === PUBLISHER) validatePublisherSurface(bytes);
-    else assert(!/push_edition|CLANK_DEPLOY_KEY/.test(bytes), `${agent} must not reach the publisher's branch push or deploy keys`);
+    else validateNoPublishingCredential(agent, bytes);
   }
 }
 
