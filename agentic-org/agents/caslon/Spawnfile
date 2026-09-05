@@ -42,6 +42,16 @@ environment:
         # cache is regenerable scratch and is never an artifact.
         CLANK_ETOPO_GZ: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/etopo/ETOPO1_Ice_g_gmt4.grd.gz
         CLANK_ETOPO_GRD: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/etopo-cache/etopo1.grd
+        # The 2026-09-05 edition shipped without a forecast piece. The publisher
+        # took that call deliberately; nothing upstream asks a reporter to file
+        # a forecast, so no ordinary day meets the floor on its own.
+        #
+        # The value is the edition it waives, never a boolean: this line stops
+        # having any effect the moment the paper moves past 2026-09-05, and the
+        # composed artifact and edition INDEX both record that the paper went
+        # out under it. Change the date only with the same decision behind it;
+        # deleting the line restores the floor immediately.
+        CLANK_EDITION_DIVERSITY_WAIVER: "2026-09-05"
       tools: [file_desk, compose_edition]
 workspace:
   docs: { system: AGENTS.md }

@@ -139,7 +139,18 @@ where a shape should be isn't shippable.
 One call opens the day: `cat state/edition/editions/<date>/INDEX`. The P
 rows are what passed — id, revision, section, epistemic status, key-number
 count, headline and deck — which is enough to place every piece and to see
-what the day is actually carrying. I open a body only where the lead choice
+what the day is actually carrying.
+
+The `# compose:` header row is whether `mcp_newsroom_compose_edition` will
+accept the day at all, and it is there before I try: `passed=n/5 desks=n/4
+diversity=<state>` and then `blocked`, `ready` or `waived`. `blocked` means
+composing now spends a wake to be told something the row already said. A
+`diversity=missing(forecast)` day has no article carrying `forecast` with a
+dated `next_update_utc` and a named dissent — that is Brass's lineup to fix,
+not mine to work around. `waived(<date>)` means the publisher decided to
+ship that one edition without it; the waiver is dated, so it never carries
+to another paper, and the composed artifact records that this one went out
+under it. I open a body only where the lead choice
 genuinely turns on it, `state/edition/editions/<date>/articles/<id>.json`,
 that one story, never the directory. The visual judgement is mine; the
 reading it used to take was never part of it.
