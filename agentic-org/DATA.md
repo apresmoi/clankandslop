@@ -8,7 +8,7 @@
 | Ledger | shared edition state: mutable; public content: read-only | decisions, receipts and ledger-owned generated records only |
 | Caslon | shared edition state: mutable; public content: read-only; ETOPO1 relief grid: read-only | deterministic compose state, composition handoff, and the edition's `maps/` and `glyphs/` artifacts only |
 | Morgue | shared edition state: mutable; public content: read-only | archive receipts only |
-| Pressman | shared edition state: mutable; public content: mutable | sole owner of composition-digest-keyed local artifact and causal staged receipt; no published state |
+| Pressman | shared edition state: mutable; public content: mutable | sole owner of composition-digest-keyed local artifact, causal staged receipt, and the pushed `edition/<date>` branch with its causal pushed receipt; no published state |
 
 The compiler enforces resource presence, durability and whole-mount read/write mode. This table narrows mutable mounts to owner subpaths; deterministic admission and content gates reject boundary violations. Spike and Caslon may reject or request revision, but never write reporter-owned prose.
 

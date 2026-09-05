@@ -14,6 +14,12 @@ execution:
         method: codex
   sandbox:
     mode: workspace
+schedule:
+  kind: cron
+  cron: "0 16 * * *"
+  timezone: Europe/Berlin
+  jitter_seconds: 900
+  prompt: "Your working directory is your agent root. This is the press run. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX — its compose row tells you whether caslon has finished. No composed receipt means there is nothing to print: say that in room:release and stop, and do not go looking for the composition anywhere else. When there is one, call mcp_newsroom_stage_release with this schedule occurrence as event_key. It copies the composed edition into your staging volume, runs the content validator and the site build, and writes the staged receipt. A validator or build failure is the answer, not an obstacle: report exactly what failed in room:release and stop. You never edit an article, a page, a desk file or the validator to make a build pass — a gate that rejected the edition has decided the edition. When staging succeeds, call mcp_newsroom_push_edition with the same event_key. That puts the staged edition on one branch, edition/<edition-date>, in the public repository: it cannot reach main, it cannot force, it cannot delete, and it cannot open the pull request. Then post one line in room:release naming the branch and the commit so a person can open the PR and merge it. The branch is your job; publishing is theirs."
 surfaces:
   moltnet:
     - network: clank-newsroom
@@ -33,7 +39,26 @@ environment:
         CLANK_WEBSITE_DEPS_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-b
         CLANK_PUBLIC_ASSET_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-b
         CLANK_RELEASE_STAGING_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/staging
-      tools: [stage_release]
+        # Deploy-key delivery. The key names below are declared under
+        # `environment.secrets`, so `spawnfile up --env-file` refuses to start
+        # without them and no value is ever written here or into the image.
+        # Daimon builds a positive environment for a stdio MCP child
+        # (`cliChildEnvironment`: PATH, HOME, XDG_*, TMPDIR and the declared
+        # `env` map, nothing else), so a container env var does not reach this
+        # server on its own. Until Daimon forwards named secrets to MCP
+        # children, the operator drops the same key material into the
+        # `deploy-keys` volume below and the tool reads it from this directory.
+        CLANK_DEPLOY_KEY_DIR: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/secrets/ssh
+      tools: [stage_release, push_edition]
+  secrets:
+    - { name: CLANK_DEPLOY_KEY_PUBLIC, required: true }
+    # Declared so the name is reserved and auditable, optional because nothing
+    # pressman does reaches the private repository. Flip to required only when
+    # a job actually needs it.
+    - { name: CLANK_DEPLOY_KEY_PRIVATE, required: false }
+  packages:
+    - { id: git, manager: apt, name: git }
+    - { id: openssh-client, manager: apt, name: openssh-client }
 workspace:
   docs: { system: AGENTS.md }
   resources:
@@ -44,6 +69,11 @@ workspace:
     - { id: public-assets-b, kind: bundle, source: ../../newsroom-assets-b.tar, sha256: sha256:f55844657ff8ed2dccd234fef7a697c5d0bd529b1f0f97eccdade69f64664ca5, mount: ./assets-b, mode: readonly }
     - { id: public-content, kind: volume, name: clank-release-staging, mount: ./staging, mode: mutable, sharing: per_agent }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
+    # Operator-populated, read-only, and never in git: one ed25519 deploy key
+    # per remote, named after the repository it opens. Pressman only ever
+    # selects the clankandslop key; the private-repository key is not used by
+    # any declared tool.
+    - { id: deploy-keys, kind: volume, name: clank-pressman-deploy-keys, mount: ./secrets/ssh, mode: readonly, sharing: per_agent }
 
 memory:
   - id: self

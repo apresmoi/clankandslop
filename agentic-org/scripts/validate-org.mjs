@@ -202,6 +202,44 @@ export function validateRootDeclaration(bytes) {
   assert(research && new Set(research.members).size === researchMembers.size && research.members.every((member) => researchMembers.has(member)), 'research room membership invalid');
 }
 
+// What the publisher is allowed to reach. The desk holds a deploy key now, so
+// the declaration is where the authority is bounded: exactly the two release
+// tools, the key names declared as secret references and never as values, the
+// git and ssh binaries the push needs, and a read-only key mount. A deploy key
+// can push git and cannot open a pull request — that asymmetry is the design,
+// not a limitation to work around.
+export const PUBLISHER = 'pressman';
+export const PUBLISHER_TOOLS = Object.freeze(['stage_release', 'push_edition']);
+export const PUBLISHER_SECRETS = Object.freeze(['CLANK_DEPLOY_KEY_PUBLIC', 'CLANK_DEPLOY_KEY_PRIVATE']);
+
+export function declaredAgentSecretRefs(bytes) {
+  const lines = bytes.split('\n');
+  const start = lines.findIndex((line) => /^\s{2}secrets:\s*$/.test(line));
+  if (start < 0) return [];
+  const names = [];
+  for (const line of lines.slice(start + 1)) {
+    if (/^\s+#/.test(line)) continue;
+    if (!/^\s+- /.test(line)) break;
+    const match = /name:\s*([A-Z][A-Z0-9_]*)/.exec(line);
+    assert(match, 'declared secret entry must name an environment variable');
+    names.push(match[1]);
+  }
+  return names;
+}
+
+export function validatePublisherSurface(bytes) {
+  const environment = section(bytes, 'environment');
+  const workspace = section(bytes, 'workspace');
+  const tools = /tools: \[([^\]]+)\]/.exec(environment)?.[1];
+  assert(tools && csv(tools).join(',') === PUBLISHER_TOOLS.join(','), `${PUBLISHER} must declare exactly the release tools [${PUBLISHER_TOOLS.join(', ')}]`);
+  assert(declaredAgentSecretRefs(bytes).join(',') === PUBLISHER_SECRETS.join(','), `${PUBLISHER} deploy key declaration must reference exactly [${PUBLISHER_SECRETS.join(', ')}]`);
+  assert(!/(BEGIN [A-Z ]*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA)/.test(bytes), `${PUBLISHER} must reference key names, never key material`);
+  for (const name of ['git', 'openssh-client']) assert(new RegExp(`manager: apt, name: ${name} \\}`).test(environment), `${PUBLISHER} must declare the apt package ${name} the branch push runs`);
+  const keys = resourceLine(workspace, 'deploy-keys');
+  assert(keys?.includes('kind: volume') && keys.includes('name: clank-pressman-deploy-keys') && keys.includes('mount: ./secrets/ssh') && keys.includes('mode: readonly') && keys.includes('sharing: per_agent'), `${PUBLISHER} deploy key mount must be a read-only per-agent volume`);
+  assert(!/kind: git|url:|branch:/.test(workspace), `${PUBLISHER} must not declare a Git workspace resource`);
+}
+
 export function validateRuntimeBindings(root = orgRoot) {
   assert(Object.keys(engineByAgent).length === agents.length, 'runtime assignment incomplete');
   assert(policy.enginePolicy?.active?.grok === 10 && policy.enginePolicy?.active?.codex === 6, 'active engine policy invalid');
@@ -209,6 +247,8 @@ export function validateRuntimeBindings(root = orgRoot) {
   for (const agent of agents) {
     const bytes = readFileSync(resolve(root, 'agents', agent, 'Spawnfile'), 'utf8');
     validateAgentDeclaration(agent, bytes);
+    if (agent === PUBLISHER) validatePublisherSurface(bytes);
+    else assert(!/push_edition|CLANK_DEPLOY_KEY/.test(bytes), `${agent} must not reach the publisher's branch push or deploy keys`);
   }
 }
 
@@ -217,11 +257,15 @@ export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
   assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '16:00', 'schedule zone or deadline invalid');
   assert(policy.deadline === schedule.deadline, 'runtime and schedule deadline drift');
-  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'10:00',owner:'reporters'},{id:'conference',time:'10:30',owner:'brass'},{id:'review',time:'14:00',owner:'spike'},{id:'composition',time:'15:00',owner:'caslon'},{id:'release',time:'16:00',owner:'pressman'}]), 'conference checkpoints invalid');
+  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'10:00',owner:'reporters'},{id:'conference',time:'10:30',owner:'brass'},{id:'review',time:'14:00',owner:'spike'},{id:'settlement',time:'14:00',owner:'ledger'},{id:'composition',time:'15:00',owner:'caslon'},{id:'release',time:'16:00',owner:'pressman'}]), 'conference checkpoints invalid');
   assert(schedule.operator_kickoff === false && schedule.task_orchestrator === false, 'operator kickoff and task orchestrators are prohibited');
   assert(schedule.downstream_activation === 'moltnet-addressed-only' && schedule.polling === false, 'downstream work must be addressed through Moltnet without polling');
   const owners = schedule.spawnfile_schedule?.owners ?? {};
-  assert(schedule.spawnfile_schedule?.status === 'native' && Object.keys(owners).length === 9, 'native schedule roster invalid');
+  assert(schedule.spawnfile_schedule?.status === 'native' && Object.keys(owners).length === 11, 'native schedule roster invalid');
+  // Every checkpoint with a named agent owner must be a schedule that actually
+  // fires. Both publishing desks described a daily slot in prose for weeks and
+  // carried nothing but `wake: mentions`, so neither had ever run on its own.
+  for (const checkpoint of schedule.checkpoints) if (agents.includes(checkpoint.owner)) assert(Object.hasOwn(owners, checkpoint.owner), `${checkpoint.owner} owns the ${checkpoint.id} checkpoint with no schedule to fire it`);
   for (const agent of agents) {
     const bytes = readFileSync(resolve(orgRoot, 'agents', agent, 'Spawnfile'), 'utf8');
     assert(Object.hasOwn(owners, agent) === /^schedule:/m.test(bytes), `${agent} schedule authority invalid`);
