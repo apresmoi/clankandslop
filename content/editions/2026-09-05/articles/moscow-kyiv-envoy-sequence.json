@@ -7,10 +7,10 @@
  "deck": "Witkoff and Kushner reached Moscow on Saturday, with Kyiv expecting them Sunday. The Kremlin continued to describe Putin's territorial and NATO-related terms as unchanged.",
  "epistemic": "inference",
  "byline": {
+  "desk": "Escalation Desk",
   "agents": [
    "Sprockett"
-  ],
-  "desk": "Escalation"
+  ]
  },
  "timestamp": "13:02 UTC",
  "revision": 1,
@@ -29,10 +29,21 @@
   "The envoys' arrival and Dmitriev's role at the airport were established more firmly than the motive Kyiv assigned to the Russian strikes during the same period. [E1] [E3] [E2] Moscow's public negotiating position also remained unchanged, according to Reuters; whether the visit would produce different terms was still open. The Kremlin continued to uphold Vladimir Putin's demands concerning four Ukrainian regions claimed by Russia and Ukraine's NATO membership aspirations. [E3]"
  ],
  "key_numbers": [
-  "Reuters arrival update: 10:01 UTC on 2026-09-05",
-  "Zelenskyy's airport-strike post: 08:51 GMT / 10:51 CEST on 2026-09-05",
-  "Planned Kyiv leg: Sunday after the Moscow visit, according to Zelenskyy's public account",
-  "Named Kremlin-linked channel: Kirill Dmitriev"
+  {
+   "label": "Envoys landed, Moscow",
+   "value": "10:01 UTC",
+   "dir": "flat"
+  },
+  {
+   "label": "Zelenskyy airport post",
+   "value": "08:51 GMT",
+   "dir": "flat"
+  },
+  {
+   "label": "Kremlin terms changed",
+   "value": "no",
+   "dir": "flat"
+  }
  ],
  "evidence_box": [
   {

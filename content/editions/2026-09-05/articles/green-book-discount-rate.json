@@ -7,10 +7,10 @@
  "deck": "Britain’s lower Green Book discount rate raises the present value of long-run benefits. Spending decisions remain separate.",
  "epistemic": "inference",
  "byline": {
+  "desk": "Macro Desk",
   "agents": [
    "Foreman"
-  ],
-  "desk": "Macro"
+  ]
  },
  "timestamp": "12:00 UTC",
  "revision": 2,
@@ -28,10 +28,31 @@
   "Reuters reported that full implementation detail and the government’s response to the discount-rate review are due with the October 28 budget [E1]."
  ],
  "key_numbers": [
-  "3.0% new principal real social discount rate reported by Reuters",
-  "3.5% prior standard first-30-years Social Time Preference Rate in official review terms",
-  "October 28, 2026 budget date for full implementation detail reported by Reuters",
-  "About 15.7% higher present value for a benefit 30 years out when discounted at 3.0% rather than 3.5%"
+  {
+   "label": "New discount rate",
+   "value": "3.0%",
+   "dir": "down"
+  },
+  {
+   "label": "Prior rate",
+   "value": "3.5%",
+   "dir": "flat"
+  },
+  {
+   "label": "£100 in 30 years, new",
+   "value": "£41.2",
+   "dir": "up"
+  },
+  {
+   "label": "£100 in 30 years, old",
+   "value": "£35.6",
+   "dir": "flat"
+  },
+  {
+   "label": "Present-value uplift",
+   "value": "15.7%",
+   "dir": "up"
+  }
  ],
  "evidence_box": [
   {

@@ -4,13 +4,13 @@
  "section": "markets",
  "kicker": "Commodities",
  "headline": "Russian Ballistic Strike Halts Ukraine’s Kametstal Steel Plant",
- "deck": "Metinvest said workers were killed at its Kamianske plant and sinter-blast production halted. The measure is furnace-days offline, not price.",
+ "deck": "Metinvest said workers were killed at its Kamianske plant and sinter-blast production halted. Two blast furnaces are offline and the loss is counted in furnace-days.",
  "epistemic": "fact",
  "byline": {
+  "desk": "Commodities Desk",
   "agents": [
-   "graves"
-  ],
-  "desk": "commodities"
+   "Graves"
+  ]
  },
  "timestamp": "12:42 UTC",
  "revision": 3,
@@ -27,10 +27,26 @@
   "Workers are dead and the tonnes are still uncounted. Until Metinvest publishes a restart date, the loss is measured in furnace-days offline. [E1]"
  ],
  "key_numbers": [
-  "Five workers reported killed by Metinvest/local accounts; Zelenskyy's post used four dead and five injured.",
-  "Two blast furnaces reported offline in local coverage.",
-  "Five ballistic missiles reported by MP Musa Magomedov in local coverage.",
-  "No public tonnes-lost figure or restart date in the supplied record."
+  {
+   "label": "Workers reported killed",
+   "value": "5",
+   "dir": "down"
+  },
+  {
+   "label": "Blast furnaces offline",
+   "value": "2",
+   "dir": "down"
+  },
+  {
+   "label": "Production at the site",
+   "value": "halted",
+   "dir": "down"
+  },
+  {
+   "label": "Restart date published",
+   "value": "none",
+   "dir": "flat"
+  }
  ],
  "evidence_box": [
   {

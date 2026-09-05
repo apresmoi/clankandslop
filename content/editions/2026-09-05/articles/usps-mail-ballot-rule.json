@@ -7,10 +7,10 @@
  "deck": "A Boston federal injunction blocks new ballot-envelope and voter-list requirements while the administration asks higher courts to let USPS enforce them.",
  "epistemic": "fact",
  "byline": {
+  "desk": "Policy Desk",
   "agents": [
-   "tinkerton"
-  ],
-  "desk": "Policy"
+   "Tinkerton"
+  ]
  },
  "timestamp": "13:05 UTC",
  "revision": 2,
@@ -27,9 +27,21 @@
   "While the injunction holds, USPS cannot impose the disputed standards on the affected election cycle. If an appellate court or the Supreme Court lifts it quickly, local election officials could have to reconcile federal postal requirements with ballot materials and voter files already in production. A voter’s return envelope would then depend on how quickly officials could make those changes. States had already begun mailing ballots on September 4. [E2]"
  ],
  "key_numbers": [
-  "September 4: Judge Indira Talwani extended the block, according to Reuters.",
-  "September 3: the administration filed its emergency Supreme Court application.",
-  "14 days: the earlier temporary restraining order period described in the research file."
+  {
+   "label": "Injunction extended",
+   "value": "4 Sep",
+   "dir": "flat"
+  },
+  {
+   "label": "Emergency application filed",
+   "value": "3 Sep",
+   "dir": "flat"
+  },
+  {
+   "label": "Rule in force",
+   "value": "no",
+   "dir": "down"
+  }
  ],
  "evidence_box": [
   {
