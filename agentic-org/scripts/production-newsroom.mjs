@@ -3,7 +3,7 @@ import { cp, link, lstat, mkdir, readFile, readdir, rename, rm, symlink, unlink,
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
-import { armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
+import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
 const stable=value=>JSON.stringify(value,Object.keys(value).sort());
@@ -18,6 +18,17 @@ const identity=args=>{object(args);if(!date.test(args.edition))throw new Error(`
 const root=()=>{const value=process.env.CLANK_EDITION_STATE_ROOT;if(!value?.startsWith('/'))throw new Error('edition state root unavailable');return path.resolve(value);};
 const within=(base,...parts)=>{const value=path.resolve(base,...parts);if(value!==base&&!value.startsWith(`${base}${path.sep}`))throw new Error('path escaped authority');return value;};
 async function converge(file,value){const bytes=`${JSON.stringify(value)}\n`;await mkdir(path.dirname(file),{recursive:true});try{if(await readFile(file,'utf8')!==bytes)throw new Error('event_key conflict');return value;}catch(error){if(error.code!=='ENOENT')throw error;}const temporary=`${file}.tmp-${randomUUID()}`;await writeFile(temporary,bytes,{flag:'wx',mode:0o600});try{await link(temporary,file);}catch(error){if(error.code!=='EEXIST'||await readFile(file,'utf8')!==bytes)throw new Error('event_key conflict');}finally{await unlink(temporary).catch(()=>{});}return value;}
+// Writes `value` at `file` whatever is already there, atomically. The opposite
+// of `converge`, and used for exactly one thing: a filing revision the editor
+// has not ruled on yet, plus its own `filed` receipt.
+//
+// `converge` is the right rule for every durable record that something else
+// has already bound itself to. It is the wrong rule for a draft: it turns a
+// reporter's second attempt at the same revision into the bare string
+// "event_key conflict", which is what taught a reporter on 2026-09-05 that a
+// prior filing must exist and sent it inventing revision numbers to escape.
+async function supersede(file,value){const bytes=`${JSON.stringify(value)}\n`;await mkdir(path.dirname(file),{recursive:true});const temporary=`${file}.tmp-${randomUUID()}`;await writeFile(temporary,bytes,{flag:'wx',mode:0o600});try{await rename(temporary,file);}catch(error){await unlink(temporary).catch(()=>{});throw error;}return value;}
+async function supersedeIndexed(edition,file,value){const result=await supersede(file,value);await writeEditionIndex(root(),edition);return result;}
 const location=(edition,kind,name)=>within(root(),'editions',edition,kind,`${name}.json`);
 // Every durable record an agent will later have to find again — assignment,
 // filing, verdict, PASSed article, desk document, page — is written through
@@ -26,7 +37,7 @@ const location=(edition,kind,name)=>within(root(),'editions',edition,kind,`${nam
 // tracking a filing sends Spike to read the wrong file with full confidence,
 // which costs far more than the failed tool call the agent can simply retry.
 async function convergeIndexed(edition,file,value){const result=await converge(file,value);await writeEditionIndex(root(),edition);return result;}
-const receipt=async(args,kind,data)=>converge(location(args.edition,'receipts',`${kind}-${sha(args.event_key).slice(7,23)}`),{version:'clank.newsroom-receipt.v1',kind,edition:args.edition,event_key:args.event_key,digest:sha(JSON.stringify(data))});
+const receipt=async(args,kind,data,write=converge)=>write(location(args.edition,'receipts',`${kind}-${sha(args.event_key).slice(7,23)}`),{version:'clank.newsroom-receipt.v1',kind,edition:args.edition,event_key:args.event_key,digest:sha(JSON.stringify(data))});
 // The composed receipt is the durable record of what this edition was composed
 // under — including a diversity waiver, when one applied. The index is
 // regenerated after it lands so the INDEX compose row reports the waiver from
@@ -110,23 +121,60 @@ export async function fileArticle(args){
   const evidence=new Set(resolvedArticle.evidence_box.flatMap(item=>[item?.source_note?.source_url,item?.source_note?.source_id]).filter(Boolean));
   const missingEvidence=assignment.evidence_refs.filter(ref=>!evidence.has(ref));
   if(missingEvidence.length>0)throw new Error(`article.evidence_box does not preserve assignment lineage — missing evidence_refs from your assignment ${describeAssignment(assignment)}: ${missingEvidence.join(', ')}`);
-  if(resolvedArticle.revision>1){
-    const priorPath=location(args.edition,'verdicts',`${assignment.id}/${resolvedArticle.revision-1}`);
-    const prior=await readJson(priorPath).catch(()=>{throw new Error(`no verdict on file for "${assignment.id}" revision ${resolvedArticle.revision-1} — a refile requires a prior REVISION_REQUEST verdict`);});
-    if(prior.verdict!=='REVISION_REQUEST')throw new Error(`revision ${resolvedArticle.revision} requires revision ${resolvedArticle.revision-1} to carry a REVISION_REQUEST verdict, got "${prior.verdict}"`);
+  // Two different questions, answered from two different records on disk, and
+  // conflating them is what broke on 2026-09-05:
+  //
+  //   "may this revision still be written?"  — is there a VERDICT at this
+  //      revision? A revision Spike has ruled on is immutable, because his
+  //      verdict pins its digest and composition re-checks that digest. A
+  //      revision he has not ruled on is a draft, and a draft may be replaced.
+  //
+  //   "may this revision exist at all?"      — for revision N > 1, does
+  //      revision N-1 carry a REVISION_REQUEST? Unchanged: advancing the
+  //      revision number is still Spike's call, never the reporter's.
+  //
+  // So re-filing the same revision after a refusal is always allowed (nothing
+  // was written, and nothing has bound to it), re-filing the same revision
+  // after a filing Spike has not yet read is allowed (so a warning handed back
+  // at file time is something the reporter can actually act on), and inventing
+  // revision N+1 to escape a validation failure is still refused — now with a
+  // refusal that says which revision to file instead.
+  const revision=resolvedArticle.revision;
+  const verdictAt=async offset=>readJson(location(args.edition,'verdicts',`${assignment.id}/${offset}`)).catch(()=>undefined);
+  const filingPath=location(args.edition,'filings',`${assignment.id}/${revision}`);
+  const priorFiling=await readJson(filingPath).catch(()=>undefined);
+  const ruled=await verdictAt(revision);
+  if(ruled)throw new Error(`revision ${revision} of "${assignment.id}" has already been reviewed — the editor recorded "${ruled.verdict}" against it and a reviewed revision cannot be rewritten. ${ruled.verdict==='REVISION_REQUEST'?`File your corrected piece as revision ${revision+1}.`:'Wait for the editor rather than re-filing this one.'}`);
+  if(revision>1){
+    const prior=await verdictAt(revision-1);
+    if(!prior){
+      const priorExists=await readJson(location(args.edition,'filings',`${assignment.id}/${revision-1}`)).then(()=>true,()=>false);
+      throw new Error(priorExists
+        ?`revision ${revision-1} of "${assignment.id}" is filed and still with the editor — you do not raise your own revision number. Wait for the verdict, or file revision ${revision-1} again if you need to correct it before the editor reads it.`
+        :`you have never filed revision ${revision-1} of "${assignment.id}", so there is no revision ${revision} to file. A refused filing is not a filing — nothing was recorded — so file revision ${revision-1} again with the problem fixed, rather than raising the number.`);
+    }
+    if(prior.verdict!=='REVISION_REQUEST')throw new Error(`revision ${revision} requires revision ${revision-1} to carry a REVISION_REQUEST verdict, got "${prior.verdict}"`);
   }
-  // Off by default. When on, the mechanical defects that always end in a
-  // REVISION_REQUEST are refused at filing time, naming the article field at
-  // fault, so the reporter fixes them inside the wake that is already holding
-  // the draft instead of paying a verdict wake plus a refile wake for it.
-  const armed=armedHardLintNames();
-  if(armed.length>0){
-    const failures=hardLintFlags(lintFiling(resolvedArticle,await knownTopicSlugs()),armed);
-    if(failures.length>0)throw new Error(`filing rejected on ${failures.length} mechanical check${failures.length===1?'':'s'} — fix and file again in this wake: ${failures.map(flag=>`${flag} — ${describeLintFlag(flag)}`).join('; ')}`);
-  }
-  const filing={...resolvedArticle,assignment_ref:{event_key:assignmentEventKey,id:assignment.id}};
-  await convergeIndexed(args.edition,location(args.edition,'filings',`${assignment.id}/${resolvedArticle.revision}`),filing);
-  const result={article_id:assignment.id,revision:resolvedArticle.revision,digest:sha(JSON.stringify(filing)),receipt:await receipt(args,'filed',filing)};
+  const topics=await knownTopicSlugs();
+  const flags=lintFiling(resolvedArticle,topics);
+  // Citation integrity, always on and not switchable: a body that prints a
+  // private research id, an [En] that resolves to no evidence-box entry, or a
+  // ref the evidence box never declared. See CITATION_GATE_NAMES.
+  //
+  // Off by default and armed per flag: the remaining mechanical defects that
+  // always end in a REVISION_REQUEST, refused at filing time so the reporter
+  // fixes them inside the wake already holding the draft.
+  const refused=[...new Set([...hardLintFlags(flags,CITATION_GATE_NAMES),...hardLintFlags(flags,armedHardLintNames())])];
+  if(refused.length>0)throw new Error(`filing rejected on ${refused.length} mechanical check${refused.length===1?'':'s'} — fix and file again in this wake, as revision ${revision}, because nothing was recorded: ${refused.map(flag=>`${flag} — ${describeLintFlag(flag)}`).join('; ')}`);
+  // Warnings, never refusals: the advisory lint flags plus the three prose
+  // checks that used to run only in the release validator at 16:00, two hours
+  // after Spike had already passed the piece. They ride the filing so that
+  // review_article hands the editor the same sentences the reporter just read.
+  const {flags:warningFlags,warnings}=advisoryFilingWarnings(resolvedArticle,topics,refused);
+  const filing={...resolvedArticle,assignment_ref:{event_key:assignmentEventKey,id:assignment.id},...(warnings.length>0?{lint:{flags:warningFlags,warnings}}:{})};
+  await supersedeIndexed(args.edition,filingPath,filing);
+  const result={article_id:assignment.id,revision,digest:sha(JSON.stringify(filing)),warnings,receipt:await receipt(args,'filed',filing,supersede)};
+  if(priorFiling)result.replaced=`this replaces your earlier revision ${revision} of "${assignment.id}", which the editor had not yet reviewed`;
   if(corrected)result.note=`your assignment today is ${describeAssignment(assignment)} — filed under that id instead of the supplied ${JSON.stringify(article.id)}`;
   return result;
 }
@@ -140,8 +188,15 @@ export async function reviewArticle(args){
   const filing=await readJson(location(args.edition,'filings',`${args.article_id}/${args.revision}`)).catch(()=>{throw new Error(`no filing found for article_id ${JSON.stringify(args.article_id)} revision ${args.revision} — the reporter must file_article that revision before it can be reviewed`);});
   const review={version:'clank.editorial-verdict.v1',article_id:args.article_id,revision:args.revision,article_digest:sha(JSON.stringify(filing)),verdict:args.verdict,notes:args.notes,event_key:args.event_key};
   await convergeIndexed(args.edition,location(args.edition,'verdicts',`${args.article_id}/${args.revision}`),review);
-  if(args.verdict==='PASS'){const{assignment_ref:_,...article}=filing;await converge(location(args.edition,'reviews',args.article_id),review);await convergeIndexed(args.edition,location(args.edition,'articles',args.article_id),article);}
-  return{...review,receipt:await receipt(args,'reviewed',review)};
+  // `lint` is filing-time advice for the two people who can still act on it,
+  // never part of the paper: it is stripped here alongside assignment_ref, so
+  // what reaches articles/ — and from there content/editions/ — is the article
+  // and nothing about how it was checked.
+  if(args.verdict==='PASS'){const{assignment_ref:_,lint:__,...article}=filing;await converge(location(args.edition,'reviews',args.article_id),review);await convergeIndexed(args.edition,location(args.edition,'articles',args.article_id),article);}
+  // The warnings the reporter was shown at file time, handed to the editor
+  // with the filing rather than left to surface in the release validator two
+  // hours after he has already ruled. Advisory: they are his to weigh.
+  return{...review,warnings:filing.lint?.warnings??[],receipt:await receipt(args,'reviewed',review)};
 }
 export async function fileDesk(args){
   identity(args);exact(args,['edition','event_key','name','document']);

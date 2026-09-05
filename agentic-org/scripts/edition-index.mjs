@@ -14,6 +14,11 @@ import { mkdir, readFile, readdir, rename, unlink, writeFile } from 'node:fs/pro
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
+// The prose warnings live under ops/ beside the release validator that also
+// runs them. Both directories ship in the same tree — the runtime bundle is
+// the repo's tracked files, and CLANK_PUBLIC_SOURCE_ROOT is that same repo —
+// so one implementation reaches file_article and stage_release alike.
+import { proseLintFindings } from '../../ops/prose-lint.mjs';
 
 const INDEX_VERSION = 'clank.edition-index.v1';
 const EDITION_DATE = /^\d{4}-\d{2}-\d{2}$/u;
@@ -27,6 +32,11 @@ const AGENT_IDS = ['klaxon', 'cogsworth', 'sprockett', 'foreman', 'graves', 'tin
 const NAMED_PERSONAS = ['Klaxon', 'Cogsworth', 'Sprockett', 'Tinkerton', 'Vesta', 'Caslon'];
 const PERSONA_PATTERN = new RegExp(`\\b(?:${NAMED_PERSONAS.join('|')})\\b|@(?:${AGENT_IDS.join('|')})\\b|Clank\\s*(?:&|and)\\s*Slop`, 'u');
 const CITATION_PATTERN = /\[(E\d+)\]/gu;
+// The id shape the private research corpus uses for one gathered source —
+// `s-` and eight hex characters, as in `repos/newsroom-private/<date>/`. It is
+// an internal handle: it identifies a row in a store no reader can open, it is
+// not a citation, and a body that prints it has published a dead reference.
+const PRIVATE_RESEARCH_ID = /\bs-[0-9a-f]{8}\b/gu;
 const OPENER_STOPWORDS = new Set(['the', 'a', 'an', 'that', 'this', 'those', 'these', 'it', 'in', 'on', 'at', 'by', 'for', 'but', 'and', 'if', 'as', 'no', 'not', 'both', 'there', 'what', 'when', 'to', 'of', 'from', 'with', 'its', 'their']);
 
 // The flags that mean a filing cannot be right, only wrong: a citation with no
@@ -36,6 +46,24 @@ const OPENER_STOPWORDS = new Set(['the', 'a', 'an', 'that', 'this', 'those', 'th
 // production-newsroom.mjs turns these into a filing-time error; it is off by
 // default. Everything else is advisory and rides the F row for Spike to weigh.
 export const HARD_LINT_NAMES = ['refs_subset', 'cite_missing', 'topic_unknown', 'persona_in_body', 'domains<2'];
+
+/**
+ * Citation integrity: the three flags that mean a filed article's references
+ * do not work as references. Unlike HARD_LINT_NAMES these are NOT armable and
+ * NOT switchable — `fileArticle` always refuses them.
+ *
+ * They are always on because a citation scheme is not a matter of taste and
+ * the archive agrees: across all 368 published articles these three fire on
+ * exactly two, both filed on 2026-09-05, and both wrong in the same way.
+ * `moscow-kyiv-envoy-sequence` carries zero `[En]` citations and prints four
+ * private research ids eleven times; `usps-mail-ballot-rule` prints one and
+ * mixes it into `refs`. Every other article in the paper's history passes
+ * unchanged, so this gate costs the newsroom nothing it was doing right.
+ *
+ * `refs_order`, `cite_unused` and the prose flags stay advisory: they are
+ * matters of craft, and Spike weighs them.
+ */
+export const CITATION_GATE_NAMES = ['private_id_in_body', 'cite_missing', 'refs_subset'];
 const named = (flag, name) => flag === name || flag.startsWith(`${name}:`);
 export const isHardLintFlag = (flag, names = HARD_LINT_NAMES) => names.some((name) => named(flag, name));
 export const hardLintFlags = (flags, names = HARD_LINT_NAMES) => flags.filter((flag) => isHardLintFlag(flag, names));
@@ -62,10 +90,14 @@ export function armedHardLintNames(value = process.env.CLANK_FILE_ARTICLE_HARD_L
 // Field-named explanations, so a rejected filing tells the reporter which key
 // of its own article object to fix rather than making it guess from a verdict.
 const LINT_FIELDS = {
-  refs_subset: ['article.refs', 'cites a source id that article.evidence_box does not carry as source_note.source_id'],
+  refs_subset: ['article.refs', 'names a source id that article.evidence_box does not carry as source_note.source_id — list only ids the evidence box actually declares'],
   refs_order: ['article.refs', 'is not in article.evidence_box order'],
-  cite_missing: ['article.body', 'cites a source id that article.evidence_box does not carry'],
+  cite_missing: ['article.body', 'cites a source id that article.evidence_box does not carry — cite the evidence box by position, [E1] for the first entry through [En] for the nth'],
+  private_id_in_body: ['article.body', 'prints a private research id, which no reader can resolve — keep it in evidence_box.source_note.source_id and cite that entry from the body by its position, [E1] for the first entry through [En] for the nth'],
   cite_unused: ['article.refs', 'declares a source id the body never cites'],
+  openers_run: ['article.body', 'opens three or more consecutive paragraphs on the same word'],
+  binary_contrast: ['article.headline/deck', 'leans on the "X, not Y" binary-contrast reflex'],
+  em_dashes: ['article.body', 'uses the em dash as a default connector'],
   'domains<2': ['article.evidence_box', 'spans fewer than two distinct source_url domains — one domain repeated is not corroboration'],
   persona_in_body: ['article.body', 'names a newsroom persona; the byline is the only place anyone here appears'],
   topic_unknown: ['article.topics', 'is not a slug in the topic glossary'],
@@ -97,7 +129,10 @@ export function lintFiling(filing, knownTopics) {
   const body = strings(filing?.body);
   const text = body.join('\n');
 
-  if (refs.some((ref) => !noteIdSet.has(ref))) flags.push('refs_subset');
+  // Names the offending token: a reporter handed "refs_subset" has to diff two
+  // lists by hand, and one handed "refs_subset:E9" has already been told which
+  // entry to delete or to declare.
+  for (const ref of refs.filter((ref) => !noteIdSet.has(ref))) flags.push(`refs_subset:${ref}`);
 
   // Reference order follows the evidence box, so [E1] [E2] [E3] in the box is
   // [E1] [E2] [E3] in refs. Only refs the box actually carries are ordered —
@@ -119,6 +154,12 @@ export function lintFiling(filing, knownTopics) {
   const unused = slots.filter((slot) => !cited.has(slot.label) && !(slot.id && (cited.has(slot.id) || text.includes(slot.id))));
   for (const slot of unused.sort((left, right) => byCitationNumber(left.label, right.label))) flags.push(`cite_unused:${slot.label}`);
 
+  // A private research id in the body is not a citation, it is a handle into a
+  // store the reader cannot open. The evidence box may keep it as a
+  // source_note.source_id — that is the audit trail and it stays — but the
+  // prose has to reach the same note through its position, [E1]..[En].
+  for (const id of [...new Set(text.match(PRIVATE_RESEARCH_ID) ?? [])].sort()) flags.push(`private_id_in_body:${id}`);
+
   const domains = new Set(notes.map((item) => hostnameOf(item?.source_note?.source_url)).filter(Boolean));
   if (domains.size < 2) flags.push('domains<2');
 
@@ -139,6 +180,32 @@ export function lintFiling(filing, knownTopics) {
   if (notes.some((item) => item?.source_note?.source_kind === 'public_url' && !hostnameOf(item?.source_note?.source_url))) flags.push('public_url_no_url');
 
   return flags;
+}
+
+/**
+ * Everything a filing earns that is worth telling somebody about but is not
+ * worth refusing it for: the advisory mechanical flags (reference order, an
+ * unused source note, a thin domain spread) plus the three prose warnings that
+ * used to surface only at 16:00 inside the release validator.
+ *
+ * `rejected` are the flags the caller has already refused the filing for, so
+ * they are not repeated back as advice about a filing that never landed.
+ *
+ * Returned as `{ flags, warnings }`: `flags` are the stable machine names,
+ * `warnings` the sentences a reporter or an editor reads.
+ */
+export function advisoryFilingWarnings(filing, knownTopics, rejected = []) {
+  const prose = proseLintFindings(filing);
+  // `openers_run:the×3` is a strictly narrower finding than this file's own
+  // `openers`, and it names the word, the run length and the paragraph. When
+  // both fire, the coarse one is dropped: the reporter is told once, in the
+  // form it can act on, rather than twice in two vocabularies.
+  const superseded = prose.some((finding) => finding.flag.startsWith('openers_run:')) ? ['openers'] : [];
+  const flags = lintFiling(filing, knownTopics).filter((flag) => !rejected.includes(flag) && !superseded.includes(flag));
+  return {
+    flags: [...flags, ...prose.map((finding) => finding.flag)],
+    warnings: [...flags.map((flag) => describeLintFlag(flag)), ...prose.map((finding) => finding.message)]
+  };
 }
 
 export const countDomains = (filing) => new Set((Array.isArray(filing?.evidence_box) ? filing.evidence_box : []).map((item) => hostnameOf(item?.source_note?.source_url)).filter(Boolean)).size;

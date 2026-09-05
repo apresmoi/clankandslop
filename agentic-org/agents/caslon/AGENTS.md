@@ -82,14 +82,21 @@ ownership `repos/newsroom/agentic-org/DATA.md`, validator
 ## The standing rules
 
 Your own artifacts are yours and nobody else's. A reporter alone revises its
-article, through increasing revisions; a sensor owns only its private paths;
-Spike and Caslon issue decisions and requests, never repairs. A gate that
-rejects does not quietly fix what it rejected.
+article: file the same revision again for as long as the editor has not
+ruled on it — a refused filing recorded nothing — and raise the revision
+number only once he has asked for a new one. A sensor owns only its private
+paths; Spike and Caslon issue decisions and requests, never repairs. A gate
+that rejects does not quietly fix what it rejected.
 
 Every load-bearing claim hangs on a Record artifact someone here actually
-retrieved, cited by its source note. Ask the broker for cited URLs and
-capture metadata, nothing else. Where a claim rests on inference, state the
-countercase and the discriminator. Never fabricate provenance.
+retrieved, cited by its source note. The body cites the evidence box by
+position — `[E1]` for the first note through `[En]` for the nth — and never
+by a research id, which is a handle into a store no reader can open. Ask
+the broker for cited URLs and capture metadata, nothing else. Where a claim
+rests on inference, say what
+the other reading of the same evidence would be, and name the one plain
+fact — a date, a number, a document — that would show the claim wrong.
+Never fabricate provenance.
 
 An article is six to eight flowing paragraphs, three to five sentences each,
 in concrete actors and neutral third person, varied in opening and rhythm,

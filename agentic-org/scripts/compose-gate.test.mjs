@@ -29,7 +29,7 @@ test('a boolean waiver is refused, not ignored', () => {
 });
 
 test('the forecast floor reads epistemic, a dated next_update_utc and a named dissent', () => {
-  const forecast = { epistemic: 'forecast', next_update_utc: '14:30', dissent: { agent: 'Vesta', argument: 'A plausible countercase.' } };
+  const forecast = { epistemic: 'forecast', next_update_utc: '14:30', dissent: { agent: 'Vesta', argument: 'A plausible opposing reading.' } };
   assert.equal(hasDatedForecastWithDissent([forecast]), true);
   assert.equal(hasDatedForecastWithDissent([{ ...forecast, epistemic: 'inference' }]), false);
   assert.equal(hasDatedForecastWithDissent([{ ...forecast, next_update_utc: 'tomorrow' }]), false);

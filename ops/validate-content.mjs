@@ -5,6 +5,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
+import { proseLintFindings } from './prose-lint.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const contentRoot = resolve(root, 'content');
@@ -264,34 +265,13 @@ for (const { date, dir: edDir, desk } of scopes) {
           err(file, `body self-references the newsroom ("${d}") — report the news, never our own desks`);
     }
 
-    // Editorial variety: don't open three or more consecutive paragraphs with the
-    // same word. The composer's default reflex is to start everything with "The";
-    // monotonous openers read as a wall, not a newspaper. (Warning, not a gate —
-    // legacy editions carry the debt; new copy should clear it.)
-    const openers = bodyParas
-      .map((p) => (String(p).trim().match(/^[“"”']?([A-Za-z]+)/) || [])[1] || '');
-    for (let i = 0; i + 2 < openers.length; i++) {
-      const w = openers[i].toLowerCase();
-      if (w && openers[i + 1].toLowerCase() === w && openers[i + 2].toLowerCase() === w) {
-        let run = 3;
-        while (openers[i + run]?.toLowerCase() === w) run++;
-        warn(file, `${run} consecutive paragraphs open with "${openers[i]}" (para ${i + 1}+) — vary the openers`);
-        break;
-      }
-    }
-
-    // The "X, not Y" / "not X, it's Y" binary-contrast reflex — a machine tic the
-    // headline/deck over-reach for. Fine once; flag it so it doesn't become the house
-    // formula. (Warning, not a gate.)
-    const hd = `${isStr(a.headline) ? a.headline : ''} ${isStr(a.deck) ? a.deck : ''}`.replace(/\n/g, ' ');
-    if (/,\s*not\s|\bnot\b[^.]{0,40}\b(?:but|it['’]?s|its)\b|\bno longer\b|\bisn['’]?t\b[^.]{0,30}\bit['’]?s\b/i.test(hd))
-      warn(file, `headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form`);
-
-    // Em dashes as a default connector are a loud AI tell. Flag overuse — more than
-    // one per ~two paragraphs (min 3) — not the occasional deliberate one.
-    const emDashes = (bodyParas.join(' ').match(/—/g) || []).length;
-    if (emDashes >= 3 && emDashes * 2 > bodyParas.length)
-      warn(file, `${emDashes} em dashes across ${bodyParas.length} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`);
+    // Editorial variety, the binary-contrast reflex, and em-dash overuse. All
+    // three are warnings, never gates — legacy editions carry the debt, and new
+    // copy should clear it. The checks themselves live in ops/prose-lint.mjs so
+    // that file_article can run the identical code inside the reporter's wake
+    // and hand the same sentence to the reporter and to Spike, hours before
+    // this validator would have printed it to nobody.
+    for (const finding of proseLintFindings(a)) warn(file, finding.message);
 
     // topics (optional) must resolve to the glossary
     if (a.topics !== undefined) {

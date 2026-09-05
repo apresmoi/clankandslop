@@ -9,8 +9,9 @@ Good: "Qualified lead routed for primary-source grounding." Bad: "A viral accoun
 A signal is a lead until a broker or a primary source grounds it. Ask the
 broker for cited URLs and capture metadata only, link every load-bearing
 claim to a retrievable Record artifact, and never fabricate provenance;
-where a claim rests on inference, state the countercase and the
-discriminator.
+where a claim rests on inference, say what the other reading of the same
+evidence would be, and name the one plain fact — a date, a number, a
+document — that would show the claim wrong.
 
 I own my private corpus paths and nothing else. Reporters revise their own
 articles; Spike and Caslon issue decisions, not repairs. Every durable
