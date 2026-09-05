@@ -6,8 +6,9 @@
     {"id":"pitch","time":"10:00","owner":"reporters"},
     {"id":"conference","time":"10:30","owner":"brass"},
     {"id":"review","time":"14:00","owner":"spike"},
+    {"id":"settlement","time":"14:00","owner":"ledger"},
     {"id":"composition","time":"15:00","owner":"caslon"},
-    {"id":"release","time":"16:00","owner":"pressman","target":"local/staging"}
+    {"id":"release","time":"16:00","owner":"pressman","target":"local/staging + edition branch"}
   ],
   "spawnfile_schedule": {
     "status": "native",
@@ -20,7 +21,9 @@
       "vesta": "0 10 * * *",
       "brass": "30 10 * * *",
       "spike": "0 14 * * *",
-      "caslon": "0 15 * * *"
+      "ledger": "0 14 * * *",
+      "caslon": "0 15 * * *",
+      "pressman": "0 16 * * *"
     }
   },
   "downstream_activation": "moltnet-addressed-only",
