@@ -189,10 +189,19 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   (default camera renders nothing); glyph density follows color distance
   from paper (near-paper colors rasterize as spaces); hotspots don't bake
   into rotation keyframes (no auto-spin under labels).
-- **NEVER bump the top-level `glyphcss` past `0.0.3`.** WorldGlyph + MapGlyph
-  render with its 3D **runtime** API (`createGlyphScene`, orbit controls); `0.0.9`
-  silently blanks the globe — no error, the build still passes, it only shows at
-  runtime. The animated-roll **build-time** compiler is deliberately isolated via
+- **Top-level `glyphcss` is pinned exact (`0.1.5`), and every camera number
+  goes through `src/lib/glyphCamera.ts`.** 0.1.0 re-derived the camera on
+  voxcss/three.js conventions: `rotX`/`rotY` became **degrees**, `zoom` became
+  **CSS px per world unit** (was a fraction of the smaller grid axis), and the
+  old `distance` pinhole moved to a separate `perspective` option. None of that
+  is a type error — the pre-0.1 numbers still compile and still render, into a
+  single character cell. That is why the globe "silently blanks" on a naive
+  bump. Block props and edition JSON stay in the old units; the conversion
+  happens in `glyphCamera.ts` and nowhere else. A build passing proves nothing
+  here — run `node scripts/verify-glyph-cameras.mjs` (headless, no server) and
+  `node scripts/verify-glyph-scenes.mjs` (real Chromium against a preview
+  server) after touching glyphcss, its version, or any camera argument.
+  The animated-roll **build-time** compiler is deliberately isolated via
   `@glyphcss/compile` (which carries its own nested glyphcss), so the runtime 3D
   and the build-time compiler can be on different versions without colliding.
   `compilePolygons` doesn't auto-scale — normalize the model to a 2-unit box first.
