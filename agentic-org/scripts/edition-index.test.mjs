@@ -3,7 +3,8 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { HARD_LINT_NAMES, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
+import { CITATION_GATE_NAMES, HARD_LINT_NAMES, advisoryFilingWarnings, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
+import { proseLintFindings } from '../../ops/prose-lint.mjs';
 import { composeEdition, fileArticle, fileDesk, recordAssignment, reviewArticle } from './production-newsroom.mjs';
 
 const EDITION = '2026-09-04';
@@ -25,7 +26,7 @@ const article = (id, agent, index) => ({
     { source: `Second ${index}`, fragment: 'fact', as_of: EDITION, source_note: { source_id: 'E2', source_kind: 'public_url', used_by_agent: agent, source_url: `https://second${index}.example/evidence`, retrieved_at: `${EDITION}T10:00:00Z` } }
   ],
   refs: ['E1', 'E2'],
-  ...(index === 1 ? { dissent: { agent: 'Vesta', p: 0.4, argument: 'The named dissenter identifies a plausible countercase.' } } : {}),
+  ...(index === 1 ? { dissent: { agent: 'Vesta', p: 0.4, argument: 'The named dissenter identifies a plausible opposing reading.' } } : {}),
   ...(index === 0 ? { art: { hero_map: 'world-map' } } : {})
 });
 const page = (name, ids, map) => name === 'front'
@@ -52,7 +53,7 @@ async function driveEdition(state) {
     return text;
   };
 
-  const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and countercase for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] }));
+  const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] }));
   const afterAssignment = await step('record_assignment', () => recordAssignment({ edition: EDITION, event_key: 'schedule:conference-1', assignments }));
   assert.equal(rows(afterAssignment, 'A').length, 5);
   assert.match(afterAssignment, /^A cogsworth story-0 refs=1 +\| Report the verified mechanism/mu);
@@ -67,7 +68,7 @@ async function driveEdition(state) {
   assert.match(afterFiling, /^F story-0 rev=1 owner=cogsworth epi=fact words=\d+ refs=2 domains=2 topics=ok lint=ok$/mu);
 
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
-  const afterRevision = await step('review_article REVISION_REQUEST', () => reviewArticle({ edition: EDITION, event_key: 'verdict-request', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the countercase.' }));
+  const afterRevision = await step('review_article REVISION_REQUEST', () => reviewArticle({ edition: EDITION, event_key: 'verdict-request', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the opposing reading.' }));
   assert.match(afterRevision, /^V story-0 rev=1 REVISION_REQUEST by=spike$/mu);
   assert.equal(rows(afterRevision, 'P').length, 0, 'a REVISION_REQUEST must not promote a P row');
 
@@ -130,7 +131,7 @@ test('a failed index write fails the tool call', async () => {
     // read-only mount would.
     await mkdir(path.join(state, 'editions', EDITION, 'INDEX'), { recursive: true });
     await writeFile(path.join(state, 'editions', EDITION, 'INDEX', 'occupied'), 'x');
-    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and countercase for story number ${index}.`, evidence_refs: [] }));
+    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] }));
     await assert.rejects(recordAssignment({ edition: EDITION, event_key: 'schedule:blocked-index', assignments }), (error) => error.code === 'EISDIR' || /EISDIR|ENOTDIR|EPERM|EACCES/u.test(error.message));
 
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
@@ -155,10 +156,23 @@ test('lint flags are computed from the filing, not re-derived by the editor', ()
   disordered.refs = ['E2', 'E1'];
   assert.deepEqual(lintFiling(disordered, TOPICS), ['refs_order']);
 
-  // A reference the evidence box does not carry at all.
+  // A reference the evidence box does not carry at all. The flag names the
+  // offending token so the refusal can hand it back rather than describe it.
   const stray = structuredClone(clean);
   stray.refs = ['E1', 'E2', 'E9'];
-  assert.deepEqual(lintFiling(stray, TOPICS), ['refs_subset']);
+  assert.deepEqual(lintFiling(stray, TOPICS), ['refs_subset:E9']);
+
+  // A private research id printed in the body: an internal handle into a store
+  // no reader can open, so it is not a citation at all.
+  const privateId = structuredClone(clean);
+  privateId.body = [...clean.body.slice(0, 3), 'Delta closes on the operating fact [s-5adc90c2].'];
+  assert.deepEqual(lintFiling(privateId, TOPICS), ['private_id_in_body:s-5adc90c2']);
+
+  // The same id living in the evidence box is the audit trail, and stays.
+  const privateInBox = structuredClone(clean);
+  privateInBox.evidence_box[0].source_note.source_id = 's-5adc90c2';
+  privateInBox.refs = ['s-5adc90c2', 'E2'];
+  assert.deepEqual(lintFiling(privateInBox, TOPICS), []);
 
   // A source note the body never reaches, by label or by id.
   const unused = structuredClone(clean);
@@ -197,8 +211,54 @@ test('lint flags are computed from the filing, not re-derived by the editor', ()
   positional.refs = ['press:reuters:one', 'gov:ministry:two'];
   assert.deepEqual(lintFiling(positional, TOPICS), []);
 
-  assert.deepEqual(hardLintFlags(['refs_order', 'openers', 'cite_unused:E2', 'domains<2', 'topic_unknown:x', 'cite_missing:E4', 'persona_in_body', 'refs_subset']), ['domains<2', 'topic_unknown:x', 'cite_missing:E4', 'persona_in_body', 'refs_subset']);
+  assert.deepEqual(hardLintFlags(['refs_order', 'openers', 'cite_unused:E2', 'domains<2', 'topic_unknown:x', 'cite_missing:E4', 'persona_in_body', 'refs_subset:E9']), ['domains<2', 'topic_unknown:x', 'cite_missing:E4', 'persona_in_body', 'refs_subset:E9']);
   assert.match(describeLintFlag('cite_missing:E4'), /^article\.body cites a source id .*\(E4\)$/u);
+  assert.match(describeLintFlag('private_id_in_body:s-5adc90c2'), /^article\.body prints a private research id,.*\(s-5adc90c2\)$/u);
+  // The citation gates are their own closed set, disjoint from the arming
+  // switch: nothing can turn them off, and nothing turns them on either.
+  assert.deepEqual(hardLintFlags(['refs_order', 'openers', 'cite_unused:E2', 'domains<2', 'cite_missing:E4', 'persona_in_body', 'refs_subset:E9', 'private_id_in_body:s-1234abcd'], CITATION_GATE_NAMES), ['cite_missing:E4', 'refs_subset:E9', 'private_id_in_body:s-1234abcd']);
+  assert.throws(() => armedHardLintNames('private_id_in_body'), /no such hard lint flag: private_id_in_body/u);
+});
+
+// ---------------------------------------------------------------------------
+// The prose warnings, moved out of the release validator.
+//
+// They ran only inside ops/validate-content.mjs at stage_release — 16:00, two
+// hours after Spike passed the piece at 14:00 — so nobody had ever read one.
+// ---------------------------------------------------------------------------
+test('prose warnings are computed from the article and never gate it', () => {
+  const clean = article('story-0', 'Cogsworth', 0);
+  assert.deepEqual(proseLintFindings(clean), []);
+
+  const wall = structuredClone(clean);
+  wall.body = ['The ministry opened [E1].', 'The ministry held [E2].', 'The ministry closed [E1].', 'Delta closes [E2].'];
+  assert.deepEqual(proseLintFindings(wall).map((finding) => finding.flag), ['openers_run:the×3']);
+  assert.match(proseLintFindings(wall)[0].message, /^3 consecutive paragraphs open with "The" \(para 1\+\) — vary the openers$/u);
+
+  const reflex = structuredClone(clean);
+  reflex.deck = 'A story about the permit, not the promise.';
+  assert.deepEqual(proseLintFindings(reflex).map((finding) => finding.flag), ['binary_contrast']);
+
+  const dashes = structuredClone(clean);
+  dashes.body = ['Alpha — the port — reports [E1].', 'Beta — the yard — confirms [E2].', 'Gamma disputes [E1].', 'Delta closes [E2].'];
+  assert.deepEqual(proseLintFindings(dashes).map((finding) => finding.flag), ['em_dashes:4/4']);
+
+  // Advisory means advisory: a prose flag is not a hard lint and cannot be armed.
+  for (const name of ['openers_run', 'binary_contrast', 'em_dashes']) assert.throws(() => armedHardLintNames(name), /no such hard lint flag/u);
+  assert.deepEqual(hardLintFlags(['openers_run:the×3', 'binary_contrast', 'em_dashes:4/4'], CITATION_GATE_NAMES), []);
+
+  // And they reach file_article's caller through the advisory channel, beside
+  // the mechanical flags the filing was not refused for.
+  const both = structuredClone(wall);
+  both.refs = ['E2', 'E1'];
+  const advisory = advisoryFilingWarnings(both, TOPICS);
+  // The coarse `openers` flag is dropped in favour of the run finding that
+  // supersedes it, so the reporter reads one sentence about openers, not two.
+  assert.ok(lintFiling(both, TOPICS).includes('openers'), 'the coarse flag does fire on this body');
+  assert.deepEqual(advisory.flags, ['refs_order', 'openers_run:the×3']);
+  assert.equal(advisory.warnings.length, 2);
+  assert.match(advisory.warnings[0], /^article\.refs is not in article\.evidence_box order$/u);
+  assert.match(advisory.warnings[1], /vary the openers$/u);
 });
 
 test('hard lint rejection is off by default and names the field when armed', async () => {
@@ -206,22 +266,25 @@ test('hard lint rejection is off by default and names the field when armed', asy
   const state = path.join(temporary, 'state');
   process.env.CLANK_EDITION_STATE_ROOT = state;
   try {
-    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and countercase for story number ${index}.`, evidence_refs: [] }));
+    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] }));
     await recordAssignment({ edition: EDITION, event_key: 'schedule:hardlint', assignments });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    // `persona_in_body` is armable-only: unlike the three citation gates it is
+    // still off unless someone turns it on. (Using a citation-gate flag here
+    // would prove nothing — those are refused either way.)
     const broken = article('story-0', 'Cogsworth', 0);
-    broken.body = [...broken.body.slice(0, 3), 'Epsilon leans on a note nobody filed [E4].'];
+    broken.body = [...broken.body.slice(0, 3), 'Cogsworth walked the line himself [E2].'];
 
     delete process.env.CLANK_FILE_ARTICLE_HARD_LINT;
     const filed = await fileArticle({ edition: EDITION, event_key: 'hardlint-off', article: broken });
     assert.equal(filed.article_id, 'story-0', 'the flag is off by default and a hard-lint filing still lands');
     const text = await readIndex(state);
-    assert.match(text, /^F story-0 rev=1 .* lint=cite_missing:E4$/mu, 'the flag rides the F row whether or not rejection is armed');
+    assert.match(text, /^F story-0 rev=1 .* lint=persona_in_body$/mu, 'the flag rides the F row whether or not rejection is armed');
 
     process.env.CLANK_FILE_ARTICLE_HARD_LINT = '1';
     await assert.rejects(
       fileArticle({ edition: EDITION, event_key: 'hardlint-on', article: { ...broken, revision: 1, deck: 'Another deck.' } }),
-      /filing rejected on 1 mechanical check .*cite_missing:E4 — article\.body cites a source id/u
+      /filing rejected on 1 mechanical check .*persona_in_body — article\.body names a newsroom persona/u
     );
     // An advisory-only defect still files with the flag armed.
     const advisory = structuredClone(article('story-1', 'Sprockett', 1));
