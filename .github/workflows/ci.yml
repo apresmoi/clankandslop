@@ -36,3 +36,10 @@ jobs:
         run: |
           npm ci
           npx astro build
+      # A green build says nothing about whether the glyphcss scenes RENDER:
+      # feeding the camera pre-0.1 units type-checks, builds, and draws the
+      # whole globe into one character cell. This rasterizes it headlessly and
+      # fails if the disc is a dot. (Needs Node 22.18+ for the .ts import.)
+      - name: Verify glyphcss cameras render
+        working-directory: website
+        run: node scripts/verify-glyph-cameras.mjs
