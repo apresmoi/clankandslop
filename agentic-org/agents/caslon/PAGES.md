@@ -209,23 +209,68 @@ one digit string per grid row. They are region data, not edition data: the
 same file renders the same relief whatever day it is filed under. Names follow
 the story that first needed them — `hormuz`, `taiwan-strait`, `moscow-kyiv`,
 `danube-second-reactor`, `okanagan-evacuation-orders` — with `-hero` and `-sq`
-marking tighter re-crops of the same ground. `ops/ASSETS.md` lists every one;
-`ls ./repos/newsroom/content/editions/*/maps/` is the live answer.
+marking narrower re-crops of the same ground, cut for the hero panel rather
+than the wide story-page frame. `ops/ASSETS.md` lists every one with its
+bounding box; `ls ./repos/newsroom/content/editions/*/maps/` is the live
+answer. A `-hero` variant is not separately reachable today: the gate ships
+one region per story and `art.map` and `art.hero_map` have to name it
+together, so a story picks the crop that fits and uses it in both places.
 
-**And I still cannot put one on a page.** The route runs
-`article art.hero_map → MapGlyph → compose_edition maps[]`, and the first
-link has no author: no reporter brief asks for `art`, and `file_article` is
-not one of my tools. `lay-page.mjs` reads today's maps from the edition state,
-not from the archive, and `compose_edition` refuses any supplied map that is
-not exactly an `art.hero_map` value on a PASSed article. So an existing region
-*could* be reused — the archive is real and the documents are portable — but
-only once a story declares it, and baking a new region is not possible in this
-container at all: `gdal-async` is in no bundle and `content/editions/` is
-read-only under `./repos/newsroom`.
+### How a map reaches the page
 
-Until that changes, the honest rule is the one below: a glyph from the ten
-wherever a story needs art, and a map exactly when the story already carries
-one.
+The route is `article art.hero_map → MapGlyph → compose_edition maps[]`, and
+every link of it now has an author. The reporter briefs ask for `art` where a
+story has a place; the assembler resolves the named region and hands
+`compose_edition` the document; `compose_edition` writes it into the edition.
+None of it is mine to originate — `file_article` is not one of my tools — and
+none of it needs to be.
+
+**Finding which stories carry one.** The INDEX does not print `art`, so it is
+one grep over the day's filings, not six file reads:
+
+```
+grep -l '"kind": *"map"' ./state/edition/editions/<date>/articles/*.json
+grep -h '"hero_map"' ./state/edition/editions/<date>/articles/*.json
+```
+
+Whatever comes back is the day's map set, and I place those stories in the
+illustrated slots when I can. I do not add `art` to a story that has none and
+I do not remove one that has it.
+
+**Reading the region itself**, when I want to see what a story is actually
+pointing at before I place it — the bounding box and grid, not the bands:
+
+```
+head -c 200 ./repos/newsroom/content/editions/*/maps/<region>.json
+```
+
+Same region, same file, whatever edition directory it is filed under: a baked
+map is region data. `ops/ASSETS.md` lists every one with its box, which is
+cheaper to read than the files.
+
+**What the assembler does with it.** I supply nothing. It resolves each named
+region — today's `maps/` first, then the committed archive — and prints the
+document in the `maps` array on stdout, which goes straight across. Three
+things it will refuse me for, all naming `maps must match article art`: a
+region no edition ever baked, a story whose `art.map` and `art.hero_map`
+disagree (two keys, one directory — the story page reads the first and the
+gate reads the second), and two stories claiming one region with different
+`spots`.
+
+**The three rules the gate enforces**, restated because they are what a
+composition dies on:
+
+1. The `maps` I pass must be **exactly** the `art.hero_map` values on the
+   day's PASSed articles — no more and no fewer. One extra is a refusal.
+2. A `MapGlyph` on a page may only name a map in that set.
+3. On a day no article declares one, the set is empty and the page carries no
+   map. That is a normal day, not a failure.
+
+**A map I cannot have.** Baking a *new* region is impossible in this
+container — `gdal-async` is in no bundle and `content/editions/` is read-only
+under `./repos/newsroom` — so a story whose ground no archived region covers
+runs on a glyph, or bare. There is no version of this where I cut a crop to
+fit a story.
 
 ## What the front becomes
 
@@ -246,6 +291,27 @@ art on **opposite sides**, which is what satisfies the alternation gate by
 construction; the shorter pieces two-up; then the Flashpoint Index. The
 front carries **every** PASSed piece, which is what the extra rows are for on
 a heavy day — nothing is dropped and nothing is placed twice.
+
+**When the lead itself declares a map**, the hero panel takes it — that is
+what `hero_map` is named for — and the two feature rows underneath flip so
+the art still zig-zags:
+
+```
+Hero  withArt     the lead's own map, left of the lead      ← art LEFT
+Grid [2,1]        first feature left, art right             ← art RIGHT
+Grid [1,2]        art left, second feature right            ← art LEFT
+```
+
+Hero art is not one of the blocks the illustration gate counts, so the front
+still carries two-to-three `MapGlyph`/`GlyphArt` blocks either way. It *is*
+counted by `ops/validate-content.mjs`, which reads a hero carrying art as the
+first art-left row of the run — which is exactly why the rows below it flip,
+and the assembler refuses itself if they do not.
+
+A story that carries a map but sits further down the page keeps it: the
+region is still supplied to `compose_edition` and the map runs on that
+story's own page at 104×42, where a locator does most of its work anyway.
+The front's two illustrated slots are not the only place a map appears.
 
 The `WorldIndex` rows and the globe hotspots are the same places in the same
 order, because they are built from one list. A seventh hotspot against six
@@ -360,11 +426,18 @@ cannot be laid out, and it names the gate and the missing input:
   carries no art of its own, and `art["<slug>"]` is missing or has no caption.
 - **`glyph catalogue`** — a shape or roll that has no model. Nine static
   shapes, two rolls, and `roll:"eclipse"` needs `shape:"eclipse"` beside it.
-- **`maps must match article art`** — a story declares an `art.hero_map` with
-  no baked map in the edition. The maps supplied to `compose_edition` must be
-  precisely the `art.hero_map` values on the day's PASSed articles, no more
-  and no fewer, and no `MapGlyph` may name a map outside that set. On a day
-  no article declares one, that set is empty and the page carries no map.
+- **`maps must match article art`** — a story declares a region no edition
+  ever baked, or one whose `art.map` and `art.hero_map` disagree, or two
+  stories claim one region with different `spots`. The maps supplied to
+  `compose_edition` must be precisely the `art.hero_map` values on the day's
+  PASSed articles, no more and no fewer, and no `MapGlyph` may name a map
+  outside that set. On a day no article declares one, that set is empty and
+  the page carries no map. None of these is mine to fix by editing an
+  article — I say so in `room:floor` and lay the page without it.
+- **`illustration alternation`** — the adjacent run of illustrated rows does
+  not go left, right, left. The assembler builds it that way, so this is a
+  self-check standing in for `ops/validate-content.mjs` at the release
+  boundary rather than something a record can cause.
 - **`briefly shape`** — not exactly three desks, or an item missing its
   `kicker`, `agent` or `what`.
 - **`agent reference`** — a name with no persona file. Only the six bylined

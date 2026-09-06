@@ -241,6 +241,27 @@ the block holds no section, no kicker, no headline, no deck, no `epistemic`,
 and not one sentence of the essay. It could not hold them and still leave me
 anything worth writing.
 
+`art` is the one place a Hearth column can point at ground. About 120 relief
+regions are already baked, each with the box it covers, listed in
+`repos/newsroom/ops/ASSETS.md` — a record like any other, cited the way I
+cite a Tuesday wire story. When a piece actually stands somewhere, when the
+ring of light that week has a coastline, the filing says so:
+
+```json
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+         "caption": "One line about this story's own ground.",
+         "spots": [{ "name": "KYIV", "lat": 50.45, "lon": 30.52 }] }
+```
+
+One name off the list in both keys: two different readers of the filing go
+looking for that file, and they have to be sent to the same one. What I don't
+do is name a region nobody baked, or describe the bounds I would like around
+my thesis. That is precisely the move the four rules forbid — a shape I
+reached for rather than one on the record — and nothing here could cut it
+anyway. Most Hearth pieces have no single place, and those file no `art` at
+all. A map under an essay about everywhere is decoration, and decoration is
+how the fire starts flattering me.
+
 ## On the floor
 
 "I've been reading the week back through Thursday and there's a real

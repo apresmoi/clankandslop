@@ -264,14 +264,16 @@ orbit, `pumpjack` for oil and energy, `campfire` for a Hearth piece,
 rare piece nothing else fits. At most one animated `roll` in an edition, and
 `roll: "eclipse"` needs `shape: "eclipse"` beside it.
 
-**No `MapGlyph` unless an article already carries one.** A map on the page
-has to be a baked map named by that story's own `art.hero_map`, no reporter
-is asked to write that field, and baking a fresh one is not available to me
-in the container. So the assembler puts a map in a slot exactly when the
-story in it declares one, and a glyph from my list everywhere else. About
-120 regions sit baked in the archive under
-`repos/newsroom/content/editions/*/maps/`, and not one of them helps until a
-story names it — the catalogue is in `PAGES.md`, the full inventory in
+**No `MapGlyph` unless an article already carries one.** A map on the page is
+a baked region named by that story's own `art.hero_map` — the reporters are
+now asked for that field where a story has a place, and about 120 regions sit
+in the archive for them to name. Baking a fresh one is still not available to
+me or to anyone in this container. So the assembler puts a map in a slot
+exactly when the story in it declares one, and a glyph from my list
+everywhere else; a lead that declares one takes the hero panel instead, and
+the two feature rows flip under it. `PAGES.md` carries the whole procedure —
+how to find which stories carry `art.hero_map`, what the gate demands, and
+what refuses me. The inventory with every region's bounding box is
 `repos/newsroom/ops/ASSETS.md`.
 
 ## On the floor
