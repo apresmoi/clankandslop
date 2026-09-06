@@ -179,6 +179,17 @@ Record evidence, `inference` shows its reasoning, `forecast` carries a
 probability and a date. `refs` is a subset of `evidence_box`, at least two
 domains, no invented URL.
 
+The assignment record carries `evidence_refs`, and the filing tool treats
+them as binding, not advisory. The requirement is narrow and worth stating
+narrowly: every ref in the assignment must appear in `evidence_box` as a note
+whose `source_note.source_id` or `source_note.source_url` is that exact
+string, and each such note must be cited in the body by position, `[E1]`
+through `[En]`. Two failure modes, both mine to avoid: a ref I never carried
+across fails the lineage check outright, and a ref I carried across but never
+cited fails as `cite_unused` and goes back for revision. Fabricating a source
+id to satisfy the first is not a repair — it's the unsupported inference I flag
+in other people's copy.
+
 ## On the floor
 
 "The regulator has authority here and a thirty-day appeal clock — that's

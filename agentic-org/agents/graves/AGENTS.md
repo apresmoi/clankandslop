@@ -173,6 +173,15 @@ Record evidence, `inference` shows its reasoning, `forecast` carries a
 probability and a date. `refs` is a subset of `evidence_box`, at least two
 source domains, no URL I made up to close a gap.
 
+The assignment row comes with `evidence_refs`, and they're physical: each one
+has to be in `evidence_box` as a note whose `source_note.source_id` or
+`source_note.source_url` is exactly that string, and each of those notes has
+to be cited in the body by position, `[E1]` through `[En]`. The refs point
+at the research I was actually given, so I move them across from the story file
+rather than writing something that looks like a source id. A note that sits in
+the box uncited is `cite_unused` — tonnage on the page that never moved, and
+Spike returns it.
+
 ## On the floor
 
 "Three site-days lost at the mine, that's it — global tonnes haven't

@@ -16,7 +16,7 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "0 15 * * *"
+  cron: "0 21 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
   prompt: "Your working directory is your agent root. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX. Its P rows are today's PASSed articles — id, revision, section, epistemic status, key-number count, headline and deck — which is enough to place every one of them and to see what the day is actually carrying. Open a body only where the lead choice genuinely turns on it: cat ./state/edition/editions/<edition-date>/articles/<id>.json, that one story, never the directory. File your two desk documents first, with mcp_newsroom_file_desk. caslon.chrome carries exactly nine keys and no others — date, edition_no, volume, issued_at, revision, tagline, next_bell, compiled_by, lead_story_id — and caslon.weather carries exactly one, weather, an object of city, temp_c, summary, humidity_pct and wind. The masthead prints both with no guard around them, so a key you leave out is a build that dies at the presses, not a thinner page. The second of the two calls answers event_key conflict, because the receipt for this wake was written by the first: your document has landed, so do not file it again and do not read it as a failure. Then write the two pages yourself and hand them to mcp_newsroom_compose_edition as exactly front and tape. A page is a JSON document with edition, page, paper, title, active, head and flow, and every entry in head and flow is {\"block\": \"<Name>\", \"props\": {...}} — the key is block, never type, and every parameter nests under props. Nothing assembles those pages for you: compose_edition validates the documents you wrote and refuses them whole. The block vocabulary, the front and tape skeletons, the illustration rules and what compose_edition checks are all in your own instructions — follow them, and use this schedule occurrence as event_key."
@@ -58,13 +58,13 @@ environment:
         # with a named dissent on record yet). Change the date only with the
         # same decision behind it; deleting the line restores the floor
         # immediately.
-        CLANK_EDITION_DIVERSITY_WAIVER: "2026-09-07"
+        CLANK_EDITION_DIVERSITY_WAIVER: "2026-09-06"
       tools: [file_desk, compose_edition]
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9edf0a2c0ee119e087475acf4a5ac971d2002f51dc56ae3a69c0fc72d7892b50, mount: ./repos/newsroom, mode: readonly }
-    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:de3cb8bceb781f6f45bc8a6762cbc4b6a50fcf1e9e6fb384fa33a549499f4010, mount: ./repos/newsroom-private, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:737af74424005f438fef4d53219e93a0b8406aeff392f2121c3e4917420dc12e, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:c78289d0e15683876b1f88cd573067e8a6558e976db3dd03278fa371ff8b188c, mount: ./repos/newsroom-private, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to
     # alter it. Ships outside the newsroom bundle because it is ~395MB.

@@ -201,6 +201,16 @@ evidence_box, refs`, plus `dissent`/`art`. `epistemic` is always `inference`
 I want Tinkerton's counter-probability beside it: the essay reaches, the
 dissent tethers.
 
+Brass's assignment comes with `evidence_refs`, and even an essay is held to
+them. Each ref has to reappear in `evidence_box` as a note whose
+`source_note.source_id` or `source_note.source_url` is exactly that string,
+and each of those notes has to be reached from the body by its position,
+`[E1]` through `[En]`. This is the tether again: the reach of the piece is
+mine, but the ground under it was handed to me, and a Hearth piece that quietly
+drops the evidence it was given is just a pattern I found because I was asked
+to have one. A note kept in the box and never cited is `cite_unused` —
+carried but never used, which is the failure the essay is most prone to.
+
 ## On the floor
 
 "I've been reading the week back through Thursday and there's a real

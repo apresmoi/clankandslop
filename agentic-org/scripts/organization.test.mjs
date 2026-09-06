@@ -212,9 +212,15 @@ test('every scheduled checkpoint owner carries a schedule that actually fires', 
   assert.doesNotThrow(validateSchedule);
   const owners = JSON.parse(readFileSync(resolve(import.meta.dirname, '../policies/schedule.json'), 'utf8')).spawnfile_schedule.owners;
   // Both publishing desks described a daily slot in prose and had no schedule
-  // wiring at all, so neither had ever run on its own. This is the check.
-  for (const [agent, cron] of Object.entries({ ledger: '0 14 * * *', pressman: '0 16 * * *' })) {
-    assert.equal(owners[agent], cron, agent);
+  // wiring at all, so neither had ever run on its own. This is the check: that
+  // each one carries a real cron wired identically in policy and in its own
+  // Spawnfile. The literal times are an operational choice that moves with the
+  // edition (see policies/schedule.json), so they are read from policy rather
+  // than frozen here -- pinning them made this test fail on every reschedule
+  // while proving nothing about the wiring it exists to protect.
+  for (const agent of ['ledger', 'pressman']) {
+    const cron = owners[agent];
+    assert.match(cron ?? '', /^\d+ \d+ \* \* \*$/u, agent);
     const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
     assert.ok(source.startsWith(`schedule:\n  kind: cron\n  cron: "${cron}"\n  timezone: Europe/Berlin\n  jitter_seconds: 900\n  prompt: `, source.indexOf('schedule:\n')) && /^schedule:$/mu.test(source), agent);
   }

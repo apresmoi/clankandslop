@@ -16,7 +16,7 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "0 16 * * *"
+  cron: "30 21 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
   prompt: "Your working directory is your agent root. This is the press run. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX — its compose row tells you whether caslon has finished. No composed receipt means there is nothing to print: say that in room:release and stop, and do not go looking for the composition anywhere else. When there is one, call mcp_newsroom_stage_release with this schedule occurrence as event_key. It copies the composed edition into your staging volume, runs the content validator and the site build, and writes the staged receipt. A validator or build failure is the answer, not an obstacle: report exactly what failed in room:release and stop. You never edit an article, a page, a desk file or the validator to make a build pass — a gate that rejected the edition has decided the edition. When it succeeds, post one line in room:release naming the edition and the staging artifact, and stop there. You hold no publishing credential and there is nothing further for you to call: a job outside this organization picks the promoted artifact up and puts it on a branch for a person to merge. The artifact is your job; publishing is theirs."
@@ -43,13 +43,13 @@ environment:
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9edf0a2c0ee119e087475acf4a5ac971d2002f51dc56ae3a69c0fc72d7892b50, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:737af74424005f438fef4d53219e93a0b8406aeff392f2121c3e4917420dc12e, mount: ./repos/newsroom, mode: readonly }
     - { id: website-deps-a, kind: bundle, source: ../../newsroom-dependencies-a.tar, sha256: sha256:93e6b34174ee27a059e80f3519d6e522e1fe0705f3aabcd3275507a805c1d768, mount: ./deps-a, mode: readonly }
     - { id: website-deps-b, kind: bundle, source: ../../newsroom-dependencies-b.tar, sha256: sha256:23f02646bbdc1e778a93c972710fd31dc2db61a92fc0ae4fa39cead8b855fd03, mount: ./deps-b, mode: readonly }
     - { id: public-assets-a, kind: bundle, source: ../../newsroom-assets-a.tar, sha256: sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a, mount: ./assets-a, mode: readonly }
     - { id: public-assets-b, kind: bundle, source: ../../newsroom-assets-b.tar, sha256: sha256:f55844657ff8ed2dccd234fef7a697c5d0bd529b1f0f97eccdade69f64664ca5, mount: ./assets-b, mode: readonly }
     - { id: public-content, kind: volume, name: clank-release-staging, mount: ./staging, mode: mutable, sharing: per_agent }
-    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:de3cb8bceb781f6f45bc8a6762cbc4b6a50fcf1e9e6fb384fa33a549499f4010, mount: ./repos/newsroom-private, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:c78289d0e15683876b1f88cd573067e8a6558e976db3dd03278fa371ff8b188c, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
   - id: self
