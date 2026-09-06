@@ -64,7 +64,7 @@ environment:
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:c559c0d80090360ca2a00451752b4f252df3d41bc11af3b37310b0c7700720ab, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:d3fd5dcf55b246ef21a61e82b27496eb36f1781d8cc57e6358361aa48537ec6c, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:c78289d0e15683876b1f88cd573067e8a6558e976db3dd03278fa371ff8b188c, mount: ./repos/newsroom-private, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to
