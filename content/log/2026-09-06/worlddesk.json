@@ -1,0 +1,740 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-09-06",
+  "generated_at": "2026-09-06T16:20:28Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 96.02,
+        "observed_at": "2026-09-01",
+        "stale_days": 5,
+        "contributes": 3,
+        "reason": "96.02 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 91.48,
+        "observed_at": "2026-09-01",
+        "stale_days": 5,
+        "contributes": 1,
+        "reason": "91.48 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 5.599,
+        "observed_at": "2026-08-31",
+        "stale_days": 6,
+        "contributes": 2,
+        "reason": "5.599 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 2.9,
+        "observed_at": "2026-09-01",
+        "stale_days": 5,
+        "contributes": 0,
+        "reason": "2.9 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 14.32,
+        "observed_at": "2026-09-03",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "14.32 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 2.65,
+        "observed_at": "2026-09-03",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "2.65 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 118.7479,
+        "observed_at": "2026-08-28",
+        "stale_days": 9,
+        "contributes": 0,
+        "reason": "118.7479 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-09-06T16:07:53Z",
+        "http_status": 200,
+        "bytes": 173999,
+        "sha256": "0fc2b14586317a473196eb12a6c3f708ba1ed1f19e3dd9b8cd25c2b1ba38f7c4",
+        "cached": true
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-09-06T16:07:53Z",
+        "http_status": 200,
+        "bytes": 179085,
+        "sha256": "cdfb91a12bdbf1083f75ad7ac0dac2d1871a7a74d3363241d8c5f1cf28d3e6e4",
+        "cached": true
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-09-06T16:07:54Z",
+        "http_status": 200,
+        "bytes": 28823,
+        "sha256": "2d37dd68aea6b837304384378f2e8052b062afaee21782d79f63d0b0219efc93",
+        "cached": true
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-09-06T16:07:54Z",
+        "http_status": 200,
+        "bytes": 122796,
+        "sha256": "9af9ee8bba04a3828f3de2b081987e7e94b4e4881c41b430aff9929499ca53c3",
+        "cached": true
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-09-06T16:07:54Z",
+        "http_status": 200,
+        "bytes": 161102,
+        "sha256": "6b2cd4028784f69ae160250c3c10dbce88150e125f5fdc18f0c8d43ae557d5a3",
+        "cached": true
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-09-06T16:07:54Z",
+        "http_status": 200,
+        "bytes": 12718,
+        "sha256": "1e41cd74c25dd21b105685af48bfb5f4735134450b4b4a28518744c850002a59",
+        "cached": true
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-09-06T16:07:54Z",
+        "http_status": 200,
+        "bytes": 104045,
+        "sha256": "b20c5bd9504f3c2af41ab42cac69d4220d5e43f3577688a7d60ce63e8a85eebd",
+        "cached": true
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 25,
+    "open_conflicts": 2,
+    "watch": 1,
+    "dormant": 10,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 6,
+        "evidence": [
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-07d348b5",
+            "story_title": "CENTCOM Kylo video still circulating (first-print was overnight)",
+            "source": "grok/grok-rolling-1149.md",
+            "slot": "1149",
+            "matched": [
+              "Hormuz",
+              "Kharg",
+              "IRGC",
+              "Gulf of Oman"
+            ],
+            "source_url": "https://x.com/CENTCOM/status/2096397091769565468",
+            "source_urls": [
+              "https://x.com/CENTCOM/status/2096397091769565468",
+              "https://www.centcom.mil/",
+              "https://www.financialexpress.com/world-news/us-diesel-hits-record-high-centcom-shares-clip-after-permanently-disabling-3-iran-oil-tankers/4332901/"
+            ],
+            "observed_at": "2026-09-06T09:49:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-37db92d5",
+            "story_title": "U.S.-Iran maritime escalation: oil carriers are now direct military targets",
+            "source": "chatgpt/chatgpt-rolling-0618.md",
+            "slot": "0618",
+            "matched": [
+              "Hormuz",
+              "Kharg",
+              "IRGC"
+            ],
+            "source_url": "https://www.centcom.mil/MEDIA/",
+            "source_urls": [
+              "https://www.centcom.mil/MEDIA/",
+              "https://www.reuters.com/world/middle-east/explosions-heard-near-irans-kharg-island-gulf-origin-unknown-fars-news-says-2026-09-05/"
+            ],
+            "observed_at": "2026-09-06T04:18:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-577404e5",
+            "story_title": "Iran claims it struck an unmanned U.S. military vessel in the Strait of Hormuz",
+            "source": "chatgpt/chatgpt-rolling-1334.md",
+            "slot": "1334",
+            "matched": [
+              "Hormuz",
+              "Kharg",
+              "IRGC"
+            ],
+            "source_url": "https://apnews.com/article/a52beec77dc90af3d040d0553837ad20",
+            "source_urls": [
+              "https://apnews.com/article/a52beec77dc90af3d040d0553837ad20",
+              "https://www.reuters.com/world/middle-east/explosions-heard-near-irans-kharg-island-gulf-origin-unknown-fars-news-says-2026-09-05/",
+              "https://www.centcom.mil/MEDIA/PRESS-RELEASES/"
+            ],
+            "observed_at": "2026-09-06T11:34:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-653b6e87",
+            "story_title": "OPEC+ decision is the strongest imminent commodities lead",
+            "source": "chatgpt/chatgpt-rolling-1040.md",
+            "slot": "1040",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.opec.org/pr-detail/1854611-2-august-2026.html",
+            "source_urls": [
+              "https://www.opec.org/pr-detail/1854611-2-august-2026.html",
+              "https://www.opec.org/",
+              "https://www.reuters.com/business/energy/opec-set-keep-oil-output-policy-unchanged-sunday-sources-say-2026-09-06/"
+            ],
+            "observed_at": "2026-09-06T08:40:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-c88ce359",
+            "story_title": "U.S.–Iran maritime escalation remains the highest-risk breaking-news file, but today's visible material is…",
+            "source": "chatgpt/chatgpt-rolling-1040.md",
+            "slot": "1040",
+            "matched": [
+              "Hormuz",
+              "Kharg",
+              "IRGC",
+              "Gulf of Oman"
+            ],
+            "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4591744/centcom-destroys-3-irgc-oil-tankers-after-iran-targets-2-us-navy-warships/",
+            "source_urls": [
+              "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4591744/centcom-destroys-3-irgc-oil-tankers-after-iran-targets-2-us-navy-warships/",
+              "https://x.com/CENTCOM/article/2096231596449767452",
+              "https://www.reuters.com/world/middle-east/explosions-heard-near-irans-kharg-island-gulf-origin-unknown-fars-news-says-2026-09-05/",
+              "https://ofac.treasury.gov/sanctions-programs-and-country-information/iran-sanctions"
+            ],
+            "observed_at": "2026-09-06T08:40:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-ddaf9ea7",
+            "story_title": "CENTCOM names three IRGC-linked tankers (edition first-print after the 5 Sep 15:00 cutoff)",
+            "source": "grok/grok-rolling-0307.md",
+            "slot": "0307",
+            "matched": [
+              "Hormuz",
+              "Kharg",
+              "IRGC",
+              "Gulf of Oman"
+            ],
+            "source_url": "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4591744/centcom-destroys-3-irgc-oil-tankers-after-iran-targets-2-us-navy-warships/",
+            "source_urls": [
+              "https://www.centcom.mil/MEDIA/PUBLIC-RELEASES/Article/4591744/centcom-destroys-3-irgc-oil-tankers-after-iran-targets-2-us-navy-warships/",
+              "https://www.tradewindsnews.com/tankers/us-missiles-strike-three-iranian-tankers-as-pete-hegseth-fires-warning/2-1-2039727",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/09/05/blasts-heard-near-iran-s-kharg-island-in-gulf-amid-reports-tanker-hit"
+            ],
+            "observed_at": "2026-09-06T01:07:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-198d7b15",
+            "story_title": "Israeli dawn strikes in southern Lebanon: 4 dead, 20 wounded",
+            "source": "grok/grok-rolling-1149.md",
+            "slot": "1149",
+            "matched": [
+              "Hezbollah",
+              "Nabatieh",
+              "southern Lebanon"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/9/6/israeli-air-attacks-on-lebanon-kill-at-least-four",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/9/6/israeli-air-attacks-on-lebanon-kill-at-least-four",
+              "https://www.reuters.com/world/middle-east/israeli-military-says-it-strikes-southern-lebanon-after-hezbollah-launched-2026-09-06/"
+            ],
+            "observed_at": "2026-09-06T09:49:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 7,
+        "evidence": [
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-13c65efc",
+            "story_title": "Witkoff and Kushner are on the ground in Kyiv — first visit, talks started",
+            "source": "grok/grok-rolling-1414.md",
+            "slot": "1414",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://x.com/ZelenskyyUa/status/2096559388446138810",
+            "source_urls": [
+              "https://x.com/ZelenskyyUa/status/2096559388446138810",
+              "https://x.com/ZelenskyyUa/status/2096536036985774114",
+              "https://www.reuters.com/business/aerospace-defense/us-envoys-make-first-kyiv-visit-amid-ukraine-war-peace-push-2026-09-06/",
+              "https://www.cnn.com/2026/09/06/europe/witkoff-kushner-visit-kyiv-intl",
+              "https://www.theguardian.com/world/2026/sep/06/us-envoys-jared-kushner-steve-witkoff-arrive-kyiv-talks-on-ending-war",
+              "https://www.pravda.com.ua/eng/news/2026/09/06/8052135/",
+              "http://en.special.kremlin.ru/events/president/transcripts/80699"
+            ],
+            "observed_at": "2026-09-06T12:14:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-4f6c37cd",
+            "story_title": "Witkoff and Kushner arrive in Kyiv after Moscow talks, creating a live shuttle-diplomacy gate",
+            "source": "chatgpt/chatgpt-rolling-1334.md",
+            "slot": "1334",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/business/aerospace-defense/us-envoys-make-first-kyiv-visit-amid-ukraine-war-peace-push-2026-09-06/",
+            "source_urls": [
+              "https://www.reuters.com/business/aerospace-defense/us-envoys-make-first-kyiv-visit-amid-ukraine-war-peace-push-2026-09-06/",
+              "https://www.reuters.com/world/europe/putins-envoy-dmitriev-meet-witkoff-kushner-upon-their-arrival-moscow-sources-say-2026-09-05/",
+              "https://www.president.gov.ua/en/news/administration",
+              "https://x.com/ZelenskyyUa"
+            ],
+            "observed_at": "2026-09-06T11:34:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-5264a971",
+            "story_title": "Zaporizhzhia: a repair ceasefire buys time, not restored power",
+            "source": "chatgpt/chatgpt-rolling-0618.md",
+            "slot": "0618",
+            "matched": [
+              "Ukraine",
+              "Kyiv",
+              "Zaporizhzhia"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/brokered-ceasefire-takes-effect-repairs-zaporizhzhia-nuclear-plant-2026-09-05/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/brokered-ceasefire-takes-effect-repairs-zaporizhzhia-nuclear-plant-2026-09-05/"
+            ],
+            "observed_at": "2026-09-06T04:18:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-54afbf20",
+            "story_title": "Kremlin issues the first detailed readout; the U.S. plane goes to Poland, not Kyiv",
+            "source": "grok/grok-rolling-0307.md",
+            "slot": "0307",
+            "matched": [
+              "Kyiv"
+            ],
+            "source_url": "http://special.kremlin.ru/events/president/news/80700",
+            "source_urls": [
+              "http://special.kremlin.ru/events/president/news/80700",
+              "http://en.kremlin.ru/events/president/news/80699",
+              "http://en.special.kremlin.ru/events/president/transcripts/80699",
+              "http://www.china.org.cn/world/Off_the_Wire/2026-09/06/content_118682233.shtml",
+              "https://iz.ru/en/node/2162025",
+              "https://airlive.net/military/2026/09/05/as-a-usaf-c-32a-touches-down-in-moscow-will-envoys-fly-directly-to-kyiv-tomorrow-a-first-since-2022/"
+            ],
+            "observed_at": "2026-09-06T01:07:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-70a0c734",
+            "story_title": "U.S. envoys move from Moscow diplomacy toward Kyiv",
+            "source": "chatgpt/chatgpt-rolling-0618.md",
+            "slot": "0618",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://en.kremlin.ru/",
+            "source_urls": [
+              "https://en.kremlin.ru/",
+              "https://www.president.gov.ua/en/news/speeches",
+              "https://apnews.com/article/russia-ukraine-war-kushner-witkoff-visit-36a991feaff241bb8f24857ac159202a",
+              "https://apnews.com/article/12c3cb67859b2c51054b378d60148d33?utm_source=chatgpt.com",
+              "https://www.reuters.com/world/middle-east/explosions-heard-near-irans-kharg-island-gulf-origin-unknown-fars-news-says-2026-09-05/?utm_source=chatgpt.com",
+              "https://apnews.com/article/36a991feaff241bb8f24857ac159202a?utm_source=chatgpt.com",
+              "https://www.reuters.com/business/energy/brokered-ceasefire-takes-effect-repairs-zaporizhzhia-nuclear-plant-2026-09-05/?utm_source=chatgpt.com"
+            ],
+            "observed_at": "2026-09-06T04:18:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-90ef712b",
+            "story_title": "Witkoff and Kushner still only “expected” in Kyiv; first visit, no terms",
+            "source": "grok/grok-rolling-1149.md",
+            "slot": "1149",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.nytimes.com/2026/09/06/world/europe/ukraine-zelensky-witkoff-kushner-russia-putin.html",
+            "source_urls": [
+              "https://www.nytimes.com/2026/09/06/world/europe/ukraine-zelensky-witkoff-kushner-russia-putin.html",
+              "https://www.washingtonpost.com/world/2026/09/06/russia-ukraine-war-witkoff-kushner-zelenskyy-putin/",
+              "https://english.alarabiya.net/News/world/2026/09/06/us-envoys-discuss-with-putin-substantive-plans-for-steps-to-end-ukraine-war"
+            ],
+            "observed_at": "2026-09-06T09:49:00Z"
+          },
+          {
+            "edition": "2026-09-06",
+            "story_id": "s-b8a155dc",
+            "story_title": "Envoys still in Poland; Kyiv arrival unconfirmed; capital-only pause in force",
+            "source": "grok/grok-rolling-0802.md",
+            "slot": "0802",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://iz.ru/en/node/2162025",
+            "source_urls": [
+              "https://iz.ru/en/node/2162025",
+              "https://understandingwar.org/research/russia-ukraine/russian-offensive-campaign-assessment-september-5-2026/",
+              "https://www.pravda.com.ua/eng/news/2026/09/05/8052026/",
+              "https://www.cnn.com/2026/09/05/europe/witkoff-kushner-moscow-kyiv-proposal-war-intl"
+            ],
+            "observed_at": "2026-09-06T06:02:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "first reading",
+    "current": 0.4615,
+    "previous": null,
+    "previous_edition": null,
+    "change": null
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
