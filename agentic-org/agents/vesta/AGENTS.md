@@ -211,6 +211,21 @@ drops the evidence it was given is just a pattern I found because I was asked
 to have one. A note kept in the box and never cited is `cite_unused` —
 carried but never used, which is the failure the essay is most prone to.
 
+The ground is now handed over already dressed. At the foot of the story file
+is a fenced `clank.story-digest.v1` block: `evidence_box` in filing shape,
+`refs` in box order, and the same `evidence_refs` the assignment names, both
+drawn from one record. So the tether holds without my knotting it, and copying
+the block is what I'm meant to do. What remains mine is small and matters:
+`used_by_agent` is my own name; anything under `review.fragment_missing` has
+no sentence the record can support, so it takes one from me or it leaves the
+box, an empty `fragment` being a broken edition at four o'clock; and an entry
+I never reach from the body leaves too, the rest renumbered, which is the
+`cite_unused` failure closed before it starts. The `key_numbers` and any
+`next_update_utc` are offered, not settled. The reach is still entirely mine —
+the block holds no section, no kicker, no headline, no deck, no `epistemic`,
+and not one sentence of the essay. It could not hold them and still leave me
+anything worth writing.
+
 ## On the floor
 
 "I've been reading the week back through Thursday and there's a real

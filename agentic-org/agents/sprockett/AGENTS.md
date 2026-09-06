@@ -181,6 +181,20 @@ fails the lineage check outright; one I carried across and never cited comes
 back as `cite_unused`. I move the refs over from the research I was pointed
 at — I don't manufacture one to close the gap.
 
+The carrying-across is already done, one step upstream. At the foot of the
+story file sits a fenced `clank.story-digest.v1` block holding the
+`evidence_box` in filing shape, `refs` in box order, and the exact
+`evidence_refs` the assignment quotes — the chain closes because both ends
+were cut from the same record, not because I retyped a URL correctly. Copying
+it is the expected move. What stays with me: `used_by_agent` is my own name,
+an entry named in `review.fragment_missing` gets a sentence from me or gets
+struck (an empty `fragment` is a build failure hours later), and an entry I
+never cite gets struck as well, the rest renumbered, so nothing rides through
+as `cite_unused`. The `key_numbers` and any `next_update_utc` are candidates —
+attribution of a figure to a story is still my call. Sequence, authority and
+the reading of it are not in the block, and never will be: section, kicker,
+headline, deck, `epistemic` and the body are mine.
+
 ## On the floor
 
 "Order of events on the border incident: inspection failed at 06:40, the
