@@ -11,6 +11,21 @@ about; they never name a glyph, bake an asset, or place a block. Every edition
 carries the established two-to-three illustration rhythm, and every asset must
 FIT its story — a recycled glyph on a marquee piece is a defect, not a saving.
 
+**One exception, scoped narrowly: a reporter may name an archived map region
+in `art`.** The prohibition above is about *choosing map bounds*, which is a
+real editorial judgement and is why baking is author-time work. Naming a
+region whose bounds were frozen in a committed file months ago is not that
+judgement — it is a statement about where the story happened, which is the
+reporter's own ground and nobody else's. Saying "this story is inside the box
+`moscow-kyiv` already covers" is reporting; saying "cut me a box from 20°E to
+44°E" is illustration authority, stays Caslon's, and cannot be executed in
+any container the newsroom runs in. A reporter who coins a region name or
+proposes bounds is refused by the assembler, by name.
+
+The rest is unchanged: which slot a map lands in, whether a story that has no
+map gets a glyph and which one, the caption on the page, and the whole
+alternation and rhythm of the front are Caslon's alone.
+
 Two asset kinds exist, and they fail differently. Maps are deterministic and
 reliably legible; glyphs are the risk and must be looked at as images before
 they ship.
@@ -37,6 +52,13 @@ edition.
   bundle, and `content/editions/` is read-only under `./repos/newsroom`. No
   agent bakes a map during an edition; it reuses what `ops/ASSETS.md` lists,
   or the story runs without one.
+- **Reuse is a supported path, not a workaround.** A reporter names an
+  archived region in `art.map` and `art.hero_map` (the same name in both:
+  the story page reads one, `compose_edition`'s gate reads the other);
+  `ops/lay-page.mjs` resolves it out of `content/editions/*/maps/` and hands
+  the document to `compose_edition`, which writes it into the day's edition.
+  A region that appears under several dates is one region — the archive is a
+  catalogue of crops, not a set of dated artifacts.
 - Every argument is `--key value`; there are no bare boolean flags. The grid
   is `--etopoGz` (the compressed source, default
   `/Users/apresmoi/glyphcss/etopo/ETOPO1_Ice_g_gmt4.grd.gz`) and `--etopo`

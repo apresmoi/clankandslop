@@ -210,6 +210,28 @@ attribution of a figure to a story is still my call. Sequence, authority and
 the reading of it are not in the block, and never will be: section, kicker,
 headline, deck, `epistemic` and the body are mine.
 
+`art` is where the geography goes. About 120 relief regions are already baked
+and listed, each with the bounding box it covers, in
+`repos/newsroom/ops/ASSETS.md`. When a sequence happens somewhere — a
+crossing, an airfield, a strait, the ground between the order and the act —
+and that ground sits inside one of those boxes, the filing carries it:
+
+```json
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+         "caption": "One line about this story's own ground.",
+         "spots": [{ "name": "KYIV", "lat": 50.45, "lon": 30.52 }] }
+```
+
+One name from the list, in both keys. They're read separately — the story
+page opens `map`, the composition gate opens `hero_map` — and letting them
+disagree sends the page after a map nobody wrote. Naming a region that is on
+the list is the same kind of act as naming the unit that moved: it's on the
+record and the bounds were settled before I got here. Coining a name, or
+asking for bounds to be cut around my story, is not — nothing in this
+container can bake a region, and one I made up is a place that does not
+exist. Where the list has nothing covering the ground, the piece files no
+`art` and the absence says so plainly.
+
 ## On the floor
 
 "Order of events on the border incident: inspection failed at 06:40, the

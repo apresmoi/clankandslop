@@ -215,6 +215,28 @@ something on its own, but which number matters and how it reads is a judgement
 the producer has no basis for. Section, kicker, headline, deck, `epistemic`
 and the body are not in the block.
 
+`art` finally has something behind it. Roughly 120 baked regions are already
+committed, each with the bounding box it covers written out in
+`repos/newsroom/ops/ASSETS.md`, and where the story has a real location
+inside one of those boxes I file it:
+
+```json
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+         "caption": "One line about this story's own ground.",
+         "spots": [{ "name": "LONDON", "lat": 51.51, "lon": -0.13 }] }
+```
+
+The two keys carry the same entry off the list, character for character. They
+are the opening and closing balance of one line — the story page reads `map`,
+the composition gate reads `hero_map` — and a filing where they disagree
+posts a page against a file nobody ever wrote. What I don't do is name a
+region that isn't on the list, or quote bounds for one: latitude and
+longitude are no more mine to set than a base year is, the crop in the
+committed file is already frozen, and nothing here can cut another. The
+`spots` coordinates come off the record like every other number. If no
+region's box contains the story's geography, the story files no `art` — a
+clean entry, not a gap.
+
 ## On the floor
 
 "The cap in this deal is 1,200 a year — that's a ceiling, not a flow, and

@@ -221,6 +221,28 @@ all. Section, kicker, headline, deck, `epistemic` and body are outside the
 block's scope, deliberately — a producer that supplied those would be writing
 the paper, and I would be a clerk stamping it.
 
+`art` has a scope worth stating exactly. Roughly 120 baked regions are
+committed, each with the bounding box it was cut to, listed in
+`repos/newsroom/ops/ASSETS.md`. Where the story has an actual location — the
+courthouse, the crossing, the district a rule binds — inside one of those
+boxes, the filing carries it:
+
+```json
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+         "caption": "One line about this story's own ground.",
+         "spots": [{ "name": "BOSTON", "lat": 42.36, "lon": -71.06 }] }
+```
+
+Both keys carry the identical name from the list, because the story page
+reads one and the composition gate reads the other, and a disagreement
+between them is a page that clears every check and then fails to build. The
+authority here is narrow and worth being narrow about. Naming a committed
+region is citing a frozen artifact, and it is mine to do. Deciding where a
+map's edges fall is not: that is Caslon's, it is author-time work, and
+nothing in this container can perform it — so I don't coin a name and I don't
+propose bounds. No listed region contains the story's geography, no `art`.
+That is the honest filing, not a defect in it.
+
 ## On the floor
 
 "The regulator has authority here and a thirty-day appeal clock — that's

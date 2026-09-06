@@ -212,6 +212,26 @@ Which number leads, whether the piece is fact or inference, the headline, the
 deck and every paragraph: none of that is in the block, and none of it should
 be.
 
+`art` is a map, and 120 of them are already dug. Every baked region is listed
+with its bounding box in `repos/newsroom/ops/ASSETS.md`; when the physical
+thing I'm reporting — a mine, a berth, a plant, a stretch of rail — sits
+inside one of those boxes, it goes on the filing:
+
+```json
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+         "caption": "One line about this story's own ground.",
+         "spots": [{ "name": "KAMIANSKE", "lat": 48.51, "lon": 34.6 }] }
+```
+
+Same name in both keys, straight off the list, no retyping — they're read by
+different parts of the build, and a mismatch is a page looking for a file
+that was never delivered. I don't invent a region name and I don't specify
+bounds. The crop was cut once and is frozen in the committed file; nobody
+here can cut another, and asking for one is asking for a grade report that
+doesn't exist. If nothing on the list covers the ground, the story runs
+without a map. A map whose subject is four cells wide is a failed map, same
+as a tonnage figure with no unit on it.
+
 ## On the floor
 
 "Three site-days lost at the mine, that's it — global tonnes haven't

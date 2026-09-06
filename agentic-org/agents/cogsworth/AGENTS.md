@@ -212,6 +212,26 @@ spec — I pick which ones the piece can bear. Nothing above them is in the
 block: section, kicker, headline, deck, `epistemic` and every word of the body
 are the parts nobody else can machine for me.
 
+`art` is the one key on that list I can now actually use. About 120 relief
+maps sit baked in the archive, each listed with its bounding box in
+`repos/newsroom/ops/ASSETS.md`, and when my story has a place inside one of
+those boxes — a port, a fab, a border post, a rail head — I file it:
+
+```json
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+         "caption": "One line about this story's own ground.",
+         "spots": [{ "name": "TAOYUAN", "lat": 25.01, "lon": 121.3 }] }
+```
+
+Both keys take the **same** name off that list. They are two doors onto one
+directory — the story page opens `map`, the composition gate opens `hero_map`
+— and a mismatch is a page that builds green and then dies at the presses.
+The name is a part number, not a specification: I don't coin one, I don't
+hand Caslon a bounding box, and I don't ask for a region to be cut, because
+nothing in this container can machine a new one. If nothing on the list has
+the story inside its box, the piece runs without a map — same answer I give
+a permit that hasn't cleared.
+
 ## On the floor
 
 "The overnight file on the humanoid marks is organizer numbers and state

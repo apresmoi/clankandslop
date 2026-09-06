@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { LayoutError, layEdition, personaNames, readEditionInputs } from './lay-page.mjs';
+import { LayoutError, alternationRuns, archiveIndex, archiveResolver, layEdition, personaNames, readEditionInputs } from './lay-page.mjs';
 import { collectPublicArticleReferences } from '../agentic-org/scripts/production-newsroom.mjs';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,18 +20,16 @@ const sha = (value) => `sha256:${createHash('sha256').update(value).digest('hex'
 // the orchestrator's own and are the quality target.
 const EDITIONS = ['2026-08-19', '2026-08-20', '2026-08-21', '2026-08-22', '2026-09-05'];
 
-// Glyphs for the two illustrated slots on the days whose articles carry no
-// `art` at all. Those pages shipped a MapGlyph naming a map no article declares
-// as `art.hero_map`, which the maps gate refuses — so the assembler cannot
-// reproduce them and the record supplies a fitting glyph instead.
+// Glyphs for the two illustrated slots on a day whose articles carry no `art`
+// at all. That page shipped a MapGlyph naming a map no article declares as
+// `art.hero_map`, which the maps gate refuses — so the assembler cannot
+// reproduce it and the record supplies a fitting glyph instead. 2026-09-05 was
+// the same shape until its two illustrated stories were given the archived
+// regions their own geography sits inside, which is why it is no longer here.
 const SUBSTITUTE_GLYPHS = {
   '2026-08-22': {
     'panama-canal-cuts-daily-slots-to-thirty-four': { shape: 'pumpjack', caption: 'Gatún Lake feeds the locks. A-29-2026 cuts bookable slots from 4 September.' },
     'lima-transportistas-hold-the-twenty-fifth': { shape: 'colosseum', caption: 'Lima and Callao. The convocantes were not in the Saturday Mininter room.' },
-  },
-  '2026-09-05': {
-    'kametstal-furnace-outage': { shape: 'pumpjack', caption: 'Kamianske. Two blast furnaces are down and no restart date is published.' },
-    'foxconn-ai-capex-build-chain': { shape: 'chip', caption: 'NT$921.8bn in August. The build chain sits on this coast.' },
   },
 };
 
@@ -126,6 +124,9 @@ const synthetic = () => ({
     },
   },
   agents,
+  // Hermetic: the synthetic edition never reaches the repository's own atlas,
+  // so a test that wants an archived region has to say which one it means.
+  archive: () => undefined,
 });
 const lay = (mutate = (input) => input) => layEdition(mutate(synthetic()));
 const refuses = (mutate, gate) => {
@@ -263,6 +264,104 @@ test('an article carrying map art in an illustrated slot becomes a MapGlyph with
   assert.equal(block.props.interactive, false);
 });
 
+// ---- the archived atlas ------------------------------------------------------
+
+const KYIV_MAP = { name: 'kyiv', west: 20, east: 40, south: 40, north: 60, cols: 2, rows: 1, bands: ['01'] };
+const withMap = (i, slug, over = {}) => {
+  i.articles[slug].art = { kind: 'map', map: 'kyiv', hero_map: 'kyiv', caption: 'From the article.', spots: [{ name: 'KYIV', lat: 50.45, lon: 30.52 }], ...over };
+  i.maps.kyiv = KYIV_MAP;
+  delete i.decisions.art[slug];
+  return i;
+};
+
+test('a region baked for an earlier edition resolves out of the committed archive', () => {
+  // The edition state of a fresh day holds no maps at all — compose_edition is
+  // what writes that directory — so an archived region is only reachable if the
+  // assembler looks past it into content/editions/*/maps/. This is the whole
+  // route by which a map reaches the paper.
+  const { maps } = lay((i) => {
+    i.articles.bravo.art = { kind: 'map', map: 'hormuz-strait', hero_map: 'hormuz-strait', caption: 'The archive.', spots: [] };
+    delete i.decisions.art.bravo;
+    i.archive = archiveResolver();
+    return i;
+  });
+  assert.deepEqual(maps.map((m) => m.name), ['hormuz-strait']);
+  assert.equal(maps[0].document.name, 'hormuz-strait');
+  assert.equal(maps[0].document.bands.length, maps[0].document.rows);
+  assert.deepEqual(
+    maps[0].document,
+    readJson(resolve(repo, 'content/editions/2026-06-26/maps/hormuz-strait.json')),
+    'the archive hands back the committed document unchanged',
+  );
+});
+
+test('the archive index carries every region committed on this branch, newest crop winning', () => {
+  const index = archiveIndex();
+  assert.equal(index.size, 120, 'the branch carries 120 distinct baked regions');
+  // Five names were re-cropped under the same name across editions. The index
+  // is built in edition order, so the newest crop is the one a story gets.
+  assert.match(index.get('hormuz'), /2026-07-16\/maps\/hormuz\.json$/);
+  assert.equal(index.has('bhote-koshi'), false, 'regions that exist only on origin/main are not claimable here');
+});
+
+test('a story naming a region no edition ever baked is refused, naming the maps gate', () => {
+  const error = refuses((i) => {
+    i.articles.echo.art = { kind: 'map', map: 'kamchatka', hero_map: 'kamchatka', caption: 'c' };
+    i.archive = archiveResolver();
+    return i;
+  }, /maps must match article art/);
+  assert.match(error.message, /neither in this edition's maps\/ nor in the committed archive/);
+  assert.match(error.message, /Nothing in this newsroom can bake a new one/);
+});
+
+test('art.map and art.hero_map must name one region, because two keys read one directory', () => {
+  // compose_edition writes only the art.hero_map values; the story page loads
+  // art.map. Disagree and the page builds green and dies in astro build.
+  refuses((i) => withMap(i, 'bravo', { map: 'kyiv-wide' }), /Name one archived region in both keys/);
+  refuses((i) => withMap(i, 'bravo', { hero_map: undefined }), /not both "map" and "hero_map"/);
+  refuses((i) => withMap(i, 'bravo', { map: undefined }), /not both "map" and "hero_map"/);
+});
+
+test('two stories may not carry one region with different spots', () => {
+  refuses((i) => {
+    withMap(i, 'bravo');
+    withMap(i, 'charlie', { spots: [{ name: 'LVIV', lat: 49.84, lon: 24.03 }] });
+    return i;
+  }, /one region cannot carry two sets/);
+  // The same spots on both is the legible case and stays allowed.
+  const { maps } = lay((i) => { withMap(i, 'bravo'); withMap(i, 'charlie'); return i; });
+  assert.deepEqual(maps.map((m) => m.name), ['kyiv']);
+});
+
+test('a lead that declares a map takes the hero panel, and the feature rows flip under it', () => {
+  const plain = lay().pages[0].document.head;
+  assert.equal(plain[0].props.withArt, false);
+  assert.deepEqual([plain[1].props.cols, plain[2].props.cols], [[1, 2], [2, 1]]);
+
+  const head = lay((i) => withMap(i, 'alpha')).pages[0].document.head;
+  assert.equal(head[0].props.withArt, true, 'the lead\'s own map renders in the hero panel');
+  // Hero art is not a counted block, so the rhythm is still the two feature
+  // glyphs — but validate-content reads it as the first art-LEFT row.
+  assert.deepEqual([head[1].props.cols, head[2].props.cols], [[2, 1], [1, 2]]);
+  assert.equal(head[1].props.columns[1][0].block, 'GlyphArt');
+  assert.equal(head[2].props.columns[0][0].block, 'GlyphArt');
+  const visuals = JSON.stringify(lay((i) => withMap(i, 'alpha')).pages[0].document).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu) ?? [];
+  assert.equal(visuals.length, 2, 'a hero map does not consume one of the two-to-three visual blocks');
+});
+
+test('a page whose illustrated run does not alternate is refused before compose_edition sees it', () => {
+  // Mutation check on the flip above: with the hero carrying art, a front that
+  // still opens art-left is exactly what ops/validate-content.mjs refuses at
+  // the release boundary, so the assembler has to refuse it here.
+  const head = [
+    { block: 'Hero', props: { variant: 'lead-only', withArt: true, lead: 'alpha' } },
+    { block: 'Grid', props: { cols: [1, 2], columns: [[{ block: 'GlyphArt', props: {} }], [{ block: 'Teaser', props: { article: 'bravo' } }]] } },
+  ];
+  assert.deepEqual(alternationRuns(head), [['left', 'left']]);
+  assert.deepEqual(alternationRuns(lay((i) => withMap(i, 'alpha')).pages[0].document.head), [['left', 'right', 'left']]);
+  assert.deepEqual(alternationRuns(lay().pages[0].document.head), [['left', 'right']]);
+});
+
 test('a reporter-shipped presentation.flashpoint is used when the record declares none', () => {
   const { pages } = lay((i) => {
     delete i.decisions.flashpoints;
@@ -355,7 +454,11 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
       const root = resolve(dir, name);
       const edition = resolve(root, 'editions', date);
       mkdirSync(edition, { recursive: true });
-      for (const kind of ['articles', 'desk', 'maps'])
+      // No `maps` directory: on a real day compose_edition is what writes one,
+      // and seeding the published copies would only test whether they happen to
+      // be byte-identical to what `converge` writes (they are not — the
+      // committed archive carries no trailing newline).
+      for (const kind of ['articles', 'desk'])
         if (existsSync(resolve(repo, 'content/editions', date, kind))) cpSync(resolve(repo, 'content/editions', date, kind), resolve(edition, kind), { recursive: true });
       // The filing and verdict pair composition re-checks: a filing is the PASSed
       // article plus the assignment_ref review_article strips on PASS.
@@ -378,9 +481,53 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
 
     process.env.CLANK_EDITION_STATE_ROOT = seed('assembled');
     const { pages, maps } = layShipped(date);
+    // Two archived regions reach the paper: the front carries a MapGlyph for
+    // each, and compose_edition writes both documents into the edition.
+    assert.deepEqual(maps.map((m) => m.name), ['moscow-kyiv', 'taiwan-north']);
     const result = await composeEdition({ edition: date, event_key: 'lay-page-test', pages, maps });
     assert.match(result.compose_gates, /passed=6\/5 desks=4\/4/);
     assert.deepEqual(result.tree.pages, ['front', 'tape']);
+    assert.deepEqual(result.tree.maps, ['moscow-kyiv', 'taiwan-north']);
+
+    // Mutation checks. Each deletes one half of the maps contract from output
+    // the gate has just accepted, so a green run above cannot be the gate
+    // failing to look.
+    const clone = (value) => JSON.parse(JSON.stringify(value));
+
+    // 1. A map no article names. The set-equality assertion is what stands
+    //    between the archive and a compositor helping himself to it.
+    process.env.CLANK_EDITION_STATE_ROOT = seed('extra-map');
+    await assert.rejects(
+      () => composeEdition({ edition: date, event_key: 'lay-page-test-extra', pages, maps: [...maps, { name: 'hormuz-strait', document: { name: 'hormuz-strait' } }] }),
+      /maps must exactly match article art — article art\.hero_map values \[moscow-kyiv, taiwan-north\], supplied maps \[hormuz-strait, moscow-kyiv, taiwan-north\]/,
+    );
+
+    // 2. The page drops a MapGlyph while the article keeps its art. Caught two
+    //    ways, and both are the mismatch: drop the supplied map with it and the
+    //    same set equality reddens from the other side; keep a MapGlyph but
+    //    point it somewhere else and the page-reference assertion fires.
+    process.env.CLANK_EDITION_STATE_ROOT = seed('dropped-glyph');
+    const stripped = clone(pages);
+    // Swapped for a glyph rather than deleted, so the front still carries two
+    // visual blocks and the illustration gate cannot answer first.
+    for (const block of stripped[0].document.head)
+      for (const column of block.props?.columns ?? [])
+        for (const [index, nested] of column.entries())
+          if (nested.block === 'MapGlyph' && nested.props.map === 'moscow-kyiv') column[index] = { block: 'GlyphArt', props: { shape: 'pumpjack', scale: 0.6, caption: 'A glyph in its place.' } };
+    await assert.rejects(
+      () => composeEdition({ edition: date, event_key: 'lay-page-test-dropped', pages: stripped, maps: maps.filter((m) => m.name !== 'moscow-kyiv') }),
+      /maps must exactly match article art — article art\.hero_map values \[moscow-kyiv, taiwan-north\], supplied maps \[taiwan-north\]/,
+    );
+
+    process.env.CLANK_EDITION_STATE_ROOT = seed('repointed-glyph');
+    const repointed = clone(pages);
+    for (const block of repointed[0].document.head)
+      for (const column of block.props?.columns ?? [])
+        for (const nested of column) if (nested.block === 'MapGlyph' && nested.props.map === 'moscow-kyiv') nested.props.map = 'hormuz-strait';
+    await assert.rejects(
+      () => composeEdition({ edition: date, event_key: 'lay-page-test-repointed', pages: repointed, maps }),
+      /maps must exactly match page references — page\(s\) reference map\(s\) not in article art\.hero_map: hormuz-strait/,
+    );
 
     process.env.CLANK_EDITION_STATE_ROOT = seed('shipped');
     const shipped = ['front', 'tape'].map((name) => ({ name, document: readJson(resolve(repo, 'content/editions', date, 'pages', `${name}.json`)) }));
