@@ -40,11 +40,11 @@
   ],
   "private": {
     "archive": "newsroom-private.tar",
-    "sha256": "sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e",
+    "sha256": "sha256:de3cb8bceb781f6f45bc8a6762cbc4b6a50fcf1e9e6fb384fa33a549499f4010",
     "mount": "repos/newsroom-private",
-    "file_count": 3008,
-    "content_bytes": 60504167,
-    "commit": "c65e6d375bcaebe53f63d6d2aa4569dc34d38735"
+    "file_count": 3216,
+    "content_bytes": 61801913,
+    "commit": "7a7e9e4cd89ecf3560250ac1589f6e9930412239"
   },
   "lockfile": "website/package-lock.json",
   "entrypoint": "agentic-org/scripts/production-newsroom-mcp.mjs"

@@ -49,7 +49,7 @@ workspace:
     - { id: public-assets-a, kind: bundle, source: ../../newsroom-assets-a.tar, sha256: sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a, mount: ./assets-a, mode: readonly }
     - { id: public-assets-b, kind: bundle, source: ../../newsroom-assets-b.tar, sha256: sha256:f55844657ff8ed2dccd234fef7a697c5d0bd529b1f0f97eccdade69f64664ca5, mount: ./assets-b, mode: readonly }
     - { id: public-content, kind: volume, name: clank-release-staging, mount: ./staging, mode: mutable, sharing: per_agent }
-    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e, mount: ./repos/newsroom-private, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:de3cb8bceb781f6f45bc8a6762cbc4b6a50fcf1e9e6fb384fa33a549499f4010, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
   - id: self
