@@ -16,7 +16,7 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "0 20 * * *"
+  cron: "15 18 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
   prompt: "Your working directory is your agent root. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX. It lists every assignment, filing and verdict on record today, and each F row already carries the mechanical checks you would otherwise re-derive by reading — word count, refs, distinct source domains, topic validity, and a lint field naming any citation that does not resolve, any reference out of evidence order, any persona left in the body. Those were computed from the filing itself at the moment it was written; take them as done and spend your reading on the judgement they cannot make. Then work one filing at a time: cat ./state/edition/editions/<edition-date>/filings/<id>/<rev>.json, decide, call mcp_newsroom_review_article for that one, and only then open the next. Never cat the whole filings directory in one go, and never re-read a filing you have already ruled on — the index is what tells you a revision landed. Use this schedule occurrence as event_key. Return PASS, REVISION_REQUEST, HOLD or SPIKE. A REVISION_REQUEST mentions the owning reporter in room:filing with actionable notes and goes back to them: you never rewrite a reporter's prose and never edit a reporter-owned file. An index with no F rows, or no index at all, means nothing has been filed yet and is not an error to investigate."
@@ -41,7 +41,7 @@ environment:
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:4f46bfbeea0262c18a78ea45cbd618b870c4701ee5711db4558e068fea7a3cc6, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:3da7218f1c247127e4f4a36a410fc149d518291beb531a774c3c9b1765972c32, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:d8ae767543c1f0d746c8eb0813204c338c0700833b1816d23b74bc80262ec480, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
