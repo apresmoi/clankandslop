@@ -3,27 +3,52 @@
   "timezone": "Europe/Berlin",
   "deadline": "16:00",
   "checkpoints": [
-    {"id":"pitch","time":"10:00","owner":"reporters"},
-    {"id":"conference","time":"10:30","owner":"brass"},
-    {"id":"review","time":"14:00","owner":"spike"},
-    {"id":"settlement","time":"14:00","owner":"ledger"},
-    {"id":"composition","time":"15:00","owner":"caslon"},
-    {"id":"release","time":"16:00","owner":"pressman","target":"local/staging + edition branch"}
+    {
+      "id": "pitch",
+      "time": "10:00",
+      "owner": "reporters"
+    },
+    {
+      "id": "conference",
+      "time": "10:30",
+      "owner": "brass"
+    },
+    {
+      "id": "review",
+      "time": "14:00",
+      "owner": "spike"
+    },
+    {
+      "id": "settlement",
+      "time": "14:00",
+      "owner": "ledger"
+    },
+    {
+      "id": "composition",
+      "time": "15:00",
+      "owner": "caslon"
+    },
+    {
+      "id": "release",
+      "time": "16:00",
+      "owner": "pressman",
+      "target": "local/staging + edition branch"
+    }
   ],
   "spawnfile_schedule": {
     "status": "native",
     "owners": {
-      "cogsworth": "30 14 * * *",
-      "sprockett": "30 14 * * *",
-      "foreman": "30 14 * * *",
-      "graves": "30 14 * * *",
-      "tinkerton": "30 14 * * *",
-      "vesta": "30 14 * * *",
-      "brass": "0 15 * * *",
-      "spike": "30 16 * * *",
-      "ledger": "0 17 * * *",
-      "caslon": "30 17 * * *",
-      "pressman": "0 18 * * *"
+      "cogsworth": "0 18 * * *",
+      "sprockett": "0 18 * * *",
+      "foreman": "0 18 * * *",
+      "graves": "0 18 * * *",
+      "tinkerton": "0 18 * * *",
+      "vesta": "0 18 * * *",
+      "brass": "30 18 * * *",
+      "spike": "0 20 * * *",
+      "ledger": "30 20 * * *",
+      "caslon": "0 21 * * *",
+      "pressman": "30 21 * * *"
     }
   },
   "downstream_activation": "moltnet-addressed-only",
