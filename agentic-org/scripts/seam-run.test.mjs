@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { DEFAULT_REPO, SeamError, TAG_PREFIX, berlinToday, parseArgs, seam, settle, sweepImages } from './seam-run.mjs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, parseArgs, pinFindings, seam, settle, sweepImages } from './seam-run.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -117,4 +120,59 @@ test('the image sweep only ever touches the seam s own tags, and never the one j
   sweepImages({ tag: 'clank-and-slop:seam-2026-09-06-090000' }, { log: noop, exec });
   assert.deepEqual(removed, ['clank-and-slop:seam-2026-09-03-090000']);
   assert.ok(!removed.some((tag) => tag.includes('local7') || tag.includes('registry')));
+});
+
+// --- the pin check org:bundle cannot do for itself ---------------------------
+// `check-bundle-descriptor.mjs` only covers the source archive, because it has
+// to be able to run in CI without the private checkout or node_modules. The
+// seam has both, and a dependency archive that moved under an unchanged pin is
+// an image whose agents refuse to start.
+const A = 'sha256:'.concat('a'.repeat(64));
+const B = 'sha256:'.concat('b'.repeat(64));
+
+function pinWorld(spawnfilePins, descriptor) {
+  const repo = mkdtempSync(path.join(tmpdir(), 'clank-pin-test-'));
+  mkdirSync(path.join(repo, 'agentic-org', 'agents', 'cogsworth'), { recursive: true });
+  writeFileSync(path.join(repo, 'agentic-org', 'newsroom-runtime-bundle.json'), JSON.stringify(descriptor));
+  writeFileSync(path.join(repo, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), spawnfilePins.join('\n'));
+  return repo;
+}
+const line = (id, archive, sha) => `    - { id: ${id}, kind: bundle, source: ../../${archive}, sha256: ${sha}, mount: ./x, mode: readonly }`;
+const descriptorOf = (source, dependency) => ({
+  source: { archive: 'newsroom-runtime.tar', sha256: source },
+  private: { archive: 'newsroom-private.tar', sha256: A },
+  dependencies: [{ archive: 'newsroom-dependencies-a.tar', sha256: dependency }],
+  assets: []
+});
+
+test('a Spawnfile pin that disagrees with the descriptor is a finding, for every archive', () => {
+  const repo = pinWorld([line('public-content', 'newsroom-runtime.tar', A), line('deps-a', 'newsroom-dependencies-a.tar', A)], descriptorOf(A, B));
+  try {
+    const result = pinFindings(repo);
+    assert.equal(result.checked, 2);
+    assert.equal(result.findings.length, 1);
+    assert.match(result.findings[0], /newsroom-dependencies-a\.tar/u);
+  } finally { rmSync(repo, { recursive: true, force: true }); }
+});
+
+test('matching pins produce no findings', () => {
+  const repo = pinWorld([line('public-content', 'newsroom-runtime.tar', A), line('deps-a', 'newsroom-dependencies-a.tar', B)], descriptorOf(A, B));
+  try { assert.deepEqual(pinFindings(repo).findings, []); } finally { rmSync(repo, { recursive: true, force: true }); }
+});
+
+test('an archive the descriptor does not describe is a finding unless it is the known relief grid', () => {
+  assert.deepEqual(KNOWN_UNDESCRIBED, ['etopo-relief.tar']);
+  const known = pinWorld([line('etopo-relief', 'etopo-relief.tar', A)], descriptorOf(A, B));
+  const unknown = pinWorld([line('mystery', 'somebody-elses.tar', A)], descriptorOf(A, B));
+  try {
+    assert.deepEqual(pinFindings(known).findings, []);
+    assert.match(pinFindings(unknown).findings[0], /the descriptor does not describe/u);
+  } finally { rmSync(known, { recursive: true, force: true }); rmSync(unknown, { recursive: true, force: true }); }
+});
+
+test('a pin check that matched nothing is a finding, not a pass', () => {
+  // A regex that stops matching because the Spawnfile format moved would
+  // otherwise report a clean bill of health over zero evidence.
+  const repo = pinWorld(['agent: cogsworth', 'resources: []'], descriptorOf(A, B));
+  try { assert.match(pinFindings(repo).findings[0], /matched nothing/u); } finally { rmSync(repo, { recursive: true, force: true }); }
 });

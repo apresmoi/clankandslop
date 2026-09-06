@@ -46,19 +46,35 @@ A redeploy kills every in-flight wake. `wake-window.mjs` therefore answers
 
 ## Order is not a style choice
 
-`repin-private-source.mjs` runs **standalone and first**, `npm run org:bundle`
-second. Two independent reasons:
+```
+repin-private-source.mjs  →  check-bundle-descriptor --repin-source  →  org:bundle  →  check-bundle-descriptor
+   private tar,                  descriptor.source                        six tars,        the proof
+   private pins,                 + 12 Spawnfile source pins               descriptor
+   descriptor.private                                                     (no Spawnfile)
+```
 
-1. `check-bundle-descriptor.mjs --repin-source` finds the Spawnfile pins by
-   searching for the descriptor's *current* digest. A bundle build that ran
-   first advances the descriptor and leaves the repin nothing to match.
-2. `policies/private-source.json` is a tracked file and therefore part of the
-   source archive. Repinning it changes `newsroom-runtime.tar`, so the tar has
-   to be rebuilt *after* the repin or it stops being the archive every
-   Spawnfile pins, and the image carries a resource no agent can verify.
+- **repin before `--repin-source`**: repinning rewrites
+  `policies/private-source.json`, a *tracked* file and therefore part of the
+  source archive, so the source digest is only measurable once the pin is in.
+- **`--repin-source` before `org:bundle`**: `--repin-source` finds the twelve
+  Spawnfile pins by searching for the descriptor's *current* source digest.
+  `org:bundle` advances the descriptor and writes into no Spawnfile at all, so
+  running it first leaves the repin nothing to match and produces an image
+  whose agents pin an archive that no longer exists. Confirmed on the box on
+  2026-09-06 by doing it in the wrong order and watching all twelve Spawnfiles
+  fall out of agreement with the descriptor.
 
-`seam-run.test.mjs` asserts that order; it is not defended only by this
-paragraph.
+`seam-run.test.mjs` asserts the order; it is not defended only by this section.
+
+The dependency and asset archives have **no repin at all** — their digests
+exist only in the Spawnfiles. If `npm ci` moves `website/node_modules` under
+the job, `org:bundle` advances the descriptor and the pins stay put.
+`assertPinsMatchDescriptor` catches that and **refuses**; it does not repair
+it, because rewriting a dependency pin from an unreviewed rebuild is how you
+deploy an archive nobody chose. `etopo-relief.tar` is the one archive a
+Spawnfile may pin that the descriptor does not describe (it is built
+separately from a ~395MB external download) and it is named in the code, not
+skipped silently.
 
 ## The build root is load-bearing
 

@@ -11,15 +11,19 @@
 //
 // THE ORDER IS NOT A STYLE CHOICE
 // -------------------------------
-//   1. repin-private-source.mjs   — standalone, FIRST
-//   2. npm run org:bundle         — second
-// `check-bundle-descriptor.mjs --repin-source` locates the Spawnfile pins by
-// searching for the descriptor's CURRENT digest, so a bundle build that runs
-// first advances the descriptor and leaves the repin with nothing to match.
-// Beyond that, `policies/private-source.json` is a tracked file and therefore
-// part of the source archive: repinning it CHANGES newsroom-runtime.tar, so the
-// bundle build has to come after the repin or the tar on disk no longer matches
-// the digest every Spawnfile pins, and the build fails closed at verification.
+//   1. repin-private-source.mjs            — standalone, FIRST
+//   2. check-bundle-descriptor --repin-source
+//   3. npm run org:bundle
+//   4. check-bundle-descriptor             — the proof
+//
+// (1) before (2): repinning rewrites policies/private-source.json, which is a
+// tracked file and therefore part of the source archive, so the source digest
+// is only measurable once the pin is in.
+// (2) before (3): `--repin-source` finds the twelve Spawnfile pins by searching
+// for the descriptor's CURRENT source digest. `org:bundle` advances the
+// descriptor and writes into no Spawnfile at all, so running it first leaves
+// the repin nothing to match and produces an image whose agents pin an archive
+// that no longer exists. Confirmed on the box, 2026-09-06, by doing it wrong.
 //
 // A REDEPLOY KILLS IN-FLIGHT WAKES
 // --------------------------------
@@ -46,7 +50,7 @@
 // Every stage that fails raises the alarm (alarm.mjs) before exiting non-zero.
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
@@ -61,6 +65,9 @@ export const DEFAULT_DEPLOY_USER = 'clank';
 // `local<n>`, and so the retention sweep below can only ever touch its own.
 export const TAG_PREFIX = 'clank-and-slop:seam-';
 export const KEEP_IMAGES = 3;
+// Archives an agent may pin that newsroom-runtime-bundle.json deliberately does
+// not describe, because org:bundle does not build them.
+export const KNOWN_UNDESCRIBED = Object.freeze(['etopo-relief.tar']);
 
 const berlinDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' });
 export const berlinToday = (now = new Date()) => berlinDate.format(now);
@@ -129,18 +136,77 @@ export function repin(options, { log = console.log } = {}) {
 }
 
 // --- stage 3: the bundles ----------------------------------------------------
-// The full build, not `--repin-source`. `--repin-source` refreshes the
-// descriptor and the twelve Spawnfile pins from a fresh MEASUREMENT of the tree
-// but writes no tar, and the repin has just changed a tracked file — so the
-// newsroom-runtime.tar on disk would no longer be the archive those pins
-// describe, and the image would carry a resource no agent can verify.
+// THREE commands, in one order that is the only order that works. Verified on
+// the box, 2026-09-06, by getting it wrong first:
+//
+//   a. `--repin-source` FIRST, because it finds the Spawnfile pins by searching
+//      for the descriptor's CURRENT source digest. It has to run while the
+//      descriptor still holds the digest the Spawnfiles hold. It also has to
+//      run AFTER repin-private-source.mjs, because that rewrites
+//      policies/private-source.json — a tracked file, therefore part of the
+//      source archive — so the measurement is only correct once the pin is in.
+//   b. `org:bundle` SECOND. It writes the six tars and the descriptor, and it
+//      writes NOTHING into any Spawnfile. Running it before (a) advances the
+//      descriptor, leaves (a) nothing to match, and silently produces an image
+//      whose agents pin an archive that no longer exists.
+//   c. the plain check LAST, as the proof rather than the hope.
+//
+// The dependency and asset archives have no repin at all: their digests are
+// only ever in the Spawnfiles, so if `npm ci` moved node_modules underneath
+// this job, the descriptor advances and the pins do not. That is what
+// assertPinsMatchDescriptor catches, and it is a refusal, not a repair —
+// rewriting a dependency pin from an unreviewed rebuild is how you deploy an
+// archive nobody chose.
 export function bundle(options, { log = console.log } = {}) {
   if (options.check) {
-    log('\n(check mode: not rebuilding the archives; verifying the committed descriptor against the tree instead)');
-    return run('bundle-check', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs')], { cwd: options.repo, log });
+    log('\n(check mode: not rebuilding the archives; verifying the descriptor against the tree instead)');
+    run('bundle-check', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs')], { cwd: options.repo, log });
+    return assertPinsMatchDescriptor(options, { log });
   }
+  run('bundle-repin-source', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs'), '--repin-source'], { cwd: options.repo, log });
   run('bundle', 'bundle-mismatch', 'npm', ['run', 'org:bundle'], { cwd: options.repo, log });
-  return run('bundle-verify', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs')], { cwd: options.repo, log });
+  run('bundle-verify', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs')], { cwd: options.repo, log });
+  return assertPinsMatchDescriptor(options, { log });
+}
+
+// Every checksum-pinned bundle resource in every agent Spawnfile, against the
+// archive of that name in the descriptor. `check-bundle-descriptor.mjs` only
+// covers the source archive — deliberately, because it must be able to run in
+// CI without the private checkout or node_modules. This job has both, so it
+// checks all six.
+export function pinFindings(repo) {
+  const descriptorPath = path.join(repo, 'agentic-org/newsroom-runtime-bundle.json');
+  const descriptor = JSON.parse(readFileSync(descriptorPath, 'utf8'));
+  const byArchive = new Map();
+  for (const entry of [descriptor.source, descriptor.private, ...descriptor.dependencies ?? [], ...descriptor.assets ?? []])
+    if (entry?.archive) byArchive.set(entry.archive, entry.sha256);
+  // Caslon's relief grid is built by build-etopo-bundle.mjs from a ~395MB
+  // external download, not by org:bundle, so the descriptor does not and should
+  // not describe it. Named here rather than skipped silently: any OTHER archive
+  // the descriptor does not know about is drift and must still be a finding.
+  const undescribed = new Set(KNOWN_UNDESCRIBED);
+  const agentsRoot = path.join(repo, 'agentic-org/agents');
+  const findings = [];
+  let checked = 0;
+  for (const agent of readdirSync(agentsRoot).sort()) {
+    const file = path.join(agentsRoot, agent, 'Spawnfile');
+    if (!existsSync(file)) continue;
+    for (const [, id, archive, pinned] of readFileSync(file, 'utf8').matchAll(/- \{ id: ([\w-]+), kind: bundle, source: \.\.\/\.\.\/([\w.-]+\.tar), sha256: (sha256:[a-f0-9]{64})/gu)) {
+      const expected = byArchive.get(archive);
+      checked += 1;
+      if (expected === undefined) { if (!undescribed.has(archive)) findings.push(`agents/${agent}/Spawnfile pins ${archive} as ${id}, which the descriptor does not describe`); }
+      else if (expected !== pinned) findings.push(`agents/${agent}/Spawnfile pins ${archive} at ${pinned}, the descriptor says ${expected}`);
+    }
+  }
+  if (checked === 0) findings.push(`no agent Spawnfile under ${agentsRoot} declares a checksum-pinned bundle resource — the pin check matched nothing, which is not the same as passing`);
+  return { findings, checked, archives: [...byArchive.keys()] };
+}
+
+export function assertPinsMatchDescriptor(options, { log = console.log } = {}) {
+  const result = pinFindings(options.repo);
+  if (result.findings.length) throw new SeamError(`bundle pins disagree with the descriptor — ${result.findings.length} finding(s):\n  ${result.findings.join('\n  ')}`, 'bundle-mismatch');
+  log(`pins: ${result.checked} checksum-pinned bundle resource(s) across the agent Spawnfiles all match the descriptor (${result.archives.join(', ')})`);
+  return result;
 }
 
 // --- stage 4: the image ------------------------------------------------------
