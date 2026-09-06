@@ -1,0 +1,17 @@
+# The OnFailure= handler. %i is the unit that failed.
+#
+# This is the piece CLANK_TO_PROD.md §1.6 says never existed: systemd reported
+# `Failed` for two days into an endpoint nobody had built. Every unit in this
+# directory names this handler, so a unit that fails for ANY reason — including
+# one its own code never anticipated, including being killed — still reaches a
+# human. The alarm script writes a breadcrumb before it sends, so even an
+# undeliverable alarm leaves the text on disk.
+[Unit]
+Description=Raise the newsroom alarm for %i
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/clank-alarm/alarm.env
+ExecStart=/bin/sh -c 'systemctl status --no-pager --lines=40 %i > /run/clank-alarm-%i.log 2>&1 || true; \
+  /usr/bin/node /root/work/clankandslop/agentic-org/scripts/alarm.mjs \
+    --reason=deploy-failed --message="systemd unit %i failed" --detail-file=/run/clank-alarm-%i.log'

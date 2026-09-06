@@ -1,0 +1,179 @@
+# The publication hop, without the person — and without loosening one property
+# of the airlock that person was standing in.
+#
+# WHAT STAYS EXACTLY AS IT WAS
+# ----------------------------
+# `agentic-org/scripts/publish-edition-branch.mjs` still runs on the host,
+# outside every container, with a restricted deploy key the container never
+# sees, a pinned GitHub host key, a refspec that can only ever be
+# `edition/YYYY-MM-DD`, and an explicit refusal of `main`, `master`, `staging`,
+# `gh-pages` and `HEAD` as whole refs or as any component. None of that moves.
+# The container still cannot write `main`.
+#
+# WHAT THIS ADDS
+# --------------
+# The second half of the hop — the merge a person did by hand — runs here
+# instead, in GitHub Actions, where the credential is GitHub's own short-lived
+# GITHUB_TOKEN rather than anything the newsroom holds.
+#
+# FOUR LOCKS, EACH INDEPENDENT
+# ----------------------------
+#  1. TRIGGER. `push` on `edition/*` only. No workflow_dispatch, no schedule, no
+#     pull_request trigger — there is no way to ask this workflow to run against
+#     any other ref.
+#  2. REF SHAPE. The trigger filter is re-asserted inside the job against
+#     `^refs/heads/edition/\d{4}-\d{2}-\d{2}$`, because a glob is a convenience
+#     and this is the check that means it.
+#  3. CI. The merge waits for the CI workflow's own run against THIS EXACT
+#     head SHA and refuses anything but `success`. It never re-runs the checks
+#     itself (a second opinion is not the gate), never uses `--admin`, and
+#     never merges while a run is queued or in progress.
+#  4. CONTENT. The diff against `main` must touch nothing outside the paths
+#     `publish-edition-branch.mjs` is allowed to commit. An edition branch that
+#     carries a workflow change, a script change, or a website change is
+#     refused and left for a person — automation that can merge arbitrary code
+#     into `main` on a branch-name match is a worse hole than the one it closes.
+#
+# `permissions` is the whole grant: no packages, no id-token, no deployments.
+name: Merge edition
+
+on:
+  push:
+    branches:
+      - "edition/*"
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  actions: read
+
+# One merge at a time per branch, and never cancel a merge half-done.
+concurrency:
+  group: merge-edition-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BASE_BRANCH: main
+  # Exactly what publish-edition-branch.mjs commits: the edition directory and
+  # the two generated views CI diff-checks. Nothing else may ride along.
+  ALLOWED_PATHS: "content/editions/ content/topics.txt content/bylines/"
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse any ref that is not a dated edition branch
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          if ! printf '%s' "$REF" | grep -Eq '^refs/heads/edition/[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+            echo "::error::$REF is not an edition/YYYY-MM-DD branch — refusing"
+            exit 1
+          fi
+          echo "ref $REF accepted"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refuse a branch that changes anything but the edition content
+        env:
+          BASE: ${{ env.BASE_BRANCH }}
+          ALLOWED: ${{ env.ALLOWED_PATHS }}
+        run: |
+          set -euo pipefail
+          git fetch --quiet origin "$BASE"
+          changed="$(git diff --name-only "origin/$BASE...HEAD")"
+          if [ -z "$changed" ]; then
+            echo "::error::branch is identical to $BASE — nothing to merge"
+            exit 1
+          fi
+          echo "changed files:"; printf '%s\n' "$changed" | sed 's/^/  /'
+          bad=0
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            ok=0
+            for prefix in $ALLOWED; do
+              case "$file" in "$prefix"*) ok=1 ;; esac
+            done
+            if [ "$ok" -eq 0 ]; then echo "::error::$file is outside the edition content paths"; bad=1; fi
+          done <<< "$changed"
+          [ "$bad" -eq 0 ] || { echo "::error::refusing to auto-merge a branch that changes more than the edition"; exit 1; }
+          echo "every changed path is edition content"
+
+      # The gate. It reads the CI workflow's conclusion for this head SHA and
+      # for no other commit — a green run on an older push must never let a
+      # newer, redder one through.
+      - name: Wait for CI on this exact commit
+        id: ci
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          deadline=$(( $(date +%s) + 1800 ))
+          while :; do
+            runs="$(gh api "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$SHA&per_page=100" \
+                      --jq '[.workflow_runs[] | {status, conclusion}]')"
+            total="$(printf '%s' "$runs" | jq 'length')"
+            pending="$(printf '%s' "$runs" | jq '[.[] | select(.status != "completed")] | length')"
+            failed="$(printf '%s' "$runs" | jq '[.[] | select(.status == "completed" and .conclusion != "success")] | length')"
+            succeeded="$(printf '%s' "$runs" | jq '[.[] | select(.conclusion == "success")] | length')"
+            echo "CI for $SHA: total=$total pending=$pending failed=$failed succeeded=$succeeded"
+            if [ "$failed" -gt 0 ]; then
+              echo "::error::CI concluded non-success for $SHA — refusing to merge a red branch"
+              echo "green=false" >> "$GITHUB_OUTPUT"
+              exit 1
+            fi
+            if [ "$total" -gt 0 ] && [ "$pending" -eq 0 ] && [ "$succeeded" -gt 0 ]; then
+              echo "green=true" >> "$GITHUB_OUTPUT"
+              break
+            fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo "::error::CI for $SHA did not conclude within 30 minutes — refusing to merge on a timeout"
+              echo "green=false" >> "$GITHUB_OUTPUT"
+              exit 1
+            fi
+            sleep 20
+          done
+
+      - name: Open or update the pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+          BASE: ${{ env.BASE_BRANCH }}
+        run: |
+          set -euo pipefail
+          number="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$number" ]; then
+            gh pr create --head "$BRANCH" --base "$BASE" \
+              --title "chore(edition): publish ${BRANCH#edition/}" \
+              --body "Automated publication of the ${BRANCH#edition/} edition. Merged by \`merge-edition.yml\` only after CI concluded success on this exact commit and the diff was confined to edition content."
+            number="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number')"
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          echo "pull request #$number"
+
+      # Read the checks a second time, from the pull request's own view, right
+      # before merging. Two independent reads of the same fact is what stops a
+      # race between the poll above and the merge below.
+      - name: Merge, but only if the pull request itself is still green
+        if: steps.ci.outputs.green == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          head="$(gh pr view "$NUMBER" --json headRefOid --jq .headRefOid)"
+          [ "$head" = "$SHA" ] || { echo "::error::the branch moved from $SHA to $head while CI ran — refusing"; exit 1; }
+          if ! gh pr checks "$NUMBER"; then
+            echo "::error::the pull request's own checks are not all green — refusing"
+            exit 1
+          fi
+          gh pr merge "$NUMBER" --merge --delete-branch=false
+          echo "merged #$NUMBER ($SHA)"

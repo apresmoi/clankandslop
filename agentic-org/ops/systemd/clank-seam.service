@@ -1,0 +1,28 @@
+# The seam: repin the private corpus to today's edition branch, rebuild the
+# bundles, rebuild the image, redeploy — the step that used to be a person.
+#
+# The job refuses to deploy unless the schedule is clear AND the running
+# container is quiet (see agentic-org/scripts/wake-window.mjs), so an overrun
+# wake or a manual one is enough to stop it; the timer's hour is a convenience,
+# not the safety property.
+[Unit]
+Description=Clank newsroom seam (repin, bundle, build, deploy)
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+# systemd's own Failed is what screamed into a void for two days. This is the
+# void being replaced: any exit that systemd calls a failure raises the alarm.
+OnFailure=clank-alarm@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/work/clankandslop
+EnvironmentFile=/etc/clank-alarm/alarm.env
+Environment=SPAWNFILE_MOLTNET_TARGET_ARCH=amd64
+Environment=SPAWNFILE_CLI=/root/work/spawnfile/dist/cli/index.js
+Environment=SPAWNFILE_DAIMON_SOURCE_DIR=/root/work/daimon
+Environment=SPAWNFILE_DAIMON_PACKAGE_TARBALL=/root/work/noopolis-daimon-0.2.0.tgz
+Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/root/work/spawnfile/.local-daimon-runtime-identity.json
+Environment=SPAWNFILE_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
+ExecStart=/usr/bin/node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs
+TimeoutStartSec=3600
