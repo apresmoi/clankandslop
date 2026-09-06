@@ -95,5 +95,5 @@ networks:
       - { id: assignment, visibility: private, write_policy: members, federation: [clank-observer], members: [gatherer, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
       - { id: filing, visibility: private, write_policy: members, federation: [clank-observer], members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
       - { id: sensor, visibility: private, write_policy: members, federation: [clank-observer], members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
-      - { id: research, visibility: private, write_policy: members, federation: [clank-observer], members: [gatherer, research-sensor, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
+      - { id: research, visibility: private, write_policy: members, federation: [clank-observer], members: [gatherer, research-sensor, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
       - { id: release, visibility: private, write_policy: members, federation: [clank-observer], members: [brass, spike, ledger, caslon, pressman] }

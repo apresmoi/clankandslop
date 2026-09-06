@@ -66,7 +66,12 @@ export const engineByAgent = Object.freeze({
 
 const corpusAgents = new Set(['klaxon']);
 const publicWriters = new Set(['pressman']);
-const researchMembers = new Set(['gatherer', 'research-sensor', ...reporters, 'brass']);
+// klaxon is here because it declares `allowed_wake_senders: [research-sensor]`
+// on its DM surface, i.e. the org expects the sensor to be able to reach it.
+// It cannot: Spawnfile never emits `outbound_dm_peers`, so every DM the sensor
+// sends is denied by `resolveDM`, and the sensor posts to room:research anyway.
+// Room membership is the only path that actually delivers.
+const researchMembers = new Set(['gatherer', 'research-sensor', 'klaxon', ...reporters, 'brass']);
 const section = (source, name) => {
   const lines = source.split('\n');
   const start = lines.findIndex((line) => line === `${name}:`);
