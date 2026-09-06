@@ -18,11 +18,19 @@ OnFailure=clank-alarm@%n.service
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
 EnvironmentFile=/etc/clank-alarm/alarm.env
+# Verified by running the seam end to end on the box, 2026-09-06.
+# SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR, not SPAWNFILE_MOLTNET_RELEASE_DIR: the
+# published-release path wants moltnet_release_stamp_<arch>.json, and what the
+# box has is the LOCAL release, stamped local_moltnet_release_stamp_<arch>.json.
+# Pointing the published variable at the local directory fails the capability
+# stamp check — which is the compiler refusing an unstamped release correctly,
+# not a bug to route around. SPAWNFILE_ALLOW_LOCAL_E2E=1 is what admits it.
 Environment=SPAWNFILE_MOLTNET_TARGET_ARCH=amd64
 Environment=SPAWNFILE_CLI=/root/work/spawnfile/dist/cli/index.js
 Environment=SPAWNFILE_DAIMON_SOURCE_DIR=/root/work/daimon
 Environment=SPAWNFILE_DAIMON_PACKAGE_TARBALL=/root/work/noopolis-daimon-0.2.0.tgz
 Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/root/work/spawnfile/.local-daimon-runtime-identity.json
-Environment=SPAWNFILE_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
+Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
+Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
 ExecStart=/usr/bin/node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs
 TimeoutStartSec=3600
