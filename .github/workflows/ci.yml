@@ -16,6 +16,13 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: Validate content
         run: node ops/validate-content.mjs
+      # The page data layer has one build-time decision in it that a green
+      # astro build cannot see: whether a story advertises an og:image for a
+      # card that was never rendered. Fifteen editions have no cards at all, and
+      # every one of their stories used to serve a 404 image to every crawler.
+      - name: Test the website data layer
+        working-directory: website
+        run: npm run test:lib
       - name: Build website
         working-directory: website
         run: |

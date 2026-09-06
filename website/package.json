@@ -15,6 +15,7 @@
     "bake:glyphart": "node scripts/bake-glyphart.mjs",
     "watch:glyphart": "node scripts/watch-glyphart.mjs",
     "bake:404": "node scripts/bake-404.mjs",
+    "test:lib": "node --test src/lib/*.test.ts",
     "watch:404": "node scripts/watch-404.mjs"
   },
   "dependencies": {

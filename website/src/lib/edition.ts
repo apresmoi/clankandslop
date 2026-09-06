@@ -133,9 +133,18 @@ export function articleHref(a: { edition_date: string; id: string }): string {
   return `/editions/${a.edition_date}/articles/${a.id}`;
 }
 
-/** Committed social-card path for an article (date-scoped to match). */
-export function articleOgPath(date: string, slug: string): string {
-  return `/og/${date}/${slug}.png`;
+/** Where a committed social card lives on disk, if it was ever rendered. */
+export const ogRoot = resolve(contentRoot, '..', 'website', 'public', 'og');
+
+/** Committed social-card path for an article (date-scoped to match), or
+    `undefined` when that card was never rendered and committed.
+    Cards are produced by `npm run og` on a laptop and committed; fifteen
+    editions have none, and the layout emitted `og:image` for every article
+    regardless — so those pages advertised a 1200x630 image that answers 404.
+    A missing file now falls through to the layout's `/og/default.png`, which
+    exists. Checked once at build time; the site is static. */
+export function articleOgPath(date: string, slug: string): string | undefined {
+  return existsSync(resolve(ogRoot, date, `${slug}.png`)) ? `/og/${date}/${slug}.png` : undefined;
 }
 
 /** All edition dates that have a directory under content/editions/.
