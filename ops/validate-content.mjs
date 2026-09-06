@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
 import { proseLintFindings } from './prose-lint.mjs';
+import { EDITION_PART_FILES, OUTCOMES as DESK_OUTCOMES, deskDocumentFindings } from './desk-contract.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const contentRoot = resolve(root, 'content');
@@ -18,7 +19,7 @@ const BLOCKS = new Set([
 
 const EPISTEMIC = new Set(['fact', 'inference', 'forecast']);
 const GLYPH_ROLLS = new Set(['chip', 'eclipse']);
-const OUTCOMES = new Set(['hit', 'miss', 'open']);
+const OUTCOMES = DESK_OUTCOMES;
 const KEYNUM_DIRS = new Set(['up', 'down', 'flat']);
 
 const errors = [];
@@ -115,18 +116,15 @@ for (const { date, dir: edDir, desk } of scopes) {
   // edition chrome — per-owner part files under desk/. Filename = owner +
   // artifact; the set must be complete and assemble into the Edition view.
   if (desk) {
-  const EDITION_PARTS = [
-    'caslon.chrome.json',
-    'caslon.weather.json',
-    'ledger.settlements.json',
-    'ledger.worlddesk.json',
-  ];
   const deskDir = resolve(edDir, 'desk');
   const edFile = rel(deskDir);
   let ed = {};
-  for (const part of EDITION_PARTS) {
+  for (const part of EDITION_PART_FILES) {
     const p = readJson(resolve(deskDir, part));
     if (p === null) { err(`${edFile}/${part}`, 'missing edition part'); ed = null; break; }
+    // The same contract file_desk applies hours earlier, so a document that
+    // reaches here malformed has already been refused once at filing time.
+    for (const finding of deskDocumentFindings(part.slice(0, -5), p)) err(`${edFile}/${part}`, finding);
     Object.assign(ed, p);
   }
   if (ed) {

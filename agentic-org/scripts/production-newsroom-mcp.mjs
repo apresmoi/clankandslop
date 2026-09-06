@@ -1,5 +1,6 @@
 import { createInterface } from 'node:readline';
 import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, reviewArticle, stageRelease } from './production-newsroom.mjs';
+import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
 
 // Closed sets mirrored from production-newsroom.mjs's own validation (`desks`,
 // the verdict list in reviewArticle, and the epistemic values used across
@@ -13,6 +14,10 @@ const COMPONENT_PATTERN = '^[a-z0-9][a-z0-9-]{0,127}$';
 const DATE_PATTERN = '^\\d{4}-\\d{2}-\\d{2}$';
 const DESK_NAMES_BY_AGENT = { ledger: ['ledger.settlements', 'ledger.worlddesk'], caslon: ['caslon.chrome', 'caslon.weather'] };
 const role = process.env.CLANK_NEWSROOM_AGENT;
+const DESK_NAMES = DESK_NAMES_BY_AGENT[role] ?? Object.values(DESK_NAMES_BY_AGENT).flat();
+// Rendered from ops/desk-contract.mjs, the same module the gate applies, so
+// what the agent is told and what it is held to cannot drift apart.
+const DESK_SHAPE_LINE = DESK_NAMES.map((name) => `${name} {${deskDocumentKeys(name).join(', ')}}`).join('; ');
 
 const edition = { type: 'string', pattern: DATE_PATTERN, description: 'Edition date, YYYY-MM-DD.' };
 const eventKey = { type: 'string', minLength: 8, maxLength: 1024, description: 'Causal idempotency key for this call. When Daimon binds a wake id (DAIMON_WAKE_ID), this must equal that wake id exactly.' };
@@ -114,12 +119,14 @@ const definitions = {
     execute: reviewArticle
   },
   file_desk: {
-    description: 'File one Ledger- or Caslon-owned desk document.',
+    description: `File one Ledger- or Caslon-owned desk document. Each name carries exactly its own keys and no others: ${DESK_SHAPE_LINE}. The document is checked against that shape here, so a rejection is something to fix and file again, not a filing that half landed.`,
     required: ['edition', 'event_key', 'name', 'document'],
     properties: {
       edition, event_key: eventKey,
-      name: { type: 'string', enum: DESK_NAMES_BY_AGENT[role] ?? ['ledger.settlements', 'ledger.worlddesk', 'caslon.chrome', 'caslon.weather'], description: 'Only the names your own agent owns are accepted.' },
-      document: { type: 'object', additionalProperties: true }
+      name: { type: 'string', enum: DESK_NAMES, description: 'Only the names your own agent owns are accepted.' },
+      // The keys are enumerated in the tool description rather than as a
+      // schema per name, because one call files one of four different shapes.
+      document: { type: 'object', additionalProperties: true, description: `The whole document, carrying exactly the keys listed for this name: ${DESK_SHAPE_LINE}.` }
     },
     execute: fileDesk
   },
