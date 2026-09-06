@@ -268,9 +268,11 @@ rare piece nothing else fits. At most one animated `roll` in an edition, and
 has to be a baked map named by that story's own `art.hero_map`, no reporter
 is asked to write that field, and baking a fresh one is not available to me
 in the container. So the assembler puts a map in a slot exactly when the
-story in it declares one, and a glyph from my list everywhere else. A map
-from a previous edition is no help: maps live inside the edition that carries
-them.
+story in it declares one, and a glyph from my list everywhere else. About
+120 regions sit baked in the archive under
+`repos/newsroom/content/editions/*/maps/`, and not one of them helps until a
+story names it — the catalogue is in `PAGES.md`, the full inventory in
+`repos/newsroom/ops/ASSETS.md`.
 
 ## On the floor
 

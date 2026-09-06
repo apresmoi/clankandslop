@@ -30,6 +30,8 @@ clanknslop/
 │                   audits/ (launch audit + v2 blueprint — the build plan)
 ├── ops/            validate-content.mjs (the content gate, runs in CI and
 │                   before every build) · bake-map.mjs · build-landmask.mjs
+│                   ASSETS.md — the verified inventory of what illustration
+│                   art is already committed, and what can still be baked
 ├── website/        Astro 6 static site, custom newspaper UI
 └── content/        editions (frozen by date), agent personas, baked maps
 ```
@@ -130,6 +132,12 @@ Two paper themes: newsprint cream (`--paper: #F4EEE0`) and warm coal dark
 (`#14110E`), single amber accent (`--accent`) used like ink — sparingly.
 Red = down/breaking only; green = up only. Paper-grain noise overlay.
 
+**Before reaching for an asset, read `ops/ASSETS.md`.** It is the measured
+inventory of what is committed — the nine baked shapes, the two rolls, the
+~120-region map atlas under `content/editions/<date>/maps/` — and of what can
+no longer be produced. Baking is author-time work on a developer machine; it
+is not available inside an agent workspace.
+
 Glyph art (ASCII rendered from real data) is the house illustration style:
 
 - **WorldGlyph** — the World Desk globe (ETOPO1 landmask, numbered
@@ -170,7 +178,10 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   the `satellite` glyph; etc. When no fitting asset exists, **bake a fresh one**
   (`ops/bake-map.mjs` for terrain, a `scripts/bake-*.mjs` for a 3D glyph from
   glyphcss/voxcss models or primitives) rather than leave the piece bare or
-  bolt on a mismatched shape.
+  bolt on a mismatched shape. **Baking is author-time only**: `gdal-async` is
+  absent from every runtime bundle and the `scripts/bake-*.mjs` rasterisers are
+  not in this repository, so an agent composing an edition picks from the
+  committed catalogue in `ops/ASSETS.md` or runs the piece bare.
 - Inside-article maps are **at most 48 rows tall** (height ∝ baked `rows`).
   Match the lead map's shape — `140×48` (rows/cols ≈ 0.34) is the reference.
   To keep terrain undistorted at higher latitudes, widen the longitude crop
@@ -261,7 +272,11 @@ npm run dev
 npm run validate   # content gate — node ops/validate-content.mjs
 npm run build      # runs validate first; an invalid edition cannot ship
 
-# bake a regional map for a story (datasets stay on the newsroom machine)
+# what art is already committed, and what can still be baked
+cat ops/ASSETS.md
+
+# bake a regional map for a story (datasets stay on the newsroom machine;
+# author-time only — gdal-async is in no runtime bundle)
 node ops/bake-map.mjs --edition 2026-05-17 --name taiwan-strait \
   --west 105 --east 130 --south 15 --north 32 --cols 132 --rows 30
 ```
