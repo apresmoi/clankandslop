@@ -1,0 +1,46 @@
+# The last host-side hop: put the artifact pressman promoted on an edition
+# branch in the public repository, and stop.
+#
+# It runs OUTSIDE every container, with a deploy key the container never sees,
+# for the reason `publish-edition-branch.mjs` spells out at length: a
+# restriction that executes inside the process a model drives is a claim about
+# that process, not a boundary around a credential. Nothing about that placement
+# changes by putting a timer in front of it — the timer only removes the person
+# who used to type the command.
+#
+# WHAT THE FLAGS BUY
+#   --edition today  refuses to publish anything but today's paper. `current-
+#                    edition` is durable: it keeps naming last night's artifact
+#                    until pressman promotes a new one, so without this a timer
+#                    re-pushes yesterday's edition every night the org fails to
+#                    compose — silently, for as long as the org stays down.
+#   --state          binds the bytes about to be pushed to the durable `staged-`
+#                    receipt: the artifact directory must be the one that
+#                    composition produced, and its contents must hash to what
+#                    pressman recorded. `--edition` refuses to run without it.
+#   --key            REFERENCES the operator's key file. It is never read,
+#                    copied or re-written by the job; ssh reads it and nothing
+#                    else does.
+#
+# Failure is loud on purpose and costs nothing: no `current-edition`, the wrong
+# edition, a missing key, a tampered artifact, or a non-fast-forward push all
+# exit non-zero, push nothing, and reach a phone through the OnFailure handler.
+# An edition already merged into `main` is a quiet success, not a failure — a
+# nightly alarm for "the paper you published is published" is how an alarm
+# stops being read.
+[Unit]
+Description=Clank newsroom publication (put today's staged edition on its branch)
+After=network-online.target docker.service
+Wants=network-online.target
+OnFailure=clank-alarm@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/work/clankandslop
+EnvironmentFile=/etc/clank-alarm/alarm.env
+ExecStart=/usr/bin/node /root/work/clankandslop/agentic-org/scripts/publish-edition-branch.mjs \
+  --staging /var/lib/docker/volumes/clank-release-staging/_data \
+  --state /var/lib/docker/volumes/clank-edition-state/_data \
+  --key /root/.ssh/clank_public \
+  --edition today
+TimeoutStartSec=900
