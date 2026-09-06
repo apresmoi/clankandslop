@@ -821,3 +821,94 @@ test('the pages ops/lay-page.mjs assembles compose, at five stories and at six',
     }
   }
 });
+
+// ---------------------------------------------------------------------------
+// The two read-only bundles that merge into one directory.
+//
+// The first real stage_release ever attempted died here:
+//
+//   EACCES: permission denied, unlink
+//     '.../website/node_modules/.package-lock.json'
+//
+// deps-a and deps-b are copied into the SAME website/node_modules and assets-a
+// and assets-b into the SAME website/public/og. Both bundles are mode 555/444;
+// `fs.cp` preserves those modes; `force:true` unlinks before overwriting and
+// unlink needs write on the parent directory. So the second bundle of each pair
+// could never land on a path the first one already held — and they overlap on
+// `.package-lock.json`, `@astrojs`, `@img`, `@shikijs`, and every shared date
+// directory under og/.
+//
+// The fixture below is the shape of the bug rather than a copy of the message:
+// two roots that overlap. Disjoint roots pass with or without the fix.
+// ---------------------------------------------------------------------------
+const writeReadOnly = async (file, bytes) => { await mkdir(path.dirname(file), { recursive: true }); await writeFile(file, bytes); };
+async function sealTree(root) {
+  const entries = await readdir(root, { recursive: true, withFileTypes: true });
+  const paths = [...entries.map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))].reverse();
+  for (const file of [...paths, root]) { const stats = await lstat(file); await chmod(file, stats.isDirectory() ? 0o555 : 0o444); }
+}
+async function unsealTree(root) {
+  const entries = await readdir(root, { recursive: true, withFileTypes: true });
+  for (const file of [root, ...entries.map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))]) {
+    const stats = await lstat(file); await chmod(file, stats.isDirectory() ? 0o755 : 0o644);
+  }
+}
+
+test('two read-only bundles merging into one directory: the second one lands', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-bundle-merge-'));
+  const state = path.join(temporary, 'state'), source = path.join(temporary, 'source'), staging = path.join(temporary, 'staging');
+  const depsA = path.join(temporary, 'deps-a'), depsB = path.join(temporary, 'deps-b');
+  const assetsA = path.join(temporary, 'assets-a'), assetsB = path.join(temporary, 'assets-b');
+  const edition = '2026-09-05';
+  const saved = { deps: process.env.CLANK_WEBSITE_DEPS_ROOTS, assets: process.env.CLANK_PUBLIC_ASSET_ROOTS };
+  try {
+    const composeArgs = await driveToCompose(state, edition, article);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await composeEdition({ ...composeArgs, event_key: 'compose-for-bundle-merge' });
+
+    // The public source root carries the validator; the astro binary arrives in
+    // the dependency bundle, exactly as it does in the container.
+    await writeReadOnly(path.join(source, 'ops', 'validate-content.mjs'), 'process.stdout.write("content OK\\n");\n');
+    await writeReadOnly(path.join(source, 'website', 'package.json'), '{"name":"site"}\n');
+
+    // The overlap. `.package-lock.json` exists in both halves with different
+    // bytes, which is the file the real failure named.
+    await writeReadOnly(path.join(depsA, 'website', 'node_modules', '.package-lock.json'), '{"half":"a"}\n');
+    await writeReadOnly(path.join(depsA, 'website', 'node_modules', '@astrojs', 'marker.js'), '// a\n');
+    await writeReadOnly(path.join(depsA, 'website', 'node_modules', 'astro', 'bin', 'astro.mjs'), 'process.stdout.write("built\\n");\n');
+    await writeReadOnly(path.join(depsB, 'website', 'node_modules', '.package-lock.json'), '{"half":"b"}\n');
+    await writeReadOnly(path.join(depsB, 'website', 'node_modules', '@shikijs', 'marker.js'), '// b\n');
+    // Same shape for the asset halves: one shared date directory, one file each.
+    await writeReadOnly(path.join(assetsA, 'website', 'public', 'og', edition, 'story-0.png'), 'a');
+    await writeReadOnly(path.join(assetsA, 'website', 'public', 'og', edition, 'shared.png'), 'a');
+    await writeReadOnly(path.join(assetsB, 'website', 'public', 'og', edition, 'story-1.png'), 'b');
+    await writeReadOnly(path.join(assetsB, 'website', 'public', 'og', edition, 'shared.png'), 'b');
+    for (const root of [source, depsA, depsB, assetsA, assetsB]) await sealTree(root);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'pressman';
+    process.env.CLANK_PUBLIC_SOURCE_ROOT = source;
+    process.env.CLANK_RELEASE_STAGING_ROOT = staging;
+    process.env.CLANK_WEBSITE_DEPS_ROOTS = `${depsA}:${depsB}`;
+    process.env.CLANK_PUBLIC_ASSET_ROOTS = `${assetsA}:${assetsB}`;
+
+    const staged = await stageRelease({ edition, event_key: 'stage-bundle-merge' });
+    assert.equal(staged.validated, true);
+    assert.equal(staged.built, true);
+
+    // Both halves of each pair reached the artifact, and the later root won the
+    // paths they share — which is the ordering the roots are listed in.
+    const modules = path.join(staged.staging_root, 'website', 'node_modules');
+    assert.equal(await readFile(path.join(modules, '.package-lock.json'), 'utf8'), '{"half":"b"}\n');
+    assert.ok((await readdir(modules)).includes('@astrojs'), 'deps-a survived deps-b');
+    assert.ok((await readdir(modules)).includes('@shikijs'), 'deps-b landed at all');
+    const og = path.join(staged.staging_root, 'website', 'public', 'og', edition);
+    assert.deepEqual((await readdir(og)).sort(), ['shared.png', 'story-0.png', 'story-1.png']);
+    assert.equal(await readFile(path.join(og, 'shared.png'), 'utf8'), 'b');
+  } finally {
+    for (const root of [source, depsA, depsB, assetsA, assetsB]) await unsealTree(root).catch(() => {});
+    for (const [key, value] of [['CLANK_WEBSITE_DEPS_ROOTS', saved.deps], ['CLANK_PUBLIC_ASSET_ROOTS', saved.assets]])
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
