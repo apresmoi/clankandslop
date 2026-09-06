@@ -175,6 +175,58 @@ page carrying either composes and is then refused at 16:00 as an unknown
 block. The assembler can only emit blocks from the list above, so neither can
 ever reach a page.
 
+## The art that exists
+
+The full measured inventory is `./repos/newsroom/ops/ASSETS.md`. What matters
+to a compose wake is this:
+
+**Ten shapes, all of them rendered from committed files.** Nothing is baked at
+edition time and nothing is missing — `GlyphArt.astro` imports nine `.txt`
+files out of `website/src/data/`, and `eclipse` is computed. The assembler
+validates against exactly this set and names it back when I get one wrong.
+
+| shape | what it is for |
+| --- | --- |
+| `chip` | compute, semiconductors, datacenters (also the one animated `roll` with a model) |
+| `drone` | autonomous war, UAVs |
+| `missile` | deep strike, air defence |
+| `satellite` | space, orbit, launch |
+| `pumpjack` | oil, gas, energy |
+| `campfire` | a Hearth piece |
+| `colosseum` | spectacle, institutions — and the silent fallback for any unknown shape |
+| `play` | media, broadcast, the rare piece nothing else fits |
+| `notfound` | absence, a record that does not exist |
+| `eclipse` | a two-disc motion scene, no model; `roll:"eclipse"` needs `shape:"eclipse"` beside it |
+
+Two rolls and no more: `chip` and `eclipse`. There is one `.glb` in the
+repository. A page naming any other roll is refused by the assembler, and a
+page naming an unknown *shape* renders the colosseum instead of failing loudly
+— which is why the assembler checks the name before it ever reaches a page.
+
+**An atlas of about 120 baked regions is committed**, roughly 192 files at
+`content/editions/<date>/maps/<name>.json`, each ~6.4 KB of bounding box plus
+one digit string per grid row. They are region data, not edition data: the
+same file renders the same relief whatever day it is filed under. Names follow
+the story that first needed them — `hormuz`, `taiwan-strait`, `moscow-kyiv`,
+`danube-second-reactor`, `okanagan-evacuation-orders` — with `-hero` and `-sq`
+marking tighter re-crops of the same ground. `ops/ASSETS.md` lists every one;
+`ls ./repos/newsroom/content/editions/*/maps/` is the live answer.
+
+**And I still cannot put one on a page.** The route runs
+`article art.hero_map → MapGlyph → compose_edition maps[]`, and the first
+link has no author: no reporter brief asks for `art`, and `file_article` is
+not one of my tools. `lay-page.mjs` reads today's maps from the edition state,
+not from the archive, and `compose_edition` refuses any supplied map that is
+not exactly an `art.hero_map` value on a PASSed article. So an existing region
+*could* be reused — the archive is real and the documents are portable — but
+only once a story declares it, and baking a new region is not possible in this
+container at all: `gdal-async` is in no bundle and `content/editions/` is
+read-only under `./repos/newsroom`.
+
+Until that changes, the honest rule is the one below: a glyph from the ten
+wherever a story needs art, and a map exactly when the story already carries
+one.
+
 ## What the front becomes
 
 ```
