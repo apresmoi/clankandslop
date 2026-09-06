@@ -189,5 +189,39 @@ const definitions = {
 const roleTools={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
 const tools=roleTools[role]??[];
 const schema=definition=>({type:'object',additionalProperties:false,required:definition.required,properties:definition.properties});
+// The stdio transport, and what it means for the peer to go away.
+//
+// This is one process per agent, speaking JSON-RPC over a pipe daimon opens and
+// closes. When the host closes its end — a startup probe that hangs up after
+// the handshake, a wake that ends, the container stopping — the read end of our
+// stdout is gone and the next write raises EPIPE. Node has no default handler
+// for a stream 'error', so it becomes an uncaught exception: a stack trace and
+// exit 1. On 2026-09-06 that happened to `graves` during daimon startup on one
+// start in three and took the whole org container down with it.
+//
+// A peer that closed its own end is not a failure. There is nobody left to
+// answer and nothing left to record, so we leave quietly, with the exit code of
+// a process that finished its work.
+//
+// Everything else on the transport still exits non-zero with the reason on
+// stderr. That distinction is the point: a blanket try/catch around the write
+// would also swallow a genuinely broken pipe, and an agent whose tool server
+// has silently died — accepting calls, answering nothing — is worse than one
+// that visibly fails and can be restarted.
+const PEER_CLOSED=new Set(['EPIPE','ERR_STREAM_DESTROYED','ERR_STREAM_WRITE_AFTER_END']);
+const onTransportError=name=>error=>{
+  if(PEER_CLOSED.has(error?.code))process.exit(0);
+  try{process.stderr.write(`clank-newsroom-${role}: ${name} transport failed (${error?.code??'unknown'}): ${error?.message??error}\n`);}catch{}
+  process.exit(70);
+};
+process.stdout.on('error',onTransportError('stdout'));
+process.stdin.on('error',onTransportError('stdin'));
+// stderr is the only thing left to report a failure with; a broken one is not
+// worth a second failure on top of the first.
+process.stderr.on('error',()=>process.exit(70));
+// Fault injection for the regression test, the same shape as
+// CLANK_RELEASE_CRASH_BEFORE_SWITCH: emits one synthetic stream error so both
+// branches above are exercised against this handler rather than a copy of it.
+if(process.env.CLANK_MCP_INJECT_STREAM_ERROR)process.nextTick(()=>process.stdout.emit('error',Object.assign(new Error('injected stream error'),{code:process.env.CLANK_MCP_INJECT_STREAM_ERROR})));
 const reply=(id,result,error)=>process.stdout.write(`${JSON.stringify({jsonrpc:'2.0',id,...(error?{error:{code:-32000,message:error}}:{result})})}\n`);
 for await(const line of createInterface({input:process.stdin,crlfDelay:Infinity})){let request;try{request=JSON.parse(line);if(request.method==='initialize')reply(request.id,{protocolVersion:'2025-06-18',capabilities:{tools:{}},serverInfo:{name:`clank-newsroom-${role}`,version:'1.0.0'}});else if(request.method==='notifications/initialized'){}else if(request.method==='tools/list')reply(request.id,{tools:tools.map(name=>({name,description:definitions[name].description,inputSchema:schema(definitions[name])}))});else if(request.method==='tools/call'){const name=request.params?.name;if(!tools.includes(name))throw new Error('tool exceeds agent authority');const value=await definitions[name].execute(request.params.arguments);reply(request.id,{content:[{type:'text',text:JSON.stringify(value)}],structuredContent:value});}else if(request.id!==undefined)reply(request.id,undefined,'unsupported method');}catch(error){reply(request?.id??null,undefined,error instanceof Error?error.message:'newsroom tool failed');}}

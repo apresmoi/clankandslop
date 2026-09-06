@@ -96,3 +96,61 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
     assert.ok(!tools.some((tool) => tool.name === 'record_dissent'), `${role} must not be offered record_dissent`);
   }
 });
+
+// ---------------------------------------------------------------------------
+// The stdio transport.
+//
+// On 2026-09-06 the org container was found `Exited (1)` from an unhandled
+// `write EPIPE` raised in this file for `graves` during daimon startup — one
+// start in three. `docker start` was not reliably survivable, and a crash there
+// takes the run down before any wake fires.
+//
+// The peer closing its end of a pipe is a normal end of life for one of these
+// processes. A transport that is genuinely broken is not, and must still fail
+// where somebody can see it: an agent whose tool server died silently would
+// accept calls and answer none.
+// ---------------------------------------------------------------------------
+function runServer(role, { env = {}, onFirstReply, stdin = [] } = {}) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [path.join(import.meta.dirname, 'production-newsroom-mcp.mjs')], { env: { ...process.env, CLANK_NEWSROOM_AGENT: role, ...env }, stdio: ['pipe', 'pipe', 'pipe'] });
+    let stderr = '';
+    child.stderr.on('data', (chunk) => { stderr += chunk; });
+    if (onFirstReply) child.stdout.once('data', () => onFirstReply(child));
+    child.on('exit', (code) => resolve({ code, stderr }));
+    for (const line of stdin) child.stdin.write(`${JSON.stringify(line)}\n`);
+  });
+}
+
+test('the peer closing its end of stdout ends the server quietly, not with a crash', async () => {
+  // Exactly the shape that killed the container: answer the handshake, have the
+  // host hang up, then write again.
+  const { code, stderr } = await runServer('graves', {
+    stdin: [{ jsonrpc: '2.0', id: 1, method: 'initialize', params: {} }],
+    onFirstReply: (child) => {
+      child.stdout.destroy();
+      setTimeout(() => {
+        child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} })}\n`);
+        child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/list', params: {} })}\n`);
+        child.stdin.end();
+      }, 20);
+    },
+  });
+  assert.equal(code, 0, `a closed peer must not be a crash — stderr was:\n${stderr}`);
+  assert.doesNotMatch(stderr, /Unhandled 'error' event|EPIPE/u, 'nothing to report, so nothing is reported');
+});
+
+test('a transport that is broken rather than closed still fails loudly', async () => {
+  // The half a blanket try/catch would have swallowed. Any stream error whose
+  // code is not "the other end hung up" is a dead tool server, and a dead tool
+  // server that exits 0 is an agent that looks alive and answers nothing.
+  const { code, stderr } = await runServer('graves', { env: { CLANK_MCP_INJECT_STREAM_ERROR: 'ENOSPC' } });
+  assert.equal(code, 70);
+  assert.match(stderr, /clank-newsroom-graves: stdout transport failed \(ENOSPC\)/u);
+
+  // And the classification is by code, not by luck: the three codes that mean
+  // "closed normally" all exit 0, everything else does not.
+  for (const closed of ['EPIPE', 'ERR_STREAM_DESTROYED', 'ERR_STREAM_WRITE_AFTER_END'])
+    assert.equal((await runServer('graves', { env: { CLANK_MCP_INJECT_STREAM_ERROR: closed } })).code, 0, `${closed} must be a quiet exit`);
+  for (const broken of ['ECONNRESET', 'ENOSPC', 'EIO'])
+    assert.equal((await runServer('graves', { env: { CLANK_MCP_INJECT_STREAM_ERROR: broken } })).code, 70, `${broken} must be a loud exit`);
+});
