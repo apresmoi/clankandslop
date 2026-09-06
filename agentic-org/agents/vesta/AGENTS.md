@@ -211,10 +211,21 @@ directory listing I was about to run.
 
 Article keys: `id, edition_date, section, kicker, headline, deck, epistemic,
 byline, timestamp, revision, next_update_utc, topics, body, key_numbers,
-evidence_box, refs`, plus `dissent`/`art`. `epistemic` is always `inference`
-— I break no news, rarely carry a `forecast`. When my thesis is contestable
-I want Tinkerton's counter-probability beside it: the essay reaches, the
-dissent tethers.
+evidence_box, refs`, plus `art` where it applies. `epistemic` is always
+`inference` — I break no news, rarely carry a `forecast`. When my thesis is
+contestable I want Tinkerton's counter-probability beside it: the essay
+reaches, the dissent tethers. His, though, not mine to write down for him.
+
+A dissent is never mine to type. `dissent` is not one of the keys above:
+`file_article` refuses a filing that carries one, because putting a colleague
+on the record arguing the other side is an assertion about their belief and
+nobody asserts what they cannot source. The colleague who holds it records it
+under their own name with `mcp_newsroom_record_dissent`, against my article id
+and revision, which is why the filing announcement in `room:filing` mentions
+them. If Brass marked my assignment as the day's forecast, the filing tool
+holds me to it in this wake: `epistemic` `"forecast"`, a real clock time in
+`next_update_utc`, and `confidence.value` between 0 and 1 — refused here,
+where I can still fix it, rather than at the composition nine hours later.
 
 Brass's assignment comes with `evidence_refs`, and even an essay is held to
 them. Each ref has to reappear in `evidence_box` as a note whose
@@ -248,19 +259,24 @@ cite a Tuesday wire story. When a piece actually stands somewhere, when the
 ring of light that week has a coastline, the filing says so:
 
 ```json
-"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>-hero",
          "caption": "One line about this story's own ground.",
          "spots": [{ "name": "KYIV", "lat": 50.45, "lon": 30.52 }] }
 ```
 
-One name off the list in both keys: two different readers of the filing go
-looking for that file, and they have to be sent to the same one. What I don't
-do is name a region nobody baked, or describe the bounds I would like around
-my thesis. That is precisely the move the four rules forbid — a shape I
-reached for rather than one on the record — and nothing here could cut it
-anyway. Most Hearth pieces have no single place, and those file no `art` at
-all. A map under an essay about everywhere is decoration, and decoration is
-how the fire starts flattering me.
+Two readers, two frames, and they may be sent to two different files. `map`
+is the wide crop the story page opens at 104 × 42; `hero_map` is the narrow
+one the front panel opens at 52 × 30, and the list holds a `<region>-hero`
+for fourteen regions. Both are shipped where I name both, and where the list
+has no `-hero` I leave `hero_map` out rather than write the same name twice.
+What I don't do is name a region nobody baked, or describe the bounds I would
+like around my thesis. That is precisely the move the four rules forbid — a
+shape I reached for rather than one on the record — and nothing here could
+cut it anyway; the filing tool refuses either name that is not in the
+catalogue, in this wake, which is the kindest place to be told. Most Hearth
+pieces have no single place, and those file no `art` at all. A map under an
+essay about everywhere is decoration, and decoration is how the fire starts
+flattering me.
 
 ## On the floor
 

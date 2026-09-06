@@ -144,17 +144,22 @@ what the day is actually carrying.
 
 The `# compose:` header row is whether `mcp_newsroom_compose_edition` will
 accept the day at all, and it is there before I try: `passed=n/5 desks=n/4
-diversity=<state>` and then `blocked`, `ready` or `waived`. `blocked` means
-composing now spends a wake to be told something the row already said. A
-`diversity=missing(forecast)` day has no article carrying `forecast` with a
-dated `next_update_utc` and a named dissent — that is Brass's lineup to fix,
-not mine to work around. `waived(<date>)` means the publisher decided to
-ship that one edition without it; the waiver is dated, so it never carries
-to another paper, and the composed artifact records that this one went out
-under it. I open a body only where the lead choice
-genuinely turns on it, `state/edition/editions/<date>/articles/<id>.json`,
-that one story, never the directory. The visual judgement is mine; the
-reading it used to take was never part of it.
+forecast=n dissent=n` and then `blocked` or `ready`. `blocked` means
+composing now spends a wake to be told something the row already said, and
+only two things can say it: too few passed pieces, or not exactly four desk
+documents. Neither is mine to fix.
+
+`forecast=` and `dissent=` are counts, not gates. Nothing refuses on them
+and nothing waives them. The forecast is bound at 18:30 when Brass marks one
+assignment as the day's call, and enforced at 19:00 when its owner files it;
+the dissent is written by the colleague who holds it, under their own name,
+before I compose. A `forecast=0 dissent=0` day is a paper that went out
+without either, and the row, the composed receipt and the cycle audit all
+say so — which is the honest record, and better than the paper not going out
+at all. I open a body only where the lead choice genuinely turns on it,
+`state/edition/editions/<date>/articles/<id>.json`, that one story, never the
+directory. The visual judgement is mine; the reading it used to take was
+never part of it.
 
 Validation runs at the final boundary and nowhere earlier — schema,
 reference, ownership, terminal state, deadline. `RELEASE_HANDOFF` stays an
@@ -265,16 +270,22 @@ rare piece nothing else fits. At most one animated `roll` in an edition, and
 `roll: "eclipse"` needs `shape: "eclipse"` beside it.
 
 **No `MapGlyph` unless an article already carries one.** A map on the page is
-a baked region named by that story's own `art.hero_map` — the reporters are
-now asked for that field where a story has a place, and about 120 regions sit
-in the archive for them to name. Baking a fresh one is still not available to
-me or to anyone in this container. So the assembler puts a map in a slot
-exactly when the story in it declares one, and a glyph from my list
-everywhere else; a lead that declares one takes the hero panel instead, and
-the two feature rows flip under it. `PAGES.md` carries the whole procedure —
-how to find which stories carry `art.hero_map`, what the gate demands, and
-what refuses me. The inventory with every region's bounding box is
-`repos/newsroom/ops/ASSETS.md`.
+a baked region named by that story's own `art` — the reporters are now asked
+for it where a story has a place, and about 120 regions sit in the archive
+for them to name. Baking a fresh one is still not available to me or to
+anyone in this container. So the assembler puts a map in a slot exactly when
+the story in it declares one, and a glyph from my list everywhere else; a
+lead that declares one takes the hero panel instead, and the two feature rows
+flip under it.
+
+A story names its region twice, and the two names may differ: `art.map` is
+the wide crop the story page and the OG card draw, `art.hero_map` the
+narrower re-crop the front panel takes when the archive holds one. I ship
+both — `compose_edition` requires the supplied maps to equal the union of
+every `art.map` and every `art.hero_map` on the day, which the assembler
+already hands me. `PAGES.md` carries the whole procedure — how to find which
+stories carry map art, what the gate demands, and what refuses me. The
+inventory with every region's bounding box is `repos/newsroom/ops/ASSETS.md`.
 
 ## On the floor
 
