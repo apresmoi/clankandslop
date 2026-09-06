@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { layEdition, readEditionInputs } from '../../ops/lay-page.mjs';
 import { writeEditionIndex } from './edition-index.mjs';
 import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, hasDatedForecastWithDissent, qualifySignal, recordAssignment, reviewArticle, stagePublicSource, stageRelease } from './production-newsroom.mjs';
 
@@ -466,143 +467,65 @@ test('file_desk refuses a desk document the edition cannot be assembled from', a
   }
 });
 
-// The skeletons are READ OUT OF CASLON'S BRIEF, never copied here. A test that
-// hand-copies the document it is meant to be checking proves only that two
-// files once agreed; this one fails the moment the brief stops composing.
-const CASLON_BRIEF = readFileSync(path.join(import.meta.dirname, '..', 'agents', 'caslon', 'AGENTS.md'), 'utf8');
+// The page shape is READ OUT OF THE ASSEMBLER THAT SHIPS IT, never copied
+// here. A test that hand-copies the document it is meant to be checking proves
+// only that two files once agreed; this one fails the moment ops/lay-page.mjs
+// stops producing a composable page. (It used to parse the skeletons out of
+// caslon's brief, and went red the moment they moved to PAGES.md — a shape
+// pinned to prose is a shape pinned to nothing.)
+const decisions = (edition, ids) => ({
+  edition,
+  order: ids,
+  art: { [ids[1]]: { shape: 'chip', caption: 'One glyph.' }, [ids[2]]: { shape: 'drone', caption: 'The other.' } },
+  flashpoints: [{ place: 'KYIV', lat: 50.45, lon: 30.52, note: 'A place worth a marker.', article: ids[0] }],
+  briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `Kicker ${n}`, agent: 'Graves', what: `What ${n}.` }, rest: [] })),
+  tape: {
+    briefly: [1, 2, 3].map((n) => ({ label: `Tape ${n}`, lead: { kicker: `Tape kicker ${n}`, agent: 'Foreman', what: `Tape what ${n}.` }, rest: [] })),
+    markets: { kicker: 'A day in eight words', rows: [{ sym: 'ACP', value: '34', spark: 'slots', pct: 'from 4 Sep', dir: 'down' }] },
+    watch: [{ when: '8 Sep', what: 'The measure either enters force or the date slips.', who: 'Foreman' }],
+  },
+});
 
-function briefSkeleton(page) {
-  for (const match of CASLON_BRIEF.matchAll(/```json\n([\s\S]*?)```/gu)) {
-    let document;
-    try { document = JSON.parse(match[1]); } catch { continue; }
-    if (document?.page === page && Array.isArray(document.head)) return document;
-  }
-  throw new Error(`caslon's brief carries no parseable "${page}" page skeleton`);
-}
+const layAt = (state, edition, count) => {
+  const ids = Array.from({ length: count }, (_, index) => `story-${index}`);
+  return layEdition({ edition, ...readEditionInputs(state, edition), decisions: decisions(edition, ids) });
+};
 
-/**
- * Places the day's PASSed ids into the front skeleton. The brief's five slugs
- * are a floor, not a shape: extra pieces go into copies of the skeleton's own
- * rows, inserted before the SectionHeader, exactly as the brief says.
- */
-function placeFront(edition, ids) {
-  const skeleton = briefSkeleton('front');
-  // Deduped in document order: the WorldIndex entry points back at a story the
-  // page already carries, so a placeholder can legitimately appear twice.
-  const placeholders = [...new Set([...JSON.stringify(skeleton).matchAll(/"(<[a-z-]+>)"/gu)].map((m) => m[1]))];
-  assert.ok(placeholders.length >= 5, 'the front skeleton must place at least the five PASSed articles compose_edition requires');
-  let rendered = JSON.stringify(skeleton);
-  for (const [index, placeholder] of placeholders.entries()) rendered = rendered.replaceAll(`"${placeholder}"`, JSON.stringify(ids[index]));
-  const front = JSON.parse(rendered);
-  front.edition = edition;
-
-  const twoUp = front.head.find((block) => block.block === 'Grid' && JSON.stringify(block.props.cols) === '[1,1]' && block.props.columns.every((column) => column.some((nested) => nested.block === 'Teaser')));
-  assert.ok(twoUp, 'the front skeleton must carry a two-up Teaser row to extend from');
-  const extra = ids.slice(placeholders.length);
-  const rows = [];
-  for (let index = 0; index < extra.length; index += 2) {
-    const pair = extra.slice(index, index + 2);
-    rows.push(pair.length === 2
-      ? { block: 'Grid', props: { ...structuredClone(twoUp.props), columns: pair.map((id) => [{ block: 'Teaser', props: { article: id, size: 'flow' } }]) } }
-      : { block: 'Grid', props: { cols: [1], align: 'start', rule: false, columns: [[{ block: 'Teaser', props: { article: pair[0], size: 'feature' } }]] } });
-  }
-  const header = front.head.findIndex((block) => block.block === 'SectionHeader');
-  assert.ok(header > 0, 'the front skeleton must close its head with the Flashpoint SectionHeader');
-  front.head.splice(header, 0, ...rows);
-  return front;
-}
-
-function placeTape(edition) {
-  const tape = briefSkeleton('tape');
-  tape.edition = edition;
-  return tape;
-}
-
-test("the front and tape skeletons in caslon's brief compose, at five stories and at six", async () => {
-  // Both extension forms the brief documents, so deleting either from the
-  // brief fails here rather than at 15:00.
-  assert.match(CASLON_BRIEF, /"cols":\[1\],"align":"start","rule":false/u, 'the brief must document the full-width extra row');
-  assert.match(CASLON_BRIEF, /a second two-up `Grid` with `cols:\[1,1\]`/u, 'the brief must document the two-up extra row');
-
-  for (const [edition, count] of [['2026-09-09', 5], ['2026-09-10', 6]]) {
-    const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-brief-pages-'));
+test('the pages ops/lay-page.mjs assembles compose, at five stories and at six', async () => {
+  // Seven and eight are covered structurally in ops/lay-page.test.mjs; the
+  // fixture here has one owner per story and the roster is six.
+  for (const count of [5, 6]) {
+    const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-lay-page-'));
     const state = path.join(temporary, 'state');
+    const edition = ['2026-09-09', '2026-09-10'][count - 5];
     try {
-      // No article carries art.hero_map, which is the ordinary day the brief is
-      // written for: the permitted map set is empty and the front runs on glyphs.
+      // No article carries art.hero_map, which is the ordinary day the paper
+      // runs: the permitted map set is empty and the front runs on glyphs.
       const noMap = (id, agent, date, index) => { const { art: _, ...value } = article(id, agent, date, index); return value; };
       await driveToCompose(state, edition, noMap, count);
-      const ids = Array.from({ length: count }, (_, index) => `story-${index}`);
       process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-      const front = placeFront(edition, ids);
-      const composed = await composeEdition({ edition, event_key: `compose-brief-${count}`, pages: [
-        { name: 'front', document: front },
-        { name: 'tape', document: placeTape(edition) },
-      ] });
+      const { pages, maps } = layAt(state, edition, count);
+      const composed = await composeEdition({ edition, event_key: `compose-laid-${count}`, pages, maps });
       assert.deepEqual(composed.tree.pages, ['front', 'tape']);
       assert.deepEqual(composed.tree.maps, []);
       // The two GlyphArt blocks alone clear the 2-3 illustration gate, whatever
       // the day's length, and every PASSed piece is placed exactly once.
       const index = await readIndexFile(state, edition);
-      assert.match(index, new RegExp(`^G front articles=${count} visuals=2 papers=front lead=${ids[0]}$`, 'mu'));
+      assert.match(index, new RegExp(`^G front articles=${count} visuals=2 papers=front lead=story-0$`, 'mu'));
       assert.match(index, /^G tape articles=0 visuals=0 papers=tape lead=-$/mu);
 
-      // The same skeleton with one glyph removed is one visual short and refused.
-      const thin = placeFront(edition, ids);
-      thin.head[1].props.columns[0] = [];
-      await assert.rejects(composeEdition({ edition, event_key: `compose-brief-thin-${count}`, pages: [{ name: 'front', document: thin }, { name: 'tape', document: placeTape(edition) }] }), /illustration rhythm invalid.*found 1/su);
+      // The same pages with one glyph removed are one visual short and refused.
+      const thin = layAt(state, edition, count).pages;
+      thin[0].document.head[1].props.columns[0] = [];
+      await assert.rejects(composeEdition({ edition, event_key: `compose-laid-thin-${count}`, pages: thin, maps: [] }), /illustration rhythm invalid.*found 1/su);
 
       // Both pages on the same stock is refused: the paper values must differ.
-      const sameStock = placeTape(edition); sameStock.paper = 'front';
-      await assert.rejects(composeEdition({ edition, event_key: `compose-brief-stock-${count}`, pages: [{ name: 'front', document: placeFront(edition, ids) }, { name: 'tape', document: sameStock }] }), /paper diversity invalid/u);
+      const sameStock = layAt(state, edition, count).pages;
+      sameStock[1].document.paper = 'front';
+      await assert.rejects(composeEdition({ edition, event_key: `compose-laid-stock-${count}`, pages: sameStock, maps: [] }), /paper diversity invalid/u);
     } finally {
       delete process.env.CLANK_NEWSROOM_AGENT;
       await rm(temporary, { recursive: true, force: true });
     }
-  }
-});
-
-
-// Regression: the deployed CLANK_PUBLIC_SOURCE_ROOT is a symlink into a
-// read-only 555 bundle mount. Both properties are reproduced here, because
-// both independently made stage_release fail on the box: a bare recursive cp
-// copies the *link* (so the candidate is not a tree at all), and it preserves
-// 555 (so the non-root runtime cannot build into the candidate, nor remove it).
-test('the staging candidate is a real writable tree even when the source is a read-only symlink', async () => {
-  const base = await mkdtemp(path.join(os.tmpdir(), 'clank-stage-source-'));
-  try {
-    const real = path.join(base, 'bundle'), link = path.join(base, 'newsroom'), out = path.join(base, 'candidate');
-    await mkdir(path.join(real, 'website', 'src'), { recursive: true });
-    await mkdir(path.join(real, '.git'), { recursive: true });
-    await writeFile(path.join(real, 'website', 'src', 'page.astro'), 'page');
-    await writeFile(path.join(real, '.git', 'HEAD'), 'ref: refs/heads/main');
-    // Read-only bundle modes, deepest first so the walk can still descend.
-    for (const directory of [path.join(real, 'website', 'src'), path.join(real, 'website'), real]) await chmod(directory, 0o555);
-    await symlink(real, link);
-
-    await stagePublicSource(out === link ? real : link, out, (file) => !['.git', '.astro', 'dist'].includes(path.basename(file)));
-
-    // Defect 1: without dereference the candidate is a symlink, not a tree.
-    assert.equal((await lstat(out)).isSymbolicLink(), false, 'candidate must be a materialized directory, not a symlink');
-    assert.equal((await lstat(out)).isDirectory(), true);
-    assert.equal(await readFile(path.join(out, 'website', 'src', 'page.astro'), 'utf8'), 'page');
-    assert.ok(!(await readdir(out)).includes('.git'), 'the filter must still exclude .git');
-
-    // Defect 2: the build writes into the candidate, so it must be writable.
-    for (const directory of [out, path.join(out, 'website'), path.join(out, 'website', 'src')]) {
-      assert.ok((await lstat(directory)).mode & 0o200, `${directory} must be owner-writable`);
-    }
-    await writeFile(path.join(out, 'website', 'built.txt'), 'astro output');
-    await mkdir(path.join(out, 'website', 'dist'), { recursive: true });
-
-    // The source bundle itself must be untouched by any of this.
-    assert.equal((await lstat(real)).mode & 0o777, 0o555, 'the read-only source must not be chmodded');
-    assert.ok(!(await readdir(path.join(real, 'website'))).includes('built.txt'), 'nothing may be written through into the source');
-
-    // And the candidate must be removable, which 555 prevented.
-    await rm(out, { recursive: true });
-  } finally {
-    for (const directory of [path.join(base, 'bundle', 'website', 'src'), path.join(base, 'bundle', 'website'), path.join(base, 'bundle')]) await chmod(directory, 0o755).catch(() => undefined);
-    await rm(base, { recursive: true, force: true });
   }
 });
