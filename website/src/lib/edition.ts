@@ -138,7 +138,7 @@ export const ogRoot = resolve(contentRoot, '..', 'website', 'public', 'og');
 
 /** Committed social-card path for an article (date-scoped to match), or
     `undefined` when that card was never rendered and committed.
-    Cards are produced by `npm run og` on a laptop and committed; 15 of the 71
+    Cards are produced by `npm run og` on a laptop and committed; fifteen
     editions have none, and the layout emitted `og:image` for every article
     regardless — so those pages advertised a 1200x630 image that answers 404.
     A missing file now falls through to the layout's `/og/default.png`, which

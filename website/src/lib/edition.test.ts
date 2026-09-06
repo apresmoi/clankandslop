@@ -36,6 +36,6 @@ test('no article on the site can advertise a card that is not on disk', () => {
   }
   // Without this the test above passes vacuously the day every card exists —
   // and passes vacuously TODAY if the existence check is deleted, which is the
-  // regression it is here to catch. 15 of the 71 editions have no cards.
+  // regression it is here to catch. Fifteen editions have no cards at all.
   assert.ok(missing > 0, 'every article has a card: this fixture can no longer prove a missing one falls back');
 });
