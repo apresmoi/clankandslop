@@ -121,7 +121,14 @@ export async function fileArticle(args){
   const resolvedArticle=corrected?{...article,id:assignment.id}:article;
   const evidence=new Set(resolvedArticle.evidence_box.flatMap(item=>[item?.source_note?.source_url,item?.source_note?.source_id]).filter(Boolean));
   const missingEvidence=assignment.evidence_refs.filter(ref=>!evidence.has(ref));
-  if(missingEvidence.length>0)throw new Error(`article.evidence_box does not preserve assignment lineage — missing evidence_refs from your assignment ${describeAssignment(assignment)}: ${missingEvidence.join(', ')}`);
+  // The refusal a reporter actually reads, and the only place this rule is
+  // stated at the moment it binds. Naming the missing refs was not enough: on
+  // 2026-09-06 all six reporters were refused here, and the obvious repair --
+  // bolting the refs into evidence_box uncited -- trips cite_unused and comes
+  // back from Spike as a revision request. So the message carries the whole
+  // repair: which field, in what form, and the citation that keeps the fix
+  // from becoming the next failure.
+  if(missingEvidence.length>0)throw new Error(`article.evidence_box does not preserve assignment lineage — your assignment ${describeAssignment(assignment)} carries evidence_refs that your evidence_box does not: ${missingEvidence.join(', ')}. Each one must appear as an entry in article.evidence_box whose source_note.source_id or source_note.source_url is exactly that string — carry the note across from the research the assignment points at, never invent one to clear this check. Then cite each of those entries in article.body by its position, [E1] for the first evidence_box entry through [En] for the nth: an entry added only to satisfy this check and never cited is flagged cite_unused and the editor returns it for revision.`);
   // Two different questions, answered from two different records on disk, and
   // conflating them is what broke on 2026-09-05:
   //

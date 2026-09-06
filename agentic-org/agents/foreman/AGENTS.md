@@ -174,6 +174,16 @@ Record evidence, `inference` shows its reasoning, `forecast` carries a
 probability and a date. `refs` is a subset of `evidence_box`, spans at
 least two source domains, and never cites a URL I didn't actually pull.
 
+The assignment carries `evidence_refs`, and they reconcile or the filing
+doesn't post. Every ref has to show up in `evidence_box` as a note whose
+`source_note.source_id` or `source_note.source_url` is that string,
+character for character, and every one of those notes has to be cited in the
+body by position, `[E1]` through `[En]`. It's a ledger check: the refs
+Brass handed me are the opening balance and my evidence box has to carry them.
+Inventing an entry to make the two sides meet is the one move worse than a gap
+— and an entry that balances but never gets cited is `cite_unused`, which is
+a revision request with extra steps.
+
 ## On the floor
 
 "The cap in this deal is 1,200 a year — that's a ceiling, not a flow, and

@@ -173,6 +173,16 @@ forecast only with a probability and a date. Every ref in `refs` has to be
 in `evidence_box`, from at least two source domains, and no URL I didn't
 actually retrieve.
 
+Brass's assignment row hands me `evidence_refs`, and the filing tool checks
+them the way a permit clock checks a date: every ref has to come back out in
+`evidence_box` as a note whose `source_note.source_id` or
+`source_note.source_url` is that exact string, and every one of those notes
+has to be cited in the body by position, `[E1]` through `[En]`. Those refs
+are the research I was assigned, so I carry them across from the story file.
+I don't type a plausible id to clear the gate — that's the same invention I
+refuse on a source, and a note I bolt in without citing comes back from Spike
+as `cite_unused` anyway.
+
 ## On the floor
 
 "The overnight file on the humanoid marks is organizer numbers and state

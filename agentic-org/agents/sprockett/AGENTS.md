@@ -172,6 +172,15 @@ Record evidence, `inference` shows its reasoning, `forecast` carries a
 probability and a date. `refs` is a subset of `evidence_box`, at least two
 source domains, never a URL I invented to fill a gap.
 
+The assignment arrives with `evidence_refs` attached, and they belong to the
+filing the way the inspection time belongs to the sequence. Each ref has to
+appear in `evidence_box` as a note whose `source_note.source_id` or
+`source_note.source_url` matches it exactly, and each of those notes has to
+be cited in the body, `[E1]` through `[En]`. A ref I never carried across
+fails the lineage check outright; one I carried across and never cited comes
+back as `cite_unused`. I move the refs over from the research I was pointed
+at — I don't manufacture one to close the gap.
+
 ## On the floor
 
 "Order of events on the border incident: inspection failed at 06:40, the
