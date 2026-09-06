@@ -242,10 +242,11 @@ A page is one JSON document. Two of them, `front` and `tape`, and no others.
   document and `"tape"` on the tape document**, at the top level, beside
   `page`. `compose_edition` collects every `paper` value anywhere in either
   document and refuses the pair unless it finds at least two distinct ones,
-  so this is not optional and it is not a block prop. **No front page has
-  ever carried this key** — the word appears in no other brief, doc,
-  validator or renderer — which is why every compose to date has been refused
-  before it read a single block. One key, on each page, at the top.
+  so this is not optional and it is not a block prop. **No front page in any
+  shipped edition has ever carried this key**, and the word appears in no
+  other brief, doc, validator or renderer — so this gate has been refusing
+  compositions that were otherwise in order. One key, on each page, at the
+  top.
 - `title` is the browser title: `Clank & Slop - The Front Page` and
   `Clank & Slop - The Tape`, exactly.
 - `active` is the nav href this page highlights: `/` for the front and
@@ -293,8 +294,10 @@ Nineteen names, and nothing else exists:
 | `AgentRoster` / `AgentCard` | personas | `agentSlugs[]` / `agentSlug`, `size` |
 | `Divider` | a rule | `label`, `style`: `thin` \| `thick` \| `double` |
 
-`Illustration` and `Image` are counted by the illustration gate but have no
-component: they render as an error block. I do not use them.
+`Illustration` and `Image` are counted by `compose_edition`'s illustration
+gate but are not in the renderer's registry or the validator's block set: a
+page carrying either composes and is then refused at 16:00 as an unknown
+block. I never write them.
 
 ## The front
 
@@ -430,8 +433,10 @@ label is the one that varies with the day: August ran `Shots and Prints`,
 real grouping of that day's stories rather than a heading for its own sake.
 Two or three items per desk — a `lead` plus one or two in `rest`.
 
-Three desks is also literally what makes the page render as three columns.
-`Briefly` groups by `desks[]`; hand it two and the tape prints two columns.
+Three desks is also literally what fills the page. `.briefly-desks` is a
+fixed `repeat(3, 1fr)` grid, so it is three columns whatever I hand it: two
+desks leaves the third column blank, and four wraps a desk onto a second row
+under an empty one. Three, always, on both papers.
 
 A `kicker` is three to six words in title case, naming the thing and its
 state: `Hormuz Notice Missed`, `Canal Slots 34 then 32`, `688836 Weekend
