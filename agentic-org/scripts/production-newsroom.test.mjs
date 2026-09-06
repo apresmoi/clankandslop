@@ -453,7 +453,7 @@ test('file_desk refuses a desk document the edition cannot be assembled from', a
 // The skeleton written into caslon's brief, transcribed. If this stops
 // composing, the brief is wrong and an edition is not going out.
 const briefFront = (ids) => ({
-  edition: '2026-09-09', page: 'front', paper: 'broadsheet',
+  edition: '2026-09-09', page: 'front', paper: 'front',
   title: 'Clank & Slop - The Front Page', active: '/',
   head: [
     { block: 'Hero', props: { variant: 'lead-only', lead: ids[0] } },
@@ -477,7 +477,7 @@ const briefFront = (ids) => ({
     { label: 'Moving and Unverified', lead: { kicker: 'Kametstal Restart Unset', agent: 'Graves', what: 'No restart date has been published.' }, rest: [] } ] } }],
 });
 const briefTape = () => ({
-  edition: '2026-09-09', page: 'tape', paper: 'ticker',
+  edition: '2026-09-09', page: 'tape', paper: 'tape',
   title: 'Clank & Slop - The Tape', active: '/tape',
   head: [
     { block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: [
@@ -516,8 +516,8 @@ test("the front and tape skeletons in caslon's brief compose", async () => {
     assert.deepEqual(composed.tree.maps, []);
     // The two GlyphArt blocks alone clear the 2-3 illustration gate, and the
     // INDEX records the count the gate actually read.
-    assert.match(await readIndexFile(state, edition), /^G front articles=5 visuals=2 papers=broadsheet lead=story-0$/mu);
-    assert.match(await readIndexFile(state, edition), /^G tape articles=0 visuals=0 papers=ticker lead=-$/mu);
+    assert.match(await readIndexFile(state, edition), /^G front articles=5 visuals=2 papers=front lead=story-0$/mu);
+    assert.match(await readIndexFile(state, edition), /^G tape articles=0 visuals=0 papers=tape lead=-$/mu);
 
     // The same skeleton with one glyph removed is one visual short and refused.
     const thin = briefFront(ids);
@@ -525,7 +525,7 @@ test("the front and tape skeletons in caslon's brief compose", async () => {
     await assert.rejects(composeEdition({ edition, event_key: 'compose-brief-thin', pages: [{ name: 'front', document: thin }, { name: 'tape', document: briefTape() }] }), /illustration rhythm invalid.*found 1/su);
 
     // Both pages on the same stock is refused: the paper values must differ.
-    const sameStock = briefTape(); sameStock.paper = 'broadsheet';
+    const sameStock = briefTape(); sameStock.paper = 'front';
     await assert.rejects(composeEdition({ edition, event_key: 'compose-brief-stock', pages: [{ name: 'front', document: briefFront(ids) }, { name: 'tape', document: sameStock }] }), /paper diversity invalid/u);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;

@@ -231,16 +231,21 @@ rather than by copying them: `"worldDesk": "edition"` and `"resolved":
 A page is one JSON document. Two of them, `front` and `tape`, and no others.
 
 ```json
-{ "edition": "2026-09-07", "page": "front", "paper": "broadsheet",
+{ "edition": "2026-09-07", "page": "front", "paper": "front",
   "title": "Clank & Slop - The Front Page", "active": "/",
   "head": [ ... ], "flow": [ ... ] }
 ```
 
 - `edition` is the edition date and must match. `page` is `front` or `tape`
   and must match the filename.
-- `paper` is the stock this page is printed on. The two pages must not carry
-  the same value — `broadsheet` for the front, `ticker` for the tape — and
-  `compose_edition` refuses the pair outright if they match.
+- `paper` is the stock this page is printed on: **`"front"` on the front
+  document and `"tape"` on the tape document**, at the top level, beside
+  `page`. `compose_edition` collects every `paper` value anywhere in either
+  document and refuses the pair unless it finds at least two distinct ones,
+  so this is not optional and it is not a block prop. **No front page has
+  ever carried this key** — the word appears in no other brief, doc,
+  validator or renderer — which is why every compose to date has been refused
+  before it read a single block. One key, on each page, at the top.
 - `title` is the browser title: `Clank & Slop - The Front Page` and
   `Clank & Slop - The Tape`, exactly.
 - `active` is the nav href this page highlights: `/` for the front and
@@ -297,7 +302,7 @@ Six head blocks, one flow block. This shape has run every day from August
 through the last edition, and it is the shape to hold:
 
 ```json
-{ "edition": "2026-09-07", "page": "front", "paper": "broadsheet",
+{ "edition": "2026-09-07", "page": "front", "paper": "front",
   "title": "Clank & Slop - The Front Page", "active": "/",
   "head": [
     { "block": "Hero", "props": { "variant": "lead-only", "lead": "<lead-slug>" } },
@@ -357,7 +362,7 @@ Four head blocks, empty flow. The last edition shipped a two-block tape and
 it read as a stub; this is the shape that works:
 
 ```json
-{ "edition": "2026-09-07", "page": "tape", "paper": "ticker",
+{ "edition": "2026-09-07", "page": "tape", "paper": "tape",
   "title": "Clank & Slop - The Tape", "active": "/tape",
   "head": [
     { "block": "Briefly", "props": { "title": "The Markets File", "compact": true,
@@ -453,8 +458,8 @@ documents I hand over — not later, not partially:
   blocks are written from the day's numbers, not from the stories — so **the
   front carries every PASSed piece**, which is what the sixth and seventh
   head rows are for on a heavy day.
-- **The two pages carry different `paper` values.** `broadsheet` and
-  `ticker`.
+- **The two pages carry different `paper` values.** `front` and `tape`,
+  top level. This is the gate that has refused every compose so far.
 - **The front carries two or three `MapGlyph`/`GlyphArt` blocks.** Fewer is a
   wall of grey; more crowds the page. Two is the floor and it is enforced.
 - **Illustrated story rows alternate sides.** Where two illustrated rows sit
