@@ -24,10 +24,13 @@
 #  2. REF SHAPE. The trigger filter is re-asserted inside the job against
 #     `^refs/heads/edition/\d{4}-\d{2}-\d{2}$`, because a glob is a convenience
 #     and this is the check that means it.
-#  3. CI. The merge waits for the CI workflow's own run against THIS EXACT
-#     head SHA and refuses anything but `success`. It never re-runs the checks
-#     itself (a second opinion is not the gate), never uses `--admin`, and
-#     never merges while a run is queued or in progress.
+#  3. CI. `agentic-org/scripts/ci-gate.mjs` reads the CI workflow's own run
+#     against THIS EXACT head SHA and refuses anything but `success`. It never
+#     re-runs the checks itself (a second opinion is not the gate), never uses
+#     `--admin`, and never merges while a run is queued or in progress. It is
+#     read TWICE — once before the pull request exists and once immediately
+#     before the merge, with the head SHA re-asserted in between. The rule
+#     lives in a unit-tested script, not in inline YAML.
 #  4. CONTENT. The diff against `main` must touch nothing outside the paths
 #     `publish-edition-branch.mjs` is allowed to commit, and the two of those
 #     that are not content are admitted on a much shorter leash: every changed
@@ -133,42 +136,25 @@ jobs:
           done
           echo "every change under the checksum-only paths is a checksum"
 
-      # The gate. It reads the CI workflow's conclusion for this head SHA and
-      # for no other commit — a green run on an older push must never let a
-      # newer, redder one through.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The gate. `agentic-org/scripts/ci-gate.mjs` reads the CI workflow's own
+      # conclusion for THIS EXACT head SHA and for no other commit — a green run
+      # on an older push must never let a newer, redder one through. The rule
+      # lives in a script with unit tests rather than in inline YAML, because
+      # "an action_required duplicate does not veto a green push run, but an
+      # action_required push run does" is precisely the kind of clause that
+      # rots silently when it is only written once, in a shell pipeline.
       - name: Wait for CI on this exact commit
         id: ci
         env:
           GH_TOKEN: ${{ github.token }}
-          SHA: ${{ github.sha }}
-          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          deadline=$(( $(date +%s) + 1800 ))
-          while :; do
-            runs="$(gh api "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$SHA&per_page=100" \
-                      --jq '[.workflow_runs[] | {status, conclusion}]')"
-            total="$(printf '%s' "$runs" | jq 'length')"
-            pending="$(printf '%s' "$runs" | jq '[.[] | select(.status != "completed")] | length')"
-            failed="$(printf '%s' "$runs" | jq '[.[] | select(.status == "completed" and .conclusion != "success")] | length')"
-            succeeded="$(printf '%s' "$runs" | jq '[.[] | select(.conclusion == "success")] | length')"
-            echo "CI for $SHA: total=$total pending=$pending failed=$failed succeeded=$succeeded"
-            if [ "$failed" -gt 0 ]; then
-              echo "::error::CI concluded non-success for $SHA — refusing to merge a red branch"
-              echo "green=false" >> "$GITHUB_OUTPUT"
-              exit 1
-            fi
-            if [ "$total" -gt 0 ] && [ "$pending" -eq 0 ] && [ "$succeeded" -gt 0 ]; then
-              echo "green=true" >> "$GITHUB_OUTPUT"
-              break
-            fi
-            if [ "$(date +%s)" -ge "$deadline" ]; then
-              echo "::error::CI for $SHA did not conclude within 30 minutes — refusing to merge on a timeout"
-              echo "green=false" >> "$GITHUB_OUTPUT"
-              exit 1
-            fi
-            sleep 20
-          done
+          node agentic-org/scripts/ci-gate.mjs --sha="${{ github.sha }}" --repo="${{ github.repository }}"
+          echo "green=true" >> "$GITHUB_OUTPUT"
 
       - name: Open or update the pull request
         id: pr
@@ -188,10 +174,12 @@ jobs:
           echo "number=$number" >> "$GITHUB_OUTPUT"
           echo "pull request #$number"
 
-      # Read the checks a second time, from the pull request's own view, right
-      # before merging. Two independent reads of the same fact is what stops a
-      # race between the poll above and the merge below.
-      - name: Merge, but only if the pull request itself is still green
+      # Read it a second time, after the pull request exists and immediately
+      # before merging. Two reads separated in time is what closes the race
+      # between the gate above and the merge below — and the head SHA is
+      # re-asserted, so a branch that moved while CI ran is refused rather than
+      # merged on the strength of a run for a commit that is no longer the tip.
+      - name: Merge, but only if it is still green and still the same commit
         if: steps.ci.outputs.green == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -201,9 +189,8 @@ jobs:
           set -euo pipefail
           head="$(gh pr view "$NUMBER" --json headRefOid --jq .headRefOid)"
           [ "$head" = "$SHA" ] || { echo "::error::the branch moved from $SHA to $head while CI ran — refusing"; exit 1; }
-          if ! gh pr checks "$NUMBER"; then
-            echo "::error::the pull request's own checks are not all green — refusing"
-            exit 1
-          fi
+          node agentic-org/scripts/ci-gate.mjs --sha="$SHA" --repo="${{ github.repository }}" --timeout-seconds=300  # short, but not zero: the duplicate run the PR itself created may still be queued
+          state="$(gh pr view "$NUMBER" --json mergeable --jq .mergeable)"
+          [ "$state" != "CONFLICTING" ] || { echo "::error::pull request #$NUMBER conflicts with the base — refusing"; exit 1; }
           gh pr merge "$NUMBER" --merge --delete-branch=false
           echo "merged #$NUMBER ($SHA)"
