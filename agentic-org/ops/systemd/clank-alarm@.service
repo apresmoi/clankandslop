@@ -23,4 +23,4 @@ Type=oneshot
 EnvironmentFile=/etc/clank-alarm/alarm.env
 ExecStart=/bin/sh -c 'systemctl status --no-pager --lines=40 %i > /run/clank-alarm-%i.log 2>&1 || true; \
   /usr/bin/node /usr/local/lib/clank-alarm/alarm.mjs \
-    --reason=deploy-failed --message="systemd unit %i failed" --detail-file=/run/clank-alarm-%i.log'
+    --reason=unit-failed --message="systemd unit %i failed on hetzner" --detail-file=/run/clank-alarm-%i.log'

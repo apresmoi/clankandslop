@@ -55,6 +55,12 @@ export const REASONS = Object.freeze({
   'deploy-failed': { title: 'Newsroom: deploy failed', priority: 'urgent', tags: 'rotating_light' },
   'no-edition': { title: 'Newsroom: no edition today', priority: 'urgent', tags: 'newspaper' },
   'seam-blocked': { title: 'Newsroom: seam could not run', priority: 'high', tags: 'warning' },
+  // For an OnFailure= handler, which is reached by units whose own code never
+  // ran or never got to say why. Reusing `deploy-failed` or `no-edition` there
+  // would put the wrong words on a lock screen at 04:00 and send someone to
+  // the wrong box — the point of a fixed vocabulary is that each word means
+  // one thing.
+  'unit-failed': { title: 'Newsroom: a scheduled job failed', priority: 'urgent', tags: 'rotating_light' },
   selftest: { title: 'Newsroom alarm self-test', priority: 'default', tags: 'white_check_mark' }
 });
 

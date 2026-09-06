@@ -10,8 +10,16 @@ const url = 'https://ntfy.sh/topic-abcdef';
 const environment = (extra = {}) => ({ CLANK_ALARM_URL: url, CLANK_ALARM_HOST: 'testbox', ...extra });
 
 test('every reason the unattended cycle can raise has a title, a priority and a tag', () => {
-  for (const reason of ['repin-failed', 'bundle-mismatch', 'deploy-failed', 'no-edition'])
+  for (const reason of ['repin-failed', 'bundle-mismatch', 'deploy-failed', 'no-edition', 'seam-blocked', 'unit-failed'])
     assert.ok(REASONS[reason]?.title && REASONS[reason].priority && REASONS[reason].tags, `${reason} is not a declared alarm reason`);
+});
+
+test('a unit failure has its own word — an OnFailure handler never borrows another reason', () => {
+  // Reached by units whose own code never ran. Calling that "no edition" or
+  // "deploy failed" puts the wrong words on a lock screen and sends someone to
+  // the wrong box.
+  assert.equal(REASONS['unit-failed'].title, 'Newsroom: a scheduled job failed');
+  assert.equal(parseArgs(['--reason=unit-failed']).reason, 'unit-failed');
 });
 
 test('an unknown reason is refused rather than sent as free text', () => {
