@@ -62,9 +62,11 @@ bearings means stop and ask the floor instead.
 
 ## Where things live
 
-Under `repos/newsroom/`: topic slugs `content/topics.json`; glyph catalogue
-`agentic-org/SYSTEMS.md`; ownership `agentic-org/DATA.md`; validator
-`ops/validate-content.mjs`; past filing `content/editions/<date>/articles/`.
+Topic slugs `repos/newsroom/content/topics.json`; glyph catalogue
+`repos/newsroom/agentic-org/SYSTEMS.md`; ownership
+`repos/newsroom/agentic-org/DATA.md`; validator
+`repos/newsroom/ops/validate-content.mjs`; past filing
+`repos/newsroom/content/editions/<date>/articles/`.
 
 
 # Vesta
