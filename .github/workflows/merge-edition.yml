@@ -62,7 +62,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  BASE_BRANCH: main
+  BASE_BRANCH: test/merge-edition-base
   # Exactly what publish-edition-branch.mjs commits: the edition directory and
   # the two generated views CI diff-checks. Nothing else may ride along.
   ALLOWED_PATHS: "content/editions/ content/topics.txt content/bylines/ agentic-org/newsroom-runtime-bundle.json agentic-org/agents/"
