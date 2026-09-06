@@ -16,6 +16,11 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: Validate content
         run: node ops/validate-content.mjs
+      # ops/lay-page.mjs assembles both page documents before compose_edition
+      # sees them, so its guarantees are the ones that keep a composition from
+      # being refused inside a wake. Run here rather than nowhere.
+      - name: Test the page assembler
+        run: npm run ops:test
       # content/topics.txt is a generated, committed view of content/topics.json:
       # the agents read the flat file instead of pulling the 503-line registry
       # into an expensive context. Regenerate and diff so an edit to topics.json

@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "ops:test": "node --test ops/*.test.mjs",
     "org:bundle": "node agentic-org/scripts/build-newsroom-bundle.mjs",
     "org:test": "node --test agentic-org/scripts/*.test.mjs && node agentic-org/e2e/run.mjs",
     "org:e2e": "node agentic-org/e2e/run.mjs",
