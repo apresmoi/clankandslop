@@ -48,7 +48,13 @@ const SHAPES = {
   'caslon.weather': {
     keys: ['weather'],
     check(document, out) {
-      if (!isObj(document.weather)) { out.push('weather must be an object {city, temp_c, summary, humidity_pct, wind}'); return; }
+      // The desk owns no weather instrument. A reading reaches it only as a
+      // retrieved observation file; on a day there is none, `null` is the
+      // complete and honest document, and the masthead ear drops the two
+      // weather lines. The contract permits that explicitly so the only way
+      // to satisfy it is never to invent a temperature.
+      if (document.weather === null) return;
+      if (!isObj(document.weather)) { out.push('weather must be an object {city, temp_c, summary, humidity_pct, wind}, or null when no observation was retrieved'); return; }
       for (const key of ['city', 'summary', 'wind']) if (!isStr(document.weather[key])) out.push(`weather.${key} must be a non-empty string`);
       for (const key of ['temp_c', 'humidity_pct']) if (!isNum(document.weather[key])) out.push(`weather.${key} must be a number`);
     },

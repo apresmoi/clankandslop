@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -266,17 +267,22 @@ const refusesWithFloorMessage = (error) => { assert.equal(error.message, FORECAS
 // stories of fact and inference and nothing carrying a dated forecast.
 const withoutForecast = (id, agent, edition, index) => { const { dissent: _, ...value } = article(id, agent, edition, index); return { ...value, epistemic: index % 2 === 0 ? 'fact' : 'inference' }; };
 
-async function driveToCompose(state, edition, make) {
+// `count` is how many stories the day carries. Five is compose_edition's floor,
+// not the only length a day comes in: 2026-09-05 PASSed six.
+async function driveToCompose(state, edition, make, count = owners.length) {
   process.env.CLANK_EDITION_STATE_ROOT = state;
-  const assignments = owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] }));
+  const day = [...owners, 'vesta'].slice(0, count);
+  assert.equal(day.length, count, 'the fixture has no owner for that many stories');
+  process.env.CLANK_EDITION_STATE_ROOT = state;
+  const assignments = day.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] }));
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
   await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments });
-  for (const [index, owner] of owners.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition, event_key: `filing-${edition}-${index}`, article: make(`story-${index}`, owner[0].toUpperCase() + owner.slice(1), edition, index) }); }
+  for (const [index, owner] of day.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition, event_key: `filing-${edition}-${index}`, article: make(`story-${index}`, owner[0].toUpperCase() + owner.slice(1), edition, index) }); }
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
-  for (const index of owners.keys()) await reviewArticle({ edition, event_key: `review-${edition}-${index}`, article_id: `story-${index}`, revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+  for (const index of day.keys()) await reviewArticle({ edition, event_key: `review-${edition}-${index}`, article_id: `story-${index}`, revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
   process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: deskDocument(name, edition) });
   process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: deskDocument(name, edition) });
-  const ids = owners.map((_, index) => `story-${index}`);
+  const ids = day.map((_, index) => `story-${index}`);
   return { edition, pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'world-map') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps: [{ name: 'world-map', document: { version: 'test' } }] };
 }
 
@@ -439,6 +445,16 @@ test('file_desk refuses a desk document the edition cannot be assembled from', a
     // Nothing settled is the empty array, which is a complete document.
     await fileDesk({ edition: missingEdition, event_key: 'settle-empty', name: 'ledger.settlements', document: { resolved_last_edition: [] } });
 
+    // No observation retrieved is `null`, which is also a complete document.
+    // The contract has to accept it, or the only way to file a valid weather
+    // document on a day with no reading is to invent one.
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await fileDesk({ edition: missingEdition, event_key: 'weather-unavailable', name: 'caslon.weather', document: { weather: null } });
+    // A partial reading is still refused: null is the whole document or the
+    // five retrieved fields are, and there is nothing in between.
+    await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'weather-partial', name: 'caslon.weather', document: { weather: { city: 'Berlin', summary: 'clear' } } }), /weather\.temp_c must be a number/u);
+    await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'weather-absent', name: 'caslon.weather', document: {} }), /weather must be an object .*or null/u);
+
     // A field filed into the wrong document is caught here rather than
     // assembling silently over its owner's.
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
@@ -450,85 +466,98 @@ test('file_desk refuses a desk document the edition cannot be assembled from', a
   }
 });
 
-// The skeleton written into caslon's brief, transcribed. If this stops
-// composing, the brief is wrong and an edition is not going out.
-const briefFront = (ids) => ({
-  edition: '2026-09-09', page: 'front', paper: 'front',
-  title: 'Clank & Slop - The Front Page', active: '/',
-  head: [
-    { block: 'Hero', props: { variant: 'lead-only', lead: ids[0] } },
-    { block: 'Grid', props: { cols: [1, 2], align: 'stretch', rule: false, columns: [
-      [{ block: 'GlyphArt', props: { shape: 'chip', scale: 0.6 } }],
-      [{ block: 'Teaser', props: { article: ids[1], size: 'feature' } }] ] } },
-    { block: 'Grid', props: { cols: [2, 1], align: 'stretch', rule: false, columns: [
-      [{ block: 'Teaser', props: { article: ids[2], size: 'feature' } }],
-      [{ block: 'GlyphArt', props: { shape: 'pumpjack', scale: 0.6 } }] ] } },
-    { block: 'Grid', props: { cols: [1, 1], align: 'start', columns: [
-      [{ block: 'Teaser', props: { article: ids[3], size: 'flow' } }],
-      [{ block: 'Teaser', props: { article: ids[4], size: 'flow' } }] ] } },
-    { block: 'SectionHeader', props: { text: 'The Flashpoint Index' } },
-    { block: 'Grid', props: { cols: [1, 1], columns: [
-      [{ block: 'WorldGlyph', props: { worldDesk: 'edition', hotspots: [{ name: 'Kharg Island', lat: 29.25, lon: 50.33, p: 0.34 }] } }],
-      [{ block: 'WorldIndex', props: { items: [{ place: 'Kharg Island', note: 'No vessel named.', agent: 'Sprockett', p: 0.34 }] } }] ] } },
-  ],
-  flow: [{ block: 'Briefly', props: { title: '', compact: true, desks: [
-    { label: 'On the Front', lead: { kicker: 'Ankara Sequence Holds', agent: 'Sprockett', what: 'The clock started; no text has been published.' }, rest: [] },
-    { label: 'Held and Waiting', lead: { kicker: 'Green Book Rate Still 28 Oct', agent: 'Foreman', what: 'Published, but no project changes status yet.' }, rest: [] },
-    { label: 'Moving and Unverified', lead: { kicker: 'Kametstal Restart Unset', agent: 'Graves', what: 'No restart date has been published.' }, rest: [] } ] } }],
-});
-const briefTape = () => ({
-  edition: '2026-09-09', page: 'tape', paper: 'tape',
-  title: 'Clank & Slop - The Tape', active: '/tape',
-  head: [
-    { block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: [
-      { label: 'Closed Clocks', lead: { kicker: 'Galați Drone Attributed', agent: 'Sprockett', what: 'The 23 August call settles YES.' }, rest: [{ kicker: 'Cernavodă Still Offline', agent: 'Graves', what: 'The 23 August call settles NO.' }] },
-      { label: 'Open Clocks', lead: { kicker: 'Canada Match 8 Sep', agent: 'Foreman', what: 'No Gazette list has been posted.' }, rest: [{ kicker: 'Ballot Rule Still Held', agent: 'Tinkerton', what: 'The order stands while the application sits.' }] },
-      { label: 'Tape Notes', lead: { kicker: 'Canal Slots 34 then 32', agent: 'Graves', what: 'Bookable transits fall to 34 a day, then 32.' }, rest: [{ kicker: 'Foxconn Books Eleven Billion', agent: 'Cogsworth', what: 'Capex booked against undelivered racks.' }] } ] } },
-    { block: 'Grid', props: { cols: [1, 1], columns: [
-      [{ block: 'MarketsRail', props: { title: 'The Tape', kicker: '9 Sep · slots cut, ballot rule held', rows: [
-        { sym: 'ACP', value: '34', spark: 'slots', pct: 'from 4 Sep', dir: 'down' },
-        { sym: '338', value: '50%', spark: 'live', pct: '04:01 UTC', dir: 'up' },
-        { sym: 'KHARG', value: 'unnamed', spark: 'no vessel', pct: 'unverified', dir: 'flat' } ] } }],
-      [{ block: 'WhatToWatch', props: { title: 'The Deadlines · 8 Sep – 30 Sep', items: [
-        { when: '8 Sep', what: 'The matching tariffs either enter force or the date slips.', who: 'Foreman' } ] } }] ] } },
-    { block: 'ForecastLedger', props: { meta: '19 open calls', open_calls: [
-      { horizon: 'By 8 Sep', question: 'The matching tariffs enter force on 8 September 2026', call: 'YES', direction: 'bull', p: 0.7, interval: 0.2, quorum: '3/5', detail: 'YES requires an operative measure effective 8 September.', dissent: { agents: ['Tinkerton'], p: 0.48 } } ] } },
-    { block: 'TrackRecord', props: { label: 'Track Record · Settlement', resolved: 'edition' } },
-  ],
-  flow: [],
-});
+// The skeletons are READ OUT OF CASLON'S BRIEF, never copied here. A test that
+// hand-copies the document it is meant to be checking proves only that two
+// files once agreed; this one fails the moment the brief stops composing.
+const CASLON_BRIEF = readFileSync(path.join(import.meta.dirname, '..', 'agents', 'caslon', 'AGENTS.md'), 'utf8');
 
-test("the front and tape skeletons in caslon's brief compose", async () => {
-  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-brief-pages-'));
-  const state = path.join(temporary, 'state'), edition = '2026-09-09';
-  try {
-    // No article carries art.hero_map, which is the ordinary day the brief is
-    // written for: the permitted map set is empty and the front runs on glyphs.
-    const noMap = (id, agent, date, index) => { const { art: _, ...value } = article(id, agent, date, index); return value; };
-    await driveToCompose(state, edition, noMap);
-    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    const ids = owners.map((_, index) => `story-${index}`);
-    const composed = await composeEdition({ edition, event_key: 'compose-brief-skeleton', pages: [
-      { name: 'front', document: briefFront(ids) },
-      { name: 'tape', document: briefTape() },
-    ] });
-    assert.deepEqual(composed.tree.pages, ['front', 'tape']);
-    assert.deepEqual(composed.tree.maps, []);
-    // The two GlyphArt blocks alone clear the 2-3 illustration gate, and the
-    // INDEX records the count the gate actually read.
-    assert.match(await readIndexFile(state, edition), /^G front articles=5 visuals=2 papers=front lead=story-0$/mu);
-    assert.match(await readIndexFile(state, edition), /^G tape articles=0 visuals=0 papers=tape lead=-$/mu);
+function briefSkeleton(page) {
+  for (const match of CASLON_BRIEF.matchAll(/```json\n([\s\S]*?)```/gu)) {
+    let document;
+    try { document = JSON.parse(match[1]); } catch { continue; }
+    if (document?.page === page && Array.isArray(document.head)) return document;
+  }
+  throw new Error(`caslon's brief carries no parseable "${page}" page skeleton`);
+}
 
-    // The same skeleton with one glyph removed is one visual short and refused.
-    const thin = briefFront(ids);
-    thin.head[1].props.columns[0] = [];
-    await assert.rejects(composeEdition({ edition, event_key: 'compose-brief-thin', pages: [{ name: 'front', document: thin }, { name: 'tape', document: briefTape() }] }), /illustration rhythm invalid.*found 1/su);
+/**
+ * Places the day's PASSed ids into the front skeleton. The brief's five slugs
+ * are a floor, not a shape: extra pieces go into copies of the skeleton's own
+ * rows, inserted before the SectionHeader, exactly as the brief says.
+ */
+function placeFront(edition, ids) {
+  const skeleton = briefSkeleton('front');
+  // Deduped in document order: the WorldIndex entry points back at a story the
+  // page already carries, so a placeholder can legitimately appear twice.
+  const placeholders = [...new Set([...JSON.stringify(skeleton).matchAll(/"(<[a-z-]+>)"/gu)].map((m) => m[1]))];
+  assert.ok(placeholders.length >= 5, 'the front skeleton must place at least the five PASSed articles compose_edition requires');
+  let rendered = JSON.stringify(skeleton);
+  for (const [index, placeholder] of placeholders.entries()) rendered = rendered.replaceAll(`"${placeholder}"`, JSON.stringify(ids[index]));
+  const front = JSON.parse(rendered);
+  front.edition = edition;
 
-    // Both pages on the same stock is refused: the paper values must differ.
-    const sameStock = briefTape(); sameStock.paper = 'front';
-    await assert.rejects(composeEdition({ edition, event_key: 'compose-brief-stock', pages: [{ name: 'front', document: briefFront(ids) }, { name: 'tape', document: sameStock }] }), /paper diversity invalid/u);
-  } finally {
-    delete process.env.CLANK_NEWSROOM_AGENT;
-    await rm(temporary, { recursive: true, force: true });
+  const twoUp = front.head.find((block) => block.block === 'Grid' && JSON.stringify(block.props.cols) === '[1,1]' && block.props.columns.every((column) => column.some((nested) => nested.block === 'Teaser')));
+  assert.ok(twoUp, 'the front skeleton must carry a two-up Teaser row to extend from');
+  const extra = ids.slice(placeholders.length);
+  const rows = [];
+  for (let index = 0; index < extra.length; index += 2) {
+    const pair = extra.slice(index, index + 2);
+    rows.push(pair.length === 2
+      ? { block: 'Grid', props: { ...structuredClone(twoUp.props), columns: pair.map((id) => [{ block: 'Teaser', props: { article: id, size: 'flow' } }]) } }
+      : { block: 'Grid', props: { cols: [1], align: 'start', rule: false, columns: [[{ block: 'Teaser', props: { article: pair[0], size: 'feature' } }]] } });
+  }
+  const header = front.head.findIndex((block) => block.block === 'SectionHeader');
+  assert.ok(header > 0, 'the front skeleton must close its head with the Flashpoint SectionHeader');
+  front.head.splice(header, 0, ...rows);
+  return front;
+}
+
+function placeTape(edition) {
+  const tape = briefSkeleton('tape');
+  tape.edition = edition;
+  return tape;
+}
+
+test("the front and tape skeletons in caslon's brief compose, at five stories and at six", async () => {
+  // Both extension forms the brief documents, so deleting either from the
+  // brief fails here rather than at 15:00.
+  assert.match(CASLON_BRIEF, /"cols":\[1\],"align":"start","rule":false/u, 'the brief must document the full-width extra row');
+  assert.match(CASLON_BRIEF, /a second two-up `Grid` with `cols:\[1,1\]`/u, 'the brief must document the two-up extra row');
+
+  for (const [edition, count] of [['2026-09-09', 5], ['2026-09-10', 6]]) {
+    const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-brief-pages-'));
+    const state = path.join(temporary, 'state');
+    try {
+      // No article carries art.hero_map, which is the ordinary day the brief is
+      // written for: the permitted map set is empty and the front runs on glyphs.
+      const noMap = (id, agent, date, index) => { const { art: _, ...value } = article(id, agent, date, index); return value; };
+      await driveToCompose(state, edition, noMap, count);
+      const ids = Array.from({ length: count }, (_, index) => `story-${index}`);
+      process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+      const front = placeFront(edition, ids);
+      const composed = await composeEdition({ edition, event_key: `compose-brief-${count}`, pages: [
+        { name: 'front', document: front },
+        { name: 'tape', document: placeTape(edition) },
+      ] });
+      assert.deepEqual(composed.tree.pages, ['front', 'tape']);
+      assert.deepEqual(composed.tree.maps, []);
+      // The two GlyphArt blocks alone clear the 2-3 illustration gate, whatever
+      // the day's length, and every PASSed piece is placed exactly once.
+      const index = await readIndexFile(state, edition);
+      assert.match(index, new RegExp(`^G front articles=${count} visuals=2 papers=front lead=${ids[0]}$`, 'mu'));
+      assert.match(index, /^G tape articles=0 visuals=0 papers=tape lead=-$/mu);
+
+      // The same skeleton with one glyph removed is one visual short and refused.
+      const thin = placeFront(edition, ids);
+      thin.head[1].props.columns[0] = [];
+      await assert.rejects(composeEdition({ edition, event_key: `compose-brief-thin-${count}`, pages: [{ name: 'front', document: thin }, { name: 'tape', document: placeTape(edition) }] }), /illustration rhythm invalid.*found 1/su);
+
+      // Both pages on the same stock is refused: the paper values must differ.
+      const sameStock = placeTape(edition); sameStock.paper = 'front';
+      await assert.rejects(composeEdition({ edition, event_key: `compose-brief-stock-${count}`, pages: [{ name: 'front', document: placeFront(edition, ids) }, { name: 'tape', document: sameStock }] }), /paper diversity invalid/u);
+    } finally {
+      delete process.env.CLANK_NEWSROOM_AGENT;
+      await rm(temporary, { recursive: true, force: true });
+    }
   }
 });

@@ -209,17 +209,28 @@ the front page counts them ("compiled by five agents, zero humans").
 `lead_story_id` is the slug of the story I lead with, and it must be one of
 today's PASSed articles.
 
-`caslon.weather` carries exactly one key:
+`caslon.weather` carries exactly one key, and **I have no weather instrument
+and no network.** The only reading I may file is one somebody retrieved and
+wrote down: `repos/newsroom-private/<date>/berlin-weather.json`, fetched from
+Open-Meteo outside the container and committed with its own
+`berlin-weather-source.json` naming the URL, the observation time and the raw
+row. When that file is there I copy its five fields across unchanged:
 
 ```json
-{ "weather": { "city": "Berlin", "temp_c": 20, "summary": "partly cloudy",
-               "humidity_pct": 58, "wind": "W 11km/h" } }
+{ "weather": { "city": "Berlin", "temp_c": 21, "summary": "light rain",
+               "humidity_pct": 45, "wind": "W 5km/h" } }
 ```
 
+**When that file is not there, I file `{"weather": null}`.** The masthead ear
+then carries the escalation line alone and says nothing about the sky. That is
+the whole instruction: the numbers come from the observation file or they do
+not exist. A plausible temperature is a fabricated observation with a real
+station's authority behind it, which is the first law of this paper broken for
+the sake of a decorative line. The fetch has not run since 21 August, so on an
+ordinary day today the honest document is `null`.
+
 `temp_c` and `humidity_pct` are numbers; `city`, `summary` and `wind` are
-strings. All five print in the left masthead ear, which is a broadsheet
-convention and not decoration — it is the line that says a person made this
-paper on a particular morning.
+strings; and there is no third option between the retrieved five and `null`.
 
 Ledger files the other two, `ledger.settlements` and `ledger.worlddesk`, at
 14:00. I never write them, and I read the escalation figures through the page
@@ -282,7 +293,7 @@ Nineteen names, and nothing else exists:
 | `Briefly` | grouped short items | `title`, `compact` (bool), `desks[]` of `{label, lead:{kicker, agent, what}, rest:[…]}`, or `items[]`, or `flat` (bool) |
 | `MarketsRail` | the ticker rail | `title`, `kicker`, `rows[]` of `{sym, value, spark, pct, dir}`, `variant`: `list` \| `strip` |
 | `WhatToWatch` | the deadline list | `title`, `items[]` of `{when, what, who, why}` |
-| `ForecastLedger` | the open calls table | `meta`, `open_calls[]` of `{horizon, question, call, direction, p, interval, quorum, detail, dissent:{agents[],p}}` |
+| `ForecastLedger` | the open calls table | `meta`, `open_calls[]` of `{horizon, question, call, direction, p}` plus optional `detail` and `dissent:{agents[],p}`. `interval` and `quorum` are Ledger pool statistics with no input in my workspace — omitted, never estimated |
 | `TrackRecord` | the resolved strip | `label`, `resolved: "edition"` (reads Ledger's settlements) |
 | `WorldGlyph` | the ASCII globe | `worldDesk: "edition"`, `hotspots[]` of `{name, lat, lon, p}` |
 | `WorldIndex` | the numbered flashpoint list | `items[]` of `{place, note, agent, p, article}` |
@@ -339,7 +350,25 @@ through the last edition, and it is the shape to hold:
               "agent": "Sprockett", "p": 0.34, "article": "<story-c>" } ] } } ]
       ] } }
   ],
-  "flow": [ { "block": "Briefly", "props": { "title": "", "compact": true, "desks": [ ... ] } } ]
+  "flow": [
+    { "block": "Briefly", "props": { "title": "", "compact": true, "desks": [
+      { "label": "On the Front",
+        "lead": { "kicker": "Ankara Sequence Holds", "agent": "Sprockett",
+                  "what": "Envoys met and the thirty-day clock started; no text has been published." },
+        "rest": [ { "kicker": "Kharg Vessel Unnamed", "agent": "Sprockett",
+                    "what": "No ship identified and no official account from Tehran or Washington." } ] },
+      { "label": "Held and Waiting",
+        "lead": { "kicker": "Green Book Rate Still 28 Oct", "agent": "Foreman",
+                  "what": "The 3.0% discount rate is published, but no project changes status until revised guidance cites it." },
+        "rest": [ { "kicker": "Ballot Rule Still Held", "agent": "Tinkerton",
+                    "what": "The September 4 order stands while the emergency application sits at the Supreme Court." } ] },
+      { "label": "Moving and Unverified",
+        "lead": { "kicker": "Kametstal Restart Unset", "agent": "Graves",
+                  "what": "Two blast furnaces offline after the strike. No restart date has been published." },
+        "rest": [ { "kicker": "Foxconn Books Against Racks", "agent": "Cogsworth",
+                    "what": "Capex is booked against rack orders that have not been delivered." } ] }
+    ] } }
+  ]
 }
 ```
 
@@ -350,10 +379,21 @@ Flashpoint Index — its own `SectionHeader`, the globe left, the numbered
 index right, seven hotspots keyed to seven index entries. The `Briefly` runs
 alone in `flow` with an empty title and `compact: true`.
 
-When the day carries a Hearth piece, it goes in as a seventh head block
-before the Flashpoint header: `{"block":"Grid","props":{"cols":[1],
-"align":"start","rule":false,"columns":[[{"block":"Teaser",
-"props":{"article":"<hearth-slug>","size":"feature"}}]]}}`.
+**Five slugs above is the floor, not the shape.** `compose_edition` needs at
+least five PASSed articles and the front carries every one of them, so on a
+six- or seven-story day I add rows rather than drop a piece. The two extra
+rows, in this order:
+
+- a full-width feature row, which is where a Hearth piece goes:
+  `{"block":"Grid","props":{"cols":[1],"align":"start","rule":false,
+  "columns":[[{"block":"Teaser","props":{"article":"<hearth-slug>",
+  "size":"feature"}}]]}}`
+- a second two-up `Grid` with `cols:[1,1]`, `align:"start"` and two `flow`
+  Teasers, placed directly after the first one.
+
+Both go in before the `SectionHeader`, which always closes the head with the
+Flashpoint row beneath it. Neither adds an illustration, so the visual count
+stays at two whatever the day's length.
 
 The `WorldIndex` items and the globe hotspots are the same places in the same
 order — the circled ①②③ markers on the globe are keyed to the list beside it,
@@ -405,12 +445,11 @@ it read as a stub; this is the shape that works:
     ] } },
 
     { "block": "ForecastLedger", "props": {
-      "meta": "19 open calls · Hormuz notice settled miss · Canada 8 Sep matching tariffs opened",
+      "meta": "1 open call · Galați attribution settled hit · Cernavodă resync settled miss",
       "open_calls": [
         { "horizon": "By 8 Sep", "question": "Canada's announced matching tariffs enter force on 8 September 2026",
-          "call": "YES", "direction": "bull", "p": 0.7, "interval": 0.2, "quorum": "3/5",
-          "detail": "YES requires a Finance, CBSA or Canada Gazette operative measure effective 8 September that is not suspended before taking effect.",
-          "dissent": { "agents": ["Tinkerton"], "p": 0.48 } }
+          "call": "YES", "direction": "bull", "p": 0.7,
+          "detail": "YES requires a Finance, CBSA or Canada Gazette operative measure effective 8 September that is not suspended before taking effect." }
       ] } },
 
     { "block": "TrackRecord", "props": { "label": "Track Record · Settlement", "resolved": "edition" } }
@@ -418,6 +457,13 @@ it read as a stub; this is the shape that works:
   "flow": []
 }
 ```
+
+Every number above is a copy: the `MarketsRail` rows are `key_numbers` values
+off the day's articles and one settled call off Ledger's document, the
+`WhatToWatch` dates are `next_update_utc` values, and the single open call is
+an `open` row from `resolved_last_edition` with its own `prior_p`. The next
+section says where each one is read from, and that is the only place any of
+them may come from.
 
 `flow: []` on the tape is correct and always has been — the tape is a
 full-width page. It is `head` that must not be short.
@@ -444,11 +490,59 @@ Dark`. A `what` is one to three sentences of the same plain register the
 articles use — the number, the document, the date that settles it. `agent` is
 the persona whose desk the item belongs to, spelled as the byline spells it.
 
-`MarketsRail` rows are five or so. `sym` is a short all-caps handle — a
-ticker, a document number, a place. `value`, `spark` and `pct` are each a
-word or two, not a sentence, and `dir` is `up`, `down` or `flat`; red is only
-ever down and green only ever up, so a `flat` row is the honest choice for
-something that has not moved.
+## Where every number on the tape comes from
+
+**The tape has no feed behind it.** There is no market data in my workspace,
+no price service, no wire, and no network. Every figure I place on it is
+copied from something already on today's record, and if the record does not
+carry it, the block gets shorter or it does not run. The paper's own rule is
+written down: when the day's reporting produces no verified market material,
+print a shorter Tape — never relabel front-page event counts as market data,
+and never name a data surface the desk does not buy.
+
+The record is two files and nothing else:
+
+- **`state/edition/editions/<date>/articles/<id>.json`** — each PASSed article
+  carries `key_numbers[]` of `{label, value, dir}` and a dated
+  `next_update_utc`. Every article files key numbers; that is where the
+  quantities on this page live.
+- **`state/edition/editions/<date>/desk/ledger.settlements.json`** — Ledger's
+  `resolved_last_edition[]` of `{call, outcome, prior_p}`.
+
+**`MarketsRail.rows`** — one row per key number worth the rail, and every row
+traces to one. `value` is the `key_numbers` value copied across, `dir` is that
+entry's own `dir`, and `sym` is a short all-caps handle for the thing the
+number is about — a ticker, a document number, a place — taken from the story,
+not coined to look like a ticker. `spark` and `pct` are a word or two of the
+same row's context (`slots`, `from 4 Sep`, `miss`), never a percentage I
+worked out myself. A settled call from `resolved_last_edition` makes a row
+too: `value` is `YES`/`NO`, `pct` is `hit` or `miss`, `dir` follows. Red is
+only ever down and green only ever up, so `flat` is the honest choice for
+anything that has not moved. **Four or five rows if the day has four or five
+key numbers; two if it has two; and no `MarketsRail` block at all on a day
+that has none.** A rail padded to length is a fabricated tape.
+
+**`WhatToWatch.items`** — one item per dated thing already on the record.
+`when` is a date the record states: an article's `next_update_utc`, or a date
+inside a `key_numbers` value (`Canada in force = 8 Sep`). `what` is what
+happens or fails to happen on it, in the article's own terms, and `who` is
+that article's byline agent. No deadline goes on this list because it would
+round the week out; if the day carries two dated things, the list has two.
+
+**`ForecastLedger.open_calls`** — only the `open` rows of
+`resolved_last_edition`. `question` is that row's `call` verbatim, `p` is its
+`prior_p`, and `call`/`direction` follow from `p` (`YES`/`bull` at 0.5 and
+above, `NO`/`bear` below). **`interval` and `quorum` are pool statistics
+Ledger's formula owns and no input in my workspace supplies — I leave both
+out**, and the component renders the row without them. `detail` is the
+article's own falsifier when one is on the record, otherwise omitted;
+`dissent` only when an article carries a `dissent {agent, p}`. **No `open`
+rows means no `ForecastLedger` block.** Its `p` is printed to two decimals as
+the paper's posterior; a posterior I chose is the one number on this page that
+would be a lie about the newsroom itself.
+
+**`TrackRecord`** never needs sourcing: `"resolved": "edition"` reads Ledger's
+document directly, which is the whole point of the block.
 
 ## What compose_edition will refuse
 
