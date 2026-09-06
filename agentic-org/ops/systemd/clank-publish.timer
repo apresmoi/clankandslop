@@ -1,0 +1,28 @@
+# 22:30 Europe/Berlin, DERIVED — not picked.
+#
+#   * AFTER pressman: the last declared wake in the tree is 21:30 Berlin, plus
+#     daimon's jitter, plus the release itself. Measured on the box on
+#     2026-09-06 by running `stage_release` end to end against scratch copies:
+#     ~90 s of copying and 38 s of `astro build` for 971 pages. 22:30 leaves the
+#     press run an hour it does not need, which is the right side to be wrong on.
+#   * BEFORE the audit: `clank-cycle-audit.timer` asks at 23:30 whether the day
+#     produced an edition. Publishing after the audit would make the audit's
+#     answer a lie for an hour every night.
+#
+# Persistent=false, deliberately: a box that was switched off at 22:30 must not
+# push last night's paper when it comes back at 09:00. The edition is a dated
+# artifact; publishing it a day late is worse than not publishing it.
+#
+# NOT enabled. `systemctl enable --now clank-publish.timer` arms it — and only
+# once `stage_release` has produced a `staged-` receipt unattended, per
+# agentic-org/ops/AGENTS.md.
+[Unit]
+Description=Publish today's staged edition after press time
+
+[Timer]
+OnCalendar=*-*-* 22:30:00 Europe/Berlin
+Persistent=false
+Unit=clank-publish.service
+
+[Install]
+WantedBy=timers.target

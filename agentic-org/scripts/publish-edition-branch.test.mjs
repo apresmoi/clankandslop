@@ -8,8 +8,9 @@ import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
 import { bundleDescriptorFindings, repinSource } from './check-bundle-descriptor.mjs';
 import {
-  BASE_BRANCH, GENERATED_INDEX_PATHS, REPINNED_DESCRIPTOR_PATHS, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
-  assertNoForcedPush, assertNotProtectedRef, assertPushableRef, editionBranch, editionCommitMessage,
+  BASE_BRANCH, DESCRIPTOR_FILE, GENERATED_INDEX_PATHS, REPINNED_DESCRIPTOR_PATHS, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
+  artifactDigest, assertNoForcedPush, assertNotProtectedRef, assertPushableRef, assertRequestedEdition, berlinToday,
+  editionBranch, editionCommitMessage,
   parseArguments, prepareSshIdentity, publishEditionBranch, pushArgv, pushStagedEditionTree,
   regenerateIndexes, repinBundleDescriptor, remoteUrl, resolveStagedEdition, sshConfig
 } from './publish-edition-branch.mjs';
@@ -24,7 +25,7 @@ const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf8', en
 // nothing for the drift check to be wrong about.
 const TOPICS_JSON = { topics: { oil: { name: 'Oil', blurb: 'Crude and products.' }, rates: { name: 'Rates', blurb: 'Policy rates.' } } };
 
-function remote() {
+function remote({ descriptor = true } = {}) {
   const root = scratch('remote');
   const bare = join(root, 'origin.git'), seed = join(root, 'seed');
   mkdirSync(bare); mkdirSync(seed);
@@ -36,16 +37,24 @@ function remote() {
   buildTopicsTxt(seed);
   buildBylinesTsv(seed);
   writeFileSync(join(seed, 'content', 'bylines', '.keep'), '');
-  seedDescriptor(seed);
-  git(['add', '--', 'README.md', 'content', 'agentic-org'], seed);
+  if (descriptor) seedDescriptor(seed);
+  git(['add', '--', 'README.md', 'content', ...(descriptor ? ['agentic-org'] : [])], seed);
   // Repin against the staged tree so the seed is self-consistent, exactly as
   // `main` is: descriptor digest == a fresh measurement, and every Spawnfile
   // pins it. That is the state an edition branch is cut from.
-  repinSource(seed);
-  git(['add', '--', 'agentic-org'], seed);
+  if (descriptor) {
+    repinSource(seed);
+    git(['add', '--', 'agentic-org'], seed);
+  }
   git(['commit', '-q', '-m', 'chore: seed'], seed);
   git(['push', '-q', bare, `refs/heads/${BASE_BRANCH}:refs/heads/${BASE_BRANCH}`], seed);
-  return { root, url: bare, head: () => git(['rev-parse', `refs/heads/${BASE_BRANCH}`], bare), refs: () => git(['for-each-ref', '--format=%(refname)'], bare).split('\n').filter(Boolean) };
+  return {
+    root, url: bare,
+    head: () => git(['rev-parse', `refs/heads/${BASE_BRANCH}`], bare),
+    refs: () => git(['for-each-ref', '--format=%(refname)'], bare).split('\n').filter(Boolean),
+    // Stands in for merge-edition.yml: the edition branch lands on the base.
+    merge: (commit) => git(['update-ref', `refs/heads/${BASE_BRANCH}`, commit], bare)
+  };
 }
 
 // The smallest tree `measureSourceArchive` will measure: the two entrypoints it
@@ -143,28 +152,89 @@ test('the ssh identity references the operator key and never copies it', async (
   await assert.rejects(prepareSshIdentity(directory, root), /is not a file/u);
 });
 
+// Shapes a promoted artifact the way stage_release does, and the receipt the
+// way pressman writes it FROM INSIDE THE CONTAINER: `staging_root` is the
+// workspace symlink pressman sees, which is not the path the host reads the
+// same volume at. A receipt binding that compares those two strings refuses
+// every real artifact; verified against the first one ever produced, on the box
+// on 2026-09-06.
+const CONTAINER_STAGING = '/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/staging';
+async function promoted(edition, short, seed = '{"page":"front"}\n') {
+  const root = scratch('staging'), artifact = `${edition}-${short}`;
+  const directory = join(root, artifact, 'content', 'editions', edition);
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(join(directory, 'front.json'), seed);
+  symlinkSync(artifact, join(root, 'current-edition'));
+  const state = scratch('state'), receipts = join(state, 'editions', edition, 'receipts');
+  mkdirSync(receipts, { recursive: true });
+  const receipt = {
+    version: 'clank.newsroom-release-receipt.v1', state: 'staged', edition,
+    composition_digest: `sha256:${short}${'0'.repeat(48)}`,
+    artifact_digest: await artifactDigest(join(root, artifact)),
+    staging_root: `${CONTAINER_STAGING}/${artifact}`
+  };
+  const file = join(receipts, `staged-${short}.json`);
+  const write = (value) => writeFileSync(file, JSON.stringify(value));
+  write(receipt);
+  return { root, state, artifact, artifactPath: join(root, artifact), receipts, receipt, write };
+}
+
 test('only a promoted artifact can be resolved, and the receipt must agree with it', async () => {
   const root = scratch('staging');
   await assert.rejects(resolveStagedEdition(root), /no promoted edition/u);
   await assert.rejects(resolveStagedEdition('relative'), /must be an absolute path/u);
-  const artifact = '2026-09-05-abcdef0123456789';
-  mkdirSync(join(root, artifact, 'content', 'editions', '2026-09-05'), { recursive: true });
-  symlinkSync(artifact, join(root, 'current-edition'));
-  const resolved = await resolveStagedEdition(root);
+  const staged = await promoted('2026-09-05', 'abcdef0123456789');
+  const resolved = await resolveStagedEdition(staged.root);
   assert.equal(resolved.edition, '2026-09-05');
   assert.equal(resolved.editionPath, 'content/editions/2026-09-05');
-  // With a state root the durable receipt has to name the same artifact, so a
-  // staging volume edited by hand between the build and the push is caught.
-  const state = scratch('state');
-  const receipts = join(state, 'editions', '2026-09-05', 'receipts');
-  mkdirSync(receipts, { recursive: true });
-  const receipt = { version: 'clank.newsroom-release-receipt.v1', state: 'staged', edition: '2026-09-05', staging_root: join(root, artifact) };
-  writeFileSync(join(receipts, 'staged-abcdef0123456789.json'), JSON.stringify(receipt));
-  assert.equal((await resolveStagedEdition(root, { stateRoot: state })).receipt.state, 'staged');
-  writeFileSync(join(receipts, 'staged-abcdef0123456789.json'), JSON.stringify({ ...receipt, staging_root: '/somewhere/else' }));
-  await assert.rejects(resolveStagedEdition(root, { stateRoot: state }), /but current-edition points at/u);
-  writeFileSync(join(receipts, 'staged-0000000000000000.json'), JSON.stringify(receipt));
-  await assert.rejects(resolveStagedEdition(root, { stateRoot: state }), /exactly one staged receipt/u);
+  // The receipt pressman actually writes — container path and all — is ACCEPTED.
+  // This is the case the old path comparison refused, and the reason `--state`
+  // could never be passed by an unattended timer.
+  assert.equal((await resolveStagedEdition(staged.root, { stateRoot: staged.state })).receipt.state, 'staged');
+  // A receipt naming a different artifact directory is still refused, whatever
+  // volume it was written against: the directory NAME is the artifact identity.
+  staged.write({ ...staged.receipt, staging_root: `${CONTAINER_STAGING}/2026-09-05-0123456789abcdef` });
+  await assert.rejects(resolveStagedEdition(staged.root, { stateRoot: staged.state }), /but current-edition points at/u);
+  // And the name has to be the one stage_release derives from the composition
+  // it recorded, so a promoted directory that belongs to another composition
+  // cannot be published under this receipt.
+  staged.write({ ...staged.receipt, composition_digest: `sha256:${'b'.repeat(64)}` });
+  await assert.rejects(resolveStagedEdition(staged.root, { stateRoot: staged.state }), /is not the artifact this composition produced/u);
+  staged.write({ ...staged.receipt, artifact_digest: undefined });
+  await assert.rejects(resolveStagedEdition(staged.root, { stateRoot: staged.state }), /carries no artifact_digest/u);
+  staged.write(staged.receipt);
+  writeFileSync(join(staged.receipts, 'staged-0000000000000000.json'), JSON.stringify(staged.receipt));
+  await assert.rejects(resolveStagedEdition(staged.root, { stateRoot: staged.state }), /exactly one staged receipt/u);
+});
+
+test('a staging volume edited after the build is caught by the artifact digest', async () => {
+  const staged = await promoted('2026-09-05', 'abcdef0123456789');
+  assert.equal((await resolveStagedEdition(staged.root, { stateRoot: staged.state })).receipt.state, 'staged');
+  // One byte, in a file the edition directory does not even contain. The path
+  // comparison this replaced could not see it; the digest is the whole point.
+  writeFileSync(join(staged.artifactPath, 'README.md'), 'tampered\n');
+  await assert.rejects(resolveStagedEdition(staged.root, { stateRoot: staged.state }), /the staging volume changed after pressman built it/u);
+});
+
+test('the artifact digest is the producer rule: sorted names, typed entries, no symlinks', async () => {
+  const root = scratch('digest');
+  mkdirSync(join(root, 'b'), { recursive: true });
+  writeFileSync(join(root, 'a.txt'), 'one\n');
+  writeFileSync(join(root, 'b', 'c.txt'), 'two\n');
+  const digest = await artifactDigest(root);
+  assert.match(digest, /^sha256:[0-9a-f]{64}$/u);
+  // Content-addressed: same bytes, same digest, whatever the directory is called.
+  const copy = scratch('digest');
+  mkdirSync(join(copy, 'b'), { recursive: true });
+  writeFileSync(join(copy, 'a.txt'), 'one\n');
+  writeFileSync(join(copy, 'b', 'c.txt'), 'two\n');
+  assert.equal(await artifactDigest(copy), digest);
+  writeFileSync(join(copy, 'b', 'c.txt'), 'three\n');
+  assert.notEqual(await artifactDigest(copy), digest);
+  // A symlink in a release artifact is a refusal, exactly as it is in the
+  // producer: a hash that follows links describes something other than the tree.
+  symlinkSync('/etc/passwd', join(root, 'link'));
+  await assert.rejects(artifactDigest(root), /contains a symlink/u);
 });
 
 test('the promoted link may not escape the staging volume', async () => {
@@ -186,6 +256,33 @@ test('the command line refuses to run without a staging volume or a key', () => 
   assert.throws(() => parseArguments(['--staging', '/s', '--nope', 'x']), /unknown argument/u);
   assert.throws(() => parseArguments(['--staging']), /requires a value/u);
   assert.deepEqual(parseArguments(['--staging', '/s', '--dry-run']), { dryRun: true, staging: '/s' });
+});
+
+test('an unattended caller must name the edition, and naming it binds the receipt', () => {
+  assert.deepEqual(parseArguments(['--staging', '/s', '--state', '/t', '--edition', 'today', '--dry-run']), { dryRun: true, staging: '/s', state: '/t', edition: 'today' });
+  assert.equal(parseArguments(['--staging', '/s', '--state', '/t', '--edition', '2026-09-05', '--dry-run']).edition, '2026-09-05');
+  for (const value of ['tomorrow', '2026-9-5', '', 'edition/2026-09-05', '2026-09-05 '])
+    assert.throws(() => parseArguments(['--staging', '/s', '--state', '/t', '--edition', value, '--dry-run']), /must be "today" or YYYY-MM-DD/u, value);
+  // The two halves of an unattended publication are not separable: the date
+  // proves current-edition is not stale, the receipt proves the bytes are the
+  // ones pressman built. `--edition` without `--state` is refused outright.
+  assert.throws(() => parseArguments(['--staging', '/s', '--edition', 'today', '--dry-run']), /--edition requires --state/u);
+});
+
+test('the timer publishes today\'s paper or nothing, on the Berlin clock', () => {
+  // 2026-09-06 22:30 Berlin is 20:30 UTC, and 00:30 UTC on the 7th is still the
+  // 6th's evening in Berlin — the two hours a UTC "today" would get wrong are
+  // exactly the hours this timer runs in.
+  assert.equal(berlinToday(new Date('2026-09-06T20:30:00Z')), '2026-09-06');
+  assert.equal(berlinToday(new Date('2026-09-06T22:30:00Z')), '2026-09-07');
+  assert.equal(assertRequestedEdition('2026-09-06', undefined), '2026-09-06');
+  assert.equal(assertRequestedEdition('2026-09-06', 'today', new Date('2026-09-06T20:30:00Z')), '2026-09-06');
+  assert.equal(assertRequestedEdition('2026-09-06', '2026-09-06'), '2026-09-06');
+  // A stale current-edition — yesterday's paper, or a rehearsal's — is the
+  // failure this exists for: it refuses and nothing is pushed.
+  assert.throws(() => assertRequestedEdition('2026-09-05', 'today', new Date('2026-09-06T20:30:00Z')), /the promoted edition is 2026-09-05, but "today" means 2026-09-06/u);
+  assert.throws(() => assertRequestedEdition('2026-09-05', '2026-09-06'), /the promoted edition is 2026-09-05/u);
+  assert.throws(() => assertRequestedEdition('2026-09-05', 'tomorrow'), /must be "today" or YYYY-MM-DD/u);
 });
 
 test('the generated indexes are rebuilt from the branch tree, and only those paths are added', async () => {
@@ -319,6 +416,60 @@ test('a retry of the same edition converges, and changed content is refused rath
   assert.equal(execFileSync('git', ['-C', origin.url, 'rev-parse', 'refs/heads/edition/2026-09-07'], { encoding: 'utf8' }).trim(), first.commit);
 });
 
+test('an edition already merged into the base is a quiet success, not a nightly alarm', async () => {
+  const origin = remote();
+  const staged = stagedEdition('2026-09-09');
+  const work = scratch('work');
+  let attempt = 0;
+  const call = () => pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-09-09'), editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, `repo-${attempt += 1}`), home: join(work, 'home'), message: editionCommitMessage('2026-09-09')
+  });
+  const first = await call();
+  assert.equal(first.pushed, true);
+  assert.equal(first.already_published, false);
+  // merge-edition.yml merges it. The timer fires again the next night with the
+  // same `current-edition` still on the volume: there is nothing to push, and
+  // saying so is a success. An error here raises the alarm every night after a
+  // successful publication, which is how an alarm stops being read.
+  origin.merge(first.commit);
+  const second = await call();
+  assert.equal(second.already_published, true);
+  assert.equal(second.pushed, false);
+  assert.equal(second.commit, origin.head());
+  assert.equal(second.generated, null, 'nothing is regenerated for a branch that will not be built');
+});
+
+test('a base branch that carries no bundle descriptor is committed without one', async () => {
+  // `main` today: `content/` and `website/`, no `agentic-org/` at all. Repinning
+  // a descriptor that is not there threw ENOENT on the first unattended
+  // publication, and committing a pathspec that matches nothing makes git
+  // refuse the commit. Both are the same bug: assuming the base carries the org.
+  const origin = remote({ descriptor: false });
+  const staged = stagedEdition('2026-09-10');
+  const work = scratch('work');
+  const result = await pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-09-10'), editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-09-10')
+  });
+  assert.equal(result.pushed, true);
+  assert.equal(result.generated.descriptor.skipped, true);
+  assert.match(result.generated.descriptor.reason, new RegExp(DESCRIPTOR_FILE.replaceAll('.', '\\.'), 'u'));
+  const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
+  assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-10/articles/one.json']);
+  for (const name of files) assert.doesNotMatch(name, /^agentic-org\//u);
+  // And a base that DOES carry one is still repinned: the skip is a fact about
+  // the branch, read from the branch, not a switch anybody can leave off.
+  const withDescriptor = remote();
+  const other = stagedEdition('2026-09-10');
+  const repinned = await pushStagedEditionTree({
+    url: withDescriptor.url, branch: editionBranch('2026-09-10'), editionSource: other.source, editionPath: other.path,
+    workdir: join(work, 'repo-descriptor'), home: join(work, 'home'), message: editionCommitMessage('2026-09-10')
+  });
+  assert.equal(repinned.generated.descriptor.skipped, false);
+  assert.deepEqual(repinned.generated.descriptor.repinned, ['cogsworth']);
+});
+
 test('the edition path may not escape the branch', async () => {
   const origin = remote();
   const staged = stagedEdition('2026-09-05');
@@ -341,7 +492,12 @@ test('end to end: a promoted artifact becomes an edition branch on a real remote
   symlinkSync(artifact, join(staging, 'current-edition'));
   const receipts = join(state, 'editions', '2026-09-08', 'receipts');
   mkdirSync(receipts, { recursive: true });
-  writeFileSync(join(receipts, 'staged-fedcba9876543210.json'), JSON.stringify({ state: 'staged', edition: '2026-09-08', staging_root: join(staging, artifact) }));
+  writeFileSync(join(receipts, 'staged-fedcba9876543210.json'), JSON.stringify({
+    state: 'staged', edition: '2026-09-08',
+    composition_digest: `sha256:fedcba9876543210${'0'.repeat(48)}`,
+    artifact_digest: await artifactDigest(join(staging, artifact)),
+    staging_root: `${CONTAINER_STAGING}/${artifact}`
+  }));
 
   const key = join(scratch('keys'), 'clankandslop');
   writeFileSync(key, 'unused-for-a-file-remote\n', { mode: 0o600 });

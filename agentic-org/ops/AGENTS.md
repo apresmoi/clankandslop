@@ -10,10 +10,12 @@ The three human steps this replaces:
 
 ```
 was:  research lands on edition/<date>   →  a person repins, rebuilds, redeploys
-      pressman promotes an artifact      →  a person opens and merges the PR
+      pressman promotes an artifact      →  a person pushes the branch
+                                         →  a person opens and merges the PR
       something breaks                   →  systemd says Failed into a void
 
 now:  clank-seam.timer         (Hetzner)      repin → bundle → build → deploy
+      clank-publish.timer      (Hetzner)      staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
       clank-alarm@.service     (both boxes)   ntfy → a phone
 ```
@@ -24,6 +26,7 @@ now:  clank-seam.timer         (Hetzner)      repin → bundle → build → dep
 |---|---|---|
 | `scripts/seam-run.mjs` | Hetzner, 16:30 Berlin | repin → `org:bundle` → build → `up` → settle |
 | `scripts/wake-window.mjs` | inside the seam | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
+| `scripts/publish-edition-branch.mjs` | Hetzner, 22:30 Berlin | today's staged artifact → `edition/<date>` on GitHub |
 | `scripts/cycle-audit.mjs` | Hetzner, 23:30 Berlin | did today's cycle reach `composed`? |
 | `scripts/alarm.mjs` | both boxes | one HTTPS POST that reaches a person |
 | `../../.github/workflows/merge-edition.yml` | GitHub | opens and merges the edition PR, only on green CI |
@@ -110,19 +113,55 @@ install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/*.service \
                /root/work/clankandslop/agentic-org/ops/systemd/*.timer \
                /etc/systemd/system/
 systemctl daemon-reload
-systemctl disable clank-seam.timer clank-cycle-audit.timer 2>/dev/null || true
+systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer 2>/dev/null || true
 
 # 5. dry-run the seam without deploying
 node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
+
+# 6. prove the deploy key opens the public repository (read-only check; it
+#    prints the repository the key is registered against and nothing secret)
+ssh -o BatchMode=yes -i /root/.ssh/clank_public -T git@github.com
 ```
 
-**To arm, one command:**
+**To arm the seam and the audit, one command:**
 
 ```bash
 systemctl enable --now clank-seam.timer clank-cycle-audit.timer
 ```
 
 To disarm again: `systemctl disable --now clank-seam.timer clank-cycle-audit.timer`.
+
+**To arm the publisher, one command — but read the paragraph under it first:**
+
+```bash
+systemctl enable --now clank-publish.timer
+```
+
+Arm it only after `stage_release` has produced a `staged-` receipt on its own,
+in a real cycle. Until then `current-edition` does not exist, the job refuses
+every night, and the alarm fires every night for a reason nobody can act on.
+A dry run costs nothing and answers the question without arming anything:
+
+```bash
+node /root/work/clankandslop/agentic-org/scripts/publish-edition-branch.mjs \
+  --staging /var/lib/docker/volumes/clank-release-staging/_data \
+  --state   /var/lib/docker/volumes/clank-edition-state/_data \
+  --key     /root/.ssh/clank_public \
+  --edition today --dry-run
+```
+
+In the same change that arms the publisher, raise the audit's bar to `staged`:
+
+```bash
+install -d -m 755 /etc/systemd/system/clank-cycle-audit.service.d
+install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/clank-cycle-audit-require-staged.conf \
+               /etc/systemd/system/clank-cycle-audit.service.d/require-staged.conf
+systemctl daemon-reload
+```
+
+Not before: on a box where the publisher is disabled the cycle never reaches
+`staged`, so installing that drop-in early guarantees an alarm at 23:30 every
+single night.
 
 Arming the timers is **not** starting the org. The org's own guards are
 separate and unaffected: every agent cron is parked at `0 4 1 1 *`, and
@@ -147,6 +186,78 @@ systemctl --user daemon-reload
 
 The drop-ins live in `~/.config/systemd/user/<unit>.d/alarm.conf` and add only
 `OnFailure=`; no timer is enabled, disabled or rescheduled by them.
+
+## The publication hop, unattended
+
+`clank-publish.timer` fires `publish-edition-branch.mjs` at 22:30 Berlin. It is
+the same job a person used to run by hand; three properties make it safe to run
+without one, and none of them relaxes anything the manual job enforced.
+
+- **`--edition today`.** `current-edition` is durable: it keeps naming last
+  night's artifact until pressman promotes a new one. A person reads that as
+  "publish what was staged". A timer must read it as "publish TODAY'S paper or
+  nothing", or the first evening the org fails to compose it re-pushes
+  yesterday's edition, silently, for as many nights as the org stays down.
+- **`--state`, and therefore the receipt.** The staged receipt has to name the
+  same artifact directory, that directory's name has to be the one
+  `stage_release` derives from the composition digest it recorded, and the
+  artifact's bytes have to hash to the `artifact_digest` in the receipt. The
+  hash is recomputed here, on the host, from the bytes on disk — the rule is a
+  second implementation of the producer's `directoryDigest`, on the other side
+  of the airlock, because a digest a host recomputes is evidence and a digest it
+  copies out of the receipt is a restatement. `--edition` refuses to run without
+  `--state`.
+- **An already-published edition is a quiet success.** After the merge the
+  edition directory is on `main`; the next run finds nothing to push and says
+  so, exit 0. A nightly alarm for "the paper you published is published" is how
+  an alarm stops being read. A branch that exists at a *different* commit is
+  still a refusal — that one really does need a person.
+
+What the receipt binding could NOT do, and now does: `stage_release` records
+`staging_root` as the container sees it (`…/agents/pressman/staging/<artifact>`)
+and the host reads the same volume at
+`/var/lib/docker/volumes/clank-release-staging/_data/<artifact>`. The two
+strings never match, so the old path comparison refused every real artifact —
+verified on the box on 2026-09-06 against the first artifact `stage_release` has
+ever produced. Comparing the artifact's *name* and *contents* is mount-point
+independent and catches the hand-edited volume the path comparison never could.
+
+### What `main` has to carry for this to land
+
+An edition branch is cut from `main` and pushed, and a `push`-triggered workflow
+runs **the workflow file on the branch it was pushed to** — which is `main`'s.
+So `merge-edition.yml` is live only once it is on `main`, and it invokes
+`agentic-org/scripts/ci-gate.mjs`, which must be on `main` too. `main` carries
+no `agentic-org/` otherwise: the org tree lives on `feat/agentic-org`. Hence
+also `repinBundleDescriptor` skipping when the base branch has no descriptor —
+there is nothing to repin, nothing on the branch checks it, and repinning
+unconditionally threw ENOENT on the first unattended publication.
+
+The first time an edition branch lands with `merge-edition.yml` on `main`, in
+order: `ci.yml` runs on the push (validate-content, the website data-layer test,
+`astro build`); `merge-edition.yml` re-asserts the ref shape, refuses any path
+outside the edition content, reads `ci-gate.mjs` for a `success` conclusion on
+that exact SHA, opens the pull request as `github-actions[bot]`, re-reads the
+gate and the head SHA, and merges into `main`; `deploy-website.yml` then
+deploys. Nobody reads the paper before it is live. That is the decision, taken
+deliberately: the airlock is branch protection plus the workflow's four locks,
+not a person's attention at 22:31.
+
+## What is deliberately not automated
+
+- **No browser step in CI, for anything.** Ten glyph shapes and 120 map regions
+  are curated and committed, `ops/lay-page.mjs` refuses any name outside either,
+  `compose_edition` enforces visual count, alternation and map set equality, and
+  `verify-glyph-cameras.mjs` already rasterizes the cameras headlessly. The
+  failure class a screenshot gate would catch is already unrepresentable.
+- **No OG card rendering in CI.** The structural defect is fixed —
+  `articleOgPath` returns a path only for a card that exists, so a story can no
+  longer advertise an image that answers 404, and `website/src/lib/edition.test.ts`
+  holds that. The *rendering* stays a laptop job (`npm run og`, commit the
+  PNGs). 280 cards shipped that way; three editions went without and nothing
+  broke. A `continue-on-error` Chromium step would cost ~90 s of every deploy,
+  grow by ~6 cards a day because CI output is not committed, and buy a social
+  preview image — measure a reason to want it before paying for it.
 
 ## What the publisher now also commits
 
