@@ -122,7 +122,7 @@ test('root declaration keeps Moltnet durable, authenticated, direct and secret-b
   assert.throws(() => validateRootDeclaration(root.replace('scopes: [observe]', 'scopes: [observe, write]')), /observe-only console token/);
   assert.throws(() => validateRootDeclaration(root.replace('secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN', 'secret: CLANK_MOLTNET_GATHERER_TOKEN')), /research sensor token boundary/);
   assert.throws(() => validateRootDeclaration(root.replace('federation: [clank-observer]', 'federation: [legacy-peer]')), /federate only to the read-only clank-observer pairing/);
-  assert.throws(() => validateRootDeclaration(root.replace(', research-sensor, cogsworth', ', cogsworth')), /research sensor local identity/);
+  assert.throws(() => validateRootDeclaration(root.replace(', research-sensor, klaxon', ', klaxon')), /research sensor local identity/);
   assert.throws(() => validateRootDeclaration(root.replace('members: [gatherer, klaxon', 'members: [klaxon')), /assignment kickoff participant/);
 });
 test('the observer pairing relaxation still forbids everything else', () => {

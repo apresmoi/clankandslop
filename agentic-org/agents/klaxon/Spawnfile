@@ -23,6 +23,7 @@ surfaces:
         conference: { wake: mentions }
         assignment: { wake: mentions }
         sensor: { wake: mentions }
+        research: { wake: mentions }
 environment:
   mcp_servers:
     - name: newsroom
