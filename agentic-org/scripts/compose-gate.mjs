@@ -1,68 +1,67 @@
-// The three compose gates, in one place, so they can be read before they are hit.
+// The compose gates, in one place, so they can be read before they are hit.
 //
-// `compose_edition` refuses on three independent conditions — enough PASSed
-// articles, exactly four desk documents, and the forecast/dissent diversity
-// floor — and until now each one was invisible until it failed. A newsroom
-// discovered them one per failed compose run, three runs and roughly 2.4M
-// tokens to learn a fact the state tree already knew. `composeGateLine` renders
-// all three as one line in the edition INDEX header, which every agent already
-// reads, and the same line is recorded in the composed artifact.
+// `compose_edition` refuses on two structural conditions — enough PASSed
+// articles and exactly four desk documents — and until this file existed each
+// one was invisible until it failed. A newsroom discovered them one per failed
+// compose run, three runs and roughly 2.4M tokens to learn a fact the state
+// tree already knew. `composeGateLine` renders them as one line in the edition
+// INDEX header, which every agent already reads, and the same line is recorded
+// in the composed artifact.
 //
-// The forecast floor is the only gate a publisher can waive, and the waiver
-// names the exact edition it excuses. It is deliberately not a boolean: a
-// waiver that cannot be dated is a quality bar that quietly disappears, which
-// is the failure this shape exists to prevent. `CLANK_EDITION_DIVERSITY_WAIVER`
-// left set after its edition ships has no effect on any later paper.
+// The forecast/dissent diversity floor used to be a third refusal here, with a
+// dated waiver to excuse it. Both are gone, and the removal is the point:
+//
+//   * 16 of the 79 editions on `main` ever carried a dated forecast, 11 of
+//     those a named dissent, the last on 2026-08-09. None of the six quality-
+//     target editions (08-19 … 08-24) had either. The gate refused the paper
+//     it was modelled on.
+//   * It was structurally unclearable where it stood. A 21:00 refusal on a
+//     property only Brass at 18:30 and a reporter at 19:00 can supply is a
+//     refusal Caslon cannot act on, so the only reachable outcome was a waiver
+//     re-dated every night — a quality bar that has quietly disappeared while
+//     still looking like one.
+//
+// So the two halves moved to where an agent can still act on them. The
+// forecast *shape* is enforced at `file_article`, in the reporter's own wake,
+// for the assignment Brass marked `slot: "forecast"`. The dissent is written
+// by the dissenter through `record_dissent`, under the identity the MCP server
+// already authenticates. Here both are counted and neither refuses: a day
+// nobody dissents ships, and says so in the INDEX, the receipt and the audit.
+//
+// Re-arming the floor as a gate is a decision for after five consecutive
+// editions carry it without anyone waiving anything. Not before.
 
 export const PASSED_ARTICLES_MINIMUM = 5;
 export const DESK_DOCUMENTS_REQUIRED = 4;
-export const DIVERSITY_WAIVER_ENV = 'CLANK_EDITION_DIVERSITY_WAIVER';
-export const FORECAST_DISSENT_FLOOR = 'forecast-dissent';
-export const WAIVER_VERSION = 'clank.edition-diversity-waiver.v1';
 
-const EDITION_DATE = /^\d{4}-\d{2}-\d{2}$/u;
+// One article's own claim to being the day's forecast: `epistemic` says so and
+// `next_update_utc` names the clock the call will be looked at again on. This
+// is reported, never enforced — `file_article` is where the shape binds, and
+// it additionally requires `confidence.value`, which it can demand because the
+// reporter is still awake to supply it.
+export const isDatedForecast = (value) => value?.epistemic === 'forecast' && /^\d{2}:\d{2}$/u.test(value?.next_update_utc ?? '');
 
-// The one floor a dated waiver can excuse: at least one article whose epistemic
-// is "forecast", carrying a dated next_update_utc and a named dissent.
-export const hasDatedForecastWithDissent = (values) => values.some((value) => value.epistemic === 'forecast' && /^\d{2}:\d{2}$/u.test(value.next_update_utc) && value.dissent?.agent && value.dissent?.argument);
-
-/**
- * Reads the waiver switch for one specific edition.
- *
- * Returns a waiver record only when the environment names *this* edition;
- * undefined when it names another one, and undefined when it is unset. A
- * value that is not an ISO edition date throws rather than being ignored,
- * because "1"/"true"/"yes" is exactly the shape a permanent, undated waiver
- * would take and silently dropping it would hide a misconfiguration.
- */
-export function editionDiversityWaiver(edition, value = process.env[DIVERSITY_WAIVER_ENV]) {
-  if (value === undefined || value === null) return undefined;
-  const declared = String(value).trim();
-  if (declared === '') return undefined;
-  if (!EDITION_DATE.test(declared)) throw new Error(`${DIVERSITY_WAIVER_ENV} must name the one edition it waives as an ISO date "YYYY-MM-DD", got ${JSON.stringify(value)} — the ${FORECAST_DISSENT_FLOOR} floor is never waived by a boolean`);
-  if (declared !== edition) return undefined;
-  return { version: WAIVER_VERSION, floor: FORECAST_DISSENT_FLOOR, edition: declared, source: DIVERSITY_WAIVER_ENV, note: 'composed without a "forecast" article carrying a dated next_update_utc and a named dissent' };
-}
+// One article carrying a colleague's recorded dissent. `agent` is the persona
+// display name `record_dissent` stamped from the dissenter's own MCP process;
+// an article can never have written it itself, because `file_article` refuses
+// an author-typed `dissent` outright.
+export const hasNamedDissent = (value) => Boolean(value?.dissent?.agent);
 
 /**
- * The state of all three gates for one edition.
+ * The state of the compose gates for one edition.
  *
- * `forecast` is true/false when the article set could be read, and undefined
- * when it could not — reported as "unknown" rather than guessed at. `waiver`
- * is whatever `editionDiversityWaiver` returned for this same edition, or the
- * waiver already recorded in a composed artifact.
+ * `forecasts` and `dissents` are counts over the PASSed article set, or
+ * `undefined` when that set could not be read — reported as "?" rather than
+ * guessed at. Neither can block: `state` is decided by `passed` and `desks`
+ * alone.
  */
-export function composeGateStatus({ edition, passed, desks, forecast, waiver }) {
+export function composeGateStatus({ edition, passed, desks, forecasts, dissents }) {
   const passedGate = { found: passed, required: PASSED_ARTICLES_MINIMUM, ok: passed >= PASSED_ARTICLES_MINIMUM };
   const deskGate = { found: desks, required: DESK_DOCUMENTS_REQUIRED, ok: desks === DESK_DOCUMENTS_REQUIRED };
-  // A waiver only ever applies to an edition that is genuinely missing the
-  // forecast piece: an edition that has one records no waiver at all.
-  const waived = forecast === false && Boolean(waiver);
-  const state = forecast === undefined ? 'unknown' : forecast ? 'ok' : waived ? `waived(${waiver.edition})` : 'missing(forecast)';
-  const diversity = { floor: FORECAST_DISSENT_FLOOR, state, ok: forecast === true || waived, waived };
-  return { edition, passed: passedGate, desks: deskGate, diversity, state: passedGate.ok && deskGate.ok && diversity.ok ? (waived ? 'waived' : 'ready') : 'blocked' };
+  return { edition, passed: passedGate, desks: deskGate, forecasts, dissents, state: passedGate.ok && deskGate.ok ? 'ready' : 'blocked' };
 }
 
 // One line, always. It is a comment row in the edition INDEX header and the
 // `compose_gates` field of the composed artifact, so both read identically.
-export const composeGateLine = (status) => `# compose: passed=${status.passed.found}/${status.passed.required} desks=${status.desks.found}/${status.desks.required} diversity=${status.diversity.state}  → ${status.state}`;
+const count = (value) => (Number.isInteger(value) ? String(value) : '?');
+export const composeGateLine = (status) => `# compose: passed=${status.passed.found}/${status.passed.required} desks=${status.desks.found}/${status.desks.required} forecast=${count(status.forecasts)} dissent=${count(status.dissents)}  → ${status.state}`;

@@ -13,7 +13,7 @@
 import { mkdir, readFile, readdir, rename, unlink, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
-import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
+import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 // The prose warnings live under ops/ beside the release validator that also
 // runs them. Both directories ship in the same tree — the runtime bundle is
 // the repo's tracked files, and CLANK_PUBLIC_SOURCE_ROOT is that same repo —
@@ -210,6 +210,15 @@ export function advisoryFilingWarnings(filing, knownTopics, rejected = []) {
 
 export const countDomains = (filing) => new Set((Array.isArray(filing?.evidence_box) ? filing.evidence_box : []).map((item) => hostnameOf(item?.source_note?.source_url)).filter(Boolean)).size;
 export const countWords = (filing) => strings(filing?.body).join(' ').split(/\s+/u).filter(Boolean).length;
+// `<map>` or `<map>/<hero_map>` — the F row's answer to "which regions does
+// this filing oblige compose_edition to ship?". Both keys, because both are
+// loaded: the story page and the OG card open art.map, the front panel opens
+// art.hero_map, and the two are allowed to be different names.
+export const artNames = (filing) => {
+  const art = filing?.art;
+  if (!art || typeof art !== 'object' || art.kind !== 'map' || typeof art.map !== 'string') return undefined;
+  return typeof art.hero_map === 'string' && art.hero_map !== art.map ? `${art.map}/${art.hero_map}` : art.map;
+};
 
 // ---------------------------------------------------------------------------
 // Topic glossary. The research half is replacing content/topics.json reads
@@ -276,22 +285,23 @@ const token = (value, fallback = '?') => String(value ?? '').replace(/\s+/gu, '-
 const pad = (value) => (value.length >= COLUMN ? `${value} ` : value.padEnd(COLUMN + 1));
 const row = (left, ...cells) => (cells.length === 0 ? left : `${pad(left)}| ${cells.join(' | ')}`);
 
-export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, articles, desks, pages, compose }) {
+export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, desks, pages, compose }) {
   const lines = [];
   lines.push(`# ${INDEX_VERSION} edition=${edition} generated=${generated} assignments=${assignments.length} filings=${filings.length} verdicts=${verdicts.length} passed=${articles.length}`);
-  // The three compose gates, before anyone spends a wake discovering them one
-  // refusal at a time. A caller that did not evaluate the forecast floor gets
-  // "unknown" rather than a guess.
-  lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length, forecast: undefined, waiver: undefined })));
-  lines.push('# rows: A assignment · F filing · V verdict · P passed article · D desk doc · G page');
-  lines.push('# read one: cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json');
+  // The two compose gates that refuse, plus the two counts that no longer do:
+  // a day with no forecast and no dissent composes and says so. A caller that
+  // did not read the article set gets "?" rather than a guess.
+  lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length })));
+  lines.push('# rows: A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page');
+  lines.push('# read one: cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json');
   for (const item of assignments) lines.push(row(`A ${token(item.owner)} ${token(item.id)} refs=${item.evidence_refs.length}`, clean(item.brief, 120)));
   for (const item of filings) {
     const unknown = item.flags.filter((flag) => flag.startsWith('topic_unknown:')).map((flag) => flag.slice('topic_unknown:'.length));
     const rest = item.flags.filter((flag) => !flag.startsWith('topic_unknown:'));
-    lines.push(`F ${token(item.id)} rev=${item.revision} owner=${token(item.owner)} epi=${token(item.epistemic)} words=${item.words} refs=${item.refs} domains=${item.domains} topics=${unknown.length === 0 ? 'ok' : `unknown:${unknown.map((slug) => token(slug)).join(',')}`} lint=${rest.length === 0 ? 'ok' : rest.join(',')}`);
+    lines.push(`F ${token(item.id)} rev=${item.revision} owner=${token(item.owner)} epi=${token(item.epistemic)} words=${item.words} refs=${item.refs} domains=${item.domains} art=${item.art === undefined ? '-' : token(item.art)} topics=${unknown.length === 0 ? 'ok' : `unknown:${unknown.map((slug) => token(slug)).join(',')}`} lint=${rest.length === 0 ? 'ok' : rest.join(',')}`);
   }
-  for (const item of verdicts) lines.push(`V ${token(item.id)} rev=${item.revision} ${token(item.verdict)} by=spike`);
+  for (const item of dissents) lines.push(`N ${token(item.id)} rev=${item.revision} by=${token(item.agent)} ${item.stance === 'dissent' ? `dissent p=${item.p}` : 'concur'}${item.against === undefined ? '' : ` carried_from_rev=${item.against}`}`);
+  for (const item of verdicts) lines.push(`V ${token(item.id)} rev=${item.revision} ${token(item.verdict)} by=spike${item.dissentDropped === undefined ? '' : ` dissent_dropped=${token(item.dissentDropped)}`}`);
   for (const item of articles) lines.push(row(`P ${token(item.id)} rev=${item.revision} section=${token(item.section)} epi=${token(item.epistemic)} key_numbers=${item.key_numbers}`, clean(item.headline, 120), clean(item.deck, 120)));
   for (const item of desks) lines.push(`D ${token(item.name)} keys=${item.keys}`);
   for (const item of pages) lines.push(`G ${token(item.name)} articles=${item.articles} visuals=${item.visuals} papers=${token(item.papers)} lead=${token(item.lead)}`);
@@ -313,9 +323,14 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
 
   const filings = (await readRevisions(base, 'filings')).map(({ id, revision, value }) => ({
     id, revision, owner: (value.byline?.agents ?? [])[0]?.toLowerCase() ?? '?', epistemic: value.epistemic ?? '?',
-    words: countWords(value), refs: strings(value.refs).length, domains: countDomains(value), flags: lintFiling(value, topics)
+    words: countWords(value), refs: strings(value.refs).length, domains: countDomains(value), art: artNames(value), flags: lintFiling(value, topics)
   }));
-  const verdicts = (await readRevisions(base, 'verdicts')).map(({ id, revision, value }) => ({ id, revision, verdict: value.verdict ?? '?' }));
+  const verdicts = (await readRevisions(base, 'verdicts')).map(({ id, revision, value }) => ({ id, revision, verdict: value.verdict ?? '?', dissentDropped: value.dissent_dropped }));
+  // dissents/<id>/<rev>.json, the same two-level shape as filings and verdicts.
+  // One row per recorded stance, whether or not it reached the page: a "concur"
+  // is the designated dissenter on the record having read the call, and a paper
+  // that composed with dissent=0 should say which of the two it was.
+  const dissents = (await readRevisions(base, 'dissents')).map(({ id, revision, value }) => ({ id, revision, agent: value.agent ?? '?', stance: value.stance ?? '?', p: value.p, against: value.against_revision }));
   const articleRecords = await readKind(base, 'articles');
   const articles = articleRecords.map(({ name, value }) => ({
     id: name, revision: value.revision ?? '?', section: value.section ?? '?', epistemic: value.epistemic ?? '?',
@@ -329,36 +344,10 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
   }));
   const compose = composeGateStatus({
     edition, passed: articles.length, desks: desks.length,
-    forecast: hasDatedForecastWithDissent(articleRecords.map((item) => item.value)),
-    waiver: await composeWaiverFor(base, edition)
+    forecasts: articleRecords.filter((item) => isDatedForecast(item.value)).length,
+    dissents: articleRecords.filter((item) => hasNamedDissent(item.value)).length
   });
-  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, articles, desks, pages, compose });
-}
-
-/**
- * Which waiver, if any, applies to this edition's forecast floor.
- *
- * Prefers the one already recorded in the composed artifact — that is a durable
- * fact about the paper that shipped, readable by every agent regardless of
- * which process holds the environment variable. Before composition there is no
- * artifact, so the environment answers instead.
- *
- * A malformed environment value throws in `compose_edition`, where it is the
- * caller's problem to fix. Here it is swallowed: the index is a report, and
- * reporting the floor as unmet is both the truthful and the conservative
- * reading of an unusable waiver. Every write path regenerates this file, so a
- * throw would take down filings and verdicts that have nothing to do with it.
- */
-async function composeWaiverFor(base, edition) {
-  // Only the composition receipts are opened: the receipt directory collects
-  // one file per tool call all day, and this runs on every one of them.
-  const names = (await listing(path.join(base, 'receipts'))).filter((name) => name.startsWith('composed-') && name.endsWith('.json')).sort();
-  for (const name of names) {
-    const value = await readJson(path.join(base, 'receipts', name));
-    const recorded = value?.kind === 'composed' && value?.edition === edition ? value.composition?.waiver : undefined;
-    if (recorded?.edition === edition) return recorded;
-  }
-  try { return editionDiversityWaiver(edition); } catch { return undefined; }
+  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, desks, pages, compose });
 }
 
 // Same shapes production-newsroom.mjs already walks when it checks page

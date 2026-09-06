@@ -32,11 +32,11 @@ surfaces:
         research: { wake: mentions }
 environment:
   mcp_servers:
-    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/vesta/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: vesta, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/vesta/state/edition }, tools: [file_article] }
+    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/vesta/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: vesta, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/vesta/state/edition }, tools: [file_article, record_dissent] }
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:c559c0d80090360ca2a00451752b4f252df3d41bc11af3b37310b0c7700720ab, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5a1573bc998c736748d72b820befb6bc9974c345575b80a7813e008433442e5b, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:c78289d0e15683876b1f88cd573067e8a6558e976db3dd03278fa371ff8b188c, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

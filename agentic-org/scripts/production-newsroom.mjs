@@ -2,9 +2,10 @@ import { createHash, randomUUID } from 'node:crypto';
 import { chmod, cp, link, lstat, mkdir, readFile, readdir, rename, rm, symlink, unlink, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
-import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
+import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
+import { archiveIndex } from '../../ops/lay-page.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
 const stable=value=>JSON.stringify(value,Object.keys(value).sort());
@@ -40,9 +41,9 @@ const location=(edition,kind,name)=>within(root(),'editions',edition,kind,`${nam
 async function convergeIndexed(edition,file,value){const result=await converge(file,value);await writeEditionIndex(root(),edition);return result;}
 const receipt=async(args,kind,data,write=converge)=>write(location(args.edition,'receipts',`${kind}-${sha(args.event_key).slice(7,23)}`),{version:'clank.newsroom-receipt.v1',kind,edition:args.edition,event_key:args.event_key,digest:sha(JSON.stringify(data))});
 // The composed receipt is the durable record of what this edition was composed
-// under — including a diversity waiver, when one applied. The index is
-// regenerated after it lands so the INDEX compose row reports the waiver from
-// the artifact rather than from whichever process happens to hold the env var.
+// under, gate line included. The index is regenerated after it lands so the
+// INDEX compose row reports the counts from the artifact rather than from
+// whichever process happens to be reading the state tree.
 async function composedResult(args,composition){const value={version:'clank.newsroom-receipt.v1',kind:'composed',edition:args.edition,event_key:args.event_key,digest:sha(JSON.stringify(composition)),composition};await converge(location(args.edition,'receipts',`composed-${sha(args.event_key).slice(7,23)}`),value);await writeEditionIndex(root(),args.edition);return{...composition,receipt:value};}
 const readJson=file=>readFile(file,'utf8').then(JSON.parse);
 const describeAssignment=item=>`"${item.id}": ${item.brief}`;
@@ -68,7 +69,7 @@ async function resolveAssignment(args,article,owner){
 const walkValues=(value,key,out=[])=>{if(Array.isArray(value))for(const item of value)walkValues(item,key,out);else if(value&&typeof value==='object')for(const[name,item]of Object.entries(value)){if(name===key&&typeof item==='string')out.push(item);walkValues(item,key,out);}return out;};
 const publicArticleRefs=(value,out=new Set())=>{if(Array.isArray(value)){for(const item of value)publicArticleRefs(item,out);return out;}if(!value||typeof value!=='object')return out;for(const[key,item]of Object.entries(value)){if(['article','lead','splitWith'].includes(key)&&typeof item==='string')out.add(item);else if(['rail','articles'].includes(key)){if(typeof item==='string')out.add(item);if(Array.isArray(item))for(const id of item)if(typeof id==='string')out.add(id);}publicArticleRefs(item,out);}return out;};
 export const collectPublicArticleReferences=(value)=>[...publicArticleRefs(value)].sort();
-export { hasDatedForecastWithDissent } from './compose-gate.mjs';
+export { isDatedForecast } from './compose-gate.mjs';
 const visualCount=value=>JSON.stringify(value).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu)?.length??0;
 async function editionTree(edition){const articles=await jsonNames(edition,'articles'),reviews=await jsonNames(edition,'reviews'),desk=await jsonNames(edition,'desk'),pages=await jsonNames(edition,'pages'),maps=await jsonNames(edition,'maps');return{articles,desk,pages,maps,reviews};}
 async function digests(edition,kind,names){return Object.fromEntries(await Promise.all(names.map(async name=>[name,sha(JSON.stringify(await readJson(location(edition,kind,name))))])));}
@@ -92,17 +93,106 @@ export async function recordAssignment(args){
   if(!Array.isArray(args.assignments))throw new Error('assignments must be an array of {id, owner, brief, evidence_refs} objects');
   if(args.assignments.length<5)throw new Error(`assignments must include at least 5 items, got ${args.assignments.length}`);
   args.assignments.forEach((item,index)=>{
-    try{exact(item,['id','owner','brief','evidence_refs']);}catch(error){throw new Error(`assignments[${index}] ${error.message}`);}
+    try{exact(item,['id','owner','brief','evidence_refs'],['slot','dissenter']);}catch(error){throw new Error(`assignments[${index}] ${error.message}`);}
     if(!component.test(item.id))throw new Error(`assignments[${index}].id ${JSON.stringify(item.id)} must be 1-128 lowercase alphanumeric/hyphen characters, starting with a letter or digit`);
     if(!desks.has(item.owner))throw new Error(`assignments[${index}].owner ${JSON.stringify(item.owner)} must be one of: ${[...desks].join(', ')}`);
     if(typeof item.brief!=='string'||item.brief.length<20)throw new Error(`assignments[${index}].brief must be a string of at least 20 characters, got ${typeof item.brief==='string'?`${item.brief.length} characters`:typeof item.brief}`);
     if(!Array.isArray(item.evidence_refs))throw new Error(`assignments[${index}].evidence_refs must be an array of strings`);
+    // The forecast slot: one item in the lineup is the day's call, and this is
+    // the only place anybody can say which. file_article then holds that
+    // reporter to the forecast shape in its own wake, where a refusal is still
+    // fixable — which is the whole reason the 21:00 floor was removed.
+    if(item.slot!==undefined&&item.slot!=='forecast')throw new Error(`assignments[${index}].slot ${JSON.stringify(item.slot)} must be "forecast" — it is the only slot the lineup names`);
+    if(item.dissenter!==undefined){
+      if(item.slot!=='forecast')throw new Error(`assignments[${index}].dissenter is only meaningful beside slot "forecast" — a dissent is held against a dated call, so name the slot too or drop the dissenter`);
+      if(!desks.has(item.dissenter))throw new Error(`assignments[${index}].dissenter ${JSON.stringify(item.dissenter)} must be one of: ${[...desks].join(', ')}`);
+      if(item.dissenter===item.owner)throw new Error(`assignments[${index}].dissenter ${JSON.stringify(item.dissenter)} is the owner of the piece — nobody dissents from their own byline, name a different desk`);
+    }
   });
   const ids=args.assignments.map(item=>item.id),duplicates=ids.filter((id,index)=>ids.indexOf(id)!==index);
   if(duplicates.length>0)throw new Error(`assignments[].id must be unique, got duplicates: ${[...new Set(duplicates)].join(', ')}`);
+  const slotted=args.assignments.filter(item=>item.slot==='forecast');
+  if(slotted.length>1)throw new Error(`at most one assignment may carry slot "forecast", got ${slotted.length}: ${slotted.map(item=>item.id).join(', ')}`);
   await convergeIndexed(args.edition,location(args.edition,'assignments',sha(args.event_key).slice(7,39)),{version:'clank.assignments.v1',...args});
-  return{recorded:args.assignments.length,receipt:await receipt(args,'assigned',args.assignments)};
+  const forecast=slotted[0]?{id:slotted[0].id,owner:slotted[0].owner,dissenter:slotted[0].dissenter??null}:null;
+  return{recorded:args.assignments.length,forecast,receipt:await receipt(args,'assigned',args.assignments)};
 }
+// filings/, verdicts/ and dissents/ are two levels deep, <id>/<revision>.json,
+// so a plain jsonNames() over them lists nothing. These two are the directory
+// half of that shape.
+const subdirNames=async(edition,kind)=>{try{return(await readdir(within(root(),'editions',edition,kind),{withFileTypes:true})).filter(entry=>entry.isDirectory()).map(entry=>entry.name).sort();}catch(error){if(error.code==='ENOENT')return[];throw error;}};
+const revisionNames=async(edition,kind,id)=>{try{return(await readdir(within(root(),'editions',edition,kind,id))).filter(name=>name.endsWith('.json')).map(name=>Number(name.slice(0,-5))).filter(value=>Number.isSafeInteger(value)&&value>=1).sort((left,right)=>left-right);}catch(error){if(error.code==='ENOENT')return[];throw error;}};
+async function latestFilings(edition){const out=[];for(const id of await subdirNames(edition,'filings')){const revisions=await revisionNames(edition,'filings',id);const revision=revisions[revisions.length-1];if(revision===undefined)continue;out.push({id,revision,value:await readJson(location(edition,'filings',`${id}/${revision}`))});}return out;}
+
+// The persona display name the archive's own dissents carry ("Tinkerton"), and
+// which ops/validate-content.mjs checks `dissent.agent` against. The record
+// keeps the lowercase agent id beside it; only the display name reaches print.
+const personaRoot=path.resolve(import.meta.dirname,'..','..','content','agents');
+const displayNames=new Map();
+async function personaName(agent){
+  if(displayNames.has(agent))return displayNames.get(agent);
+  const value=await readJson(path.join(personaRoot,`${agent}.json`)).catch(()=>undefined);
+  const name=typeof value?.name==='string'&&value.name.length>0?value.name:agent[0].toUpperCase()+agent.slice(1);
+  displayNames.set(agent,name);
+  return name;
+}
+
+// ---------------------------------------------------------------------------
+// art.map / art.hero_map, made unrepresentable-if-broken.
+//
+// `art.map` is the wide region the story page and the OG card draw at 104x42.
+// `art.hero_map` is the narrow re-crop the front panel draws at 52x30, and
+// fourteen regions are baked as matched pairs for exactly that
+// (`hormuz`/`hormuz-hero`, `taiwan-east`/`taiwan-hero`). That pairing is the
+// intended authoring pattern and was unreachable: compose_edition shipped only
+// the hero_map values, so a story page asked for a file nobody wrote and
+// `astro build` died on it — through entirely valid-looking JSON, at 21:30,
+// with nobody awake. compose_edition now ships the union of both keys, and
+// the names are resolved here, in the reporter's own wake, against the
+// committed catalogue. These agents never see the page they make; a broken one
+// has to be inexpressible rather than merely detectable.
+// ---------------------------------------------------------------------------
+let archivedMapNames;
+const archivedMaps=()=>{archivedMapNames??=new Set(archiveIndex().keys());return archivedMapNames;};
+const normalizeSpots=spots=>JSON.stringify((Array.isArray(spots)?spots:[]).map(spot=>({name:spot?.name,lat:spot?.lat,lon:spot?.lon})).sort((left,right)=>String(left.name).localeCompare(String(right.name))));
+const ART_TAIL='name a region ops/ASSETS.md lists, or file without art';
+async function checkArticleArt(edition,id,article){
+  const art=article.art;
+  if(art===undefined)return;
+  if(art===null||typeof art!=='object'||Array.isArray(art))throw new Error(`article.art must be an object {kind, …}, got ${Array.isArray(art)?'an array':typeof art} — ${ART_TAIL}`);
+  if(art.kind!=='map'&&art.kind!=='ascii')throw new Error(`article.art.kind must be "map" (a baked region) or "ascii" (a glyph the compositor picks), got ${JSON.stringify(art.kind)} — ${ART_TAIL}`);
+  if(art.kind!=='map')return;
+  const archive=archivedMaps(),supplied=new Set(await jsonNames(edition,'maps'));
+  const listed=name=>archive.has(name)||supplied.has(name);
+  if(typeof art.map!=='string'||art.map.length===0)throw new Error(`article.art.kind is "map" but art.map is ${JSON.stringify(art.map)} — art.map is the wide region the story page and the OG card draw, and it is required: ${ART_TAIL}`);
+  if(!listed(art.map))throw new Error(`article.art.map "${art.map}" is in neither this edition's maps/ nor the committed archive under content/editions/*/maps/, and nothing in this container can bake a new region: ${ART_TAIL}`);
+  if(art.hero_map!==undefined){
+    if(typeof art.hero_map!=='string'||art.hero_map.length===0)throw new Error(`article.art.hero_map must be a region name when present — the front panel's narrower re-crop, usually "${art.map}-hero" — or left out entirely, got ${JSON.stringify(art.hero_map)}: ${ART_TAIL}`);
+    if(!listed(art.hero_map))throw new Error(`article.art.hero_map "${art.hero_map}" is in neither this edition's maps/ nor the committed archive under content/editions/*/maps/: ${ART_TAIL}`);
+  }
+  if(art.spots!==undefined){
+    if(!Array.isArray(art.spots))throw new Error(`article.art.spots must be an array of {name, lat, lon} places, got ${typeof art.spots} — ${ART_TAIL}`);
+    art.spots.forEach((spot,index)=>{
+      if(!spot||typeof spot!=='object'||Array.isArray(spot))throw new Error(`article.art.spots[${index}] must be an object {name, lat, lon}`);
+      if(typeof spot.name!=='string'||spot.name.length===0)throw new Error(`article.art.spots[${index}].name must be a non-empty place name`);
+      for(const key of ['lat','lon'])if(typeof spot[key]!=='number'||!Number.isFinite(spot[key]))throw new Error(`article.art.spots[${index}].${key} must be a number — the marker on the map and the place in your copy are one place`);
+    });
+  }
+  // One region cannot carry two sets of spots: ops/validate-content.mjs matches
+  // a page MapGlyph's spots against the article art for that name and refuses
+  // the whole edition at 21:30, hours after the second reporter went to sleep.
+  const mine=normalizeSpots(art.spots),names=new Set([art.map,art.hero_map].filter(Boolean));
+  for(const filing of await latestFilings(edition)){
+    if(filing.id===id)continue;
+    const other=filing.value.art;
+    if(other?.kind!=='map')continue;
+    for(const name of [other.map,other.hero_map].filter(Boolean)){
+      if(!names.has(name)||normalizeSpots(other.spots)===mine)continue;
+      throw new Error(`"${filing.id}" already names map "${name}" with different art.spots, and one region cannot carry two sets — the content validator matches a page MapGlyph's spots against the article art for that name. Use exactly the spots "${filing.id}" filed, or ${ART_TAIL}`);
+    }
+  }
+}
+
 // `assignment_event_key` is accepted for compatibility and used only to
 // disambiguate when an owner somehow has more than one assignment on record;
 // it is never required, because the reporter's wake never contains it.
@@ -110,6 +200,14 @@ export async function fileArticle(args){
   identity(args);exact(args,['edition','event_key','article'],['assignment_event_key']);
   if(args.assignment_event_key!==undefined&&typeof args.assignment_event_key!=='string')throw new Error(`assignment_event_key must be a string when supplied, got ${typeof args.assignment_event_key}`);
   const article=object(args.article);
+  // The first-law hole, closed at the only place it can be closed: until now
+  // any reporter could type `dissent: {agent: "Tinkerton", …}` into its own
+  // filing and the schema, the validator and the renderer all accepted it —
+  // a colleague put on the record arguing the other side, by the author, with
+  // nobody asked. A dissent is an assertion about somebody else's belief, and
+  // no agent asserts what it cannot source. This refusal stands on its own,
+  // with or without any compose gate.
+  if('dissent' in article)throw new Error('article.dissent is not yours to write — a dissent is recorded by the colleague who holds it, with record_dissent, under their own name, never typed into your filing. Remove article.dissent and file again.');
   if(article.edition_date!==args.edition)throw new Error(`article.edition_date must equal "${args.edition}", got ${JSON.stringify(article.edition_date)}`);
   if(!Number.isSafeInteger(article.revision)||article.revision<1)throw new Error(`article.revision must be an integer >= 1, got ${JSON.stringify(article.revision)}`);
   if(!Array.isArray(article.body)||article.body.length<4)throw new Error(`article.body must be an array of at least 4 paragraphs, got ${Array.isArray(article.body)?article.body.length:typeof article.body}`);
@@ -163,6 +261,19 @@ export async function fileArticle(args){
     }
     if(prior.verdict!=='REVISION_REQUEST')throw new Error(`revision ${revision} requires revision ${revision-1} to carry a REVISION_REQUEST verdict, got "${prior.verdict}"`);
   }
+  // The forecast half of the deleted 21:00 floor, moved to the one moment a
+  // refusal is fixable inside the wake that caused it. Brass marks exactly one
+  // assignment `slot: "forecast"`; its owner owes the three fields every
+  // archived forecast carries and ops/validate-content.mjs checks.
+  if(assignment.slot==='forecast'){
+    const problems=[];
+    if(resolvedArticle.epistemic!=='forecast')problems.push(`article.epistemic must be "forecast", got ${JSON.stringify(resolvedArticle.epistemic)}`);
+    if(!/^\d{2}:\d{2}$/u.test(resolvedArticle.next_update_utc??''))problems.push(`article.next_update_utc must be a clock time "HH:MM" saying when the call gets looked at again, got ${JSON.stringify(resolvedArticle.next_update_utc)}`);
+    const confidence=resolvedArticle.confidence?.value;
+    if(typeof confidence!=='number'||!Number.isFinite(confidence)||confidence<0||confidence>1)problems.push(`article.confidence.value must be a number in [0, 1] — the probability the call carries, got ${JSON.stringify(resolvedArticle.confidence?.value)}`);
+    if(problems.length>0)throw new Error(`your assignment ${describeAssignment(assignment)} is today's forecast, so it files as one: ${problems.join('; ')}. Nothing was recorded — fix these and file revision ${resolvedArticle.revision} again in this wake.`);
+  }
+  await checkArticleArt(args.edition,assignment.id,resolvedArticle);
   const topics=await knownTopicSlugs();
   const flags=lintFiling(resolvedArticle,topics);
   // Citation integrity, always on and not switchable: a body that prints a
@@ -184,7 +295,101 @@ export async function fileArticle(args){
   const result={article_id:assignment.id,revision,digest:sha(JSON.stringify(filing)),warnings,receipt:await receipt(args,'filed',filing,supersede)};
   if(priorFiling)result.replaced=`this replaces your earlier revision ${revision} of "${assignment.id}", which the editor had not yet reviewed`;
   if(corrected)result.note=`your assignment today is ${describeAssignment(assignment)} — filed under that id instead of the supplied ${JSON.stringify(article.id)}`;
+  // The instruction rides the tool rather than only the brief: the dissenter's
+  // wake is a mention in room:filing, and the only agent who knows the filing
+  // just landed is the one reading this result.
+  if(assignment.slot==='forecast'){
+    result.forecast={dissenter:assignment.dissenter??null};
+    result.next=assignment.dissenter
+      ?`this is the day's forecast — mention @${assignment.dissenter} in room:filing now, with the article id and revision, so the dissent is on the record before compose at 21:00`
+      :"this is the day's forecast and the lineup named no dissenter — it will compose with dissent=0 unless a colleague records one";
+  }
   return result;
+}
+// ---------------------------------------------------------------------------
+// record_dissent — the honest producer of a named dissent.
+//
+// The archive's dissents are `{agent, p, argument}` on the published article,
+// and until now the only way one could get there was a reporter typing a
+// colleague's name into its own filing. `file_article` refuses that outright;
+// this is the replacement, and the whole of its authority is the identity the
+// MCP server already holds. There is one newsroom MCP process per agent with
+// `CLANK_NEWSROOM_AGENT` fixed in its Spawnfile env — the same trust boundary
+// `review_article` stands on (`!== 'spike'` → refuse) and the same one
+// `file_article` binds `byline.agents[0]` to. `agent` is stamped from that env
+// and no name in the arguments is read, so an agent cannot sign as anyone else
+// because it cannot reach anyone else's process.
+//
+// "concur" is a first-class outcome, not a failure: the designated dissenter
+// on the record having read the call and found nothing that crossed the line
+// is worth more than a manufactured 30%.
+// ---------------------------------------------------------------------------
+export async function recordDissent(args){
+  identity(args);exact(args,['edition','event_key','article_id','revision','stance','argument'],['p']);
+  const agent=process.env.CLANK_NEWSROOM_AGENT;
+  if(!desks.has(agent))throw new Error(`record_dissent may only be called by a reporting desk (${[...desks].join(', ')}), got ${JSON.stringify(agent)} — a dissent is a reporter's act and the tool set is the boundary`);
+  if(!component.test(args.article_id))throw new Error(`article_id ${JSON.stringify(args.article_id)} must be 1-128 lowercase alphanumeric/hyphen characters, starting with a letter or digit`);
+  if(!Number.isSafeInteger(args.revision)||args.revision<1)throw new Error(`revision must be an integer >= 1, got ${JSON.stringify(args.revision)}`);
+  if(args.stance!=='dissent'&&args.stance!=='concur')throw new Error(`stance must be "dissent" (you hold a counter-call) or "concur" (you read it and nothing crossed the line), got ${JSON.stringify(args.stance)}`);
+  if(typeof args.argument!=='string')throw new Error(`argument must be a string, got ${typeof args.argument}`);
+  if(args.stance==='dissent'){
+    if(typeof args.p!=='number'||!Number.isFinite(args.p)||args.p<0||args.p>1)throw new Error(`stance "dissent" requires p — your own probability for the call, a number in [0, 1] — got ${JSON.stringify(args.p)}`);
+    if(args.argument.length<80||args.argument.length>2000)throw new Error(`stance "dissent" requires an argument between 80 and 2000 characters: the reasoning a reader can weigh, not a verdict. Got ${args.argument.length}`);
+  }else{
+    if(args.p!==undefined)throw new Error('stance "concur" carries no p — it puts you on the record as having read the call and not opposed it, not as holding a different number');
+    if(args.argument.length<20||args.argument.length>2000)throw new Error(`stance "concur" requires an argument between 20 and 2000 characters saying why nothing crossed the line, got ${args.argument.length}`);
+  }
+  const filing=await readJson(location(args.edition,'filings',`${args.article_id}/${args.revision}`)).catch(()=>undefined);
+  if(!filing){
+    const filed=[];for(const id of await subdirNames(args.edition,'filings'))for(const revision of await revisionNames(args.edition,'filings',id))filed.push(`${id} rev ${revision}`);
+    throw new Error(`nothing is filed at revision ${args.revision} of "${args.article_id}" in edition ${args.edition}${filed.length>0?` — what is filed: ${filed.join(', ')}`:' — no filing exists yet'}. The announcement in room:filing carries the id and the revision; dissent against that one.`);
+  }
+  if(((filing.byline?.agents??[])[0]??'').toLowerCase()===agent)throw new Error(`revision ${args.revision} of "${args.article_id}" carries your own byline — you cannot dissent from your own piece`);
+  if((await jsonNames(args.edition,'receipts')).some(name=>name.startsWith('composed-')))throw new Error(`edition ${args.edition} is composed; a dissent recorded now cannot reach the page — say it on the floor, it will not be attributed to you in print`);
+  const ruled=await readJson(location(args.edition,'verdicts',`${args.article_id}/${args.revision}`)).catch(()=>undefined);
+  if(ruled?.verdict==='REVISION_REQUEST')throw new Error(`revision ${args.revision} of "${args.article_id}" was sent back for revision — dissent against the next one, once it is filed and announced`);
+  const name=await personaName(agent);
+  const value={version:'clank.dissent.v1',edition:args.edition,article_id:args.article_id,revision:args.revision,article_digest:sha(JSON.stringify(filing)),agent,name,stance:args.stance,...(args.stance==='dissent'?{p:args.p}:{}),argument:args.argument,event_key:args.event_key};
+  const dissentPath=location(args.edition,'dissents',`${args.article_id}/${args.revision}`);
+  const existing=await readJson(dissentPath).catch(()=>undefined);
+  if(existing&&JSON.stringify(existing)!==JSON.stringify(value))throw new Error(`${existing.name??existing.agent} already holds the dissent on revision ${args.revision} of "${args.article_id}" — one dissent per piece`);
+  await convergeIndexed(args.edition,dissentPath,value);
+  // The editor may already have PASSed the piece. A dissent that lands after
+  // PASS and before compose still belongs on the page, because compose is what
+  // seals the tree — so the merge happens here rather than being lost.
+  let merged=false,note;
+  if(args.stance==='dissent'){
+    const articlePath=location(args.edition,'articles',args.article_id);
+    const article=await readJson(articlePath).catch(()=>undefined);
+    if(article&&article.revision===args.revision){await supersedeIndexed(args.edition,articlePath,{...article,dissent:{agent:name,p:args.p,argument:args.argument}});merged=true;}
+    else if(article)note=`the editor passed revision ${article.revision} of "${args.article_id}", not the revision ${args.revision} you read — this dissent is on the record but is not on the page`;
+    else note='the editor has not passed this piece yet; the dissent will be merged when he does';
+  }
+  return{recorded:true,stance:args.stance,merged,...(note?{note}:{}),receipt:await receipt(args,'dissented',value)};
+}
+
+/**
+ * The dissent, if any, that belongs on the article the editor is about to PASS.
+ *
+ * A dissent recorded against the exact revision is merged. A dissent recorded
+ * against an earlier one is carried forward only when the two revisions agree
+ * on `confidence.value` and `next_update_utc` — the two things a dissent on a
+ * forecast is actually about. When the call moved, the argument is against a
+ * call that no longer exists: it is left off the page and the fact is written
+ * into the verdict, where the INDEX and the editor can both read it.
+ */
+async function dissentToMerge(args,filing){
+  const revisions=await revisionNames(args.edition,'dissents',args.article_id);
+  if(revisions.length===0)return undefined;
+  const held=[];for(const revision of revisions){const record=await readJson(location(args.edition,'dissents',`${args.article_id}/${revision}`));if(record.stance==='dissent')held.push(record);}
+  const exact=held.find(record=>record.revision===args.revision);
+  if(exact)return{dissent:{agent:exact.name,p:exact.p,argument:exact.argument}};
+  const earlier=held.filter(record=>record.revision<args.revision).sort((left,right)=>right.revision-left.revision)[0];
+  if(!earlier)return undefined;
+  const prior=await readJson(location(args.edition,'filings',`${args.article_id}/${earlier.revision}`)).catch(()=>undefined);
+  if(prior===undefined||prior.confidence?.value!==filing.confidence?.value||prior.next_update_utc!==filing.next_update_utc)return{dropped:`recorded against revision ${earlier.revision}; the call changed`};
+  await converge(location(args.edition,'dissents',`${args.article_id}/${args.revision}`),{...earlier,revision:args.revision,against_revision:earlier.revision,article_digest:sha(JSON.stringify(filing)),carried_by_event_key:args.event_key});
+  return{dissent:{agent:earlier.name,p:earlier.p,argument:earlier.argument}};
 }
 export async function reviewArticle(args){
   identity(args);exact(args,['edition','event_key','article_id','revision','verdict','notes']);
@@ -194,17 +399,21 @@ export async function reviewArticle(args){
   if(!['PASS','REVISION_REQUEST','HOLD','SPIKE'].includes(args.verdict))throw new Error(`verdict must be one of: PASS, REVISION_REQUEST, HOLD, SPIKE — got ${JSON.stringify(args.verdict)}`);
   if(typeof args.notes!=='string'||args.notes.length>8000)throw new Error(`notes must be a string of at most 8000 characters, got ${typeof args.notes==='string'?`${args.notes.length} characters`:typeof args.notes}`);
   const filing=await readJson(location(args.edition,'filings',`${args.article_id}/${args.revision}`)).catch(()=>{throw new Error(`no filing found for article_id ${JSON.stringify(args.article_id)} revision ${args.revision} — the reporter must file_article that revision before it can be reviewed`);});
-  const review={version:'clank.editorial-verdict.v1',article_id:args.article_id,revision:args.revision,article_digest:sha(JSON.stringify(filing)),verdict:args.verdict,notes:args.notes,event_key:args.event_key};
+  // Resolved before the verdict is written, so a dropped carry-forward is part
+  // of the durable verdict rather than a sentence that only existed in a tool
+  // result nobody kept.
+  const merge=args.verdict==='PASS'?await dissentToMerge(args,filing):undefined;
+  const review={version:'clank.editorial-verdict.v1',article_id:args.article_id,revision:args.revision,article_digest:sha(JSON.stringify(filing)),verdict:args.verdict,notes:args.notes,event_key:args.event_key,...(merge?.dropped?{dissent_dropped:merge.dropped}:{})};
   await convergeIndexed(args.edition,location(args.edition,'verdicts',`${args.article_id}/${args.revision}`),review);
   // `lint` is filing-time advice for the two people who can still act on it,
   // never part of the paper: it is stripped here alongside assignment_ref, so
   // what reaches articles/ — and from there content/editions/ — is the article
   // and nothing about how it was checked.
-  if(args.verdict==='PASS'){const{assignment_ref:_,lint:__,...article}=filing;await converge(location(args.edition,'reviews',args.article_id),review);await convergeIndexed(args.edition,location(args.edition,'articles',args.article_id),article);}
+  if(args.verdict==='PASS'){const{assignment_ref:_,lint:__,...article}=filing;await converge(location(args.edition,'reviews',args.article_id),review);await convergeIndexed(args.edition,location(args.edition,'articles',args.article_id),merge?.dissent?{...article,dissent:merge.dissent}:article);}
   // The warnings the reporter was shown at file time, handed to the editor
   // with the filing rather than left to surface in the release validator two
   // hours after he has already ruled. Advisory: they are his to weigh.
-  return{...review,warnings:filing.lint?.warnings??[],receipt:await receipt(args,'reviewed',review)};
+  return{...review,warnings:filing.lint?.warnings??[],...(merge?.dissent?{dissent:merge.dissent}:{}),receipt:await receipt(args,'reviewed',review)};
 }
 export async function fileDesk(args){
   identity(args);exact(args,['edition','event_key','name','document']);
@@ -225,10 +434,6 @@ export async function composeEdition(args){
   if(!Array.isArray(args.pages)||args.pages.length!==2)throw new Error(`pages must be an array of exactly 2 page documents, got ${Array.isArray(args.pages)?args.pages.length:typeof args.pages}`);
   if(new Set(args.pages.map(page=>page.name)).size!==2||args.pages.some(page=>!['front','tape'].includes(page.name)))throw new Error(`pages[].name must be exactly one "front" and one "tape", got ${JSON.stringify(args.pages.map(page=>page.name))}`);
   const articles=await jsonNames(args.edition,'articles'),reviews=await jsonNames(args.edition,'reviews'),desk=await jsonNames(args.edition,'desk');
-  // Read before the gates fire so the waiver's own shape is validated first: a
-  // waiver naming a different edition, or naming nothing datable at all, must
-  // never be able to reach the floor check below.
-  const waiver=editionDiversityWaiver(args.edition);
   if(articles.length<5)throw new Error(`edition tree incomplete — at least 5 PASSed articles required, found ${articles.length}`);
   if(reviews.length!==articles.length)throw new Error(`edition tree incomplete — reviews (${reviews.length}) must match articles (${articles.length})`);
   if(desk.length!==4)throw new Error(`edition tree incomplete — exactly 4 desk documents required (ledger.settlements, ledger.worlddesk, caslon.chrome, caslon.weather), found ${desk.length}`);
@@ -238,23 +443,27 @@ export async function composeEdition(args){
   if(owners.size<5)throw new Error(`edition diversity floor missing — at least 5 distinct byline agents required, found ${owners.size}: ${[...owners].join(', ')}`);
   if(sources.size<3)throw new Error(`edition diversity floor missing — at least 3 distinct evidence sources required, found ${sources.size}`);
   if(domains.size<3)throw new Error(`edition diversity floor missing — at least 3 distinct source_url domains required, found ${domains.size}`);
-  // The floor itself is unchanged and its refusal is word-for-word what it has
-  // always been. The only thing a waiver does is excuse this one gate, for the
-  // one edition it names, and put that fact in the artifact below.
-  const forecast=hasDatedForecastWithDissent(values);
-  const gates=composeGateStatus({edition:args.edition,passed:articles.length,desks:desk.length,forecast,waiver});
-  if(!gates.diversity.ok)throw new Error('edition diversity floor missing — at least one "forecast" article with a dated next_update_utc and a dissent {agent, argument} is required');
+  // Counted and reported, never refused. Both halves are produced upstream now
+  // — the forecast shape at file_article, the dissent by the dissenter through
+  // record_dissent — and a day nobody dissents ships saying so, here, in the
+  // composed receipt and in the INDEX. There is no waiver because there is
+  // nothing left to waive.
+  const gates=composeGateStatus({edition:args.edition,passed:articles.length,desks:desk.length,forecasts:values.filter(isDatedForecast).length,dissents:values.filter(hasNamedDissent).length});
   const pageArticles=new Set(),pageMaps=new Set(),papers=new Set();for(const page of args.pages){object(page.document);for(const value of publicArticleRefs(page.document))pageArticles.add(value);for(const value of walkValues(page.document,'map'))pageMaps.add(value);for(const value of walkValues(page.document,'paper'))papers.add(value);}
   if([...pageArticles].sort().join()!==articles.join())throw new Error(`page completeness invalid — pages must reference exactly the PASSed articles [${articles.join(', ')}], got [${[...pageArticles].sort().join(', ')}]`);
   if(papers.size<2)throw new Error(`paper diversity invalid — pages must use at least 2 distinct "paper" values, found ${papers.size}`);
   const frontVisuals=visualCount(args.pages.find(page=>page.name==='front').document);
   if(frontVisuals<2||frontVisuals>3)throw new Error(`illustration rhythm invalid — the "front" page must carry 2-3 MapGlyph/GlyphArt/Illustration/Image blocks, found ${frontVisuals}`);
-  const suppliedMaps=new Set((args.maps??[]).map(map=>map.name)),articleMaps=new Set(values.map(value=>value.art?.hero_map).filter(Boolean));
-  if([...suppliedMaps].sort().join()!==[...articleMaps].sort().join())throw new Error(`maps must exactly match article art — article art.hero_map values [${[...articleMaps].sort().join(', ')}], supplied maps [${[...suppliedMaps].sort().join(', ')}]`);
-  if([...pageMaps].some(name=>!articleMaps.has(name)))throw new Error(`maps must exactly match page references — page(s) reference map(s) not in article art.hero_map: ${[...pageMaps].filter(name=>!articleMaps.has(name)).join(', ')}`);
+  // The union, not just the hero: `art.map` is what the story page and the OG
+  // card load and `art.hero_map` is what the front panel loads, so shipping
+  // only one of two different names is a page that clears every gate here and
+  // then dies in `astro build` on a file that was never written.
+  const suppliedMaps=new Set((args.maps??[]).map(map=>map.name)),articleMaps=new Set(values.flatMap(value=>[value.art?.map,value.art?.hero_map]).filter(Boolean));
+  if([...suppliedMaps].sort().join()!==[...articleMaps].sort().join())throw new Error(`maps must exactly match article art — article art.map/art.hero_map values [${[...articleMaps].sort().join(', ')}], supplied maps [${[...suppliedMaps].sort().join(', ')}]`);
+  if([...pageMaps].some(name=>!articleMaps.has(name)))throw new Error(`maps must exactly match page references — page(s) reference map(s) not in article art.map/art.hero_map: ${[...pageMaps].filter(name=>!articleMaps.has(name)).join(', ')}`);
   for(const page of args.pages)await convergeIndexed(args.edition,location(args.edition,'pages',page.name),page.document);for(const map of args.maps??[]){if(!component.test(map.name))throw new Error(`maps[].name ${JSON.stringify(map.name)} must be 1-128 lowercase alphanumeric/hyphen characters, starting with a letter or digit`);await converge(location(args.edition,'maps',map.name),object(map.document));}
   const pageNames=['front','tape'],mapNames=[...suppliedMaps].sort(),tree={articles,desk,pages:pageNames,maps:mapNames,article_digests:await digests(args.edition,'articles',articles),desk_digests:await digests(args.edition,'desk',desk),page_digests:await digests(args.edition,'pages',pageNames),map_digests:await digests(args.edition,'maps',mapNames)};
-  const composition={tree,tree_digest:sha(JSON.stringify(tree)),compose_gates:composeGateLine(gates),...(gates.diversity.waived?{waiver}:{})};return composedResult(args,composition);
+  const composition={tree,tree_digest:sha(JSON.stringify(tree)),compose_gates:composeGateLine(gates),forecasts:gates.forecasts,dissents:gates.dissents};return composedResult(args,composition);
 }
 const jsonNames=async(edition,kind)=>{try{return(await readdir(within(root(),'editions',edition,kind))).filter(name=>name.endsWith('.json')).map(name=>name.slice(0,-5)).sort();}catch(error){if(error.code==='ENOENT')return[];throw error;}};
 const run=async(command,args,cwd)=>{const home=path.join(cwd,'.release-home'),temporary=path.join(cwd,'.release-tmp');await mkdir(home,{recursive:true});await mkdir(temporary,{recursive:true});return new Promise((resolve,reject)=>{const child=spawn(command,args,{cwd,stdio:'pipe',env:{CI:'1',HOME:home,TMPDIR:temporary,PATH:'/usr/local/bin:/usr/bin:/bin',LANG:'C.UTF-8',TZ:'UTC'}});let stderr='';child.stderr.on('data',chunk=>{if(stderr.length<65536)stderr+=chunk;});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error(`${command} failed: ${stderr.slice(-2000)}`)));});};

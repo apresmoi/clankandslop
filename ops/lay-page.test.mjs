@@ -314,12 +314,40 @@ test('a story naming a region no edition ever baked is refused, naming the maps 
   assert.match(error.message, /Nothing in this newsroom can bake a new one/);
 });
 
-test('art.map and art.hero_map must name one region, because two keys read one directory', () => {
-  // compose_edition writes only the art.hero_map values; the story page loads
-  // art.map. Disagree and the page builds green and dies in astro build.
-  refuses((i) => withMap(i, 'bravo', { map: 'kyiv-wide' }), /Name one archived region in both keys/);
-  refuses((i) => withMap(i, 'bravo', { hero_map: undefined }), /not both "map" and "hero_map"/);
-  refuses((i) => withMap(i, 'bravo', { map: undefined }), /not both "map" and "hero_map"/);
+test('a map/hero_map pair resolves and ships both, from the 2026-07-05 fixture', () => {
+  // The intended authoring pattern, and the one that was inexpressible:
+  // `taiwan-east` is the 104x42 story-page region, `taiwan-hero` the 52x30
+  // re-crop the front panel takes. Both are in the committed archive; both
+  // must reach the edition's maps/, because the story page loads art.map and
+  // the hero panel loads art.hero_map.
+  const { maps, pages } = lay((i) => {
+    i.articles.bravo.art = { kind: 'map', map: 'taiwan-east', hero_map: 'taiwan-hero', caption: 'The pair.', spots: [{ name: 'HUALIEN', lat: 23.98, lon: 121.6 }] };
+    delete i.decisions.art.bravo;
+    i.archive = archiveResolver();
+    return i;
+  });
+  assert.deepEqual(maps.map((m) => m.name), ['taiwan-east', 'taiwan-hero']);
+  assert.deepEqual(maps.map((m) => m.document.name), ['taiwan-east', 'taiwan-hero']);
+  // The panel draws the narrow crop; the wide one ships for the story page.
+  const block = pages[0].document.head[1].props.columns[0][0];
+  assert.equal(block.block, 'MapGlyph');
+  assert.equal(block.props.map, 'taiwan-hero');
+});
+
+test('equal names ship one map, and a bare art.map ships one', () => {
+  // August practice: one name in both keys. It is still legal and still one
+  // document — the union of {x} and {x}.
+  assert.deepEqual(lay((i) => withMap(i, 'bravo')).maps.map((m) => m.name), ['kyiv']);
+  // June practice, and half the archive: hero_map simply absent. The hero
+  // panel falls back to art.map rather than the filing being refused.
+  const bare = lay((i) => withMap(i, 'bravo', { hero_map: undefined }));
+  assert.deepEqual(bare.maps.map((m) => m.name), ['kyiv']);
+  assert.equal(bare.pages[0].document.head[1].props.columns[0][0].props.map, 'kyiv');
+  // What is still refused is a name nothing ever baked, on either key.
+  refuses((i) => withMap(i, 'bravo', { map: 'kyiv-wide' }), /names map "kyiv-wide", which is neither/);
+  refuses((i) => withMap(i, 'bravo', { hero_map: 'kyiv-hero' }), /names map "kyiv-hero", which is neither/);
+  refuses((i) => withMap(i, 'bravo', { map: undefined }), /carries art\.kind "map" but no "map"/);
+  refuses((i) => withMap(i, 'bravo', { hero_map: 42 }), /carries art\.hero_map 42/);
 });
 
 test('two stories may not carry one region with different spots', () => {
@@ -424,7 +452,7 @@ test('every shipped edition re-lays and satisfies each page gate', () => {
     assert.equal(new Set([front.paper, tape.paper]).size, 2, `${date} paper diversity`);
     const visuals = (JSON.stringify(front).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu) ?? []).length;
     assert.ok(visuals >= 2 && visuals <= 3, `${date} illustration rhythm: ${visuals}`);
-    const articleMaps = new Set(Object.values(readEditionInputs(resolve(repo, 'content'), date).articles).map((a) => a.art?.hero_map).filter(Boolean));
+    const articleMaps = new Set(Object.values(readEditionInputs(resolve(repo, 'content'), date).articles).flatMap((a) => [a.art?.map, a.art?.hero_map]).filter(Boolean));
     assert.deepEqual(maps.map((m) => m.name).sort(), [...articleMaps].sort(), `${date} maps match article art`);
   }
 });
@@ -448,7 +476,7 @@ test('ops/validate-content.mjs accepts every assembled edition', () => {
 test('the real compose_edition accepts the assembled 2026-09-05, and refuses the pages that shipped', async () => {
   const date = '2026-09-05';
   const dir = mkdtempSync(resolve(tmpdir(), 'lay-page-state-'));
-  const before = { root: process.env.CLANK_EDITION_STATE_ROOT, agent: process.env.CLANK_NEWSROOM_AGENT, waiver: process.env.CLANK_EDITION_DIVERSITY_WAIVER };
+  const before = { root: process.env.CLANK_EDITION_STATE_ROOT, agent: process.env.CLANK_NEWSROOM_AGENT };
   try {
     const seed = (name) => {
       const root = resolve(dir, name);
@@ -475,9 +503,6 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
     };
     const { composeEdition } = await import('../agentic-org/scripts/production-newsroom.mjs');
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    // 2026-09-05 carries no "forecast" article, which is Brass's lineup rather
-    // than a layout problem; the publisher's dated waiver is what shipped it.
-    process.env.CLANK_EDITION_DIVERSITY_WAIVER = date;
 
     process.env.CLANK_EDITION_STATE_ROOT = seed('assembled');
     const { pages, maps } = layShipped(date);
@@ -485,7 +510,13 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
     // each, and compose_edition writes both documents into the edition.
     assert.deepEqual(maps.map((m) => m.name), ['moscow-kyiv', 'taiwan-north']);
     const result = await composeEdition({ edition: date, event_key: 'lay-page-test', pages, maps });
-    assert.match(result.compose_gates, /passed=6\/5 desks=4\/4/);
+    // The paper that could not be composed without a dated waiver: six PASSed
+    // pieces, four desk documents, no forecast and no dissent. It composes, and
+    // the gate line and the receipt both say which of the two it was.
+    assert.equal(result.compose_gates, '# compose: passed=6/5 desks=4/4 forecast=0 dissent=0  → ready');
+    assert.equal(result.forecasts, 0);
+    assert.equal(result.dissents, 0);
+    assert.equal(result.waiver, undefined);
     assert.deepEqual(result.tree.pages, ['front', 'tape']);
     assert.deepEqual(result.tree.maps, ['moscow-kyiv', 'taiwan-north']);
 
@@ -499,7 +530,7 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
     process.env.CLANK_EDITION_STATE_ROOT = seed('extra-map');
     await assert.rejects(
       () => composeEdition({ edition: date, event_key: 'lay-page-test-extra', pages, maps: [...maps, { name: 'hormuz-strait', document: { name: 'hormuz-strait' } }] }),
-      /maps must exactly match article art — article art\.hero_map values \[moscow-kyiv, taiwan-north\], supplied maps \[hormuz-strait, moscow-kyiv, taiwan-north\]/,
+      /maps must exactly match article art — article art\.map\/art\.hero_map values \[moscow-kyiv, taiwan-north\], supplied maps \[hormuz-strait, moscow-kyiv, taiwan-north\]/,
     );
 
     // 2. The page drops a MapGlyph while the article keeps its art. Caught two
@@ -516,7 +547,7 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
           if (nested.block === 'MapGlyph' && nested.props.map === 'moscow-kyiv') column[index] = { block: 'GlyphArt', props: { shape: 'pumpjack', scale: 0.6, caption: 'A glyph in its place.' } };
     await assert.rejects(
       () => composeEdition({ edition: date, event_key: 'lay-page-test-dropped', pages: stripped, maps: maps.filter((m) => m.name !== 'moscow-kyiv') }),
-      /maps must exactly match article art — article art\.hero_map values \[moscow-kyiv, taiwan-north\], supplied maps \[taiwan-north\]/,
+      /maps must exactly match article art — article art\.map\/art\.hero_map values \[moscow-kyiv, taiwan-north\], supplied maps \[taiwan-north\]/,
     );
 
     process.env.CLANK_EDITION_STATE_ROOT = seed('repointed-glyph');
@@ -526,7 +557,7 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
         for (const nested of column) if (nested.block === 'MapGlyph' && nested.props.map === 'moscow-kyiv') nested.props.map = 'hormuz-strait';
     await assert.rejects(
       () => composeEdition({ edition: date, event_key: 'lay-page-test-repointed', pages: repointed, maps }),
-      /maps must exactly match page references — page\(s\) reference map\(s\) not in article art\.hero_map: hormuz-strait/,
+      /maps must exactly match page references — page\(s\) reference map\(s\) not in article art\.map\/art\.hero_map: hormuz-strait/,
     );
 
     process.env.CLANK_EDITION_STATE_ROOT = seed('shipped');
@@ -534,7 +565,7 @@ test('the real compose_edition accepts the assembled 2026-09-05, and refuses the
     await assert.rejects(() => composeEdition({ edition: date, event_key: 'lay-page-test-shipped', pages: shipped, maps: [] }), /paper diversity invalid/);
   } finally {
     rmSync(dir, { recursive: true, force: true });
-    for (const [key, value] of [['CLANK_EDITION_STATE_ROOT', before.root], ['CLANK_NEWSROOM_AGENT', before.agent], ['CLANK_EDITION_DIVERSITY_WAIVER', before.waiver]])
+    for (const [key, value] of [['CLANK_EDITION_STATE_ROOT', before.root], ['CLANK_NEWSROOM_AGENT', before.agent]])
       if (value === undefined) delete process.env[key]; else process.env[key] = value;
   }
 });
@@ -557,5 +588,74 @@ test('the assembled front reproduces the shipped August front, plus the paper ke
     assert.equal(assembled.paper, 'front');
     const { paper: _, ...withoutPaper } = assembled;
     assert.deepEqual(withoutPaper, shipped, `${date} front must re-lay byte-for-byte apart from "paper"`);
+  }
+});
+
+test('a map/hero_map pair on the real 2026-09-05 composes, ships both, and validates', async () => {
+  // §2 end to end on real data. The edition's `foxconn-ai-capex-build-chain`
+  // shipped `taiwan-north` in both keys. Given the pair it was always allowed
+  // to name — `taiwan-east` for the 104x42 story page, `taiwan-hero` for the
+  // 52x30 front panel — the old gate shipped only `taiwan-hero` and the story
+  // page asked for a `taiwan-east.json` nobody wrote, which is where
+  // `astro build` died. Both must now reach content/editions/<date>/maps/.
+  const date = '2026-09-05';
+  const dir = mkdtempSync(resolve(tmpdir(), 'lay-page-pair-'));
+  const before = { root: process.env.CLANK_EDITION_STATE_ROOT, agent: process.env.CLANK_NEWSROOM_AGENT };
+  try {
+    const inputs = readEditionInputs(resolve(repo, 'content'), date);
+    const paired = { ...inputs.articles['foxconn-ai-capex-build-chain'] };
+    paired.art = { ...paired.art, map: 'taiwan-east', hero_map: 'taiwan-hero' };
+    const articles = { ...inputs.articles, 'foxconn-ai-capex-build-chain': paired };
+
+    const root = resolve(dir, 'state');
+    const edition = resolve(root, 'editions', date);
+    mkdirSync(resolve(edition, 'articles'), { recursive: true });
+    cpSync(resolve(repo, 'content/editions', date, 'desk'), resolve(edition, 'desk'), { recursive: true });
+    for (const [id, value] of Object.entries(articles)) {
+      writeFileSync(resolve(edition, 'articles', `${id}.json`), `${JSON.stringify(value)}\n`);
+      const filing = { ...value, assignment_ref: { event_key: `t-${id}`, id } };
+      mkdirSync(resolve(edition, 'filings', id), { recursive: true });
+      writeFileSync(resolve(edition, 'filings', id, `${value.revision}.json`), `${JSON.stringify(filing)}\n`);
+      mkdirSync(resolve(edition, 'reviews'), { recursive: true });
+      writeFileSync(resolve(edition, 'reviews', `${id}.json`), `${JSON.stringify({ version: 'clank.editorial-verdict.v1', article_id: id, revision: value.revision, article_digest: sha(JSON.stringify(filing)), verdict: 'PASS', notes: '', event_key: `t-${id}` })}\n`);
+    }
+
+    const { pages, maps } = layEdition({ edition: date, articles, desk: inputs.desk, maps: {}, decisions: decisionsFromShipped(date), agents });
+    // The union, in one place: the wide region, its hero re-crop, and the
+    // second story's single name.
+    assert.deepEqual(maps.map((m) => m.name), ['moscow-kyiv', 'taiwan-east', 'taiwan-hero']);
+
+    const { composeEdition } = await import('../agentic-org/scripts/production-newsroom.mjs');
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    process.env.CLANK_EDITION_STATE_ROOT = root;
+    const result = await composeEdition({ edition: date, event_key: 'lay-page-pair-test', pages, maps });
+    assert.deepEqual(result.tree.maps, ['moscow-kyiv', 'taiwan-east', 'taiwan-hero']);
+    // Mutation check for the union: hand compose only the hero half, exactly
+    // what it used to ship by itself, and it must refuse rather than write a
+    // tree the story page cannot read.
+    rmSync(resolve(edition, 'receipts'), { recursive: true, force: true });
+    rmSync(resolve(edition, 'maps'), { recursive: true, force: true });
+    rmSync(resolve(edition, 'pages'), { recursive: true, force: true });
+    await assert.rejects(
+      () => composeEdition({ edition: date, event_key: 'lay-page-pair-hero-only', pages, maps: maps.filter((m) => m.name !== 'taiwan-east') }),
+      /maps must exactly match article art — article art\.map\/art\.hero_map values \[moscow-kyiv, taiwan-east, taiwan-hero\], supplied maps \[moscow-kyiv, taiwan-hero\]/,
+    );
+
+    // And the composed tree is a publishable edition: ops/validate-content.mjs
+    // reads art.map and art.hero_map against the edition's own maps/ directory.
+    const site = resolve(dir, 'site');
+    cpSync(resolve(repo, 'ops'), resolve(site, 'ops'), { recursive: true });
+    cpSync(resolve(repo, 'content'), resolve(site, 'content'), { recursive: true });
+    process.env.CLANK_EDITION_STATE_ROOT = root;
+    await composeEdition({ edition: date, event_key: 'lay-page-pair-recompose', pages, maps });
+    for (const kind of ['articles', 'pages', 'maps']) {
+      rmSync(resolve(site, 'content/editions', date, kind), { recursive: true, force: true });
+      cpSync(resolve(edition, kind), resolve(site, 'content/editions', date, kind), { recursive: true });
+    }
+    assert.match(execFileSync(process.execPath, ['ops/validate-content.mjs'], { cwd: site, encoding: 'utf8' }), /content OK/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    for (const [key, value] of [['CLANK_EDITION_STATE_ROOT', before.root], ['CLANK_NEWSROOM_AGENT', before.agent]])
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
   }
 });

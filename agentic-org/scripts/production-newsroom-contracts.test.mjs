@@ -63,4 +63,36 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
   assert.equal(fileArticleTool.inputSchema.properties.article.type, 'object');
   assert.ok(fileArticleTool.inputSchema.properties.article.properties.epistemic.enum.includes('fact'));
   assert.ok(!fileArticleTool.inputSchema.required.includes('assignment_event_key'), 'assignment_event_key must never be required');
+
+  // `dissent` is not an article key any more, at any layer: the schema does not
+  // advertise it and file_article refuses it. A schema that still offered it
+  // would be an invitation to the exact call the server rejects.
+  assert.equal(fileArticleTool.inputSchema.properties.article.properties.dissent, undefined, 'the article schema must not offer a dissent key');
+  const art = fileArticleTool.inputSchema.properties.article.properties.art;
+  assert.deepEqual(art.required, ['kind']);
+  assert.deepEqual(art.properties.kind.enum, ['map', 'ascii']);
+  assert.equal(art.properties.map.type, 'string');
+  assert.equal(art.properties.hero_map.type, 'string');
+  assert.deepEqual(art.properties.spots.items.required, ['name', 'lat', 'lon']);
+
+  // record_dissent is typed, and it is the six desks that hold it.
+  const recordDissentTool = cogsworth.find((tool) => tool.name === 'record_dissent');
+  assert.ok(recordDissentTool, 'a reporter must expose record_dissent');
+  assert.deepEqual(recordDissentTool.inputSchema.required, ['edition', 'event_key', 'article_id', 'revision', 'stance', 'argument']);
+  assert.deepEqual(recordDissentTool.inputSchema.properties.stance.enum, ['dissent', 'concur']);
+  assert.equal(recordDissentTool.inputSchema.properties.revision.type, 'integer');
+  assert.equal(recordDissentTool.inputSchema.properties.p.maximum, 1);
+  // No agent/name parameter, ever: identity is the process, not an argument.
+  for (const forbidden of ['agent', 'name', 'dissenter']) assert.equal(recordDissentTool.inputSchema.properties[forbidden], undefined, `record_dissent must not accept a "${forbidden}" argument`);
+  assert.equal(recordDissentTool.inputSchema.additionalProperties, false);
+
+  // The assignment item carries the forecast slot the filing gate reads.
+  assert.deepEqual(recordAssignment.inputSchema.properties.assignments.items.properties.slot.enum, ['forecast']);
+  assert.deepEqual(new Set(recordAssignment.inputSchema.properties.assignments.items.properties.dissenter.enum), new Set(['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']));
+
+  // Everyone outside the six desks is refused the tool at the surface.
+  for (const role of ['spike', 'caslon', 'brass', 'ledger', 'pressman', 'klaxon']) {
+    const tools = await mcpToolsList(role);
+    assert.ok(!tools.some((tool) => tool.name === 'record_dissent'), `${role} must not be offered record_dissent`);
+  }
 });

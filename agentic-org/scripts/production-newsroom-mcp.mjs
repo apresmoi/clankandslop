@@ -1,5 +1,5 @@
 import { createInterface } from 'node:readline';
-import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, reviewArticle, stageRelease } from './production-newsroom.mjs';
+import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, reviewArticle, stageRelease } from './production-newsroom.mjs';
 import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
 
 // Closed sets mirrored from production-newsroom.mjs's own validation (`desks`,
@@ -9,6 +9,8 @@ import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
 // call fails fast on a malformed shape instead of round-tripping to disk.
 const DESKS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta'];
 const VERDICTS = ['PASS', 'REVISION_REQUEST', 'HOLD', 'SPIKE'];
+const STANCES = ['dissent', 'concur'];
+const ART_KINDS = ['map', 'ascii'];
 const EPISTEMIC = ['fact', 'forecast', 'inference'];
 const COMPONENT_PATTERN = '^[a-z0-9][a-z0-9-]{0,127}$';
 const DATE_PATTERN = '^\\d{4}-\\d{2}-\\d{2}$';
@@ -31,7 +33,9 @@ const assignmentItem = {
     id: componentId('Immutable story id this assignment will file under. Lowercase letters, digits, hyphens.'),
     owner: { type: 'string', enum: DESKS, description: 'Reporter agent this story is assigned to.' },
     brief: { type: 'string', minLength: 20, description: 'What to report, at least 20 characters.' },
-    evidence_refs: { type: 'array', items: { type: 'string' }, description: 'source_url or source_id values the filed article must carry in evidence_box.' }
+    evidence_refs: { type: 'array', items: { type: 'string' }, description: 'source_url or source_id values the filed article must carry in evidence_box.' },
+    slot: { type: 'string', enum: ['forecast'], description: 'Optional, at most one item in the lineup: this is the day\'s forecast. file_article then requires epistemic "forecast", a dated next_update_utc and confidence.value in [0,1] from its owner.' },
+    dissenter: { type: 'string', enum: DESKS, description: 'Optional, only beside slot "forecast" and never the owner: the colleague who holds the dissent and will record it with record_dissent.' }
   }
 };
 
@@ -53,7 +57,7 @@ const article = {
     },
     timestamp: { type: 'string', description: 'Publish time, e.g. "12:00 UTC".' },
     revision: { type: 'integer', minimum: 1 },
-    next_update_utc: { type: 'string', description: '"HH:MM" — required for forecast/dissent floor checks.' },
+    next_update_utc: { type: 'string', description: '"HH:MM" — when the call gets looked at again. Required to be a real clock time when your assignment carries slot "forecast".' },
     topics: { type: 'array', items: { type: 'string' } },
     body: { type: 'array', items: { type: 'string' }, minItems: 4, description: 'At least 4 paragraphs.' },
     key_numbers: { type: 'array' },
@@ -72,8 +76,18 @@ const article = {
       description: 'Must include every evidence_refs value from your assignment, as a source_url or source_id.'
     },
     refs: { type: 'array', items: { type: 'string' }, minItems: 1, description: 'Non-empty; source-note ids like "E1" cited in body.' },
-    dissent: { type: 'object', additionalProperties: true, required: ['agent', 'argument'], properties: { agent: { type: 'string' }, p: { type: 'number' }, argument: { type: 'string' } } },
-    art: { type: 'object', additionalProperties: true, properties: { hero_map: { type: 'string' } } }
+    confidence: { type: 'object', additionalProperties: true, properties: { value: { type: 'number', minimum: 0, maximum: 1 }, label: { type: 'string' }, interval: { type: 'number' } }, description: 'Required when your assignment carries slot "forecast": confidence.value is the probability the call rests on.' },
+    art: {
+      type: 'object', additionalProperties: true, required: ['kind'],
+      properties: {
+        kind: { type: 'string', enum: ART_KINDS, description: '"map" names a baked region; "ascii" leaves the glyph to the compositor.' },
+        map: { type: 'string', description: 'Required for kind "map": the wide region the story page and the OG card draw at 104x42. Must be a region ops/ASSETS.md lists.' },
+        hero_map: { type: 'string', description: 'Optional: the front hero panel\'s narrower re-crop at 52x30, usually "<map>-hero" where ASSETS.md lists one. May repeat map; omit it entirely otherwise. Both names ship.' },
+        caption: { type: 'string' },
+        spots: { type: 'array', items: { type: 'object', additionalProperties: true, required: ['name', 'lat', 'lon'], properties: { name: { type: 'string' }, lat: { type: 'number' }, lon: { type: 'number' } } }, description: 'Places marked on the map. One region carries one set of spots across the whole edition.' }
+      },
+      description: 'Optional. A dissent is NOT an article key: the colleague who holds it records it with record_dissent, under their own name.'
+    }
   }
 };
 
@@ -105,6 +119,20 @@ const definitions = {
       article
     },
     execute: fileArticle
+  },
+  record_dissent: {
+    description: "Record your own dissent, or your concurrence, against a colleague's filed revision. You are identified by the agent this MCP server runs as — no name is read from the arguments, and nobody else can sign as you. This is the only route a dissent reaches the page: file_article refuses an author-typed one.",
+    required: ['edition', 'event_key', 'article_id', 'revision', 'stance', 'argument'],
+    optional: ['p'],
+    properties: {
+      edition, event_key: eventKey,
+      article_id: componentId("Story id from the owner's announcement in room:filing."),
+      revision: { type: 'integer', minimum: 1, description: 'The revision you actually read, from that same announcement.' },
+      stance: { type: 'string', enum: STANCES, description: '"dissent" when you hold a counter-call; "concur" when you read it and nothing crossed the line — an honest outcome, not a failure.' },
+      argument: { type: 'string', minLength: 20, maxLength: 2000, description: 'For "dissent", 80-2000 characters of reasoning a reader can weigh. For "concur", 20+ characters saying why nothing crossed the line.' },
+      p: { type: 'number', minimum: 0, maximum: 1, description: 'Required for "dissent" and refused for "concur": your own probability for the call.' }
+    },
+    execute: recordDissent
   },
   review_article: {
     description: "Record Spike's verdict for one immutable filing revision.",
@@ -143,7 +171,7 @@ const definitions = {
       },
       maps: {
         type: 'array',
-        items: { type: 'object', additionalProperties: false, required: ['name', 'document'], properties: { name: componentId('Map name; must match an article art.hero_map value.'), document: { type: 'object', additionalProperties: true } } }
+        items: { type: 'object', additionalProperties: false, required: ['name', 'document'], properties: { name: componentId('Map name; the supplied set must equal the union of every article art.map and art.hero_map value.'), document: { type: 'object', additionalProperties: true } } }
       }
     },
     execute: composeEdition
@@ -155,7 +183,10 @@ const definitions = {
     execute: stageRelease
   }
 };
-const roleTools={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article'],sprockett:['file_article'],foreman:['file_article'],graves:['file_article'],tinkerton:['file_article'],vesta:['file_article'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
+// A dissent is a reporter's act, so the six desks carry record_dissent and
+// nobody else does — the tool set is the boundary, exactly as it is for
+// review_article and compose_edition.
+const roleTools={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
 const tools=roleTools[role]??[];
 const schema=definition=>({type:'object',additionalProperties:false,required:definition.required,properties:definition.properties});
 const reply=(id,result,error)=>process.stdout.write(`${JSON.stringify({jsonrpc:'2.0',id,...(error?{error:{code:-32000,message:error}}:{result})})}\n`);
