@@ -45,6 +45,19 @@ jobs:
       # node_modules the rest of the build needs.
       - name: Check the runtime bundle descriptor describes this tree
         run: node agentic-org/scripts/check-bundle-descriptor.mjs
+      # Nothing here ever built the organization, so nothing here ever saw the
+      # briefs grow. `# The floor` — a preamble every brief carried verbatim —
+      # crossed Daimon's 16,384-byte instruction ceiling across eight merges and
+      # the first thing that noticed was a deploy; the same window merged an
+      # unescaped `"` in brass's schedule prompt that made its manifest
+      # unparseable. A real `spawnfile compile` is out of reach here (it needs a
+      # pinned Daimon runtime image whose capability receipt attests the
+      # compiler's contract manifest, i.e. Docker and a registry), but the
+      # instruction budget and the manifests are pure functions of this tree.
+      - name: Check every agent fits Daimon's instruction budget
+        run: |
+          node agentic-org/scripts/check-instruction-budget.mjs
+          node --test agentic-org/scripts/check-instruction-budget.test.mjs
       # The page data layer has one build-time decision in it that a green
       # astro build cannot see: whether a story advertises an og:image for a
       # card that was never rendered. Fifteen editions have no cards at all, and
