@@ -212,13 +212,15 @@ the story that first needed them — `hormuz`, `taiwan-strait`, `moscow-kyiv`,
 marking narrower re-crops of the same ground, cut for the hero panel rather
 than the wide story-page frame. `ops/ASSETS.md` lists every one with its
 bounding box; `ls ./repos/newsroom/content/editions/*/maps/` is the live
-answer. A `-hero` variant is not separately reachable today: the gate ships
-one region per story and `art.map` and `art.hero_map` have to name it
-together, so a story picks the crop that fits and uses it in both places.
+answer. A `-hero` variant is separately reachable: a story may name the wide
+crop in `art.map` and its `-hero` re-crop in `art.hero_map`, and both ship —
+the story page draws the wide one at 104 × 42, the front panel the narrow one
+at 52 × 30. Fourteen regions were baked as matched pairs for exactly that.
 
 ### How a map reaches the page
 
-The route is `article art.hero_map → MapGlyph → compose_edition maps[]`, and
+The route is `article art.map (+ art.hero_map) → MapGlyph → compose_edition
+maps[]`, and
 every link of it now has an author. The reporter briefs ask for `art` where a
 story has a place; the assembler resolves the named region and hands
 `compose_edition` the document; `compose_edition` writes it into the edition.
@@ -248,20 +250,20 @@ Same region, same file, whatever edition directory it is filed under: a baked
 map is region data. `ops/ASSETS.md` lists every one with its box, which is
 cheaper to read than the files.
 
-**What the assembler does with it.** I supply nothing. It resolves each named
-region — today's `maps/` first, then the committed archive — and prints the
-document in the `maps` array on stdout, which goes straight across. Three
-things it will refuse me for, all naming `maps must match article art`: a
-region no edition ever baked, a story whose `art.map` and `art.hero_map`
-disagree (two keys, one directory — the story page reads the first and the
-gate reads the second), and two stories claiming one region with different
-`spots`.
+**What the assembler does with it.** I supply nothing. It resolves every
+named region — today's `maps/` first, then the committed archive — and prints
+each document in the `maps` array on stdout, which goes straight across. A
+story naming a pair produces two entries, because two files are loaded. Two
+things it will refuse me for, both naming `maps must match article art`: a
+region no edition ever baked, and two stories claiming one region with
+different `spots`.
 
 **The three rules the gate enforces**, restated because they are what a
 composition dies on:
 
-1. The `maps` I pass must be **exactly** the `art.hero_map` values on the
-   day's PASSed articles — no more and no fewer. One extra is a refusal.
+1. The `maps` I pass must be **exactly** the union of every `art.map` and
+   `art.hero_map` on the day's PASSed articles — no more and no fewer. One
+   extra is a refusal, and so is one short.
 2. A `MapGlyph` on a page may only name a map in that set.
 3. On a day no article declares one, the set is empty and the page carries no
    map. That is a normal day, not a failure.
@@ -427,11 +429,10 @@ cannot be laid out, and it names the gate and the missing input:
 - **`glyph catalogue`** — a shape or roll that has no model. Nine static
   shapes, two rolls, and `roll:"eclipse"` needs `shape:"eclipse"` beside it.
 - **`maps must match article art`** — a story declares a region no edition
-  ever baked, or one whose `art.map` and `art.hero_map` disagree, or two
-  stories claim one region with different `spots`. The maps supplied to
-  `compose_edition` must be precisely the `art.hero_map` values on the day's
-  PASSed articles, no more and no fewer, and no `MapGlyph` may name a map
-  outside that set. On a day no article declares one, that set is empty and
+  ever baked, or two stories claim one region with different `spots`. The maps
+  supplied to `compose_edition` must be precisely the union of every `art.map`
+  and `art.hero_map` on the day's PASSed articles, no more and no fewer, and
+  no `MapGlyph` may name a map outside that set. On a day no article declares one, that set is empty and
   the page carries no map. None of these is mine to fix by editing an
   article — I say so in `room:floor` and lay the page without it.
 - **`illustration alternation`** — the adjacent run of illustrated rows does

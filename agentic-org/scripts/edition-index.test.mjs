@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { CITATION_GATE_NAMES, HARD_LINT_NAMES, advisoryFilingWarnings, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
 import { proseLintFindings } from '../../ops/prose-lint.mjs';
-import { composeEdition, fileArticle, fileDesk, recordAssignment, reviewArticle } from './production-newsroom.mjs';
+import { composeEdition, fileArticle, fileDesk, recordAssignment, recordDissent, reviewArticle } from './production-newsroom.mjs';
 
 const EDITION = '2026-09-04';
 const OWNERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
@@ -35,8 +35,10 @@ const article = (id, agent, index) => ({
     { source: `Second ${index}`, fragment: 'fact', as_of: EDITION, source_note: { source_id: 'E2', source_kind: 'public_url', used_by_agent: agent, source_url: `https://second${index}.example/evidence`, retrieved_at: `${EDITION}T10:00:00Z` } }
   ],
   refs: ['E1', 'E2'],
-  ...(index === 1 ? { dissent: { agent: 'Vesta', p: 0.4, argument: 'The named dissenter identifies a plausible opposing reading.' } } : {}),
-  ...(index === 0 ? { art: { hero_map: 'world-map' } } : {})
+  ...(index === 1 ? { confidence: { value: 0.42 } } : {}),
+  // A real archived pair: the wide region the story page loads and the narrow
+  // re-crop the front panel loads. compose_edition ships both.
+  ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {})
 });
 const page = (name, ids, map) => name === 'front'
   ? { edition: EDITION, page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], flow: [{ block: 'MapGlyph', props: { map } }, { block: 'GlyphArt', props: { glyph: 'signal' } }] }
@@ -66,15 +68,27 @@ async function driveEdition(state) {
   const afterAssignment = await step('record_assignment', () => recordAssignment({ edition: EDITION, event_key: 'schedule:conference-1', assignments }));
   assert.equal(rows(afterAssignment, 'A').length, 5);
   assert.match(afterAssignment, /^A cogsworth story-0 refs=1 +\| Report the verified mechanism/mu);
-  // All three compose gates are legible from the first write of the day, not
-  // one per failed compose run.
-  assert.match(afterAssignment, /^# compose: passed=0\/5 desks=0\/4 diversity=missing\(forecast\) {2}→ blocked$/mu);
+  // Every compose gate is legible from the first write of the day, not one per
+  // failed compose run.
+  assert.match(afterAssignment, /^# compose: passed=0\/5 desks=0\/4 forecast=0 dissent=0 {2}→ blocked$/mu);
 
   const afterFiling = await step('file_article', async () => {
     for (const [index, owner] of OWNERS.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition: EDITION, event_key: `filing-${index}`, article: article(`story-${index}`, capitalize(owner), index) }); }
   });
   assert.equal(rows(afterFiling, 'F').length, 5);
-  assert.match(afterFiling, /^F story-0 rev=1 owner=cogsworth epi=fact words=\d+ refs=2 domains=2 topics=ok lint=ok$/mu);
+  assert.match(afterFiling, /^F story-0 rev=1 owner=cogsworth epi=fact words=\d+ refs=2 domains=2 art=hormuz\/hormuz-hero topics=ok lint=ok$/mu);
+  assert.match(afterFiling, /^F story-1 rev=1 owner=sprockett epi=forecast words=\d+ refs=2 domains=2 art=- topics=ok lint=ok$/mu);
+
+  // The dissent, written by the dissenter. Vesta is not on today's lineup and
+  // needs no assignment: what authorises the call is the agent this MCP server
+  // runs as, and nothing in the arguments names anybody.
+  process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+  const afterDissent = await step('record_dissent', () => recordDissent({
+    edition: EDITION, event_key: 'dissent-story-1', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62,
+    argument: 'The call rests on a single quarter of shipment data and reads a pause as a turn; the same series moved this far twice last year without one, and the clock the piece sets is inside the revision window.'
+  }));
+  assert.match(afterDissent, /^N story-1 rev=1 by=vesta dissent p=0\.62$/mu);
+  assert.match(afterDissent, /^# rows: A assignment · F filing · N dissent · V verdict/mu);
 
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
   const afterRevision = await step('review_article REVISION_REQUEST', () => reviewArticle({ edition: EDITION, event_key: 'verdict-request', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the opposing reading.' }));
@@ -96,19 +110,21 @@ async function driveEdition(state) {
   });
   assert.equal(rows(afterDesk, 'D').length, 4);
   assert.match(afterDesk, /^D caslon\.chrome keys=9$/mu);
-  // Every gate met, and story-1 carries the dated forecast with named dissent.
-  assert.match(afterDesk, /^# compose: passed=5\/5 desks=4\/4 diversity=ok {2}→ ready$/mu);
+  // Both gates met. The two counts ride the same line and refuse on neither:
+  // story-1 is the dated forecast, and Vesta's dissent against it is on the
+  // record because Vesta recorded it, not because Sprockett typed it.
+  assert.match(afterDesk, /^# compose: passed=5\/5 desks=4\/4 forecast=1 dissent=1 {2}→ ready$/mu);
 
   const ids = OWNERS.map((_, index) => `story-${index}`);
   const afterCompose = await step('compose_edition', () => composeEdition({
     edition: EDITION, event_key: 'compose-1',
-    pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'world-map') }, { name: 'tape', document: page('tape', ids.slice(3)) }],
-    maps: [{ name: 'world-map', document: { version: 'test' } }]
+    pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }],
+    maps: [{ name: 'hormuz', document: { version: 'test' } }, { name: 'hormuz-hero', document: { version: 'test' } }]
   }));
   assert.equal(rows(afterCompose, 'G').length, 2);
   assert.match(afterCompose, /^G front articles=3 visuals=2 papers=broadsheet lead=story-0$/mu);
 
-  assert.equal(seen.length, 6, 'six converge paths must each regenerate the index');
+  assert.equal(seen.length, 7, 'seven converge paths must each regenerate the index');
   return afterCompose;
 }
 
@@ -117,8 +133,8 @@ test('every converge path regenerates the edition INDEX', async () => {
   try {
     const text = await driveEdition(path.join(temporary, 'state'));
     assert.match(text, /^# clank\.edition-index\.v1 edition=2026-09-04 generated=\S+ assignments=5 filings=6 verdicts=6 passed=5$/mu);
-    assert.match(text, /^# rows: A assignment · F filing · V verdict · P passed article · D desk doc · G page$/mu);
-    assert.match(text, /^# read one: cat filings\/<id>\/<rev>\.json \| cat articles\/<id>\.json \| cat verdicts\/<id>\/<rev>\.json$/mu);
+    assert.match(text, /^# rows: A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page$/mu);
+    assert.match(text, /^# read one: cat filings\/<id>\/<rev>\.json \| cat articles\/<id>\.json \| cat verdicts\/<id>\/<rev>\.json \| cat dissents\/<id>\/<rev>\.json$/mu);
     // The whole point of the file: it stays small enough to read every wake.
     assert.ok(Buffer.byteLength(text) < 6000, `edition INDEX grew to ${Buffer.byteLength(text)} bytes`);
   } finally {
@@ -324,9 +340,9 @@ test('a row is one line no matter what the headline carries', () => {
   for (const line of lines) assert.doesNotMatch(line, /[\n\r]/u);
   // No compose status supplied: the forecast floor is reported as unknown
   // rather than guessed at, and an unknown floor is not a green light.
-  assert.equal(lines[1], '# compose: passed=1/5 desks=1/4 diversity=unknown  → blocked');
+  assert.equal(lines[1], '# compose: passed=1/5 desks=1/4 forecast=? dissent=?  → blocked');
   assert.match(lines[4], /^A foreman x refs=0 +\| A brief split across lines and \/ carrying a separator.*…$/u);
-  assert.match(lines[5], /^F x rev=1 owner=fore-man epi=fa-ct words=1 refs=1 domains=1 topics=unknown:od-d lint=domains<2$/u);
+  assert.match(lines[5], /^F x rev=1 owner=fore-man epi=fa-ct words=1 refs=1 domains=1 art=- topics=unknown:od-d lint=domains<2$/u);
   assert.match(lines[6], /^V x rev=1 PA-SS by=spike$/u);
   assert.match(lines[7], /^P x rev=1 section=wo-rld epi=fact key_numbers=0 +\| A Headline Broken Over Three Lines \| A deck \/ with a separator and a newline\.$/u);
 });
@@ -337,7 +353,7 @@ test('an empty edition still renders a readable index', async () => {
     const text = await writeEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS });
     assert.equal(text.trim().split('\n').length, 4, 'an empty edition is four header lines and nothing else');
     assert.match(text, /assignments=0 filings=0 verdicts=0 passed=0/u);
-    assert.match(text, /^# compose: passed=0\/5 desks=0\/4 diversity=missing\(forecast\) {2}→ blocked$/mu);
+    assert.match(text, /^# compose: passed=0\/5 desks=0\/4 forecast=0 dissent=0 {2}→ blocked$/mu);
     assert.equal(await buildEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS, now: new Date(0) }).then((value) => value.includes('generated=1970-01-01T00:00:00.000Z')), true);
     await assert.rejects(writeEditionIndex(path.join(temporary, 'state'), 'not-a-date'), /must be an ISO date/u);
   } finally {

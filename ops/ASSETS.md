@@ -258,14 +258,15 @@ Every article that ever set `hero_map` to a suffixed name paired it with the
 unsuffixed base in `map` — `map: "hormuz"`, `hero_map: "hormuz-hero"` — and
 by August the practice had settled on one name in both keys.
 
-**And that pairing is not reachable through the autonomous path.**
-`compose_edition` writes exactly the `art.hero_map` values into the edition's
-`maps/`, while the story page loads `art.map`; two different names means one
-of them has no file and `astro build` dies on it. So `ops/lay-page.mjs`
-refuses a filing whose `map` and `hero_map` disagree. A story picks the crop
-that fits its frame and names it in both. Restoring the pair would mean
-changing the composition gate, which is out of scope here and recorded as a
-bound rather than worked around.
+**The pairing is reachable, and it is the intended shape.** `compose_edition`
+ships the *union* of every `art.map` and every `art.hero_map` on the day, so
+naming the wide crop in `map` and its `-hero` re-crop in `hero_map` writes
+both documents into the edition's `maps/` and both frames find their file.
+`hero_map` is optional: leave it out where the archive holds no `-hero` for
+the region, and the front panel draws `art.map`. `file_article` resolves both
+names against this catalogue at filing time, in the reporter's own wake,
+because a name that does not exist has to be refused where it can still be
+corrected — nobody in this newsroom ever sees the page it would have made.
 
 ### How a region reaches a page
 
@@ -275,14 +276,15 @@ a catalogue and not a pile of dated artifacts. The route has four links and,
 as of this change, an author at each one:
 
 ```
-reporter files art        art.kind "map", art.map == art.hero_map == a listed region
-        ↓                 the six reporter briefs ask for it where a story has a place
+reporter files art        art.kind "map", art.map a listed region, art.hero_map its
+        ↓                 -hero re-crop where one is listed (optional, may repeat map)
+        ↓                 file_article resolves both names before the filing is written
 ops/lay-page.mjs          resolves the name: today's maps/ first, then the committed
         ↓                 archive under content/editions/*/maps/ (newest crop wins)
         ↓                 emits MapGlyph in an illustrated slot, or the hero panel
         ↓                 when the lead itself declares one
-compose_edition           supplied maps must EQUAL the day's art.hero_map values, and
-        ↓                 no MapGlyph may name one outside that set
+compose_edition           supplied maps must EQUAL the union of the day's art.map and
+        ↓                 art.hero_map values, and no MapGlyph may name one outside it
 content/editions/<date>/maps/<region>.json     written, then published
 ```
 
@@ -292,9 +294,10 @@ always empty and the assembler had nothing to place. The second link was also
 half-open — `lay-page.mjs` read maps only from the mutable edition state,
 which is empty on a fresh day — and now reads through to the archive.
 
-Three refusals guard it, all named `maps must match article art`: a region no
-edition ever baked, a story whose `art.map` and `art.hero_map` disagree, and
-two stories claiming one region with different `spots`.
+Two refusals guard it, both named `maps must match article art`: a region no
+edition ever baked, and two stories claiming one region with different
+`spots`. `file_article` refuses the same two, earlier, in the wake that named
+them.
 
 **On a day no story has a place, no map runs.** That is a normal edition, not
 a failure, and the honest answer whenever no archived box contains the
@@ -357,7 +360,7 @@ website/public/{favicon*,icon-*,apple-touch-icon}.png
 | --- | --- |
 | ~~`art.hero_map` has no author~~ | **closed.** The six reporter briefs ask for `art` where a story has a place; `ops/lay-page.mjs` resolves the region out of this archive and places it. All 120 regions are reachable from a page |
 | ~~No brief named the atlas~~ | **closed.** Every reporter brief, `agents/caslon/PAGES.md` and `agentic-org/SYSTEMS.md` name it and point here |
-| A `-hero` crop cannot be paired with a wide `map` | open, and out of scope here. `compose_edition` ships exactly the `art.hero_map` values while the story page loads `art.map`, so one story means one region in both keys. Closing it means changing the composition gate |
+| ~~A `-hero` crop cannot be paired with a wide `map`~~ | **closed.** `compose_edition` ships the union of every `art.map` and `art.hero_map`, so a story may name the wide crop and its `-hero` re-crop and both reach the edition. `hero_map` is optional; `file_article` resolves both names against this catalogue in the reporter's own wake |
 | Cannot bake a new region | open, unchanged. `gdal-async` absent, default path wrong, env vars ignored, output dir read-only |
 | Cannot bake a new glyph shape | open, unchanged. The rasterisers were never committed |
 | OG cards | open, unchanged. Need a dev server; nobody owns it |

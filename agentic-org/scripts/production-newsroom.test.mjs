@@ -6,11 +6,11 @@ import path from 'node:path';
 import test from 'node:test';
 import { layEdition, readEditionInputs } from '../../ops/lay-page.mjs';
 import { writeEditionIndex } from './edition-index.mjs';
-import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, hasDatedForecastWithDissent, qualifySignal, recordAssignment, reviewArticle, stagePublicSource, stageRelease } from './production-newsroom.mjs';
+import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment, recordDissent, reviewArticle, stagePublicSource, stageRelease } from './production-newsroom.mjs';
 
 const owners = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
 const assignmentEvent = 'schedule:assignment-20260825';
-const article = (id, agent, edition, index) => ({ id, edition_date: edition, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test', headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact', byline: { desk: 'Test Desk', agents: [agent] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30', topics: ['geopolitics'], body: ['One [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'], key_numbers: [], evidence_box: [{ source: `Official ${index}`, fragment: 'fact', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: `https://source${index}.example/evidence`, retrieved_at: `${edition}T10:00:00Z` } }], refs: ['E1'], ...(index === 1 ? { dissent: { agent: 'Vesta', p: 0.4, argument: 'The named dissenter identifies a plausible opposing reading.' } } : {}), ...(index === 0 ? { art: { hero_map: 'world-map' } } : {}) });
+const article = (id, agent, edition, index) => ({ id, edition_date: edition, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test', headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact', byline: { desk: 'Test Desk', agents: [agent] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30', topics: ['geopolitics'], body: ['One [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'], key_numbers: [], evidence_box: [{ source: `Official ${index}`, fragment: 'fact', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: `https://source${index}.example/evidence`, retrieved_at: `${edition}T10:00:00Z` } }], refs: ['E1'], ...(index === 1 ? { confidence: { value: 0.42 } } : {}), ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {}) });
 // The four desk documents in the shape ops/desk-contract.mjs requires — the
 // same shape the site assembles an Edition from. file_desk refuses anything
 // else, so a test fixture cannot be a placeholder object any more.
@@ -22,10 +22,13 @@ const deskDocument = (name, edition, lead = 'story-0') => ({
 }[name]);
 const page = (name, ids, map) => name === 'front' ? { edition: '2026-08-25', page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], flow: [{ block: 'MapGlyph', props: { map } }, { block: 'GlyphArt', props: { glyph: 'signal' } }] } : { edition: '2026-08-25', page: name, paper: 'ticker', articles: [ids[0]], article: ids[1], flow: [] };
 
-test('public references and forecast dissent use the exact contract', () => {
+test('public references and the dated-forecast predicate use the exact contract', () => {
   assert.deepEqual(collectPublicArticleReferences({ article: 'a', lead: 'b', splitWith: 'c', rail: ['d'], articles: ['e'], ignored: 'f' }), ['a', 'b', 'c', 'd', 'e']);
-  assert.equal(hasDatedForecastWithDissent([{ epistemic: 'forecast', next_update_utc: '14:30' }, { dissent: { agent: 'Vesta', argument: 'No.' } }]), false);
-  assert.equal(hasDatedForecastWithDissent([{ epistemic: 'forecast', next_update_utc: '14:30', dissent: { agent: 'Vesta', argument: 'No.' } }]), true);
+  // Counted, not gated, and no longer conflated with the dissent: a forecast
+  // with nobody arguing the other side is still a forecast.
+  assert.equal(isDatedForecast({ epistemic: 'forecast', next_update_utc: '14:30' }), true);
+  assert.equal(isDatedForecast({ epistemic: 'forecast', next_update_utc: 'tomorrow' }), false);
+  assert.equal(isDatedForecast({ epistemic: 'fact', next_update_utc: '14:30' }), false);
 });
 
 test('production newsroom binds filings, composition content, and local release', async () => {
@@ -57,12 +60,12 @@ test('production newsroom binds filings, composition content, and local release'
   process.env.CLANK_NEWSROOM_AGENT = 'spike'; for (let index = 0; index < owners.length; index++) await reviewArticle({ edition, event_key: `review-${index}`, article_id: `story-${index}`, revision: index === 0 ? 2 : 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
   process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: name, name, document: deskDocument(name, edition) });
   process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: name, name, document: deskDocument(name, edition) });
-  const ids = owners.map((_, index) => `story-${index}`), pages = [{ name: 'front', document: page('front', ids.slice(0, 3), 'world-map') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps = [{ name: 'world-map', document: { version: 'test' } }];
+  const ids = owners.map((_, index) => `story-${index}`), pages = [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps = [{ name: 'hormuz', document: { version: 'test' } }, { name: 'hormuz-hero', document: { version: 'test' } }];
   await assert.rejects(composeEdition({ edition, event_key: 'compose-incomplete', pages: [pages[0], { name: 'tape', document: page('tape', [ids[3]]) }], maps }), /page completeness/u);
   await assert.rejects(composeEdition({ edition, event_key: 'compose-extra-map', pages, maps: [...maps, { name: 'unused-map', document: {} }] }), /maps must exactly/u); await composeEdition({ edition, event_key: 'compose-valid', pages, maps });
   process.env.CLANK_NEWSROOM_AGENT = 'pressman'; process.env.CLANK_PUBLIC_SOURCE_ROOT = source; process.env.CLANK_RELEASE_STAGING_ROOT = staging;
   const secrets = ['OPENAI_API_KEY', 'MOLTNET_TOKEN', 'CLANK_RUNTIME_SECRET']; for (const secret of secrets) process.env[secret] = 'must-not-propagate';
-  for (const [kind, name] of [['desk', 'ledger.worlddesk'], ['pages', 'front'], ['maps', 'world-map']]) { const file = path.join(state, 'editions', edition, kind, `${name}.json`), bytes = await readFile(file, 'utf8'), changed = JSON.parse(bytes); changed.tampered = true; await writeFile(file, `${JSON.stringify(changed)}\n`); await assert.rejects(stageRelease({ edition, event_key: 'mutation' }), /digest changed/u); await writeFile(file, bytes); }
+  for (const [kind, name] of [['desk', 'ledger.worlddesk'], ['pages', 'front'], ['maps', 'hormuz-hero']]) { const file = path.join(state, 'editions', edition, kind, `${name}.json`), bytes = await readFile(file, 'utf8'), changed = JSON.parse(bytes); changed.tampered = true; await writeFile(file, `${JSON.stringify(changed)}\n`); await assert.rejects(stageRelease({ edition, event_key: 'mutation' }), /digest changed/u); await writeFile(file, bytes); }
   const receiptRoot = path.join(state, 'editions', edition, 'receipts'), compositionName = (await readdir(receiptRoot)).find((name) => name.startsWith('composed-')), compositionPath = path.join(receiptRoot, compositionName), compositionBytes = await readFile(compositionPath, 'utf8');
   await writeFile(compositionPath, compositionBytes.replace('"digest":"sha256:', '"digest":"sha256:0')); await assert.rejects(stageRelease({ edition, event_key: 'release-valid' }), /authentication/u); await writeFile(compositionPath, compositionBytes);
   process.env.CLANK_RELEASE_CRASH_BEFORE_SWITCH = '1'; await assert.rejects(stageRelease({ edition, event_key: 'release-valid' }), /injected crash/u); await assert.rejects(readFile(path.join(staging, 'current-edition'))); delete process.env.CLANK_RELEASE_CRASH_BEFORE_SWITCH;
@@ -256,35 +259,37 @@ test('prose warnings reach the reporter at file time and the editor at review ti
 });
 
 // ---------------------------------------------------------------------------
-// The dated diversity waiver.
+// The forecast slot, the recorded dissent, and the waiver that no longer exists.
 //
-// A newspaper can decide to ship without a forecast piece. It cannot decide to
-// stop having the floor. The waiver therefore names one edition and expires by
-// being wrong about the date, not by being remembered and unset.
+// The old shape was one refusal at 21:00 for a property only Brass at 18:30 and
+// a reporter at 19:00 could supply, plus a dated environment variable to excuse
+// it — which meant the bar was met by re-typing a date every night. Both halves
+// moved to where an agent can act on them, and the counts that replaced the
+// refusal report a paper that shipped without either rather than refusing it.
 // ---------------------------------------------------------------------------
-const FORECAST_FLOOR_REFUSAL = 'edition diversity floor missing — at least one "forecast" article with a dated next_update_utc and a dissent {agent, argument} is required';
-const refusesWithFloorMessage = (error) => { assert.equal(error.message, FORECAST_FLOOR_REFUSAL); return true; };
-// The same fixture with the forecast piece taken out: today's real shape, six
-// stories of fact and inference and nothing carrying a dated forecast.
-const withoutForecast = (id, agent, edition, index) => { const { dissent: _, ...value } = article(id, agent, edition, index); return { ...value, epistemic: index % 2 === 0 ? 'fact' : 'inference' }; };
+// The same fixture with nothing carrying a dated forecast: the real shape of
+// every edition since 2026-08-09.
+const withoutForecast = (id, agent, edition, index) => { const { confidence: _, ...value } = article(id, agent, edition, index); return { ...value, epistemic: index % 2 === 0 ? 'fact' : 'inference' }; };
 
 // `count` is how many stories the day carries. Five is compose_edition's floor,
-// not the only length a day comes in: 2026-09-05 PASSed six.
-async function driveToCompose(state, edition, make, count = owners.length) {
+// not the only length a day comes in: 2026-09-05 PASSed six. `beforeReview`
+// runs after every filing and before Spike rules, which is where a dissent
+// lands on a real day.
+async function driveToCompose(state, edition, make, count = owners.length, beforeReview) {
   process.env.CLANK_EDITION_STATE_ROOT = state;
   const day = [...owners, 'vesta'].slice(0, count);
   assert.equal(day.length, count, 'the fixture has no owner for that many stories');
-  process.env.CLANK_EDITION_STATE_ROOT = state;
   const assignments = day.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] }));
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
   await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments });
   for (const [index, owner] of day.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition, event_key: `filing-${edition}-${index}`, article: make(`story-${index}`, owner[0].toUpperCase() + owner.slice(1), edition, index) }); }
+  if (beforeReview) await beforeReview();
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
   for (const index of day.keys()) await reviewArticle({ edition, event_key: `review-${edition}-${index}`, article_id: `story-${index}`, revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
   process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: deskDocument(name, edition) });
   process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: deskDocument(name, edition) });
   const ids = day.map((_, index) => `story-${index}`);
-  return { edition, pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'world-map') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps: [{ name: 'world-map', document: { version: 'test' } }] };
+  return { edition, pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps: [{ name: 'hormuz', document: { version: 'test' } }, { name: 'hormuz-hero', document: { version: 'test' } }] };
 }
 
 const readIndexFile = (state, edition) => readFile(path.join(state, 'editions', edition, 'INDEX'), 'utf8');
@@ -295,106 +300,393 @@ async function readComposedReceipt(state, edition) {
   return JSON.parse(await readFile(path.join(receiptRoot, name), 'utf8'));
 }
 
-test('the diversity floor is waived only for the exact edition the waiver names', async () => {
-  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-waiver-'));
-  const state = path.join(temporary, 'state'), edition = '2026-09-05', otherEdition = '2026-09-06';
-  const savedWaiver = process.env.CLANK_EDITION_DIVERSITY_WAIVER;
+const stateOf = (result) => result.compose_gates;
+
+test('a day with no forecast and no dissent composes, and the paper says so', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-no-floor-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-05';
   try {
     const composeArgs = await driveToCompose(state, edition, withoutForecast);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-
-    // Unwaived: refuses, word for word as it always has.
-    delete process.env.CLANK_EDITION_DIVERSITY_WAIVER;
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-unwaived' }), refusesWithFloorMessage);
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 diversity=missing\(forecast\) {2}→ blocked$/mu);
-
-    // The one that matters: a waiver dated to a different edition is not a
-    // waiver at all. Delete the `declared !== edition` guard in
-    // editionDiversityWaiver and this assertion goes red.
-    process.env.CLANK_EDITION_DIVERSITY_WAIVER = otherEdition;
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-wrong-edition' }), refusesWithFloorMessage);
-
-    // Nor is a boolean: it is refused outright rather than quietly ignored,
-    // because an undated waiver is the permanent one this shape rules out.
-    for (const value of ['1', 'true', 'yes', '2026-9-5']) {
-      process.env.CLANK_EDITION_DIVERSITY_WAIVER = value;
-      await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-boolean' }), /CLANK_EDITION_DIVERSITY_WAIVER must name the one edition it waives as an ISO date "YYYY-MM-DD".*never waived by a boolean/su);
-    }
-
-    // Dated to this edition: it composes, and the artifact carries the fact.
-    process.env.CLANK_EDITION_DIVERSITY_WAIVER = edition;
-    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-waived' });
-    assert.equal(composed.compose_gates, '# compose: passed=5/5 desks=4/4 diversity=waived(2026-09-05)  → waived');
-    assert.equal(composed.waiver.floor, 'forecast-dissent');
-    assert.equal(composed.waiver.edition, edition);
-    assert.equal(composed.waiver.source, 'CLANK_EDITION_DIVERSITY_WAIVER');
+    // The exact composition the old gate refused, and the reason it had to go:
+    // none of the six quality-target editions carried a forecast either.
+    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 forecast=0 dissent=0 {2}→ ready$/mu);
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-no-forecast' });
+    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=0 dissent=0  → ready');
+    assert.equal(composed.forecasts, 0);
+    assert.equal(composed.dissents, 0);
+    assert.equal(composed.waiver, undefined, 'nothing was waived, because there is nothing left to waive');
     const receipt = await readComposedReceipt(state, edition);
-    assert.equal(receipt.composition.waiver.edition, edition);
     assert.equal(receipt.composition.compose_gates, composed.compose_gates);
-
-    // And it is legible from the INDEX with the environment variable gone —
-    // the record lives in the artifact, not in whoever happens to hold the env.
-    delete process.env.CLANK_EDITION_DIVERSITY_WAIVER;
-    await writeEditionIndex(state, edition);
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 diversity=waived\(2026-09-05\) {2}→ waived$/mu);
-
-    // The same waiver value cannot carry to tomorrow's paper.
-    const nextState = path.join(temporary, 'next-state');
-    const nextArgs = await driveToCompose(nextState, otherEdition, withoutForecast);
-    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    process.env.CLANK_EDITION_DIVERSITY_WAIVER = edition;
-    await assert.rejects(composeEdition({ ...nextArgs, event_key: 'compose-tomorrow' }), refusesWithFloorMessage);
+    assert.equal(receipt.composition.dissents, 0);
+    assert.equal(receipt.composition.waiver, undefined);
   } finally {
-    if (savedWaiver === undefined) delete process.env.CLANK_EDITION_DIVERSITY_WAIVER; else process.env.CLANK_EDITION_DIVERSITY_WAIVER = savedWaiver;
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });
   }
 });
 
-test('an edition that carries a real forecast records no waiver, even with one set', async () => {
-  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-waiver-unused-'));
+test('the waiver environment variable is inert — no value of it changes anything', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-waiver-gone-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-05';
-  const savedWaiver = process.env.CLANK_EDITION_DIVERSITY_WAIVER;
-  try {
-    const composeArgs = await driveToCompose(state, edition, article);
-    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    process.env.CLANK_EDITION_DIVERSITY_WAIVER = edition;
-    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-forecast' });
-    assert.equal(composed.waiver, undefined, 'a paper with a forecast piece was not composed under a waiver');
-    assert.equal(composed.compose_gates, '# compose: passed=5/5 desks=4/4 diversity=ok  → ready');
-    assert.equal((await readComposedReceipt(state, edition)).composition.waiver, undefined);
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 diversity=ok {2}→ ready$/mu);
-  } finally {
-    if (savedWaiver === undefined) delete process.env.CLANK_EDITION_DIVERSITY_WAIVER; else process.env.CLANK_EDITION_DIVERSITY_WAIVER = savedWaiver;
-    delete process.env.CLANK_NEWSROOM_AGENT;
-    await rm(temporary, { recursive: true, force: true });
-  }
-});
-
-test('no other compose gate is waivable', async () => {
-  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-waiver-scope-'));
-  const state = path.join(temporary, 'state'), edition = '2026-09-05';
-  const savedWaiver = process.env.CLANK_EDITION_DIVERSITY_WAIVER;
+  const saved = process.env.CLANK_EDITION_DIVERSITY_WAIVER;
   try {
     const composeArgs = await driveToCompose(state, edition, withoutForecast);
-    process.env.CLANK_EDITION_DIVERSITY_WAIVER = edition;
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    // "1" used to be refused outright and a date used to compose under a
+    // recorded waiver. Now the variable is read by nothing at all, and the one
+    // composition this edition is allowed carries no trace of it.
+    for (const value of ['1', 'true', edition, '2026-01-01']) {
+      process.env.CLANK_EDITION_DIVERSITY_WAIVER = value;
+      const status = await readIndexFile(state, edition);
+      assert.match(status, /forecast=0 dissent=0 {2}→ ready$/mu, `${value} must not reach the gate line`);
+    }
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-junk-env' });
+    assert.equal(composed.waiver, undefined);
+    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=0 dissent=0  → ready');
+  } finally {
+    if (saved === undefined) delete process.env.CLANK_EDITION_DIVERSITY_WAIVER; else process.env.CLANK_EDITION_DIVERSITY_WAIVER = saved;
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
 
-    // A desk document short: the waiver does not reach that gate.
+test('no other compose gate went with it', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-gates-stand-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-05';
+  try {
+    const composeArgs = await driveToCompose(state, edition, withoutForecast);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     await rm(path.join(state, 'editions', edition, 'desk', 'caslon.weather.json'));
     await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-desk' }), /exactly 4 desk documents required.*found 3/su);
-
-    // A PASSed article short: likewise.
     await rm(path.join(state, 'editions', edition, 'articles', 'story-4.json'));
     await rm(path.join(state, 'editions', edition, 'reviews', 'story-4.json'));
     await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-passed' }), /at least 5 PASSed articles required, found 4/u);
   } finally {
-    if (savedWaiver === undefined) delete process.env.CLANK_EDITION_DIVERSITY_WAIVER; else process.env.CLANK_EDITION_DIVERSITY_WAIVER = savedWaiver;
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });
   }
 });
 
+// ---------------------------------------------------------------------------
+// record_dissent.
+// ---------------------------------------------------------------------------
+
+// One assignment marked as the day's forecast, its dissenter named, and the
+// owner filing the shape that slot obliges.
+const FORECAST_ARGUMENT = 'The call rests on a single quarter of shipment data and reads a pause as a turn; the same series moved this far twice last year without one, and the clock the piece sets falls inside the revision window that would settle it.';
+async function driveToForecastFiling(state, edition = '2026-09-07', over = {}) {
+  process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
+  const assignments = owners.map((owner, index) => ({
+    id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`],
+    ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {})
+  }));
+  const recorded = await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments });
+  for (const [index, owner] of owners.entries()) {
+    process.env.CLANK_NEWSROOM_AGENT = owner;
+    const value = article(`story-${index}`, owner[0].toUpperCase() + owner.slice(1), edition, index);
+    await fileArticle({ edition, event_key: `filing-${edition}-${index}`, article: index === 1 ? { ...value, ...over } : value });
+  }
+  return recorded;
+}
+
+test('an author cannot type a dissent into their own filing', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-authored-dissent-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-07';
+  try {
+    process.env.CLANK_EDITION_STATE_ROOT = state;
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] })) });
+    process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    // The first-law hole. Nobody asked Tinkerton, and until now nothing asked
+    // whether anyone had.
+    const forged = { ...article('story-0', 'Cogsworth', edition, 0), dissent: { agent: 'Tinkerton', p: 0.3, argument: 'A dissent nobody wrote.' } };
+    await assert.rejects(fileArticle({ edition, event_key: 'forged-dissent', article: forged }), /article\.dissent is not yours to write .* record_dissent, under their own name/su);
+    // Refused means nothing was recorded: no filing, no receipt, no page.
+    await assert.rejects(readFile(path.join(state, 'editions', edition, 'filings', 'story-0', '1.json')));
+    // An empty or null dissent is the same assertion and is refused the same way.
+    for (const value of [{}, null, undefined]) await assert.rejects(fileArticle({ edition, event_key: 'forged-dissent', article: { ...article('story-0', 'Cogsworth', edition, 0), dissent: value } }), /article\.dissent is not yours to write/u);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('the forecast slot binds its owner at filing time, in the wake that can still fix it', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-forecast-slot-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-07';
+  try {
+    process.env.CLANK_EDITION_STATE_ROOT = state;
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    const assignments = owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
+    const recorded = await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments });
+    assert.deepEqual(recorded.forecast, { id: 'story-1', owner: 'sprockett', dissenter: 'vesta' });
+
+    // Brass's own shape is checked where Brass can fix it too.
+    await assert.rejects(recordAssignment({ edition, event_key: 'bad-slot', assignments: assignments.map((item, index) => (index === 1 ? { ...item, slot: 'analysis' } : item)) }), /slot "analysis" must be "forecast"/u);
+    await assert.rejects(recordAssignment({ edition, event_key: 'bad-dissenter', assignments: assignments.map((item, index) => (index === 1 ? { ...item, dissenter: 'sprockett' } : item)) }), /is the owner of the piece — nobody dissents from their own byline/u);
+    await assert.rejects(recordAssignment({ edition, event_key: 'lonely-dissenter', assignments: assignments.map((item, index) => (index === 2 ? { ...item, dissenter: 'vesta' } : item)) }), /only meaningful beside slot "forecast"/u);
+    await assert.rejects(recordAssignment({ edition, event_key: 'two-slots', assignments: assignments.map((item, index) => (index === 2 ? { ...item, slot: 'forecast' } : item)) }), /at most one assignment may carry slot "forecast", got 2/u);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    const base = article('story-1', 'Sprockett', edition, 1);
+    // All three fields, named in one refusal, before anything is written.
+    await assert.rejects(fileArticle({ edition, event_key: 'flat-forecast', article: { ...base, epistemic: 'fact', next_update_utc: 'tomorrow', confidence: undefined } }),
+      /is today's forecast, so it files as one: article\.epistemic must be "forecast".*article\.next_update_utc must be a clock time.*article\.confidence\.value must be a number in \[0, 1\]/su);
+    await assert.rejects(fileArticle({ edition, event_key: 'no-confidence', article: { ...base, confidence: { value: 1.4 } } }), /article\.confidence\.value must be a number in \[0, 1\]/u);
+    await assert.rejects(readFile(path.join(state, 'editions', edition, 'filings', 'story-1', '1.json')));
+
+    // Filed correctly, the tool hands back the one instruction the wake needs.
+    const filed = await fileArticle({ edition, event_key: 'good-forecast', article: base });
+    assert.deepEqual(filed.forecast, { dissenter: 'vesta' });
+    assert.match(filed.next, /mention @vesta in room:filing/u);
+    // A story with no slot owes none of it.
+    process.env.CLANK_NEWSROOM_AGENT = 'foreman';
+    const plain = await fileArticle({ edition, event_key: 'plain-filing', article: article('story-2', 'Foreman', edition, 2) });
+    assert.equal(plain.forecast, undefined);
+    assert.equal(plain.next, undefined);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('a dissent is stamped with the agent the server runs as, and no name in the arguments', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-dissent-identity-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-07';
+  try {
+    await driveToForecastFiling(state, edition);
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    const result = await recordDissent({ edition, event_key: 'vesta-dissents', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62, argument: FORECAST_ARGUMENT });
+    assert.equal(result.recorded, true);
+    assert.equal(result.merged, false, 'the editor has not passed it yet');
+    const record = JSON.parse(await readFile(path.join(state, 'editions', edition, 'dissents', 'story-1', '1.json'), 'utf8'));
+    assert.equal(record.agent, 'vesta');
+    // The display name the archive's own dissents carry, read from the persona
+    // file rather than accepted from the caller.
+    assert.equal(record.name, 'Vesta');
+    assert.equal(record.p, 0.62);
+    assert.equal(record.version, 'clank.dissent.v1');
+    // No argument names an agent, so there is nothing to forge. Anything extra
+    // is refused as an unexpected field rather than silently ignored.
+    await assert.rejects(recordDissent({ edition, event_key: 'signed-as-someone-else', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.5, argument: FORECAST_ARGUMENT, agent: 'tinkerton' }), /unexpected: \[agent\]/u);
+
+    // The tool set is the boundary: nobody outside the six desks holds it, and
+    // the function refuses even when reached directly.
+    for (const role of ['spike', 'caslon', 'brass', 'ledger', 'pressman', 'klaxon']) {
+      process.env.CLANK_NEWSROOM_AGENT = role;
+      await assert.rejects(recordDissent({ edition, event_key: `role-${role}`, article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.5, argument: FORECAST_ARGUMENT }), /may only be called by a reporting desk/u);
+    }
+    // And a reporter cannot dissent from its own byline.
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    await assert.rejects(recordDissent({ edition, event_key: 'self-dissent', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.5, argument: FORECAST_ARGUMENT }), /carries your own byline — you cannot dissent from your own piece/u);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('a dissent reaches the page whether it lands before PASS or after it', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-dissent-merge-'));
+  try {
+    const articlePath = (state, edition, id) => path.join(state, 'editions', edition, 'articles', `${id}.json`);
+    // 1. Before PASS: review_article merges it on promotion.
+    const early = path.join(temporary, 'early'), edition = '2026-09-07';
+    await driveToForecastFiling(early, edition);
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    await recordDissent({ edition, event_key: 'early-dissent', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62, argument: FORECAST_ARGUMENT });
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    const verdict = await reviewArticle({ edition, event_key: 'pass-story-1', article_id: 'story-1', revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+    assert.deepEqual(verdict.dissent, { agent: 'Vesta', p: 0.62, argument: FORECAST_ARGUMENT });
+    assert.deepEqual(JSON.parse(await readFile(articlePath(early, edition, 'story-1'), 'utf8')).dissent, { agent: 'Vesta', p: 0.62, argument: FORECAST_ARGUMENT });
+
+    // 2. After PASS, before compose: record_dissent performs the merge itself.
+    const late = path.join(temporary, 'late');
+    await driveToForecastFiling(late, edition);
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    await reviewArticle({ edition, event_key: 'pass-first', article_id: 'story-1', revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+    assert.equal(JSON.parse(await readFile(articlePath(late, edition, 'story-1'), 'utf8')).dissent, undefined);
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    const merged = await recordDissent({ edition, event_key: 'late-dissent', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62, argument: FORECAST_ARGUMENT });
+    assert.equal(merged.merged, true);
+    assert.deepEqual(JSON.parse(await readFile(articlePath(late, edition, 'story-1'), 'utf8')).dissent, { agent: 'Vesta', p: 0.62, argument: FORECAST_ARGUMENT });
+
+    // 3. A "concur" is on the record and is not a dissent on the page.
+    const concur = path.join(temporary, 'concur');
+    await driveToForecastFiling(concur, edition);
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    const said = await recordDissent({ edition, event_key: 'concurrence', article_id: 'story-1', revision: 1, stance: 'concur', argument: 'I read the call and the counter-series does not cross it.' });
+    assert.equal(said.stance, 'concur');
+    assert.equal(said.merged, false);
+    await assert.rejects(recordDissent({ edition, event_key: 'concur-with-p', article_id: 'story-2', revision: 1, stance: 'concur', p: 0.4, argument: 'I read the call and the counter-series does not cross it.' }), /stance "concur" carries no p/u);
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    await reviewArticle({ edition, event_key: 'pass-after-concur', article_id: 'story-1', revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+    assert.equal(JSON.parse(await readFile(articlePath(concur, edition, 'story-1'), 'utf8')).dissent, undefined);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('a dissent recorded after the edition is composed is refused, loudly', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-dissent-late-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-05';
+  try {
+    const composeArgs = await driveToCompose(state, edition, article);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-before-dissent' });
+    assert.equal(composed.dissents, 0);
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    await assert.rejects(recordDissent({ edition, event_key: 'too-late', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62, argument: FORECAST_ARGUMENT }),
+      /is composed; a dissent recorded now cannot reach the page — say it on the floor, it will not be attributed to you in print/u);
+    // Nothing was written, so the composition receipt still authenticates.
+    await assert.rejects(readFile(path.join(state, 'editions', edition, 'dissents', 'story-1', '1.json')));
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('a dissent is refused against a revision that does not exist, one that went back, and one somebody else already holds', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-dissent-refusals-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-07';
+  try {
+    await driveToForecastFiling(state, edition);
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    // A revision that was never filed: the refusal names what is filed instead
+    // of leaving the dissenter to guess.
+    await assert.rejects(recordDissent({ edition, event_key: 'no-such-rev', article_id: 'story-1', revision: 3, stance: 'dissent', p: 0.5, argument: FORECAST_ARGUMENT }), /nothing is filed at revision 3 of "story-1".*what is filed: story-0 rev 1, story-1 rev 1/su);
+    await assert.rejects(recordDissent({ edition, event_key: 'no-such-story', article_id: 'story-9', revision: 1, stance: 'dissent', p: 0.5, argument: FORECAST_ARGUMENT }), /nothing is filed at revision 1 of "story-9"/u);
+    // A revision the editor sent back is not the one to argue with.
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    await reviewArticle({ edition, event_key: 'send-back', article_id: 'story-1', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Show the counter-series.' });
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    await assert.rejects(recordDissent({ edition, event_key: 'against-returned', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.5, argument: FORECAST_ARGUMENT }), /was sent back for revision — dissent against the next one/u);
+    // One dissent per piece: a second desk cannot overwrite the first.
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    await recordDissent({ edition, event_key: 'first-holder', article_id: 'story-0', revision: 1, stance: 'dissent', p: 0.4, argument: FORECAST_ARGUMENT });
+    process.env.CLANK_NEWSROOM_AGENT = 'tinkerton';
+    await assert.rejects(recordDissent({ edition, event_key: 'second-holder', article_id: 'story-0', revision: 1, stance: 'dissent', p: 0.7, argument: FORECAST_ARGUMENT }), /Vesta already holds the dissent on revision 1 of "story-0" — one dissent per piece/u);
+    // The same call twice from the same wake converges rather than conflicting.
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    await assert.doesNotReject(recordDissent({ edition, event_key: 'first-holder', article_id: 'story-0', revision: 1, stance: 'dissent', p: 0.4, argument: FORECAST_ARGUMENT }));
+    // Shape: a bare "no" is not an argument, and a dissent without a number is
+    // not a call.
+    await assert.rejects(recordDissent({ edition, event_key: 'thin-argument', article_id: 'story-2', revision: 1, stance: 'dissent', p: 0.4, argument: 'Nope.' }), /between 80 and 2000 characters/u);
+    await assert.rejects(recordDissent({ edition, event_key: 'dissent-without-p', article_id: 'story-2', revision: 1, stance: 'dissent', argument: FORECAST_ARGUMENT }), /requires p — your own probability/u);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('a dissent carries to a later revision only when the call did not move', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-dissent-carry-'));
+  const edition = '2026-09-07';
+  const run = async (name, revised) => {
+    const state = path.join(temporary, name);
+    await driveToForecastFiling(state, edition);
+    process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+    await recordDissent({ edition, event_key: `carry-${name}`, article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62, argument: FORECAST_ARGUMENT });
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    await reviewArticle({ edition, event_key: `send-back-${name}`, article_id: 'story-1', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Tighten the second paragraph.' });
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    await fileArticle({ edition, event_key: `refile-${name}`, article: { ...article('story-1', 'Sprockett', edition, 1), revision: 2, ...revised } });
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    const verdict = await reviewArticle({ edition, event_key: `pass-${name}`, article_id: 'story-1', revision: 2, verdict: 'PASS', notes: 'Sources and voice pass.' });
+    return { state, verdict, article: JSON.parse(await readFile(path.join(state, 'editions', edition, 'articles', 'story-1.json'), 'utf8')) };
+  };
+  try {
+    // Prose changed, the call did not: the dissent is still an argument about
+    // this piece, and it carries with the revision it was recorded against.
+    const held = await run('held', { deck: 'A revised sourced deck.' });
+    assert.deepEqual(held.article.dissent, { agent: 'Vesta', p: 0.62, argument: FORECAST_ARGUMENT });
+    assert.equal(held.verdict.dissent_dropped, undefined);
+    const carried = JSON.parse(await readFile(path.join(held.state, 'editions', edition, 'dissents', 'story-1', '2.json'), 'utf8'));
+    assert.equal(carried.against_revision, 1);
+
+    // The number moved: the argument is against a call that no longer exists,
+    // so it is left off the page and the verdict says why.
+    const moved = await run('moved', { confidence: { value: 0.71 } });
+    assert.equal(moved.article.dissent, undefined);
+    assert.equal(moved.verdict.dissent_dropped, 'recorded against revision 1; the call changed');
+    // Durable, not just a tool result: the INDEX row carries it too.
+    assert.match(await readIndexFile(moved.state, edition), /^V story-1 rev=2 PASS by=spike dissent_dropped=recorded-against-revision-1;-the-call-changed$/mu);
+
+    // And the clock moving counts as the call moving.
+    const reclocked = await run('reclocked', { next_update_utc: '18:00' });
+    assert.equal(reclocked.article.dissent, undefined);
+    assert.equal(reclocked.verdict.dissent_dropped, 'recorded against revision 1; the call changed');
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('a recorded dissent is counted by compose and reported in the receipt', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-dissent-compose-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-05';
+  try {
+    const composeArgs = await driveToCompose(state, edition, article, owners.length, async () => {
+      process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+      await recordDissent({ edition, event_key: 'vesta-on-the-record', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62, argument: FORECAST_ARGUMENT });
+    });
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-dissent' });
+    assert.equal(composed.compose_gates, '# compose: passed=5/5 desks=4/4 forecast=1 dissent=1  → ready');
+    assert.equal(composed.forecasts, 1);
+    assert.equal(composed.dissents, 1);
+    assert.equal((await readComposedReceipt(state, edition)).composition.dissents, 1);
+    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 forecast=1 dissent=1 {2}→ ready$/mu);
+    assert.match(await readIndexFile(state, edition), /^N story-1 rev=1 by=vesta dissent p=0\.62$/mu);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// §2 — art.map / art.hero_map, refused at filing time.
+// ---------------------------------------------------------------------------
+
+test('a map pair ships both regions, and an unlisted region is refused in the wake that named it', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-art-pair-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-07';
+  const withArt = (index, art) => ({ ...article(`story-${index}`, owners[index][0].toUpperCase() + owners[index].slice(1), edition, index), art });
+  try {
+    process.env.CLANK_EDITION_STATE_ROOT = state;
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] })) });
+
+    process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    const spots = [{ name: 'HORMUZ', lat: 26.6, lon: 56.25 }];
+    // The intended pattern, and the one that used to build a page and then die:
+    // the wide region for the story page, its -hero re-crop for the front panel.
+    await fileArticle({ edition, event_key: 'pair-filing', article: withArt(0, { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots }) });
+    const filed = JSON.parse(await readFile(path.join(state, 'editions', edition, 'filings', 'story-0', '1.json'), 'utf8'));
+    assert.deepEqual([filed.art.map, filed.art.hero_map], ['hormuz', 'hormuz-hero']);
+
+    // A region no edition ever baked, on either key, refused while the reporter
+    // is still awake — nothing in this container can bake a new one.
+    for (const art of [{ kind: 'map', map: 'kamchatka' }, { kind: 'map', map: 'hormuz', hero_map: 'kamchatka-hero' }]) {
+      await assert.rejects(fileArticle({ edition, event_key: 'unlisted-region', article: withArt(0, art) }), /is in neither this edition's maps\/ nor the committed archive.*name a region ops\/ASSETS\.md lists, or file without art/su);
+    }
+    await assert.rejects(fileArticle({ edition, event_key: 'no-map-key', article: withArt(0, { kind: 'map', hero_map: 'hormuz-hero' }) }), /art\.kind is "map" but art\.map is undefined/u);
+    await assert.rejects(fileArticle({ edition, event_key: 'bad-kind', article: withArt(0, { kind: 'Map', map: 'hormuz' }) }), /art\.kind must be "map" .* or "ascii"/su);
+    await assert.rejects(fileArticle({ edition, event_key: 'bad-spot', article: withArt(0, { kind: 'map', map: 'hormuz', spots: [{ name: 'HORMUZ', lat: '26.6', lon: 56.25 }] }) }), /art\.spots\[0\]\.lat must be a number/u);
+
+    // Cross-filing: one region, one set of spots. The content validator refuses
+    // the page for this at 21:30; here the second reporter can still fix it.
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    await assert.rejects(fileArticle({ edition, event_key: 'clashing-spots', article: withArt(1, { kind: 'map', map: 'hormuz', caption: 'Again.', spots: [{ name: 'BANDAR', lat: 27.2, lon: 56.3 }] }) }), /"story-0" already names map "hormuz" with different art\.spots/u);
+    // The same spots are fine — two stories may share a region.
+    await assert.doesNotReject(fileArticle({ edition, event_key: 'matching-spots', article: withArt(1, { kind: 'map', map: 'hormuz-hero', caption: 'Again.', spots }) }));
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
 test('file_desk refuses a desk document the edition cannot be assembled from', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-desk-shape-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-07';
@@ -527,5 +819,96 @@ test('the pages ops/lay-page.mjs assembles compose, at five stories and at six',
       delete process.env.CLANK_NEWSROOM_AGENT;
       await rm(temporary, { recursive: true, force: true });
     }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// The two read-only bundles that merge into one directory.
+//
+// The first real stage_release ever attempted died here:
+//
+//   EACCES: permission denied, unlink
+//     '.../website/node_modules/.package-lock.json'
+//
+// deps-a and deps-b are copied into the SAME website/node_modules and assets-a
+// and assets-b into the SAME website/public/og. Both bundles are mode 555/444;
+// `fs.cp` preserves those modes; `force:true` unlinks before overwriting and
+// unlink needs write on the parent directory. So the second bundle of each pair
+// could never land on a path the first one already held — and they overlap on
+// `.package-lock.json`, `@astrojs`, `@img`, `@shikijs`, and every shared date
+// directory under og/.
+//
+// The fixture below is the shape of the bug rather than a copy of the message:
+// two roots that overlap. Disjoint roots pass with or without the fix.
+// ---------------------------------------------------------------------------
+const writeReadOnly = async (file, bytes) => { await mkdir(path.dirname(file), { recursive: true }); await writeFile(file, bytes); };
+async function sealTree(root) {
+  const entries = await readdir(root, { recursive: true, withFileTypes: true });
+  const paths = [...entries.map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))].reverse();
+  for (const file of [...paths, root]) { const stats = await lstat(file); await chmod(file, stats.isDirectory() ? 0o555 : 0o444); }
+}
+async function unsealTree(root) {
+  const entries = await readdir(root, { recursive: true, withFileTypes: true });
+  for (const file of [root, ...entries.map((entry) => path.join(entry.parentPath ?? entry.path, entry.name))]) {
+    const stats = await lstat(file); await chmod(file, stats.isDirectory() ? 0o755 : 0o644);
+  }
+}
+
+test('two read-only bundles merging into one directory: the second one lands', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-bundle-merge-'));
+  const state = path.join(temporary, 'state'), source = path.join(temporary, 'source'), staging = path.join(temporary, 'staging');
+  const depsA = path.join(temporary, 'deps-a'), depsB = path.join(temporary, 'deps-b');
+  const assetsA = path.join(temporary, 'assets-a'), assetsB = path.join(temporary, 'assets-b');
+  const edition = '2026-09-05';
+  const saved = { deps: process.env.CLANK_WEBSITE_DEPS_ROOTS, assets: process.env.CLANK_PUBLIC_ASSET_ROOTS };
+  try {
+    const composeArgs = await driveToCompose(state, edition, article);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await composeEdition({ ...composeArgs, event_key: 'compose-for-bundle-merge' });
+
+    // The public source root carries the validator; the astro binary arrives in
+    // the dependency bundle, exactly as it does in the container.
+    await writeReadOnly(path.join(source, 'ops', 'validate-content.mjs'), 'process.stdout.write("content OK\\n");\n');
+    await writeReadOnly(path.join(source, 'website', 'package.json'), '{"name":"site"}\n');
+
+    // The overlap. `.package-lock.json` exists in both halves with different
+    // bytes, which is the file the real failure named.
+    await writeReadOnly(path.join(depsA, 'website', 'node_modules', '.package-lock.json'), '{"half":"a"}\n');
+    await writeReadOnly(path.join(depsA, 'website', 'node_modules', '@astrojs', 'marker.js'), '// a\n');
+    await writeReadOnly(path.join(depsA, 'website', 'node_modules', 'astro', 'bin', 'astro.mjs'), 'process.stdout.write("built\\n");\n');
+    await writeReadOnly(path.join(depsB, 'website', 'node_modules', '.package-lock.json'), '{"half":"b"}\n');
+    await writeReadOnly(path.join(depsB, 'website', 'node_modules', '@shikijs', 'marker.js'), '// b\n');
+    // Same shape for the asset halves: one shared date directory, one file each.
+    await writeReadOnly(path.join(assetsA, 'website', 'public', 'og', edition, 'story-0.png'), 'a');
+    await writeReadOnly(path.join(assetsA, 'website', 'public', 'og', edition, 'shared.png'), 'a');
+    await writeReadOnly(path.join(assetsB, 'website', 'public', 'og', edition, 'story-1.png'), 'b');
+    await writeReadOnly(path.join(assetsB, 'website', 'public', 'og', edition, 'shared.png'), 'b');
+    for (const root of [source, depsA, depsB, assetsA, assetsB]) await sealTree(root);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'pressman';
+    process.env.CLANK_PUBLIC_SOURCE_ROOT = source;
+    process.env.CLANK_RELEASE_STAGING_ROOT = staging;
+    process.env.CLANK_WEBSITE_DEPS_ROOTS = `${depsA}:${depsB}`;
+    process.env.CLANK_PUBLIC_ASSET_ROOTS = `${assetsA}:${assetsB}`;
+
+    const staged = await stageRelease({ edition, event_key: 'stage-bundle-merge' });
+    assert.equal(staged.validated, true);
+    assert.equal(staged.built, true);
+
+    // Both halves of each pair reached the artifact, and the later root won the
+    // paths they share — which is the ordering the roots are listed in.
+    const modules = path.join(staged.staging_root, 'website', 'node_modules');
+    assert.equal(await readFile(path.join(modules, '.package-lock.json'), 'utf8'), '{"half":"b"}\n');
+    assert.ok((await readdir(modules)).includes('@astrojs'), 'deps-a survived deps-b');
+    assert.ok((await readdir(modules)).includes('@shikijs'), 'deps-b landed at all');
+    const og = path.join(staged.staging_root, 'website', 'public', 'og', edition);
+    assert.deepEqual((await readdir(og)).sort(), ['shared.png', 'story-0.png', 'story-1.png']);
+    assert.equal(await readFile(path.join(og, 'shared.png'), 'utf8'), 'b');
+  } finally {
+    for (const root of [source, depsA, depsB, assetsA, assetsB]) await unsealTree(root).catch(() => {});
+    for (const [key, value] of [['CLANK_WEBSITE_DEPS_ROOTS', saved.deps], ['CLANK_PUBLIC_ASSET_ROOTS', saved.assets]])
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
   }
 });

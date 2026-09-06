@@ -146,7 +146,9 @@ const mapArt = (article) => (isObj(article?.art) && article.art.kind === 'map' ?
 function artBlock(slug, article, choice, maps) {
   const art = article.art;
   if (mapArt(article)) {
-    const name = art.hero_map;
+    // The hero panel is 52 × 30: it takes the narrow re-crop when the story
+    // named one, and the wide region when it did not.
+    const name = isStr(art.hero_map) ? art.hero_map : art.map;
     if (!isStr(name) || !maps[name]) fail('maps must match article art', `"${slug}" carries art.kind "map" whose map did not resolve — this is an assembler bug, resolveArticleMaps should have refused it first`);
     return { block: 'MapGlyph', props: { map: name, spots: (art.spots ?? []).map((s) => ({ ...s })), tone: 'soft', locator_context: 'regional', rule: false, interactive: false, caption: choice?.caption ?? art.caption ?? '' } };
   }
@@ -276,34 +278,38 @@ const visualCount = (value) => JSON.stringify(value).match(/"block":"(?:MapGlyph
 
 /**
  * Every region today's stories declare, resolved to a document, refusing the
- * three filings that would build a page nothing can render.
+ * filings that would build a page nothing can render.
  *
- * `compose_edition` writes exactly the `art.hero_map` values into the
- * edition's `maps/`, and the story page loads `art.map`. Those are two
- * different keys reading one directory, so a filing whose `map` and
- * `hero_map` disagree — or which sets only one of them — ships a page that
- * passes every gate and then dies in `astro build` on a file that was never
- * written. One archived region in both keys is the only shape that holds.
+ * A story names the wide region in `art.map` — what the story page draws at
+ * 104 × 42, and the OG card with it — and may name a narrower re-crop for the
+ * front hero panel in `art.hero_map`. Fourteen regions are baked as matched
+ * pairs for exactly that (`hormuz`/`hormuz-hero`, `taiwan-east`/`taiwan-hero`),
+ * and both halves of a pair now ship: `compose_edition` supplies the union of
+ * the two keys, so a page can no longer clear every gate and then die in
+ * `astro build` on a file nobody wrote. `hero_map` is optional and may repeat
+ * `map`; what is refused is a name no edition ever baked, and one region
+ * claimed twice with different spots.
  */
 function resolveArticleMaps(articles, maps, archive) {
   const resolved = {}, spotsFor = new Map();
   for (const slug of Object.keys(articles).sort()) {
     const art = mapArt(articles[slug]);
     if (art === null) continue;
-    if (!isStr(art.map) || !isStr(art.hero_map))
-      fail('maps must match article art', `"${slug}" carries art.kind "map" but not both "map" and "hero_map" — the story page loads art.map and compose_edition ships only art.hero_map, so a filing missing either leaves one of the two looking for a file nobody wrote`);
-    if (art.map !== art.hero_map)
-      fail('maps must match article art', `"${slug}" names art.map "${art.map}" and art.hero_map "${art.hero_map}" — compose_edition supplies precisely the art.hero_map values, so a different art.map is a story page that cannot find its own map. Name one archived region in both keys`);
-    const name = art.hero_map;
-    const document = maps[name] ?? archive(name);
-    if (!isObj(document))
-      fail('maps must match article art', `"${slug}" names map "${name}", which is neither in this edition's maps/ nor in the committed archive under content/editions/*/maps/ — name a region ops/ASSETS.md lists, or file the story without art. Nothing in this newsroom can bake a new one`);
+    if (!isStr(art.map))
+      fail('maps must match article art', `"${slug}" carries art.kind "map" but no "map" — art.map is the wide region the story page and the OG card load, and it is the one key a map story cannot leave out`);
+    if (art.hero_map !== undefined && !isStr(art.hero_map))
+      fail('maps must match article art', `"${slug}" carries art.hero_map ${JSON.stringify(art.hero_map)} — it names the front panel's narrower re-crop, usually "${art.map}-hero", or it is left out entirely`);
     const spots = JSON.stringify((art.spots ?? []).map(({ name: place, lat, lon }) => ({ place, lat, lon })).sort((a, b) => a.place.localeCompare(b.place)));
-    const seen = spotsFor.get(name);
-    if (seen !== undefined && seen.spots !== spots)
-      fail('maps must match article art', `"${slug}" and "${seen.slug}" both name map "${name}" with different art.spots — ops/validate-content.mjs matches a page MapGlyph's spots against the article art for that map name, and one region cannot carry two sets. Give them the same spots, or one of them a different region`);
-    spotsFor.set(name, { slug, spots });
-    resolved[name] = document;
+    for (const name of [art.map, ...(isStr(art.hero_map) ? [art.hero_map] : [])]) {
+      const document = maps[name] ?? archive(name);
+      if (!isObj(document))
+        fail('maps must match article art', `"${slug}" names map "${name}", which is neither in this edition's maps/ nor in the committed archive under content/editions/*/maps/ — name a region ops/ASSETS.md lists, or file the story without art. Nothing in this newsroom can bake a new one`);
+      const seen = spotsFor.get(name);
+      if (seen !== undefined && seen.slug !== slug && seen.spots !== spots)
+        fail('maps must match article art', `"${slug}" and "${seen.slug}" both name map "${name}" with different art.spots — ops/validate-content.mjs matches a page MapGlyph's spots against the article art for that map name, and one region cannot carry two sets. Give them the same spots, or one of them a different region`);
+      spotsFor.set(name, { slug, spots });
+      resolved[name] = document;
+    }
   }
   return resolved;
 }
@@ -379,9 +385,10 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, agen
       const expected = offset % 2 === 0 ? 'left' : 'right';
       if (side !== expected) fail('illustration alternation', `an adjacent run of illustrated rows goes [${run.join(', ')}]; ops/validate-content.mjs requires art ${expected} in position ${offset} — adjacent runs alternate left → right, and a hero carrying art is the first left`);
     }
-  // Exactly the set compose_edition recomputes off the same articles: supply
-  // more and the equality assertion refuses the composition, supply fewer and
-  // a MapGlyph on the page names a map that was never written.
+  // Exactly the set compose_edition recomputes off the same articles — the
+  // union of every art.map and art.hero_map. Supply more and the equality
+  // assertion refuses the composition; supply fewer and a story page or a
+  // MapGlyph names a map that was never written.
   const supplied = Object.keys(resolved).sort();
   return {
     pages: [{ name: 'front', document: front }, { name: 'tape', document: tape }],

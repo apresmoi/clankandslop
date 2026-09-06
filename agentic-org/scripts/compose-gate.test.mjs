@@ -1,60 +1,45 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { DIVERSITY_WAIVER_ENV, composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
+import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 
 const EDITION = '2026-09-05';
 const line = (status) => composeGateLine(status);
 
-test('a waiver names one edition and is inert on every other', () => {
-  const waiver = editionDiversityWaiver(EDITION, EDITION);
-  assert.equal(waiver.floor, 'forecast-dissent');
-  assert.equal(waiver.edition, EDITION);
-  assert.equal(waiver.source, DIVERSITY_WAIVER_ENV);
-
-  // The property the whole shape exists for: a waiver left set applies to
-  // exactly one paper. Every other edition sees nothing.
-  for (const other of ['2026-09-04', '2026-09-06', '2027-09-05', '2026-10-05']) assert.equal(editionDiversityWaiver(other, EDITION), undefined);
-  assert.equal(editionDiversityWaiver(EDITION, undefined), undefined);
-  assert.equal(editionDiversityWaiver(EDITION, ''), undefined);
-  assert.equal(editionDiversityWaiver(EDITION, '   '), undefined);
-  // Surrounding whitespace from a shell or a compiled env block is not a
-  // different date.
-  assert.equal(editionDiversityWaiver(EDITION, ` ${EDITION}\n`).edition, EDITION);
+test('a dated forecast is epistemic plus a clock, and nothing about dissent', () => {
+  assert.equal(isDatedForecast({ epistemic: 'forecast', next_update_utc: '14:30' }), true);
+  assert.equal(isDatedForecast({ epistemic: 'inference', next_update_utc: '14:30' }), false);
+  assert.equal(isDatedForecast({ epistemic: 'forecast', next_update_utc: 'tomorrow' }), false);
+  assert.equal(isDatedForecast({ epistemic: 'forecast' }), false);
+  assert.equal(isDatedForecast(undefined), false);
+  // The two halves are counted separately now, so a forecast with no dissent
+  // is still a forecast — which is what 16 of the 79 archived editions are.
+  assert.equal(hasNamedDissent({ epistemic: 'forecast', next_update_utc: '14:30' }), false);
+  assert.equal(hasNamedDissent({ dissent: { agent: 'Tinkerton', p: 0.4, argument: 'No.' } }), true);
+  assert.equal(hasNamedDissent({ dissent: { p: 0.4, argument: 'No.' } }), false);
 });
 
-test('a boolean waiver is refused, not ignored', () => {
-  for (const value of ['1', '0', 'true', 'yes', 'always', '2026-9-5', '2026-09-05T00:00:00Z', 'today']) {
-    assert.throws(() => editionDiversityWaiver(EDITION, value), /must name the one edition it waives as an ISO date "YYYY-MM-DD".*never waived by a boolean/su, `"${value}" must not be accepted`);
-  }
-});
-
-test('the forecast floor reads epistemic, a dated next_update_utc and a named dissent', () => {
-  const forecast = { epistemic: 'forecast', next_update_utc: '14:30', dissent: { agent: 'Vesta', argument: 'A plausible opposing reading.' } };
-  assert.equal(hasDatedForecastWithDissent([forecast]), true);
-  assert.equal(hasDatedForecastWithDissent([{ ...forecast, epistemic: 'inference' }]), false);
-  assert.equal(hasDatedForecastWithDissent([{ ...forecast, next_update_utc: 'tomorrow' }]), false);
-  assert.equal(hasDatedForecastWithDissent([{ ...forecast, dissent: { agent: 'Vesta' } }]), false);
-  assert.equal(hasDatedForecastWithDissent([]), false);
-});
-
-test('the gate line renders all three gates at once', () => {
-  const waiver = editionDiversityWaiver(EDITION, EDITION);
-  // Today's real state: six PASSed pieces, four desk documents, no forecast.
-  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecast: false })), '# compose: passed=6/5 desks=4/4 diversity=missing(forecast)  → blocked');
-  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecast: false, waiver })), '# compose: passed=6/5 desks=4/4 diversity=waived(2026-09-05)  → waived');
-  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecast: true })), '# compose: passed=6/5 desks=4/4 diversity=ok  → ready');
-  // A waiver never turns a different gate green.
-  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 4, desks: 3, forecast: false, waiver })), '# compose: passed=4/5 desks=3/4 diversity=waived(2026-09-05)  → blocked');
-  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 5, forecast: true })), '# compose: passed=6/5 desks=5/4 diversity=ok  → blocked');
-  // An article set that could not be read reports unknown, and unknown blocks.
-  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecast: undefined, waiver })), '# compose: passed=6/5 desks=4/4 diversity=unknown  → blocked');
+test('the gate line reports the forecast and dissent counts and refuses on neither', () => {
+  // Today's real state on 2026-09-05: six PASSed pieces, four desk documents,
+  // no forecast and no dissent. It composes.
+  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecasts: 0, dissents: 0 })), '# compose: passed=6/5 desks=4/4 forecast=0 dissent=0  → ready');
+  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecasts: 1, dissents: 1 })), '# compose: passed=6/5 desks=4/4 forecast=1 dissent=1  → ready');
+  // The two gates that do refuse are untouched by either count.
+  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 4, desks: 4, forecasts: 1, dissents: 1 })), '# compose: passed=4/5 desks=4/4 forecast=1 dissent=1  → blocked');
+  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 3, forecasts: 1, dissents: 1 })), '# compose: passed=6/5 desks=3/4 forecast=1 dissent=1  → blocked');
+  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 5, forecasts: 1, dissents: 1 })), '# compose: passed=6/5 desks=5/4 forecast=1 dissent=1  → blocked');
+  // An article set that could not be read reports "?" rather than a guess,
+  // and still does not block on it.
+  assert.equal(line(composeGateStatus({ edition: EDITION, passed: 6, desks: 4 })), '# compose: passed=6/5 desks=4/4 forecast=? dissent=?  → ready');
   // One line, always.
-  for (const status of [composeGateStatus({ edition: EDITION, passed: 0, desks: 0, forecast: false })]) assert.equal(line(status).split('\n').length, 1);
+  for (const status of [composeGateStatus({ edition: EDITION, passed: 0, desks: 0, forecasts: 0, dissents: 0 })]) assert.equal(line(status).split('\n').length, 1);
 });
 
-test('a waived edition is one that was actually missing the forecast', () => {
-  const waiver = editionDiversityWaiver(EDITION, EDITION);
-  assert.equal(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecast: true, waiver }).diversity.waived, false);
-  assert.equal(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecast: false, waiver }).diversity.waived, true);
-  assert.equal(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecast: false }).diversity.ok, false);
+test('the waiver mechanism is gone, not merely unused', async () => {
+  // The whole point of the change: there is no symbol left to re-date. If any
+  // of these comes back, so does a quality bar that disappears by being
+  // remembered rather than met.
+  const module = await import('./compose-gate.mjs');
+  for (const symbol of ['DIVERSITY_WAIVER_ENV', 'FORECAST_DISSENT_FLOOR', 'WAIVER_VERSION', 'editionDiversityWaiver', 'hasDatedForecastWithDissent'])
+    assert.equal(module[symbol], undefined, `compose-gate.mjs must not export ${symbol}`);
+  assert.equal(composeGateStatus({ edition: EDITION, passed: 6, desks: 4, forecasts: 0, dissents: 0 }).diversity, undefined);
 });

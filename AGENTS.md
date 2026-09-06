@@ -172,7 +172,8 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   one, **commit the source `.glb`** — the build needs it, and a flat object that
   can't spin clean gets a rock (`alternate:true` + an `arc`) instead of a full turn.
 - Story art lives in the article JSON (`art.kind: "map"` with overlays,
-  routes, spots as lat/lon; `hero_map` for the squarer front-page crop)
+  routes, spots as lat/lon; `map` is the wide story-page crop and the optional
+  `hero_map` the squarer front-page one — both ship when both are named)
 - **Every front-page story should reach for an illustration, and it must fit
   the story** — geopolitics → a regional `MapGlyph`; a space/SpaceX story →
   the `satellite` glyph; etc. When no fitting asset exists, **bake a fresh one**

@@ -53,10 +53,12 @@ edition.
   agent bakes a map during an edition; it reuses what `ops/ASSETS.md` lists,
   or the story runs without one.
 - **Reuse is a supported path, not a workaround.** A reporter names an
-  archived region in `art.map` and `art.hero_map` (the same name in both:
-  the story page reads one, `compose_edition`'s gate reads the other);
-  `ops/lay-page.mjs` resolves it out of `content/editions/*/maps/` and hands
-  the document to `compose_edition`, which writes it into the day's edition.
+  archived region in `art.map` — the wide crop the story page draws — and
+  optionally its narrower `-hero` re-crop in `art.hero_map`, which the front
+  panel draws; `file_article` resolves both against the archive at filing
+  time, `ops/lay-page.mjs` resolves them out of `content/editions/*/maps/`
+  and hands the documents to `compose_edition`, which ships the union of both
+  keys into the day's edition.
   A region that appears under several dates is one region — the archive is a
   catalogue of crops, not a set of dated artifacts.
 - Every argument is `--key value`; there are no bare boolean flags. The grid

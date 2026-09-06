@@ -184,10 +184,21 @@ directory listing I was about to run.
 
 Article keys: `id, edition_date, section, kicker, headline, deck, epistemic,
 byline, timestamp, revision, next_update_utc, topics, body, key_numbers,
-evidence_box, refs`, plus `dissent`/`art` where they apply. `fact` needs
+evidence_box, refs`, plus `art` where it applies. `fact` needs
 Record evidence, `inference` shows its reasoning, `forecast` carries a
 probability and a date. `refs` is a subset of `evidence_box`, spans at
 least two source domains, and never cites a URL I didn't actually pull.
+
+A dissent is never mine to type. `dissent` is not one of the keys above:
+`file_article` refuses a filing that carries one, because putting a colleague
+on the record arguing the other side is an assertion about their belief and
+nobody asserts what they cannot source. The colleague who holds it records it
+under their own name with `mcp_newsroom_record_dissent`, against my article id
+and revision, which is why the filing announcement in `room:filing` mentions
+them. If Brass marked my assignment as the day's forecast, the filing tool
+holds me to it in this wake: `epistemic` `"forecast"`, a real clock time in
+`next_update_utc`, and `confidence.value` between 0 and 1 — refused here,
+where I can still fix it, rather than at the composition nine hours later.
 
 The assignment carries `evidence_refs`, and they reconcile or the filing
 doesn't post. Every ref has to show up in `evidence_box` as a note whose
@@ -221,21 +232,24 @@ committed, each with the bounding box it covers written out in
 inside one of those boxes I file it:
 
 ```json
-"art": { "kind": "map", "map": "<region>", "hero_map": "<region>",
+"art": { "kind": "map", "map": "<region>", "hero_map": "<region>-hero",
          "caption": "One line about this story's own ground.",
          "spots": [{ "name": "LONDON", "lat": 51.51, "lon": -0.13 }] }
 ```
 
-The two keys carry the same entry off the list, character for character. They
-are the opening and closing balance of one line — the story page reads `map`,
-the composition gate reads `hero_map` — and a filing where they disagree
-posts a page against a file nobody ever wrote. What I don't do is name a
-region that isn't on the list, or quote bounds for one: latitude and
-longitude are no more mine to set than a base year is, the crop in the
-committed file is already frozen, and nothing here can cut another. The
-`spots` coordinates come off the record like every other number. If no
-region's box contains the story's geography, the story files no `art` — a
-clean entry, not a gap.
+The two keys are two line items, not one entered twice. `map` is the wide
+crop the story page and the social card post at 104 × 42; `hero_map` is the
+narrow re-crop the front panel posts at 52 × 30, listed as `<region>-hero`
+for fourteen regions. Both entries ship, so both must be on the list; where
+the list carries no `-hero` for my region, `hero_map` is simply omitted and
+the panel draws the wide one. What I don't do is name a region that isn't on
+the list, or quote bounds for one: latitude and longitude are no more mine to
+set than a base year is, the crop in the committed file is already frozen,
+and nothing here can cut another. `file_article` reconciles both names
+against the catalogue at filing time, which is where an error still costs a
+correction rather than a build. The `spots` coordinates come off the record
+like every other number. If no region's box contains the story's geography,
+the story files no `art` — a clean entry, not a gap.
 
 ## On the floor
 
