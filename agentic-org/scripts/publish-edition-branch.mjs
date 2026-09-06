@@ -24,6 +24,8 @@ import { spawn } from 'node:child_process';
 import { cp, mkdir, mkdtemp, readFile, readdir, readlink, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { buildBylinesTsv } from './build-bylines-tsv.mjs';
+import { buildTopicsTxt } from './build-topics-txt.mjs';
 
 // One ed25519 deploy key per repository, reached through an SSH host alias so
 // the generated config — not ssh's agent or default key search — decides which
@@ -120,6 +122,29 @@ export async function prepareSshIdentity(directory, keyFile) {
   return { configFile, sshCommand: `ssh -F ${configFile} -o BatchMode=yes` };
 }
 
+// --- the generated views CI diff-checks --------------------------------------
+// `content/topics.txt` and `content/bylines/*.tsv` are committed views of
+// content the edition changes: the topic registry, and every article file.
+// ci.yml regenerates both and runs `git diff --exit-code`, and nothing else in
+// the pipeline invokes the generators — so an edition branch built from the
+// edition directory alone lands red and stays red until a person runs them by
+// hand. They are regenerated here, from the branch's own tree, immediately
+// before the commit.
+//
+// This widens what the commit may contain by exactly these two paths, both
+// compile-time constants under `content/`, and widens nothing about what may
+// be pushed: the branch, the refspec, the remote and the flags are untouched.
+export const GENERATED_INDEX_PATHS = Object.freeze(['content/topics.txt', 'content/bylines']);
+
+// Both generators are pure functions of the tree they are handed, so a retry
+// rebuilds byte-identical output and the commit stays the same object.
+export async function regenerateIndexes(workdir) {
+  if (!path.isAbsolute(workdir)) throw new Error('index regeneration workdir must be an absolute path');
+  buildTopicsTxt(workdir);
+  const { written, articleCount } = buildBylinesTsv(workdir);
+  return { topics: 'content/topics.txt', bylines: written.map((item) => `content/bylines/${item.agent}.tsv`), articles: articleCount };
+}
+
 // --- reading what pressman promoted ----------------------------------------
 // `current-edition` is the symlink stage_release flips atomically after its
 // validator and build both passed. Following it, rather than scanning for the
@@ -184,7 +209,9 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
   const scoped = path.normalize(editionPath);
-  if (path.isAbsolute(scoped) || scoped.split('/').includes('..')) throw new Error(`edition path ${JSON.stringify(editionPath)} must stay inside the branch`);
+  const committed = [scoped, ...GENERATED_INDEX_PATHS];
+  for (const item of committed)
+    if (path.isAbsolute(item) || item.split('/').includes('..')) throw new Error(`edition path ${JSON.stringify(editionPath)} must stay inside the branch`);
   const options = { home, sshCommand };
   await mkdir(path.join(home, 'tmp'), { recursive: true });
   await mkdir(workdir, { recursive: true });
@@ -195,17 +222,22 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   await rm(path.join(workdir, scoped), { recursive: true, force: true });
   await mkdir(path.dirname(path.join(workdir, scoped)), { recursive: true });
   await cp(editionSource, path.join(workdir, scoped), { recursive: true });
+  // Whether the edition is worth a branch is still decided by the edition
+  // directory alone: a re-run of an edition already on the base branch is
+  // refused here, exactly as before, and never on generated-index drift.
   await git(['-C', workdir, 'add', '--', scoped], options);
   const staged = await git(['-C', workdir, 'status', '--porcelain', '--', scoped], options);
   if (staged.length === 0) throw new Error(`nothing to push — ${scoped} is already identical to ${base} on the remote`);
+  const generated = await regenerateIndexes(workdir);
+  await git(['-C', workdir, 'add', '--', ...GENERATED_INDEX_PATHS], options);
   // Pinned to the edition's own 16:00 Berlin release instant so a retry after a
   // failed push rebuilds the identical commit instead of a new one every run.
   const date = `${branch.slice('edition/'.length)}T16:00:00+02:00`;
-  await git(['-C', workdir, '-c', `user.name=${COMMIT_NAME}`, '-c', `user.email=${COMMIT_EMAIL}`, 'commit', '-q', '-m', message, '--', scoped], { ...options, date });
+  await git(['-C', workdir, '-c', `user.name=${COMMIT_NAME}`, '-c', `user.email=${COMMIT_EMAIL}`, 'commit', '-q', '-m', message, '--', ...committed], { ...options, date });
   const commit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
-  if (dryRun) return { branch, commit, base: baseCommit, remote_url: url, pushed: false };
+  if (dryRun) return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: false };
   await git(['-C', workdir, ...pushArgv(url, branch)], options);
-  return { branch, commit, base: baseCommit, remote_url: url, pushed: true };
+  return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: true };
 }
 
 export function parseArguments(argv) {

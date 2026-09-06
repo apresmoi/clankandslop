@@ -4,11 +4,13 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { buildBylinesTsv } from './build-bylines-tsv.mjs';
+import { buildTopicsTxt } from './build-topics-txt.mjs';
 import {
-  BASE_BRANCH, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
+  BASE_BRANCH, GENERATED_INDEX_PATHS, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   assertNoForcedPush, assertNotProtectedRef, assertPushableRef, editionBranch, editionCommitMessage,
   parseArguments, prepareSshIdentity, publishEditionBranch, pushArgv, pushStagedEditionTree,
-  remoteUrl, resolveStagedEdition, sshConfig
+  regenerateIndexes, remoteUrl, resolveStagedEdition, sshConfig
 } from './publish-edition-branch.mjs';
 
 const scratch = (label) => mkdtempSync(join(tmpdir(), `clank-${label}-`));
@@ -16,6 +18,11 @@ const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf8', en
 
 // A real remote, on disk. Everything below pushes to it for real, so a guard
 // that only *claims* to stop a push to main has somewhere to be caught out.
+// The base branch carries what the real one carries: the topic registry, and
+// the two generated views ci.yml regenerates and diffs. Without them there is
+// nothing for the drift check to be wrong about.
+const TOPICS_JSON = { topics: { oil: { name: 'Oil', blurb: 'Crude and products.' }, rates: { name: 'Rates', blurb: 'Policy rates.' } } };
+
 function remote() {
   const root = scratch('remote');
   const bare = join(root, 'origin.git'), seed = join(root, 'seed');
@@ -23,7 +30,12 @@ function remote() {
   git(['init', '-q', '--bare', '-b', BASE_BRANCH], bare);
   git(['init', '-q', '-b', BASE_BRANCH], seed);
   writeFileSync(join(seed, 'README.md'), '# seed\n');
-  git(['add', '--', 'README.md'], seed);
+  mkdirSync(join(seed, 'content', 'bylines'), { recursive: true });
+  writeFileSync(join(seed, 'content', 'topics.json'), JSON.stringify(TOPICS_JSON));
+  buildTopicsTxt(seed);
+  buildBylinesTsv(seed);
+  writeFileSync(join(seed, 'content', 'bylines', '.keep'), '');
+  git(['add', '--', 'README.md', 'content'], seed);
   git(['commit', '-q', '-m', 'chore: seed'], seed);
   git(['push', '-q', bare, `refs/heads/${BASE_BRANCH}:refs/heads/${BASE_BRANCH}`], seed);
   return { root, url: bare, head: () => git(['rev-parse', `refs/heads/${BASE_BRANCH}`], bare), refs: () => git(['for-each-ref', '--format=%(refname)'], bare).split('\n').filter(Boolean) };
@@ -33,8 +45,18 @@ function stagedEdition(edition) {
   const root = scratch('staged');
   const directory = join(root, 'content', 'editions', edition);
   mkdirSync(join(directory, 'articles'), { recursive: true });
-  writeFileSync(join(directory, 'articles', 'one.json'), '{"id":"one"}\n');
+  // A real article row, so the byline index the base branch carries genuinely
+  // goes stale the moment this edition is added to the tree.
+  writeFileSync(join(directory, 'articles', 'one.json'), `${JSON.stringify({ id: 'one', edition_date: edition, section: 'world', epistemic: 'fact', topics: ['oil'], headline: 'A headline', byline: { desk: 'Test Desk', agents: ['Cogsworth'] } })}\n`);
   return { root, source: directory, path: `content/editions/${edition}` };
+}
+
+// Exactly what ci.yml does: run both generators over the checked-out tree and
+// require `git diff --exit-code` to find nothing.
+function ciDriftCheck(workdir) {
+  buildTopicsTxt(workdir);
+  buildBylinesTsv(workdir);
+  return git(['status', '--porcelain'], workdir);
 }
 
 test('the edition branch is derived from the date and nothing else may be pushed', () => {
@@ -141,6 +163,29 @@ test('the command line refuses to run without a staging volume or a key', () => 
   assert.deepEqual(parseArguments(['--staging', '/s', '--dry-run']), { dryRun: true, staging: '/s' });
 });
 
+test('the generated indexes are rebuilt from the branch tree, and only those two paths are added', async () => {
+  assert.deepEqual(GENERATED_INDEX_PATHS, ['content/topics.txt', 'content/bylines']);
+  await assert.rejects(regenerateIndexes('relative/tree'), /must be an absolute path/u);
+
+  const tree = scratch('tree');
+  mkdirSync(join(tree, 'content', 'editions', '2026-09-05', 'articles'), { recursive: true });
+  writeFileSync(join(tree, 'content', 'topics.json'), JSON.stringify(TOPICS_JSON));
+  writeFileSync(join(tree, 'content', 'editions', '2026-09-05', 'articles', 'one.json'), JSON.stringify({ id: 'one', edition_date: '2026-09-05', section: 'world', epistemic: 'fact', topics: ['oil'], headline: 'A headline', byline: { desk: 'Test Desk', agents: ['Cogsworth'] } }));
+
+  const first = await regenerateIndexes(tree);
+  assert.equal(first.topics, 'content/topics.txt');
+  assert.deepEqual(first.bylines, ['content/bylines/cogsworth.tsv']);
+  assert.equal(first.articles, 1);
+  assert.equal(readFileSync(join(tree, 'content', 'topics.txt'), 'utf8'), 'oil\tOil\nrates\tRates\n');
+  assert.match(readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8'), /^2026-09-05\tone\tworld\tfact\toil\tA headline$/mu);
+
+  // Pure functions of the tree: a second run is byte-identical, which is what
+  // keeps a retried push rebuilding the same commit object.
+  const before = readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8');
+  await regenerateIndexes(tree);
+  assert.equal(readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8'), before);
+});
+
 test('a real push creates the edition branch and leaves main exactly where it was', async () => {
   const origin = remote(), before = origin.head();
   const staged = stagedEdition('2026-09-05');
@@ -156,7 +201,12 @@ test('a real push creates the edition branch and leaves main exactly where it wa
   assert.equal(origin.head(), before, 'main moved');
   const bare = origin.url;
   assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%s', result.commit], { encoding: 'utf8' }).trim(), 'chore(edition): add the 2026-09-05 edition');
-  assert.equal(execFileSync('git', ['-C', bare, 'show', `${result.commit}:content/editions/2026-09-05/articles/one.json`], { encoding: 'utf8' }), '{"id":"one"}\n');
+  assert.match(execFileSync('git', ['-C', bare, 'show', `${result.commit}:content/editions/2026-09-05/articles/one.json`], { encoding: 'utf8' }), /"id":"one"/u);
+  // The pushed tree is what ci.yml will check out: regenerating both indexes
+  // over it must leave the working tree clean, which is `git diff --exit-code`.
+  const checkout = scratch('ci');
+  git(['clone', '-q', '--branch', result.branch, bare, checkout], checkout);
+  assert.equal(ciDriftCheck(checkout), '', 'the pushed branch would fail the CI drift check');
   // The commit is pinned to the edition's release instant, so a retry after a
   // failed push rebuilds the identical object rather than a new one.
   assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%aI', result.commit], { encoding: 'utf8' }).trim(), '2026-09-05T16:00:00+02:00');
@@ -190,7 +240,10 @@ test('the commit carries only the edition directory, whatever else is in the tre
     workdir, home: join(work, 'home'), message: editionCommitMessage('2026-09-06')
   });
   const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
-  assert.deepEqual(files, ['content/editions/2026-09-06/articles/one.json']);
+  // The edition directory and the two generated views ci.yml diff-checks, and
+  // nothing else: neither the stray file nor the git home rides along.
+  assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-06/articles/one.json']);
+  for (const name of files) assert.ok(GENERATED_INDEX_PATHS.some((prefix) => name.startsWith(prefix)) || name.startsWith('content/editions/2026-09-06/'), name);
 });
 
 test('a retry of the same edition converges, and changed content is refused rather than forced', async () => {
