@@ -449,3 +449,86 @@ test('file_desk refuses a desk document the edition cannot be assembled from', a
     await rm(temporary, { recursive: true, force: true });
   }
 });
+
+// The skeleton written into caslon's brief, transcribed. If this stops
+// composing, the brief is wrong and an edition is not going out.
+const briefFront = (ids) => ({
+  edition: '2026-09-09', page: 'front', paper: 'broadsheet',
+  title: 'Clank & Slop - The Front Page', active: '/',
+  head: [
+    { block: 'Hero', props: { variant: 'lead-only', lead: ids[0] } },
+    { block: 'Grid', props: { cols: [1, 2], align: 'stretch', rule: false, columns: [
+      [{ block: 'GlyphArt', props: { shape: 'chip', scale: 0.6 } }],
+      [{ block: 'Teaser', props: { article: ids[1], size: 'feature' } }] ] } },
+    { block: 'Grid', props: { cols: [2, 1], align: 'stretch', rule: false, columns: [
+      [{ block: 'Teaser', props: { article: ids[2], size: 'feature' } }],
+      [{ block: 'GlyphArt', props: { shape: 'pumpjack', scale: 0.6 } }] ] } },
+    { block: 'Grid', props: { cols: [1, 1], align: 'start', columns: [
+      [{ block: 'Teaser', props: { article: ids[3], size: 'flow' } }],
+      [{ block: 'Teaser', props: { article: ids[4], size: 'flow' } }] ] } },
+    { block: 'SectionHeader', props: { text: 'The Flashpoint Index' } },
+    { block: 'Grid', props: { cols: [1, 1], columns: [
+      [{ block: 'WorldGlyph', props: { worldDesk: 'edition', hotspots: [{ name: 'Kharg Island', lat: 29.25, lon: 50.33, p: 0.34 }] } }],
+      [{ block: 'WorldIndex', props: { items: [{ place: 'Kharg Island', note: 'No vessel named.', agent: 'Sprockett', p: 0.34 }] } }] ] } },
+  ],
+  flow: [{ block: 'Briefly', props: { title: '', compact: true, desks: [
+    { label: 'On the Front', lead: { kicker: 'Ankara Sequence Holds', agent: 'Sprockett', what: 'The clock started; no text has been published.' }, rest: [] },
+    { label: 'Held and Waiting', lead: { kicker: 'Green Book Rate Still 28 Oct', agent: 'Foreman', what: 'Published, but no project changes status yet.' }, rest: [] },
+    { label: 'Moving and Unverified', lead: { kicker: 'Kametstal Restart Unset', agent: 'Graves', what: 'No restart date has been published.' }, rest: [] } ] } }],
+});
+const briefTape = () => ({
+  edition: '2026-09-09', page: 'tape', paper: 'ticker',
+  title: 'Clank & Slop - The Tape', active: '/tape',
+  head: [
+    { block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: [
+      { label: 'Closed Clocks', lead: { kicker: 'Galați Drone Attributed', agent: 'Sprockett', what: 'The 23 August call settles YES.' }, rest: [{ kicker: 'Cernavodă Still Offline', agent: 'Graves', what: 'The 23 August call settles NO.' }] },
+      { label: 'Open Clocks', lead: { kicker: 'Canada Match 8 Sep', agent: 'Foreman', what: 'No Gazette list has been posted.' }, rest: [{ kicker: 'Ballot Rule Still Held', agent: 'Tinkerton', what: 'The order stands while the application sits.' }] },
+      { label: 'Tape Notes', lead: { kicker: 'Canal Slots 34 then 32', agent: 'Graves', what: 'Bookable transits fall to 34 a day, then 32.' }, rest: [{ kicker: 'Foxconn Books Eleven Billion', agent: 'Cogsworth', what: 'Capex booked against undelivered racks.' }] } ] } },
+    { block: 'Grid', props: { cols: [1, 1], columns: [
+      [{ block: 'MarketsRail', props: { title: 'The Tape', kicker: '9 Sep · slots cut, ballot rule held', rows: [
+        { sym: 'ACP', value: '34', spark: 'slots', pct: 'from 4 Sep', dir: 'down' },
+        { sym: '338', value: '50%', spark: 'live', pct: '04:01 UTC', dir: 'up' },
+        { sym: 'KHARG', value: 'unnamed', spark: 'no vessel', pct: 'unverified', dir: 'flat' } ] } }],
+      [{ block: 'WhatToWatch', props: { title: 'The Deadlines · 8 Sep – 30 Sep', items: [
+        { when: '8 Sep', what: 'The matching tariffs either enter force or the date slips.', who: 'Foreman' } ] } }] ] } },
+    { block: 'ForecastLedger', props: { meta: '19 open calls', open_calls: [
+      { horizon: 'By 8 Sep', question: 'The matching tariffs enter force on 8 September 2026', call: 'YES', direction: 'bull', p: 0.7, interval: 0.2, quorum: '3/5', detail: 'YES requires an operative measure effective 8 September.', dissent: { agents: ['Tinkerton'], p: 0.48 } } ] } },
+    { block: 'TrackRecord', props: { label: 'Track Record · Settlement', resolved: 'edition' } },
+  ],
+  flow: [],
+});
+
+test("the front and tape skeletons in caslon's brief compose", async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-brief-pages-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-09';
+  try {
+    // No article carries art.hero_map, which is the ordinary day the brief is
+    // written for: the permitted map set is empty and the front runs on glyphs.
+    const noMap = (id, agent, date, index) => { const { art: _, ...value } = article(id, agent, date, index); return value; };
+    await driveToCompose(state, edition, noMap);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    const ids = owners.map((_, index) => `story-${index}`);
+    const composed = await composeEdition({ edition, event_key: 'compose-brief-skeleton', pages: [
+      { name: 'front', document: briefFront(ids) },
+      { name: 'tape', document: briefTape() },
+    ] });
+    assert.deepEqual(composed.tree.pages, ['front', 'tape']);
+    assert.deepEqual(composed.tree.maps, []);
+    // The two GlyphArt blocks alone clear the 2-3 illustration gate, and the
+    // INDEX records the count the gate actually read.
+    assert.match(await readIndexFile(state, edition), /^G front articles=5 visuals=2 papers=broadsheet lead=story-0$/mu);
+    assert.match(await readIndexFile(state, edition), /^G tape articles=0 visuals=0 papers=ticker lead=-$/mu);
+
+    // The same skeleton with one glyph removed is one visual short and refused.
+    const thin = briefFront(ids);
+    thin.head[1].props.columns[0] = [];
+    await assert.rejects(composeEdition({ edition, event_key: 'compose-brief-thin', pages: [{ name: 'front', document: thin }, { name: 'tape', document: briefTape() }] }), /illustration rhythm invalid.*found 1/su);
+
+    // Both pages on the same stock is refused: the paper values must differ.
+    const sameStock = briefTape(); sameStock.paper = 'broadsheet';
+    await assert.rejects(composeEdition({ edition, event_key: 'compose-brief-stock', pages: [{ name: 'front', document: briefFront(ids) }, { name: 'tape', document: sameStock }] }), /paper diversity invalid/u);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
