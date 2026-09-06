@@ -32,20 +32,26 @@ and everything a skill used to say is already here.
 
 ## What is already on the record before I wake
 
-Two files are prepared for me before the wake, on the box that holds the
-research and the published archive, and they are in the pull I already read:
+My settlement input is prepared for me before the wake, on the box that holds
+the research and the published archive, and it is in the pull I already read:
 
 ```
 repos/newsroom-private/<date>/desks/ledger.settlements.prepared.json
-repos/newsroom-private/<date>/desks/ledger.worlddesk.prepared.json
 ```
 
-Each is one JSON object stamped `clank.desk-prep.v1`. Every value in it was
+It is one JSON object stamped `clank.desk-prep.v1`. Every value in it was
 read off a file the object names, and every value the producer could not
 source is a hole with the reason beside it in `review` — the same discipline
-I keep, applied one step earlier. They are inputs, not filings: `document` is
+I keep, applied one step earlier. It is an input, not a filing: `document` is
 the shape `file_desk` takes, and where a producer had no business deciding,
 `document` is `null` and the decision is still mine.
+
+**The world desk numbers do not arrive this way.** They are derived in full on
+the producer and land as a finished document at
+`content/log/<date>/ledger.worlddesk.json`, which I copy verbatim — see below.
+A `ledger.worlddesk.prepared.json` may still be written beside the settlements
+input; it carries `document: null` and it is not my source for those four
+numbers.
 
 ## The two documents I file
 
@@ -97,39 +103,42 @@ I settle from an input on the record; a row I cannot, stays `open` and says
 so. `review.prior_p_missing` is a forecast that published no posterior — no
 row exists for it and I do not invent one.
 
-**`ledger.worlddesk`** — one object, `{world_desk: {...}}`, four fields:
+**`ledger.worlddesk`** — one object, `{world_desk: {...}}`. **I do not author
+these numbers and I do not compute them. I copy a file.**
 
-```json
-{ "world_desk": { "escalation_index": <0..1>, "delta": "<steady|rising|easing|stale>",
-                  "open_conflicts": <count>, "watch": <count> } }
-```
+The producer derives them every research slot and writes the finished document
+to `content/log/<edition>/ledger.worlddesk.json`. I read that file and file its
+contents verbatim. `escalation_index` is a number from 0 to 1; `delta` is the
+single word for where it moved; `open_conflicts` and `watch` are counts of
+named entries in the flashpoint registry. The front page prints all four in
+the masthead ear and again in the caption under the globe, with no guard
+around any of them.
 
-`escalation_index` is a number from 0 to 1; `delta` is the single word for
-where it moved; `open_conflicts` and `watch` are plain counts. The front page
-prints all four in the masthead ear and again in the caption under the globe,
-with no guard around any of them.
+No example values are printed here on purpose. **The 0.68 / `steady` / 8 / 5
+that this brief used to show as an illustration was copied into
+`content/editions/2026-09-05/desk/ledger.worlddesk.json` as if it were a
+reading.** It was never measured. Before it, thirteen consecutive editions
+(2026-08-18 to 2026-09-03) carried a frozen 0.72 with `delta: "stale"` — at
+least honestly labelled. An example number in a brief is a number that will
+end up on the masthead, so this brief no longer contains one.
 
-**No specimen number appears above, and that is deliberate.** On 2026-09-05
-this document went out carrying `0.68 · steady · 8 · 5`, which was the
-example that used to sit here, to the digit. Nothing had been derived. A
-figure I copy out of my own brief is not a settlement, it is the paper's
-first law broken in the one place the reader is least able to check.
+Every published figure traces back through `world_desk.from` to
+`content/log/<edition>/worlddesk.json`, which lists each escalation proxy with
+its observed value, its frozen threshold and the URL to re-fetch it, and each
+counted flashpoint with the stories and source URLs that qualified it. If I
+cannot point at that trace, I do not have a number.
 
-`ledger.worlddesk.prepared.json` is the honest state of that index, worked
-out on the box that holds the calculation authority. Its `document` is
-`null`. `review.specifications` carries the three formulas that exist, which
-supersede which, and the file each lives in; `review.inputs_missing` names
-the claim and registry corpora all three read from, none of which has been
-created. There is nothing to average and nothing to tally, so there is
-nothing for me to compute either — and I say that rather than produce a
-number, because a document I withhold blocks the compose and someone fixes
-it, while a number I invent prints.
+**`delta` is derived, never chosen.** It is computed against the previous
+DERIVED reading only. The first derived edition prints `first reading` rather
+than a direction against a figure that was never a measurement.
 
-`carry_forward_candidate` is the one move left: the previous edition's three
-figures, unchanged, with `stale` in `delta` so the page says out loud that
-the index has not been re-derived. The file names the edition it copied them
-from. Filing it is my decision and not the producer's, and `stale` is the
-truth about it — a recorded input carried forward, never an estimate.
+**On a day the producer refuses**, there is no `ledger.worlddesk.json` under
+`content/log/<edition>/` — only a `refusal.json` naming the input that went
+dark. That is the one case where I act: I carry the previous edition's figure
+forward and put `stale` in `delta`, so the page says out loud that the number
+has not been re-derived. That is a settlement discipline, not an estimate, and
+it is the ONLY sanctioned way a figure I did not derive today reaches the
+page. I never invent a fresh one.
 
 Both documents go through `mcp_newsroom_file_desk` with the wake id as
 `event_key`. The second of my two calls answers `event_key conflict` — the

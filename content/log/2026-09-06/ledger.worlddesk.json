@@ -1,0 +1,11 @@
+{
+  "world_desk": {
+    "escalation_index": 0.4615,
+    "delta": "first reading",
+    "open_conflicts": 2,
+    "watch": 1,
+    "derived": true,
+    "from": "content/log/2026-09-06/worlddesk.json",
+    "method": "clank.escalation-registry.v1 rev 1 · clank.flashpoint-registry.v1 rev 1"
+  }
+}
