@@ -45,6 +45,13 @@ jobs:
       # node_modules the rest of the build needs.
       - name: Check the runtime bundle descriptor describes this tree
         run: node agentic-org/scripts/check-bundle-descriptor.mjs
+      # The page data layer has one build-time decision in it that a green
+      # astro build cannot see: whether a story advertises an og:image for a
+      # card that was never rendered. 15 of the 71 editions have no cards, and
+      # every one of their stories used to serve a 404 image to every crawler.
+      - name: Test the website data layer
+        working-directory: website
+        run: npm run test:lib
       - name: Build website
         working-directory: website
         run: |
