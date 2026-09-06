@@ -43,7 +43,12 @@ export const BUSY_STATES = Object.freeze(new Set(['accepted', 'running']));
 // The processes a healthy idle container always has: the two entrypoints, the
 // Moltnet server, the organization runtime, and one Moltnet node per agent.
 // Anything else running under the runtime is work in flight.
-export const STEADY_STATE = Object.freeze([/daimon-uid-entrypoint\.sh/u, /\/opt\/spawnfile\/entrypoint\.sh/u, /moltnet start --config/u, /moltnet node /u, /daimon-runtime run --config/u, /^ps( |$)/u]);
+export const STEADY_STATE = Object.freeze([/daimon-uid-entrypoint\.sh/u, /\/opt\/spawnfile\/entrypoint\.sh/u, /moltnet start --config/u, /moltnet node /u, /daimon-runtime run --config/u]);
+// `docker exec … sh -c 'ps …'` shows up in its own output as the shell plus the
+// ps it spawned. Excluding those by pattern would mean excluding `sh -c`, which
+// is exactly the shape an engine turn takes — so the probe carries a sentinel
+// instead and its own subtree is subtracted by PID. Anything left is real.
+export const PROBE_SENTINEL = 'clank-quiescence-probe';
 
 export class WindowError extends Error {}
 const fail = (message) => { throw new WindowError(message); };
@@ -228,13 +233,26 @@ export function quiescence(container, { docker = 'docker', now = new Date(), qui
 
   // 3. the process table.
   try {
-    const raw = exec(container, 'ps -eo args', { docker });
-    observed.extraProcesses = raw.split('\n').slice(1).map((line) => line.trim()).filter(Boolean)
-      .filter((args) => !STEADY_STATE.some((pattern) => pattern.test(args)));
+    observed.extraProcesses = foreignProcesses(exec(container, `ps -eo pid,ppid,args # ${PROBE_SENTINEL}`, { docker }));
     for (const args of observed.extraProcesses) findings.push(`a process outside the steady-state set is running in the container: ${args.slice(0, 160)}`);
   } catch (error) { findings.push(`could not read the container process table (${String(error.message).trim().slice(0, 200)})`); }
 
   return { quiet: findings.length === 0, findings, observed };
+}
+
+// Splits a `pid ppid args` table into "work in flight" and everything else.
+// The probe's own shell is found by its sentinel and removed together with
+// every process it parented, so the measurement cannot see itself.
+export function foreignProcesses(table) {
+  const rows = table.split('\n').map((line) => line.trim()).filter(Boolean)
+    .map((line) => /^(\d+)\s+(\d+)\s+(.*)$/u.exec(line)).filter(Boolean)
+    .map(([, pid, ppid, args]) => ({ pid, ppid, args }));
+  const probe = new Set(rows.filter((row) => row.args.includes(PROBE_SENTINEL)).map((row) => row.pid));
+  // One generation is enough: `sh -c` spawns ps directly. Repeat until stable
+  // anyway, so a shell that forks once more cannot reappear as a finding.
+  for (let round = 0; round < 4; round += 1)
+    for (const row of rows) if (probe.has(row.ppid)) probe.add(row.pid);
+  return rows.filter((row) => !probe.has(row.pid) && !STEADY_STATE.some((pattern) => pattern.test(row.args))).map((row) => row.args);
 }
 
 export function assess(orgRoot, container, options = {}) {

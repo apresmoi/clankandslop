@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { orgRoot } from './lib.mjs';
-import { BUSY_STATES, WindowError, assess, clockFindings, deriveWindow, nextFire, parseCron, previousFire, quiescence, readSchedule } from './wake-window.mjs';
+import { BUSY_STATES, PROBE_SENTINEL, WindowError, assess, clockFindings, deriveWindow, foreignProcesses, nextFire, parseCron, previousFire, quiescence, readSchedule } from './wake-window.mjs';
 
 const at = (iso) => new Date(iso);
 const berlin = 'Europe/Berlin';
@@ -65,7 +65,17 @@ test('the clock refuses a deploy inside the lead before a wake and the tail afte
 });
 
 // --- quiescence: the check that is not the clock -----------------------------
-const container = (files, { ps = 'COMMAND\nbash /opt/spawnfile/daimon-uid-entrypoint.sh\n/usr/local/bin/moltnet node /x.json', usage = '' } = {}) =>
+const IDLE_PS = [
+  '    1     0 bash /opt/spawnfile/daimon-uid-entrypoint.sh',
+  '   39     1 bash /opt/spawnfile/entrypoint.sh --spawnfile-runtime-identity 2000 2000',
+  '   63    39 /usr/local/bin/moltnet start --config /var/lib/spawnfile/moltnet/servers/x/Moltnet.json',
+  '  365    39 node /usr/local/bin/daimon-runtime run --config /var/lib/spawnfile/instances/daimon/x.json',
+  '  630    39 /usr/local/bin/moltnet node /var/lib/spawnfile/moltnet/nodes/x.json',
+  `ate 1608     0 sh -c ps -eo pid,ppid,args # ${PROBE_SENTINEL}`.slice(4),
+  ' 1609  1608 ps -eo pid,ppid,args'
+].join('\n');
+
+const container = (files, { ps = IDLE_PS, usage = '' } = {}) =>
   (_name, script) => {
     if (script.includes('wake-acceptance')) return files.join('\n');
     if (script.includes('usage.jsonl')) return usage;
@@ -99,8 +109,18 @@ test('an incomplete turn, or a turn written moments ago, blocks the deploy', () 
   assert.deepEqual(quiescence('c', { exec: container([], { usage: old }), inspect: healthy, now: at('2026-09-06T09:00:00Z') }).findings, []);
 });
 
+test('the quiescence probe cannot see itself — its own sh and ps are not findings', () => {
+  // Observed live on 2026-09-06: `docker exec … sh -c 'ps …'` appears in its own
+  // output, and a naive filter reported the measurement as work in flight, so
+  // the seam could never have run. The probe subtracts its own subtree by PID
+  // rather than by pattern, because excluding `sh -c` would also excuse an
+  // engine turn.
+  assert.deepEqual(foreignProcesses(IDLE_PS), []);
+  assert.equal(quiescence('c', { exec: container([]), inspect: healthy, now: at('2026-09-06T09:00:00Z') }).quiet, true);
+});
+
 test('a process outside the steady-state set blocks the deploy', () => {
-  const ps = 'COMMAND\nbash /opt/spawnfile/daimon-uid-entrypoint.sh\n/usr/local/bin/moltnet node /x.json\ncodex exec --sandbox danger-full-access';
+  const ps = `${IDLE_PS}\n 1700    39 codex exec --sandbox danger-full-access`;
   const result = quiescence('c', { exec: container([], { ps }), inspect: healthy, now: at('2026-09-06T09:00:00Z') });
   assert.match(result.findings.join(' '), /outside the steady-state set/u);
   assert.deepEqual(result.observed.extraProcesses, ['codex exec --sandbox danger-full-access']);
