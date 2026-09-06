@@ -13,17 +13,17 @@
   "spawnfile_schedule": {
     "status": "native",
     "owners": {
-      "cogsworth": "0 10 * * *",
-      "sprockett": "0 10 * * *",
-      "foreman": "0 10 * * *",
-      "graves": "0 10 * * *",
-      "tinkerton": "0 10 * * *",
-      "vesta": "0 10 * * *",
-      "brass": "30 10 * * *",
-      "spike": "0 14 * * *",
-      "ledger": "0 14 * * *",
-      "caslon": "0 15 * * *",
-      "pressman": "0 16 * * *"
+      "cogsworth": "30 14 * * *",
+      "sprockett": "30 14 * * *",
+      "foreman": "30 14 * * *",
+      "graves": "30 14 * * *",
+      "tinkerton": "30 14 * * *",
+      "vesta": "30 14 * * *",
+      "brass": "0 15 * * *",
+      "spike": "30 16 * * *",
+      "ledger": "0 17 * * *",
+      "caslon": "30 17 * * *",
+      "pressman": "0 18 * * *"
     }
   },
   "downstream_activation": "moltnet-addressed-only",
