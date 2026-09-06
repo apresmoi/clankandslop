@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { bundleDescriptorFindings } from './check-bundle-descriptor.mjs';
+import { measureSourceArchive, sourceDescriptorFindings } from './source-archive.mjs';
 import { checkRuntime } from './check-runtime.mjs';
 import { provision } from './provision.mjs';
 import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
@@ -229,5 +232,75 @@ test('removing either publishing desk schedule fails closed', () => {
     // And the reverse: dropping it from the roster while the Spawnfile keeps it.
     writeFileSync(schedulePath, original.replace(new RegExp(`\\s*"${agent}": "[^"]+",?`, 'u'), '').replace(',\n    }', '\n    }'));
     try { assert.throws(validateSchedule, /schedule roster invalid|schedule authority invalid|checkpoint with no schedule/u, agent); } finally { writeFileSync(schedulePath, original); }
+  }
+});
+
+// The descriptor and the Spawnfiles have always been checked against each
+// other and never against the tree, so both could be — and three times were —
+// consistently wrong. This is the check that has an opinion about the tree.
+test('the runtime bundle descriptor describes the tree that is committed', () => {
+  assert.deepEqual(bundleDescriptorFindings(), []);
+});
+
+test('the descriptor drift check has an opinion about the source archive and the pins', () => {
+  const repo = resolve(import.meta.dirname, '../..');
+  const scratch = mkdtempSync(join(tmpdir(), 'clank-descriptor-'));
+  try {
+    // A throwaway checkout, so the mutations below cannot touch the tree the
+    // rest of the suite is reading. The baseline is measured rather than
+    // assumed, so this stays honest whatever state that checkout is in.
+    execFileSync('git', ['worktree', 'add', '--detach', scratch, 'HEAD'], { cwd: repo, stdio: 'pipe' });
+    const measured = measureSourceArchive(scratch);
+    const baseline = { sha256: measured.digest, file_count: measured.count, content_bytes: measured.total };
+
+    // One tracked, bundled file changed without a rebuild — the exact shape of
+    // the defect: the tree moves, the pin does not.
+    const bundled = join(scratch, 'ops', 'desk-contract.mjs');
+    writeFileSync(bundled, `${readFileSync(bundled, 'utf8')}// drift\n`);
+    const drifted = measureSourceArchive(scratch);
+    assert.notEqual(drifted.digest, baseline.sha256, 'a changed bundled file must change the source digest');
+    assert.equal(drifted.total, baseline.content_bytes + '// drift\n'.length);
+    assert.deepEqual(sourceDescriptorFindings({ source: baseline }, drifted).map((finding) => finding.split(' is ')[0]), ['source.sha256', 'source.content_bytes']);
+    assert.ok(bundleDescriptorFindings(scratch).some((finding) => /^source\.sha256 is .* a fresh build of this tree is /u.test(finding)));
+
+    // A new bundled file moves the count too — the descriptor that shipped
+    // three times carried a count from before files it did not know about.
+    writeFileSync(join(scratch, 'ops', 'drift-probe.mjs'), 'export const probe = 1;\n');
+    execFileSync('git', ['-C', scratch, 'add', '--', 'ops/drift-probe.mjs'], { stdio: 'pipe' });
+    assert.equal(measureSourceArchive(scratch).count, baseline.file_count + 1);
+    assert.ok(sourceDescriptorFindings({ source: baseline }, measureSourceArchive(scratch)).some((finding) => finding.startsWith('source.file_count is')));
+
+    // And a Spawnfile that no longer carries the descriptor's digest is named.
+    execFileSync('git', ['-C', scratch, 'rm', '-q', '-f', '--', 'ops/drift-probe.mjs'], { stdio: 'pipe' });
+    execFileSync('git', ['-C', scratch, 'checkout', '--', 'ops/desk-contract.mjs'], { stdio: 'pipe' });
+    const spawnfile = join(scratch, 'agentic-org', 'agents', 'caslon', 'Spawnfile');
+    const descriptor = JSON.parse(readFileSync(join(scratch, 'agentic-org', 'newsroom-runtime-bundle.json'), 'utf8'));
+    writeFileSync(spawnfile, readFileSync(spawnfile, 'utf8').replace(descriptor.source.sha256, 'sha256:0000000000000000000000000000000000000000000000000000000000000000'));
+    assert.ok(bundleDescriptorFindings(scratch).some((finding) => /agents\/caslon\/Spawnfile does not pin/u.test(finding)));
+  } finally {
+    execFileSync('git', ['worktree', 'remove', '--force', scratch], { cwd: repo, stdio: 'pipe' });
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
+// c65e6d3 is the private commit whose tree carries zero `.index` files: every
+// reporter wakes, finds no research rows, and files nothing. #111 repinned off
+// it. This branch merged #111, and the merge put the public-content digest one
+// line above the private-archive digest in all twelve Spawnfiles — a
+// take-ours resolution restores this pin consistently across the descriptor
+// and every declaration, so nothing else in the suite would notice.
+const STARVING_PRIVATE_COMMIT = 'c65e6d375bcaebe53f63d6d2aa4569dc34d38735';
+const STARVING_PRIVATE_DIGEST = 'sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e';
+
+test('the private research corpus is never repinned back to the commit with no research in it', () => {
+  const descriptor = JSON.parse(readFileSync(resolve(import.meta.dirname, '../newsroom-runtime-bundle.json'), 'utf8'));
+  const pin = JSON.parse(readFileSync(resolve(import.meta.dirname, '../policies/private-source.json'), 'utf8'));
+  assert.notEqual(pin.commit, STARVING_PRIVATE_COMMIT, 'policies/private-source.json is back on the corpus commit that has no desk index files');
+  assert.notEqual(descriptor.private.commit, STARVING_PRIVATE_COMMIT);
+  assert.notEqual(descriptor.private.sha256, STARVING_PRIVATE_DIGEST);
+  for (const agent of agents) {
+    const line = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8')
+      .split('\n').find((row) => row.includes('id: private-archive'));
+    assert.ok(!line.includes(STARVING_PRIVATE_DIGEST), `${agent} was resolved back onto the starving corpus digest`);
   }
 });
