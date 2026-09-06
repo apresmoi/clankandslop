@@ -1,0 +1,15 @@
+# 23:30 Europe/Berlin: two hours after the last declared wake (pressman, 21:30),
+# which is long enough for a press run to finish and short enough that a person
+# still hears about a missing edition the same night.
+#
+# NOT enabled. `systemctl enable --now clank-cycle-audit.timer` arms it.
+[Unit]
+Description=Audit the day's cycle after press time
+
+[Timer]
+OnCalendar=*-*-* 23:30:00 Europe/Berlin
+Persistent=true
+Unit=clank-cycle-audit.service
+
+[Install]
+WantedBy=timers.target

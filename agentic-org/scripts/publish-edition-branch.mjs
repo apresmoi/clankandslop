@@ -26,6 +26,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
+import { repinSource } from './check-bundle-descriptor.mjs';
 
 // One ed25519 deploy key per repository, reached through an SSH host alias so
 // the generated config — not ssh's agent or default key search — decides which
@@ -131,10 +132,23 @@ export async function prepareSshIdentity(directory, keyFile) {
 // hand. They are regenerated here, from the branch's own tree, immediately
 // before the commit.
 //
-// This widens what the commit may contain by exactly these two paths, both
-// compile-time constants under `content/`, and widens nothing about what may
-// be pushed: the branch, the refspec, the remote and the flags are untouched.
+// `agentic-org/newsroom-runtime-bundle.json` and the twelve Spawnfile source
+// pins are the THIRD instance of exactly that defect, and the one that made an
+// unattended publication impossible rather than merely annoying. The source
+// archive is every tracked file bar a short exclusion list, so
+// `content/editions/<date>/**` is IN it: adding an edition changes the source
+// digest, and ci.yml's "Check the runtime bundle descriptor describes this
+// tree" therefore fails on EVERY edition branch. Verified against `main`
+// (green) plus one restored edition directory: source.file_count 1243 -> 1256,
+// digest moved, check red. Without this, no edition branch could ever be green
+// and an auto-merge would have had nothing to merge, ever.
+//
+// This widens what the commit may contain by exactly these paths, all
+// mechanically derived from the tree being committed, and widens nothing about
+// what may be pushed: the branch, the refspec, the remote and the flags are
+// untouched, and `main` is still refused as hard as it ever was.
 export const GENERATED_INDEX_PATHS = Object.freeze(['content/topics.txt', 'content/bylines']);
+export const REPINNED_DESCRIPTOR_PATHS = Object.freeze(['agentic-org/newsroom-runtime-bundle.json', 'agentic-org/agents']);
 
 // Both generators are pure functions of the tree they are handed, so a retry
 // rebuilds byte-identical output and the commit stays the same object.
@@ -143,6 +157,18 @@ export async function regenerateIndexes(workdir) {
   buildTopicsTxt(workdir);
   const { written, articleCount } = buildBylinesTsv(workdir);
   return { topics: 'content/topics.txt', bylines: written.map((item) => `content/bylines/${item.agent}.tsv`), articles: articleCount };
+}
+
+// LAST, and after the generated views are staged. `repinSource` measures the
+// git INDEX, so the digest it writes only describes the commit if every other
+// path the commit carries is already in the index — measuring before
+// `content/bylines/<agent>.tsv` is staged produces a pin that is short by
+// exactly the files the generators just wrote, and the branch lands red on the
+// same check this exists to satisfy.
+export async function repinBundleDescriptor(workdir) {
+  if (!path.isAbsolute(workdir)) throw new Error('descriptor repin workdir must be an absolute path');
+  const pins = repinSource(workdir);
+  return { source: pins.digest, previous: pins.previous, file_count: pins.file_count, content_bytes: pins.content_bytes, repinned: pins.repinned };
 }
 
 // --- reading what pressman promoted ----------------------------------------
@@ -209,7 +235,7 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
   const scoped = path.normalize(editionPath);
-  const committed = [scoped, ...GENERATED_INDEX_PATHS];
+  const committed = [scoped, ...GENERATED_INDEX_PATHS, ...REPINNED_DESCRIPTOR_PATHS];
   for (const item of committed)
     if (path.isAbsolute(item) || item.split('/').includes('..')) throw new Error(`edition path ${JSON.stringify(editionPath)} must stay inside the branch`);
   const options = { home, sshCommand };
@@ -230,6 +256,8 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   if (staged.length === 0) throw new Error(`nothing to push — ${scoped} is already identical to ${base} on the remote`);
   const generated = await regenerateIndexes(workdir);
   await git(['-C', workdir, 'add', '--', ...GENERATED_INDEX_PATHS], options);
+  generated.descriptor = await repinBundleDescriptor(workdir);
+  await git(['-C', workdir, 'add', '--', ...REPINNED_DESCRIPTOR_PATHS], options);
   // Pinned to the edition's own 16:00 Berlin release instant so a retry after a
   // failed push rebuilds the identical commit instead of a new one every run.
   const date = `${branch.slice('edition/'.length)}T16:00:00+02:00`;

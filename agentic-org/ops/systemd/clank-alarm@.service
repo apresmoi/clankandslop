@@ -1,0 +1,26 @@
+# The OnFailure= handler. %i is the unit that failed.
+#
+# This is the piece CLANK_TO_PROD.md §1.6 says never existed: systemd reported
+# `Failed` for two days into an endpoint nobody had built. Every unit in this
+# directory names this handler, so a unit that fails for ANY reason — including
+# one its own code never anticipated, including being killed — still reaches a
+# human. The alarm script writes a breadcrumb before it sends, so even an
+# undeliverable alarm leaves the text on disk.
+#
+# IT POINTS AT A STANDALONE COPY, NOT AT THE CHECKOUT. Verified the hard way on
+# 2026-09-06: pointed at /root/work/clankandslop/agentic-org/scripts/alarm.mjs,
+# the handler died with MODULE_NOT_FOUND because that tree had not been updated
+# yet — an alarm that only works when the repository is in the right state is
+# an alarm that is missing exactly when the repository is the problem. alarm.mjs
+# imports nothing but node builtins, so a copy at /usr/local/lib/clank-alarm/
+# is self-sufficient and survives a rebase, a half-finished deploy, or a
+# checkout that is not there at all.
+[Unit]
+Description=Raise the newsroom alarm for %i
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/clank-alarm/alarm.env
+ExecStart=/bin/sh -c 'systemctl status --no-pager --lines=40 %i > /run/clank-alarm-%i.log 2>&1 || true; \
+  /usr/bin/node /usr/local/lib/clank-alarm/alarm.mjs \
+    --reason=deploy-failed --message="systemd unit %i failed" --detail-file=/run/clank-alarm-%i.log'

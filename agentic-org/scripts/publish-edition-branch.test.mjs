@@ -6,11 +6,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
+import { bundleDescriptorFindings, repinSource } from './check-bundle-descriptor.mjs';
 import {
-  BASE_BRANCH, GENERATED_INDEX_PATHS, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
+  BASE_BRANCH, GENERATED_INDEX_PATHS, REPINNED_DESCRIPTOR_PATHS, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   assertNoForcedPush, assertNotProtectedRef, assertPushableRef, editionBranch, editionCommitMessage,
   parseArguments, prepareSshIdentity, publishEditionBranch, pushArgv, pushStagedEditionTree,
-  regenerateIndexes, remoteUrl, resolveStagedEdition, sshConfig
+  regenerateIndexes, repinBundleDescriptor, remoteUrl, resolveStagedEdition, sshConfig
 } from './publish-edition-branch.mjs';
 
 const scratch = (label) => mkdtempSync(join(tmpdir(), `clank-${label}-`));
@@ -35,10 +36,30 @@ function remote() {
   buildTopicsTxt(seed);
   buildBylinesTsv(seed);
   writeFileSync(join(seed, 'content', 'bylines', '.keep'), '');
-  git(['add', '--', 'README.md', 'content'], seed);
+  seedDescriptor(seed);
+  git(['add', '--', 'README.md', 'content', 'agentic-org'], seed);
+  // Repin against the staged tree so the seed is self-consistent, exactly as
+  // `main` is: descriptor digest == a fresh measurement, and every Spawnfile
+  // pins it. That is the state an edition branch is cut from.
+  repinSource(seed);
+  git(['add', '--', 'agentic-org'], seed);
   git(['commit', '-q', '-m', 'chore: seed'], seed);
   git(['push', '-q', bare, `refs/heads/${BASE_BRANCH}:refs/heads/${BASE_BRANCH}`], seed);
   return { root, url: bare, head: () => git(['rev-parse', `refs/heads/${BASE_BRANCH}`], bare), refs: () => git(['for-each-ref', '--format=%(refname)'], bare).split('\n').filter(Boolean) };
+}
+
+// The smallest tree `measureSourceArchive` will measure: the two entrypoints it
+// requires unconditionally, one Spawnfile carrying a pin, and a descriptor.
+function seedDescriptor(root) {
+  mkdirSync(join(root, 'agentic-org', 'scripts'), { recursive: true });
+  mkdirSync(join(root, 'agentic-org', 'agents', 'cogsworth'), { recursive: true });
+  writeFileSync(join(root, 'agentic-org', 'scripts', 'production-newsroom.mjs'), 'export const newsroom = 1;\n');
+  writeFileSync(join(root, 'agentic-org', 'scripts', 'production-newsroom-mcp.mjs'), 'export const mcp = 1;\n');
+  const zero = `sha256:${'0'.repeat(64)}`;
+  writeFileSync(join(root, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'),
+    `agent: cogsworth\n    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: ${zero}, mount: ./repos/newsroom, mode: readonly }\n`);
+  writeFileSync(join(root, 'agentic-org', 'newsroom-runtime-bundle.json'),
+    `${JSON.stringify({ version: 'clank.newsroom-runtime-bundle.v2', source: { archive: 'newsroom-runtime.tar', sha256: zero, file_count: 0, content_bytes: 0 } }, null, 2)}\n`);
 }
 
 function stagedEdition(edition) {
@@ -51,12 +72,16 @@ function stagedEdition(edition) {
   return { root, source: directory, path: `content/editions/${edition}` };
 }
 
-// Exactly what ci.yml does: run both generators over the checked-out tree and
-// require `git diff --exit-code` to find nothing.
+// Exactly what ci.yml does: run both generators over the checked-out tree, run
+// the bundle descriptor check, and require neither to find anything. The
+// descriptor half is the one an edition branch used to fail unconditionally —
+// `content/editions/**` is inside the source archive, so landing an edition
+// moves the digest — and it is what made an unattended merge impossible.
 function ciDriftCheck(workdir) {
   buildTopicsTxt(workdir);
   buildBylinesTsv(workdir);
-  return git(['status', '--porcelain'], workdir);
+  const findings = bundleDescriptorFindings(workdir);
+  return [git(['status', '--porcelain'], workdir), ...findings].filter(Boolean).join('\n');
 }
 
 test('the edition branch is derived from the date and nothing else may be pushed', () => {
@@ -163,19 +188,32 @@ test('the command line refuses to run without a staging volume or a key', () => 
   assert.deepEqual(parseArguments(['--staging', '/s', '--dry-run']), { dryRun: true, staging: '/s' });
 });
 
-test('the generated indexes are rebuilt from the branch tree, and only those two paths are added', async () => {
+test('the generated indexes are rebuilt from the branch tree, and only those paths are added', async () => {
   assert.deepEqual(GENERATED_INDEX_PATHS, ['content/topics.txt', 'content/bylines']);
+  assert.deepEqual(REPINNED_DESCRIPTOR_PATHS, ['agentic-org/newsroom-runtime-bundle.json', 'agentic-org/agents']);
+  await assert.rejects(repinBundleDescriptor('relative/tree'), /must be an absolute path/u);
   await assert.rejects(regenerateIndexes('relative/tree'), /must be an absolute path/u);
 
   const tree = scratch('tree');
   mkdirSync(join(tree, 'content', 'editions', '2026-09-05', 'articles'), { recursive: true });
   writeFileSync(join(tree, 'content', 'topics.json'), JSON.stringify(TOPICS_JSON));
+  seedDescriptor(tree);
+  git(['init', '-q', '-b', BASE_BRANCH], tree);
+  git(['add', '-A'], tree);
   writeFileSync(join(tree, 'content', 'editions', '2026-09-05', 'articles', 'one.json'), JSON.stringify({ id: 'one', edition_date: '2026-09-05', section: 'world', epistemic: 'fact', topics: ['oil'], headline: 'A headline', byline: { desk: 'Test Desk', agents: ['Cogsworth'] } }));
 
   const first = await regenerateIndexes(tree);
+  git(['add', '-A'], tree);
+  first.descriptor = await repinBundleDescriptor(tree);
   assert.equal(first.topics, 'content/topics.txt');
   assert.deepEqual(first.bylines, ['content/bylines/cogsworth.tsv']);
   assert.equal(first.articles, 1);
+  // The descriptor is repinned from the same tree, and the Spawnfile follows
+  // it. Without this the branch is red on ci.yml's descriptor check forever.
+  assert.match(first.descriptor.source, /^sha256:[a-f0-9]{64}$/u);
+  assert.notEqual(first.descriptor.source, first.descriptor.previous);
+  assert.deepEqual(first.descriptor.repinned, ['cogsworth']);
+  assert.match(readFileSync(join(tree, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), 'utf8'), new RegExp(first.descriptor.source, 'u'));
   assert.equal(readFileSync(join(tree, 'content', 'topics.txt'), 'utf8'), 'oil\tOil\nrates\tRates\n');
   assert.match(readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8'), /^2026-09-05\tone\tworld\tfact\toil\tA headline$/mu);
 
@@ -183,6 +221,8 @@ test('the generated indexes are rebuilt from the branch tree, and only those two
   // keeps a retried push rebuilding the same commit object.
   const before = readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8');
   await regenerateIndexes(tree);
+  git(['add', '-A'], tree);
+  assert.equal((await repinBundleDescriptor(tree)).source, first.descriptor.source);
   assert.equal(readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8'), before);
 });
 
@@ -240,10 +280,20 @@ test('the commit carries only the edition directory, whatever else is in the tre
     workdir, home: join(work, 'home'), message: editionCommitMessage('2026-09-06')
   });
   const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
-  // The edition directory and the two generated views ci.yml diff-checks, and
-  // nothing else: neither the stray file nor the git home rides along.
-  assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-06/articles/one.json']);
-  for (const name of files) assert.ok(GENERATED_INDEX_PATHS.some((prefix) => name.startsWith(prefix)) || name.startsWith('content/editions/2026-09-06/'), name);
+  // The edition directory, the two generated views ci.yml diff-checks and the
+  // bundle pins ci.yml checks against the tree — and nothing else: neither the
+  // stray file nor the git home rides along.
+  assert.deepEqual(files.sort(), [
+    'agentic-org/agents/cogsworth/Spawnfile', 'agentic-org/newsroom-runtime-bundle.json',
+    'content/bylines/cogsworth.tsv', 'content/editions/2026-09-06/articles/one.json'
+  ]);
+  for (const name of files) assert.ok([...GENERATED_INDEX_PATHS, ...REPINNED_DESCRIPTOR_PATHS].some((prefix) => name.startsWith(prefix)) || name.startsWith('content/editions/2026-09-06/'), name);
+  // The only thing that changed in the Spawnfile is a checksum. That is what
+  // lets merge-edition.yml admit these paths without admitting arbitrary code.
+  const spawnfileDiff = execFileSync('git', ['-C', origin.url, 'diff', '-U0', `${result.base}..${result.commit}`, '--', 'agentic-org/agents'], { encoding: 'utf8' })
+    .split('\n').filter((line) => /^[+-][^+-]/u.test(line));
+  assert.equal(spawnfileDiff.length, 2);
+  for (const line of spawnfileDiff) assert.match(line, /sha256:[a-f0-9]{64}/u);
 });
 
 test('a retry of the same edition converges, and changed content is refused rather than forced', async () => {
