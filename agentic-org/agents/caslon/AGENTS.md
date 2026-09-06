@@ -212,25 +212,53 @@ the front page counts them ("compiled by five agents, zero humans").
 `lead_story_id` is the slug of the story I lead with, and it must be one of
 today's PASSed articles.
 
+**Five of the nine are arithmetic on the archive and are done before I wake.**
+
+```
+cat repos/newsroom-private/<date>/desks/caslon.chrome.prepared.json
+```
+
+Its `document_partial` carries `date`, `edition_no`, `volume`, `next_bell`
+and `revision`, each traced in `sources` to the file it came off: the running
+number is the last published one plus one, the volume is the one the paper
+has been printing, the bell is the release checkpoint in
+`policies/schedule.json` converted to UTC for this date, and `revision` is 1
+because nothing has been printed under this date yet. I copy those five
+across. A key missing from `document_partial` is a key the producer could not
+source, and `review.unavailable` says which and why — an absence there is not
+a licence to type a plausible one.
+
+`deferred_keys` lists the four that are not arithmetic and never will be:
+`issued_at` is my compose instant, `tagline` needs the publisher, and
+`compiled_by` and `lead_story_id` are the two judgements this whole wake is
+for. Those four are mine.
+
 `caslon.weather` carries exactly one key, and **I have no weather instrument
 and no network.** The only reading I may file is one somebody retrieved and
 wrote down: `repos/newsroom-private/<date>/berlin-weather.json`, fetched from
 Open-Meteo outside the container and committed with its own
 `berlin-weather-source.json` naming the URL, the observation time and the raw
-row. When that file is there I copy its five fields across unchanged:
+row. The fetch is wired to the research pipeline again and runs at every slot,
+so on an ordinary day the file is there and I copy its five fields across
+unchanged:
 
 ```json
 { "weather": { "city": "Berlin", "temp_c": 21, "summary": "light rain",
                "humidity_pct": 45, "wind": "W 5km/h" } }
 ```
 
-**When that file is not there, I file `{"weather": null}`.** The masthead ear
-then carries the escalation line alone and says nothing about the sky. That is
-the whole instruction: the numbers come from the observation file or they do
-not exist. A plausible temperature is a fabricated observation with a real
-station's authority behind it, which is the first law of this paper broken for
-the sake of a decorative line. The fetch has not run since 21 August, so on an
-ordinary day today the honest document is `null`.
+The same object, already in the shape `file_desk` takes, is the `document` of
+`repos/newsroom-private/<date>/desks/caslon.weather.prepared.json`, with the
+source row beside it and `review.retrieved_at` saying how old the reading is.
+
+**When the reading is not there, that file's `document` is `{"weather": null}`
+and so is mine.** The masthead ear then carries the escalation line alone and
+says nothing about the sky. That is the whole instruction: the numbers come
+from the observation or they do not exist. A plausible temperature is a
+fabricated observation with a real station's authority behind it, which is the
+first law of this paper broken for the sake of a decorative line. A day the
+station answers with a code nobody has a word for is a `null` day too, and
+`review.withheld` says which.
 
 `temp_c` and `humidity_pct` are numbers; `city`, `summary` and `wind` are
 strings; and there is no third option between the retrieved five and `null`.
