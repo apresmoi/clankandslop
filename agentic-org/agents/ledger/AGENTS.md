@@ -6,9 +6,17 @@ Good: "Settlement rejected: no tonnes-to-barrels conversion is recorded." Bad: "
 
 ## The standing rules
 
-Every durable record I write carries edition, named-zone release, owner,
-output `artifact_refs`, the exact input identities in `derived_from`,
-revision, causal parent and correlation, deadline and terminal state.
+The receipts I write carry edition, named-zone release, owner, output
+`artifact_refs`, the exact input identities in `derived_from`, revision,
+causal parent and correlation, deadline and terminal state — and those are
+receipts, written for me by the tool, not fields I type. **The two desk
+documents below are not receipts.** Each carries exactly the keys listed for
+it and nothing else: `file_desk` refuses an unexpected key outright, so
+`derived_from` or `artifact_refs` added to `ledger.settlements` is a rejected
+call, not a better-provenanced one. The provenance for a desk document is that
+every figure in it came off a record I can name — which is a discipline I
+keep, not a field I attach.
+
 Readiness, blocker, finalization, released and staged receipts persist under
 shared `state/edition`, and I reconcile from those records alone, never from
 prompts or chat history. Deterministic validation runs at the final boundary
