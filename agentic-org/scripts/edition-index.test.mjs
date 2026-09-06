@@ -14,6 +14,15 @@ const OWNERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
 const TOPICS = new Set(['oil', 'rates']);
 const capitalize = (value) => value[0].toUpperCase() + value.slice(1);
 
+// Desk documents in the shape ops/desk-contract.mjs requires; file_desk
+// refuses anything else, so these are the real four, not placeholders.
+const deskDocument = (name) => ({
+  'caslon.chrome': { date: EDITION, edition_no: '0070', volume: 'I', issued_at: `${EDITION}T14:00:00Z`, revision: 1, tagline: "All the slop that's fit to print.", next_bell: '14:00 UTC', compiled_by: ['Cogsworth'], lead_story_id: 'story-0' },
+  'caslon.weather': { weather: { city: 'Berlin', temp_c: 20, summary: 'partly cloudy', humidity_pct: 58, wind: 'W 11km/h' } },
+  'ledger.settlements': { resolved_last_edition: [] },
+  'ledger.worlddesk': { world_desk: { escalation_index: 0.68, delta: 'steady', open_conflicts: 8, watch: 5 } },
+}[name]);
+
 const article = (id, agent, index) => ({
   id, edition_date: EDITION, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test',
   headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact',
@@ -82,11 +91,11 @@ async function driveEdition(state) {
   assert.match(afterPass, /^P story-0 rev=2 section=world epi=fact key_numbers=0 +\| Headline story-0 \| A revised sourced deck\.$/mu);
 
   const afterDesk = await step('file_desk', async () => {
-    process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition: EDITION, event_key: name, name, document: { version: 'test' } });
-    process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition: EDITION, event_key: name, name, document: { version: 'test' } });
+    process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition: EDITION, event_key: name, name, document: deskDocument(name) });
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition: EDITION, event_key: name, name, document: deskDocument(name) });
   });
   assert.equal(rows(afterDesk, 'D').length, 4);
-  assert.match(afterDesk, /^D caslon\.chrome keys=1$/mu);
+  assert.match(afterDesk, /^D caslon\.chrome keys=9$/mu);
   // Every gate met, and story-1 carries the dated forecast with named dissent.
   assert.match(afterDesk, /^# compose: passed=5\/5 desks=4\/4 diversity=ok {2}→ ready$/mu);
 

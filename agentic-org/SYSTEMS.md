@@ -76,53 +76,28 @@ prerequisite for growing the static library, not for running an edition.
 
 ### Permitted roll catalogue
 
-One recurring beat per entry. Models are CC0 or CC-BY (poly.pizza), with the
-licence and attribution recorded beside the model.
+Two, and both are already in the runtime bundle:
 
-| roll | beat | mode | motion | fits |
-| --- | --- | --- | --- | --- |
-| `biplane` | aviation | ink | rock | air safety, air cargo |
-| `bat` | biosecurity | ink | rock | zoonotic spillover, vectors, urban health |
-| `rat` | biosecurity | ink | rock | zoonotic spillover, vectors, urban health |
-| `chip` | compute | ink | rock | semiconductors, compute, datacenters |
-| `corn` | crops | ink | rock | harvest, grain, drought |
-| `violin` | culture | ink | rock | arts and performance |
-| `drill` | energy | solid | rock | extraction, fuel, grid |
-| `jerrycan` | energy | ink | rock | extraction, fuel, grid |
-| `lobster` | fisheries | ink | rock | quotas, stock collapse, ocean heat |
-| `shark` | fisheries | ink | rock | quotas, stock collapse, ocean heat |
-| `cow` | livestock | ink | rock | herds, avian flu, meat and dairy prices |
-| `duck` | livestock | ink | rock | herds, avian flu, meat and dairy prices |
-| `pig` | livestock | ink | rock | herds, avian flu, meat and dairy prices |
-| `sheep` | livestock | ink | rock | herds, avian flu, meat and dairy prices |
-| `atm` | macro | ink | rock | banks, rates, household finance |
-| `telegraph` | policy | ink | rock | courts, rulings, enforcement |
-| `astronaut` | space | ink | rock | launch, orbit, observation |
-| `hubble` | space | ink | rock | launch, orbit, observation |
-| `iss` | space | solid | held | launch, orbit, observation |
-| `rover` | space | ink | held | launch, orbit, observation |
-| `dumptruck` | trade | ink | rock | freight, tariffs, supply routes |
-| `truck` | trade | ink | rock | freight, tariffs, supply routes |
-| `policecar` | unrest | ink | rock | policing, civil disorder |
-| `elephant` | wildlife | ink | rock | conservation, habitat, poaching |
-| `globe` | world | ink | rock | whole-world framing |
+| roll | beat | source | motion |
+| --- | --- | --- | --- |
+| `chip` | compute, semiconductors, datacenters | `website/src/models/small-microchip.glb` | rock — 56° arc, 60 frames, 3s |
+| `eclipse` | a two-disc scene, not a model | `website/src/lib/glyphEclipse.ts` | continuous |
 
-`eclipse` is a shared glyphcss scene rather than a model and is always available.
+`ops/validate-content.mjs` enforces exactly this set (`GLYPH_ROLLS`), and
+`GlyphArt.astro`'s `ROLLS` map registers exactly one model. A wider catalogue
+was specified here — one model per recurring beat, twenty-five of them — and
+none of it was ever committed: there is one `.glb` under
+`website/src/models/`, and a page naming any other roll renders the colosseum
+or nothing at all. Treat the static nine as the library and these two as the
+motion, and grow the list by committing a model and registering it, not by
+writing a row here.
 
-Every entry above is a committed model under `website/src/models/`, registered
-in `website/src/components/GlyphArt.astro` with the framing it was tuned at, and
-carried in the pinned runtime bundle. **Motion** is either a `rock` — the house
-56° arc over 60 frames in 3s, taken from the chip — or `held`, a single frame at
-a chosen angle. A held glyph costs 1/60th the page weight of a rocking one,
-which is the real reason the one-animated-roll-per-edition rule exists: a
-128×52 roll inlines 45–210KB of ASCII into the page (5–20KB gzipped).
+There is no contact sheet and no angle grid to run: `ops/CATALOGS.md`,
+`ops/glyph-catalog.mjs` and `ops/glyph-angles.mjs` do not exist in this
+repository. Auditioning a new model is author-time work through
+`website/scripts/glyph-lab.mjs`, and it ends in a committed model, a registry
+line and a fresh bundle digest — never an edition-time decision.
 
-The recipe for auditioning, tuning and registering a glyph or a map — including
-the failure modes already paid for — is `ops/CATALOGS.md`.
-
-To retune an angle or audition new models, run `node ops/glyph-catalog.mjs`
-(a local HTML contact sheet, baked through the same code path the site uses) and
-`node ops/glyph-angles.mjs --model <path> --name <n>` for a rotX × facing grid.
 Voxel (`.vox`) sources are not candidates: blocky geometry does not survive
 contour tracing at this resolution.
 

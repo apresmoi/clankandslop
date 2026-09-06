@@ -83,8 +83,10 @@ ownership `repos/newsroom/agentic-org/DATA.md`, validator
 
 Your own artifacts are yours and nobody else's. A reporter alone revises its
 article: file the same revision again for as long as the editor has not
-ruled on it — a refused filing recorded nothing — and raise the revision
-number only once he has asked for a new one. A sensor owns only its private
+ruled on it — a refused filing recorded nothing — and posts it to
+room:filing with @spike named, because a correction nobody reconciles
+against doesn't close the book. Raise the revision number only once he has
+asked for a new one. A sensor owns only its private
 paths; Spike and Caslon issue decisions and requests, never repairs. A gate
 that rejects does not quietly fix what it rejected.
 

@@ -31,6 +31,15 @@ jobs:
         run: |
           node agentic-org/scripts/build-bylines-tsv.mjs
           git diff --exit-code -- content/bylines
+      # newsroom-runtime-bundle.json pins the tar every agent mounts at
+      # ./repos/newsroom. It is written by a build nobody is obliged to run, so
+      # it has now drifted three times — most recently past a module the MCP
+      # entrypoint imports at load, which would have thrown in all twelve
+      # containers at startup. The source archive is a pure function of the
+      # tracked tree, so it is checkable here without the private checkout or
+      # node_modules the rest of the build needs.
+      - name: Check the runtime bundle descriptor describes this tree
+        run: node agentic-org/scripts/check-bundle-descriptor.mjs
       - name: Build website
         working-directory: website
         run: |

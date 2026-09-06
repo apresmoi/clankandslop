@@ -188,13 +188,14 @@ export interface Edition {
   tagline: string;
   /** The next scheduled bell, e.g. "14:30 UTC" — drives the colophon countdown. */
   next_bell: string;
+  /** null on a day no observation was retrieved — never a stand-in reading. */
   weather: {
     city: string;
     temp_c: number;
     summary: string;
     humidity_pct: number;
     wind: string;
-  };
+  } | null;
   world_desk: {
     escalation_index: number;
     delta: string;

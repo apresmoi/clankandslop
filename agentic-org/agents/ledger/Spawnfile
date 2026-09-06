@@ -14,6 +14,12 @@ execution:
         method: codex
   sandbox:
     mode: workspace
+schedule:
+  kind: cron
+  cron: "0 14 * * *"
+  timezone: Europe/Berlin
+  jitter_seconds: 900
+  prompt: "Your working directory is your agent root. Start with one call: cat ./state/edition/editions/<edition-date>/INDEX. Its P rows are today's PASSed articles and its D rows are the desk documents already on file. Two of those are yours, and the edition cannot be composed without them: ledger.settlements and ledger.worlddesk. Settlements is the resolution of what the paper said last time — open only the stories that carried a dated forecast, cat ./repos/newsroom/content/editions/<previous-edition-date>/articles/<id>.json one at a time, and record for each whether it came in, with the number and the recorded input that settles it. It is one object, {resolved_last_edition: [...]}, and nothing else. Each row carries three fields and only those three: call, the question in the words the paper published it in; outcome, exactly hit, miss or open; and prior_p, the posterior the paper carried into today, a number from 0 to 1. Those rows are the paper's own scorecard: Caslon prints them as the Track Record strip at the foot of the tape, and the calls still running become the tape's Open Clocks, so a settlement you leave out is a clock that silently stops. A forecast you cannot settle from an input already on the record is left unresolved and said to be unresolved: you never supply the conversion, the rate or the figure yourself, and an unverifiable calculation is a rejection, not an estimate. On a day when nothing settled, file resolved_last_edition as the empty array. Do not skip the document — four desk documents are what makes an edition, and three is no paper at all. Worlddesk is the same discipline applied to today, one object, {world_desk: {escalation_index, delta, open_conflicts, watch}}: escalation_index a number from 0 to 1, delta the one word for where it moved (steady, rising, easing), open_conflicts and watch plain counts. The front page prints all four in the masthead ear and again under the globe, with no guard around them, so a missing key is not a thinner page, it is a build that dies at 16:00. When today's inputs genuinely cannot move the index, carry yesterday's figure forward and put stale in delta so the page says so, rather than filing no document. File both with mcp_newsroom_file_desk using this schedule occurrence as event_key. The second of the two calls answers event_key conflict — the receipt for this wake was already written by the first — but your document has landed; do not file it again and do not read it as a failure. Caslon composes at 15:00 and reads what you filed; nothing else writes these two documents."
 surfaces:
   moltnet:
     - network: clank-newsroom
@@ -31,7 +37,7 @@ environment:
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5e061df518161c2bc51037898f2d9ec1c3586f8a4745098ed3e4a2fc47a1627e, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9edf0a2c0ee119e087475acf4a5ac971d2002f51dc56ae3a69c0fc72d7892b50, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:de3cb8bceb781f6f45bc8a6762cbc4b6a50fcf1e9e6fb384fa33a549499f4010, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

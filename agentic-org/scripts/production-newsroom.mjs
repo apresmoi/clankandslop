@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { composeGateLine, composeGateStatus, editionDiversityWaiver, hasDatedForecastWithDissent } from './compose-gate.mjs';
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
+import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
 const stable=value=>JSON.stringify(value,Object.keys(value).sort());
@@ -202,7 +203,13 @@ export async function fileDesk(args){
   identity(args);exact(args,['edition','event_key','name','document']);
   const agent=process.env.CLANK_NEWSROOM_AGENT,allowed=agent==='ledger'?new Set(['ledger.settlements','ledger.worlddesk']):agent==='caslon'?new Set(['caslon.chrome','caslon.weather']):new Set();
   if(!allowed.has(args.name))throw new Error(`name ${JSON.stringify(args.name)} is not owned by "${agent}" — allowed names for "${agent}": ${allowed.size?[...allowed].join(', '):'none'}`);
-  await convergeIndexed(args.edition,location(args.edition,'desk',args.name),object(args.document));
+  // The build-time content gate applies this same contract at 16:00, from
+  // ops/desk-contract.mjs. Applying it here means a missing world_desk or a
+  // bad outcome is a sentence the agent reads while it is still awake, not an
+  // edition pressman cannot stage two hours later.
+  const findings=deskDocumentFindings(args.name,object(args.document));
+  if(findings.length>0)throw new Error(`desk document ${JSON.stringify(args.name)} does not match the shape the edition is assembled from — ${findings.join('; ')}`);
+  await convergeIndexed(args.edition,location(args.edition,'desk',args.name),args.document);
   return{name:args.name,receipt:await receipt(args,'desk-filed',args.document)};
 }
 export async function composeEdition(args){

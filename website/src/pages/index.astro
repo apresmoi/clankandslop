@@ -13,13 +13,19 @@ const date    = latestEditionDate();
 const edition = loadEdition(date);
 const page    = loadPage(date, 'front');
 
+// `weather` is null on a day no observation was retrieved. The ear then
+// carries the escalation line alone rather than a plausible temperature:
+// the desk has no weather instrument of its own, and a reading it did not
+// take is exactly the fabricated provenance the paper's first law forbids.
 const w = edition.weather;
 const COUNT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 const agentCount = COUNT_WORDS[edition.compiled_by.length] ?? String(edition.compiled_by.length);
 const ears = {
   left: [
-    `${w.city} ${w.temp_c}°C · ${w.summary}`,
-    `Wind ${w.wind} · Humidity ${w.humidity_pct}%`,
+    ...(w ? [
+      `${w.city} ${w.temp_c}°C · ${w.summary}`,
+      `Wind ${w.wind} · Humidity ${w.humidity_pct}%`,
+    ] : []),
     `Escalation index ${edition.world_desk.escalation_index.toFixed(2)} ${edition.world_desk.delta}`,
   ],
   right: [

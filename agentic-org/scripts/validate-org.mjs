@@ -202,6 +202,39 @@ export function validateRootDeclaration(bytes) {
   assert(research && new Set(research.members).size === researchMembers.size && research.members.every((member) => researchMembers.has(member)), 'research room membership invalid');
 }
 
+// What the publisher may NOT reach. The deploy key that pushes an edition
+// branch lives on the host, in `scripts/publish-edition-branch.mjs`, and this
+// is the mechanical statement that it stays there: no agent declares a push
+// tool, a secret reference, the binaries a push needs, or a key mount.
+//
+// The reasoning is worth keeping next to the assertion. A deploy key with
+// write access can push any ref. A ref restriction executing inside the
+// process a model drives is therefore a claim about that process, not a
+// boundary around the credential — so the credential and its restrictions sit
+// outside every container, and what is enforced here is the absence.
+export const PUBLISHER = 'pressman';
+export const PUBLISHER_TOOLS = Object.freeze(['stage_release']);
+export const HOST_ONLY_PUBLISHER = 'scripts/publish-edition-branch.mjs';
+const CREDENTIAL_PATTERNS = Object.freeze([
+  [/push_edition|publish-edition-branch/, 'declares the host-side publisher'],
+  [/^\s{2}secrets:/mu, 'declares an environment secret reference'],
+  [/DEPLOY_KEY|deploy-keys|IdentityFile|id_ed25519/, 'declares deploy key material or an ssh identity'],
+  [/manager: apt, name: (?:git|openssh-client)/, 'declares a package the push would need'],
+  [/kind: git|url:|branch:/, 'declares a Git workspace resource'],
+  [/BEGIN [A-Z ]*PRIVATE KEY|ssh-ed25519 AAAA|ssh-rsa AAAA/, 'carries key material']
+]);
+
+export function validateNoPublishingCredential(agent, bytes) {
+  for (const [pattern, reason] of CREDENTIAL_PATTERNS) assert(!pattern.test(bytes), `${agent} ${reason} — the deploy key and every ref restriction stay on the host, outside every container`);
+}
+
+export function validatePublisherSurface(bytes) {
+  const environment = section(bytes, 'environment');
+  const tools = /tools: \[([^\]]+)\]/.exec(environment)?.[1];
+  assert(tools && csv(tools).join(',') === PUBLISHER_TOOLS.join(','), `${PUBLISHER} must declare exactly the release tools [${PUBLISHER_TOOLS.join(', ')}]`);
+  validateNoPublishingCredential(PUBLISHER, bytes);
+}
+
 export function validateRuntimeBindings(root = orgRoot) {
   assert(Object.keys(engineByAgent).length === agents.length, 'runtime assignment incomplete');
   assert(policy.enginePolicy?.active?.grok === 10 && policy.enginePolicy?.active?.codex === 6, 'active engine policy invalid');
@@ -209,6 +242,8 @@ export function validateRuntimeBindings(root = orgRoot) {
   for (const agent of agents) {
     const bytes = readFileSync(resolve(root, 'agents', agent, 'Spawnfile'), 'utf8');
     validateAgentDeclaration(agent, bytes);
+    if (agent === PUBLISHER) validatePublisherSurface(bytes);
+    else validateNoPublishingCredential(agent, bytes);
   }
 }
 
@@ -217,11 +252,15 @@ export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
   assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '16:00', 'schedule zone or deadline invalid');
   assert(policy.deadline === schedule.deadline, 'runtime and schedule deadline drift');
-  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'10:00',owner:'reporters'},{id:'conference',time:'10:30',owner:'brass'},{id:'review',time:'14:00',owner:'spike'},{id:'composition',time:'15:00',owner:'caslon'},{id:'release',time:'16:00',owner:'pressman'}]), 'conference checkpoints invalid');
+  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'10:00',owner:'reporters'},{id:'conference',time:'10:30',owner:'brass'},{id:'review',time:'14:00',owner:'spike'},{id:'settlement',time:'14:00',owner:'ledger'},{id:'composition',time:'15:00',owner:'caslon'},{id:'release',time:'16:00',owner:'pressman'}]), 'conference checkpoints invalid');
   assert(schedule.operator_kickoff === false && schedule.task_orchestrator === false, 'operator kickoff and task orchestrators are prohibited');
   assert(schedule.downstream_activation === 'moltnet-addressed-only' && schedule.polling === false, 'downstream work must be addressed through Moltnet without polling');
   const owners = schedule.spawnfile_schedule?.owners ?? {};
-  assert(schedule.spawnfile_schedule?.status === 'native' && Object.keys(owners).length === 9, 'native schedule roster invalid');
+  assert(schedule.spawnfile_schedule?.status === 'native' && Object.keys(owners).length === 11, 'native schedule roster invalid');
+  // Every checkpoint with a named agent owner must be a schedule that actually
+  // fires. Both publishing desks described a daily slot in prose for weeks and
+  // carried nothing but `wake: mentions`, so neither had ever run on its own.
+  for (const checkpoint of schedule.checkpoints) if (agents.includes(checkpoint.owner)) assert(Object.hasOwn(owners, checkpoint.owner), `${checkpoint.owner} owns the ${checkpoint.id} checkpoint with no schedule to fire it`);
   for (const agent of agents) {
     const bytes = readFileSync(resolve(orgRoot, 'agents', agent, 'Spawnfile'), 'utf8');
     assert(Object.hasOwn(owners, agent) === /^schedule:/m.test(bytes), `${agent} schedule authority invalid`);
