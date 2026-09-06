@@ -113,5 +113,30 @@
   "E2",
   "E3",
   "E4"
- ]
+ ],
+ "art": {
+  "kind": "map",
+  "map": "moscow-kyiv",
+  "hero_map": "moscow-kyiv",
+  "caption": "Kamianske sits between Kyiv and the tracks the ballistic rounds fly. Two blast furnaces off, counted in furnace-days.",
+  "spots": [
+   {
+    "name": "KYIV",
+    "lat": 50.45,
+    "lon": 30.52,
+    "label_side": "left"
+   },
+   {
+    "name": "MOSCOW",
+    "lat": 55.75,
+    "lon": 37.62
+   },
+   {
+    "name": "KAMIANSKE",
+    "lat": 48.51,
+    "lon": 34.6,
+    "label_side": "left"
+   }
+  ]
+ }
 }
