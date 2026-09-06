@@ -184,6 +184,7 @@ is not a checksum is refused and left for a person.
 | `deploy-failed` | the image build failed, `up` failed, or the container never settled |
 | `no-edition` | the cycle audit found no edition, or one that stopped below `composed` |
 | `seam-blocked` | the schedule was not clear or the container was not quiet |
+| `unit-failed` | a systemd unit failed for a reason its own code never got to name — the `OnFailure=` handler |
 
 Every one of them also lands as a JSON breadcrumb under the spool directory
 before the send, so an undeliverable alarm still leaves the text on disk.
