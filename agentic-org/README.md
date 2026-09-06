@@ -21,3 +21,39 @@ node agentic-org/scripts/compile-local.mjs
 ```
 
 The runtime check is expected to fail in a fresh checkout and prints missing capability names only. The compile helper never builds, downloads, or relaxes release verification. Browser research remains brokered; no raw capture, prompt, account identifier, private content, or secret value belongs here.
+
+## Daily private-corpus repin
+
+The reporters wake at 10:00 `Europe/Berlin` and read
+`repos/newsroom-private/<edition-date>/desks/<agent>.index`, resolving
+`<edition-date>` themselves — nothing templates it. That path only exists if
+`newsroom-private.tar` was cut from a private commit that already carries the
+day's corpus, so the pin in `policies/private-source.json` has to move every
+day:
+
+```bash
+node agentic-org/scripts/repin-private-source.mjs
+```
+
+It resolves `edition/<today in Europe/Berlin>` in the private repo, rebuilds
+`newsroom-private.tar`, rewrites the `private` block of
+`newsroom-runtime-bundle.json` and the `private-archive` checksum in every
+agent Spawnfile, and asserts that all six reporters' indexes — and every story
+row they name — resolve inside the rebuilt archive. It is idempotent and exits
+non-zero on any inconsistency; `--check` verifies without writing, and
+`--edition=`/`--ref=` override the date and the branch.
+
+**Run repin, rebuild and redeploy between roughly 08:00 and 09:45 Berlin.**
+Earlier and the morning's last research intake is not in the branch yet; later
+and the redeploy lands on top of a live wake and kills it. Never run it while
+the agents are awake.
+
+The source branch is not `main`. Producers commit each day's corpus to
+`edition/<date>`, and a separate job merges that branch into private `main`
+only in the late afternoon — hours after the reporters needed it — so `main`
+carries the *previous* edition at 10:00. Pinning `main` leaves the
+organization permanently one day behind, which is why the script refuses a ref
+whose tree has no `<edition-date>/desks/` rather than falling back to one.
+
+Installing the timer that calls this is deliberately out of scope for the
+repository.
