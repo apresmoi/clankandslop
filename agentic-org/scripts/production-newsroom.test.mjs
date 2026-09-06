@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { chmod, lstat, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { writeEditionIndex } from './edition-index.mjs';
-import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, hasDatedForecastWithDissent, qualifySignal, recordAssignment, reviewArticle, stageRelease } from './production-newsroom.mjs';
+import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, hasDatedForecastWithDissent, qualifySignal, recordAssignment, reviewArticle, stagePublicSource, stageRelease } from './production-newsroom.mjs';
 
 const owners = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
 const assignmentEvent = 'schedule:assignment-20260825';
@@ -559,5 +559,50 @@ test("the front and tape skeletons in caslon's brief compose, at five stories an
       delete process.env.CLANK_NEWSROOM_AGENT;
       await rm(temporary, { recursive: true, force: true });
     }
+  }
+});
+
+
+// Regression: the deployed CLANK_PUBLIC_SOURCE_ROOT is a symlink into a
+// read-only 555 bundle mount. Both properties are reproduced here, because
+// both independently made stage_release fail on the box: a bare recursive cp
+// copies the *link* (so the candidate is not a tree at all), and it preserves
+// 555 (so the non-root runtime cannot build into the candidate, nor remove it).
+test('the staging candidate is a real writable tree even when the source is a read-only symlink', async () => {
+  const base = await mkdtemp(path.join(os.tmpdir(), 'clank-stage-source-'));
+  try {
+    const real = path.join(base, 'bundle'), link = path.join(base, 'newsroom'), out = path.join(base, 'candidate');
+    await mkdir(path.join(real, 'website', 'src'), { recursive: true });
+    await mkdir(path.join(real, '.git'), { recursive: true });
+    await writeFile(path.join(real, 'website', 'src', 'page.astro'), 'page');
+    await writeFile(path.join(real, '.git', 'HEAD'), 'ref: refs/heads/main');
+    // Read-only bundle modes, deepest first so the walk can still descend.
+    for (const directory of [path.join(real, 'website', 'src'), path.join(real, 'website'), real]) await chmod(directory, 0o555);
+    await symlink(real, link);
+
+    await stagePublicSource(out === link ? real : link, out, (file) => !['.git', '.astro', 'dist'].includes(path.basename(file)));
+
+    // Defect 1: without dereference the candidate is a symlink, not a tree.
+    assert.equal((await lstat(out)).isSymbolicLink(), false, 'candidate must be a materialized directory, not a symlink');
+    assert.equal((await lstat(out)).isDirectory(), true);
+    assert.equal(await readFile(path.join(out, 'website', 'src', 'page.astro'), 'utf8'), 'page');
+    assert.ok(!(await readdir(out)).includes('.git'), 'the filter must still exclude .git');
+
+    // Defect 2: the build writes into the candidate, so it must be writable.
+    for (const directory of [out, path.join(out, 'website'), path.join(out, 'website', 'src')]) {
+      assert.ok((await lstat(directory)).mode & 0o200, `${directory} must be owner-writable`);
+    }
+    await writeFile(path.join(out, 'website', 'built.txt'), 'astro output');
+    await mkdir(path.join(out, 'website', 'dist'), { recursive: true });
+
+    // The source bundle itself must be untouched by any of this.
+    assert.equal((await lstat(real)).mode & 0o777, 0o555, 'the read-only source must not be chmodded');
+    assert.ok(!(await readdir(path.join(real, 'website'))).includes('built.txt'), 'nothing may be written through into the source');
+
+    // And the candidate must be removable, which 555 prevented.
+    await rm(out, { recursive: true });
+  } finally {
+    for (const directory of [path.join(base, 'bundle', 'website', 'src'), path.join(base, 'bundle', 'website'), path.join(base, 'bundle')]) await chmod(directory, 0o755).catch(() => undefined);
+    await rm(base, { recursive: true, force: true });
   }
 });
