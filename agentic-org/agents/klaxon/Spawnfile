@@ -35,7 +35,7 @@ environment:
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:3da7218f1c247127e4f4a36a410fc149d518291beb531a774c3c9b1765972c32, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:d8027be7369f5c951c7fde7d060412fc642b575aa2d3b1edd81f9daa6aa38b9a, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:d8ae767543c1f0d746c8eb0813204c338c0700833b1816d23b74bc80262ec480, mount: ./repos/newsroom-private, mode: readonly }
     - { id: private-corpus, kind: volume, name: clank-klaxon-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }
 

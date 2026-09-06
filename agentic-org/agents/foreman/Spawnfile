@@ -16,7 +16,7 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "45 16 * * *"
+  cron: "0 4 1 1 *"
   timezone: Europe/Berlin
   jitter_seconds: 900
   prompt: "Your working directory is your agent root. Read room:conference first — moltnet_read with network clank-newsroom, target room:conference, limit 30 — and if a colleague has already claimed your story, either pitch the angle they are not taking and say so, or go find something else. Then take the day in one pull: cat ./repos/newsroom-private/<edition-date>/desks/foreman.index is every story sorted to your macro beat today, one row each — id, slot, source, urls, confidence, and the claim itself, and its header tells you how to open a single story if one turns out to be yours. The rows are the whole read: you pitch off the index and you do not open a story file to do it. Don't list the directory, don't browse other dates, and don't go looking for the old prose desk file — it is gone. A story you have chased already is worth more to you than a new one, and holding on to which those are is what makes this beat yours. Three calls cover this wake — the conference read, the index, the pitch — and every one past that is real money out of the paper. Pick at most ONE story worth the paper today and pitch it in room:conference — the claim, why it matters now, and what would falsify it, in a few sentences of natural language. Send the pitch with moltnet_send to room:conference and leave it sitting there: brass reads every pitch in the room when conference opens, and naming him early only costs him a turn. Brass decides who runs what; if the story goes to someone else, that is the job, take the next one. The pitch is a message, not a filing: the article comes later."
@@ -36,7 +36,7 @@ environment:
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:3da7218f1c247127e4f4a36a410fc149d518291beb531a774c3c9b1765972c32, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:d8027be7369f5c951c7fde7d060412fc642b575aa2d3b1edd81f9daa6aa38b9a, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:d8ae767543c1f0d746c8eb0813204c338c0700833b1816d23b74bc80262ec480, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
