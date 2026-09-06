@@ -15,14 +15,16 @@
     "bake:glyphart": "node scripts/bake-glyphart.mjs",
     "watch:glyphart": "node scripts/watch-glyphart.mjs",
     "bake:404": "node scripts/bake-404.mjs",
-    "watch:404": "node scripts/watch-404.mjs"
+    "watch:404": "node scripts/watch-404.mjs",
+    "verify:glyph": "node scripts/verify-glyph-cameras.mjs",
+    "verify:glyph:browser": "node scripts/verify-glyph-scenes.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",
     "@glyphcss/compile": "0.0.9",
-    "@glyphcss/core": "0.0.3",
+    "@glyphcss/core": "0.1.5",
     "astro": "^6.0.8",
-    "glyphcss": "0.0.3"
+    "glyphcss": "0.1.5"
   },
   "devDependencies": {
     "playwright": "^1.60.0",
