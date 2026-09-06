@@ -138,6 +138,33 @@ systemctl --user daemon-reload
 The drop-ins live in `~/.config/systemd/user/<unit>.d/alarm.conf` and add only
 `OnFailure=`; no timer is enabled, disabled or rescheduled by them.
 
+## What the publisher now also commits
+
+`publish-edition-branch.mjs` gained one step, for the same reason it already
+regenerates `content/topics.txt` and `content/bylines/*.tsv`: those are views
+CI diff-checks that nothing else in the pipeline rebuilds. The bundle
+descriptor is the third instance, and the one that made unattended publication
+impossible rather than merely annoying.
+
+`content/editions/**` is **inside the source archive** — it is a tracked path
+and not on the exclusion list — so landing an edition moves
+`newsroom-runtime-bundle.json`'s source digest, and ci.yml's *"Check the
+runtime bundle descriptor describes this tree"* fails on **every** edition
+branch. Measured against `main` (green) plus one restored edition directory:
+`source.file_count 1243 -> 1256`, digest moved, check red. Without the repin no
+edition branch could ever be green, and the auto-merge would have had nothing
+to merge, ever.
+
+So the publisher now repins the descriptor and the twelve Spawnfile source pins
+from the branch's own tree — **last**, after the generated views are staged,
+because the measurement reads the git index. Nothing about what may be *pushed*
+changed: same branch pattern, same refspec, same remote, same refusal of `main`.
+
+`merge-edition.yml` admits those two paths on a shorter leash than the content
+paths: every changed line under `agentic-org/` must differ only in a
+`sha256:` value or a `file_count`/`content_bytes` field. A Spawnfile edit that
+is not a checksum is refused and left for a person.
+
 ## What the alarm fires on
 
 | Reason | Raised by |
