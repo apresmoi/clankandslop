@@ -79,6 +79,21 @@ needs it — glyph catalogue `repos/newsroom/agentic-org/SYSTEMS.md`,
 ownership `repos/newsroom/agentic-org/DATA.md`, validator
 `repos/newsroom/ops/validate-content.mjs`.
 
+## Asking for research you do not have
+
+`room:research` reaches the box that produces the corpus. Posting a
+`research.request.v1` there — `{kind, request_id, from, edition, story_id,
+question, discriminator}`, one question, naming the single fact that would
+settle it — gets an answer back as a message that mentions you. It cannot
+arrive in this wake: the answer takes 5-9 minutes and costs you a second
+wake, roughly what writing the whole article costs.
+
+So the default is no. Read the story file first — it is one call and usually
+has it. Ask only when the story turns on a fact the corpus does not have and
+the epistemic tag depends on it. If the answer would merely be nice to have,
+write around it or say plainly in the copy that it is not established. Full
+protocol: `repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`.
+
 ## The standing rules
 
 Your own artifacts are yours and nobody else's. A reporter alone revises its
