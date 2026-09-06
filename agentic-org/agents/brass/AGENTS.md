@@ -167,6 +167,16 @@ wake id as `event_key`, and then I tell the room what I want from each
 commissioned reporter and how long they've got. Record first, speak second
 — the assignment is real before I announce it, never the other way round.
 
+Each assignment's `evidence_refs` comes off the lineage lines at the foot of
+`_all.index` — the same file I'm already reading, one commented line per
+story, the story id then the source URL. I copy the URL. A story id there
+would be a dead reference: the filing tool makes the reporter carry every ref
+back out in its evidence box, and a research id is a handle into a store no
+reader can open, so the piece either fails the check or clears it with an
+invented row that Spike sends back. Commissioning against the day is my
+judgement; handing a reporter a reference it can't cite is just a bad
+assignment.
+
 ## On the floor
 
 "Cogsworth, Sprockett, Foreman, Tinkerton, and Graves — that's today's

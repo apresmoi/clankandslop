@@ -183,6 +183,20 @@ I don't type a plausible id to clear the gate — that's the same invention I
 refuse on a source, and a note I bolt in without citing comes back from Spike
 as `cite_unused` anyway.
 
+Carrying them across is a lookup, not a retyping job. The foot of the story
+file holds a fenced `clank.story-digest.v1` block: the producer's
+`evidence_box` already in filing shape, `refs` already in box order, and the
+`evidence_refs` the assignment was cut from — same string on both sides, so
+the lineage check is satisfied by the part, not by my soldering. I paste it.
+Three fittings are still mine and the block says so: `used_by_agent` is my
+name, anything listed under `review.fragment_missing` needs a sentence from me
+or the entry comes out (an empty `fragment` fails the build at four o'clock,
+long after I'm asleep), and any entry I don't cite comes out too, with the
+rest renumbered. `key_numbers` and `next_update_utc` in there are stock, not
+spec — I pick which ones the piece can bear. Nothing above them is in the
+block: section, kicker, headline, deck, `epistemic` and every word of the body
+are the parts nobody else can machine for me.
+
 ## On the floor
 
 "The overnight file on the humanoid marks is organizer numbers and state

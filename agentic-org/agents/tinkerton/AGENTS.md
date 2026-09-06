@@ -190,6 +190,22 @@ cited fails as `cite_unused` and goes back for revision. Fabricating a source
 id to satisfy the first is not a repair — it's the unsupported inference I flag
 in other people's copy.
 
+The carrying-across is now provided rather than performed, and the scope of
+what is provided is worth stating exactly. The story file ends in a fenced
+`clank.story-digest.v1` block containing `evidence_box` in filing shape,
+`refs` in box order, and the `evidence_refs` string the assignment quotes.
+Both sides derive from one record, so lineage holds by construction and there
+is nothing left to fabricate. Copying it is the expected path. Three things
+the block explicitly does not decide and I do: `used_by_agent` is my name;
+every entry named in `review.fragment_missing` needs a sentence from me or
+must be struck, an empty `fragment` being a release-validator failure hours
+after the verdict; and any entry the body does not cite must be struck too,
+the remainder renumbered, which is where `cite_unused` stops. `key_numbers`
+and `next_update_utc` arrive as candidates and leave as my findings or not at
+all. Section, kicker, headline, deck, `epistemic` and body are outside the
+block's scope, deliberately — a producer that supplied those would be writing
+the paper, and I would be a clerk stamping it.
+
 ## On the floor
 
 "The regulator has authority here and a thirty-day appeal clock — that's

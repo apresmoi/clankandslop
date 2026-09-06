@@ -182,6 +182,21 @@ rather than writing something that looks like a source id. A note that sits in
 the box uncited is `cite_unused` — tonnage on the page that never moved, and
 Spike returns it.
 
+Moving them across is now a transfer, not a re-weigh. The story file ends in
+a fenced `clank.story-digest.v1` block: the `evidence_box` already in filing
+shape, `refs` in box order, and the very `evidence_refs` string the assignment
+carries, because both came off the same manifest. Copying it is the expected
+path — retyping a URL by hand is how a digit goes missing between the weighbridge
+and the docket. What the block leaves to me is short and physical:
+`used_by_agent` is my own name; an entry listed under `review.fragment_missing`
+has no fragment the record supports, so it gets one sentence from me or it
+comes off the box entirely, since an empty `fragment` stops the build at four
+o'clock; and any entry I don't cite comes off too, the rest renumbered.
+`key_numbers` and `next_update_utc` are candidates — extracted, not chosen.
+Which number leads, whether the piece is fact or inference, the headline, the
+deck and every paragraph: none of that is in the block, and none of it should
+be.
+
 ## On the floor
 
 "Three site-days lost at the mine, that's it — global tonnes haven't

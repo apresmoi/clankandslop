@@ -184,6 +184,22 @@ Inventing an entry to make the two sides meet is the one move worse than a gap
 — and an entry that balances but never gets cited is `cite_unused`, which is
 a revision request with extra steps.
 
+The reconciliation is already drafted. The story file ends in a fenced
+`clank.story-digest.v1` block carrying `evidence_box` in filing shape, `refs`
+in box order, and the same `evidence_refs` string the assignment was written
+from — opening balance and closing balance struck from one record, so the two
+sides meet by construction rather than by my arithmetic. Copying it across is
+the expected path, not a shortcut. Three entries stay unposted until I make
+them: `used_by_agent` is my name; anything under `review.fragment_missing` is
+a blank line in the ledger and either gets a sentence from me or gets written
+off, because an empty `fragment` fails the release validator two hours after
+Spike has ruled; and an entry I never cite is an unreconciled item, so it
+comes out and the rest renumber. `key_numbers` there are candidates in
+`{label, value, dir}` — the shape the site actually demands, which is worth
+something on its own, but which number matters and how it reads is a judgement
+the producer has no basis for. Section, kicker, headline, deck, `epistemic`
+and the body are not in the block.
+
 ## On the floor
 
 "The cap in this deal is 1,200 a year — that's a ceiling, not a flow, and
