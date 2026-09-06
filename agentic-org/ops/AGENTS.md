@@ -94,18 +94,25 @@ printf 'CLANK_ALARM_URL=https://ntfy.sh/<topic>\nCLANK_ALARM_HOST=hetzner\n' > /
 chmod 600 /etc/clank-alarm/alarm.env
 install -d -m 700 /var/lib/clank-alarm/spool
 
-# 2. prove the channel before trusting it
-set -a; . /etc/clank-alarm/alarm.env; set +a
-node /root/work/clankandslop/agentic-org/scripts/alarm.mjs --selftest
+# 2. a STANDALONE copy of the alarm, independent of every checkout. alarm.mjs
+#    imports nothing but node builtins on purpose: an alarm that only works
+#    when the repository is in the right state is missing exactly when the
+#    repository is the problem.
+install -d -m 755 /usr/local/lib/clank-alarm
+install -m 755 /root/work/clankandslop/agentic-org/scripts/alarm.mjs /usr/local/lib/clank-alarm/alarm.mjs
 
-# 3. the units, loaded and DISABLED
+# 3. prove the channel before trusting it
+set -a; . /etc/clank-alarm/alarm.env; set +a
+node /usr/local/lib/clank-alarm/alarm.mjs --selftest
+
+# 4. the units, loaded and DISABLED
 install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/*.service \
                /root/work/clankandslop/agentic-org/ops/systemd/*.timer \
                /etc/systemd/system/
 systemctl daemon-reload
 systemctl disable clank-seam.timer clank-cycle-audit.timer 2>/dev/null || true
 
-# 4. dry-run the seam without deploying
+# 5. dry-run the seam without deploying
 node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
 ```
 
@@ -129,10 +136,13 @@ The three research timers already exist and stay exactly as they are. The only
 change is that their failures now reach a person:
 
 ```bash
-install -d -m 700 ~/.config/clank-alarm
-printf 'CLANK_ALARM_URL=https://ntfy.sh/<topic>\nCLANK_ALARM_HOST=ledeluge\n' > ~/.config/clank-alarm/alarm.env
+install -d -m 700 ~/.config/clank-alarm ~/.local/lib/clank-alarm ~/.local/state/clank-alarm/spool
+printf 'CLANK_ALARM_URL=https://ntfy.sh/<topic>\nCLANK_ALARM_HOST=ledeluge\nCLANK_ALARM_SPOOL=%s/.local/state/clank-alarm/spool\n' "$HOME" > ~/.config/clank-alarm/alarm.env
 chmod 600 ~/.config/clank-alarm/alarm.env
+cp <clankandslop>/agentic-org/scripts/alarm.mjs ~/.local/lib/clank-alarm/alarm.mjs
 systemctl --user daemon-reload
+# node is under nvm here, so the unit names it absolutely:
+#   ~/.nvm/versions/node/v22.14.0/bin/node ~/.local/lib/clank-alarm/alarm.mjs --selftest
 ```
 
 The drop-ins live in `~/.config/systemd/user/<unit>.d/alarm.conf` and add only
