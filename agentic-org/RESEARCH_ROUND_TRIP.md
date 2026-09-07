@@ -11,12 +11,25 @@ agent acceptance test. No production reporter was woken by this rehearsal.
 
 ## Who may ask
 
+Direct Internet research is prohibited for all twelve agents. Do not browse,
+search or fetch URLs with browser tools, shell HTTP clients or another CLI/agent.
+Bounded local reads and declared offline commands remain permitted; this rule
+does not claim that runtime egress is already blocked.
+
 The six reporters and Brass may send to `room:research` on `clank-newsroom`.
 The responder checks the server's credential-bound sender, network identity and
-request's `from`. Spike, Ledger and Caslon are not currently requesters.
+request's `from`. Klaxon, Spike, Ledger, Caslon and Pressman are not requesters.
 
-Read the existing story research first. Escalate one load-bearing question that
-the corpus cannot answer. The discriminator names the fact that would settle
+Spike asks the article owner in `room:filing`; Caslon asks that owner there or
+Brass in `room:release`. Ledger and Pressman ask Brass in `room:release`.
+Klaxon asks Brass in `room:conference`. Mention the requested colleague and
+name the missing fact and discriminator. Brass or the reporter returns the
+substantive findings, source URLs, capture time and request id in that shared
+room with a mention of the asking desk; not every desk can read `room:research`.
+
+Reporters read the existing story research first. Brass uses its permitted
+slate and pitches before deciding that a bounded sensor request is necessary.
+Escalate one load-bearing question that the corpus cannot answer. The discriminator names the fact that would settle
 it. Research takes minutes and may queue; end the requesting turn instead of
 polling inside it.
 
@@ -75,6 +88,11 @@ only the requester; incidental mentions in captured prose are neutralized.
 On its next turn, the reporter reads the matching request ID and makes its own
 editorial judgment. Evidence IDs are local to the answer and must be reconciled
 with the article's citation order. The sensor does not author the article.
+Preserve the source URLs, `ran_at` and any unresolved qualifications. A sensor-supplied finding is attributed sensor
+research; do not claim you personally fetched the page or checked an original
+quotation you did not receive. Missing or unverified evidence remains so.
+An unreadable third-party page alone does not establish that the claim is
+false; ask the permitted requester for the missing source fact or fragment.
 
 Raw reports remain on the sensor host. Inline answers do not require replacing
 the pinned corpus mid-run. Rolling research still uses the bundle/pinning path.
@@ -106,5 +124,6 @@ the newsroom message API nor its SQLite state. Production delivery still
 depends on Hetzner. The independent rehearsal used a separate unfederated
 Moltnet server on the 4090.
 
-The org-wide prohibition on independent agent web access remains an unresolved
-production requirement. This responder does not enforce that prohibition.
+The org-wide prohibition on independent agent web access is an instruction.
+Runtime enforcement remains an unresolved production requirement; this
+responder does not enforce that prohibition.

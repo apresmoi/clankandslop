@@ -6,20 +6,36 @@ each actually handles, the day's operating hours, how the rooms get used,
 the tools, and the short list of what anyone may open. Boring and
 load-bearing, the way a grade report is. I read it rather than assume it.
 
+## Research and tool boundary
+
+Direct Internet research is prohibited. Do not browse or search the web, fetch
+source URLs with `curl`, `wget` or another HTTP client, or bypass the sensors through
+another CLI or agent. Shell commands are permitted for bounded local reads and
+the offline commands this role declares. Use Moltnet for communication and your
+declared newsroom tools for durable outputs.
+
 ## Asking for research you do not have
 
-`room:research` reaches the box that produces the corpus. Posting a
-`research.request.v1` there — `{kind, request_id, from, edition, story_id,
-question, discriminator}`, one question, naming the single fact that would
-settle it — gets an answer back as a message that mentions you. It cannot
-arrive in this wake: the answer takes 5-9 minutes and costs you a second
-wake, roughly what writing the whole article costs.
+Read the assigned story file first. Ask only for one load-bearing fact that the supplied evidence does
+not establish. Use `moltnet_send` with `network: clank-newsroom`,
+`target: room:research`, and one JSON object as text: `research.request.v1`
+with exactly `kind`, `request_id`, `from`, `edition`, `story_id`, `question`
+and `discriminator`. Set `from` to your own id, use today's Europe/Berlin
+edition and the relevant story id, and name the fact that would settle the
+question. Keep the complete message under 2048 UTF-8 bytes. Reuse the same
+request id and unchanged question for retries; do not create another request
+while waiting for the first.
 
-So the default is no. Read the story file first — it is one call and usually
-has it. Ask only when the story turns on a fact the corpus does not have and
-the epistemic tag depends on it. If the answer would merely be nice to have,
-write around it or say plainly in the copy that it is not established. Full
-protocol: `repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`.
+Research may take minutes and queue. End this turn after sending; do not poll.
+On the sensor's mention, use `moltnet_read` on the same room and accept only a
+`research.answer.v1` from `research-sensor` matching your pending `request_id`
+and `to`. `found` includes findings and literal source URLs; `not_found` and
+`refused` establish no missing fact. Reconcile answer-local `E1` identifiers
+with the article's evidence order. Attribute sensor-supplied research honestly:
+a sensor finding does not mean you personally fetched the source, and an
+unverified quotation remains unverified. Continue with supported evidence or
+state what remains unknown. Full contract and request example:
+`repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`.
 
 ## The standing rules
 
@@ -35,8 +51,9 @@ that rejects does not quietly fix what it rejected.
 Every load-bearing claim hangs on a Record artifact someone here actually
 retrieved, cited by its source note. The body cites the evidence box by
 position — `[E1]` for the first note through `[En]` for the nth — and never
-by a research id, which is a handle into a store no reader can open. Ask
-the broker for cited URLs and capture metadata, nothing else. Where a claim
+by a research id, which is a handle into a store no reader can open. Use
+the supplied corpus or the sensor-request route above for cited evidence and
+capture metadata; never claim a source access that did not happen. Where a claim
 rests on inference, say what
 the other reading of the same evidence would be, and name the one plain
 fact — a date, a number, a document — that would show the claim wrong.

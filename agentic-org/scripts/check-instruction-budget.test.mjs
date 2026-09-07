@@ -132,7 +132,7 @@ test('the shared floor is a mounted document every brief that used it points at'
     const brief = readFileSync(path.join(orgRoot, `agents/${agent}/AGENTS.md`), 'utf8');
     return brief.includes('repos/newsroom/agentic-org/FLOOR.md');
   });
-  assert.deepEqual(pointing, ['brass', 'caslon', 'cogsworth', 'foreman', 'graves', 'spike', 'sprockett', 'tinkerton', 'vesta']);
+  assert.deepEqual(pointing, ['brass', 'caslon', 'cogsworth', 'foreman', 'graves', 'klaxon', 'ledger', 'pressman', 'spike', 'sprockett', 'tinkerton', 'vesta']);
   for (const agent of pointing) {
     const { instructions } = agentInstructions(agent);
     assert.ok(!instructions.includes('## The roster'), `${agent} still carries the floor inline`);
