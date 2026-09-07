@@ -1,0 +1,33 @@
+# clank.edition-index.v1 edition=2026-09-06 generated=2026-09-07T01:21:02.324Z assignments=5 filings=10 verdicts=10 passed=3
+# compose: passed=3/5 desks=0/4 forecast=1 dissent=0  → blocked
+# rows: A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page
+# read one: cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json
+A sprockett s-13c65efc refs=1                                        | Report the Witkoff-Kushner Kyiv visit as the live sequence from Moscow talks and Poland pause into first Kyiv talks with…
+A cogsworth s-261b5912 refs=1                                        | Report Isar Aerospace's Spectrum flight as a hardware and procurement-clock story about whether an orbital launch create…
+A tinkerton s-43f44309 refs=1                                        | Report Germany's proposed anti-sabotage shield as a policy story about statutory authority, budget, tender and coordinat…
+A graves s-653b6e87 refs=1                                           | Forecast whether today's OPEC+ producer meeting leaves October barrels unchanged, with probability, next update tied to…
+A foreman s-84c43570 refs=1                                          | Report China's 360 billion yuan state-bank and insurer capital push as a balance-sheet capacity story, separating capita…
+F s-13c65efc rev=1 owner=sprockett epi=fact words=520 refs=7 domains=6 art=- topics=ok lint=ok
+F s-13c65efc rev=2 owner=sprockett epi=fact words=518 refs=7 domains=6 art=- topics=ok lint=ok
+F s-13c65efc rev=3 owner=sprockett epi=fact words=513 refs=7 domains=6 art=- topics=ok lint=ok
+F s-261b5912 rev=1 owner=cogsworth epi=fact words=430 refs=4 domains=3 art=- topics=ok lint=ok
+F s-261b5912 rev=2 owner=cogsworth epi=inference words=474 refs=4 domains=3 art=- topics=ok lint=openers
+F s-43f44309 rev=1 owner=tinkerton epi=inference words=452 refs=2 domains=2 art=- topics=ok lint=openers
+F s-43f44309 rev=2 owner=tinkerton epi=inference words=453 refs=2 domains=2 art=- topics=ok lint=openers
+F s-653b6e87 rev=1 owner=graves epi=forecast words=438 refs=3 domains=2 art=- topics=ok lint=openers
+F s-653b6e87 rev=2 owner=graves epi=forecast words=449 refs=4 domains=2 art=- topics=ok lint=openers
+F s-84c43570 rev=1 owner=foreman epi=fact words=437 refs=3 domains=1 art=- topics=ok lint=domains<2
+N s-653b6e87 rev=1 by=foreman dissent p=0.46
+V s-13c65efc rev=1 REVISION_REQUEST by=spike
+V s-13c65efc rev=2 REVISION_REQUEST by=spike
+V s-13c65efc rev=3 PASS by=spike
+V s-261b5912 rev=1 REVISION_REQUEST by=spike
+V s-261b5912 rev=2 HOLD by=spike
+V s-43f44309 rev=1 REVISION_REQUEST by=spike
+V s-43f44309 rev=2 PASS by=spike
+V s-653b6e87 rev=1 REVISION_REQUEST by=spike
+V s-653b6e87 rev=2 PASS by=spike dissent_dropped=recorded-against-revision-1;-the-call-changed
+V s-84c43570 rev=1 HOLD by=spike
+P s-13c65efc rev=3 section=world epi=fact key_numbers=2              | Witkoff and Kushner Reach Kyiv After Moscow Talks | The U.S. envoys' first Kyiv visit moved the peace push from Putin's table to Zelenskyy's, with the travel route and ceas…
+P s-43f44309 rev=2 section=Policy epi=inference key_numbers=2        | Dobrindt’s Shield Has To Clear The Law Before It Stops A Drone | Germany’s reported anti-sabotage plan is not one program yet. It is a stack of authority, procurement and surveillance d…
+P s-653b6e87 rev=2 section=commodities epi=forecast key_numbers=4    | OPEC+ Posts An Unchanged October Barrel Ledger | The September 6 communique keeps required production flat for October; the remaining risk is member-level allocation, co…
