@@ -1,0 +1,72 @@
+editorial warnings — 54 (non-blocking):
+
+  ⚠ content/editions/2026-06-13/articles/agreed-text-warning-shots.json: 4 em dashes across 5 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/chokepoint-premia.json: 4 em dashes across 4 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/inspection-warfare.json: 4 em dashes across 4 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/mrbeast-half-billion.json: 4 em dashes across 3 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/premium-deflates.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-13/articles/premium-deflates.json: 3 em dashes across 3 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/spacex-ipo-record.json: 5 em dashes across 6 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/three-central-banks.json: 3 em dashes across 4 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/visa-openai-agents-pay.json: 5 em dashes across 4 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-13/articles/world-cup-access-paradox.json: 6 em dashes across 4 paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops
+  ⚠ content/editions/2026-06-14/articles/brent-believes-the-signature.json: 3 consecutive paragraphs open with "The" (para 5+) — vary the openers
+  ⚠ content/editions/2026-06-14/articles/paramount-warner-state-fight.json: 5 consecutive paragraphs open with "The" (para 4+) — vary the openers
+  ⚠ content/editions/2026-06-15/articles/beirut-the-clause-from-outside.json: 3 consecutive paragraphs open with "The" (para 3+) — vary the openers
+  ⚠ content/editions/2026-06-15/articles/cleared-in-washington-fought-in-the-states.json: 3 consecutive paragraphs open with "The" (para 5+) — vary the openers
+  ⚠ content/editions/2026-06-15/articles/hormuz-signed-not-sailing.json: 3 consecutive paragraphs open with "The" (para 3+) — vary the openers
+  ⚠ content/editions/2026-06-15/articles/the-model-the-state-switched-off.json: 6 consecutive paragraphs open with "The" (para 3+) — vary the openers
+  ⚠ content/editions/2026-06-15/articles/the-tournament-and-the-thermometer.json: 8 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-16/articles/hormuz-open-not-normal.json: 3 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-16/articles/hormuz-open-not-normal.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-16/articles/lebanon-the-tripwire.json: 3 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-16/articles/lebanon-the-tripwire.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-16/articles/spacex-buys-the-coder.json: 5 consecutive paragraphs open with "The" (para 2+) — vary the openers
+  ⚠ content/editions/2026-06-16/articles/the-citizenship-control.json: 3 consecutive paragraphs open with "The" (para 6+) — vary the openers
+  ⚠ content/editions/2026-06-16/articles/the-price-floor-bloc.json: 4 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-16/articles/the-price-floor-bloc.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-17/articles/hormuz-a-trickle.json: 7 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-17/articles/spacex-reflexivity-zone.json: 3 consecutive paragraphs open with "The" (para 4+) — vary the openers
+  ⚠ content/editions/2026-06-17/articles/spacex-reflexivity-zone.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-17/articles/the-deal-with-no-text.json: 4 consecutive paragraphs open with "The" (para 5+) — vary the openers
+  ⚠ content/editions/2026-06-17/articles/the-managed-access-template.json: 4 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-17/articles/the-trusted-partner-tier.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-18/articles/grain-not-drones.json: 3 consecutive paragraphs open with "The" (para 6+) — vary the openers
+  ⚠ content/editions/2026-06-18/articles/lebanon-the-buried-ledger.json: 5 consecutive paragraphs open with "The" (para 3+) — vary the openers
+  ⚠ content/editions/2026-06-18/articles/oils-peace-dividend.json: 3 consecutive paragraphs open with "The" (para 6+) — vary the openers
+  ⚠ content/editions/2026-06-18/articles/the-bank-becomes-the-border.json: 3 consecutive paragraphs open with "The" (para 5+) — vary the openers
+  ⚠ content/editions/2026-06-18/articles/the-text-that-buys-time.json: 3 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-19/articles/stock-as-strategy.json: 3 consecutive paragraphs open with "The" (para 6+) — vary the openers
+  ⚠ content/editions/2026-06-19/articles/the-hawkish-hold.json: 4 consecutive paragraphs open with "The" (para 4+) — vary the openers
+  ⚠ content/editions/2026-06-19/articles/the-hawkish-hold.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-19/articles/the-missing-party.json: 3 consecutive paragraphs open with "The" (para 3+) — vary the openers
+  ⚠ content/editions/2026-06-19/articles/the-permissioned-strait.json: 3 consecutive paragraphs open with "The" (para 4+) — vary the openers
+  ⚠ content/editions/2026-06-20/articles/post-perimeter.json: 5 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-20/articles/the-budget-war.json: 4 consecutive paragraphs open with "The" (para 1+) — vary the openers
+  ⚠ content/editions/2026-06-20/articles/the-compliance-room.json: 4 consecutive paragraphs open with "The" (para 2+) — vary the openers
+  ⚠ content/editions/2026-06-20/articles/the-float-trade.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-21/articles/fuel-for-government-only.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-21/articles/the-screen-and-the-water.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-21/articles/the-strait-and-the-room.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-21/articles/the-traces-that-escaped.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-22/articles/machinery-not-compliance.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-23/articles/the-fill-line.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-06-23/articles/victus-haze.json: headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form
+  ⚠ content/editions/2026-07-21/articles/the-crowd-turns.json: 5 consecutive paragraphs open with "The" (para 2+) — vary the openers
+  ⚠ content/editions/2026-09-06/articles/s-653b6e87.json: 4 consecutive paragraphs open with "The" (para 2+) — vary the openers
+
+content validation failed — 13 error(s):
+
+  ✗ content/editions/2026-09-06/desk/caslon.chrome.json: unreadable JSON — ENOENT: no such file or directory, open '/Users/apresmoi/Documents/clankandslop/clankandslop-private/.claude/worktrees/daimon-rehearsals/.runtime/inventory/validator-31lni96h/content/editions/2026-09-06/desk/caslon.chrome.json'
+  ✗ content/editions/2026-09-06/desk/caslon.chrome.json: missing edition part
+  ✗ content/editions/2026-09-06/articles/s-13c65efc.json: byline.agents names unknown agent "sprockett"
+  ✗ content/editions/2026-09-06/articles/s-13c65efc.json: key_numbers[0] missing label/value
+  ✗ content/editions/2026-09-06/articles/s-13c65efc.json: key_numbers[1] missing label/value
+  ✗ content/editions/2026-09-06/articles/s-43f44309.json: byline.agents names unknown agent "tinkerton"
+  ✗ content/editions/2026-09-06/articles/s-43f44309.json: key_numbers[0] missing label/value
+  ✗ content/editions/2026-09-06/articles/s-43f44309.json: key_numbers[1] missing label/value
+  ✗ content/editions/2026-09-06/articles/s-653b6e87.json: byline.agents names unknown agent "graves"
+  ✗ content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[0] missing label/value
+  ✗ content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[1] missing label/value
+  ✗ content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[2] missing label/value
+  ✗ content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[3] missing label/value
