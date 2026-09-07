@@ -66,7 +66,7 @@ workflow or invent a tool. The role operations below are supplied by the
 | Role | Newsroom operations |
 |---|---|
 | Klaxon | `qualify_signal` |
-| Six reporters | `file_article`, `record_dissent` |
+| Six reporters | `file_article`, `record_dissent`; separate `validation` server: `validate_article` |
 | Brass | `record_assignment` |
 | Spike | `review_article` |
 | Ledger | `file_desk` |
@@ -74,6 +74,11 @@ workflow or invent a tool. The role operations below are supplied by the
 | Pressman | `stage_release` |
 
 Every role uses `moltnet_read` and `moltnet_send` only on its declared rooms.
+Before filing, reporters call `mcp_validation_validate_article` with the edition
+date and complete article JSON. Correct the reported fields and validate again;
+the filing tool repeats the publication-format gate before saving anything.
+A format pass does not verify source truth, quotation authenticity or the
+assignment. The reporter owns the final prose; Caslon composes accepted JSON.
 There is no separate research tool: send the service request as Moltnet text.
 If a declared tool is absent or refuses the call, report the missing capability;
 do not replace it with a shell write to another role's durable artifacts.
@@ -119,7 +124,8 @@ Never `ls`. Never open a whole desk, a directory of filings, or a SKILL.md
 file: there are none, and everything a skill used to say is already in this
 document. The rest of the shelf, for the rare piece of work that truly
 needs it — sensor request contract
-`repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`, Caslon's page vocabulary
+`repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`, reporter article format
+`repos/newsroom/agentic-org/ARTICLE_FORMAT.md`, Caslon's page vocabulary
 `repos/newsroom/agentic-org/agents/caslon/PAGES.md`, committed asset inventory
 `repos/newsroom/ops/ASSETS.md`, glyph catalogue `repos/newsroom/agentic-org/SYSTEMS.md`,
 ownership `repos/newsroom/agentic-org/DATA.md`, validator

@@ -38,6 +38,9 @@ export function bundleDescriptorFindings(repoRoot = repo) {
   const descriptorPath = path.join(repoRoot, 'agentic-org/newsroom-runtime-bundle.json');
   const descriptor = JSON.parse(readFileSync(descriptorPath, 'utf8'));
   const findings = sourceDescriptorFindings(descriptor, measureSourceArchive(repoRoot));
+  let validation;
+  try { validation = JSON.parse(readFileSync(path.join(repoRoot, 'agentic-org/article-validation-runtime-bundle.json'), 'utf8')); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
   // The pin is only worth anything if the declarations carry it. Checked here
   // as well as in organization.test.mjs so one command answers the whole
   // question: does the tree, the descriptor, and every workspace agree?
@@ -48,6 +51,9 @@ export function bundleDescriptorFindings(repoRoot = repo) {
     try { source = readFileSync(spawnfile, 'utf8'); } catch { continue; }
     if (!source.includes(`sha256: ${descriptor.source.sha256}`))
       findings.push(`agents/${agent}/Spawnfile does not pin the descriptor source digest ${descriptor.source.sha256}`);
+    const toolBundle = source.split('\n').find(line => line.includes('id: article-validation,'));
+    if (toolBundle && (validation?.version !== 'clank.article-validation-runtime-bundle.v1' || !/^sha256:[a-f0-9]{64}$/u.test(validation?.sha256) || !toolBundle.includes(`sha256: ${validation.sha256},`)))
+      findings.push(`agents/${agent}/Spawnfile does not pin a valid article-validation descriptor digest`);
   }
   return findings;
 }

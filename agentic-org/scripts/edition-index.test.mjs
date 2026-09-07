@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -35,7 +35,7 @@ const article = (id, agent, index) => ({
     { source: `Second ${index}`, fragment: 'fact', as_of: EDITION, source_note: { source_id: 'E2', source_kind: 'public_url', used_by_agent: agent, source_url: `https://second${index}.example/evidence`, retrieved_at: `${EDITION}T10:00:00Z` } }
   ],
   refs: ['E1', 'E2'],
-  ...(index === 1 ? { confidence: { value: 0.42 } } : {}),
+  ...(index === 1 ? { confidence: { label: 'TEST CALL', value: 0.42 } } : {}),
   // A real archived pair: the wide region the story page loads and the narrow
   // re-crop the front panel loads. compose_edition ships both.
   ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {})
@@ -286,36 +286,56 @@ test('prose warnings are computed from the article and never gate it', () => {
   assert.match(advisory.warnings[1], /vary the openers$/u);
 });
 
-test('hard lint rejection is off by default and names the field when armed', async () => {
+test('publication format always rejects invalid prose while source-domain lint remains optional', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-hardlint-'));
   const state = path.join(temporary, 'state');
   process.env.CLANK_EDITION_STATE_ROOT = state;
+  const snapshot = async (dir = state) => {
+    const out = {};
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) Object.assign(out, await snapshot(file));
+      else out[file] = await readFile(file, 'utf8');
+    }
+    return out;
+  };
   try {
     const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] }));
     await recordAssignment({ edition: EDITION, event_key: 'schedule:hardlint', assignments });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
-    // `persona_in_body` is armable-only: unlike the three citation gates it is
-    // still off unless someone turns it on. (Using a citation-gate flag here
-    // would prove nothing — those are refused either way.)
     const broken = article('story-0', 'Cogsworth', 0);
     broken.body = [...broken.body.slice(0, 3), 'Cogsworth walked the line himself [E2].'];
+    const assigned = await snapshot();
+    for (const setting of [undefined, '0', '1']) {
+      if (setting === undefined) delete process.env.CLANK_FILE_ARTICLE_HARD_LINT;
+      else process.env.CLANK_FILE_ARTICLE_HARD_LINT = setting;
+      await assert.rejects(
+        fileArticle({ edition: EDITION, event_key: `format-persona-${setting ?? 'default'}`, article: broken }),
+        /article format rejected.*article\.body\[3\] \[persona_in_body\]/u
+      );
+      assert.deepEqual(await snapshot(), assigned, `format refusal with lint ${setting ?? 'default'} changed state`);
+    }
 
+    // Source diversity is editorial policy: one domain remains admissible until armed.
+    const oneDomain = article('story-0', 'Cogsworth', 0);
+    oneDomain.evidence_box[1].source_note.source_url = 'https://source0.example/other';
     delete process.env.CLANK_FILE_ARTICLE_HARD_LINT;
-    const filed = await fileArticle({ edition: EDITION, event_key: 'hardlint-off', article: broken });
-    assert.equal(filed.article_id, 'story-0', 'the flag is off by default and a hard-lint filing still lands');
-    const text = await readIndex(state);
-    assert.match(text, /^F story-0 rev=1 .* lint=persona_in_body$/mu, 'the flag rides the F row whether or not rejection is armed');
-
+    const filed = await fileArticle({ edition: EDITION, event_key: 'hardlint-off', article: oneDomain });
+    assert.equal(filed.article_id, 'story-0');
+    assert.match(await readIndex(state), /^F story-0 rev=1 .* lint=domains<2$/mu);
+    const accepted = await snapshot();
     process.env.CLANK_FILE_ARTICLE_HARD_LINT = '1';
     await assert.rejects(
-      fileArticle({ edition: EDITION, event_key: 'hardlint-on', article: { ...broken, revision: 1, deck: 'Another deck.' } }),
-      /filing rejected on 1 mechanical check .*persona_in_body — article\.body names a newsroom persona/u
+      fileArticle({ edition: EDITION, event_key: 'hardlint-on', article: { ...oneDomain, deck: 'Another deck.' } }),
+      /filing rejected on 1 mechanical check .*domains<2 — article\.evidence_box spans fewer than two/u
     );
-    // An advisory-only defect still files with the flag armed.
+    assert.deepEqual(await snapshot(), accepted, 'armed lint refusal changed the accepted filing or INDEX');
+
     const advisory = structuredClone(article('story-1', 'Sprockett', 1));
     advisory.refs = ['E2', 'E1'];
     process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
     await assert.doesNotReject(fileArticle({ edition: EDITION, event_key: 'hardlint-advisory', article: advisory }));
+    assert.match(await readIndex(state), /^F story-1 rev=1 .* lint=refs_order$/mu);
   } finally {
     delete process.env.CLANK_FILE_ARTICLE_HARD_LINT;
     delete process.env.CLANK_NEWSROOM_AGENT;
@@ -367,8 +387,8 @@ test('the hard lint switch arms nothing, everything, or a named subset', () => {
   assert.deepEqual(armedHardLintNames('1'), HARD_LINT_NAMES);
   assert.deepEqual(armedHardLintNames('cite_missing,persona_in_body'), ['cite_missing', 'persona_in_body']);
   assert.throws(() => armedHardLintNames('openers'), /no such hard lint flag: openers/u);
-  // The staged rollout: the four flags that fire on none of the 362 published
-  // articles are armable without arming domains<2, which fires on 25 of them.
+  // The legacy selector still supports these names; mandatory publication
+  // checks apply independently of its selected flags.
   const staged = ['refs_subset', 'cite_missing', 'topic_unknown', 'persona_in_body'];
   assert.deepEqual(hardLintFlags(['domains<2', 'cite_missing:E4'], staged), ['cite_missing:E4']);
 });

@@ -10,7 +10,7 @@ import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, 
 
 const owners = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
 const assignmentEvent = 'schedule:assignment-20260825';
-const article = (id, agent, edition, index) => ({ id, edition_date: edition, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test', headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact', byline: { desk: 'Test Desk', agents: [agent] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30', topics: ['geopolitics'], body: ['One [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'], key_numbers: [], evidence_box: [{ source: `Official ${index}`, fragment: 'fact', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: `https://source${index}.example/evidence`, retrieved_at: `${edition}T10:00:00Z` } }], refs: ['E1'], ...(index === 1 ? { confidence: { value: 0.42 } } : {}), ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {}) });
+const article = (id, agent, edition, index) => ({ id, edition_date: edition, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test', headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact', byline: { desk: 'Test Desk', agents: [agent] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30', topics: ['unclos'], body: ['One [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'], key_numbers: [], evidence_box: [{ source: `Official ${index}`, fragment: 'fact', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: `https://source${index}.example/evidence`, retrieved_at: `${edition}T10:00:00Z` } }], refs: ['E1'], ...(index === 1 ? { confidence: { label: 'TEST CALL', value: 0.42 } } : {}), ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {}) });
 // The four desk documents in the shape ops/desk-contract.mjs requires — the
 // same shape the site assembles an Edition from. file_desk refuses anything
 // else, so a test fixture cannot be a placeholder object any more.
@@ -124,7 +124,7 @@ test('a filing whose citations do not resolve is refused, and the refusal names 
     privateId.body = [...privateId.body.slice(0, 3), 'Delta closes on the operating fact [s-5adc90c2].'];
     await assert.rejects(
       fileArticle({ edition: EDITION, event_key: 'gate-private-id', article: privateId }),
-      /private_id_in_body:s-5adc90c2 — article\.body prints a private research id.*\[E1\] for the first entry through \[En\] for the nth/su
+      /article\.body\[3\] \[private_id_in_body\].*s-5adc90c2.*cite the row by position/su
     );
 
     // 2. An [En] that lands on no evidence_box entry at all.
@@ -132,14 +132,14 @@ test('a filing whose citations do not resolve is refused, and the refusal names 
     dangling.body = [...dangling.body.slice(0, 3), 'Delta leans on a note nobody filed [E9].'];
     await assert.rejects(
       fileArticle({ edition: EDITION, event_key: 'gate-cite-missing', article: dangling }),
-      /cite_missing:E9 — article\.body cites a source id that article\.evidence_box does not carry/u
+      /article\.body\[3\] \[cite_missing\].*\[E9\].*positional rows/u
     );
 
     // 3. A ref the evidence box never declared.
     const strayRef = cited('story-0', 'Cogsworth', { refs: ['E1', 'E2', 'E9'] });
     await assert.rejects(
       fileArticle({ edition: EDITION, event_key: 'gate-refs-subset', article: strayRef }),
-      /refs_subset:E9 — article\.refs names a source id that article\.evidence_box does not carry/u
+      /article\.refs\[2\] \[refs_subset\].*E9.*no Record row/u
     );
 
     // None of the three is switchable: turning the arming switch fully off
@@ -433,8 +433,8 @@ test('the forecast slot binds its owner at filing time, in the wake that can sti
     const base = article('story-1', 'Sprockett', edition, 1);
     // All three fields, named in one refusal, before anything is written.
     await assert.rejects(fileArticle({ edition, event_key: 'flat-forecast', article: { ...base, epistemic: 'fact', next_update_utc: 'tomorrow', confidence: undefined } }),
-      /is today's forecast, so it files as one: article\.epistemic must be "forecast".*article\.next_update_utc must be a clock time.*article\.confidence\.value must be a number in \[0, 1\]/su);
-    await assert.rejects(fileArticle({ edition, event_key: 'no-confidence', article: { ...base, confidence: { value: 1.4 } } }), /article\.confidence\.value must be a number in \[0, 1\]/u);
+      /article\.next_update_utc.*article\.epistemic \[forecast\] must be "forecast".*article\.confidence \[forecast\]/su);
+    await assert.rejects(fileArticle({ edition, event_key: 'no-confidence', article: { ...base, confidence: { value: 1.4 } } }), /article\.confidence\.value \[range\] must be at most 1/u);
     await assert.rejects(readFile(path.join(state, 'editions', edition, 'filings', 'story-1', '1.json')));
 
     // Filed correctly, the tool hands back the one instruction the wake needs.
@@ -608,7 +608,7 @@ test('a dissent carries to a later revision only when the call did not move', as
 
     // The number moved: the argument is against a call that no longer exists,
     // so it is left off the page and the verdict says why.
-    const moved = await run('moved', { confidence: { value: 0.71 } });
+    const moved = await run('moved', { confidence: { label: 'TEST CALL', value: 0.71 } });
     assert.equal(moved.article.dissent, undefined);
     assert.equal(moved.verdict.dissent_dropped, 'recorded against revision 1; the call changed');
     // Durable, not just a tool result: the INDEX row carries it too.
@@ -669,12 +669,12 @@ test('a map pair ships both regions, and an unlisted region is refused in the wa
 
     // A region no edition ever baked, on either key, refused while the reporter
     // is still awake — nothing in this container can bake a new one.
-    for (const art of [{ kind: 'map', map: 'kamchatka' }, { kind: 'map', map: 'hormuz', hero_map: 'kamchatka-hero' }]) {
+    for (const art of [{ kind: 'map', map: 'kamchatka', caption: 'The region.' }, { kind: 'map', map: 'hormuz', hero_map: 'kamchatka-hero', caption: 'The region.' }]) {
       await assert.rejects(fileArticle({ edition, event_key: 'unlisted-region', article: withArt(0, art) }), /is in neither this edition's maps\/ nor the committed archive.*name a region ops\/ASSETS\.md lists, or file without art/su);
     }
-    await assert.rejects(fileArticle({ edition, event_key: 'no-map-key', article: withArt(0, { kind: 'map', hero_map: 'hormuz-hero' }) }), /art\.kind is "map" but art\.map is undefined/u);
-    await assert.rejects(fileArticle({ edition, event_key: 'bad-kind', article: withArt(0, { kind: 'Map', map: 'hormuz' }) }), /art\.kind must be "map" .* or "ascii"/su);
-    await assert.rejects(fileArticle({ edition, event_key: 'bad-spot', article: withArt(0, { kind: 'map', map: 'hormuz', spots: [{ name: 'HORMUZ', lat: '26.6', lon: 56.25 }] }) }), /art\.spots\[0\]\.lat must be a number/u);
+    await assert.rejects(fileArticle({ edition, event_key: 'no-map-key', article: withArt(0, { kind: 'map', hero_map: 'hormuz-hero' }) }), /article\.art\.map \[asset\] is required/u);
+    await assert.rejects(fileArticle({ edition, event_key: 'bad-kind', article: withArt(0, { kind: 'Map', map: 'hormuz' }) }), /article\.art\.kind \[enum\] must be one of ascii, map/su);
+    await assert.rejects(fileArticle({ edition, event_key: 'bad-spot', article: withArt(0, { kind: 'map', map: 'hormuz', spots: [{ name: 'HORMUZ', lat: '26.6', lon: 56.25 }] }) }), /article\.art\.spots\[0\]\.lat \[type\] must be a number/u);
 
     // Cross-filing: one region, one set of spots. The content validator refuses
     // the page for this at 21:30; here the second reporter can still fix it.

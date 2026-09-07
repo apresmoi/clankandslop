@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { agents, assert, digest, orgRoot, policy, privateKinds, reporters, sensors, readJson, releaseFor } from './lib.mjs';
 import { validateLifecycleGraph } from './lifecycle-graph.mjs';
 import { isBerlinRelease } from './release-time.mjs';
+import { parseManifest } from './check-instruction-budget.mjs';
 
 const TYPES = new Set(['ASSIGNMENT', 'ACK', 'PINPOINT_REQUEST', 'PINPOINT_CLAIM', 'PINPOINT_RESULT', 'PINPOINT_NOT_FOUND', 'FILED', 'REVISION_REQUEST', 'REFILED', 'PASS', 'HOLD', 'SPIKE', 'COMPOSITION_ISSUE', 'COMPOSED', 'RELEASE_HANDOFF']);
 const TERMINALS = { ACK: 'ACKED', PINPOINT_CLAIM: 'CLAIMED', PINPOINT_RESULT: 'CLAIMED', PINPOINT_NOT_FOUND: 'CLAIMED', FILED: 'FILED', REVISION_REQUEST: 'REVISION_REQUESTED', REFILED: 'REFILED', PASS: 'PASSED', HOLD: 'HELD', SPIKE: 'SPIKED', COMPOSED: 'COMPOSED', RELEASE_HANDOFF: 'HANDED_OFF' };
@@ -111,6 +112,27 @@ export function declaredPairings(bytes) {
 
 const inlineField = (value, key) => new RegExp(`\\b${key}: "?([^,"}]+)"?`).exec(value ?? '')?.[1]?.trim();
 
+export function validateReporterValidationDeclaration(agent, bytes) {
+  const manifest = parseManifest(bytes);
+  const servers = (manifest.environment?.mcp_servers ?? []).filter((item) => item.name === 'validation');
+  const bundles = (manifest.workspace?.resources ?? []).filter((item) => item.id === 'article-validation');
+  if (!reporters.has(agent)) {
+    assert(servers.length === 0 && bundles.length === 0, `${agent} must not receive the reporter validation surface`);
+    return;
+  }
+  assert(servers.length === 1, `${agent} must declare one validation MCP server`);
+  const server = servers[0];
+  const workspace = `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}`;
+  assert(server.transport === 'stdio' && server.command === '/usr/local/bin/node', `${agent} validation transport invalid`);
+  assert(JSON.stringify(server.args) === JSON.stringify([`${workspace}/tools/article-validation/server.mjs`]), `${agent} validation entry point invalid`);
+  assert(server.env?.CLANK_NEWSROOM_AGENT === agent && server.env?.CLANK_PUBLIC_SOURCE_ROOT === `${workspace}/repos/newsroom` && Object.keys(server.env).length === 2, `${agent} validation identity or public source root invalid`);
+  assert(JSON.stringify(server.tools) === JSON.stringify(['validate_article']), `${agent} validation tool allowlist invalid`);
+  assert(bundles.length === 1, `${agent} must declare one article-validation bundle`);
+  const bundle = bundles[0];
+  assert(bundle.kind === 'bundle' && bundle.source === '../../article-validation-runtime.tar' && /^sha256:[a-f0-9]{64}$/u.test(bundle.sha256), `${agent} article-validation bundle source or digest invalid`);
+  assert(bundle.mount === './tools/article-validation' && bundle.mode === 'readonly', `${agent} article-validation bundle must be mounted read-only at its tool path`);
+}
+
 export function validateAgentDeclaration(agent, bytes) {
   const engine = engineByAgent[agent];
   assert(engine, `${agent} runtime assignment missing`);
@@ -141,6 +163,7 @@ export function validateAgentDeclaration(agent, bytes) {
   } else {
     assert(!corpus, `${agent} must not receive a private corpus resource`);
   }
+  validateReporterValidationDeclaration(agent, bytes);
 }
 
 export function validateRootDeclaration(bytes) {

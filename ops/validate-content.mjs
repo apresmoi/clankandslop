@@ -5,7 +5,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
-import { proseLintFindings } from './prose-lint.mjs';
+import { articleFormatFindings } from './article-format.mjs';
 import { EDITION_PART_FILES, OUTCOMES as DESK_OUTCOMES, deskDocumentFindings } from './desk-contract.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -17,10 +17,7 @@ const BLOCKS = new Set([
   'AgentRoster', 'AgentCard', 'Divider', 'WorldGlyph', 'MapGlyph', 'WorldIndex', 'RankBars', 'GlyphArt', 'SectionHeader', 'Grid',
 ]);
 
-const EPISTEMIC = new Set(['fact', 'inference', 'forecast']);
-const GLYPH_ROLLS = new Set(['chip', 'eclipse']);
 const OUTCOMES = DESK_OUTCOMES;
-const KEYNUM_DIRS = new Set(['up', 'down', 'flat']);
 
 const errors = [];
 const err = (file, msg) => errors.push(`${file}: ${msg}`);
@@ -105,6 +102,7 @@ for (const date of ls(editionsDir)) {
   scopes.push({ date, dir: resolve(editionsDir, date), desk: true });
 }
 scopes.push({ date: 'fixtures', dir: resolve(contentRoot, 'fixtures'), desk: false });
+const previousArticles = new Set(scopes.flatMap(({ date, dir }) => ls(resolve(dir, 'articles')).filter(f => f.endsWith('.json')).map(f => `${date}/${f.slice(0, -5)}`)));
 
 for (const { date, dir: edDir, desk } of scopes) {
   const articleDir = resolve(edDir, 'articles');
@@ -170,113 +168,10 @@ for (const { date, dir: edDir, desk } of scopes) {
     const file = rel(resolve(articleDir, `${slug}.json`));
     const a = readJson(resolve(articleDir, `${slug}.json`));
     if (!a) continue;
-    if (a.id !== slug) err(file, `id "${a.id}" does not match filename`);
-    if (a.edition_date !== date) err(file, `edition_date "${a.edition_date}" does not match edition ${date}`);
-    for (const k of ['section', 'kicker', 'headline', 'timestamp'])
-      if (!isStr(a[k])) err(file, `missing ${k}`);
-    if (a.epistemic !== undefined && !EPISTEMIC.has(a.epistemic))
-      err(file, 'epistemic must be fact|inference|forecast');
-    if (!a.byline || !isStr(a.byline.desk)) err(file, 'missing byline.desk');
-    if (!Array.isArray(a.byline?.agents) || a.byline.agents.length === 0)
-      err(file, 'byline.agents must be a non-empty array');
-    for (const name of a.byline?.agents ?? []) checkAgentName(file, 'byline.agents', name);
-    if (!isNum(a.revision)) err(file, 'revision must be a number');
-    for (const [i, prior] of (a.previous_coverage ?? []).entries()) {
-      if (!prior || !/^\d{4}-\d{2}-\d{2}$/.test(prior.date) || !isStr(prior.slug)) {
-        err(file, `previous_coverage[${i}] must contain date and slug`);
-        continue;
-      }
-      if (prior.date >= date) err(file, `previous_coverage[${i}] must reference an earlier edition`);
-      if (!ls(resolve(editionsDir, prior.date, 'articles')).includes(`${prior.slug}.json`))
-        err(file, `previous_coverage[${i}] references missing article ${prior.date}/${prior.slug}`);
-    }
-    // Body items are paragraphs (strings) or inline figure blocks
-    // ({ glyph, side?, caption? }) — a floated GlyphImage the prose wraps around.
-    const isFigureItem = (x) => x && typeof x === 'object' && isStr(x.glyph);
-    if (!Array.isArray(a.body) || a.body.length === 0 || !a.body.every((x) => isStr(x) || isFigureItem(x)))
-      err(file, 'body must be a non-empty array of paragraphs (strings) or figure blocks ({ glyph })');
-    for (const item of Array.isArray(a.body) ? a.body : []) {
-      if (isFigureItem(item)) {
-        if (!glyphSlugs.has(item.glyph)) err(file, `body figure references missing glyph "${item.glyph}" (bake with ops/bake-image.mjs)`);
-        if (item.side !== undefined && !['left', 'right', 'full'].includes(item.side))
-          err(file, `body figure side must be left|right|full`);
-      }
-    }
-    if (!Array.isArray(a.refs)) err(file, 'missing refs array');
-    if (a.confidence && !isP(a.confidence.value)) err(file, 'confidence.value must be in [0,1]');
-    if (a.dissent) {
-      checkAgentName(file, 'dissent.agent', a.dissent.agent);
-      if (!isP(a.dissent.p)) err(file, 'dissent.p must be in [0,1]');
-      if (!isStr(a.dissent.argument)) err(file, 'dissent.argument must be a non-empty string (the component renders this field)');
-    }
-    for (const [i, k] of (a.key_numbers ?? []).entries()) {
-      if (!isStr(k.label) || !isStr(k.value)) err(file, `key_numbers[${i}] missing label/value`);
-      if (k.dir !== undefined && !KEYNUM_DIRS.has(k.dir)) err(file, `key_numbers[${i}].dir must be up|down|flat`);
-    }
-    if (a.art) {
-      if (a.art.kind === 'ascii') {
-        // Either raw ascii text, or a glyph shape name rendered by GlyphArt.
-        if (!isStr(a.art.ascii) && !isStr(a.art.shape)) err(file, 'art.ascii or art.shape (glyph) is required');
-        if (a.art.roll !== undefined && !GLYPH_ROLLS.has(a.art.roll)) err(file, `unknown art.roll "${a.art.roll}"`);
-        if (a.art.roll === 'eclipse' && a.art.shape !== 'eclipse') err(file, 'art.roll "eclipse" requires art.shape "eclipse"');
-      } else if (a.art.kind === 'map') {
-        if (!mapSlugs.has(a.art.map)) err(file, `art.map references missing map "${a.art.map}"`);
-        if (a.art.hero_map !== undefined && !mapSlugs.has(a.art.hero_map))
-          err(file, `art.hero_map references missing map "${a.art.hero_map}"`);
-        for (const [i, spot] of (a.art.spots ?? []).entries()) {
-          if (!isStr(spot.name) || !isNum(spot.lat) || !isNum(spot.lon))
-            err(file, `art.spots[${i}] must contain name, lat and lon`);
-        }
-        if (isStr(a.art.map)) articleMapArts.set(a.art.map, { slug, spots: a.art.spots ?? [] });
-      } else {
-        err(file, 'art.kind must be ascii|map');
-      }
-      if (!isStr(a.art.caption)) err(file, 'art.caption is required');
-    }
-    const box = a.evidence_box ?? [];
-    for (const [i, e] of box.entries())
-      if (!isStr(e.source) || !isStr(e.fragment)) err(file, `evidence_box[${i}] missing source/fragment`);
-    // References must reference: every ref resolves to a Record row.
-    const recordIds = new Set(box.map((e) => e.source_note?.source_id).filter(Boolean));
-    for (const r of a.refs ?? [])
-      if (!recordIds.has(r)) err(file, `ref "${r}" has no Record row — references must reference`);
-    // Prose-only view of the body: skip inline figure blocks for the text gates.
-    const bodyParas = (Array.isArray(a.body) ? a.body : []).filter((x) => typeof x === 'string');
-    // every [En] marker in body must land on an evidence_box row
-    for (const para of bodyParas)
-      for (const m of String(para).matchAll(/\[E(\d+)\]/g)) {
-        const n = Number(m[1]);
-        if (n < 1 || n > box.length)
-          err(file, `body cites [E${n}] but evidence_box has ${box.length} entries`);
-      }
-    // No newsroom self-reference: an article reports the news; it is never a
-    // story about our own desks. Body prose must not name a persona or a desk —
-    // the byline is the only place an agent appears. (Case-sensitive: flags the
-    // capitalized proper-noun use, not the common-noun "foreman"/"graves".)
-    const DESK_PHRASES = ['Hardware Desk', 'Escalation Desk', 'Macro Desk', 'Commodities Desk', 'Policy Desk'];
-    for (const para of bodyParas) {
-      for (const nm of personaNames)
-        if (new RegExp(`\\b${nm}\\b`).test(para))
-          err(file, `body self-references the newsroom ("${nm}") — report the news, never our own agents`);
-      for (const d of DESK_PHRASES)
-        if (para.includes(d))
-          err(file, `body self-references the newsroom ("${d}") — report the news, never our own desks`);
-    }
-
-    // Editorial variety, the binary-contrast reflex, and em-dash overuse. All
-    // three are warnings, never gates — legacy editions carry the debt, and new
-    // copy should clear it. The checks themselves live in ops/prose-lint.mjs so
-    // that file_article can run the identical code inside the reporter's wake
-    // and hand the same sentence to the reporter and to Spike, hours before
-    // this validator would have printed it to nobody.
-    for (const finding of proseLintFindings(a)) warn(file, finding.message);
-
-    // topics (optional) must resolve to the glossary
-    if (a.topics !== undefined) {
-      if (!Array.isArray(a.topics)) err(file, 'topics must be an array of slugs');
-      else for (const t of a.topics)
-        if (!validTopics.has(t)) err(file, `topic "${t}" not in content/topics.json glossary`);
-    }
+    const findings = articleFormatFindings(a, { profile: 'archive', editionDate: date, articleId: slug, agentNames, personaNames, topicSlugs: validTopics, mapSlugs, glyphSlugs, previousArticles });
+    for (const finding of findings.errors) err(file, `${finding.path}: ${finding.message}`);
+    for (const finding of findings.warnings) warn(file, finding.message);
+    if (a.art?.kind === 'map' && isStr(a.art.map)) articleMapArts.set(a.art.map, { slug, spots: a.art.spots ?? [] });
   }
 
   // pages

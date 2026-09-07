@@ -1,3 +1,4 @@
+import { articleFilingSchema } from '../../ops/article-format.mjs';
 import { createInterface } from 'node:readline';
 import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, reviewArticle, stageRelease } from './production-newsroom.mjs';
 import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
@@ -39,57 +40,7 @@ const assignmentItem = {
   }
 };
 
-const article = {
-  type: 'object',
-  additionalProperties: true,
-  required: ['edition_date', 'section', 'kicker', 'headline', 'deck', 'epistemic', 'byline', 'timestamp', 'revision', 'next_update_utc', 'topics', 'body', 'key_numbers', 'evidence_box', 'refs'],
-  properties: {
-    id: componentId('Story id. Optional to supply — if it does not match your one assignment for this edition, the server uses the assigned id and reports the correction rather than rejecting the filing.'),
-    edition_date: edition,
-    section: { type: 'string', description: 'Section slug, e.g. world, markets, technology, policy, culture.' },
-    kicker: { type: 'string' },
-    headline: { type: 'string' },
-    deck: { type: 'string' },
-    epistemic: { type: 'string', enum: EPISTEMIC, description: 'Epistemic status of the article.' },
-    byline: {
-      type: 'object', additionalProperties: true, required: ['desk', 'agents'],
-      properties: { desk: { type: 'string' }, agents: { type: 'array', items: { type: 'string' }, minItems: 1, description: 'agents[0] must equal your own agent name (case-insensitively).' } }
-    },
-    timestamp: { type: 'string', description: 'Publish time, e.g. "12:00 UTC".' },
-    revision: { type: 'integer', minimum: 1 },
-    next_update_utc: { type: 'string', description: '"HH:MM" — when the call gets looked at again. Required to be a real clock time when your assignment carries slot "forecast".' },
-    topics: { type: 'array', items: { type: 'string' } },
-    body: { type: 'array', items: { type: 'string' }, minItems: 4, description: 'At least 4 paragraphs.' },
-    key_numbers: { type: 'array' },
-    evidence_box: {
-      type: 'array', minItems: 1,
-      items: {
-        type: 'object', additionalProperties: true,
-        properties: {
-          source: { type: 'string' }, fragment: { type: 'string' }, as_of: { type: 'string' },
-          source_note: {
-            type: 'object', additionalProperties: true,
-            properties: { source_id: { type: 'string' }, source_kind: { type: 'string' }, used_by_agent: { type: 'string' }, source_url: { type: 'string' }, retrieved_at: { type: 'string' } }
-          }
-        }
-      },
-      description: 'Must include every evidence_refs value from your assignment, as a source_url or source_id.'
-    },
-    refs: { type: 'array', items: { type: 'string' }, minItems: 1, description: 'Non-empty; source-note ids like "E1" cited in body.' },
-    confidence: { type: 'object', additionalProperties: true, properties: { value: { type: 'number', minimum: 0, maximum: 1 }, label: { type: 'string' }, interval: { type: 'number' } }, description: 'Required when your assignment carries slot "forecast": confidence.value is the probability the call rests on.' },
-    art: {
-      type: 'object', additionalProperties: true, required: ['kind'],
-      properties: {
-        kind: { type: 'string', enum: ART_KINDS, description: '"map" names a baked region; "ascii" leaves the glyph to the compositor.' },
-        map: { type: 'string', description: 'Required for kind "map": the wide region the story page and the OG card draw at 104x42. Must be a region ops/ASSETS.md lists.' },
-        hero_map: { type: 'string', description: 'Optional: the front hero panel\'s narrower re-crop at 52x30, usually "<map>-hero" where ASSETS.md lists one. May repeat map; omit it entirely otherwise. Both names ship.' },
-        caption: { type: 'string' },
-        spots: { type: 'array', items: { type: 'object', additionalProperties: true, required: ['name', 'lat', 'lon'], properties: { name: { type: 'string' }, lat: { type: 'number' }, lon: { type: 'number' } } }, description: 'Places marked on the map. One region carries one set of spots across the whole edition.' }
-      },
-      description: 'Optional. A dissent is NOT an article key: the colleague who holds it records it with record_dissent, under their own name.'
-    }
-  }
-};
+const article = articleFilingSchema;
 
 const definitions = {
   qualify_signal: {

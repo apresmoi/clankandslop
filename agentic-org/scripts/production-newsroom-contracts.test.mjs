@@ -69,8 +69,8 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
   // would be an invitation to the exact call the server rejects.
   assert.equal(fileArticleTool.inputSchema.properties.article.properties.dissent, undefined, 'the article schema must not offer a dissent key');
   const art = fileArticleTool.inputSchema.properties.article.properties.art;
-  assert.deepEqual(art.required, ['kind']);
-  assert.deepEqual(art.properties.kind.enum, ['map', 'ascii']);
+  assert.deepEqual(art.required, ['kind', 'caption']);
+  assert.deepEqual(new Set(art.properties.kind.enum), new Set(['map', 'ascii']));
   assert.equal(art.properties.map.type, 'string');
   assert.equal(art.properties.hero_map.type, 'string');
   assert.deepEqual(art.properties.spots.items.required, ['name', 'lat', 'lon']);

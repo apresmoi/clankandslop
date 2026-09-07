@@ -4,8 +4,8 @@ The twelve live agents have their declared role tools. Their complete tasks
 are not yet proven. Production remains parked. Read-only deployment checks
 completed September 7, 19:26–19:31 UTC.
 
-The local [workflow diagram](../../WORKFLOW.html) provides sixteen numbered
-steps, Berlin start times, the research and revision loops, and unresolved
+The local [workflow diagram](../../WORKFLOW.html) provides seventeen numbered
+stages, Berlin start times, the research and revision loops, and unresolved
 handoffs. It follows the executable declarations, while displaying the
 conflicting daytime playbook separately. It does not change the schedule.
 
@@ -53,6 +53,16 @@ production deployment. The deployed bundled research guide is still the old
 213-line specification claiming that the responder is not built. Before
 deployment, require the rebuilt source bundle and its matching declarations.
 
+## Reporter format validation
+
+The local org declarations now give all six reporters a separate read-only
+`validate_article` tool, implemented in private automation. It checks the same
+public publication-format contract enforced by `file_article` before writes.
+Reporters correct their own JSON; Caslon composes the accepted record.
+The separate [validation report](article-validation.md) records the isolated
+Daimon result, packaging and remaining deployment prerequisites. This addition
+is not part of the live availability audit above.
+
 ## Remaining acceptance requirements
 
 - **Enforcement:** the live Codex launcher uses danger-full-access. Recent
@@ -69,7 +79,9 @@ deployment, require the rebuilt source bundle and its matching declarations.
 - **Clock and handoffs:** decide daytime versus evening, unify the assignment
   room contract, connect rolling notices to Klaxon and refresh corpus pins.
 - **Edition correctness:** retain the earlier inventory's HOLD recovery,
-  filing/site-schema, World Desk input and failed-turn accounting findings.
+  World Desk input and failed-turn accounting findings. The new local shared
+  article-format gate addresses filing/site-schema drift; deployment and a
+  complete autonomous edition remain unproven.
 - **Release policy:** TEAM describes a human PR decision; the checked-in
   edition workflow automerges after its CI/content gates. Resolve that policy
   and validate the publication hop before enabling it.
@@ -81,15 +93,17 @@ certificate or a new operating policy.
 ## Local validation
 
 The diagram passed the skill's static safety/accessibility checks and actual
-Chrome rendering: fonts loaded, sixteen node text bounds fit, and mobile
+Chrome rendering: fonts loaded, seventeen node text bounds fit, and mobile
 horizontal scrolling remains within the figure. Independent AGY review found
 no blocking or minor defects in the diagram and instruction packet.
 
 Private instruction-contract checks cover all twelve roles, seven requesters,
 the actual responder parser and seventeen mutations. The instruction-budget
-suite passes with all twelve readers. The organization suite passes 210 tests
-with one dependency-dependent skip; all 47 operations tests pass. An isolated build
-of the unchanged website produced 971 pages after content validation.
+suite passes with all twelve readers. After adding article validation, the
+organization suite passes 212 tests with one dependency-dependent skip, and
+all 55 operations tests pass. An isolated website build produced 971 pages
+after content validation. The new reporter-format rehearsal passed through
+real Daimon; its scope and earlier failed attempts are in the validation report.
 
 The existing Docker e2e launcher was attempted but could not resolve its sibling
 ecosystem checkouts from this nested worktree. It did not exercise cognition.

@@ -95,6 +95,37 @@ test('workspace resources enforce public modes and private corpus least privileg
   assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('mode: mutable', 'mode: readonly')), /public content resource/);
   assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('kind: volume', 'kind: git').replace('name: clank-release-staging, ', 'url: https://github.com/apresmoi/clankandslop.git, branch: staging, ')), /public content resource/);
 });
+test('all six reporter declarations reject broken validation identity, tools and read-only bundles', () => {
+  for (const agent of ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']) {
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    const server = source.split('\n').find((line) => line.includes('name: validation,'));
+    const bundle = source.split('\n').find((line) => line.includes('id: article-validation,'));
+    assert.ok(server && bundle, `${agent} must carry the validation declaration`);
+    assert.doesNotThrow(() => validateAgentDeclaration(agent, source));
+    const mutations = [
+      ['missing server', source.replace(server, '')],
+      ['duplicate server', source.replace(server, `${server}\n${server}`)],
+      ['wrong transport', source.replace(server, server.replace('transport: stdio', 'transport: http'))],
+      ['wrong entry point', source.replace(server, server.replace('/tools/article-validation/server.mjs', '/repos/newsroom/server.mjs'))],
+      ['another reporter identity', source.replace(server, server.replace(`CLANK_NEWSROOM_AGENT: ${agent}`, 'CLANK_NEWSROOM_AGENT: spike'))],
+      ['another source root', source.replace(server, server.replace('/repos/newsroom }', '/repos/newsroom-private }'))],
+      ['missing tools', source.replace(server, server.replace('tools: [validate_article]', 'tools: []'))],
+      ['write tool added', source.replace(server, server.replace('tools: [validate_article]', 'tools: [validate_article, file_article]'))],
+      ['missing bundle', source.replace(bundle, '')],
+      ['duplicate bundle', source.replace(bundle, `${bundle}\n${bundle}`)],
+      ['wrong source', source.replace(bundle, bundle.replace('article-validation-runtime.tar', 'newsroom-runtime.tar'))],
+      ['unpinned bundle', source.replace(bundle, bundle.replace(/sha256: sha256:[a-f0-9]{64}, /u, ''))],
+      ['wrong mount', source.replace(bundle, bundle.replace('./tools/article-validation', './tools/elsewhere'))],
+      ['writable bundle', source.replace(bundle, bundle.replace('mode: readonly', 'mode: mutable'))],
+    ];
+    for (const [name, changed] of mutations) {
+      assert.notEqual(changed, source, `${agent}: ${name} must mutate the actual declaration`);
+      assert.throws(() => validateAgentDeclaration(agent, changed), /validation/u, `${agent}: ${name}`);
+    }
+    const doc = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/AGENTS.md`), 'utf8').replace(/\s+/gu, ' ');
+    for (const phrase of ['ARTICLE_FORMAT.md', 'mcp_validation_validate_article', '{edition, article}', 'complete candidate', 'revalidate in the same wake', 'before any durable write', 'not proof of a source or quote', `"agents": ["${agent[0].toUpperCase()}${agent.slice(1)}"]`]) assert.ok(doc.includes(phrase), `${agent} needs ${phrase}`);
+  }
+});
 test('Pressman implementation contains no network publisher, push, credential, or process execution path', () => { const source=readFileSync(resolve(import.meta.dirname,'newsroom.mjs'),'utf8'); assert.doesNotMatch(source,/child_process|execFile|spawn\(|fetch\(|https?:|git\s+push|credential|token/i); });
 test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
 // identical SKILL.md files at the top of every wake. Their content now
@@ -246,6 +277,13 @@ test('removing either publishing desk schedule fails closed', () => {
 // consistently wrong. This is the check that has an opinion about the tree.
 test('the runtime bundle descriptor describes the tree that is committed', () => {
   assert.deepEqual(bundleDescriptorFindings(), []);
+  const tool = JSON.parse(readFileSync(resolve(import.meta.dirname, '../article-validation-runtime-bundle.json'), 'utf8'));
+  assert.equal(tool.file_count, 2);
+  assert.match(tool.source_commit, /^[a-f0-9]{40}$/u);
+  for (const agent of ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']) {
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.ok(source.split('\n').find(line => line.includes('id: article-validation,')).includes(`sha256: ${tool.sha256},`));
+  }
 });
 
 test('the descriptor drift check has an opinion about the source archive and the pins', () => {
@@ -283,6 +321,12 @@ test('the descriptor drift check has an opinion about the source archive and the
     const descriptor = JSON.parse(readFileSync(join(scratch, 'agentic-org', 'newsroom-runtime-bundle.json'), 'utf8'));
     writeFileSync(spawnfile, readFileSync(spawnfile, 'utf8').replace(descriptor.source.sha256, 'sha256:0000000000000000000000000000000000000000000000000000000000000000'));
     assert.ok(bundleDescriptorFindings(scratch).some((finding) => /agents\/caslon\/Spawnfile does not pin/u.test(finding)));
+    const toolDescriptor = 'agentic-org/article-validation-runtime-bundle.json';
+    const tool = JSON.parse(readFileSync(join(repo, toolDescriptor), 'utf8'));
+    writeFileSync(join(scratch, toolDescriptor), JSON.stringify(tool));
+    const reporter = 'agentic-org/agents/cogsworth/Spawnfile';
+    writeFileSync(join(scratch, reporter), readFileSync(join(repo, reporter), 'utf8').replace(tool.sha256, `sha256:${'0'.repeat(64)}`));
+    assert.ok(bundleDescriptorFindings(scratch).some(finding => /cogsworth.*article-validation descriptor/u.test(finding)));
   } finally {
     execFileSync('git', ['worktree', 'remove', '--force', scratch], { cwd: repo, stdio: 'pipe' });
     rmSync(scratch, { recursive: true, force: true });

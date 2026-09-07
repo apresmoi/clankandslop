@@ -94,8 +94,15 @@ quotation you did not receive. Missing or unverified evidence remains so.
 An unreadable third-party page alone does not establish that the claim is
 false; ask the permitted requester for the missing source fact or fragment.
 
-Raw reports remain on the sensor host. Inline answers do not require replacing
-the pinned corpus mid-run. Rolling research still uses the bundle/pinning path.
+Ad hoc raw reports remain on the 4090; the responder does not push them to
+GitHub. Inline answers return through Moltnet and do not require replacing the
+pinned corpus mid-run.
+
+Scheduled rolling research pushes its captures, story packets, desk indexes
+and prepared inputs to the private GitHub repository, `clankandslop-private`,
+on `edition/YYYY-MM-DD`. Moltnet announces that update. The agents still need a
+refreshed pinned corpus bundle; a GitHub push alone does not update their
+mounted workspace.
 
 ## Operational bounds
 

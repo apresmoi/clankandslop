@@ -5,6 +5,7 @@ import path from 'node:path';
 import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
+import { articleFormatFindings } from '../../ops/article-format.mjs';
 import { archiveIndex } from '../../ops/lay-page.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
@@ -208,15 +209,13 @@ export async function fileArticle(args){
   // no agent asserts what it cannot source. This refusal stands on its own,
   // with or without any compose gate.
   if('dissent' in article)throw new Error('article.dissent is not yours to write — a dissent is recorded by the colleague who holds it, with record_dissent, under their own name, never typed into your filing. Remove article.dissent and file again.');
-  if(article.edition_date!==args.edition)throw new Error(`article.edition_date must equal "${args.edition}", got ${JSON.stringify(article.edition_date)}`);
-  if(!Number.isSafeInteger(article.revision)||article.revision<1)throw new Error(`article.revision must be an integer >= 1, got ${JSON.stringify(article.revision)}`);
-  if(!Array.isArray(article.body)||article.body.length<4)throw new Error(`article.body must be an array of at least 4 paragraphs, got ${Array.isArray(article.body)?article.body.length:typeof article.body}`);
-  if(!Array.isArray(article.evidence_box)||article.evidence_box.length===0)throw new Error('article.evidence_box must be a non-empty array of source notes');
-  if(!Array.isArray(article.refs)||article.refs.length===0)throw new Error('article.refs must be a non-empty array of source-note ids');
-  const owner=(article.byline?.agents??[])[0]?.toLowerCase();
-  if(owner!==process.env.CLANK_NEWSROOM_AGENT)throw new Error(`article.byline.agents[0] must be the filing agent "${process.env.CLANK_NEWSROOM_AGENT}", got ${JSON.stringify((article.byline?.agents??[])[0])}`);
+  const owner=process.env.CLANK_NEWSROOM_AGENT;
   const{assignment,event_key:assignmentEventKey,corrected}=await resolveAssignment(args,article,owner);
   const resolvedArticle=corrected?{...article,id:assignment.id}:article;
+  const topics=await knownTopicSlugs(),previousArticles=new Set();
+  for(const prior of Array.isArray(resolvedArticle.previous_coverage)?resolvedArticle.previous_coverage:[])if(date.test(prior?.date??'')&&component.test(prior?.slug??'')&&await lstat(path.join(personaRoot,'..','editions',prior.date,'articles',`${prior.slug}.json`)).then(stat=>stat.isFile(),()=>false))previousArticles.add(`${prior.date}/${prior.slug}`);
+  const format=articleFormatFindings(resolvedArticle,{profile:'filing',editionDate:args.edition,articleId:assignment.id,owner,topicSlugs:topics,previousArticles,forecastRequired:assignment.slot==='forecast'});
+  if(format.errors.length)throw new Error(`article format rejected — nothing was recorded; fix these fields and file again: ${format.errors.map(item=>`${item.path} [${item.code}] ${item.message}`).join('; ')}`);
   const evidence=new Set(resolvedArticle.evidence_box.flatMap(item=>[item?.source_note?.source_url,item?.source_note?.source_id]).filter(Boolean));
   const missingEvidence=assignment.evidence_refs.filter(ref=>!evidence.has(ref));
   // The refusal a reporter actually reads, and the only place this rule is
@@ -261,20 +260,7 @@ export async function fileArticle(args){
     }
     if(prior.verdict!=='REVISION_REQUEST')throw new Error(`revision ${revision} requires revision ${revision-1} to carry a REVISION_REQUEST verdict, got "${prior.verdict}"`);
   }
-  // The forecast half of the deleted 21:00 floor, moved to the one moment a
-  // refusal is fixable inside the wake that caused it. Brass marks exactly one
-  // assignment `slot: "forecast"`; its owner owes the three fields every
-  // archived forecast carries and ops/validate-content.mjs checks.
-  if(assignment.slot==='forecast'){
-    const problems=[];
-    if(resolvedArticle.epistemic!=='forecast')problems.push(`article.epistemic must be "forecast", got ${JSON.stringify(resolvedArticle.epistemic)}`);
-    if(!/^\d{2}:\d{2}$/u.test(resolvedArticle.next_update_utc??''))problems.push(`article.next_update_utc must be a clock time "HH:MM" saying when the call gets looked at again, got ${JSON.stringify(resolvedArticle.next_update_utc)}`);
-    const confidence=resolvedArticle.confidence?.value;
-    if(typeof confidence!=='number'||!Number.isFinite(confidence)||confidence<0||confidence>1)problems.push(`article.confidence.value must be a number in [0, 1] — the probability the call carries, got ${JSON.stringify(resolvedArticle.confidence?.value)}`);
-    if(problems.length>0)throw new Error(`your assignment ${describeAssignment(assignment)} is today's forecast, so it files as one: ${problems.join('; ')}. Nothing was recorded — fix these and file revision ${resolvedArticle.revision} again in this wake.`);
-  }
   await checkArticleArt(args.edition,assignment.id,resolvedArticle);
-  const topics=await knownTopicSlugs();
   const flags=lintFiling(resolvedArticle,topics);
   // Citation integrity, always on and not switchable: a body that prints a
   // private research id, an [En] that resolves to no evidence-box entry, or a
