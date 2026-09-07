@@ -4,6 +4,8 @@
 
 **Later update, September 7 16:00 UTC:** the missing sensor display is repaired and both browser captures completed. Two research-runner issues remain. See [sensor-display-fix.md](sensor-display-fix.md); the inventory below records the earlier inspection.
 
+**Later update, September 7 18:58 UTC:** ad hoc research responders are deployed on the 4090. Both providers passed real isolated Moltnet round trips and restart/deduplication checks. See [adhoc-responder.md](adhoc-responder.md). Production remains parked; real Daimon consumption and internet restrictions remain unverified.
+
 Verified September 7, 2026, primarily 14:59–15:07 UTC (16:59–17:07 Berlin), with subsequent local code and validator checks. “Yesterday” means the September 6 edition; its night/rescue run continued into September 7. This investigation changed no deployed service, schedule, message, corpus or article.
 
 Org findings and acceptance criteria live here, on public branch `feat/agentic-org`. Automation and execution scratch belong in `clankandslop-private`. The Noopolis repositories supply dependencies; they are not the workspace for this newspaper's automation. Existing `ORG_FLOW.html` was inspected, not rewritten.
