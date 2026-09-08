@@ -4,7 +4,7 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-The org produced and locally staged the 8 September edition: five reviewed articles, four desk documents, two illustrated pages, and a successful mechanical validation/build receipt. The real 4090 ad hoc research loop and agent-owned Moltnet handoffs worked. This first production run needed operator recovery prompts; unattended daily operation remains unproven. Eight generic repairs are deployed and passed 43 native isolation checks. Publisher disabled. Original audit rows below remain historical evidence.
+The org produced and locally staged the 8 September edition: five reviewed articles, four desk documents, two composed pages, and a successful mechanical validation/build receipt. The real 4090 ad hoc research loop and agent-owned Moltnet handoffs worked. This first production run needed operator recovery prompts; unattended daily operation remains unproven. Eight generic repairs are deployed and passed 43 native isolation checks. Publisher disabled. Original audit rows below remain historical evidence.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
@@ -168,3 +168,5 @@ The org produced and locally staged the 8 September edition: five reviewed artic
 - 15_clock_recovery deployed mounted-store evidence remains UNKNOWN.
 - 16_research_consistency leaves UNKNOWN whether newsroom-tools/article-validation descriptor files are fresh builds of their listed source files.
 - CF-08 credential filesystem isolation remains UNKNOWN pending deployment/container/mount evidence.
+
+- **LEAD-ART-LOCATOR — SOURCE REPAIRED; RUNTIME ROLLOUT AND REBAKE PENDING.** Caslon supplies fitting lead art independently of reporter article JSON. New composition checks require explicit lead art; the build checks a lead map’s terrain, locator minimap and positive footprint. Frozen edition compatibility remains separate. The earlier handoff-only deployment timer is cancelled. The staged 8 September edition still awaits its new lead map.

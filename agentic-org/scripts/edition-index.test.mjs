@@ -51,7 +51,7 @@ const article = (id, agent, index) => ({
   ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {})
 });
 const page = (name, ids, map) => name === 'front'
-  ? { edition: EDITION, page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], flow: [{ block: 'MapGlyph', props: { map } }, { block: 'GlyphArt', props: { shape: 'chip' } }] }
+  ? { edition: EDITION, page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], head: [{ block: 'Hero', props: { variant: 'lead-only', withArt: true, lead: ids[0], art: { block: 'MapGlyph', props: { map, caption: 'Lead map.', locator_context: 'regional', interactive: false } } } }], flow: [{ block: 'GlyphArt', props: { shape: 'chip' } }] }
   : { edition: EDITION, page: name, paper: 'ticker', articles: [ids[0]], article: ids[1], flow: [] };
 
 const indexPath = (state) => path.join(state, 'editions', EDITION, 'INDEX');

@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
 import { layoutArtifacts } from './layout-artifacts.mjs';
-import { glyphSelectionFindings } from './glyph-format.mjs';
+import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-format.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -15,8 +15,6 @@ const isStr = (v) => typeof v === 'string' && v.length > 0;
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-const GLYPH_SHAPES = new Set(['colosseum', 'play', 'notfound', 'satellite', 'pumpjack', 'missile', 'drone', 'chip', 'campfire', 'eclipse']);
-const GLYPH_ROLLS = new Set(['chip', 'eclipse']);
 const RAIL_DIRS = new Set(['up', 'down', 'flat']);
 const CHROME = {
   front: { title: 'Clank & Slop - The Front Page', active: '/' },
@@ -104,14 +102,14 @@ function artBlock(slug, article, choice, maps) {
     if (mapArt(article)) fail('art selection', `"${slug}" already owns map art; retain its approved geography`);
     if (!isStr(choice.caption)) fail('art caption', `generated art for "${slug}" needs a caption`);
     const ref = choice.artifact;
-    if (ref.kind === 'map') return { block: 'MapGlyph', props: { map: ref.name, tone: 'soft', locator_context: 'regional', rule: false, interactive: false, caption: choice.caption } };
+    if (ref.kind === 'map') return { block: 'MapGlyph', props: { map: ref.name, tone: 'soft', locator_context: choice.locator_context ?? 'regional', rule: false, interactive: false, caption: choice.caption } };
     return { block: 'GlyphArt', props: { glyph: ref.name, scale: isNum(choice.scale) ? choice.scale : 0.9, caption: choice.caption } };
   }
   if (mapArt(article)) {
     if (['shape', 'roll', 'scale'].some(key => choice?.[key] !== undefined)) fail('art selection', `reporter map for ${slug} permits only a caption choice`);
     const name = isStr(art.hero_map) ? art.hero_map : art.map;
     if (!isStr(name) || !maps[name]) fail('maps must match article art', `"${slug}" carries art.kind "map" whose map did not resolve — this is an assembler bug, resolveArticleMaps should have refused it first`);
-    return { block: 'MapGlyph', props: { map: name, spots: (art.spots ?? []).map((s) => ({ ...s })), tone: 'soft', locator_context: 'regional', rule: false, interactive: false, caption: choice?.caption ?? art.caption ?? '' } };
+    return { block: 'MapGlyph', props: { map: name, cols: art.cols, rows: art.rows, rotX: art.rotX, rotY: art.rotY, zoom: art.zoom, overlays: art.overlays, routes: art.routes, spots: (art.spots ?? []).map((s) => ({ ...s })), tone: art.tone ?? 'soft', locator_context: choice?.locator_context ?? art.locator_context ?? 'regional', rule: false, interactive: false, caption: choice?.caption ?? art.caption ?? '' } };
   }
   const shape = choice?.shape ?? art?.shape, roll = choice?.roll ?? art?.roll;
   if (art?.kind === 'ascii' && (isStr(shape) || isStr(roll))) {
@@ -152,7 +150,7 @@ function flashpoints(order, articles, decisions, agents) {
 
 function frontPage(edition, order, articles, decisions, maps, agents) {
   const [lead, featureA, featureB, ...rest] = order;
-  const heroArt = mapArt(articles[lead]) !== null;
+  const heroArt = artBlock(lead, articles[lead], decisions.art?.[lead], maps);
   const artRow = (slug, side) => {
     const art = artBlock(slug, articles[slug], decisions.art?.[slug], maps);
     const story = teaser(slug, 'feature');
@@ -161,9 +159,9 @@ function frontPage(edition, order, articles, decisions, maps, agents) {
       : grid([2, 1], [[story], [art]], { rule: false, align: 'stretch' });
   };
   const head = [
-    { block: 'Hero', props: { variant: 'lead-only', withArt: heroArt, lead } },
-    artRow(featureA, heroArt ? 'right' : 'left'),
-    artRow(featureB, heroArt ? 'left' : 'right'),
+    { block: 'Hero', props: { variant: 'lead-only', withArt: true, lead, art: heroArt } },
+    artRow(featureA, 'right'),
+    artRow(featureB, 'left'),
   ];
   const pairs = [];
   for (let i = 0; i + 1 < rest.length; i += 2) pairs.push(rest.slice(i, i + 2));

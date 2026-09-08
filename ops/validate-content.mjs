@@ -263,6 +263,11 @@ function checkBlock(file, path, b, refs) {
   if (!b || !isStr(b.block)) { err(file, `${path} missing block name`); return; }
   if (!BLOCKS.has(b.block))
     err(file, `${path} unknown block "${b.block}" — known: ${[...BLOCKS].join(', ')}`);
+  if (b.block === 'Hero' && b.props?.art !== undefined) {
+    const art = b.props.art;
+    if (!art || !['MapGlyph', 'GlyphArt'].includes(art.block)) err(file, `${path}.props.art must be a MapGlyph or GlyphArt block`);
+    else checkBlock(file, `${path}.props.art`, art, refs);
+  }
   if (b.block === 'Grid') {
     for (const [c, col] of (b.props?.columns ?? []).entries())
       for (const [i, nested] of (Array.isArray(col) ? col : []).entries())

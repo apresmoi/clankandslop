@@ -58,7 +58,7 @@ function preparedDeskDocument(name, edition, root = path.join(os.tmpdir(), `clan
   }
   return document;
 }
-const page = (name, ids, map) => name === 'front' ? { edition: '2026-08-25', page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], flow: [{ block: 'MapGlyph', props: { map } }, { block: 'GlyphArt', props: { shape: 'chip' } }] } : { edition: '2026-08-25', page: name, paper: 'ticker', articles: [ids[0]], article: ids[1], flow: [] };
+const page = (name, ids, map) => name === 'front' ? { edition: '2026-08-25', page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], head: [{ block: 'Hero', props: { variant: 'lead-only', withArt: true, lead: ids[0], art: { block: 'MapGlyph', props: { map, caption: 'Lead map.', locator_context: 'regional', interactive: false } } } }], flow: [{ block: 'GlyphArt', props: { shape: 'chip' } }] } : { edition: '2026-08-25', page: name, paper: 'ticker', articles: [ids[0]], article: ids[1], flow: [] };
 
 test('public references and the dated-forecast predicate use the exact contract', () => {
   assert.deepEqual(collectPublicArticleReferences({ article: 'a', lead: 'b', splitWith: 'c', rail: ['d'], articles: ['e'], ignored: 'f' }), ['a', 'b', 'c', 'd', 'e']);
@@ -345,6 +345,47 @@ async function readComposedReceipt(state, edition) {
 }
 
 const stateOf = (result) => result.compose_gates;
+
+
+runtimeTest('new compositions require explicit Hero lead art when callers bypass lay_page', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-lead-art-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-08';
+  try {
+    const composeArgs = await driveToCompose(state, edition, article);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    const noLeadArt = structuredClone(composeArgs);
+    delete noLeadArt.pages[0].document.head;
+    await assert.rejects(composeEdition({ ...noLeadArt, event_key: 'compose-missing-lead-art' }), /lead illustration invalid/u);
+
+    const front = structuredClone(composeArgs.pages.find((page) => page.name === 'front').document);
+    front.head = [{ block: 'Hero', props: { variant: 'lead-only', withArt: true, lead: 'story-0', art: { block: 'MapGlyph', props: { map: 'hormuz-hero', caption: 'Lead map.', locator_context: 'regional', interactive: false } } } }];
+    const pages = [{ name: 'front', document: front }, composeArgs.pages.find((page) => page.name === 'tape')];
+    const wrongVariant = structuredClone(pages);
+    wrongVariant[0].document.head[0].props.variant = 'split-hero';
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-lead-wrong-variant', pages: wrongVariant }), /lead-only Hero/u);
+    const missingProps = structuredClone(pages);
+    delete missingProps[0].document.head[0].props.art.props;
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-lead-art-no-props', pages: missingProps }), /Hero\.props\.art\.props must be an object/u);
+    const missingMap = structuredClone(pages);
+    delete missingMap[0].document.head[0].props.art.props.map;
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-lead-art-no-map', pages: missingMap }), /Hero\.props\.art MapGlyph requires a valid map name/u);
+    const interactiveMap = structuredClone(pages);
+    interactiveMap[0].document.head[0].props.art.props.interactive = true;
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-lead-art-interactive', pages: interactiveMap }), /MapGlyph must be print mode/u);
+    const emptyGlyph = structuredClone(pages);
+    emptyGlyph[0].document.head[0].props.art = { block: 'GlyphArt', props: {} };
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-lead-empty-glyph', pages: emptyGlyph }), /GlyphArt must name a glyph or known shape\/roll/u);
+    const inventedGlyph = structuredClone(pages);
+    inventedGlyph[0].document.head[0].props.art = { block: 'GlyphArt', props: { shape: 'invented' } };
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-lead-invented-glyph', pages: inventedGlyph }), /GlyphArt invalid.*invented/u);
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-lead-art', pages });
+    assert.deepEqual(composed.tree.pages, ['front', 'tape']);
+    assert.deepEqual(composed.tree.maps, ['hormuz', 'hormuz-hero']);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
 
 runtimeTest('a day with the required forecast and no recorded dissent composes, and the paper says so', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-no-floor-'));
@@ -900,7 +941,7 @@ runtimeTest('file_desk refuses a desk document the edition cannot be assembled f
 const decisions = (edition, ids) => ({
   edition,
   order: ids,
-  art: { [ids[1]]: { shape: 'chip', caption: 'One glyph.' }, [ids[2]]: { shape: 'drone', caption: 'The other.' } },
+  art: { [ids[0]]: { shape: 'satellite', caption: 'Lead glyph.' }, [ids[1]]: { shape: 'chip', caption: 'One glyph.' }, [ids[2]]: { shape: 'drone', caption: 'The other.' } },
   flashpoints: [{ place: 'KYIV', lat: 50.45, lon: 30.52, note: 'A place worth a marker.', article: ids[0] }],
   briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `Kicker ${n}`, agent: 'Graves', what: `What ${n}.` }, rest: [] })),
   tape: {
@@ -924,7 +965,8 @@ runtimeTest('the pages ops/lay-page.mjs assembles compose, at five stories and a
     const edition = ['2026-09-09', '2026-09-10'][count - 5];
     try {
       // No article carries art.hero_map, which is the ordinary day the paper
-      // runs: the permitted map set is empty and the front runs on glyphs.
+      // runs: the permitted map set is empty and Caslon supplies three glyphs,
+      // including the required lead illustration.
       const noMap = (id, agent, date, index) => { const { art: _, ...value } = article(id, agent, date, index); return value; };
       await driveToCompose(state, edition, noMap, count);
       process.env.CLANK_NEWSROOM_AGENT = 'caslon';
@@ -932,15 +974,16 @@ runtimeTest('the pages ops/lay-page.mjs assembles compose, at five stories and a
       const composed = await composeEdition({ edition, event_key: `compose-laid-${count}`, pages, maps });
       assert.deepEqual(composed.tree.pages, ['front', 'tape']);
       assert.deepEqual(composed.tree.maps, []);
-      // The two GlyphArt blocks alone clear the 2-3 illustration gate, whatever
+      // The three GlyphArt blocks clear the 2-3 illustration gate, whatever
       // the day's length, and every PASSed piece is placed exactly once.
       const index = await readIndexFile(state, edition);
-      assert.match(index, new RegExp(`^G front articles=${count} visuals=2 papers=front lead=story-0$`, 'mu'));
+      assert.match(index, new RegExp(`^G front articles=${count} visuals=3 papers=front lead=story-0$`, 'mu'));
       assert.match(index, /^G tape articles=0 visuals=0 papers=tape lead=-$/mu);
 
-      // The same pages with one glyph removed are one visual short and refused.
+      // The same pages with only the lead art left are one visual short and refused.
       const thin = layAt(state, edition, count).pages;
-      thin[0].document.head[1].props.columns[0] = [];
+      thin[0].document.head[1].props.columns[1] = [];
+      thin[0].document.head[2].props.columns[0] = [];
       await assert.rejects(composeEdition({ edition, event_key: `compose-laid-thin-${count}`, pages: thin, maps: [] }), /illustration rhythm invalid.*found 1/su);
 
       // Both pages on the same stock is refused: the paper values must differ.

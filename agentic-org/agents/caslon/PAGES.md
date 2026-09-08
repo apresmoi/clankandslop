@@ -33,10 +33,14 @@ than accepted twice.
             "foxconn-ai-capex-build-chain", "green-book-discount-rate",
             "usps-mail-ballot-rule", "hard-public-verbs-hearth"],
 
-  // 2. The two glyphs, keyed by the slug in each illustrated slot. Only
-  //    needed where the story carries no art of its own; a story that does
-  //    gets its own map or shape and I say nothing. `scale` defaults to 0.6.
+  // 2. Lead art plus up to two feature illustrations, keyed by slug.
+  //    order[0] is the lead. Use reporter art when it is already approved;
+  //    otherwise choose generated lead art. order[1] and order[2] are the
+  //    feature rows. A generated lead map names locator_context, which makes
+  //    the print renderer include the locator inset from the same map.
   "art": {
+    "moscow-kyiv-envoy-sequence": { "artifact": { "kind": "map", "name": "moscow-kyiv-lead", "sha256": "<digest>" },
+      "caption": "Moscow to Kyiv. The lead geography anchors the page.", "locator_context": "regional" },
     "kametstal-furnace-outage": { "shape": "pumpjack",
       "caption": "Kamianske. Two blast furnaces are down and no restart date is published." },
     "foxconn-ai-capex-build-chain": { "shape": "chip",
@@ -148,7 +152,7 @@ they are the vocabulary my choices are made in.
 
 | block | what it is | the props that matter |
 | --- | --- | --- |
-| `Hero` | the lead, full width | `lead` (slug), `variant`: `lead-only` \| `lead-rail` \| `split-hero`, `rail` (slugs), `splitWith` (slug), `withArt` (bool — renders the lead's own art) |
+| `Hero` | lead art beside the lead story | New compositions use `variant: "lead-only"`, `lead` (slug), `withArt: true`, and `art` (a `MapGlyph` or `GlyphArt` block). Other variants are for frozen archive pages. |
 | `Teaser` | one story in a column | `article` (slug), `size`: `lead` \| `rail` \| `flow` \| `feature` |
 | `Grid` | the structural row | `cols` (fractions, e.g. `[2,1]`), `columns` (one block array per column), `align`: `start` \| `stretch`, `rule` (bool), `finance` (bool) |
 | `SectionHeader` | a full-width rule and label | `text` |
@@ -260,31 +264,37 @@ different `spots`.
 and page `MapGlyph` references. Every supplied map must resolve to an unchanged
 archive document or a selected authenticated Caslon bake. No extra maps ship.
 
-For a story without reporter map art, call `bake_map` or `bake_glyph`, then
-set `art["<slug>"].artifact` to the returned `{kind,name,sha256}`
-and supply a reader-facing caption about the subject, without tool or model names.
-Generated art occupies either illustrated feature slot,
-`order[1]` or `order[2]`. Do not combine it with `shape` or `roll`. Call
-`lay_pages({edition,decisions})`; pass its `layout_sha256`, the edition and
+For lead art on a story without approved reporter art, call `bake_map` or
+`bake_glyph`, then set `art[order[0]].artifact` to the returned
+`{kind,name,sha256}`. If the lead artifact is a map, add
+`locator_context:"regional"` or `"continental"`. The locator is not a second
+bake: `MapGlyph` builds the print minimap automatically from the selected map
+bounds, the committed landmask, and `locator_context`. Use the crop that makes
+the lead's geography readable; no image inspection or visual PASS step is
+required.
+
+For feature art on `order[1]` or `order[2]`, call `bake_map` or `bake_glyph`
+when the story carries no suitable reporter art, then set `art["<slug>"].artifact`
+to the returned `{kind,name,sha256}` and supply a reader-facing caption about
+the subject, without tool or model names. Do not combine generated artifact art
+with `shape` or `roll`. The front carries at most three story illustrations:
+the lead plus the two feature rows.
+
+Call `lay_pages({edition,decisions})`; pass its `layout_sha256`, the edition and
 current wake id to `compose_edition`. The tool authenticates and loads the
-saved `pages`, `maps` and `artifacts` itself.
-
-Image inspection tools are optional diagnostics. Release depends on the
-baked structure and mechanical validation/build receipts, with no agent
-visual inspection or visual PASS step.
-
-A generated glyph becomes `GlyphArt` with `props.glyph` naming the edition file.
-A fresh map becomes `MapGlyph` with `props.map`. This does not change a reporter's
-article or insert claims into their prose. For a missing article map, ask its
-owner in `room:filing` and Brass in `room:release`; every PASSed piece still has
-to be placed. Wait for the owning reporter's fix and Spike's new verdict.
+saved `pages`, `maps` and `artifacts` itself. Generated art does not change a
+reporter's article or insert claims into their prose. If the reporter's article
+already carries map art, keep that reference unchanged. If the article itself
+needs a map correction, ask its owner in `room:filing` and Brass in
+`room:release`; every PASSed piece still has to be placed. Wait for the owning
+reporter's fix and Spike's new verdict.
 
 ## What the front becomes
 
 ```
-Hero               the lead alone across the top
-Grid [1,2]         art left,  first feature right
-Grid [2,1]         second feature left, art right
+Hero  withArt      lead art left, lead story right
+Grid [2,1]         first feature left, art right
+Grid [1,2]         art left, second feature right
 Grid [1,1]         two shorter pieces, side by side          ┐ one row per
 Grid [1,1]         two more, on a seven-story day            ┘ pair left over
 Grid [1]           the full-width feature — the Hearth slot, on an odd day
@@ -293,32 +303,31 @@ Grid [1,1]         the globe left, the numbered index right
 flow: Briefly      compact, empty title, three desks
 ```
 
-The rhythm, in words: the lead alone; two illustrated feature rows with the
-art on **opposite sides**, which is what satisfies the alternation gate by
-construction; the shorter pieces two-up; then the Flashpoint Index. The
-front carries **every** PASSed piece, which is what the extra rows are for on
-a heavy day — nothing is dropped and nothing is placed twice.
+The rhythm, in words: the lead hero first; two illustrated feature rows with
+the art on **opposite sides**; the shorter pieces two-up; then the Flashpoint
+Index. The front carries **every** PASSed piece, which is what the extra rows
+are for on a heavy day — nothing is dropped and nothing is placed twice.
 
-**When the lead itself declares a map**, the hero panel takes it — that is
-what `hero_map` is named for — and the two feature rows underneath flip so
-the art still zig-zags:
+**When the lead carries reporter art or my generated lead art**, the hero
+panel takes it, and the two feature rows underneath flip so the art still
+zig-zags:
 
 ```
-Hero  withArt     the lead's own map, left of the lead      ← art LEFT
+Hero  withArt     the lead art, left of the lead            ← art LEFT
 Grid [2,1]        first feature left, art right             ← art RIGHT
 Grid [1,2]        art left, second feature right            ← art LEFT
 ```
 
-Hero art is not one of the blocks the illustration gate counts, so the front
-still carries two-to-three `MapGlyph`/`GlyphArt` blocks either way. It *is*
-counted by `ops/validate-content.mjs`, which reads a hero carrying art as the
-first art-left row of the run — which is exactly why the rows below it flip,
-and the assembler refuses itself if they do not.
+Hero art is part of the page's story illustration run. When the lead lacks
+reporter art, my generated `art[order[0]]` choice becomes the hero art; when a
+generated map carries `locator_context`, print output includes the locator inset
+from the same map data. The rows below it flip so the run starts left, then right,
+then left, and the assembler refuses itself if they do not.
 
 A story that carries a map but sits further down the page keeps it: the
 region is still supplied to `compose_edition` and the map runs on that
 story's own page at 104×42, where a locator does most of its work anyway.
-The front's two illustrated slots are not the only place a map appears.
+The front's feature slots are not the only place a map appears.
 
 The `WorldIndex` rows and the globe hotspots are the same places in the same
 order, because they are built from one list. A seventh hotspot against six
@@ -429,6 +438,9 @@ cannot be laid out, and it names the gate and the missing input:
   front and the tape may not feature the same story.
 - **`lead story`** — `order[0]` disagrees with `caslon.chrome.lead_story_id`.
   Two documents, one lead.
+- **`lead art`** — new live compositions need hero art. Reporter art may satisfy
+  it; otherwise `art[order[0]]` supplies it. A generated lead map must include
+  `locator_context` so the locator renders.
 - **`illustration rhythm invalid`** — a story sits in an illustrated slot,
   carries no art of its own, and `art["<slug>"]` is missing or has no caption.
 - **`glyph catalogue`** — a shape or roll that has no model. Nine static

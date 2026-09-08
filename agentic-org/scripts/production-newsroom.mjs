@@ -8,6 +8,7 @@ import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } 
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
 import { articleFormatFindings } from '../../ops/article-format.mjs';
+import { glyphSelectionFindings } from '../../ops/glyph-format.mjs';
 import { archiveIndex } from '../../ops/lay-page.mjs';
 import { authenticateWorldDeskFiling } from './worlddesk-filing.mjs';
 
@@ -59,6 +60,7 @@ const publicArticleRefs=(value,out=new Set())=>{if(Array.isArray(value)){for(con
 export const collectPublicArticleReferences=(value)=>[...publicArticleRefs(value)].sort();
 export { isDatedForecast } from './compose-gate.mjs';
 const visualCount=value=>JSON.stringify(value).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu)?.length??0;
+const leadArtError=hero=>{const art=hero?.props?.art;if(hero?.props?.variant!=='lead-only')return'new compositions require a lead-only Hero that renders lead art';if(hero?.props?.withArt!==true||!art||!['MapGlyph','GlyphArt'].includes(art.block))return'new compositions require Hero.props.art from Caslon-owned lead art';if(!art.props||typeof art.props!=='object'||Array.isArray(art.props))return'Hero.props.art.props must be an object';if(art.block==='MapGlyph'){if(!component.test(art.props.map??''))return'Hero.props.art MapGlyph requires a valid map name';if(art.props.interactive!==false)return'Hero.props.art MapGlyph must be print mode with interactive:false';}if(art.block==='GlyphArt'){if(!['glyph','shape','roll'].some(key=>art.props[key]!==undefined))return'Hero.props.art GlyphArt must name a glyph or known shape/roll';const errors=glyphSelectionFindings(art.props);if(errors.length)return`Hero.props.art GlyphArt invalid: ${errors.join('; ')}`;}return'';};
 async function editionTree(edition){const articles=await jsonNames(edition,'articles'),reviews=await jsonNames(edition,'reviews'),desk=await jsonNames(edition,'desk'),pages=await jsonNames(edition,'pages'),maps=await jsonNames(edition,'maps');return{articles,desk,pages,maps,reviews};}
 async function digests(edition,kind,names){return Object.fromEntries(await Promise.all(names.map(async name=>[name,sha(JSON.stringify(await readJson(location(edition,kind,name))))])));}
 async function directoryDigest(directory){const hash=createHash('sha256');async function visit(base,relative=''){for(const name of(await readdir(base)).sort()){const file=path.join(base,name),next=path.posix.join(relative,name),stat=await lstat(file);if(stat.isSymbolicLink())throw new Error('release artifact contains symlink');hash.update(`${stat.isDirectory()?'d':'f'}\0${next}\0`);if(stat.isDirectory())await visit(file,next);else if(stat.isFile())hash.update(await readFile(file));else throw new Error('release artifact contains unsupported node');}}await visit(directory);return`sha256:${hash.digest('hex')}`;}
@@ -322,7 +324,9 @@ async function composeEditionAction(args){
   const pageArticles=new Set(),pageMaps=new Set(),papers=new Set();for(const page of args.pages){object(page.document);for(const value of publicArticleRefs(page.document))pageArticles.add(value);for(const value of walkValues(page.document,'map'))pageMaps.add(value);for(const value of walkValues(page.document,'paper'))papers.add(value);}
   if([...pageArticles].sort().join()!==articles.join())throw new Error(`page completeness invalid — pages must reference exactly the PASSed articles [${articles.join(', ')}], got [${[...pageArticles].sort().join(', ')}]`);
   if(papers.size<2)throw new Error(`paper diversity invalid — pages must use at least 2 distinct "paper" values, found ${papers.size}`);
-  const frontVisuals=visualCount(args.pages.find(page=>page.name==='front').document);
+  const frontPageDocument=args.pages.find(page=>page.name==='front').document,frontHero=(frontPageDocument.head??[]).find(block=>block?.block==='Hero');
+  {const leadError=leadArtError(frontHero);if(leadError)throw new Error(`lead illustration invalid — ${leadError}`);}
+  const frontVisuals=visualCount(frontPageDocument);
   if(frontVisuals<2||frontVisuals>3)throw new Error(`illustration rhythm invalid — the "front" page must carry 2-3 MapGlyph/GlyphArt/Illustration/Image blocks, found ${frontVisuals}`);
   const selected={maps:new Map(),glyphs:new Map()};
   if(args.artifacts!==undefined&&!Array.isArray(args.artifacts))throw new Error('artifacts must be an array of immutable Caslon artwork references');

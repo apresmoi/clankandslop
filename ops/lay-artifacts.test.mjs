@@ -13,7 +13,7 @@ function input() {
   return {
     edition, articles:Object.fromEntries(order.map(id => [id,{id,section:'world',epistemic:'fact',headline:'Fixture',deck:'Fixture deck',byline:{agents:['Cogsworth']}}])),
     desk:{'caslon.chrome':{lead_story_id:'alpha'},'caslon.weather':{weather:null},'ledger.settlements':{resolved_last_edition:[]},'ledger.worlddesk':{world_desk:{}}},
-    decisions:{edition,order,art:{bravo:{artifact:map,caption:'Taiwan terrain'},charlie:{artifact:glyph,caption:'Microchip'}},flashpoints:[],briefly,tape:{briefly}},
+    decisions:{edition,order,art:{alpha:{shape:'satellite',caption:'Lead'},bravo:{artifact:map,caption:'Taiwan terrain',locator_context:'continental'},charlie:{artifact:glyph,caption:'Microchip'}},flashpoints:[],briefly,tape:{briefly}},
     artifacts:[{reference:map,document:mapDoc},{reference:glyph,document:glyphDoc}],agents:new Set(['Cogsworth']),archive:()=>undefined,
   };
 }
@@ -22,8 +22,9 @@ test('fresh map and glyph reach page JSON and compose inputs without editing art
   const source = input(), before = JSON.stringify(source.articles), result = layEdition(source);
   assert.deepEqual(result.artifacts,[map,glyph]);
   assert.deepEqual(result.maps,[{name:map.name,document:mapDoc}]);
-  assert.equal(result.pages[0].document.head[1].props.columns[0][0].props.map,map.name);
-  assert.equal(result.pages[0].document.head[2].props.columns[1][0].props.glyph,glyph.name);
+  assert.equal(result.pages[0].document.head[1].props.columns[1][0].props.map,map.name);
+  assert.equal(result.pages[0].document.head[1].props.columns[1][0].props.locator_context,'continental');
+  assert.equal(result.pages[0].document.head[2].props.columns[0][0].props.glyph,glyph.name);
   assert.equal(JSON.stringify(source.articles),before);
 });
 
@@ -32,7 +33,7 @@ test('missing, changed, ambiguous and unused generated selections are refused', 
     x => x.artifacts.pop(),
     x => x.artifacts[1].reference = {...glyph,sha256:'c'.repeat(64)},
     x => x.decisions.art.charlie.shape = 'chip',
-    x => x.decisions.art.alpha = {artifact:glyph,caption:'Unused hero'},
+    x => x.decisions.art.delta = {artifact:glyph,caption:'Unused flow'},
     x => x.artifacts.push(structuredClone(x.artifacts[1])),
     x => x.artifacts[1].document.art = '  \n  ',
     x => x.articles.bravo.art = {kind:'map',map:map.name},
@@ -51,12 +52,12 @@ test('baked layouts reject invisible or overflowing art scales before compositio
   for (const scale of [0.6, 0.82, 0.86, 0.9, 1]) {
     const source = input(); source.decisions.art.charlie.scale = scale;
     const result = layEdition(source);
-    assert.equal(result.pages[0].document.head[2].props.columns[1][0].props.scale, scale);
+    assert.equal(result.pages[0].document.head[2].props.columns[0][0].props.scale, scale);
   }
 });
 
 test('art choices cannot be silently discarded by placement or reporter map ownership', () => {
-  for (const slug of ['alpha', 'delta', 'missing']) {
+  for (const slug of ['delta', 'missing']) {
     const source = input(); source.decisions.art[slug] = {shape:'chip',caption:'Unused'};
     assert.throws(() => layEdition(source), /art placement/);
   }

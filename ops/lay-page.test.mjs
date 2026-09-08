@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, existsSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
@@ -29,7 +29,7 @@ const synthetic = () => ({
   decisions: {
     edition: '2026-09-09',
     order: ['alpha', 'bravo', 'charlie', 'delta', 'echo'],
-    art: { bravo: { shape: 'chip', caption: 'One.' }, charlie: { shape: 'drone', caption: 'Two.' } },
+    art: { alpha: { shape: 'satellite', caption: 'Lead.' }, bravo: { shape: 'chip', caption: 'One.' }, charlie: { shape: 'drone', caption: 'Two.' } },
     flashpoints: [{ place: 'KYIV', lat: 50.45, lon: 30.52, note: 'A note.', article: 'alpha' }],
     briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `K${n}`, agent: 'Graves', what: `W${n}` }, rest: [] })),
     tape: {
@@ -57,10 +57,11 @@ test('the two pages carry different top-level paper values', () => {
   assert.equal(new Set(pages.map((p) => p.document.paper)).size, 2);
 });
 
-test('the front carries exactly two visual blocks', () => {
+test('the front carries exactly three visual blocks including Caslon-owned lead art', () => {
   const { pages } = lay();
   const visuals = JSON.stringify(pages[0].document).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu) ?? [];
-  assert.equal(visuals.length, 2);
+  assert.equal(visuals.length, 3);
+  assert.equal(pages[0].document.head[0].props.art.block, 'GlyphArt');
 });
 
 test('every PASSed article is placed exactly once, and the tape features none', () => {
@@ -72,12 +73,13 @@ test('every PASSed article is placed exactly once, and the tape features none', 
   assert.deepEqual(front.filter((slug) => tape.includes(slug)), []);
 });
 
-test('illustrated rows alternate art left then art right', () => {
-  const [rowA, rowB] = lay().pages[0].document.head.slice(1, 3);
-  assert.deepEqual(rowA.props.cols, [1, 2]);
-  assert.equal(rowA.props.columns[0][0].block, 'GlyphArt');
-  assert.deepEqual(rowB.props.cols, [2, 1]);
-  assert.equal(rowB.props.columns[1][0].block, 'GlyphArt');
+test('illustrated rows alternate after the lead art row', () => {
+  const [hero, rowA, rowB] = lay().pages[0].document.head.slice(0, 3);
+  assert.equal(hero.props.withArt, true);
+  assert.deepEqual(rowA.props.cols, [2, 1]);
+  assert.equal(rowA.props.columns[1][0].block, 'GlyphArt');
+  assert.deepEqual(rowB.props.cols, [1, 2]);
+  assert.equal(rowB.props.columns[0][0].block, 'GlyphArt');
 });
 
 test('the globe hotspots and the flashpoint index are the same places in the same order', () => {
@@ -131,6 +133,11 @@ test('an illustrated slot with neither article art nor a record entry is refused
   assert.match(error.message, /art\["bravo"\]/);
 });
 
+test('a new layout without lead art is refused before page bytes are produced', () => {
+  const error = refuses((i) => { delete i.decisions.art.alpha; return i; }, /illustration rhythm invalid/);
+  assert.match(error.message, /art\["alpha"\]/);
+});
+
 test('a glyph outside the committed library is refused', () => {
   refuses((i) => { i.decisions.art.bravo.shape = 'biplane'; return i; }, /glyph catalogue/);
   refuses((i) => { i.decisions.art.bravo.roll = 'globe'; return i; }, /glyph catalogue/);
@@ -143,7 +150,7 @@ test('eclipse glyph requires both shape "eclipse" and roll "eclipse" in layout',
     i.decisions.art.bravo = { shape: 'eclipse', roll: 'eclipse', caption: 'The total solar eclipse.' };
     return i;
   });
-  const block = pages[0].document.head[1].props.columns[0][0];
+  const block = pages[0].document.head[1].props.columns[1][0];
   assert.deepEqual(block.props, { shape: 'eclipse', roll: 'eclipse', scale: 0.6, caption: 'The total solar eclipse.' });
 
   const shapeOnlyErr = refuses((i) => { i.decisions.art.bravo = { shape: 'eclipse', caption: 'Shape only.' }; return i; }, /glyph catalogue/);
@@ -188,7 +195,7 @@ test('an article carrying map art in an illustrated slot becomes a MapGlyph with
     delete i.decisions.art.bravo;
     return i;
   });
-  const block = pages[0].document.head[1].props.columns[0][0];
+  const block = pages[0].document.head[1].props.columns[1][0];
   assert.equal(block.block, 'MapGlyph');
   assert.deepEqual(block.props.spots, spots);
   assert.equal(block.props.caption, 'From the article.');
@@ -246,7 +253,7 @@ test('a map/hero_map pair resolves and ships both, from the 2026-07-05 fixture',
   });
   assert.deepEqual(maps.map((m) => m.name), ['taiwan-east', 'taiwan-hero']);
   assert.deepEqual(maps.map((m) => m.document.name), ['taiwan-east', 'taiwan-hero']);
-  const block = pages[0].document.head[1].props.columns[0][0];
+  const block = pages[0].document.head[1].props.columns[1][0];
   assert.equal(block.block, 'MapGlyph');
   assert.equal(block.props.map, 'taiwan-hero');
 });
@@ -255,7 +262,7 @@ test('equal names ship one map, and a bare art.map ships one', () => {
   assert.deepEqual(lay((i) => withMap(i, 'bravo')).maps.map((m) => m.name), ['kyiv']);
   const bare = lay((i) => withMap(i, 'bravo', { hero_map: undefined }));
   assert.deepEqual(bare.maps.map((m) => m.name), ['kyiv']);
-  assert.equal(bare.pages[0].document.head[1].props.columns[0][0].props.map, 'kyiv');
+  assert.equal(bare.pages[0].document.head[1].props.columns[1][0].props.map, 'kyiv');
   refuses((i) => withMap(i, 'bravo', { map: 'kyiv-wide' }), /names map "kyiv-wide", which is neither/);
   refuses((i) => withMap(i, 'bravo', { hero_map: 'kyiv-hero' }), /names map "kyiv-hero", which is neither/);
   refuses((i) => withMap(i, 'bravo', { map: undefined }), /carries art\.kind "map" but no "map"/);
@@ -272,28 +279,29 @@ test('two stories may not carry one region with different spots', () => {
   assert.deepEqual(maps.map((m) => m.name), ['kyiv']);
 });
 
-test('a lead that declares a map takes the hero panel, and the feature rows flip under it', () => {
+test('a lead that declares a map takes the hero panel without losing reporter map presentation', () => {
   const plain = lay().pages[0].document.head;
-  assert.equal(plain[0].props.withArt, false);
-  assert.deepEqual([plain[1].props.cols, plain[2].props.cols], [[1, 2], [2, 1]]);
+  assert.equal(plain[0].props.withArt, true);
+  assert.equal(plain[0].props.art.block, 'GlyphArt');
+  assert.deepEqual([plain[1].props.cols, plain[2].props.cols], [[2, 1], [1, 2]]);
 
-  const head = lay((i) => withMap(i, 'alpha')).pages[0].document.head;
+  const head = lay((i) => withMap(i, 'alpha', { cols: 52, rows: 30, rotX: 1.1, rotY: 0.2, zoom: 0.7, tone: 'normal', locator_context: 'continental', overlays: [{ ring: [[50, 30], [51, 30], [51, 31]], color: 'red' }], routes: [{ points: [[50, 30], [51, 31]], color: 'accent' }] })).pages[0].document.head;
   assert.equal(head[0].props.withArt, true, 'the lead\'s own map renders in the hero panel');
   assert.deepEqual([head[1].props.cols, head[2].props.cols], [[2, 1], [1, 2]]);
   assert.equal(head[1].props.columns[1][0].block, 'GlyphArt');
   assert.equal(head[2].props.columns[0][0].block, 'GlyphArt');
   const visuals = JSON.stringify(lay((i) => withMap(i, 'alpha')).pages[0].document).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu) ?? [];
-  assert.equal(visuals.length, 2, 'a hero map does not consume one of the two-to-three visual blocks');
+  assert.equal(visuals.length, 3, 'the hero map joins the two feature visuals');
 });
 
 test('a page whose illustrated run does not alternate is refused before compose_edition sees it', () => {
   const head = [
-    { block: 'Hero', props: { variant: 'lead-only', withArt: true, lead: 'alpha' } },
+    { block: 'Hero', props: { variant: 'lead-only', withArt: true, lead: 'alpha', art: { block: 'GlyphArt', props: { shape: 'satellite', caption: 'Lead.' } } } },
     { block: 'Grid', props: { cols: [1, 2], columns: [[{ block: 'GlyphArt', props: {} }], [{ block: 'Teaser', props: { article: 'bravo' } }]] } },
   ];
   assert.deepEqual(alternationRuns(head), [['left', 'left']]);
   assert.deepEqual(alternationRuns(lay((i) => withMap(i, 'alpha')).pages[0].document.head), [['left', 'right', 'left']]);
-  assert.deepEqual(alternationRuns(lay().pages[0].document.head), [['left', 'right']]);
+  assert.deepEqual(alternationRuns(lay().pages[0].document.head), [['left', 'right', 'left']]);
 });
 
 test('a reporter-shipped presentation.flashpoint is used when the record declares none', () => {
@@ -343,37 +351,46 @@ test('page chrome is ceremony and is never taken from the record', () => {
 test('the assembler is deterministic — same inputs, byte-identical output', () => {
   const once = JSON.stringify(lay());
   for (let i = 0; i < 3; i += 1) assert.equal(JSON.stringify(lay()), once);
-  for (const date of EDITIONS) assert.equal(JSON.stringify(layShipped(date)), JSON.stringify(layShipped(date)));
 });
 
-test('every shipped edition re-lays and satisfies each page gate', () => {
+test('legacy shipped editions stay renderable as frozen page JSON, but bare-lead relayout is refused', () => {
   for (const date of EDITIONS) {
-    const { pages, maps } = layShipped(date);
-    const [front, tape] = pages.map((p) => p.document);
+    const front = readJson(resolve(repo, 'content/editions', date, 'pages/front.json'));
+    const tape = readJson(resolve(repo, 'content/editions', date, 'pages/tape.json'));
     const passed = Object.keys(readEditionInputs(resolve(repo, 'content'), date).articles).sort();
-    assert.deepEqual(collectPublicArticleReferences(front), passed, `${date} page completeness`);
-    assert.deepEqual(collectPublicArticleReferences(tape), [], `${date} tape features nothing`);
-    assert.equal(new Set([front.paper, tape.paper]).size, 2, `${date} paper diversity`);
-    const visuals = (JSON.stringify(front).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu) ?? []).length;
-    assert.ok(visuals >= 2 && visuals <= 3, `${date} illustration rhythm: ${visuals}`);
-    const articleMaps = new Set(Object.values(readEditionInputs(resolve(repo, 'content'), date).articles).flatMap((a) => [a.art?.map, a.art?.hero_map]).filter(Boolean));
-    assert.deepEqual(maps.map((m) => m.name).sort(), [...articleMaps].sort(), `${date} maps match article art`);
+    assert.deepEqual(collectPublicArticleReferences(front), passed, `${date} frozen page completeness`);
+    assert.deepEqual(collectPublicArticleReferences(tape), [], `${date} frozen tape features nothing`);
+    assert.equal(new Set([front.paper ?? 'front', tape.paper ?? 'tape']).size, 2, `${date} frozen paper diversity`);
+    assert.throws(() => layShipped(date), /art\[".*?"\]/u, `${date} legacy relayout needs explicit lead art`);
   }
 });
 
-test('ops/validate-content.mjs accepts every assembled edition', () => {
+test('ops/validate-content.mjs accepts frozen shipped editions', () => {
   const dir = mkdtempSync(resolve(tmpdir(), 'lay-page-'));
   try {
     cpSync(resolve(repo, 'ops'), resolve(dir, 'ops'), { recursive: true });
     cpSync(resolve(repo, 'content'), resolve(dir, 'content'), { recursive: true });
     for (const date of EDITIONS) {
-      const pages = resolve(dir, 'content/editions', date, 'pages');
-      rmSync(pages, { recursive: true, force: true });
-      mkdirSync(pages, { recursive: true });
-      for (const page of layShipped(date).pages) writeFileSync(resolve(pages, `${page.name}.json`), `${JSON.stringify(page.document, null, 1)}\n`);
     }
     const out = execFileSync(process.execPath, ['ops/validate-content.mjs'], { cwd: dir, encoding: 'utf8' });
     assert.match(out, /content OK/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('ops/validate-content.mjs validates explicit Hero art without requiring legacy pages to carry it', () => {
+  const dir = mkdtempSync(resolve(tmpdir(), 'lay-page-'));
+  try {
+    cpSync(resolve(repo, 'ops'), resolve(dir, 'ops'), { recursive: true });
+    cpSync(resolve(repo, 'content'), resolve(dir, 'content'), { recursive: true });
+    const frontPath = resolve(dir, 'content/editions/2026-06-13/pages/front.json');
+    const front = readJson(frontPath);
+    front.head[0].props.withArt = true;
+    front.head[0].props.art = { block: 'GlyphArt', props: { shape: 'satellite', caption: 'Explicit lead art.' } };
+    writeFileSync(frontPath, `${JSON.stringify(front, null, 1)}\n`);
+    assert.match(execFileSync(process.execPath, ['ops/validate-content.mjs'], { cwd: dir, encoding: 'utf8' }), /content OK/);
+    front.head[0].props.art = { block: 'UnknownArt', props: {} };
+    writeFileSync(frontPath, `${JSON.stringify(front, null, 1)}\n`);
+    assert.throws(() => execFileSync(process.execPath, ['ops/validate-content.mjs'], { cwd: dir, encoding: 'utf8', stdio: 'pipe' }), /props\.art must be a MapGlyph or GlyphArt block/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
@@ -383,17 +400,7 @@ test('the record may run an article glyph as an animated roll, and only one may 
     i.decisions.art.bravo = { roll: 'chip' };
     return i;
   };
-  const block = lay(withRoll).pages[0].document.head[1].props.columns[0][0];
+  const block = lay(withRoll).pages[0].document.head[1].props.columns[1][0];
   assert.deepEqual(block.props, { shape: 'chip', roll: 'chip', scale: 0.6, caption: 'From the article.' });
   refuses((i) => { withRoll(i); i.decisions.art.charlie = { shape: 'eclipse', roll: 'eclipse', caption: 'The other.' }; return i; }, /animated roll/);
-});
-
-test('the assembled front reproduces the shipped August front, plus the paper key the gate wanted', () => {
-  for (const date of ['2026-08-19', '2026-08-20', '2026-08-21']) {
-    const assembled = layShipped(date).pages[0].document;
-    const shipped = readJson(resolve(repo, 'content/editions', date, 'pages/front.json'));
-    assert.equal(assembled.paper, 'front');
-    const { paper: _, ...withoutPaper } = assembled;
-    assert.deepEqual(withoutPaper, shipped, `${date} front must re-lay byte-for-byte apart from "paper"`);
-  }
 });

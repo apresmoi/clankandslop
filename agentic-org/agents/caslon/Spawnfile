@@ -20,7 +20,7 @@ schedule:
   cron: "0 21 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md plus repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. The tools enforce the baked page structure. Mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md plus repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed, including decisions.art[order[0]] lead art when the lead lacks reporter art; generated lead maps need locator_context. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. The tools enforce the baked page structure. Mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."
 
 surfaces:
   moltnet:
@@ -70,8 +70,8 @@ workspace:
   docs: { system: AGENTS.md }
   resources:
     - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
-    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:74aa3446890c27e17f63dd6f8c9d223d4b2994c450680dd1b3d85926d86787e9, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:ebf7a17cde1804c40ee8eb6ca8543a29642ed9b42245bb4d3c9cae78438669dc, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:3d358495ab5fda5f005fc1a0c345dc467bc51d0f93afe60eb770ac0b7eba2fa7, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:53e86e095d15193b3d8fd45dc4c7abcede4bcf2873a64ff6b55bd50a8bf27363, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:1b9d4fad435d6263eb31d80f3685eee3ce5805841d308757ec32b0155b71048e, mount: ./repos/newsroom-private, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to

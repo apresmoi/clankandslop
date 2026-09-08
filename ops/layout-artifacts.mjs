@@ -8,7 +8,7 @@ const validRef = ref => ref && Object.keys(ref).sort().join() === 'kind,name,sha
 export function layoutArtifacts(decisions, artifacts, fail) {
   const maps = {}, selected = new Map(), names = new Map();
   for (const [story, choice] of Object.entries(decisions.art ?? {})) {
-    if (!decisions.order.slice(1, 3).includes(story)) fail('art placement', `art for ${story} must occupy an illustrated feature slot`);
+    if (!decisions.order.slice(0, 3).includes(story)) fail('art placement', `art for ${story} must occupy the lead or an illustrated feature slot`);
     if (choice?.artifact === undefined) continue;
     const ref = choice.artifact;
     if (!validRef(ref)) fail('art reference', `invalid artifact for ${story}`);
