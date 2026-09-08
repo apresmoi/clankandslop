@@ -1,3 +1,5 @@
+import { archiveResolver } from '../../ops/lay-page.mjs';
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
@@ -5,8 +7,10 @@ import path from 'node:path';
 import test from 'node:test';
 import { CITATION_GATE_NAMES, HARD_LINT_NAMES, advisoryFilingWarnings, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
 import { proseLintFindings } from '../../ops/prose-lint.mjs';
-import { composeEdition, fileArticle, fileDesk, recordAssignment, recordDissent, reviewArticle } from './production-newsroom.mjs';
+import { composeEdition, fileArticle, fileDesk, recordAssignment, recordDissent, reviewArticle as reviewArticleWithDigest } from './production-newsroom.mjs';
 
+const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
+const reviewArticle = async args => { const filing = JSON.parse(await readFile(path.join(process.env.CLANK_EDITION_STATE_ROOT, 'editions', args.edition, 'filings', args.article_id, `${args.revision}.json`), 'utf8')); return reviewArticleWithDigest({ ...args, filing_digest: `sha256:${createHash('sha256').update(JSON.stringify(filing)).digest('hex')}` }); };
 const EDITION = '2026-09-04';
 const OWNERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
 // Real slugs from content/topics.json: the index and file_article both read
@@ -41,7 +45,7 @@ const article = (id, agent, index) => ({
   ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {})
 });
 const page = (name, ids, map) => name === 'front'
-  ? { edition: EDITION, page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], flow: [{ block: 'MapGlyph', props: { map } }, { block: 'GlyphArt', props: { glyph: 'signal' } }] }
+  ? { edition: EDITION, page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], flow: [{ block: 'MapGlyph', props: { map } }, { block: 'GlyphArt', props: { shape: 'chip' } }] }
   : { edition: EDITION, page: name, paper: 'ticker', articles: [ids[0]], article: ids[1], flow: [] };
 
 const indexPath = (state) => path.join(state, 'editions', EDITION, 'INDEX');
@@ -54,6 +58,7 @@ const rows = (text, kind) => text.split('\n').filter((line) => line.startsWith(`
 // desk document and page each get their own before/after check.
 async function driveEdition(state) {
   process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
   const seen = [];
   const step = async (label, run) => {
     await rm(indexPath(state), { force: true });
@@ -76,8 +81,8 @@ async function driveEdition(state) {
     for (const [index, owner] of OWNERS.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition: EDITION, event_key: `filing-${index}`, article: article(`story-${index}`, capitalize(owner), index) }); }
   });
   assert.equal(rows(afterFiling, 'F').length, 5);
-  assert.match(afterFiling, /^F story-0 rev=1 owner=cogsworth epi=fact words=\d+ refs=2 domains=2 art=hormuz\/hormuz-hero topics=ok lint=ok$/mu);
-  assert.match(afterFiling, /^F story-1 rev=1 owner=sprockett epi=forecast words=\d+ refs=2 domains=2 art=- topics=ok lint=ok$/mu);
+  assert.match(afterFiling, /^F story-0 rev=1 digest=sha256:[a-f0-9]{64} owner=cogsworth epi=fact words=\d+ refs=2 domains=2 art=hormuz\/hormuz-hero topics=ok lint=ok$/mu);
+  assert.match(afterFiling, /^F story-1 rev=1 digest=sha256:[a-f0-9]{64} owner=sprockett epi=forecast words=\d+ refs=2 domains=2 art=- topics=ok lint=ok$/mu);
 
   // The dissent, written by the dissenter. Vesta is not on today's lineup and
   // needs no assignment: what authorises the call is the agent this MCP server
@@ -119,7 +124,7 @@ async function driveEdition(state) {
   const afterCompose = await step('compose_edition', () => composeEdition({
     edition: EDITION, event_key: 'compose-1',
     pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }],
-    maps: [{ name: 'hormuz', document: { version: 'test' } }, { name: 'hormuz-hero', document: { version: 'test' } }]
+    maps: [{ name: 'hormuz', document: archiveResolver()('hormuz') }, { name: 'hormuz-hero', document: archiveResolver()('hormuz-hero') }]
   }));
   assert.equal(rows(afterCompose, 'G').length, 2);
   assert.match(afterCompose, /^G front articles=3 visuals=2 papers=broadsheet lead=story-0$/mu);
@@ -128,7 +133,7 @@ async function driveEdition(state) {
   return afterCompose;
 }
 
-test('every converge path regenerates the edition INDEX', async () => {
+runtimeTest('every converge path regenerates the edition INDEX', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-'));
   try {
     const text = await driveEdition(path.join(temporary, 'state'));
@@ -146,10 +151,11 @@ test('every converge path regenerates the edition INDEX', async () => {
 // Mutation guard for the fail-closed contract. If writeEditionIndex ever
 // swallows its errors (or a caller wraps it in try/catch), the tool call below
 // starts succeeding and this test goes red.
-test('a failed index write fails the tool call', async () => {
+runtimeTest('a failed index write fails the tool call', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-fail-'));
   const state = path.join(temporary, 'state');
   process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
   try {
     // A non-empty directory where the INDEX file belongs: the rename that
     // publishes the index fails with EISDIR, exactly as a full disk or a
@@ -286,10 +292,11 @@ test('prose warnings are computed from the article and never gate it', () => {
   assert.match(advisory.warnings[1], /vary the openers$/u);
 });
 
-test('publication format always rejects invalid prose while source-domain lint remains optional', async () => {
+runtimeTest('publication format always rejects invalid prose while source-domain lint remains optional', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-hardlint-'));
   const state = path.join(temporary, 'state');
   process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
   const snapshot = async (dir = state) => {
     const out = {};
     for (const entry of await readdir(dir, { withFileTypes: true })) {

@@ -1,3 +1,4 @@
+import { compositionArtifactSchema } from './composition-contract.mjs';
 import { articleFilingSchema } from '../../ops/article-format.mjs';
 import { createInterface } from 'node:readline';
 import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, reviewArticle, stageRelease } from './production-newsroom.mjs';
@@ -23,7 +24,7 @@ const DESK_NAMES = DESK_NAMES_BY_AGENT[role] ?? Object.values(DESK_NAMES_BY_AGEN
 const DESK_SHAPE_LINE = DESK_NAMES.map((name) => `${name} {${deskDocumentKeys(name).join(', ')}}`).join('; ');
 
 const edition = { type: 'string', pattern: DATE_PATTERN, description: 'Edition date, YYYY-MM-DD.' };
-const eventKey = { type: 'string', minLength: 8, maxLength: 1024, description: 'Causal idempotency key for this call. When Daimon binds a wake id (DAIMON_WAKE_ID), this must equal that wake id exactly.' };
+const eventKey = { type: 'string', minLength: 8, maxLength: 1024, description: 'The actual wake id; several different articles or desk documents may share it. An accepted operation is idempotent by wake, role and artifact. Changed accepted input needs a new wake. When Daimon binds a wake id (DAIMON_WAKE_ID), this must equal that wake id exactly.' };
 const componentId = (description) => ({ type: 'string', pattern: COMPONENT_PATTERN, description });
 
 const assignmentItem = {
@@ -86,12 +87,13 @@ const definitions = {
     execute: recordDissent
   },
   review_article: {
-    description: "Record Spike's verdict for one immutable filing revision.",
-    required: ['edition', 'event_key', 'article_id', 'revision', 'verdict', 'notes'],
+    description: "Record Spike's verdict for one immutable filing revision. HOLD and REVISION_REQUEST allow only its owner to file the next revision; SPIKE ends the story.",
+    required: ['edition', 'event_key', 'article_id', 'revision', 'filing_digest', 'verdict', 'notes'],
     properties: {
       edition, event_key: eventKey,
       article_id: componentId('Story id of the filing being reviewed.'),
       revision: { type: 'integer', minimum: 1 },
+      filing_digest: { type: 'string', pattern: '^sha256:[a-f0-9]{64}$', description: 'Digest of the exact filing you read, from its INDEX F row or filing receipt. A changed draft must be read again.' },
       verdict: { type: 'string', enum: VERDICTS },
       notes: { type: 'string', maxLength: 8000 }
     },
@@ -110,19 +112,21 @@ const definitions = {
     execute: fileDesk
   },
   compose_edition: {
-    description: 'Compose the two page documents and verify the complete PASS edition tree.',
-    required: ['edition', 'event_key', 'pages'],
-    optional: ['maps'],
+    description: 'Compose the exact immutable layout returned by lay_pages using layout_sha256. Re-run the canonical assembler and verify the complete PASS edition tree. Never retype page JSON.',
+    required: ['edition', 'event_key'],
+    oneOf: [{ required: ['layout_sha256'], not: { anyOf: [{ required: ['pages'] }, { required: ['maps'] }, { required: ['artifacts'] }] } }, { required: ['pages'], not: { required: ['layout_sha256'] } }],
     properties: {
       edition, event_key: eventKey,
+      layout_sha256: { type: 'string', pattern: '^[a-f0-9]{64}$', description: 'The exact digest returned by lay_pages for this edition. The tool loads and authenticates those bytes; do not retype the layout.' },
       pages: {
         type: 'array', minItems: 2, maxItems: 2,
         items: { type: 'object', additionalProperties: false, required: ['name', 'document'], properties: { name: { type: 'string', enum: ['front', 'tape'] }, document: { type: 'object', additionalProperties: true } } },
         description: 'Exactly one "front" and one "tape" page document.'
       },
+      artifacts: { type: 'array', items: compositionArtifactSchema, description: 'Immutable Caslon-generated map/glyph registrations returned by the private artwork tools.' },
       maps: {
         type: 'array',
-        items: { type: 'object', additionalProperties: false, required: ['name', 'document'], properties: { name: componentId('Map name; the supplied set must equal the union of every article art.map and art.hero_map value.'), document: { type: 'object', additionalProperties: true } } }
+        items: { type: 'object', additionalProperties: false, required: ['name', 'document'], properties: { name: componentId('Map name; supplied maps plus selected map artifacts must match all article and page map references.'), document: { type: 'object', additionalProperties: true } } }
       }
     },
     execute: composeEdition
@@ -138,8 +142,9 @@ const definitions = {
 // nobody else does — the tool set is the boundary, exactly as it is for
 // review_article and compose_edition.
 const roleTools={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
+if(process.env.CLANK_STATE_OFFLINE_FIXTURE!=='1'){const definition=definitions.compose_edition;definition.required=['edition','event_key','layout_sha256'];delete definition.oneOf;definition.properties=Object.fromEntries(definition.required.map(key=>[key,definition.properties[key]]));}
 const tools=roleTools[role]??[];
-const schema=definition=>({type:'object',additionalProperties:false,required:definition.required,properties:definition.properties});
+const schema=definition=>({type:'object',additionalProperties:false,required:definition.required,properties:definition.properties,...(definition.oneOf?{oneOf:definition.oneOf}:{})});
 // The stdio transport, and what it means for the peer to go away.
 //
 // This is one process per agent, speaking JSON-RPC over a pipe daimon opens and

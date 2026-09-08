@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { agents, assert, digest, orgRoot, policy, privateKinds, reporters, sensors, readJson, releaseFor } from './lib.mjs';
 import { validateLifecycleGraph } from './lifecycle-graph.mjs';
 import { isBerlinRelease } from './release-time.mjs';
+import { runtimeToolFindings } from './tool-bundle-contract.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
 
 const TYPES = new Set(['ASSIGNMENT', 'ACK', 'PINPOINT_REQUEST', 'PINPOINT_CLAIM', 'PINPOINT_RESULT', 'PINPOINT_NOT_FOUND', 'FILED', 'REVISION_REQUEST', 'REFILED', 'PASS', 'HOLD', 'SPIKE', 'COMPOSITION_ISSUE', 'COMPOSED', 'RELEASE_HANDOFF']);
@@ -39,7 +40,7 @@ export function validateMessage(message, prior = []) {
   for (const key of ['version', 'id', 'type', 'edition', 'release', 'owner', 'artifact_refs', 'derived_from', 'revision', 'correlation_id', 'deadline', 'terminal_state', 'summary']) assert(key in message, `message missing ${key}`);
   assert(message.version === 'v1' && TYPES.has(message.type), 'message version/type invalid');
   assert(/^\d{4}-\d{2}-\d{2}$/.test(message.edition), 'edition invalid');
-  assert(isBerlinRelease(message.edition, message.release), 'release must be Berlin 16:00');
+  assert(isBerlinRelease(message.edition, message.release), 'release must match the edition’s declared Berlin release clock');
   assert(agents.includes(message.owner), 'unknown owner');
   for (const refs of [message.artifact_refs, message.derived_from]) assert(Array.isArray(refs) && refs.every((ref) => digest.test(ref.digest) && !/(credential|profile|html|prompt)/i.test(ref.ref)), 'artifact reference invalid');
   assert(message.artifact_refs.length > 0, 'output artifact missing');
@@ -164,9 +165,13 @@ export function validateAgentDeclaration(agent, bytes) {
     assert(!corpus, `${agent} must not receive a private corpus resource`);
   }
   validateReporterValidationDeclaration(agent, bytes);
+  const toolErrors = runtimeToolFindings(agent, parseManifest(bytes));
+  assert(toolErrors.length === 0, `${agent} runtime tools invalid: ${toolErrors.join('; ')}`);
 }
 
 export function validateRootDeclaration(bytes) {
+  const packages = parseManifest(bytes).shared?.environment?.packages ?? [];
+  assert(packages.some(item => item.id === 'newsroom-git' && item.manager === 'apt' && item.name === 'git'), 'shared Git package is required for accepted revision history');
   const shared = section(bytes, 'shared');
   assert(shared.includes('id: edition-state') && shared.includes('kind: volume') && shared.includes('name: clank-edition-state') && shared.includes('mount: ./state/edition') && shared.includes('mode: mutable') && shared.includes('sharing: team'), 'shared edition state resource invalid');
   assert(bytes.includes('id: clank-newsroom') && bytes.includes('provider: moltnet'), 'Moltnet network identity invalid');
@@ -278,12 +283,19 @@ export function validateRuntimeBindings(root = orgRoot) {
 export function validateTree() { for (const agent of agents) for (const file of ['Spawnfile', 'AGENTS.md', 'CLAUDE.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
 export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
-  assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '16:00', 'schedule zone or deadline invalid');
+  assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '22:00' && schedule.effective_from === '2026-09-08', 'schedule zone or deadline invalid');
   assert(policy.deadline === schedule.deadline, 'runtime and schedule deadline drift');
-  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'10:00',owner:'reporters'},{id:'conference',time:'10:30',owner:'brass'},{id:'review',time:'14:00',owner:'spike'},{id:'settlement',time:'14:00',owner:'ledger'},{id:'composition',time:'15:00',owner:'caslon'},{id:'release',time:'16:00',owner:'pressman'}]), 'conference checkpoints invalid');
+  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'18:00',owner:'reporters'},{id:'conference',time:'18:30',owner:'brass'},{id:'review',time:'20:00',owner:'spike'},{id:'settlement',time:'20:30',owner:'ledger'},{id:'composition',time:'21:00',owner:'caslon'},{id:'release',time:'21:30',owner:'pressman'}]), 'conference checkpoints invalid');
   assert(schedule.operator_kickoff === false && schedule.task_orchestrator === false, 'operator kickoff and task orchestrators are prohibited');
   assert(schedule.downstream_activation === 'moltnet-addressed-only' && schedule.polling === false, 'downstream work must be addressed through Moltnet without polling');
   const owners = schedule.spawnfile_schedule?.owners ?? {};
+  for (const checkpoint of schedule.checkpoints) {
+    const assigned = checkpoint.owner === 'reporters' ? [...reporters] : [checkpoint.owner];
+    for (const owner of assigned) {
+      const [minute,hour] = (owners[owner] ?? '').split(' ');
+      assert(`${hour?.padStart(2,'0')}:${minute?.padStart(2,'0')}` === checkpoint.time, `${owner} checkpoint clock disagrees with native cron`);
+    }
+  }
   assert(schedule.spawnfile_schedule?.status === 'native' && Object.keys(owners).length === 11, 'native schedule roster invalid');
   // Every checkpoint with a named agent owner must be a schedule that actually
   // fires. Both publishing desks described a daily slot in prose for weeks and
@@ -303,8 +315,8 @@ export function validateSchedule() {
 export function validateEditorialContracts(vesta, data, voices) {
   for (const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike']) assert(vesta.includes(phrase), `Vesta constraint missing: ${phrase}`);
   assert(/ordinary Record.*boring null.*observable falsifier/i.test(voices.vesta.good) && /hidden hand/i.test(voices.vesta.bad), 'Vesta voice boundary invalid');
-  for (const owner of ['World Scout, Klaxon, Frontier, Closure','reporters','Ledger','Caslon','Morgue']) assert(new RegExp(`\\| ${owner} \\|[^\\n]*public content: read-only`).test(data), `${owner} DATA boundary invalid`);
-  assert(/\| Pressman \|[^\n]*public content: mutable[^\n]*\| sole owner/.test(data), 'Pressman DATA ownership invalid');
+  for (const owner of ['reporters','Ledger','Caslon','Morgue']) assert(new RegExp(`\\| ${owner} \\|[^\\n]*public content: read-only`).test(data), `${owner} DATA boundary invalid`);
+  assert(/\| Pressman \|[^\n]*public source: read-only[^\n]*\| sole owner/.test(data), 'Pressman DATA ownership invalid');
 }
 export function validateLifecycle(receipts, options = {}) {
   const keys=['version','id','kind','edition','release','owner','correlation_id','causal_parent','artifact_digest','receipt_ref','status'];

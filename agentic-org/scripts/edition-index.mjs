@@ -11,7 +11,7 @@
 // Every row is one line, and every line names the one path that answers it.
 // Nothing here replaces judgement; it replaces the reading that preceded it.
 import { mkdir, readFile, readdir, rename, unlink, writeFile } from 'node:fs/promises';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 // The prose warnings live under ops/ beside the release validator that also
@@ -298,7 +298,7 @@ export function renderEditionIndex({ edition, generated, assignments, filings, v
   for (const item of filings) {
     const unknown = item.flags.filter((flag) => flag.startsWith('topic_unknown:')).map((flag) => flag.slice('topic_unknown:'.length));
     const rest = item.flags.filter((flag) => !flag.startsWith('topic_unknown:'));
-    lines.push(`F ${token(item.id)} rev=${item.revision} owner=${token(item.owner)} epi=${token(item.epistemic)} words=${item.words} refs=${item.refs} domains=${item.domains} art=${item.art === undefined ? '-' : token(item.art)} topics=${unknown.length === 0 ? 'ok' : `unknown:${unknown.map((slug) => token(slug)).join(',')}`} lint=${rest.length === 0 ? 'ok' : rest.join(',')}`);
+    lines.push(`F ${token(item.id)} rev=${item.revision}${/^sha256:[a-f0-9]{64}$/u.test(item.digest ?? '') ? ` digest=${item.digest}` : ''} owner=${token(item.owner)} epi=${token(item.epistemic)} words=${item.words} refs=${item.refs} domains=${item.domains} art=${item.art === undefined ? '-' : token(item.art)} topics=${unknown.length === 0 ? 'ok' : `unknown:${unknown.map((slug) => token(slug)).join(',')}`} lint=${rest.length === 0 ? 'ok' : rest.join(',')}`);
   }
   for (const item of dissents) lines.push(`N ${token(item.id)} rev=${item.revision} by=${token(item.agent)} ${item.stance === 'dissent' ? `dissent p=${item.p}` : 'concur'}${item.against === undefined ? '' : ` carried_from_rev=${item.against}`}`);
   for (const item of verdicts) lines.push(`V ${token(item.id)} rev=${item.revision} ${token(item.verdict)} by=spike${item.dissentDropped === undefined ? '' : ` dissent_dropped=${token(item.dissentDropped)}`}`);
@@ -322,7 +322,7 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
   const assignments = [...seen.values()].map((item) => ({ id: item.id, owner: item.owner, brief: item.brief, evidence_refs: item.evidence_refs ?? [] })).sort((left, right) => left.id.localeCompare(right.id));
 
   const filings = (await readRevisions(base, 'filings')).map(({ id, revision, value }) => ({
-    id, revision, owner: (value.byline?.agents ?? [])[0]?.toLowerCase() ?? '?', epistemic: value.epistemic ?? '?',
+    id, revision, digest: `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`, owner: (value.byline?.agents ?? [])[0]?.toLowerCase() ?? '?', epistemic: value.epistemic ?? '?',
     words: countWords(value), refs: strings(value.refs).length, domains: countDomains(value), art: artNames(value), flags: lintFiling(value, topics)
   }));
   const verdicts = (await readRevisions(base, 'verdicts')).map(({ id, revision, value }) => ({ id, revision, verdict: value.verdict ?? '?', dissentDropped: value.dissent_dropped }));

@@ -11,9 +11,11 @@ import { qualifySignal } from './production-newsroom.mjs';
 // DAIMON_WAKE_ID when Daimon injects one, and the MCP layer's schemas
 // actually being typed (not `{}`) for every tool.
 
-test('event_key must equal DAIMON_WAKE_ID when Daimon binds one, and is unconstrained otherwise', async () => {
+const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
+runtimeTest('event_key must equal DAIMON_WAKE_ID when Daimon binds one, and is unconstrained otherwise', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-wake-bind-'));
   process.env.CLANK_EDITION_STATE_ROOT = path.join(temporary, 'state');
+  process.env.CLANK_NEWSROOM_AGENT = 'klaxon';
   const edition = '2026-08-26';
   const qualified = (eventKey) => ({ edition, event_key: eventKey, summary: 'A sufficiently detailed qualified signal for the daily paper.', selected_desks: ['foreman'], evidence_refs: ['https://source.example/evidence'] });
   try {

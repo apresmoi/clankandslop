@@ -64,7 +64,7 @@ the shape `file_desk` takes, and where a producer had no business deciding,
 
 **The world desk numbers do not arrive this way.** They are derived in full on
 the producer and land as a finished document at
-`content/log/<date>/ledger.worlddesk.json`, which I copy verbatim — see below.
+`repos/newsroom-private/<date>/worlddesk/ledger.worlddesk.json`, which I copy verbatim — see below.
 A `ledger.worlddesk.prepared.json` may still be written beside the settlements
 input; it carries `document: null` and it is not my source for those four
 numbers.
@@ -123,7 +123,7 @@ row exists for it and I do not invent one.
 these numbers and I do not compute them. I copy a file.**
 
 The producer derives them every research slot and writes the finished document
-to `content/log/<edition>/ledger.worlddesk.json`. I read that file and file its
+to `repos/newsroom-private/<edition>/worlddesk/ledger.worlddesk.json`. I read that file and file its
 contents verbatim. `escalation_index` is a number from 0 to 1; `delta` is the
 single word for where it moved; `open_conflicts` and `watch` are counts of
 named entries in the flashpoint registry. The front page prints all four in
@@ -139,7 +139,7 @@ least honestly labelled. An example number in a brief is a number that will
 end up on the masthead, so this brief no longer contains one.
 
 Every published figure traces back through `world_desk.from` to
-`content/log/<edition>/worlddesk.json`, which lists each escalation proxy with
+`repos/newsroom-private/<edition>/worlddesk/trace.json`, which lists each escalation proxy with
 its observed value, its frozen threshold and the URL to re-fetch it, and each
 counted flashpoint with the stories and source URLs that qualified it. If I
 cannot point at that trace, I do not have a number.
@@ -149,15 +149,14 @@ DERIVED reading only. The first derived edition prints `first reading` rather
 than a direction against a figure that was never a measurement.
 
 **On a day the producer refuses**, there is no `ledger.worlddesk.json` under
-`content/log/<edition>/` — only a `refusal.json` naming the input that went
+`repos/newsroom-private/<edition>/worlddesk/` — only a `refusal.json` naming the input that went
 dark. That is the one case where I act: I carry the previous edition's figure
 forward and put `stale` in `delta`, so the page says out loud that the number
 has not been re-derived. That is a settlement discipline, not an estimate, and
 it is the ONLY sanctioned way a figure I did not derive today reaches the
 page. I never invent a fresh one.
 
-Both documents go through `mcp_newsroom_file_desk` with the wake id as
-`event_key`. The second of my two calls answers `event_key conflict` — the
-receipt for this wake was already written by the first — but **the document
-itself has landed.** I do not file it again, and I do not read it as a
-failure.
+Both documents go through `mcp_newsroom_file_desk` with the same current wake
+id as `event_key`; each document gets its own receipt. An error is a refusal,
+never evidence that a write landed. An identical retry returns the same result.
+Corrections use a later wake and retain the previous operation in history.

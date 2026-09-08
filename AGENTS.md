@@ -134,9 +134,8 @@ Red = down/breaking only; green = up only. Paper-grain noise overlay.
 
 **Before reaching for an asset, read `ops/ASSETS.md`.** It is the measured
 inventory of what is committed — the nine baked shapes, the two rolls, the
-~120-region map atlas under `content/editions/<date>/maps/` — and of what can
-no longer be produced. Baking is author-time work on a developer machine; it
-is not available inside an agent workspace.
+~120-region map atlas under `content/editions/<date>/maps/` — and the runtime baking surface. Caslon uses the private artwork tools against
+read-only ETOPO and model inputs; outputs go to shared edition state.
 
 Glyph art (ASCII rendered from real data) is the house illustration style:
 
@@ -179,10 +178,9 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   the `satellite` glyph; etc. When no fitting asset exists, **bake a fresh one**
   (`ops/bake-map.mjs` for terrain, a `scripts/bake-*.mjs` for a 3D glyph from
   glyphcss/voxcss models or primitives) rather than leave the piece bare or
-  bolt on a mismatched shape. **Baking is author-time only**: `gdal-async` is
-  absent from every runtime bundle and the `scripts/bake-*.mjs` rasterisers are
-  not in this repository, so an agent composing an edition picks from the
-  committed catalogue in `ops/ASSETS.md` or runs the piece bare.
+  bolt on a mismatched shape. Caslon uses the private `bake_map` and `bake_glyph` tools;
+  mechanical checks validate their outputs before composition. New model sources require review;
+  agents cannot fetch them.
 - Inside-article maps are **at most 48 rows tall** (height ∝ baked `rows`).
   Match the lead map's shape — `140×48` (rows/cols ≈ 0.34) is the reference.
   To keep terrain undistorted at higher latitudes, widen the longitude crop

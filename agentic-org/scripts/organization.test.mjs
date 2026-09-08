@@ -50,7 +50,7 @@ test('hostile envelope mutations reject for their intended reason', () => {
   for (const [, index, mutate, reason] of cases) { const cycle = messages(); cycle[index] = mutate(cycle[index]); assert.throws(() => validate(cycle.slice(0, index + 1)), reason); }
 });
 test('native Brass checkpoints replace operator kickoff and polling', () => assert.doesNotThrow(validateSchedule));
-test('all Node D policy files agree on 16:00 with no stale deadline',()=>{const runtime=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/runtime.json'),'utf8'));const schedule=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/schedule.json'),'utf8'));assert.equal(runtime.deadline,'16:00');assert.equal(schedule.deadline,runtime.deadline);const root=resolve(import.meta.dirname,'..');const visit=(directory)=>{for(const name of readdirSync(directory)){const file=join(directory,name);if(statSync(file).isDirectory())visit(file);else if(!name.endsWith('.test.mjs')&&!name.endsWith('.tar'))assert.doesNotMatch(readFileSync(file,'utf8'),/16:20/);}};visit(root);});
+test('all current policy files agree on 22:00 with historical receipts preserved',()=>{const runtime=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/runtime.json'),'utf8'));const schedule=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/schedule.json'),'utf8'));assert.equal(runtime.deadline,'22:00');assert.equal(schedule.deadline,runtime.deadline);const root=resolve(import.meta.dirname,'..');const visit=(directory)=>{for(const name of readdirSync(directory)){const file=join(directory,name);if(statSync(file).isDirectory())visit(file);else if(!name.endsWith('.test.mjs')&&!name.endsWith('.tar'))assert.doesNotMatch(readFileSync(file,'utf8'),/16:20/);}};visit(root);});
 test('autonomy mutations fail closed', () => {
   const schedulePath=resolve(import.meta.dirname,'../policies/schedule.json'); const original=readFileSync(schedulePath,'utf8');
   // try/finally throughout: an assertion that fails here must not leave a
@@ -88,7 +88,9 @@ test('Daimon engine declarations preserve their real model-auth boundary', () =>
 });
 test('workspace resources enforce public modes and private corpus least privilege', () => {
   const scout = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
-  assert.throws(() => validateAgentDeclaration('klaxon', scout.replace('mode: readonly', 'mode: mutable')), /public content resource/);
+  const publicLine = scout.split('\n').find(line => line.includes('{ id: public-content,'));
+  assert.ok(publicLine?.includes('mode: readonly'));
+  assert.throws(() => validateAgentDeclaration('klaxon', scout.replace(publicLine, publicLine.replace('mode: readonly', 'mode: mutable'))), /public content resource/);
   const reporter = readFileSync(resolve(import.meta.dirname, '../agents/cogsworth/Spawnfile'), 'utf8');
   assert.throws(() => validateAgentDeclaration('cogsworth', reporter.replace('  resources:', '  resources:\n    - { id: private-corpus, kind: volume, name: clank-cogsworth-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }')), /must not receive a private corpus/);
   const pressman = readFileSync(resolve(import.meta.dirname, '../agents/pressman/Spawnfile'), 'utf8');
@@ -133,7 +135,12 @@ test('production roles declare exact newsroom tools and carry the folded editori
 // closure to hold is the opposite one — no agent declares a skill, and the
 // editorial constraints those skills carried are in the reporter's own doc.
 const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance','six to eight flowing paragraphs'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);assert.match(source,/transport: stdio/u);assert.match(source,/command: \/usr\/local\/bin\/node/u);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
-test('production instructions require natural-language handoffs and stay free of read-before-acting mandates',()=>{const team=readFileSync(resolve(import.meta.dirname,'../TEAM.md'),'utf8');for(const phrase of ['natural-language','at least five articles','content/editions/<date>/{articles,desk,pages,maps}','never pushes Git','Publishing happens outside this organization','beside the key','a claim rather than a boundary'])assert.ok(team.includes(phrase));assert.doesNotMatch(team,/by path — never search for them/u);});
+test('production instructions describe natural-language handoffs, mechanical staging and external publication', () => {
+  const team = readFileSync(resolve(import.meta.dirname, '../TEAM.md'), 'utf8');
+  for (const phrase of ['natural-language', 'at least five articles', 'never pushes Git', 'host-side job that holds the deploy key', 'A prompt prohibition is not network isolation', 'No agent opens a page or approves an image'])
+    assert.ok(team.includes(phrase), `missing workflow rule: ${phrase}`);
+  assert.doesNotMatch(team, /by path — never search for them/u);
+});
 test('production declarations consume only checksum-pinned offline newsroom bundles',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.ok(source.includes(`sha256: ${descriptor.source.sha256}`));assert.doesNotMatch(source,/kind: git|github\.com\/apresmoi\/clankandslop|branch: staging/u);}const pressman=readFileSync(resolve(import.meta.dirname,'../agents/pressman/Spawnfile'),'utf8');for(const dependency of [...descriptor.dependencies,...descriptor.assets]){assert.ok(pressman.includes(`sha256: ${dependency.sha256}`));assert.ok(pressman.includes(`mount: ./${dependency.mount}`));}assert.match(pressman,/CLANK_WEBSITE_DEPS_ROOTS: .*deps-a:.*deps-b/u);});
 // The private research archive is the one bundle whose digest changes on its
 // own cadence (a daily repin, see scripts/repin-private-source.mjs), and it
@@ -236,7 +243,7 @@ test('the deploy key and every ref restriction live outside every container', ()
   assert.doesNotMatch(mcp, /push_edition|publish-edition-branch/u);
   const production = readFileSync(resolve(import.meta.dirname, 'production-newsroom.mjs'), 'utf8');
   assert.doesNotMatch(production, /push_edition|publish-edition-branch|DEPLOY_KEY|GIT_SSH_COMMAND/u);
-  assert.throws(() => validateRuntimeBindings(mutatedOrg('ledger', (source) => source.replace('tools: [file_desk]', 'tools: [file_desk, push_edition]'))), /stay on the host/u);
+  assert.throws(() => validateRuntimeBindings(mutatedOrg('ledger', (source) => source.replace('tools: [file_desk]', 'tools: [file_desk, push_edition]'))), /ledger runtime tools invalid: newsroom entry point or exact role tools are invalid/u);
 });
 
 test('every scheduled checkpoint owner carries a schedule that actually fires', () => {
@@ -268,7 +275,7 @@ test('removing either publishing desk schedule fails closed', () => {
     try { assert.throws(validateSchedule, /schedule authority invalid/u, agent); } finally { writeFileSync(agentPath, source); }
     // And the reverse: dropping it from the roster while the Spawnfile keeps it.
     writeFileSync(schedulePath, original.replace(new RegExp(`\\s*"${agent}": "[^"]+",?`, 'u'), '').replace(',\n    }', '\n    }'));
-    try { assert.throws(validateSchedule, /schedule roster invalid|schedule authority invalid|checkpoint with no schedule/u, agent); } finally { writeFileSync(schedulePath, original); }
+    try { assert.throws(validateSchedule, new RegExp(`${agent} checkpoint clock disagrees with native cron`, 'u'), agent); } finally { writeFileSync(schedulePath, original); }
   }
 });
 
@@ -353,4 +360,10 @@ test('the private research corpus is never repinned back to the commit with no r
       .split('\n').find((row) => row.includes('id: private-archive'));
     assert.ok(!line.includes(STARVING_PRIVATE_DIGEST), `${agent} was resolved back onto the starving corpus digest`);
   }
+});
+
+test('shared Git package is required by accepted revision history', () => {
+  const source = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
+  assert.doesNotThrow(() => validateRootDeclaration(source));
+  assert.throws(() => validateRootDeclaration(source.replace('name: git }', 'name: missing-git }')), /shared Git package/);
 });

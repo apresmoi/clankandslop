@@ -5,6 +5,9 @@ description: Bounded daily newspaper organization. Runtime admission is external
 mode: hierarchical
 lead: brass
 shared:
+  environment:
+    packages:
+      - { id: newsroom-git, manager: apt, name: git }
   workspace:
     docs:
       system: TEAM.md

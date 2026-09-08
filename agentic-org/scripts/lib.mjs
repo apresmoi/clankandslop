@@ -1,3 +1,4 @@
+import { releaseClock } from './release-time.mjs';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve, relative, sep } from 'node:path';
 
@@ -14,4 +15,4 @@ export function assert(condition, message) { if (!condition) throw new Error(mes
 export function readJson(path) { return JSON.parse(readFileSync(path, 'utf8')); }
 export function beneath(root, target) { const rel = relative(resolve(root), resolve(target)); return rel && !rel.startsWith(`..${sep}`) && rel !== '..' && !rel.includes(`${sep}..${sep}`); }
 export function safeDirectory(path) { return existsSync(path) && statSync(path).isDirectory(); }
-export function releaseFor(edition, offset = '+02:00') { return `${edition}T16:00:00${offset}[Europe/Berlin]`; }
+export function releaseFor(edition, offset = '+02:00') { return `${edition}T${releaseClock(edition)}:00${offset}[Europe/Berlin]`; }

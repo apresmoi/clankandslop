@@ -1,38 +1,38 @@
 {
   "version": "v3",
   "timezone": "Europe/Berlin",
-  "deadline": "16:00",
+  "deadline": "22:00",
   "checkpoints": [
     {
       "id": "pitch",
-      "time": "10:00",
+      "time": "18:00",
       "owner": "reporters"
     },
     {
       "id": "conference",
-      "time": "10:30",
+      "time": "18:30",
       "owner": "brass"
     },
     {
       "id": "review",
-      "time": "14:00",
+      "time": "20:00",
       "owner": "spike"
     },
     {
       "id": "settlement",
-      "time": "14:00",
+      "time": "20:30",
       "owner": "ledger"
     },
     {
       "id": "composition",
-      "time": "15:00",
+      "time": "21:00",
       "owner": "caslon"
     },
     {
       "id": "release",
-      "time": "16:00",
+      "time": "21:30",
       "owner": "pressman",
-      "target": "local/staging + edition branch"
+      "target": "validate and build mechanically; stage by 22:00"
     }
   ],
   "spawnfile_schedule": {
@@ -54,5 +54,7 @@
   "downstream_activation": "moltnet-addressed-only",
   "polling": false,
   "operator_kickoff": false,
-  "task_orchestrator": false
+  "task_orchestrator": false,
+  "effective_from": "2026-09-08",
+  "previous_deadline": "16:00"
 }

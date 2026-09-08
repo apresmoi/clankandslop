@@ -21,8 +21,7 @@ file.
 ## Glyph art — complete, nothing missing
 
 Nine shapes are committed as pre-baked ASCII and imported directly by
-`website/src/components/GlyphArt.astro`. No generator runs, at edition time or
-ever; the art is the artifact.
+`website/src/components/GlyphArt.astro`. Selecting these static assets runs no generator; fresh bakes use the separate private tools.
 
 ```
 website/src/data/glyphart-coliseum.txt    7061 B    shape: colosseum (also the fallback)
@@ -51,11 +50,12 @@ rolls   chip eclipse                                                            
 `agentic-org/SYSTEMS.md` describes the same catalogue.
 **The whole catalogue is usable today.**
 
-What is missing is only the ability to bake a *new* shape. The rasterisers
-that produced the nine (`bake-glb.mjs`, `bake-vox.mjs`, `bake-glyphart.mjs`,
-`bake-satellite.mjs`, `bake-404.mjs`) are not in this repository, and neither
-is `ops/glyph-catalog.mjs`, `ops/glyph-angles.mjs` or `ops/CATALOGS.md`.
-Nothing an edition does depends on them.
+Caslon can also bake the hash-pinned microchip model through the private
+`bake_glyph` tool and select its mechanically validated immutable artifact
+reference in the decision record. The runtime catalogue and contact-sheet
+image tools expose the actual available assets. Standalone developer scripts
+exist under `website/scripts/`; their old laptop imports are not the runtime
+entry point. Adding another permitted model remains a reviewed source change.
 
 ---
 
@@ -266,7 +266,7 @@ both documents into the edition's `maps/` and both frames find their file.
 the region, and the front panel draws `art.map`. `file_article` resolves both
 names against this catalogue at filing time, in the reporter's own wake,
 because a name that does not exist has to be refused where it can still be
-corrected — nobody in this newsroom ever sees the page it would have made.
+corrected. Staging requires mechanical content, layout and build checks.
 
 ### How a region reaches a page
 
@@ -284,7 +284,7 @@ ops/lay-page.mjs          resolves the name: today's maps/ first, then the commi
         ↓                 emits MapGlyph in an illustrated slot, or the hero panel
         ↓                 when the lead itself declares one
 compose_edition           supplied maps must EQUAL the union of the day's art.map and
-        ↓                 art.hero_map values, and no MapGlyph may name one outside it
+        ↓                 art.hero_map values plus page MapGlyph references; each is authenticated
 content/editions/<date>/maps/<region>.json     written, then published
 ```
 
@@ -303,30 +303,14 @@ them.
 a failure, and the honest answer whenever no archived box contains the
 story's geography.
 
-### Why a new region cannot be baked
+### Fresh regions
 
-```
-ops/bake-map.mjs         imports gdal-async, which is a root devDependency and is
-                         installed in no workspace and in no runtime bundle
-                         (the bundles vendor website/node_modules only)
-        line 33          defaults to /Users/apresmoi/glyphcss/etopo/ETOPO1_Ice_g_gmt4.grd.gz
-                         — a laptop path that is wrong even on the laptop
-        env              reads neither CLANK_ETOPO_GZ nor CLANK_ETOPO_GRD, though
-                         agents/caslon/Spawnfile sets both and mounts the grid at
-                         ./etopo. Only --etopo-gz / --etopo reach it.
-output dir               content/editions/<date>/maps/ is inside the read-only
-                         ./repos/newsroom mount
-```
-
-`agentic-org/scripts/build-etopo-bundle.mjs` says its source resolution
-"mirrors `ops/bake-map.mjs`" and reads `CLANK_ETOPO_GZ`. `ops/bake-map.mjs`
-does not. That drift is the reason the wired-up grid is unreachable.
-
-**Existing regions are data an agent points at — and, since this change, does
-point at. New ones cannot be produced in any environment the newsroom runs
-in, and nothing above changes that.**
-
----
+Caslon's private `bake_map` tool reads the mounted ETOPO1 dataset, preserves
+absolute terrain thresholds and writes immutable map/provenance/preview files
+under shared edition state. It needs no GDAL installation or developer path.
+`inspect_artifact` provides optional image diagnostics, not a release gate. `lay_pages` and
+`compose_edition` authenticate the selected `{kind,name,sha256}` reference;
+only used maps reach the composed edition. Source data stays read-only.
 
 ## OG social cards
 
@@ -361,8 +345,8 @@ website/public/{favicon*,icon-*,apple-touch-icon}.png
 | ~~`art.hero_map` has no author~~ | **closed.** The six reporter briefs ask for `art` where a story has a place; `ops/lay-page.mjs` resolves the region out of this archive and places it. All 120 regions are reachable from a page |
 | ~~No brief named the atlas~~ | **closed.** Every reporter brief, `agents/caslon/PAGES.md` and `agentic-org/SYSTEMS.md` name it and point here |
 | ~~A `-hero` crop cannot be paired with a wide `map`~~ | **closed.** `compose_edition` ships the union of every `art.map` and `art.hero_map`, so a story may name the wide crop and its `-hero` re-crop and both reach the edition. `hero_map` is optional; `file_article` resolves both names against this catalogue in the reporter's own wake |
-| Cannot bake a new region | open, unchanged. `gdal-async` absent, default path wrong, env vars ignored, output dir read-only |
-| Cannot bake a new glyph shape | open, unchanged. The rasterisers were never committed |
+| Cannot bake a new region | private `bake_map` now reads the mounted grid and writes shared immutable artifacts; deployment verification pending |
+| Cannot bake a new glyph shape | private `bake_glyph` now renders the committed microchip; additional model sources still require review |
 | OG cards | open, unchanged. Need a dev server; nobody owns it |
 
 ---

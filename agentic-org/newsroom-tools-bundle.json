@@ -1,0 +1,176 @@
+{
+  "version": "clank.newsroom-tools-bundle.v1",
+  "archive": "newsroom-tools.tar",
+  "mount": "tools/newsroom",
+  "sha256": "sha256:8da08cfffd98901a56c7abfb2c4e9680bd812a67a88678563d8f468459923256",
+  "file_count": 270,
+  "content_bytes": 42275646,
+  "source_commit": "da3667d191ad02b76678c9580ad436bc756bc131",
+  "platform": "linux",
+  "arch": "x64",
+  "source_files": [
+    {
+      "path": "newsroom/art/adapter.mjs",
+      "sha256": "sha256:85133df78163dda7631193818334b3055a3d2ea3ce88bb2b9ee2d85da7c4f00e"
+    },
+    {
+      "path": "newsroom/art/bakers.mjs",
+      "sha256": "sha256:2f4a15693ae955d109289c8d2ac739551ad18d2ebd7819eb5c0200c56a06d2c7"
+    },
+    {
+      "path": "newsroom/art/catalogue.mjs",
+      "sha256": "sha256:01bc73847ba5a7f0e67fdbbbb036686b6c0eebf46aaef85166a9de8778316bb3"
+    },
+    {
+      "path": "newsroom/art/decisions.mjs",
+      "sha256": "sha256:8d3cfd730cb75f641326075eb64b58c725058e59800f76fb2a42f7dcc6afde0c"
+    },
+    {
+      "path": "newsroom/art/fonts.conf",
+      "sha256": "sha256:833b5db16866d4e6ae9d8e2fa6cd6008c3b504c10f3859fdf05fde7fc4157152"
+    },
+    {
+      "path": "newsroom/art/fonts.mjs",
+      "sha256": "sha256:b4fbf0630435a3c24a11f194d3954e221e967ebd5c99871b411b17dd30a34f49"
+    },
+    {
+      "path": "newsroom/art/layout.mjs",
+      "sha256": "sha256:51e6fad2f83ffc9bc1d3b0ac6f7be2902c02b67ccb75b9da6fdb6519e72b7e3e"
+    },
+    {
+      "path": "newsroom/art/netcdf.mjs",
+      "sha256": "sha256:ce48084ac04b48aea918871694fc120cc05c36e19e127aee827bdef86ac2b6c0"
+    },
+    {
+      "path": "newsroom/art/package-lock.json",
+      "sha256": "sha256:00adac918a09a59d4d6e321be17c5abe033aac1457676a9e19dd2c9fc8fb0705"
+    },
+    {
+      "path": "newsroom/art/package.json",
+      "sha256": "sha256:a6aab8b32872da6a97c2d97f19997571b5082d8ad1e9a730dde5ce7e7d0179f1"
+    },
+    {
+      "path": "newsroom/art/preview.mjs",
+      "sha256": "sha256:4d86ee7716125a94da60b66c46a041e0d1ec8f2999d83a3adaab87f81bf4ce84"
+    },
+    {
+      "path": "newsroom/art/server.mjs",
+      "sha256": "sha256:6c1decd549b68e61a072a52c9619967354da5d4fae0889987ecf73b06dcfc77c"
+    },
+    {
+      "path": "newsroom/art/storage.mjs",
+      "sha256": "sha256:34f14a88b65a61870e970fb0cc52d72234c7ab3cb6e4c2d4c56fbcd0f87f2238"
+    },
+    {
+      "path": "newsroom/build/archive.mjs",
+      "sha256": "sha256:76e6335d3db3b35cb84b91919fa4d66460ed7ddc609c8bd3822dff8792ff8a15"
+    },
+    {
+      "path": "newsroom/build/build-dependencies.mjs",
+      "sha256": "sha256:1227eed62e4fb25b503c9cf46004a126b0d10b572e21c2ab78f02cd403e8f29c"
+    },
+    {
+      "path": "newsroom/build/dependencies.mjs",
+      "sha256": "sha256:4eeb4f553592c21ea4fd79fb12f59ec78c95e8aada988aa80f831f763d928e17"
+    },
+    {
+      "path": "newsroom/build/jobs.mjs",
+      "sha256": "sha256:4f04e4bf00c1f90b800cbd867e5d266babb97a25a271b0ab87324f584d6feadb"
+    },
+    {
+      "path": "newsroom/build/mechanical.mjs",
+      "sha256": "sha256:2b13d4c98bfc90955b250b076ee3915510a100af941269f04e76944c36db50bc"
+    },
+    {
+      "path": "newsroom/build/process.mjs",
+      "sha256": "sha256:ddbce6799bc70439df470845a37585617804ecf062dd6d4652fbf520af4d2a8e"
+    },
+    {
+      "path": "newsroom/build/public-trace.mjs",
+      "sha256": "sha256:434307d0532e8c408a1511d9e509d4e70b71c6a4e53e0011525594b0aba2a157"
+    },
+    {
+      "path": "newsroom/build/release.mjs",
+      "sha256": "sha256:b8ae677379886d11c3cd906dc07d7d4716726e0f57c5f7b6749f659ac8c9e0cc"
+    },
+    {
+      "path": "newsroom/build/worker.mjs",
+      "sha256": "sha256:2e765b451163954aa33b08df5a4a000844b7516d4f2327106072f5fd99219312"
+    },
+    {
+      "path": "newsroom/history/contract.mjs",
+      "sha256": "sha256:706103abe9f8da2ec7688a1f01ef7e375d577b6c96a6959c9e509df1b244d960"
+    },
+    {
+      "path": "newsroom/history/git.mjs",
+      "sha256": "sha256:1783e5a8c95ee20034db6ea373e2d754de63d50d50e5af33aca7bc87f51e4543"
+    },
+    {
+      "path": "newsroom/history/index.mjs",
+      "sha256": "sha256:b32149d3e181e265de8e6e52107f196660f1171a91b81dbf0633770881077cb0"
+    },
+    {
+      "path": "newsroom/state/admission.mjs",
+      "sha256": "sha256:66c6a0540ea6360168ab44f1763278dfe646381b2682909341aa5c784352bc75"
+    },
+    {
+      "path": "newsroom/state/layout.mjs",
+      "sha256": "sha256:4b1b14712406a881f42907787571c5616b66fcbbba5d522c89e0670498cfd329"
+    },
+    {
+      "path": "newsroom/state/transaction.mjs",
+      "sha256": "sha256:84f7bc3163927a7c65dea0f3f552b8921da0a1561230764c9b9712da18b5162d"
+    },
+    {
+      "path": "newsroom/visual/adapter.mjs",
+      "sha256": "sha256:bfbfd1d58352a7b4b871f94b3d7656bbebf3ac8170f3e6911ac32add6f3cead3"
+    },
+    {
+      "path": "newsroom/visual/capture.mjs",
+      "sha256": "sha256:b956d26eb00eec7d488bf72b351c9c32a576f7bed64f2eb8e22bb9f2c3622c75"
+    },
+    {
+      "path": "newsroom/visual/image.mjs",
+      "sha256": "sha256:c8b7da6279fe49876f613f8634fc67d9484dcbef08a2f6a9db99568c38a3b858"
+    },
+    {
+      "path": "newsroom/visual/preview.mjs",
+      "sha256": "sha256:f87fd795ffb44b3067bbbb088f41ba6a07c02aad5af4aaf6b3f1788e134bcbee"
+    },
+    {
+      "path": "newsroom/visual/server.mjs",
+      "sha256": "sha256:30c980ca0a73f9d58fa6df44c6798cb425a701b960ff79d5a082b35429da275c"
+    },
+    {
+      "path": "newsroom/visual/store.mjs",
+      "sha256": "sha256:9eb9e66fc946dc877a50978d05b7455ed93214580244d179cad0c5b9f1fbbfea"
+    },
+    {
+      "path": "newsroom/visual/verify-generated-fixture.mjs",
+      "sha256": "sha256:a9608ef7007c5b5eab9ded6499a48cc3872a68b15fd98e1a5671a189966b1a63"
+    }
+  ],
+  "font_sources": [
+    {
+      "path": "website/public/fonts/44ce4a84f20d60f24539bd0c.ttf",
+      "archive_path": "art/fonts/JetBrainsMono.ttf",
+      "sha256": "sha256:44ce4a84f20d60f24539bd0cef11f79c29e38609e0f8adf18551c9794a5d9dc3"
+    },
+    {
+      "path": "website/public/fonts/27350bc95b961b9b4e1a80d8.ttf",
+      "archive_path": "art/fonts/InterTight.ttf",
+      "sha256": "sha256:27350bc95b961b9b4e1a80d872f49e903fe727f290f6b2a079e67ceb1685fb1f"
+    },
+    {
+      "path": "website/public/fonts/jetbrainsmono-OFL.txt",
+      "archive_path": "art/fonts/jetbrainsmono-OFL.txt",
+      "sha256": "sha256:b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d"
+    },
+    {
+      "path": "website/public/fonts/intertight-OFL.txt",
+      "archive_path": "art/fonts/intertight-OFL.txt",
+      "sha256": "sha256:50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
+    }
+  ],
+  "art_lock_sha256": "sha256:00adac918a09a59d4d6e321be17c5abe033aac1457676a9e19dd2c9fc8fb0705"
+}

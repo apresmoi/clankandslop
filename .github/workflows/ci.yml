@@ -58,6 +58,10 @@ jobs:
         run: |
           node agentic-org/scripts/check-instruction-budget.mjs
           node --test agentic-org/scripts/check-instruction-budget.test.mjs
+      - name: Check declared agent tools and release clock
+        run: |
+          node agentic-org/scripts/validate-org.mjs
+          node --test agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs
       # The page data layer has one build-time decision in it that a green
       # astro build cannot see: whether a story advertises an og:image for a
       # card that was never rendered. Fifteen editions have no cards at all, and

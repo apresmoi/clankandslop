@@ -2,13 +2,14 @@
 
 | Owner | Compiler resource access | Writable boundary |
 | --- | --- | --- |
-| World Scout, Klaxon, Frontier, Closure | private per-agent corpus: mutable; shared edition state: mutable; public content: read-only | own sensor-ledger, candidates, evidence, pinpoint and dossier artifacts only |
+| Scheduled sensor services (4090) | private archive checkout: mutable | captures, research ledgers, indexes, prepared inputs and ad hoc responses; committed and pushed to the private repository |
+| Klaxon (newsroom agent) | research snapshot: read-only; shared edition state: mutable | qualified signals only |
 | reporters | shared edition state: mutable; public content: read-only | own dossiers and assigned article handoffs only |
 | Brass, Spike | shared edition state: mutable; public content: read-only | assignment and verdict artifacts only; never reporter prose |
 | Ledger | shared edition state: mutable; public content: read-only | decisions, receipts and ledger-owned generated records only |
 | Caslon | shared edition state: mutable; public content: read-only; ETOPO1 relief grid: read-only | deterministic compose state, composition handoff, and the edition's `maps/` and `glyphs/` artifacts only |
 | Morgue | shared edition state: mutable; public content: read-only | archive receipts only |
-| Pressman | shared edition state: mutable; public content: mutable | sole owner of composition-digest-keyed local artifact and causal staged receipt; no published state, no push credential |
+| Pressman | shared edition state and own staging: mutable; public source: read-only | sole owner of composition-digest-keyed local artifact and causal staged receipt; no published state, no push credential |
 
 The compiler enforces resource presence, durability and whole-mount read/write mode. This table narrows mutable mounts to owner subpaths; deterministic admission and content gates reject boundary violations. Spike and Caslon may reject or request revision, but never write reporter-owned prose.
 
@@ -23,22 +24,14 @@ Caslon alone bakes illustrations, and both of its inputs are read-only:
 
 The decompressed grid is a regenerable cache at `CLANK_ETOPO_GRD`, never an
 artifact and never committed. Editions carry only the few-KB baked outputs.
-No agent has network access to fetch a relief dataset or a 3D model, by
-design: the catalogue in `SYSTEMS.md` is the whole permitted surface.
+Agents are prohibited from fetching a relief dataset or a 3D model; the catalogue in `SYSTEMS.md` is the whole permitted surface.
 
 ## The one presentation field a reporter may carry
 
 `ops/lay-page.mjs` builds the front's Flashpoint Index from a list of places,
-each with a coordinate and a two-sentence note. **That data exists in no
-article field today**, so it reaches the assembler from Caslon's decision
-record — which means the compositor writes a sentence about a story it did
-not report. The alternative is one optional block on the filing itself, which
-`file_article` already accepts unchanged (`object()` rather than `exact()`,
-`additionalProperties: true` on the tool schema, no unknown-key check in the
-validator, and `review_article` strips only `assignment_ref` and `lint` on
-PASS — so it flows filing → verdict → `articles/` → `content/editions/`
-untouched, and is covered by Spike's verdict rather than merely compatible
-with it):
+each with a coordinate and a two-sentence note. The optional `presentation.flashpoint` field is part of the strict reporter
+format. Unknown presentation fields are rejected. The accepted note is covered
+by Spike's verdict and retained unchanged through composition:
 
 ```json
 "presentation": {
@@ -72,3 +65,12 @@ time by `ops/validate-content.mjs`. The slug field is `id`, and an article
 file's name is always `<id>.json`. A row in
 `state/edition/editions/<date>/INDEX` names that file; nothing else needs to
 enumerate the directory.
+
+## Accepted revision history
+
+The private acceptance service commits assignments, filings, dissent, verdicts,
+desk documents and compositions before returning their acceptance receipts.
+The producing agent is the Git author; the service is the committer. Exact
+retries retain the same commit and corrections create new revisions. This
+edition-local history has no remote or publishing credentials. Shared JSON
+files are the working projection; accepted commits preserve their exact bytes.

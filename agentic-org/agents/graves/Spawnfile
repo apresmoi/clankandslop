@@ -32,12 +32,13 @@ surfaces:
         research: { wake: mentions }
 environment:
   mcp_servers:
-    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: graves, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/state/edition }, tools: [file_article, record_dissent] }
+    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: graves, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:graves" }, tools: [file_article, record_dissent] }
     - { name: validation, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/tools/article-validation/server.mjs], env: { CLANK_NEWSROOM_AGENT: graves, CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom }, tools: [validate_article] }
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9d03d6ee7c9175ae199759b5d46e8e26bebcb93448dc0da9266b347e9f01b6d8, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:8da08cfffd98901a56c7abfb2c4e9680bd812a67a88678563d8f468459923256, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:aa83c91a55754b2ed2bb1cf61a8b31e18d4b97940217938fb1424c5638689ae1, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:c78289d0e15683876b1f88cd573067e8a6558e976db3dd03278fa371ff8b188c, mount: ./repos/newsroom-private, mode: readonly }
     - { id: article-validation, kind: bundle, source: ../../article-validation-runtime.tar, sha256: sha256:0e402b3a4efc96e46c18e91931ce369eea26c20e4051faacf1a53ce720fdcd04, mount: ./tools/article-validation, mode: readonly }
 

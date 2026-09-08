@@ -96,22 +96,20 @@ titles and `compact`; the `MarketsRail` title; the `WhatToWatch` title;
 
 ## Running it
 
-```
-node ./repos/newsroom/ops/lay-page.mjs --edition <date> --decisions - <<'JSON'
-{ ... the object above ... }
-JSON
+Call `lay_pages({edition, decisions})` with the decision record above. It
+writes immutable layout JSON and returns `layout_sha256`, the page and map
+names, and its validation report. Submit only the edition, current wake id
+and that digest to `compose_edition`:
+
+```json
+{"edition":"2026-09-07","event_key":"<current wake id>","layout_sha256":"<digest returned by lay_pages>"}
 ```
 
-It prints one line of JSON on stdout: `{"pages": [...], "maps": [...]}`.
-Those two values are exactly the `pages` and `maps` arguments
-`mcp_newsroom_compose_edition` takes, so they go straight across. The line on
-stderr is a receipt for me — articles placed, front visual count, the two
-`paper` values, how many flashpoints and maps.
-
-`--state` defaults to `./state/edition`, which is right; I pass it only if I
-have a reason to. If the assembler refuses, the message names the gate and
-the input that is missing, and I fix the record and run it again — the run
-costs nothing and writes nothing.
+The composition tool reads those exact bytes from this edition's shared
+state, re-runs the assembler against the current accepted inputs, and applies
+all composition gates. Production requires this digest route. I never retype the page documents
+or combine `layout_sha256` with inline `pages`, `maps` or `artifacts`. If the
+assembler refuses, I fix the decision record and call `lay_pages` again.
 
 ## What a page is
 
@@ -171,7 +169,7 @@ they are the vocabulary my choices are made in.
 
 `Illustration` and `Image` are counted by `compose_edition`'s illustration
 gate but are not in the renderer's registry or the validator's block set: a
-page carrying either composes and is then refused at 16:00 as an unknown
+page carrying either composes and is then refused at the final build as an unknown
 block. The assembler can only emit blocks from the list above, so neither can
 ever reach a page.
 
@@ -180,7 +178,7 @@ ever reach a page.
 The full measured inventory is `./repos/newsroom/ops/ASSETS.md`. What matters
 to a compose wake is this:
 
-**Ten shapes, all of them rendered from committed files.** Nothing is baked at
+**Nine static shapes plus the eclipse scene come from committed sources.** The legacy catalogue is rendered at
 edition time and nothing is missing — `GlyphArt.astro` imports nine `.txt`
 files out of `website/src/data/`, and `eclipse` is computed. The assembler
 validates against exactly this set and names it back when I get one wrong.
@@ -251,28 +249,35 @@ map is region data. `ops/ASSETS.md` lists every one with its box, which is
 cheaper to read than the files.
 
 **What the assembler does with it.** I supply nothing. It resolves every
-named region — today's `maps/` first, then the committed archive — and prints
-each document in the `maps` array on stdout, which goes straight across. A
+named region — today's `maps/` first, then the committed archive — and includes
+each document in the immutable layout's `maps` array. A
 story naming a pair produces two entries, because two files are loaded. Two
 things it will refuse me for, both naming `maps must match article art`: a
 region no edition ever baked, and two stories claiming one region with
 different `spots`.
 
-**The three rules the gate enforces**, restated because they are what a
-composition dies on:
+**The composition map set** is the union of reporter `art.map`, `art.hero_map`
+and page `MapGlyph` references. Every supplied map must resolve to an unchanged
+archive document or a selected authenticated Caslon bake. No extra maps ship.
 
-1. The `maps` I pass must be **exactly** the union of every `art.map` and
-   `art.hero_map` on the day's PASSed articles — no more and no fewer. One
-   extra is a refusal, and so is one short.
-2. A `MapGlyph` on a page may only name a map in that set.
-3. On a day no article declares one, the set is empty and the page carries no
-   map. That is a normal day, not a failure.
+For a story without reporter map art, call `bake_map` or `bake_glyph`, then
+set `art["<slug>"].artifact` to the returned `{kind,name,sha256}`
+and supply a reader-facing caption about the subject, without tool or model names.
+Generated art occupies either illustrated feature slot,
+`order[1]` or `order[2]`. Do not combine it with `shape` or `roll`. Call
+`lay_pages({edition,decisions})`; pass its `layout_sha256`, the edition and
+current wake id to `compose_edition`. The tool authenticates and loads the
+saved `pages`, `maps` and `artifacts` itself.
 
-**A map I cannot have.** Baking a *new* region is impossible in this
-container — `gdal-async` is in no bundle and `content/editions/` is read-only
-under `./repos/newsroom` — so a story whose ground no archived region covers
-runs on a glyph, or bare. There is no version of this where I cut a crop to
-fit a story.
+Image inspection tools are optional diagnostics. Release depends on the
+baked structure and mechanical validation/build receipts, with no agent
+visual inspection or visual PASS step.
+
+A generated glyph becomes `GlyphArt` with `props.glyph` naming the edition file.
+A fresh map becomes `MapGlyph` with `props.map`. This does not change a reporter's
+article or insert claims into their prose. For a missing article map, ask its
+owner in `room:filing` and Brass in `room:release`; every PASSed piece still has
+to be placed. Wait for the owning reporter's fix and Spike's new verdict.
 
 ## What the front becomes
 
@@ -430,11 +435,10 @@ cannot be laid out, and it names the gate and the missing input:
   shapes, two rolls, and `roll:"eclipse"` needs `shape:"eclipse"` beside it.
 - **`maps must match article art`** — a story declares a region no edition
   ever baked, or two stories claim one region with different `spots`. The maps
-  supplied to `compose_edition` must be precisely the union of every `art.map`
-  and `art.hero_map` on the day's PASSed articles, no more and no fewer, and
-  no `MapGlyph` may name a map outside that set. On a day no article declares one, that set is empty and
-  the page carries no map. None of these is mine to fix by editing an
-  article — I say so in `room:floor` and lay the page without it.
+  supplied to `compose_edition` must match the union of reporter references and
+  page MapGlyph references. Archive documents or authenticated bake references
+  prove their source. Ask the owner in `room:filing` or Brass in `room:release`
+  for an article correction; do not omit a PASSed article to evade the gate.
 - **`illustration alternation`** — the adjacent run of illustrated rows does
   not go left, right, left. The assembler builds it that way, so this is a
   self-check standing in for `ops/validate-content.mjs` at the release

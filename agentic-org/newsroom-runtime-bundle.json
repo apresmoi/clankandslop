@@ -2,24 +2,24 @@
   "version": "clank.newsroom-runtime-bundle.v2",
   "source": {
     "archive": "newsroom-runtime.tar",
-    "sha256": "sha256:9d03d6ee7c9175ae199759b5d46e8e26bebcb93448dc0da9266b347e9f01b6d8",
-    "file_count": 1287,
-    "content_bytes": 7567100
+    "sha256": "sha256:aa83c91a55754b2ed2bb1cf61a8b31e18d4b97940217938fb1424c5638689ae1",
+    "file_count": 1316,
+    "content_bytes": 10241739
   },
   "dependencies": [
     {
       "archive": "newsroom-dependencies-a.tar",
-      "sha256": "sha256:93e6b34174ee27a059e80f3519d6e522e1fe0705f3aabcd3275507a805c1d768",
+      "sha256": "sha256:3682eb4edaa1092fb08dcc2629da683b7690ff03e2a248301c56c7bfccc6de9d",
       "mount": "deps-a",
-      "file_count": 4762,
-      "content_bytes": 55514019
+      "file_count": 4448,
+      "content_bytes": 71906185
     },
     {
       "archive": "newsroom-dependencies-b.tar",
-      "sha256": "sha256:23f02646bbdc1e778a93c972710fd31dc2db61a92fc0ae4fa39cead8b855fd03",
+      "sha256": "sha256:c7bb3c23e59c0e66257eeb2d5dde6bd131987f0ce228dc4b6c96f5b2b8509142",
       "mount": "deps-b",
-      "file_count": 2128,
-      "content_bytes": 57248204
+      "file_count": 5680,
+      "content_bytes": 74492331
     }
   ],
   "assets": [

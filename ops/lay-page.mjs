@@ -1,24 +1,11 @@
-// The page assembler. Turns the day's PASSed articles, the four desk documents
-// and a small decision record into the two page documents `compose_edition`
-// takes, and nothing else.
-//
-// It exists because every gate that has ever refused a composition is a
-// whole-page property — the visual count, the art-side alternation, the
-// front/tape disjointness, the `paper` diversity — and none of them is a
-// judgement. A compositor rediscovering them one refusal at a time is the
-// most expensive way to retype a house style. The judgements that survive
-// are in the decision record; everything else below is derived.
-//
-// It deliberately runs BEFORE `compose_edition` and hands it the same opaque
-// `pages` array it has always taken, so one-shot composition and the
-// `stage_release` receipt binding are untouched.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
+import { layoutArtifacts } from './layout-artifacts.mjs';
+import { glyphSelectionFindings } from './glyph-format.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-/** Every refusal names the gate it is standing in for and the input that is missing. */
 export class LayoutError extends Error {
   constructor(gate, message) { super(`${gate} — ${message}`); this.gate = gate; }
 }
@@ -28,8 +15,6 @@ const isStr = (v) => typeof v === 'string' && v.length > 0;
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-// The renderer's own lists, restated here so a page can never carry a shape
-// GlyphArt.astro has no model for. `roll` is two names whatever SYSTEMS.md says.
 const GLYPH_SHAPES = new Set(['colosseum', 'play', 'notfound', 'satellite', 'pumpjack', 'missile', 'drone', 'chip', 'campfire', 'eclipse']);
 const GLYPH_ROLLS = new Set(['chip', 'eclipse']);
 const RAIL_DIRS = new Set(['up', 'down', 'flat']);
@@ -39,7 +24,6 @@ const CHROME = {
 };
 const SECTION_HEADER = 'The Flashpoint Index';
 
-// ---- inputs -----------------------------------------------------------------
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 const jsonDir = (dir) => {
@@ -49,36 +33,18 @@ const jsonDir = (dir) => {
   return out;
 };
 
-/** The persona display names the content validator will accept on an `agent` prop. */
 export function personaNames(agentsDir = resolve(root, 'content', 'agents')) {
   const names = new Set();
   for (const [slug, agent] of Object.entries(jsonDir(agentsDir))) { names.add(slug); if (isStr(agent.name)) names.add(agent.name); if (isStr(agent.id)) names.add(agent.id); }
   return names;
 }
 
-/**
- * Everything the assembler reads, from one edition directory.
- * `stateRoot` holds `editions/<date>/{articles,desk,maps}` — true of the shared
- * edition state volume and of the repo's own `content/` tree alike.
- */
 export function readEditionInputs(stateRoot, edition) {
   const dir = resolve(stateRoot, 'editions', edition);
   if (!existsSync(dir)) fail('edition tree incomplete', `no edition directory at ${dir}`);
   return { articles: jsonDir(resolve(dir, 'articles')), desk: jsonDir(resolve(dir, 'desk')), maps: jsonDir(resolve(dir, 'maps')) };
 }
 
-/**
- * Every baked region committed to the repository, by name, newest edition
- * last so a later re-crop under the same name wins.
- *
- * A baked map is region data, not edition data — the same bounds against the
- * same grid reproduce the same relief whatever day it is filed under — so the
- * archive under `content/editions/<date>/maps/` is a catalogue, not a set of
- * one-day artifacts. Nothing in the newsroom can bake a new region
- * (`gdal-async` is in no bundle, the output directory is read-only), which
- * makes reuse the only route a map has onto the paper. Filenames only: the
- * documents are parsed on demand.
- */
 export function archiveIndex(contentRoot = resolve(root, 'content')) {
   const dir = resolve(contentRoot, 'editions');
   const index = new Map();
@@ -91,7 +57,6 @@ export function archiveIndex(contentRoot = resolve(root, 'content')) {
   return index;
 }
 
-/** A `(name) => document | undefined` over that archive, built and parsed lazily. */
 export function archiveResolver(contentRoot) {
   let index;
   const cache = new Map();
@@ -105,7 +70,6 @@ export function archiveResolver(contentRoot) {
   };
 }
 
-// ---- the decision record ----------------------------------------------------
 
 const item = (where, value) => {
   if (!isObj(value)) fail('briefly shape', `${where} must be an object {kicker, agent, what}`);
@@ -126,35 +90,29 @@ function brieflyDesks(where, desks, agents) {
   });
 }
 
-// ---- derivation -------------------------------------------------------------
 
 const teaser = (article, size) => ({ block: 'Teaser', props: { article, size } });
 const grid = (cols, columns, extra = {}) => ({ block: 'Grid', props: { cols, ...extra, columns } });
 
-/** The article's map art, or null — the one shape the renderer and both gates agree on. */
 const mapArt = (article) => (isObj(article?.art) && article.art.kind === 'map' ? article.art : null);
 
-/**
- * The art block for one illustrated slot.
- *
- * Derived from the article whenever the article carries usable art: a baked
- * `hero_map` becomes a MapGlyph whose spots are the article's own, an ascii
- * shape becomes a GlyphArt. The decision record supplies the glyph only where
- * the article has none, and it always owns the caption — the reporter names
- * the ground, the compositor writes the line under it.
- */
 function artBlock(slug, article, choice, maps) {
+  const errors = glyphSelectionFindings({ scale: choice?.scale });
+  if (errors.length) fail('art selection', errors.join('; '));
   const art = article.art;
+  if (choice?.artifact) {
+    if (mapArt(article)) fail('art selection', `"${slug}" already owns map art; retain its approved geography`);
+    if (!isStr(choice.caption)) fail('art caption', `generated art for "${slug}" needs a caption`);
+    const ref = choice.artifact;
+    if (ref.kind === 'map') return { block: 'MapGlyph', props: { map: ref.name, tone: 'soft', locator_context: 'regional', rule: false, interactive: false, caption: choice.caption } };
+    return { block: 'GlyphArt', props: { glyph: ref.name, scale: isNum(choice.scale) ? choice.scale : 0.9, caption: choice.caption } };
+  }
   if (mapArt(article)) {
-    // The hero panel is 52 × 30: it takes the narrow re-crop when the story
-    // named one, and the wide region when it did not.
+    if (['shape', 'roll', 'scale'].some(key => choice?.[key] !== undefined)) fail('art selection', `reporter map for ${slug} permits only a caption choice`);
     const name = isStr(art.hero_map) ? art.hero_map : art.map;
     if (!isStr(name) || !maps[name]) fail('maps must match article art', `"${slug}" carries art.kind "map" whose map did not resolve — this is an assembler bug, resolveArticleMaps should have refused it first`);
     return { block: 'MapGlyph', props: { map: name, spots: (art.spots ?? []).map((s) => ({ ...s })), tone: 'soft', locator_context: 'regional', rule: false, interactive: false, caption: choice?.caption ?? art.caption ?? '' } };
   }
-  // The reporter says what the story is about; the shape, whether it turns,
-  // and the line under it are the compositor's, so a record entry overrides
-  // the article's own art rather than being ignored beside it.
   const shape = choice?.shape ?? art?.shape, roll = choice?.roll ?? art?.roll;
   if (art?.kind === 'ascii' && (isStr(shape) || isStr(roll))) {
     return glyph(slug, { ...(isStr(shape) ? { shape } : {}), ...(isStr(roll) ? { roll } : {}), scale: isNum(choice?.scale) ? choice.scale : 0.6, caption: choice?.caption ?? art.caption ?? '' });
@@ -171,11 +129,11 @@ function glyph(slug, props) {
   if (props.roll !== undefined && !GLYPH_ROLLS.has(props.roll))
     fail('glyph catalogue', `art["${slug}"].roll "${props.roll}" is not a committed roll — the two that exist are ${[...GLYPH_ROLLS].join(', ')}`);
   if (props.roll === 'eclipse' && props.shape !== 'eclipse') fail('glyph catalogue', `art["${slug}"] uses roll "eclipse", which requires shape "eclipse" beside it`);
+  if (props.shape === 'eclipse' && props.roll !== 'eclipse') fail('glyph catalogue', `art["${slug}"] uses shape "eclipse", which requires roll "eclipse" beside it`);
   if (props.shape === undefined && props.roll === undefined) fail('glyph catalogue', `art["${slug}"] must name a shape or a roll`);
   return { block: 'GlyphArt', props };
 }
 
-/** Flashpoint rows: the record's own list, else each ordered article's shipped `presentation.flashpoint`. */
 function flashpoints(order, articles, decisions, agents) {
   const declared = Array.isArray(decisions.flashpoints)
     ? decisions.flashpoints
@@ -191,17 +149,9 @@ function flashpoints(order, articles, decisions, agents) {
   });
 }
 
-// ---- the two pages ----------------------------------------------------------
 
 function frontPage(edition, order, articles, decisions, maps, agents) {
   const [lead, featureA, featureB, ...rest] = order;
-  // `hero_map` is named for the panel it was baked for: when the lead itself
-  // declares a map, Hero renders it beside the lead at 52x30 rather than
-  // leaving the day's best-placed picture off the front. It is not one of the
-  // blocks `visualCount` counts, so the 2-3 rhythm below is unchanged — but
-  // ops/validate-content.mjs reads a hero carrying art as the first art-LEFT
-  // row of the run, so the two feature rows underneath it flip to keep the
-  // alternation (hero-L -> feature-R -> feature-L).
   const heroArt = mapArt(articles[lead]) !== null;
   const artRow = (slug, side) => {
     const art = artBlock(slug, articles[slug], decisions.art?.[slug], maps);
@@ -215,9 +165,6 @@ function frontPage(edition, order, articles, decisions, maps, agents) {
     artRow(featureA, heroArt ? 'right' : 'left'),
     artRow(featureB, heroArt ? 'left' : 'right'),
   ];
-  // Pairs become two-up rows, a leftover single becomes the full-width feature
-  // row — which is where a Hearth piece lands. Neither carries art, so the
-  // visual count stays at two whatever the day's length.
   const pairs = [];
   for (let i = 0; i + 1 < rest.length; i += 2) pairs.push(rest.slice(i, i + 2));
   const single = rest.length % 2 === 1 ? rest[rest.length - 1] : undefined;
@@ -227,8 +174,6 @@ function frontPage(edition, order, articles, decisions, maps, agents) {
   const points = flashpoints(order, articles, decisions, agents);
   if (points.length > 0) {
     head.push({ block: 'SectionHeader', props: { text: SECTION_HEADER } });
-    // One list, two consumers: the circled markers on the globe and the numbered
-    // rows beside it are the same places in the same order, by construction.
     head.push(grid([1, 1], [
       [{ block: 'WorldGlyph', props: { cols: 84, rows: 40, rotX: 1.2, rotY: 0.9, worldDesk: 'edition', hotspots: points.map(({ place, lat, lon, p }) => ({ name: place, lat, lon, ...(isNum(p) ? { p } : {}) })) } }],
       [{ block: 'WorldIndex', props: { items: points.map(({ place, agent, note, p, article }) => ({ place, ...(agent ? { agent } : {}), note, ...(isNum(p) ? { p } : {}), ...(article ? { article } : {}) })) } }],
@@ -251,17 +196,11 @@ function tapePage(edition, decisions, desk, agents) {
     if (row.who !== undefined && !agents.has(row.who)) fail('agent reference', `tape.watch[${i}].who names agent "${row.who}", which has no persona file`);
     return { when: row.when, what: row.what, ...(row.who ? { who: row.who } : {}) };
   });
-  // A rail padded to length is a fabricated tape, so a day with no numbers
-  // simply prints a shorter page rather than a block full of invented rows.
   const rail = rows.length > 0 ? { block: 'MarketsRail', props: { title: 'The Tape', ...(isStr(tape.markets?.kicker) ? { kicker: tape.markets.kicker } : {}), rows } } : null;
   const deadlines = watch.length > 0 ? { block: 'WhatToWatch', props: { title: `The Deadlines · ${watch[0].when}${watch.length > 1 ? ` – ${watch[watch.length - 1].when}` : ''}`, items: watch } } : null;
   if (rail && deadlines) head.push(grid([1, 1], [[rail], [deadlines]]));
   else if (rail || deadlines) head.push(rail ?? deadlines);
 
-  // The open calls are Ledger's, read off the settlement document rather than
-  // retyped: question is the row's own call, p its own prior, and the direction
-  // follows from p. `interval` and `quorum` are pool statistics no input here
-  // supplies, so they are omitted rather than estimated.
   const open = (desk['ledger.settlements']?.resolved_last_edition ?? []).filter((row) => row?.outcome === 'open');
   if (open.length > 0) {
     const meta = `${open.length} open call${open.length === 1 ? '' : 's'}${isStr(tape.forecast_meta) ? ` · ${tape.forecast_meta}` : ''}`;
@@ -271,25 +210,9 @@ function tapePage(edition, decisions, desk, agents) {
   return { edition, page: 'tape', paper: 'tape', title: CHROME.tape.title, active: CHROME.tape.active, tagline: null, head, flow: [] };
 }
 
-// ---- the whole edition ------------------------------------------------------
 
-/** Counts what `compose_edition`'s illustration gate counts, the same way. */
 const visualCount = (value) => JSON.stringify(value).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu)?.length ?? 0;
 
-/**
- * Every region today's stories declare, resolved to a document, refusing the
- * filings that would build a page nothing can render.
- *
- * A story names the wide region in `art.map` — what the story page draws at
- * 104 × 42, and the OG card with it — and may name a narrower re-crop for the
- * front hero panel in `art.hero_map`. Fourteen regions are baked as matched
- * pairs for exactly that (`hormuz`/`hormuz-hero`, `taiwan-east`/`taiwan-hero`),
- * and both halves of a pair now ship: `compose_edition` supplies the union of
- * the two keys, so a page can no longer clear every gate and then die in
- * `astro build` on a file nobody wrote. `hero_map` is optional and may repeat
- * `map`; what is refused is a name no edition ever baked, and one region
- * claimed twice with different spots.
- */
 function resolveArticleMaps(articles, maps, archive) {
   const resolved = {}, spotsFor = new Map();
   for (const slug of Object.keys(articles).sort()) {
@@ -303,7 +226,7 @@ function resolveArticleMaps(articles, maps, archive) {
     for (const name of [art.map, ...(isStr(art.hero_map) ? [art.hero_map] : [])]) {
       const document = maps[name] ?? archive(name);
       if (!isObj(document))
-        fail('maps must match article art', `"${slug}" names map "${name}", which is neither in this edition's maps/ nor in the committed archive under content/editions/*/maps/ — name a region ops/ASSETS.md lists, or file the story without art. Nothing in this newsroom can bake a new one`);
+        fail('maps must match article art', `"${slug}" names map "${name}", which is neither in this edition's maps/ nor in the committed archive under content/editions/*/maps/ — name an archived region; Caslon can add fresh page art separately`);
       const seen = spotsFor.get(name);
       if (seen !== undefined && seen.slug !== slug && seen.spots !== spots)
         fail('maps must match article art', `"${slug}" and "${seen.slug}" both name map "${name}" with different art.spots — ops/validate-content.mjs matches a page MapGlyph's spots against the article art for that map name, and one region cannot carry two sets. Give them the same spots, or one of them a different region`);
@@ -314,13 +237,6 @@ function resolveArticleMaps(articles, maps, archive) {
   return resolved;
 }
 
-/**
- * The art side of each illustrated story row, exactly as
- * `ops/validate-content.mjs` reads it: a hero carrying art is an art-LEFT row,
- * a Grid is sided by which column holds the picture, and anything else ends
- * the run. Restated here so the assembler cannot hand `compose_edition` a page
- * the content validator will refuse at the release boundary.
- */
 export function alternationRuns(head) {
   const side = (block) => {
     if (block?.block === 'Hero') return block.props?.withArt === true ? 'left' : null;
@@ -343,11 +259,7 @@ export function alternationRuns(head) {
   return runs;
 }
 
-/**
- * The two page documents plus the maps that must accompany them, ready to hand
- * to `compose_edition` unchanged.
- */
-export function layEdition({ edition, articles, desk, maps = {}, decisions, agents = personaNames(), archive = archiveResolver() }) {
+export function layEdition({ edition, articles, desk, maps = {}, decisions, artifacts = [], agents = personaNames(), archive = archiveResolver() }) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(edition ?? '')) fail('edition identity', `edition must be an ISO date "YYYY-MM-DD", got ${JSON.stringify(edition)}`);
   if (!isObj(decisions)) fail('decision record', 'no decision record supplied — the assembler never guesses an editorial choice');
   if (decisions.edition !== undefined && decisions.edition !== edition) fail('edition identity', `the decision record names edition ${JSON.stringify(decisions.edition)} but the run is for ${edition}`);
@@ -361,23 +273,23 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, agen
   const placed = [...order].sort();
   if (new Set(order).size !== order.length || placed.join() !== passed.join())
     fail('page completeness invalid', `"order" must be exactly today's PASSed set, each slug once. Expected [${passed.join(', ')}], got [${[...order].sort().join(', ')}]`);
-  const lead = decisions.lead ?? desk['caslon.chrome'].lead_story_id;
-  if (isStr(lead) && lead !== order[0])
-    fail('lead story', `order[0] is "${order[0]}" but caslon.chrome.lead_story_id is "${lead}" — the page and the desk document must name the same lead`);
+  for (const [field, lead] of [['decisions.lead', decisions.lead], ['caslon.chrome.lead_story_id', desk['caslon.chrome'].lead_story_id]])
+    if (isStr(lead) && lead !== order[0])
+      fail('lead story', `order[0] is "${order[0]}" but ${field} is "${lead}" — the decision, page and desk document must name the same lead`);
 
-  const resolved = resolveArticleMaps(articles, maps, archive);
+  const generated = layoutArtifacts(decisions, artifacts, fail);
+  const resolved = { ...resolveArticleMaps(articles, maps, archive) };
+  for (const [name, document] of Object.entries(generated.maps)) {
+    if (resolved[name] && JSON.stringify(resolved[name]) !== JSON.stringify(document)) fail('map identity', `generated map ${name} conflicts with reporter art`);
+    resolved[name] = document;
+  }
   const front = frontPage(edition, order, articles, decisions, resolved, agents);
   const tape = tapePage(edition, decisions, desk, agents);
 
-  // Self-checks: every whole-page gate, re-read off the documents that are about
-  // to be handed over, so a refusal happens here rather than inside a wake.
   const visuals = visualCount(front);
   if (visuals < 2 || visuals > 3) fail('illustration rhythm invalid', `the front carries ${visuals} MapGlyph/GlyphArt blocks; compose_edition requires 2-3`);
   const rolls = front.head.flatMap((block) => block.props?.columns?.flat() ?? []).filter((nested) => nested?.block === 'GlyphArt' && isStr(nested.props.roll));
   if (rolls.length > 1) fail('animated roll', `the front carries ${rolls.length} animated rolls (${rolls.map((r) => r.props.roll).join(', ')}); at most one runs in an edition — two competing motions read like a carnival, not a newspaper`);
-  // compose_edition counts `paper` values found anywhere in either document, so
-  // an absent one is not a distinct value — and it is the gate that has refused
-  // every composition this paper has ever attempted.
   const papers = [front, tape].map((page) => page.paper).filter(isStr);
   if (new Set(papers).size < 2) fail('paper diversity invalid', `the two pages must each carry a distinct top-level "paper" value, found [${papers.join(', ')}]`);
   for (const run of alternationRuns(front.head))
@@ -385,19 +297,15 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, agen
       const expected = offset % 2 === 0 ? 'left' : 'right';
       if (side !== expected) fail('illustration alternation', `an adjacent run of illustrated rows goes [${run.join(', ')}]; ops/validate-content.mjs requires art ${expected} in position ${offset} — adjacent runs alternate left → right, and a hero carrying art is the first left`);
     }
-  // Exactly the set compose_edition recomputes off the same articles — the
-  // union of every art.map and art.hero_map. Supply more and the equality
-  // assertion refuses the composition; supply fewer and a story page or a
-  // MapGlyph names a map that was never written.
   const supplied = Object.keys(resolved).sort();
   return {
     pages: [{ name: 'front', document: front }, { name: 'tape', document: tape }],
     maps: supplied.map((name) => ({ name, document: resolved[name] })),
+    artifacts: generated.references,
     report: { edition, passed: passed.length, placed: order.length, visuals, maps: supplied.length, flashpoints: front.head.find((b) => b.block === 'Grid' && b.props.columns[0][0]?.block === 'WorldGlyph')?.props.columns[1][0].props.items.length ?? 0 },
   };
 }
 
-// ---- cli --------------------------------------------------------------------
 
 function readStdin() {
   try { return readFileSync(0, 'utf8'); } catch { return ''; }
@@ -428,8 +336,7 @@ function main(argv) {
     for (const page of laid.pages) writeFileSync(resolve(dir, `${page.name}.json`), `${JSON.stringify(page.document, null, 1)}\n`);
     console.error(`lay-page: wrote ${laid.pages.map((p) => `${basename(dir)}/${p.name}.json`).join(' ')}`);
   }
-  // stdout is exactly the two arguments compose_edition takes, and nothing else.
-  process.stdout.write(`${JSON.stringify({ pages: laid.pages, maps: laid.maps })}\n`);
+  process.stdout.write(`${JSON.stringify({ pages: laid.pages, maps: laid.maps, artifacts: laid.artifacts })}\n`);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -115,3 +115,29 @@ test('consumer attribution binds strict filings without rewriting historical sou
   assert.deepEqual(articleFormatFindings(article, { ...context, profile: 'archive' }).errors, []);
   assert.equal(JSON.stringify(article), before);
 });
+
+test('eclipse art requires both shape "eclipse" and roll "eclipse"', () => {
+  const validEclipse = structuredClone(fact);
+  validEclipse.art = { kind: 'ascii', shape: 'eclipse', roll: 'eclipse', caption: 'The Moon crosses the Sun.' };
+  assert.deepEqual(articleFormatFindings(validEclipse, context).errors, []);
+
+  const shapeOnly = structuredClone(fact);
+  shapeOnly.art = { kind: 'ascii', shape: 'eclipse', caption: 'No roll.' };
+  const shapeErrors = articleFormatFindings(shapeOnly, context).errors;
+  assert.ok(shapeErrors.some(e => e.path === 'article.art.shape' && e.code === 'asset' && e.message.includes('eclipse shape requires roll eclipse')));
+
+  const rollOnly = structuredClone(fact);
+  rollOnly.art = { kind: 'ascii', roll: 'eclipse', caption: 'No shape.' };
+  const rollErrors = articleFormatFindings(rollOnly, context).errors;
+  assert.ok(rollErrors.some(e => e.path === 'article.art.roll' && e.code === 'asset' && e.message.includes('eclipse roll requires shape eclipse')));
+
+  const mismatchedRoll = structuredClone(fact);
+  mismatchedRoll.art = { kind: 'ascii', shape: 'chip', roll: 'eclipse', caption: 'Mismatched.' };
+  const mismatchedRollErrors = articleFormatFindings(mismatchedRoll, context).errors;
+  assert.ok(mismatchedRollErrors.some(e => e.path === 'article.art.roll' && e.code === 'asset'));
+
+  const mismatchedShape = structuredClone(fact);
+  mismatchedShape.art = { kind: 'ascii', shape: 'eclipse', roll: 'chip', caption: 'Mismatched.' };
+  const mismatchedShapeErrors = articleFormatFindings(mismatchedShape, context).errors;
+  assert.ok(mismatchedShapeErrors.some(e => e.path === 'article.art.shape' && e.code === 'asset'));
+});

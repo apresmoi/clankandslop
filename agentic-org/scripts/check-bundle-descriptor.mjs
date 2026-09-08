@@ -38,7 +38,9 @@ export function bundleDescriptorFindings(repoRoot = repo) {
   const descriptorPath = path.join(repoRoot, 'agentic-org/newsroom-runtime-bundle.json');
   const descriptor = JSON.parse(readFileSync(descriptorPath, 'utf8'));
   const findings = sourceDescriptorFindings(descriptor, measureSourceArchive(repoRoot));
-  let validation;
+  let validation, automation;
+  try { automation = JSON.parse(readFileSync(path.join(repoRoot, 'agentic-org/newsroom-tools-bundle.json'), 'utf8')); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
   try { validation = JSON.parse(readFileSync(path.join(repoRoot, 'agentic-org/article-validation-runtime-bundle.json'), 'utf8')); }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
   // The pin is only worth anything if the declarations carry it. Checked here
@@ -51,6 +53,8 @@ export function bundleDescriptorFindings(repoRoot = repo) {
     try { source = readFileSync(spawnfile, 'utf8'); } catch { continue; }
     if (!source.includes(`sha256: ${descriptor.source.sha256}`))
       findings.push(`agents/${agent}/Spawnfile does not pin the descriptor source digest ${descriptor.source.sha256}`);
+    const automationBundle = source.split('\n').find(line => line.includes('id: newsroom-tools,'));
+    if (automationBundle && (automation?.version !== 'clank.newsroom-tools-bundle.v1' || !/^sha256:(?!0{64}$)[a-f0-9]{64}$/u.test(automation?.sha256) || !automationBundle.includes(`sha256: ${automation.sha256},`))) findings.push(`agents/${agent}/Spawnfile does not pin a valid newsroom tools descriptor digest`);
     const toolBundle = source.split('\n').find(line => line.includes('id: article-validation,'));
     if (toolBundle && (validation?.version !== 'clank.article-validation-runtime-bundle.v1' || !/^sha256:[a-f0-9]{64}$/u.test(validation?.sha256) || !toolBundle.includes(`sha256: ${validation.sha256},`)))
       findings.push(`agents/${agent}/Spawnfile does not pin a valid article-validation descriptor digest`);

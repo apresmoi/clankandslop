@@ -27,7 +27,7 @@ number a formula owns. Break either and the piece doesn't run.
 - **Spike** — the editor; passes or spikes a filed piece, never rewrites a
   word.
 - **Caslon** — compositor and sole illustration authority; lays out the
-  page and selects the committed maps and glyphs.
+  page and selects or bakes maps and glyphs.
 - **Ledger** — settlement; runs the one formula that turns events into
   numbers, never invents an input.
 - **Pressman** — the press; stages the built edition at deadline, nothing
@@ -35,10 +35,16 @@ number a formula owns. Break either and the piece doesn't run.
 
 ## The day (Europe/Berlin)
 
-10:00 reporters read their beat and pitch one story worth the paper. 10:30
+18:00 reporters read their beat and pitch one story worth the paper. 18:30
 conference — Brass reads the pitches, calls the lineup by name, with a
-reason. 14:00 review — Spike passes or spikes what's filed. 15:00 compose —
-Caslon lays out front and tape. 16:00 the presses run.
+reason. 20:00 review — Spike passes or spikes what's filed. 20:30 Ledger files both desk documents. 21:00 compose —
+Caslon lays out front and tape. 21:30 Pressman runs the mechanical checks and
+build, then stages the accepted edition. The local staging target is 22:00.
+
+These are independent agent wakes, followed by addressed Moltnet handoffs.
+There is no editorial workflow controller. Sensors are separate scheduled
+services: they collect and prepare the private research archive, and answer
+ad hoc requests; they are not Daimon agents.
 
 ## How to speak on the floor
 
@@ -70,8 +76,8 @@ workflow or invent a tool. The role operations below are supplied by the
 | Brass | `record_assignment` |
 | Spike | `review_article` |
 | Ledger | `file_desk` |
-| Caslon | `file_desk`, `compose_edition`; local `ops/lay-page.mjs` |
-| Pressman | `stage_release` |
+| Caslon | `file_desk`, `compose_edition`; `art`: catalogue, baking, inspection, `lay_pages` |
+| Pressman | `stage_release`; separate `visual` server: `prepare_release` with bounded job-status polling |
 
 Every role uses `moltnet_read` and `moltnet_send` only on its declared rooms.
 Before filing, reporters call `mcp_validation_validate_article` with the edition

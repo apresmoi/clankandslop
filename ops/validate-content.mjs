@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
 import { articleFormatFindings } from './article-format.mjs';
+import { glyphFormatFindings, glyphSelectionFindings } from './glyph-format.mjs';
 import { EDITION_PART_FILES, OUTCOMES as DESK_OUTCOMES, deskDocumentFindings } from './desk-contract.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -163,6 +164,11 @@ for (const { date, dir: edDir, desk } of scopes) {
         err(file, `bands[${i}] must be ${m.cols} chars of 0-8`);
   }
 
+  for (const name of glyphSlugs) {
+    const file = resolve(edDir, 'glyphs', `${name}.json`);
+    for (const finding of glyphFormatFindings(readJson(file), name)) err(rel(file), finding);
+  }
+
   // articles
   for (const slug of articleSlugs) {
     const file = rel(resolve(articleDir, `${slug}.json`));
@@ -187,7 +193,7 @@ for (const { date, dir: edDir, desk } of scopes) {
     if (!isStr(p.active)) err(file, 'missing active');
     for (const slot of ['head', 'flow']) {
       if (!Array.isArray(p[slot])) { err(file, `missing ${slot} array`); continue; }
-      p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { date, articleSlugs, mapSlugs, articleMapArts }));
+      p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { date, articleSlugs, mapSlugs, glyphSlugs, articleMapArts }));
     }
     pageFeatureRefs.set(p.page, collectFeatureArticleRefs([...(p.head ?? []), ...(p.flow ?? [])]));
     if (date >= '2026-07-30' && p.page === 'front')
@@ -273,6 +279,7 @@ function checkBlock(file, path, b, refs) {
         err(file, `${path}.spots must match article "${articleArt.slug}" art.spots for map "${b.props.map}"`);
     }
   }
+  if (b.block === 'GlyphArt') for (const finding of glyphSelectionFindings(b.props)) err(file, `${path}: ${finding}`);
   checkRefs(file, path, b.props, refs);
 }
 
@@ -288,6 +295,8 @@ function checkRefs(file, path, props, refs) {
       for (const s of v) if (!refs.articleSlugs.has(s)) err(file, `${path}.${k} references missing article "${s}"`);
     } else if (k === 'map' && isStr(v)) {
       if (!refs.mapSlugs.has(v)) err(file, `${path}.map references missing map "${v}"`);
+    } else if (k === 'glyph' && isStr(v)) {
+      if (!refs.glyphSlugs.has(v)) err(file, `${path}.glyph references missing glyph \"${v}\"`);
     } else if (k === 'agentSlug' && isStr(v)) {
       if (!agentSlugs.has(v)) err(file, `${path}.agentSlug references missing agent file "${v}"`);
     } else if (k === 'agentSlugs' && Array.isArray(v)) {

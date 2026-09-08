@@ -89,6 +89,7 @@ function checkAssets(a, context, add) {
   if (art.kind === 'ascii') {
     if (!isText(art.ascii) && !isText(art.shape)) add('art', 'asset', 'requires ascii text or a committed shape');
     if (art.roll === 'eclipse' && art.shape !== 'eclipse') add('art.roll', 'asset', 'eclipse roll requires shape eclipse');
+    if (art.shape === 'eclipse' && art.roll !== 'eclipse') add('art.shape', 'asset', 'eclipse shape requires roll eclipse');
   }
   if (art.kind === 'map') {
     if (!isText(art.map)) add('art.map', 'asset', 'is required for map art');

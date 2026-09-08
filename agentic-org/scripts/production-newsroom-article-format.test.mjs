@@ -6,6 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileArticle, recordAssignment } from './production-newsroom.mjs';
 
+const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
 const published = JSON.parse(readFileSync(new URL('../../content/editions/2026-08-21/articles/deepseek-ships-flash-vision-on-the-api.json', import.meta.url), 'utf8'));
 async function snapshot(dir) {
   const out = {};
@@ -17,7 +18,7 @@ async function snapshot(dir) {
   return out;
 }
 
-test('fileArticle cannot bypass format checks and rejected mutations write nothing', async () => {
+runtimeTest('fileArticle cannot bypass format checks and rejected mutations write nothing', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-article-format-'));
   const names = ['CLANK_EDITION_STATE_ROOT', 'CLANK_NEWSROOM_AGENT', 'CLANK_FILE_ARTICLE_HARD_LINT'];
   const saved = Object.fromEntries(names.map(name => [name, process.env[name]]));

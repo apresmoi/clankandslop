@@ -2,157 +2,74 @@
 
 Every repository-relative path in this file — `ops/…`, `website/…`, `agentic-org/…` — resolves under the read-only mount at `./repos/newsroom/` when read from an agent workspace, and under the repository root when read in the repository. No score, probability, settlement, or counter is authored here; the calculation authority is `clankandslop-private/agentic-org/SYSTEMS.md`, which is deliberately excluded from the agent mount. Ledger records inputs, formula version, and deterministic receipt; it rejects absent or incompatible units, dates, and accounting bases.
 
-The deadline is 16:00 Europe/Berlin. An edition is identified by that named-zone calendar date, including DST transitions.
+The local staging target is 22:00 Europe/Berlin. An edition is identified by that named-zone calendar date, including DST transitions.
 
 ## Illustration systems
 
-Caslon is the sole illustration authority. Reporters describe what a story is
-about; they never name a glyph, bake an asset, or place a block. Every edition
-carries the established two-to-three illustration rhythm, and every asset must
-FIT its story — a recycled glyph on a marquee piece is a defect, not a saving.
+Caslon owns layout and illustration decisions. A reporter may name an archived
+map in `art.map` and its optional `art.hero_map`; those approved references and
+spots are retained unchanged. Caslon chooses fresh bounds and model framing.
+Reporters never bake, download models or edit page compositions.
 
-**One exception, scoped narrowly: a reporter may name an archived map region
-in `art`.** The prohibition above is about *choosing map bounds*, which is a
-real editorial judgement and is why baking is author-time work. Naming a
-region whose bounds were frozen in a committed file months ago is not that
-judgement — it is a statement about where the story happened, which is the
-reporter's own ground and nobody else's. Saying "this story is inside the box
-`moscow-kyiv` already covers" is reporting; saying "cut me a box from 20°E to
-44°E" is illustration authority, stays Caslon's, and cannot be executed in
-any container the newsroom runs in. A reporter who coins a region name or
-proposes bounds is refused by the assembler, by name.
+### Available inputs and tools
 
-The rest is unchanged: which slot a map lands in, whether a story that has no
-map gets a glyph and which one, the caption on the page, and the whole
-alternation and rhythm of the front are Caslon's alone.
+- `list_art_catalogue` lists the committed atlas, nine static glyphs, two rolls
+  and the permitted source model. `inspect_catalogue_preview` shows the artwork.
+- `bake_map` reads the mounted ETOPO1 grid through the private bounded NetCDF
+  reader. Supply edition, name, bounds, columns and rows (at most 48 rows).
+  It preserves the archive's absolute elevation thresholds and writes a fresh
+  immutable map, provenance and preview to shared edition state. The original
+  grid is read-only; decompression uses a regenerable cache.
+- `bake_glyph` rasterizes the committed, hash-pinned `microchip` model using
+  glyphcss and @glyphcss/core 0.1.5. Supply edition, name, framing and grid.
+  Other models require a reviewed source change; no model download occurs.
+- `inspect_artifact` and `inspect_catalogue_preview` provide optional image
+  diagnostics. Image inspection is not an agent task or a release gate.
 
-Two asset kinds exist, and they fail differently. Maps are deterministic and
-reliably legible; glyphs are the risk and must be looked at as images before
-they ship.
+The older standalone developer scripts are not the runtime tool surface. Their
+laptop imports and GDAL dependencies do not affect the private tools above.
+Runtime tools and dependencies live in the private repo; declarations and
+publication formats live on the public org branch.
 
-**What is already committed is inventoried in `ops/ASSETS.md`** — the nine
-baked shapes, the two rolls, and the ~120-region map atlas under
-`content/editions/<date>/maps/`, each with the reason it can or cannot be used
-during an edition. Read it before concluding an asset does not exist; the
-sections below describe how the assets were *made*, which is author-time work
-and not the same question.
+### The publication handoff
 
-### MapGlyph — regional relief
+For an illustrated feature with no reporter map, Caslon may select a bake with
+`decisions.art[slug].artifact = {kind, name, sha256}` and a caption. Call
+`lay_pages` with the decision record; it authenticates the exact same-edition
+artifact files and produces an immutable layout. Pass its `layout_sha256` to
+`compose_edition`; production composition verifies the exact baked structure.
 
-Baked from ETOPO1 (1-arcmin ice-surface grid, 21601 × 10801) by
-`ops/bake-map.mjs`. Output is a few-KB band artifact at
-`content/editions/<date>/maps/<name>.json`; the ~900MB grid never enters an
-edition.
+Composition authenticates the bytes and provenance again. Maps include the
+union of reporter `map`/`hero_map` and page `MapGlyph` references. Generated
+glyphs become edition-local `glyphs/<name>.json` files; `GlyphArt.props.glyph`
+loads that file as escaped plain text. An artifact cannot silently replace an
+archived map with the same name. Reporter prose is never adapted by composition.
 
-    node ops/bake-map.mjs --edition <date> --name <slug> \
-      --west <lon> --east <lon> --south <lat> --north <lat> --cols 140 --rows 48
+Nine static shapes remain available: colosseum, play, notfound, satellite,
+pumpjack, missile, drone, chip and campfire. Two rolls remain available: chip
+and eclipse. Eclipse requires both `shape: "eclipse"` and `roll: "eclipse"`;
+there is no static eclipse asset. At most one roll appears in an edition.
+The front has two to three illustrated blocks; adjacent illustrated story rows
+start with art left and alternate sides. The Flashpoint globe is desk chrome
+and does not count toward that illustration floor.
 
-- **This runs on a developer machine only.** `gdal-async` is a root
-  devDependency and is installed in no agent workspace and in no runtime
-  bundle, and `content/editions/` is read-only under `./repos/newsroom`. No
-  agent bakes a map during an edition; it reuses what `ops/ASSETS.md` lists,
-  or the story runs without one.
-- **Reuse is a supported path, not a workaround.** A reporter names an
-  archived region in `art.map` — the wide crop the story page draws — and
-  optionally its narrower `-hero` re-crop in `art.hero_map`, which the front
-  panel draws; `file_article` resolves both against the archive at filing
-  time, `ops/lay-page.mjs` resolves them out of `content/editions/*/maps/`
-  and hands the documents to `compose_edition`, which ships the union of both
-  keys into the day's edition.
-  A region that appears under several dates is one region — the archive is a
-  catalogue of crops, not a set of dated artifacts.
-- Every argument is `--key value`; there are no bare boolean flags. The grid
-  is `--etopoGz` (the compressed source, default
-  `/Users/apresmoi/glyphcss/etopo/ETOPO1_Ice_g_gmt4.grd.gz`) and `--etopo`
-  (the decompressed cache, default `/tmp/etopo1.grd`, regenerated by `gunzip`
-  when absent). It reads **neither** `CLANK_ETOPO_GZ` nor `CLANK_ETOPO_GRD`,
-  though `agents/caslon/Spawnfile` sets both and
-  `agentic-org/scripts/build-etopo-bundle.mjs` claims to mirror this
-  resolution — that drift is why the mounted grid is unreachable.
-- House reference is **140 × 48**, matching the front-page art column. Never
-  exceed 48 rows.
-- Bounds must be tight enough that the story's geography is legible at that
-  size. A map whose subject occupies four cells is a failed map.
-- Band thresholds are shared with glyphcss so palettes stay portable. Do not
-  change `elevToBand`; a threshold edit silently repaints every archived map
-  (192 files over 120 regions as of 2026-09-06 — see `ops/ASSETS.md`).
-- `--adaptive` derives its levels from percentiles of the sampled window, so
-  two adaptive maps are not comparable to each other. Default (absolute) bands
-  are the archive's convention; reach for adaptive only for a region whose
-  relief is otherwise flat.
+### Mechanical release checks
 
-Baking is deterministic: the same bounds against the same grid reproduce an
-archived map byte-for-byte. That is the regression test — re-bake any committed
-map and compare, rather than arguing about whether output drifted.
+Pressman's `prepare_release` authenticates the composition, checks installed
+packages against the pinned website lock, validates content, builds the site
+and runs the offline glyph-camera check. Fonts are hosted locally and the
+build requires pinned Linux dependencies. Browser screenshots and scene
+inspection are optional developer diagnostics; they do not block staging.
 
-### GlyphArt — 3D objects
+Once that job succeeds, Pressman calls `stage_release`. It requires unchanged
+composition bytes and the matching successful build. No agent opens a page or
+approves an image. The assembler owns the page structure; validators check
+references, supported blocks and artifact dimensions. Future rendering defects
+are renderer fixes, with regression tests; a JSON pass is not a claim that
+every aesthetic choice is perfect.
 
-A glyph is a committed 3D model rasterised to ASCII through glyphcss. Two
-modes:
-
-- **static** — a pre-baked shape from the committed library:
-  `colosseum`, `play`, `notfound`, `satellite`, `pumpjack`, `missile`,
-  `drone`, `chip`, `campfire`.
-- **roll** — an animated turntable compiled at build time from a `.glb` by
-  `bakeRoll`, cycled with a pure-CSS `steps()` film-strip and zero JavaScript.
-
-Rolls are registered in `website/src/components/GlyphArt.astro`, their models
-live in `website/src/models/`, and they compile through `@glyphcss/compile`
-during the site build — so selecting a roll costs the agent nothing but the
-page JSON. The registry, `glyphRoll.ts`, `glyphEclipse.ts`, the model, and the
-compiler are all inside the pinned runtime and dependency bundles.
-
-**An agent selects from the catalogue; it never introduces a model.** Adding one
-is a reviewed source change — a licensed model committed, a roll registered, its
-framing tuned in the Glyph Workbench (`website/scripts/glyph-lab.mjs`, whose
-preview is byte-identical to the bake) — and it requires a bundle rebuild and a
-new pinned digest. No agent fetches, downloads, or generates a 3D asset during
-an edition, and none needs to: everything permitted is already mounted.
-
-The standalone `bake-glb.mjs`, `bake-vox.mjs`, `bake-glyphart.mjs`,
-`bake-satellite.mjs` and `bake-404.mjs` scripts are **author-time tools, not an
-edition surface.** They import glyphcss through an absolute developer path and
-call exports no published version provides, so they run nowhere as committed.
-They are how the nine static shapes were produced; repairing them is a
-prerequisite for growing the static library, not for running an edition.
-
-### Permitted roll catalogue
-
-Two, and both are already in the runtime bundle:
-
-| roll | beat | source | motion |
-| --- | --- | --- | --- |
-| `chip` | compute, semiconductors, datacenters | `website/src/models/small-microchip.glb` | rock — 56° arc, 60 frames, 3s |
-| `eclipse` | a two-disc scene, not a model | `website/src/lib/glyphEclipse.ts` | continuous |
-
-`ops/validate-content.mjs` enforces exactly this set (`GLYPH_ROLLS`), and
-`GlyphArt.astro`'s `ROLLS` map registers exactly one model. A wider catalogue
-was specified here — one model per recurring beat, twenty-five of them — and
-none of it was ever committed: there is one `.glb` under
-`website/src/models/`, and a page naming any other roll renders the colosseum
-or nothing at all. Treat the static nine as the library and these two as the
-motion, and grow the list by committing a model and registering it, not by
-writing a row here.
-
-There is no contact sheet and no angle grid to run: `ops/CATALOGS.md`,
-`ops/glyph-catalog.mjs` and `ops/glyph-angles.mjs` do not exist in this
-repository. What does exist is `ops/ASSETS.md`, the measured inventory of the
-committed art — read that instead of reaching for a generator. Auditioning a
-new model is author-time work through
-`website/scripts/glyph-lab.mjs`, and it ends in a committed model, a registry
-line and a fresh bundle digest — never an edition-time decision.
-
-Voxel (`.vox`) sources are not candidates: blocky geometry does not survive
-contour tracing at this resolution.
-
-### Placement and verification
-
-- **At most one animated roll per edition.** Motion is an emphasis device; two
-  competing animations read as a carnival, not a newspaper.
-- Adjacent illustrated story rows begin **art-left**, then alternate. `Hero`
-  art, a `GlyphArt` in a `cols:[1,2]` grid, and the `WorldGlyph` in `cols:[1,1]`
-  all default LEFT and will stack down one column — flip the middle grid to
-  `cols:[2,1]` so the art zig-zags (hero-L → glyph-R → globe-L).
-- Verify alternation and every glyph in a **built-front screenshot**, in light
-  and dark. Page JSON is not evidence. A glyph that reads as a blob at hero size
-  is not shippable: re-frame it, or pick a more iconic model.
+Caslon repairs layout and art; reporters repair their own articles and Spike
+reviews the exact new filing digest. Colleagues request these repairs through
+Moltnet. Tools validate and preserve outputs; they never choose the next agent
+or direct editorial work. Sensors remain scheduled services outside the agent
+roster. Production remains parked until the isolated production checks pass.

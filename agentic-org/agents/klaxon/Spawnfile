@@ -30,12 +30,13 @@ environment:
       transport: stdio
       command: /usr/local/bin/node
       args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
-      env: { CLANK_NEWSROOM_AGENT: klaxon, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/state/edition }
+      env: { CLANK_NEWSROOM_AGENT: klaxon, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:klaxon" }
       tools: [qualify_signal]
 workspace:
   docs: { system: AGENTS.md }
   resources:
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9d03d6ee7c9175ae199759b5d46e8e26bebcb93448dc0da9266b347e9f01b6d8, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:8da08cfffd98901a56c7abfb2c4e9680bd812a67a88678563d8f468459923256, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:aa83c91a55754b2ed2bb1cf61a8b31e18d4b97940217938fb1424c5638689ae1, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:c78289d0e15683876b1f88cd573067e8a6558e976db3dd03278fa371ff8b188c, mount: ./repos/newsroom-private, mode: readonly }
     - { id: private-corpus, kind: volume, name: clank-klaxon-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }
 

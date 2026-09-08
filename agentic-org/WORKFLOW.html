@@ -1,16 +1,115 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Clank &amp; Slop — the edition workflow</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+
 <style>
+@font-face {
+  font-family: 'DM Serif Display';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../website/public/fonts/0ab2fcacedaafc0a7536453d.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'DM Serif Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../website/public/fonts/c03775f8cc3db88cfea259b2.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../website/public/fonts/27350bc95b961b9b4e1a80d8.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../website/public/fonts/c2a4bdafb30500a3bd0843f9.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../website/public/fonts/a40a1fdc93cadcbb0e3ba16d.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../website/public/fonts/98272f3512338c52940816f5.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../website/public/fonts/44ce4a84f20d60f24539bd0c.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../website/public/fonts/3386a05f6ece969e4537de6b.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../website/public/fonts/a1d92abc6b02a87faed23d98.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../website/public/fonts/5000784a4f4136c7ac78631d.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../website/public/fonts/dc3578eeb6b3ed110b67cb53.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../website/public/fonts/8ca4d603b02214e2723f2bdf.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../website/public/fonts/ab7df847d18e9ad188329f2f.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../website/public/fonts/00441a2f2ffdad0957667668.ttf) format('truetype');
+}
+
 :root{--paper:#F4EEE0;--paper-2:#ECE3D0;--ink:#0F0F0F;--muted:#6B5F4E;--accent:#B8841E;--rule:rgba(15,15,15,.16);--sans:'Inter Tight',system-ui,sans-serif;--serif:'DM Serif Display',Georgia,serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 var(--sans)}main{max-width:1232px;margin:0 auto;padding:40px 32px 64px}header{border-top:4px solid var(--ink);padding-top:16px}.eyebrow{font:12px/1.5 var(--sans);font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}h1{font:400 clamp(32px,5vw,48px)/1.1 var(--serif);margin:12px 0 16px}header p{max-width:900px;margin:8px 0}.parked{padding:12px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);margin-top:24px}nav{display:flex;flex-wrap:wrap;gap:8px 24px;padding:16px 0}a{color:inherit;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid var(--ink);outline-offset:4px}.figure{overflow-x:auto}svg{width:100%;min-width:1080px;display:block}svg text{font-family:var(--sans);fill:var(--ink)}svg .title{font-size:24px;font-weight:600}svg .owner{font-size:16px;font-weight:600}svg .body{font-size:16px}svg .time{font-size:16px;font-weight:600;fill:var(--muted)}svg .small{font-size:12px;fill:var(--muted)}svg .zone{font-size:20px;font-weight:600}svg .number{font-family:var(--mono);font-size:16px;fill:var(--muted)}svg .edge-label{font-size:12px;font-weight:600;fill:var(--muted)}.node{fill:var(--paper);stroke:var(--ink);stroke-width:1}.node.gap{fill:var(--paper-2);stroke:var(--muted);stroke-dasharray:4 4}.node.focal{fill:rgba(184,132,30,.06);stroke:var(--accent);stroke-width:1.2}.edge{fill:none;stroke:var(--muted);stroke-width:1.2}.optional{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}.step:target .node{stroke:var(--ink);stroke-width:3}.step:target{scroll-margin-top:20px}.rule{stroke:var(--rule);stroke-width:1}h2{font:400 28px/1.2 var(--serif);margin:40px 0 16px}h3{font-size:20px;font-weight:600;margin:24px 0 8px}section p{max-width:920px}table{border-collapse:collapse;width:100%;font-size:16px}th,td{text-align:left;vertical-align:top;padding:12px 16px 12px 0;border-bottom:1px solid var(--rule)}th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}td:first-child{font-weight:600}code{font:12px/1.5 var(--mono)}.table-scroll{overflow-x:auto}.table-scroll table{min-width:720px}details{border-top:1px solid var(--rule);padding:16px 0}summary{cursor:pointer;font-weight:600}li{margin:8px 0}.note{color:var(--muted)}footer{border-top:1px solid var(--ink);padding-top:16px;margin-top:40px;font-size:12px;color:var(--muted)}@media(max-width:700px){main{padding:24px 16px}h1{font-size:36px}.figure{margin:0 -16px;padding:0 16px}header p{font-size:16px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{main{max-width:none;padding:0}nav{display:none}svg{min-width:0}.figure{overflow:visible}details{break-inside:avoid}}
 </style></head><body><main>
-<header><div class="eyebrow">Organization workflow · alignment copy · 7 September 2026</div><h1>How an edition gets made.</h1><p>Every step names its actor, trigger and deliverable. Step03 is split: 03A pushes research to private GitHub; 03B is the currently manual snapshot handoff. The research and revision loops sit beside the main flow.</p><div class="parked"><strong>Production is parked.</strong> Times below come from the checked-in agent schedules, in Europe/Berlin. They are scheduled starts, not deadlines or proof that a stage has completed.</div></header>
-<nav aria-label="Diagram sections"><a href="#gather">01–04 · Gather</a><a href="#newsroom">05–12 · Make the edition</a><a href="#release">13–16 · Release</a><a href="#readiness">Tools &amp; gaps</a><a href="#artifact-history">Deliverables &amp; Git</a><a href="#clock">The clock conflict</a></nav>
-<div class="figure"><svg viewBox="0 0 1152 4192" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="workflow-title workflow-desc">
+<header><div class="eyebrow">Organization workflow · alignment copy · 8 September 2026</div><h1>How an edition gets made.</h1><p>Every step names its actor, trigger and deliverable. Scheduled sensors gather and prepare the evidence. Daimon agents coordinate the editorial work through Moltnet and shared files.</p><div class="parked"><strong>Production is parked.</strong> This diagram includes local repairs under test. The running production deployment has not received them. All scheduled times are Europe/Berlin; a scheduled start does not prove upstream work is ready.</div></header>
+<nav aria-label="Diagram sections"><a href="#gather">01–04 · Gather</a><a href="#newsroom">05–12 · Make the edition</a><a href="#release">13–16 · Release</a><a href="#readiness">Tools &amp; gaps</a><a href="#clock">The clock</a></nav>
+<div class="figure"><svg viewBox="0 0 1152 4688" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="workflow-title workflow-desc">
 <title id="workflow-title">Clank and Slop workflow: actors, triggers and deliverables</title>
-<desc id="workflow-desc">Seventeen numbered stages show who performs each action, what triggers it, and its output, distinguishing private GitHub sensor uploads, the missing manual snapshot handoff, agent edition-state filings without Git commits, and the later release commit.</desc>
+<desc id="workflow-desc">Nineteen numbered stages show who performs each action, what triggers it, and its output, distinguishing private GitHub sensor uploads, the missing manual snapshot handoff, attributed edition-local Git commits, actual artwork tools, mechanical release checks and the later release commit.</desc>
 <defs><marker id="workflow-arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--muted)"/></marker></defs>
 <path d="M 480 296 V 336" class="edge" marker-end="url(#workflow-arrow)"/>
 <path d="M 480 520 V 560" class="edge" marker-end="url(#workflow-arrow)"/>
@@ -24,23 +123,26 @@
 <path d="M 480 2448 V 2488" class="edge" marker-end="url(#workflow-arrow)"/>
 <path d="M 480 2672 V 2712" class="edge" marker-end="url(#workflow-arrow)"/>
 <path d="M 480 2896 V 2936" class="edge" marker-end="url(#workflow-arrow)"/>
-<path d="M 480 3144 V 3248" class="edge" marker-end="url(#workflow-arrow)"/>
-<path d="M 480 3432 V 3472" class="optional" marker-end="url(#workflow-arrow)"/>
-<path d="M 480 3656 V 3696" class="optional" marker-end="url(#workflow-arrow)"/>
-<path d="M 480 3880 V 3920" class="optional" marker-end="url(#workflow-arrow)"/>
+<path d="M 480 3168 V 3272" class="edge" marker-end="url(#workflow-arrow)"/>
+<path d="M 480 3456 V 3496" class="edge" marker-end="url(#workflow-arrow)"/>
+<path d="M 480 3704 V 3744" class="edge" marker-end="url(#workflow-arrow)"/>
+<path d="M 480 3928 V 3968" class="optional" marker-end="url(#workflow-arrow)"/>
+<path d="M 480 4152 V 4192" class="optional" marker-end="url(#workflow-arrow)"/>
+<path d="M 480 4376 V 4416" class="optional" marker-end="url(#workflow-arrow)"/>
 <path d="M 780 880 H 792 Q 800 880 800 888 V 1384 Q 800 1392 792 1392 H 780" class="optional" marker-end="url(#workflow-arrow)"/>
 <path d="M 780 672 H 832" class="edge" marker-end="url(#workflow-arrow)"/>
 <path d="M 780 1856 H 832" class="optional" marker-end="url(#workflow-arrow)"/>
 <path d="M 960 2176 V 2188 Q 960 2196 952 2196 H 820 Q 812 2196 812 2188 V 1936 Q 812 1928 804 1928 H 780" class="optional" marker-end="url(#workflow-arrow)"/>
 <path d="M 780 2584 H 1112 Q 1120 2584 1120 2576 V 1756 Q 1120 1748 1112 1748 H 728 Q 720 1748 720 1756 V 1768" class="edge" marker-end="url(#workflow-arrow)"/>
 <path d="M 780 2648 H 832" class="edge" marker-end="url(#workflow-arrow)"/>
+<path d="M 780 3608 H 1112 Q 1120 3608 1120 3600 V 2924 Q 1120 2916 1112 2916 H 728 Q 720 2916 720 2924 V 2936" class="edge" marker-end="url(#workflow-arrow)"/>
 <g id="gather"><text x="32" y="40" class="zone">A / Gather and prepare</text></g>
 <g id="newsroom"><text x="32" y="1248" class="zone">B / Make the edition</text></g>
-<g id="release"><text x="32" y="3200" class="zone">C / Prove and release</text></g>
+<g id="release"><text x="32" y="3224" class="zone">C / Validate, build and release</text></g>
 <g class="step" id="step-01" data-step="01"><rect x="180" y="88" width="600" height="208" rx="8" class="node normal"/>
 <text x="32" y="120" class="time">OVERNIGHT</text><text x="32" y="144" class="small">→ AFTERNOON</text>
 <text x="200" y="120" class="number">01</text><text x="252" y="120" class="title">Rolling research</text>
-<text x="200" y="152" class="owner">Actor: 4090 scheduled job + ChatGPT and Grok web sessions</text><text x="200" y="176" class="body">Trigger: Systemd timers; headed Chrome uses logged-in subscriptions</text>
+<text x="200" y="152" class="owner">Actor: 4090 sensor services · ChatGPT / Grok web sessions</text><text x="200" y="176" class="body">Trigger: Systemd timers; headed Chrome uses logged-in subscriptions</text>
 <text x="200" y="200" class="body">ChatGPT: 01:13 · 06:13 · 10:13 · 13:13 Europe/Berlin</text>
 <text x="200" y="224" class="body">Grok: 02:41 · 07:41 · 11:41 · 13:41; starts may slip up to 50 min.</text>
 <text x="200" y="248" class="body">No new rolling job starts after 15:00.</text>
@@ -76,7 +178,7 @@
 <text x="200" y="1072" class="owner">Actor: Klaxon · sensor wire</text><text x="200" y="1096" class="body">Trigger: A sensor @mention, or an allowed sensor DM</text>
 <text x="200" y="1120" class="body">Qualify the lead and mention the selected reporting desks.</text>
 <text x="200" y="1144" class="body">Output: qualification record + claims and URLs in the sensor room.</text>
-<text x="200" y="1168" class="body">GAP: rolling notices omit @Klaxon, so this route stays silent.</text>
+<text x="200" y="1168" class="body">Local notice repair is tested; live rollout is still pending.</text>
 </g>
 <g class="step" id="step-05" data-step="05"><rect x="180" y="1296" width="600" height="184" rx="8" class="node normal"/>
 <text x="32" y="1328" class="time">18:00</text><text x="32" y="1352" class="small">+ 0–15 MIN</text>
@@ -92,8 +194,8 @@
 <text x="200" y="1584" class="owner">Actor: Brass · chief editor</text><text x="200" y="1608" class="body">Trigger: 18:30 scheduled wake; read the collected pitches</text>
 <text x="200" y="1632" class="body">Debate overlaps, kill weak pitches, commission ≥5 authors/stories.</text>
 <text x="200" y="1656" class="body">Name the forecast owner and a different reporter to challenge it.</text>
-<text x="200" y="1680" class="body">Output: durable assignment records + mentions to assigned reporters.</text>
-<text x="200" y="1704" class="body">GAP: assignment versus conference room instructions still disagree.</text>
+<text x="200" y="1680" class="body">Record assignments first, then @mention each commissioned author.</text>
+<text x="200" y="1704" class="body">Output: assignment records + commissions in the assignment room.</text>
 </g>
 <g class="step" id="step-07" data-step="07"><rect x="180" y="1768" width="600" height="208" rx="8" class="node normal"/>
 <text x="32" y="1800" class="time">ON ASSIGNMENT</text><text x="32" y="1824" class="small">BEFORE REVIEW</text>
@@ -110,7 +212,7 @@
 <text x="200" y="2080" class="owner">Actor: Reporter submits; newsroom filing tool persists</text><text x="200" y="2104" class="body">Trigger: The reporter calls file_article with the finished draft</text>
 <text x="200" y="2128" class="body">Output: an attributed article revision + receipt in edition state.</text>
 <text x="200" y="2152" class="body">Announce its ID/revision; mention Spike and any named dissenter.</text>
-<text x="200" y="2176" class="body">Current storage: edition-state JSON files, not a per-article Git commit.</text>
+<text x="200" y="2176" class="body">The tool commits exact bytes under the reporter’s Git author identity.</text>
 <text x="200" y="2200" class="body">The tool repeats format checks; invalid JSON records nothing.</text>
 </g>
 <g class="step" id="step-09" data-step="09"><rect x="180" y="2264" width="600" height="184" rx="8" class="node normal"/>
@@ -125,58 +227,76 @@
 <text x="32" y="2520" class="time">20:00</text><text x="32" y="2544" class="small">+ 0–15 MIN</text>
 <text x="200" y="2520" class="number">10</text><text x="252" y="2520" class="title">Editorial review</text>
 <text x="200" y="2552" class="owner">Actor: Spike · editor</text><text x="200" y="2576" class="body">Trigger: 20:00 scheduled wake, or a filing/revision @mention</text>
-<text x="200" y="2600" class="body">Read one filing and its mechanical checks; never rewrite the prose.</text>
-<text x="200" y="2624" class="body">Output: a durable PASS, REVISION_REQUEST, HOLD or SPIKE verdict.</text>
-<text x="200" y="2648" class="body">PASS advances; revision notes go to the owner; HOLD recovery is open.</text>
+<text x="200" y="2600" class="body">Read the exact filing digest and evidence; never rewrite the prose.</text>
+<text x="200" y="2624" class="body">Output: PASS / REVISION_REQUEST / HOLD / SPIKE bound to the filing.</text>
+<text x="200" y="2648" class="body">PASS advances; HOLD / REVISION_REQUEST allow an owner revision.</text>
 </g>
 <g class="step" id="step-11" data-step="11"><rect x="180" y="2712" width="600" height="184" rx="8" class="node normal"/>
 <text x="32" y="2744" class="time">20:30</text><text x="32" y="2768" class="small">+ 0–15 MIN</text>
 <text x="200" y="2744" class="number">11</text><text x="252" y="2744" class="title">Settle the desk</text>
 <text x="200" y="2776" class="owner">Actor: Ledger · settlement and World Desk</text><text x="200" y="2800" class="body">Trigger: 20:30 scheduled wake; release-room mentions can also wake it</text>
-<text x="200" y="2824" class="body">Use the prepared evidence and authorized formulas.</text>
+<text x="200" y="2824" class="body">Use the derived World Desk document and its matching trace.</text>
 <text x="200" y="2848" class="body">Output: settlements and World Desk JSON documents in edition state.</text>
-<text x="200" y="2872" class="body">GAP: the prepared World Desk path can contain stale inputs.</text>
+<text x="200" y="2872" class="body">A refused sensor reading uses only an explicitly marked stale carry.</text>
 </g>
-<g class="step" id="step-12" data-step="12"><rect x="180" y="2936" width="600" height="208" rx="8" class="node normal"/>
+<g class="step" id="step-12" data-step="12"><rect x="180" y="2936" width="600" height="232" rx="8" class="node normal"/>
 <text x="32" y="2968" class="time">21:00</text><text x="32" y="2992" class="small">+ 0–15 MIN</text>
 <text x="200" y="2968" class="number">12</text><text x="252" y="2968" class="title">Compose the newspaper</text>
 <text x="200" y="3000" class="owner">Actor: Caslon · compositor</text><text x="200" y="3024" class="body">Trigger: 21:00 scheduled wake, with PASS articles and desk inputs ready</text>
-<text x="200" y="3048" class="body">File chrome/weather; select committed art; assemble front and tape.</text>
+<text x="200" y="3048" class="body">File chrome/weather; select archived or freshly baked map / glyph art.</text>
 <text x="200" y="3072" class="body">Gate: ≥5 PASS articles/authors, 3 sections, 3 sources/domains,</text>
-<text x="200" y="3096" class="body">all4 desk files, complete maps and 2–3 front visuals.</text>
-<text x="200" y="3120" class="body">Output: desk/page/map JSONs + composition receipt in edition state.</text>
+<text x="200" y="3096" class="body">all 4 desk files, complete art and 2–3 front visuals.</text>
+<text x="200" y="3120" class="body">Output: immutable composition receipt + exact article / desk / art files.</text>
+<text x="200" y="3144" class="body">lay_pages fixes front / tape structure; compose verifies its digest.</text>
 </g>
-<g class="step" id="step-13" data-step="13"><rect x="180" y="3248" width="600" height="184" rx="8" class="node normal"/>
-<text x="32" y="3280" class="time">21:30</text><text x="32" y="3304" class="small">+ 0–15 MIN</text>
-<text x="200" y="3280" class="number">13</text><text x="252" y="3280" class="title">Proof, build and stage</text>
-<text x="200" y="3312" class="owner">Actor: Pressman · local press</text><text x="200" y="3336" class="body">Trigger: 21:30 scheduled wake or release @mention; composition required</text>
-<text x="200" y="3360" class="body">Validate the edition, build the website and stage the preview.</text>
-<text x="200" y="3384" class="body">Output: local built edition + a composition-linked staged receipt.</text>
-<text x="200" y="3408" class="body">A failed check stops release and goes back to its artifact owner.</text>
+<g class="step" id="step-13a" data-step="13A"><rect x="180" y="3272" width="600" height="184" rx="8" class="node normal"/>
+<text x="32" y="3304" class="time">21:30</text><text x="32" y="3328" class="small">+ 0–15 MIN</text>
+<text x="200" y="3304" class="number">13A</text><text x="252" y="3304" class="title">Validate the edition</text>
+<text x="200" y="3336" class="owner">Actor: Pressman · private deterministic build worker</text><text x="200" y="3360" class="body">Trigger: 21:30 scheduled wake or Caslon’s release-room @mention</text>
+<text x="200" y="3384" class="body">Call prepare_release; poll this job using its returned next_poll.</text>
+<text x="200" y="3408" class="body">Check exact composition, page structure, references and dependencies.</text>
+<text x="200" y="3432" class="body">Output: mechanical validation results for the immutable candidate.</text>
 </g>
-<g class="step" id="step-14" data-step="14"><rect x="180" y="3472" width="600" height="184" rx="8" class="node gap"/>
-<text x="32" y="3504" class="time">AFTER STAGING</text><text x="32" y="3528" class="small">TIMER PARKED</text>
-<text x="200" y="3504" class="number">14</text><text x="252" y="3504" class="title">Commit and push the edition</text>
-<text x="200" y="3536" class="owner">Actor: Hetzner host publication job</text><text x="200" y="3560" class="body">Trigger: Host timer reads the promoted artifact; timer currently parked</text>
-<text x="200" y="3584" class="body">Output: edition/YYYY-MM-DD in the public clankandslop repository.</text>
-<text x="200" y="3608" class="body">One assembled-edition commit, authored as “Clank &amp; Slop release”.</text>
-<text x="200" y="3632" class="body">Current gap: this does not preserve per-agent Git commit authorship.</text>
+<g class="step" id="step-13b" data-step="13B"><rect x="180" y="3496" width="600" height="208" rx="8" class="node normal"/>
+<text x="32" y="3528" class="time">DURING THE</text><text x="32" y="3552" class="small">SAME BUILD JOB</text>
+<text x="200" y="3528" class="number">13B</text><text x="252" y="3528" class="title">Build and test mechanically</text>
+<text x="200" y="3560" class="owner">Actor: Private build worker · Pressman owns the request</text><text x="200" y="3584" class="body">Trigger: The candidate passes the content and composition checks</text>
+<text x="200" y="3608" class="body">Build the actual site and run the offline glyph-camera check.</text>
+<text x="200" y="3632" class="body">Output: built candidate + successful checks, bound to composition.</text>
+<text x="200" y="3656" class="body">No agent opens a page or approves an image.</text>
+<text x="200" y="3680" class="body">A failed check goes to the owner; corrected inputs require a new build.</text>
 </g>
-<g class="step" id="step-15" data-step="15"><rect x="180" y="3696" width="600" height="184" rx="8" class="node gap"/>
-<text x="32" y="3728" class="time">AFTER BRANCH</text><text x="32" y="3752" class="small">PUSH</text>
-<text x="200" y="3728" class="number">15</text><text x="252" y="3728" class="title">CI, pull request and merge</text>
-<text x="200" y="3760" class="owner">Actor: GitHub Actions · CI and edition-merge workflows</text><text x="200" y="3784" class="body">Trigger: Push to the public dated edition branch</text>
-<text x="200" y="3808" class="body">Check content-only changes and CI success on the exact commit.</text>
-<text x="200" y="3832" class="body">Output: a PR, then automatic merge under the checked-in workflow.</text>
-<text x="200" y="3856" class="body">ALIGNMENT: TEAM says a human decides; that policy still conflicts.</text>
+<g class="step" id="step-13c" data-step="13C"><rect x="180" y="3744" width="600" height="184" rx="8" class="node normal"/>
+<text x="32" y="3776" class="time">TARGET 22:00</text><text x="32" y="3800" class="small">EUROPE / BERLIN</text>
+<text x="200" y="3776" class="number">13C</text><text x="252" y="3776" class="title">Stage the validated edition</text>
+<text x="200" y="3808" class="owner">Actor: Pressman · local press</text><text x="200" y="3832" class="body">Trigger: The matching preparation job completes successfully</text>
+<text x="200" y="3856" class="body">Call stage_release; changed bytes or failed checks are refused.</text>
+<text x="200" y="3880" class="body">Output: local staged edition + composition-linked staged receipt.</text>
+<text x="200" y="3904" class="body">No publish credentials; a failed gate returns to its artifact owner.</text>
 </g>
-<g class="step" id="step-16" data-step="16"><rect x="180" y="3920" width="600" height="184" rx="8" class="node normal"/>
-<text x="32" y="3952" class="time">AFTER MERGE</text><text x="32" y="3976" class="small">NO FIXED TIME</text>
-<text x="200" y="3952" class="number">16</text><text x="252" y="3952" class="title">Publish and retain the record</text>
-<text x="200" y="3984" class="owner">Actor: GitHub Actions · deployment workflow</text><text x="200" y="4008" class="body">Trigger: Eligible main push or manual workflow dispatch</text>
-<text x="200" y="4032" class="body">Output: website on GitHub Pages; frozen edition preserved in Git.</text>
-<text x="200" y="4056" class="body">Articles, forecasts, dissent and outcomes feed tomorrow’s Step02.</text>
-<text x="200" y="4080" class="body">This complete autonomous route has not yet produced a valid edition.</text>
+<g class="step" id="step-14" data-step="14"><rect x="180" y="3968" width="600" height="184" rx="8" class="node gap"/>
+<text x="32" y="4000" class="time">AFTER STAGING</text><text x="32" y="4024" class="small">TIMER PARKED</text>
+<text x="200" y="4000" class="number">14</text><text x="252" y="4000" class="title">Commit and push the edition</text>
+<text x="200" y="4032" class="owner">Actor: Hetzner host publication job</text><text x="200" y="4056" class="body">Trigger: Host timer reads the promoted artifact; timer currently parked</text>
+<text x="200" y="4080" class="body">Output: edition/YYYY-MM-DD in the public clankandslop repository.</text>
+<text x="200" y="4104" class="body">One assembled-edition commit, authored as “Clank &amp; Slop release”.</text>
+<text x="200" y="4128" class="body">Per-agent revision commits remain in private edition-local history.</text>
+</g>
+<g class="step" id="step-15" data-step="15"><rect x="180" y="4192" width="600" height="184" rx="8" class="node gap"/>
+<text x="32" y="4224" class="time">AFTER BRANCH</text><text x="32" y="4248" class="small">PUSH</text>
+<text x="200" y="4224" class="number">15</text><text x="252" y="4224" class="title">CI, pull request and merge</text>
+<text x="200" y="4256" class="owner">Actor: GitHub Actions · CI and edition-merge workflows</text><text x="200" y="4280" class="body">Trigger: Push to the public dated edition branch</text>
+<text x="200" y="4304" class="body">Check content-only changes and CI success on the exact commit.</text>
+<text x="200" y="4328" class="body">Output: a PR, then automatic merge under the checked-in workflow.</text>
+<text x="200" y="4352" class="body">ALIGNMENT: TEAM says a human decides; that policy still conflicts.</text>
+</g>
+<g class="step" id="step-16" data-step="16"><rect x="180" y="4416" width="600" height="184" rx="8" class="node normal"/>
+<text x="32" y="4448" class="time">AFTER MERGE</text><text x="32" y="4472" class="small">NO FIXED TIME</text>
+<text x="200" y="4448" class="number">16</text><text x="252" y="4448" class="title">Publish and retain the record</text>
+<text x="200" y="4480" class="owner">Actor: GitHub Actions · deployment workflow</text><text x="200" y="4504" class="body">Trigger: Eligible main push or manual workflow dispatch</text>
+<text x="200" y="4528" class="body">Output: website on GitHub Pages; frozen edition preserved in Git.</text>
+<text x="200" y="4552" class="body">Articles, forecasts, dissent and outcomes feed tomorrow’s Step02.</text>
+<text x="200" y="4576" class="body">This complete autonomous route has not yet produced a valid edition.</text>
 </g>
 <g id="private-merge"><rect x="832" y="624" width="264" height="192" rx="8" class="node"/>
 <text x="848" y="656" class="owner">Private archive close</text>
@@ -202,45 +322,42 @@
 <text x="848" y="2160" class="small">Raw reports stay on the 4090.</text>
 </g>
 <g id="excluded"><rect x="832" y="2624" width="264" height="128" rx="8" class="node gap"/>
-<text x="848" y="2656" class="owner">HOLD / SPIKE</text>
-<text x="848" y="2684" class="body">This piece does not advance.</text>
+<text x="848" y="2656" class="owner">SPIKE / INSUFFICIENT PASS</text>
+<text x="848" y="2684" class="body">SPIKE is terminal for a piece.</text>
 <text x="848" y="2712" class="body">Fewer than five PASS pieces?</text>
 <text x="848" y="2736" class="body">The edition cannot compose.</text>
 </g>
 <rect x="808" y="1040" width="292" height="24" fill="var(--paper)"/><text x="816" y="1056" class="edge-label">REPORTER TIMER STILL FIRES</text>
 <rect x="1016" y="2408" width="96" height="24" fill="var(--paper)"/><text x="1024" y="2424" class="edge-label">REVISE</text>
+<rect x="944" y="2884" width="152" height="24" fill="var(--paper)"/><text x="952" y="2900" class="edge-label">FAILED CHECKS</text>
 <rect x="488" y="2676" width="56" height="24" fill="var(--paper)"/><text x="496" y="2692" class="edge-label">PASS</text>
-<line x1="32" y1="4148" x2="1120" y2="4148" class="rule"/>
-<text x="32" y="4176" class="small">Actor = who acts · Trigger = why it starts · Output = deliverable and destination · Dashed = conditional / incomplete</text>
+<line x1="32" y1="4644" x2="1120" y2="4644" class="rule"/>
+<text x="32" y="4672" class="small">Actor = who acts · Trigger = why it starts · Output = deliverable and destination · Dashed = conditional / incomplete</text>
 </svg></div>
-<section id="readiness"><div class="eyebrow">What is actually available</div><h2>The tools exist. The complete workflow is not proven.</h2><p>Live configuration exposes the role tools below. All twelve agents have Moltnet messaging and durable personal memory configured. Tool presence is not a completed Daimon task: the sensor test proved real browser research and transport, but has not yet proved a reporter requesting, waking again and using its answer correctly.</p>
-<div class="table-scroll"><table><thead><tr><th>Owner</th><th>Installed role tools</th><th>Research access / responsibility</th></tr></thead><tbody>
-<tr><td>Klaxon</td><td><code>qualify_signal</code></td><td>Qualify incoming signals; ask Brass or a selected reporter for new research. Not an admitted ad hoc requester.</td></tr>
-<tr><td>Six reporters</td><td><code>file_article</code> · <code>record_dissent</code></td><td>All six may request research and receive a mentioned reply. Their tools preserve author and dissenter identity.</td></tr>
-<tr><td>Brass</td><td><code>record_assignment</code></td><td>May request research; commission and route work. Deployed brief lacks the request protocol.</td></tr>
-<tr><td>Spike</td><td><code>review_article</code></td><td>Review evidence; ask the owning reporter for a missing verification. No research-room membership.</td></tr>
-<tr><td>Ledger</td><td><code>file_desk</code></td><td>Owns settlements and World Desk. Ask Brass through release for missing inputs.</td></tr>
-<tr><td>Caslon</td><td><code>file_desk</code> · <code>compose_edition</code></td><td>Owns chrome, weather and page assembly. Select committed art; runtime map baking is unavailable.</td></tr>
-<tr><td>Pressman</td><td><code>stage_release</code></td><td>Validate, build and stage locally. Send failures to the responsible owner through release.</td></tr>
+<section id="readiness"><div class="eyebrow">Local repairs · production parked</div><h2>Tools for each owner, with separate review gates.</h2>
+<div class="table-scroll"><table><thead><tr><th>Owner</th><th>Tools and deliverables</th><th>Handoff</th></tr></thead><tbody>
+<tr><td>4090 sensors</td><td>Scheduled web captures, prepared story packets, citations and numerical inputs; bounded ad hoc research replies.</td><td>Private GitHub archive and Moltnet research room. These are services, not Daimon agents.</td></tr>
+<tr><td>Klaxon</td><td>Qualify incoming leads with <code>qualify_signal</code>.</td><td>Mention selected desks with claims, source URLs and verification gaps.</td></tr>
+<tr><td>Six reporters</td><td><code>validate_article</code>, <code>file_article</code>, <code>record_dissent</code>; complete article JSON in the established public format.</td><td>Filing room: article id, revision and digest, mentioning Spike and the named dissenter.</td></tr>
+<tr><td>Brass</td><td><code>record_assignment</code>; sourced lineup and forecast commission.</td><td>Conference for debate; assignment room for accepted commissions with reporter mentions.</td></tr>
+<tr><td>Spike</td><td><code>review_article</code>; verdict bound to the exact filing digest.</td><td>PASS advances. HOLD and REVISION_REQUEST permit the owner’s next revision. SPIKE is terminal.</td></tr>
+<tr><td>Ledger</td><td><code>file_desk</code>; settlements and derived World Desk JSON.</td><td>Release room; the paired source trace must agree with the filed World Desk.</td></tr>
+<tr><td>Caslon</td><td><code>file_desk</code>, <code>compose_edition</code>; catalogue images, <code>bake_map</code>, <code>bake_glyph</code>, <code>inspect_artifact</code>, <code>lay_pages</code>; mechanically validated page structure.</td><td>Exact article prose is retained. Fresh art uses installed ETOPO and vetted models. Mention Pressman after composition. Image inspection is not required.</td></tr>
+<tr><td>Pressman</td><td><code>prepare_release</code> validates, builds and runs mechanical checks; <code>stage_release</code> accepts the exact successful candidate.</td><td>Stage locally when mechanical checks pass; publication remains parked.</td></tr>
 </tbody></table></div>
-<h3>The six reporting desks</h3><p>Cogsworth — hardware. Sprockett — escalation. Foreman — macro. Graves — commodities. Tinkerton — policy and a usual dissenter. Vesta — The Hearth, an occasional long-view column. <strong>Five distinct authors are mandatory:</strong> when Vesta sits out, every other reporter must pass.</p>
-<details open><summary>Readiness gaps that affect this flow</summary><ul>
-<li><strong>03B / Freshness:</strong> the agents still mount the September 6 corpus. Sensor commits do not automatically replace the pinned bundle; the daily private merge is scheduled at 16:08 with up to 10 minutes of delay.</li>
-<li><strong>04 / Wake delivery:</strong> rolling notices reach the research room without @Klaxon. A message existing in history does not prove a useful agent wake.</li>
-<li><strong>06 / Assignment room:</strong> TEAM says assignment; Brass’s schedule prompt directs announcements to conference. Both rooms permit mentions, but the written handoff needs one contract.</li>
-<li><strong>07 / Agent guidance:</strong> the deployed research document describes a responder that is not built. Branch documentation has been corrected; deployment and a real Daimon acceptance test remain required.</li>
-<li><strong>07 / Internet restriction:</strong> a prompt rule is insufficient. The live launcher uses unrestricted sandbox access, and historical reporter sessions contain native web searches. Network enforcement still needs an isolated failing test.</li>
-<li><strong>08–13 / Edition correctness:</strong> September 6 reached only three PASS articles and no desk documents. Article filing accepted shapes that later failed the site validator; HOLD recovery, desk inputs and failed-turn usage accounting also remain open.</li>
-<li><strong>All agents / Model drift:</strong> the declarations name gpt-5.4-mini, while live Codex homes and a real reporter turn use gpt-5.5. Klaxon’s older Grok description also disagrees with its deployed Codex engine.</li>
-<li><strong>12 / Art availability:</strong> some briefs promise map baking that the runtime cannot perform. The supported runtime path is the committed asset catalogue.</li>
-<li><strong>15–16 / Release:</strong> prose says human approval; the checked-in edition workflow automerges after CI. The complete branch-to-deployment hop has not been accepted as part of an autonomous edition.</li>
-</ul></details>
-<details><summary>Shared tools, rooms and research limits</summary><p>Agents use <code>moltnet_read</code> and <code>moltnet_send</code> for coordination, and their named <code>mcp_newsroom_*</code> tools for durable edition state. A literal <code>@agent-id</code> requests a peer turn; ordinary chatter does not. Read the edition index and only the referenced record. Personal memory supports continuity; it does not replace the edition ledger.</p><p>Conference holds pitches and editorial debate; assignment holds commissions; filing carries article and review handoffs; sensor carries qualified leads; research carries service requests and answers; release coordinates composition and staging. Research requests are the JSON service exception to ordinary natural-language conversation.</p><p>Ad hoc raw reports stay on the 4090; they are not pushed to GitHub. Sourced findings return through Moltnet. The deployed responder admits the six reporters and Brass: one question per request, two requests per requester and twelve total per edition by default, including failed attempts. One durable queue shares browser locks with rolling research. Replies contain findings and URLs, or an explicit not-found/refused status. A sensor’s citation is attributed research, not proof that a reporter personally opened the source.</p><p>The production research room still depends on Hetzner. Cloudflare relays the newsroom to an observer; it does not host an independent newsroom API or database. The successful isolated test used its own Moltnet server on the 4090.</p></details>
-</section>
-<section id="article-validation"><div class="eyebrow">Reporter deliverable</div><h2>Validate the final JSON before filing.</h2><p><strong>Actor:</strong> the assigned reporter calls <code>validate_article</code> with the edition date and complete article JSON. <strong>Output:</strong> field-specific errors, warnings and an exact candidate digest. The tool is read-only; the reporter corrects the draft and validates again. <code>file_article</code> repeats the shared format contract before it saves a revision.</p><p>The checks cover canonical bylines, required fields, structured key numbers, supported article fields, positional citations, source metadata and topic names. A format pass does not verify source truth, quotation authenticity, assignment lineage or the assembled newspaper. Spike still reviews the evidence; Caslon composes accepted JSON without adapting the prose.</p><p><strong>Status:</strong> implemented in the local org branch and private automation checkout. Production remains parked; this tool has not been deployed there.</p></section>
-<section id="artifact-history"><div class="eyebrow">Deliverables and attribution</div><h2>An attributed filing is not yet a Git commit.</h2><p><strong>Current behavior:</strong> a reporter produces an article JSON in Step07 and submits it in Step08. The filing tool writes an attributed revision to the shared edition-state store. Assignment records, dissent, editorial verdicts, desk documents and compositions also live there. Moltnet preserves the conversations. None of these accepted agent outputs currently creates its own Git commit.</p><p>The host publication job later makes one assembled-edition commit as <strong>Clank &amp; Slop release</strong>. Sensor research commits are separate: the 4090 rolling job pushes them to the private GitHub repository under <strong>Morgue</strong>. Ad hoc raw reports currently stay on the 4090.</p><p><strong>Proposed change for alignment:</strong> after each accepted artifact or revision, automation records a Git commit attributed to the producing agent, with the automation identified as committer. Preserve the artifact identity, revision and digest; retries must reuse the recorded result. This should cover assignments, article filings, dissent, reviews, desk files and compositions. It is not implemented by this diagram.</p></section>
-<section id="clock"><div class="eyebrow">One unresolved operating decision</div><h2>Which clock should the newsroom follow?</h2><p>The diagram follows the checked-in Spawnfile times because those are executable declarations. The standing playbook still describes an earlier working day. Live production schedules are parked, so neither daily sequence is currently running.</p><div class="table-scroll"><table><thead><tr><th>Checkpoint</th><th>Diagram / declarations</th><th>Standing playbook</th></tr></thead><tbody>
-<tr><td>Pitch</td><td>18:00</td><td>10:00</td></tr><tr><td>Conference</td><td>18:30</td><td>10:30</td></tr><tr><td>Review</td><td>20:00</td><td>14:00</td></tr><tr><td>Settlement</td><td>20:30</td><td>14:00</td></tr><tr><td>Composition</td><td>21:00</td><td>15:00</td></tr><tr><td>Staging</td><td>21:30</td><td>16:00</td></tr></tbody></table></div><p class="note">All times are Europe/Berlin. Agent timers add up to 15 minutes of jitter. Sensor timers add up to 50 minutes and may catch up after downtime. Event-driven work has no fixed start; a timer does not wait for an upstream stage to pass. Dissent and settlement can overlap other work; their vertical placement shows the normal sequence, not a new scheduling dependency.</p></section>
-<details><summary>Scope and source notes</summary><p>Current source: feat/agentic-org, inspected 7 September 2026. Compared agent Spawnfiles, TEAM, FLOOR, role briefs, research protocol, composition and filing contracts, sensor timers/preparation, repository release workflows and the live parked deployment. This is an alignment artifact, not a replacement operating policy.</p><p>All twelve runtime agents are represented. The six reporters are grouped in one stage and listed individually. Morgue names the archival automation’s commit identity; it is not a thirteenth deployed Daimon agent. Gatherer is a declared external service identity, not an additional verified researcher. No undeclared retrospective or meeting has been invented.</p><p>Brand: the local newspaper’s cream paper, black ink and amber accent; DM Serif Display headings, Inter Tight labels, JetBrains Mono technical values only. SVG is static, with no script or hosted artifact dependency. Font loading uses the existing public Google Fonts families.</p><p>Related local records: <a href="inventory/2026-09-07/README.md">inventory and isolated-test plan</a> · <a href="inventory/2026-09-07/adhoc-responder.md">responder verification</a> · <a href="RESEARCH_ROUND_TRIP.md">current research protocol</a>.</p></details>
-<footer>Clank &amp; Slop · Local alignment diagram · Stable references: Step01–16 (03A / 03B) and R1 · Prepared 7 September 2026</footer>
+<p>Reporters: Cogsworth — hardware; Sprockett — escalation; Foreman — macro; Graves — commodities; Tinkerton — policy; Vesta — The Hearth. Five distinct authors must pass; Vesta is occasional, so the other five have no spare when it sits out.</p>
+<h3>Verification and remaining gaps</h3><ul>
+<li>Real Linux terrain and glyph renders, local fonts and site builds have passed. Visual inspection is not an agent requirement. The isolated Caslon → Pressman Moltnet/Daimon path composed and staged after mechanical checks. Its reporter inputs were historical fixtures; the full newsroom has not produced an edition.</li>
+<li>Daily sensor pushes still need an automatic pinned-snapshot loader before pitches. The rolling Klaxon notice repair has passed tests but is not deployed.</li>
+<li>All agents have a direct-research prohibition. The isolated Linux rehearsal demonstrated denied shell network access. Production enforcement and the secret boundary still need verification.</li>
+<li>A copied compiler fix preserves the declared model and passes tests; it is not installed in production. The live compiler still drops that setting.</li>
+<li>Per-agent Git acceptance and crash/retry checks pass locally. Git is now declared as an image package. Production still needs the rebuilt image and private tools installed.</li>
+<li>Human publication approval versus the checked-in automatic merge workflow remains unresolved. Production and publishing stay parked.</li>
+</ul>
+<details><summary>Research transport and autonomy</summary><p>Agents coordinate through <code>moltnet_read</code> and <code>moltnet_send</code>. A literal <code>@agent-id</code> requests a peer turn. Conference holds pitches and debate; assignment holds commissions; filing holds article/review handoffs; sensor carries qualified leads; research carries service requests and answers; release coordinates composition and staging.</p><p>The six reporters and Brass can request one missing fact. They end their turn while the sensor queues a real ChatGPT or Grok web capture. A matching sourced answer mentions the requester and starts a new turn. Raw ad hoc reports remain on the 4090; rolling captures and prepared corpus are committed to the private GitHub repository.</p><p>The production Moltnet server and database remain on Hetzner. Cloudflare provides an observer relay; it is not an independent server. Isolated tests use their own Moltnet server and rooms.</p><p>There is no central editorial task controller. Agent schedules provide native checkpoints; agents make downstream handoffs. Sensor timers, file validation, rendering and an agent polling its own bounded build are deterministic services.</p></details></section>
+<section id="article-validation"><div class="eyebrow">Reporter deliverable</div><h2>Validate the complete JSON, then file it.</h2><p>The reporter calls <code>validate_article</code> with the final article. It returns field errors, warnings and the candidate digest. The reporter corrects the draft; <code>file_article</code> repeats the format gate before saving. Checks cover canonical byline, supported fields, structured numbers, citations and source metadata. A schema pass does not establish source truth or quotation authenticity: Spike still reviews those.</p></section>
+<section id="artifact-history"><div class="eyebrow">Attribution</div><h2>Keep the author through every revision.</h2><p>Accepted assignments, filings, dissent, reviews, desk documents and compositions have durable, artifact-specific receipts. The private acceptance tool commits exact output bytes before confirming acceptance, with the producing agent as author and automation as committer. Exact retries retain the same commit; corrections create a new revision. History, attribution and crash/retry checks pass locally. No agent needs a deploy key; production deployment is still pending.</p></section>
+<section id="clock"><div class="eyebrow">Declared Berlin clock · effective 8 September 2026</div><h2>Evening checkpoints, followed by explicit handoffs.</h2><p>Pitch 18:00 · conference 18:30 · review 20:00 · settlement 20:30 · composition 21:00 · preview 21:30 · local staging target 22:00. Historical editions retain their original release clock.</p><p class="note">Agent timers add up to 15 minutes of jitter; sensor timers up to 50 minutes. Downstream work waits for the required accepted artifacts, not merely the wall clock. Dissent and settlement can overlap other work. Vertical placement shows the normal progression, not a new scheduling dependency.</p></section>
+<details><summary>Scope and source notes</summary><p>Org declarations and this diagram live in the public feat/agentic-org branch. Sensor, persistence, artwork and build automation live in the private repository. No Clank implementation is added to the Noopolis ecosystem repos. All twelve runtime agents are represented; Morgue is an archive commit identity, not a thirteenth Daimon agent.</p><p>This local alignment copy describes the intended path and the evidence currently available. It is not a production readiness certificate, and the organization has not yet produced an autonomous valid edition.</p><p>Related records: <a href="inventory/2026-09-07/README.md">inventory</a> · <a href="RESEARCH_ROUND_TRIP.md">research protocol</a>. Typography is loaded from the local public project assets.</p></details>
+<footer>Clank &amp; Slop · Local alignment diagram · Stable references: 01–16, with 03A/B and 13A/B/C, plus R1 · Prepared 8 September 2026</footer>
 </main></body></html>
