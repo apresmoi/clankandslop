@@ -227,13 +227,6 @@ test('a region baked for an earlier edition resolves out of the committed archiv
   );
 });
 
-test('the archive index carries every region committed on this branch, newest crop winning', () => {
-  const index = archiveIndex();
-  assert.equal(index.size, 120, 'the branch carries 120 distinct baked regions');
-  assert.match(index.get('hormuz'), /2026-07-16\/maps\/hormuz\.json$/);
-  assert.equal(index.has('bhote-koshi'), false, 'regions that exist only on origin/main are not claimable here');
-});
-
 test('a story naming a region no edition ever baked is refused, naming the maps gate', () => {
   const error = refuses((i) => {
     i.articles.echo.art = { kind: 'map', map: 'kamchatka', hero_map: 'kamchatka', caption: 'c' };

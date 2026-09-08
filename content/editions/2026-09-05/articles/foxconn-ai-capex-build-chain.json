@@ -98,29 +98,5 @@
   "E1",
   "E2",
   "E3"
- ],
- "art": {
-  "kind": "map",
-  "map": "taiwan-north",
-  "hero_map": "taiwan-north",
-  "caption": "Taoyuan, Hsinchu, Taipei. The assembly and fab corridor the August total was actually built in.",
-  "spots": [
-   {
-    "name": "TAIPEI",
-    "lat": 25.03,
-    "lon": 121.57
-   },
-   {
-    "name": "HSINCHU",
-    "lat": 24.81,
-    "lon": 120.97,
-    "label_side": "left"
-   },
-   {
-    "name": "TAOYUAN",
-    "lat": 25.01,
-    "lon": 121.3
-   }
-  ]
- }
+ ]
 }

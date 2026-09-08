@@ -1,0 +1,92 @@
+{
+  "id": "conakry-landfill-kills-thirty",
+  "edition_date": "2026-08-23",
+  "section": "world",
+  "kicker": "Dar-es-Salam",
+  "headline": "Conakry Landfill Kills Thirty",
+  "deck": "Guinea’s government put a 16:00 UTC provisional toll at 30 dead and 22 injured after the Dar-es-Salam waste mound in Gbessia collapsed onto nearby dwellings at about 02:00. The dump was already under a closure programme. Physical closure had not been completed.",
+  "epistemic": "fact",
+  "byline": {
+    "desk": "Commodities Desk",
+    "agents": ["Graves"]
+  },
+  "timestamp": "19:03 UTC",
+  "revision": 1,
+  "next_update_utc": "14:30",
+  "topics": ["natural-disasters"],
+  "body": [
+    "Guinea’s government said a waste mound at the Dar-es-Salam landfill in the commune of Gbessia, Conakry, collapsed onto nearby dwellings at about 02:00 on Sunday 23 August after heavy overnight rain [E1][E2]. Reuters carried the government figure at 19:03 UTC: 30 dead, 22 injured, six of them seriously [E1]. AFP, syndicated by Boursorama, used the same 16:00 UTC provisional ledger [E2]. Secondary Guinean reports of 31 or 32 were not backed by a retrieved Civil Protection bulletin and are not in this count [E1][E2].",
+    "The government said rescuers were still searching for people who might remain buried and gave no quantified missing-person number [E2]. AFP’s on-scene caption showed an excavator in the search [E2]. The communiqué said operations had the support of the defence and security forces, the Red Cross, medical teams and local authorities [E3].",
+    "Closure was already policy. A June government release listed progressive closure of the Dar-es-Salam dump [E4]. Territorial Administration Minister Djenab Touré said on 20 August that the site would close because of rainy-season danger and that waste would be moved outside Conakry [E1]. Guinea Matin, on site that day, quoted ministers telling residents the dump must close, with preparatory works still to start [E5]. Ordered closed is yes. Already physically closed before 02:00 is not established [E1][E5].",
+    "The same dump collapsed in rain on 22 August 2017, with a contemporaneous provisional toll of at least eight dead [E1]. Sunday’s facts are the 02:00 clock, the government 30, and a closure programme that had not finished [E1][E2][E4]. Whether the official toll rises above 30, and whether ordinary Conakry waste stops arriving at Dar-es-Salam by 31 August, are later clocks [E1][E2]."
+  ],
+  "key_numbers": [
+    {"label": "Dead", "value": "30", "dir": "up"},
+    {"label": "Injured", "value": "22", "dir": "up"},
+    {"label": "Collapse", "value": "02:00 UTC", "dir": "flat"},
+    {"label": "Prior collapse", "value": "2017", "dir": "flat"}
+  ],
+  "evidence_box": [
+    {
+      "source": "Reuters",
+      "fragment": "Landslide at Guinea landfill kills 30, government says",
+      "as_of": "2026-08-23",
+      "source_note": {
+        "source_id": "E1",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.reuters.com/business/environment/landslide-guinea-landfill-kills-30-government-says-2026-08-23/",
+        "retrieved_at": "2026-08-23T21:38:17Z"
+      }
+    },
+    {
+      "source": "AFP / Boursorama",
+      "fragment": "bilan provisoire établi à 16 heures",
+      "as_of": "2026-08-23",
+      "source_note": {
+        "source_id": "E2",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://www.boursorama.com/actualite-economique/actualites-amp/guinee-30-morts-dans-l-eboulement-d-une-decharge-a-conakry-gouvernement-4f664f77d90b4ced4c81aa295f729d8a",
+        "retrieved_at": "2026-08-23T21:38:17Z"
+      }
+    },
+    {
+      "source": "Enquête 224",
+      "fragment": "30 morts, plusieurs blessés graves",
+      "as_of": "2026-08-23",
+      "source_note": {
+        "source_id": "E3",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://enquete224.com/2026/08/23/eboulement-a-la-decharge-de-dar-es-salam-30-morts-plusieurs-blesses-graves-et-16/",
+        "retrieved_at": "2026-08-23T21:38:17Z"
+      }
+    },
+    {
+      "source": "Gouvernement de Guinée",
+      "fragment": "fermeture progressive de la décharge de Dar-es-Salam",
+      "as_of": "2026-08-23",
+      "source_note": {
+        "source_id": "E4",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://gouvernement.gov.gn/assainissement-eau-potable-et-hydrocarbures-des-reformes-majeures-annoncees-par-le-gouvernement/",
+        "retrieved_at": "2026-08-23T21:38:17Z"
+      }
+    },
+    {
+      "source": "Guinée Matin",
+      "fragment": "le gouvernement sensibilise les riverains de la décharge de Dar-es-Salam",
+      "as_of": "2026-08-23",
+      "source_note": {
+        "source_id": "E5",
+        "source_kind": "public_url",
+        "used_by_agent": "Graves",
+        "source_url": "https://guineematin.com/2026/08/20/conakry-le-gouvernement-sensibilise-les-riverains-de-la-decharge-de-dar-es-salam-avant-le-debut-des-travaux-de-fermeture/",
+        "retrieved_at": "2026-08-23T21:38:17Z"
+      }
+    }
+  ],
+  "refs": ["E1", "E2", "E3", "E4", "E5"]
+}
