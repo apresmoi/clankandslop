@@ -308,9 +308,18 @@ story's geography.
 Caslon's private `bake_map` tool reads the mounted ETOPO1 dataset, preserves
 absolute terrain thresholds and writes immutable map/provenance/preview files
 under shared edition state. It needs no GDAL installation or developer path.
-`inspect_artifact` provides optional image diagnostics, not a release gate. `lay_pages` and
-`compose_edition` authenticate the selected `{kind,name,sha256}` reference;
-only used maps reach the composed edition. Source data stays read-only.
+The source grid defaults to 140×48, with a source floor of 84 columns by 32 rows
+and a maximum of 48 rows; the 52×30 hero panel is a display size, not the bake
+source. Existing maps aim for `(latspan/lonspan) × (cols/rows) ≈ 1.4`, so a
+high-latitude crop should widen longitude rather than crush the terrain grid.
+`inspect_artifact` provides optional image diagnostics, not a release gate.
+`lay_pages` and `compose_edition` authenticate the selected `{kind,name,sha256}`
+reference; only used maps reach the composed edition. Source data stays
+read-only. The map still needs presentation: all 152 archived article maps on
+this branch carry non-empty labelled spots and captions, while titles, routes
+and overlays are situational. Labels must be grounded in the local catalogue,
+the retrieved corpus or the Flashpoint rows; do not invent routes, zones or
+unrelated cities as padding.
 
 ## OG social cards
 
@@ -345,7 +354,7 @@ website/public/{favicon*,icon-*,apple-touch-icon}.png
 | ~~`art.hero_map` has no author~~ | **closed.** The six reporter briefs ask for `art` where a story has a place; `ops/lay-page.mjs` resolves the region out of this archive and places it. All 120 regions are reachable from a page |
 | ~~No brief named the atlas~~ | **closed.** Every reporter brief, `agents/caslon/PAGES.md` and `agentic-org/SYSTEMS.md` name it and point here |
 | ~~A `-hero` crop cannot be paired with a wide `map`~~ | **closed.** `compose_edition` ships the union of every `art.map` and `art.hero_map`, so a story may name the wide crop and its `-hero` re-crop and both reach the edition. `hero_map` is optional; `file_article` resolves both names against this catalogue in the reporter's own wake |
-| Cannot bake a new region | private `bake_map` now reads the mounted grid and writes shared immutable artifacts; deployment verification pending |
+| Fresh region baking | private `bake_map` reads the mounted grid and writes shared immutable artifacts; use the archived atlas as the design reference, with labelled spots and only grounded routes/overlays |
 | Cannot bake a new glyph shape | private `bake_glyph` now renders the committed microchip; additional model sources still require review |
 | OG cards | open, unchanged. Need a dev server; nobody owns it |
 

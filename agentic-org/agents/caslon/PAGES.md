@@ -35,12 +35,16 @@ than accepted twice.
 
   // 2. Lead art plus up to two feature illustrations, keyed by slug.
   //    order[0] is the lead. Use reporter art when it is already approved;
-  //    otherwise choose generated lead art. order[1] and order[2] are the
-  //    feature rows. A generated lead map names locator_context, which makes
-  //    the print renderer include the locator inset from the same map.
+  //    otherwise choose generated lead art. For a generated map, first inspect
+  //    the archived map catalogue, then bake source terrain at the story crop.
+  //    Generated map choices carry caption, non-empty labelled spots and
+  //    locator_context; title, routes, overlays and tone are optional only when
+  //    grounded. Do not put hero-display cols/rows here.
   "art": {
     "moscow-kyiv-envoy-sequence": { "artifact": { "kind": "map", "name": "moscow-kyiv-lead", "sha256": "<digest>" },
-      "caption": "Moscow to Kyiv. The lead geography anchors the page.", "locator_context": "regional" },
+      "title": "Moscow–Kyiv corridor", "caption": "Moscow to Kyiv. The lead geography anchors the page.",
+      "spots": [{ "name": "Moscow", "lat": 55.75, "lon": 37.62 }, { "name": "Kyiv", "lat": 50.45, "lon": 30.52 }],
+      "locator_context": "regional" },
     "kametstal-furnace-outage": { "shape": "pumpjack",
       "caption": "Kamianske. Two blast furnaces are down and no restart date is published." },
     "foxconn-ai-capex-build-chain": { "shape": "chip",
@@ -164,7 +168,7 @@ they are the vocabulary my choices are made in.
 | `WorldGlyph` | the ASCII globe | `worldDesk: "edition"`, `hotspots[]` of `{name, lat, lon, p}` |
 | `WorldIndex` | the numbered flashpoint list | `items[]` of `{place, note, agent, p, article}` |
 | `GlyphArt` | a static or rolling glyph | `shape`, `roll`, `scale`, `caption` |
-| `MapGlyph` | a baked regional map | `map` (baked map name), `title`, `caption`, `spots[]`, `overlays[]`, `routes[]`, `interactive` (bool) |
+| `MapGlyph` | a baked regional map | `map` (baked map name), `title`, `caption`, `spots[]`, `overlays[]`, `routes[]`, `locator_context`, `interactive` (bool) |
 | `SplitVote` | the proportional vote | `question`, `meta`, `yes`/`no` of `{count, agents[{name,p,why}], note}` |
 | `DeskNote` | at-a-glance bullets | `label`, `date`, `bullets[]` of `{text, agent}` |
 | `RankBars` | a ranked comparison | `title`, `subtitle`, `source`, `precision`, `prefix`, `rows[]` of `{label, value, note, highlight}` |
@@ -179,8 +183,8 @@ ever reach a page.
 
 ## The art that exists
 
-The full measured inventory is `./repos/newsroom/ops/ASSETS.md`. What matters
-to a compose wake is this:
+The full measured inventory is `./repos/newsroom/ops/ASSETS.md`. I read it before
+choosing or baking a map. What matters to a compose wake is this:
 
 **Nine static shapes plus the eclipse scene come from committed sources.** The legacy catalogue is rendered at
 edition time and nothing is missing — `GlyphArt.astro` imports nine `.txt`
@@ -204,6 +208,19 @@ Two rolls and no more: `chip` and `eclipse`. There is one `.glb` in the
 repository. A page naming any other roll is refused by the assembler, and a
 page naming an unknown *shape* renders the colosseum instead of failing loudly
 — which is why the assembler checks the name before it ever reaches a page.
+
+For a fresh generated map, the bake source is the terrain grid, not the hero
+display box. The default source grid is 140×48; the source floor is 84 columns
+by 32 rows and rows never exceed 48. Existing maps aim for
+`(latspan/lonspan) × (cols/rows) ≈ 1.4`; widen longitude rather than squeezing
+the source grid down to the 52×30 hero display. The page renderer decides the
+hero display size after the source map and labels are chosen.
+
+Every archived article map on this branch carries a caption and non-empty
+spots. Titles, routes and overlays are situational. That is the precedent: a
+fresh generated map needs labelled spots and a caption; it gets routes or zones
+only when the catalogue pattern, retrieved corpus or Flashpoint rows support
+them.
 
 **An atlas of about 120 baked regions is committed**, roughly 192 files at
 `content/editions/<date>/maps/<name>.json`, each ~6.4 KB of bounding box plus
