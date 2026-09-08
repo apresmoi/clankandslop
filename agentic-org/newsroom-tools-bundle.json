@@ -2,10 +2,10 @@
   "version": "clank.newsroom-tools-bundle.v1",
   "archive": "newsroom-tools.tar",
   "mount": "tools/newsroom",
-  "sha256": "sha256:9042c22cee9eedfff0dcf1ebb455b3b4e92c411e6f42cd94e3c95ab5c9cebb94",
+  "sha256": "sha256:b568c26d02ca4e6f1b1e4b020afcac4b4558b8863b0bc69f2ebd8b8574266785",
   "file_count": 272,
-  "content_bytes": 42283829,
-  "source_commit": "1da4339a44db699991435fe7370c4285dbb418f8",
+  "content_bytes": 42284250,
+  "source_commit": "c57652f57f50e5af1bce0c84210726389a7c0a7e",
   "platform": "linux",
   "arch": "x64",
   "source_files": [
@@ -115,7 +115,7 @@
     },
     {
       "path": "newsroom/runtime/control-token-bootstrap.mjs",
-      "sha256": "sha256:010a7306735fe5bdeeb67f67466b3526ce3dbd16d8f6b0cf3c0a134933c6bc97"
+      "sha256": "sha256:2789ce971944b76dc2034d8c87e02ba9d211aa41e52471ee451987dc30db06b8"
     },
     {
       "path": "newsroom/state/admission.mjs",
