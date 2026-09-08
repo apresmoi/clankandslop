@@ -165,6 +165,13 @@ export function validateAgentDeclaration(agent, bytes) {
     assert(!corpus, `${agent} must not receive a private corpus resource`);
   }
   validateReporterValidationDeclaration(agent, bytes);
+  if (agent === 'ledger') {
+    const manifest = parseManifest(bytes);
+    const server = (manifest.environment?.mcp_servers ?? []).find((item) => item.name === 'newsroom');
+    const workspacePath = `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}`;
+    assert(server?.env?.CLANK_PUBLIC_SOURCE_ROOT === `${workspacePath}/repos/newsroom`, 'ledger newsroom public source root invalid');
+    assert(server?.env?.CLANK_PRIVATE_SOURCE_ROOT === `${workspacePath}/repos/newsroom-private`, 'ledger newsroom private source root invalid');
+  }
   const toolErrors = runtimeToolFindings(agent, parseManifest(bytes));
   assert(toolErrors.length === 0, `${agent} runtime tools invalid: ${toolErrors.join('; ')}`);
 }

@@ -33,13 +33,13 @@ environment:
       transport: stdio
       command: /usr/local/bin/node
       args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
-      env: { CLANK_NEWSROOM_AGENT: ledger, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:ledger" }
+      env: { CLANK_NEWSROOM_AGENT: ledger, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/tools/newsroom/state/transaction.mjs, CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom, CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom-private, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:ledger" }
       tools: [file_desk]
 workspace:
   docs: { system: AGENTS.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:b568c26d02ca4e6f1b1e4b020afcac4b4558b8863b0bc69f2ebd8b8574266785, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:b4c29ccd0d0c94445dd8eab0818353f11b61d366b1ba4c6f230d5672d100bdc9, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:a8713039b5eeef5b91349c98b41dd791e52127ef7628ffe7cb2b7e14b558ad3a, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:1b9d4fad435d6263eb31d80f3685eee3ce5805841d308757ec32b0155b71048e, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:

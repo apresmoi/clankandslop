@@ -2058,8 +2058,8 @@
   "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
   "artifact": "seam-checklist",
   "remediation": {
-    "updated_at": "2026-09-08T14:15:00Z",
-    "state": "Eight generic repairs deployed; 43 native checks passed. Five live filings and one dissent accepted, two revision requests saved. Missing Moltnet notices stalled review; explicit agent-owned handoff guidance awaits live retest. No staged edition; publisher disabled.",
+    "updated_at": "2026-09-08T15:09:00Z",
+    "state": "Eight generic repairs deployed; 43 native checks passed. All five live articles passed review, including three revised filings and fresh dissent. Agent-owned Moltnet handoffs and the real 4090 ad hoc research loop succeeded. Three desk documents accepted; World Desk filing is blocked by missing explicit mounted-source paths in Ledger’s MCP declaration. Composition and staging remain pending; publisher disabled.",
     "findings": [
       {
         "id": "CF-01",
@@ -2076,7 +2076,7 @@
       {
         "id": "CF-03",
         "source": "FIXED",
-        "deployment": "DEPLOYED; AUTONOMOUS RUN PENDING",
+        "deployment": "LIVE SOURCE-PATH BLOCKER; REPAIR IN PROGRESS",
         "result": "World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale."
       },
       {
@@ -2138,8 +2138,8 @@
       },
       {
         "id": "SPIKE-LEDGER-HANDOFF",
-        "status": "FIXED; DEPLOYED; LIVE HANDOFF PENDING",
-        "result": "Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested."
+        "status": "FIXED; DEPLOYED; LIVE HANDOFF VERIFIED",
+        "result": "After five PASS articles, Spike mentioned Ledger in release at 14:54 UTC; Ledger accepted and filed settlements. Schedule remains fallback."
       },
       {
         "id": "LIVE-CONTROL-BOOTSTRAP",
@@ -2158,21 +2158,24 @@
       },
       {
         "id": "LIVE-FILING-REVIEW-NOTICES",
-        "status": "FIXED IN SOURCE; LIVE RETEST PENDING",
-        "result": "Accepted tool responses explicitly require the agent’s separate Moltnet post; saved notes and final answers do not deliver mentions. No automatic messaging or wake controller."
+        "status": "FIXED; DEPLOYED; LIVE HANDOFFS VERIFIED",
+        "result": "All three requested revisions were filed and passed through separate agent-owned Moltnet posts. Spike’s release mention woke Ledger; no automatic editorial messaging or controller was added."
       }
     ],
     "live_observation": {
-      "at": "2026-09-08T14:09:02Z",
+      "at": "2026-09-08T15:05:06Z",
       "assignments": 5,
-      "filings": 5,
+      "filings": 8,
       "dissents": 1,
-      "verdicts": 2,
-      "passed": 0,
+      "verdicts": 8,
+      "passed": 5,
       "staged": 0,
       "runtime_prs_merged": 8,
       "native_checks_passed": 43,
-      "publication": "disabled"
+      "publication": "disabled",
+      "desks": 3,
+      "composed": 0,
+      "ad_hoc_sensor_loop": "verified: Foreman requested through Moltnet; 4090 ChatGPT capture answered and resumed its revision"
     }
   }
 }

@@ -129,6 +129,17 @@ test('all six reporter declarations reject broken validation identity, tools and
   }
 });
 test('Pressman implementation contains no network publisher, push, credential, or process execution path', () => { const source=readFileSync(resolve(import.meta.dirname,'newsroom.mjs'),'utf8'); assert.doesNotMatch(source,/child_process|execFile|spawn\(|fetch\(|https?:|git\s+push|credential|token/i); });
+test('Ledger declares mounted source roots for desk filing from runtime MCP cwd', () => {
+  const source = readFileSync(resolve(import.meta.dirname, '../agents/ledger/Spawnfile'), 'utf8');
+  assert.doesNotThrow(() => validateAgentDeclaration('ledger', source));
+  const publicRoot = 'CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom, ';
+  const privateRoot = 'CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom-private, ';
+  for (const [name, changed] of [['missing public root', source.replace(publicRoot, '')], ['missing private root', source.replace(privateRoot, '')]]) {
+    assert.notEqual(changed, source, name);
+    assert.throws(() => validateAgentDeclaration('ledger', changed), /ledger newsroom .* source root invalid/u, name);
+  }
+});
+
 test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
 // identical SKILL.md files at the top of every wake. Their content now
 // lives in AGENTS.md, which Codex loads into the prefix natively, so the

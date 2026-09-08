@@ -4,13 +4,13 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-Eight generic PRs merged green and deployed. The current image passed 43 native isolation checks, authenticated credential bootstrap and a three-test scripted Docker rehearsal. Today’s real run has five accepted assignments, five filings, one dissent and two revision requests, but no PASS article or staged edition yet. Missing Moltnet notifications stalled review; explicit tool handoff guidance is being tested before recovery. Publisher disabled. Original audit rows below remain historical evidence.
+Eight generic repairs deployed; 43 native checks passed. All five live articles passed review, including three revised filings and fresh dissent. Agent-owned Moltnet handoffs and the real 4090 ad hoc research loop succeeded. Three desk documents accepted; World Desk filing is blocked by missing explicit mounted-source paths in Ledger’s MCP declaration. Composition and staging remain pending; publisher disabled. Original audit rows below remain historical evidence.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
 | CF-01 | FIXED | SENSOR AND SNAPSHOT DEPLOYED | Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures. |
 | CF-02 | FIXED | DEPLOYED; LIVE ASSIGNMENT AND DISSENT RECORDED | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
-| CF-03 | FIXED | DEPLOYED; AUTONOMOUS RUN PENDING | World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale. |
+| CF-03 | FIXED | LIVE SOURCE-PATH BLOCKER; REPAIR IN PROGRESS | World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale. |
 | CF-04 | FIXED | PUBLISHER DISABLED | Workflow prepares a checked PR; explicit human merge remains the publication checkpoint. |
 | CF-05 | MERGED | DEPLOYED; COMPILED MODEL VERIFIED | Spawnfile PR15 preserves declared Codex model selection. |
 | CF-06 | MERGED | DEPLOYED; LIVE NATIVE PROBE PASSED | All 12 agents carry strict policy. Actual deployed native commands allow workspace/resource reads, deny accepted-state direct writes and direct network access. |
@@ -22,12 +22,12 @@ Eight generic PRs merged green and deployed. The current image passed 43 native 
 - **HOST-SEAM-SIDECARS — FIXED; DEPLOYED.** Host pin validation includes both tools/validation sidecar descriptors; all 47 resource pins match.
 - **ART-TRUSTED-ROOTS — FIXED; LIVE PROBE PASSED.** Trusted mount root symlinks resolve while child symlink escapes still reject; deployed catalogues show nine glyphs and 192 maps, configured ETOPO GRD map bake2.4s.
 - **IMAGE-LAUNCH-POLICY — MERGED; DEPLOYED; LIVE PROBE PASSED.** Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed.
-- **SPIKE-LEDGER-HANDOFF — FIXED; DEPLOYED; LIVE HANDOFF PENDING.** Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested.
+- **SPIKE-LEDGER-HANDOFF — FIXED; DEPLOYED; LIVE HANDOFF VERIFIED.** After five PASS articles, Spike mentioned Ledger in release at 14:54 UTC; Ledger accepted and filed settlements. Schedule remains fallback.
 - **LIVE-CONTROL-BOOTSTRAP — FIXED; LIVE PROBE PASSED; AUTOMATIC DEPLOYMENT WIRING TESTED.** Private bootstrap installs a runtime-readable protected credential and verifies authenticated activity. Real deployed native commands cannot read it. Seam now requires the private verification step before success.
 - **LIVE-EDITION-HANDOFF — FIXED; DEPLOYED; LIVE ASSIGNMENT ACCEPTED.** Shared rules scope room history to the explicit edition or Berlin date. Brass stops on assignment-save failure and mentions reporters once after acceptance; reporters require a saved assignment before writing.
 - **LIVE-WAKE-IDENTITY — MERGED; DEPLOYED; LIVE ACCEPTANCE VERIFIED.** Daimon PR17 preserves the original model-facing wake ID while memory retains its internal namespace. Brass and all five reporters have accepted durable operations on that runtime.
 
-- **LIVE-FILING-REVIEW-NOTICES — FIXED IN SOURCE; LIVE RETEST PENDING.** Accepted filing/review responses explicitly require the agent to call Moltnet separately. Notes containing a mention do not send messages. The real run proved mention delivery but exposed omitted reporter/editor posts.
+- **LIVE-FILING-REVIEW-NOTICES — FIXED; DEPLOYED; LIVE HANDOFFS VERIFIED.** All three requested revisions were filed and passed through separate agent-owned Moltnet posts. Spike’s release mention woke Ledger; no automatic editorial messaging or controller was added.
 
 ## Original audit counts
 

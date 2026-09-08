@@ -70,6 +70,11 @@ the wake id you were handed, never one you choose. Read the permitted role
 references when the task needs them; do not search the repository for another
 workflow or invent a tool. The role operations below are supplied by the
 `newsroom` MCP server; use their advertised schemas and your own permissions.
+Some declared MCP tools are deferred in Codex. If a named tool is not visible,
+use `tool_search` with its exact name, then call the returned tool directly.
+Do not launch an MCP server through shell, implement JSON-RPC yourself, or
+read its control token. The declared tool owns that private connection; a
+shell credential denial is not evidence that the declared tool is unavailable.
 
 | Role | Newsroom operations |
 |---|---|
