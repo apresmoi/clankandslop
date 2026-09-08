@@ -249,7 +249,7 @@ merge. A human's explicit merge approves publication; the resulting push to
 
 ## What is deliberately not automated
 
-- **No browser step in CI, for anything.** Ten glyph shapes and 120 map regions
+- **No browser step in CI, for anything.** Ten glyph shapes and 133 map regions
   are curated and committed, `ops/lay-page.mjs` refuses any name outside either,
   `compose_edition` enforces visual count, alternation and map set equality, and
   `verify-glyph-cameras.mjs` already rasterizes the cameras headlessly. The

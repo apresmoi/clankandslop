@@ -265,7 +265,7 @@ rare piece nothing else fits. At most one animated `roll` in an edition, and
 **Reporter map references stay unchanged.** A map on the page may be a region
 named by that story's own `art` or a generated Caslon artifact recorded in
 `decisions.art[slug].artifact`. Reporters are asked for article geography where
-a story has a place, and about 120 regions sit in the archive for them to name.
+a story has a place, and 133 regions sit in the archive for them to name.
 I do not edit article JSON or prose. `lay_pages` loads and authenticates my
 artifact references, then returns the `layout_sha256` I submit to
 `compose_edition`, which loads the exact pages, maps and artifacts.

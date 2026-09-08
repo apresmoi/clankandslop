@@ -134,7 +134,7 @@ Red = down/breaking only; green = up only. Paper-grain noise overlay.
 
 **Before reaching for an asset, read `ops/ASSETS.md`.** It is the measured
 inventory of what is committed — the nine baked shapes, the two rolls, the
-~120-region map atlas under `content/editions/<date>/maps/` — and the runtime baking surface. Caslon uses the private artwork tools against
+133-region map atlas under `content/editions/<date>/maps/` — and the runtime baking surface. Caslon uses the private artwork tools against
 read-only ETOPO and model inputs; outputs go to shared edition state.
 
 Glyph art (ASCII rendered from real data) is the house illustration style:

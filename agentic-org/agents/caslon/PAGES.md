@@ -222,7 +222,7 @@ fresh generated map needs labelled spots and a caption; it gets routes or zones
 only when the catalogue pattern, retrieved corpus or Flashpoint rows support
 them.
 
-**An atlas of about 120 baked regions is committed**, roughly 192 files at
+**An atlas of 133 baked regions is committed**, with 209 files at
 `content/editions/<date>/maps/<name>.json`, each ~6.4 KB of bounding box plus
 one digit string per grid row. They are region data, not edition data: the
 same file renders the same relief whatever day it is filed under. Names follow

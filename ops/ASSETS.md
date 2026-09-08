@@ -9,12 +9,10 @@ Read from an agent workspace, every path here resolves under the read-only
 mount at `./repos/newsroom/`. Read in the repository, it resolves from the
 root.
 
-**Counts are as of 2026-09-06 on `feat/agentic-org`, re-measured against the
-git tree for this revision.** `origin/main` carries
-more — 208 map files over 132 regions, 320 OG cards through 2026-09-03 —
-because published editions land there first. The commands beside each section
-regenerate the numbers; prefer running one over trusting a number in this
-file.
+**Counts are as of 2026-09-09 on `feat/agentic-org`, measured after syncing
+the published archive through edition 0080 (2026-09-08).** The catalogue now
+includes every published map and OG card on `main`. The commands beside each
+section regenerate the numbers.
 
 ---
 
@@ -62,11 +60,11 @@ entry point. Adding another permitted model remains a reviewed source change.
 ## Maps — a large atlas already exists
 
 ```
-find content/editions -path '*/maps/*.json' | wc -l                                    # 192 files
-find content/editions -path '*/maps/*.json' -exec basename {} .json \; | sort -u       # 120 regions
+find content/editions -path '*/maps/*.json' | wc -l                                    # 209 files
+find content/editions -path '*/maps/*.json' -exec basename {} .json \; | sort -u       # 133 regions
 ```
 
-**192 baked map files, 120 unique regions, across 69 of 71 committed
+**209 baked map files, 133 unique regions, across 78 of 80 committed
 editions.** Each file is a compact JSON of roughly 6.4 KB — a name, the
 bounding box, a `cols`/`rows` grid and one digit string per row:
 
@@ -76,13 +74,13 @@ bounding box, a `cols`/`rows` grid and one digit string per row:
 ```
 
 They live at `content/editions/<date>/maps/<name>.json`. The house grid is
-`140 × 48` (108 of the 192 files, 66 of the 120 newest-per-name crops); the
-rest are narrower, none over 48 rows. Two suffixes recur, `-hero` and `-sq`,
+`140 × 48` (124 of the 209 files, 79 of the 133 newest-per-name crops); the
+other grids vary in width; none exceed 48 rows. Two suffixes recur, `-hero` and `-sq`,
 and they mean something specific — see below.
 
-**All 120 are usable today.** A story names one and the assembler resolves it
-out of this archive; the section after the table is the route. What cannot be
-done is baking a *new* region, and that bound is unchanged.
+**All 133 are usable today.** A story names one and the assembler resolves it
+out of this archive. Caslon can bake a new region through the private
+`bake_map` tool using the mounted ETOPO dataset; see Fresh regions below.
 
 ### The regions committed on this branch
 
@@ -99,6 +97,7 @@ order and the last write wins.
 | `arizona-hero` | -114 → -110.3 | 32.2 → 35 | 108×44 | 1 |
 | `bavi` | 116 → 133 | 20 → 33 | 150×44 | 1 |
 | `bavi-hero` | 117 → 132 | 20 → 32 | 108×44 | 1 |
+| `bhote-koshi` | 83.8 → 86.95 | 27.45 → 29 | 140×48 | 3 |
 | `black-sea-civilians` | 27 → 41 | 43 → 48 | 140×43 | 1 |
 | `black-sea-grain` | 28 → 37.8 | 43.2 → 47.2 | 140×48 | 3 |
 | `brazil-trade` | -105 → -15 | -36 → 12 | 140×48 | 1 |
@@ -112,6 +111,8 @@ order and the last write wins.
 | `choco-earthquake` | -86 → -69 | 1 → 9 | 140×48 | 1 |
 | `cnmi-pacific-lease-context` | 120 → 170 | 5 → 28 | 140×40 | 1 |
 | `colombia-response` | -84 → -68 | 0 → 8 | 140×48 | 1 |
+| `colorado-mead` | -115.2 → -109.8 | 35.4 → 37.8 | 140×48 | 1 |
+| `conakry-gbessia` | -13.85 → -13.45 | 9.45 → 9.75 | 140×48 | 1 |
 | `congo-river-kinshasa` | 2 → 43 | -12 → 6 | 140×44 | 1 |
 | `crimea` | 31.5 → 37.5 | 43.8 → 46.3 | 140×48 | 1 |
 | `cuba-grid` | -85 → -73 | 19 → 24 | 140×38 | 1 |
@@ -124,6 +125,7 @@ order and the last write wins.
 | `eastern-drc-ebola` | 16 → 42 | -7 → 7 | 140×44 | 1 |
 | `ebola-surveillance-gap` | 20 → 36 | -4 → 3 | 140×48 | 1 |
 | `eclipse-shadow` | -56 → 15 | 38 → 73 | 140×48 | 1 |
+| `edouard` | -98 → -86 | 26 → 32 | 140×48 | 1 |
 | `el-obeid` | 21 → 44 | 8 → 20 | 150×44 | 10 ‡ |
 | `el-obeid-hero` | 21 → 43 | 8 → 19 | 112×44 | 1 |
 | `europe-axis` | 0.5 → 10.5 | 45.5 → 49.3 | 140×48 | 1 |
@@ -143,7 +145,7 @@ order and the last write wins.
 | `gulf-war-hero` | 47 → 60 | 24 → 30 | 116×44 | 4 |
 | `guyana-coast` | -66 → -51 | 1 → 8 | 140×48 | 1 |
 | `guyana-coast-hero` | -63 → -54.25 | 1 → 8 | 84×48 | 1 |
-| `hormuz` | 53.5 → 60 | 24.5 → 27.6 | 144×44 | 9 ‡ |
+| `hormuz` | 53.5 → 59 | 24.5 → 27.3 | 140×48 | 10 ‡ |
 | `hormuz-hero` | 54 → 59.5 | 24.6 → 27.4 | 104×44 | 7 ‡ |
 | `hormuz-strait` | 53.5 → 59 | 24.5 → 27.3 | 140×48 | 15 |
 | `hormuz-strait-sq` | 54.8 → 57.6 | 25 → 27.2 | 92×48 | 9 |
@@ -153,7 +155,9 @@ order and the last write wins.
 | `indonesia-rate` | 75 → 150 | -12 → 22 | 140×48 | 1 |
 | `iran-nuclear` | 44 → 58 | 26.5 → 35.5 | 140×48 | 4 |
 | `iraq-strike-geometry` | 30 → 59 | 24 → 38 | 140×48 | 1 |
+| `islamabad-pims` | 72.55 → 73.85 | 33.35 → 33.95 | 140×48 | 2 |
 | `ituri-outbreak` | 20 → 36 | -4 → 3 | 140×44 | 2 |
+| `kachin-mines` | 95.5 → 99.2 | 23.8 → 27.8 | 140×48 | 1 |
 | `kariba-ferry` | 22 → 42 | -22 → -8 | 140×48 | 1 |
 | `korea-ufs` | 120 → 135 | 32 → 43 | 140×48 | 2 |
 | `kumamoto-kyushu` | 129.5 → 131.6 | 32.2 → 33.2 | 140×48 | 1 |
@@ -163,9 +167,11 @@ order and the last write wins.
 | `lebanon` | 34.2 → 37 | 32.9 → 34.7 | 140×48 | 2 |
 | `lebanon-south` | 34.4 → 36.6 | 33 → 34.05 | 140×48 | 6 |
 | `lebanon-south-sq` | 34.9 → 36.2 | 33.05 → 34.05 | 92×48 | 2 |
+| `leipzig` | 2 → 22 | 47 → 55 | 140×40 | 1 |
 | `leipzig-airport` | 2 → 22 | 47 → 55 | 140×40 | 1 |
 | `lima-callao` | -77.9 → -76.23 | -12.35 → -11.55 | 140×48 | 1 |
 | `los-pelambres-shutdown` | -75 → -66.5 | -34.6 → -30.2 | 140×44 | 1 |
+| `lusaka-courts` | 19 → 42 | -20 → -9 | 140×48 | 1 |
 | `makkah-pact-arc` | 22 → 95 | 8 → 45 | 140×46 | 1 |
 | `malvinas` | -62 → -56.5 | -53.2 → -50.6 | 144×46 | 2 ‡ |
 | `malvinas-hero` | -61.5 → -56.4 | -52.9 → -50.5 | 104×44 | 1 |
@@ -173,6 +179,9 @@ order and the last write wins.
 | `metro-cordon-hero` | -74.9 → -73.4 | 40.45 → 41.15 | 116×44 | 1 |
 | `metro-smoke` | -81 → -68 | 38.8 → 46 | 140×46 | 1 |
 | `moscow-kyiv` | 20 → 44 | 41 → 58 | 140×48 | 1 |
+| `ne-syria` | 36.5 → 43.2 | 34.2 → 37.6 | 140×48 | 1 |
+| `nevada-peavine` | -120.2 → -119.4 | 39.35 → 39.75 | 140×48 | 1 |
+| `niamey` | -8 → 16 | 4 → 16 | 140×48 | 1 |
 | `nicaragua-ballot` | -96.5 → -79.8 | 8 → 16 | 140×48 | 1 |
 | `nicaragua-election` | -94 → -76 | 8 → 16 | 140×40 | 1 |
 | `north-kordofan-road` | 28.5 → 34.8 | 12.7 → 15.9 | 140×48 | 1 |
@@ -198,6 +207,7 @@ order and the last write wins.
 | `syria-russian-facilities` | 32.3 → 38.1 | 33 → 35.8 | 140×48 | 1 |
 | `taiwan` | 117 → 124 | 21.5 → 25.7 | 140×48 | 1 |
 | `taiwan-agent-campaign` | 115.5 → 125 | 21.4 → 25.8 | 140×44 | 1 |
+| `taiwan-drones` | 116 → 123.5 | 21.7 → 25.5 | 140×48 | 1 |
 | `taiwan-east` | 117.5 → 125.9 | 21.8 → 25.8 | 140×48 | 1 |
 | `taiwan-hero` | 119.2 → 124.4 | 21.6 → 25.8 | 84×48 | 1 |
 | `taiwan-north` | 119 → 123 | 23.9 → 25.8 | 140×48 | 1 |
@@ -210,18 +220,15 @@ order and the last write wins.
 | `venezuela` | -73 → -63 | 8 → 13 | 140×48 | 1 |
 | `venezuela-coast` | -67.5 → -65.5 | 10.2 → 11.2 | 140×48 | 1 |
 | `vizag-compute` | 68 → 96 | 8 → 20 | 140×42 | 1 |
+| `west-bank-regional-context` | 33.6 → 36.95 | 31.1 → 32.7 | 140×48 | 1 |
 | `zambia-count-after-pause` | 19 → 42 | -20 → -9 | 140×48 | 2 |
 | `zambia-count-custody` | 19 → 42 | -20 → -9 | 140×48 | 1 |
 | `zoox-operating-gates` | -125 → -76 | 24 → 40 | 140×44 | 1 |
 
-‡ `el-obeid`, `gulf`, `hormuz`, `hormuz-hero` and `malvinas` each exist in
-two or three different crops under one name. Every other name is one region.
+‡ `el-obeid`, `gulf`, `hormuz`, `hormuz-hero`, `malvinas` have multiple crops under one name; the newest committed crop is used.
 
-Twelve more exist on `origin/main`, from the editions of 23 August onward:
-`bhote-koshi`, `colorado-mead`, `conakry-gbessia`, `edouard`,
-`islamabad-pims`, `kachin-mines`, `leipzig`, `lusaka-courts`, `ne-syria`,
-`nevada-peavine`, `niamey`, `taiwan-drones`. They are not claimable from this
-branch; the assembler resolves only what is committed here.
+The formerly main-only regions and the published West Bank context map are
+included in this catalogue and available through the same archive lookup.
 
 ### What `-hero` and `-sq` mean
 
@@ -231,7 +238,7 @@ carried one used it.
 An article's `art` names a region twice. `art.map` is the **story-page** map,
 rendered at 104 × 42 in the wide article frame and again in the OG card.
 `art.hero_map` is the **front-page hero panel** map, rendered at 52 × 30 in
-the narrow art column beside the lead. Fourteen regions were baked as a
+the narrow art column beside the lead. Fifteen region pairs were baked as a
 matched pair for exactly that: the base name for the wide frame, a suffixed
 re-crop for the narrow one.
 
@@ -247,16 +254,18 @@ ukraine-reach   172×40 over 56° lon       ukraine-reach-hero 112×42 over 54°
   much tighter longitude window at the same latitude span. Two exist:
   `hormuz-strait-sq`, `lebanon-south-sq`.
 - **`-hero`** replaced it from 5 July onward: same idea, less aggressive —
-  84 to 116 columns instead of 132 to 172, and a modestly tighter box. Twelve
+  84 to 116 columns instead of 132 to 172, and a modestly tighter box. Thirteen
   exist: `arizona-hero`, `bavi-hero`, `britain-north-hero`, `el-obeid-hero`,
   `gulf-war-hero`, `guyana-coast-hero`, `hormuz-hero`, `malvinas-hero`,
-  `metro-cordon-hero`, `puget-hero`, `sudan-gum-hero`, `taiwan-hero`.
+  `metro-cordon-hero`, `puget-hero`, `sudan-gum-hero`, `taiwan-hero`,
+  `ukraine-reach-hero`.
   `britain-north-hero` is the pure case: identical bounds, 96 columns instead
   of 132.
 
 Every article that ever set `hero_map` to a suffixed name paired it with the
-unsuffixed base in `map` — `map: "hormuz"`, `hero_map: "hormuz-hero"` — and
-by August the practice had settled on one name in both keys.
+matching wide crop in `map`, such as `map: "hormuz"` with
+`hero_map: "hormuz-hero"`; `puget-hero` pairs with `puget-sound`.
+By August many articles used one name in both keys.
 
 **The pairing is reachable, and it is the intended shape.** `compose_edition`
 ships the *union* of every `art.map` and every `art.hero_map` on the day, so
@@ -300,8 +309,8 @@ edition ever baked, and two stories claiming one region with different
 them.
 
 **On a day no story has a place, no map runs.** That is a normal edition, not
-a failure, and the honest answer whenever no archived box contains the
-story's geography.
+a failure. Where geography matters but no archived box fits, Caslon can
+bake a suitable crop with the private map tool.
 
 ### Fresh regions
 
@@ -315,7 +324,7 @@ high-latitude crop should widen longitude rather than crush the terrain grid.
 `inspect_artifact` provides optional image diagnostics, not a release gate.
 `lay_pages` and `compose_edition` authenticate the selected `{kind,name,sha256}`
 reference; only used maps reach the composed edition. Source data stays
-read-only. The map still needs presentation: all 152 archived article maps on
+read-only. The map still needs presentation: all 166 archived article maps on
 this branch carry non-empty labelled spots and captions, while titles, routes
 and overlays are situational. Labels must be grounded in the local catalogue,
 the retrieved corpus or the Flashpoint rows; do not invent routes, zones or
@@ -327,9 +336,8 @@ unrelated cities as padding.
 find website/public/og -name '*.png' | wc -l
 ```
 
-**280 committed** at `website/public/og/<date>/<slug>.png` over 55 edition
-dates (2026-06-13 through 2026-08-22 on this branch; through 2026-09-03 on
-`main`), plus `website/public/og/default.png`. `website/scripts/make-og.mjs`
+**320 committed** at `website/public/og/<date>/<slug>.png` over 63 edition
+dates (2026-06-13 through 2026-09-03), plus `website/public/og/default.png`. `website/scripts/make-og.mjs`
 needs a live dev server, so nothing in the autonomous path produces them and
 recent editions ship without.
 
@@ -351,7 +359,7 @@ website/public/{favicon*,icon-*,apple-touch-icon}.png
 
 | gap | status |
 | --- | --- |
-| ~~`art.hero_map` has no author~~ | **closed.** The six reporter briefs ask for `art` where a story has a place; `ops/lay-page.mjs` resolves the region out of this archive and places it. All 120 regions are reachable from a page |
+| ~~`art.hero_map` has no author~~ | **closed.** The six reporter briefs ask for `art` where a story has a place; `ops/lay-page.mjs` resolves the region out of this archive and places it. All 133 regions are reachable from a page |
 | ~~No brief named the atlas~~ | **closed.** Every reporter brief, `agents/caslon/PAGES.md` and `agentic-org/SYSTEMS.md` name it and point here |
 | ~~A `-hero` crop cannot be paired with a wide `map`~~ | **closed.** `compose_edition` ships the union of every `art.map` and `art.hero_map`, so a story may name the wide crop and its `-hero` re-crop and both reach the edition. `hero_map` is optional; `file_article` resolves both names against this catalogue in the reporter's own wake |
 | Fresh region baking | private `bake_map` reads the mounted grid and writes shared immutable artifacts; use the archived atlas as the design reference, with labelled spots and only grounded routes/overlays |
