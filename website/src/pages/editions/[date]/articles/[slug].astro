@@ -21,6 +21,7 @@ import {
   renderParagraph,
 } from '../../../../lib/edition.ts';
 import { getTopic } from '../../../../lib/topics.ts';
+import { loadArticleMapArt } from '../../../../lib/composed-map.ts';
 
 export async function getStaticPaths() {
   return listAllArticleRefs().map(({ date, slug }) => ({ params: { date, slug } }));
@@ -41,7 +42,7 @@ const isTape     = article.section === 'tape';
 const backHref   = isTape ? `${editionBase}/tape` : editionBase;
 const backLabel  = isTape ? 'The Tape' : 'The Front Page';
 
-const mapArt = article.art?.kind === 'map' ? article.art : null;
+const mapArt = loadArticleMapArt(date, article);
 const artMap = mapArt ? loadMap(date, mapArt.map) : null;
 // Purpose-built motion scenes earn an article stage; stock glyphs stay in compositions.
 const motionArt = article.art?.kind === 'ascii' && article.art.roll === 'eclipse' ? article.art : null;

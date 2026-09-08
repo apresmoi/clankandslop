@@ -21,15 +21,28 @@ import campfireAscii from '../data/glyphart-campfire.txt?raw';
 import { bakeRoll } from '../lib/glyphRoll.ts';
 import { bakeEclipse } from '../lib/glyphEclipse.ts';
 import { join } from 'node:path';
+import type { loadGlyph } from '../lib/edition.ts';
 
 interface Props {
   shape?: 'colosseum' | 'play' | 'notfound' | 'satellite' | 'pumpjack' | 'missile' | 'drone' | 'chip' | 'campfire' | 'eclipse';
   /** When set, render an animated glyph instead of a static shape. */
   roll?: 'chip' | 'eclipse';
+  glyph?: ReturnType<typeof loadGlyph>;
   scale?: number;
   caption?: string;
 }
-const { shape, roll, scale = 1, caption = '' } = Astro.props;
+const { shape, roll, glyph, scale = 1, caption = '' } = Astro.props;
+
+if (glyph !== undefined && (shape !== undefined || roll !== undefined)) {
+  throw new Error('GlyphArt: generated glyph cannot also select a shape or roll');
+}
+
+if (shape === 'eclipse' && roll !== 'eclipse') {
+  throw new Error('GlyphArt: shape "eclipse" requires roll="eclipse" beside it (no static eclipse asset exists)');
+}
+if (roll === 'eclipse' && shape !== 'eclipse') {
+  throw new Error('GlyphArt: roll "eclipse" requires shape="eclipse" beside it');
+}
 
 const ROLLS: Record<string, { model: string; opts: Parameters<typeof bakeRoll>[1] }> = {
   chip: { model: 'small-microchip.glb', opts: { rotX: 48, frames: 60, zoom: 9, cols: 60, rows: 26, dur: 3, alternate: true, arc: [-28, 28] } },
@@ -51,10 +64,10 @@ if (r) {
 }
 
 const sources: Record<string, string> = { colosseum: coliseumAscii, play: playAscii, notfound: notFoundAscii, satellite: satelliteAscii, pumpjack: pumpjackAscii, missile: missileAscii, drone: droneAscii, chip: chipAscii, campfire: campfireAscii };
-const art = (sources[shape ?? 'colosseum'] ?? coliseumAscii).replace(/\n+$/, '');
+const art = (glyph?.art ?? sources[shape ?? 'colosseum'] ?? coliseumAscii).replace(/\n+$/, '');
 // When baked with useColors:true the art is HTML (color spans); else plain text.
 // Size from the VISIBLE glyphs (tags stripped) so the cols/rows math is right.
-const isColor = art.includes('<span');
+const isColor = glyph === undefined && art.includes('<span');
 const plain = isColor ? art.replace(/<[^>]+>/g, '') : art;
 const lines = plain.split('\n');
 const cols = Math.max(...lines.map((l) => l.length));
@@ -69,7 +82,7 @@ const rows = lines.length;
   </figcaption>
 </figure>
 ) : (
-<figure class={`glyphart glyphart-${shape}${isColor ? ' glyphart-color' : ''}`} style={`--cols:${cols};--rows:${rows};--glyph-scale:${scale};`}>
+<figure class={`glyphart glyphart-${glyph ? 'generated' : shape}${isColor ? ' glyphart-color' : ''}`} style={`--cols:${cols};--rows:${rows};--glyph-scale:${scale};`}>
   <div class="glyphart-stage">
     {isColor ? <pre class="glyphart-pre" set:html={art} /> : <pre class="glyphart-pre">{art}</pre>}
   </div>
@@ -84,6 +97,7 @@ const rows = lines.length;
   .glyphart { margin: 0; height: 100%; display: flex; flex-direction: column; }
   /* Mobile (stacked): no text beside it — fill the column width. */
   .glyphart-stage { flex: 1 1 auto; min-height: 0; container-type: inline-size; display: flex; }
+  .glyphart-generated .glyphart-stage { min-height: 220px; }
   .glyphart-pre {
     font-family: var(--font-mono);
     font-size: calc(100cqw * var(--glyph-scale) / (var(--cols) * 0.6));
@@ -101,6 +115,11 @@ const rows = lines.length;
     .glyphart-stage { container-type: size; }
     .glyphart-pre {
       font-size: min(calc(100cqw * var(--glyph-scale) / (var(--cols) * 0.62)), calc(100cqh * var(--glyph-scale) / (var(--rows) + 1)));
+    }
+  }
+  @media (max-width: 879px) {
+    .glyphart-generated .glyphart-pre {
+      font-size: min(calc(100cqw * var(--glyph-scale) / (var(--cols) * 0.62)), calc(260px / (var(--rows) + 1)));
     }
   }
   .glyphart-play .glyphart-pre { color: var(--accent); }
