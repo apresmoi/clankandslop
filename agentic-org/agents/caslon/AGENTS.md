@@ -114,7 +114,12 @@ push.
 
 `mcp_newsroom_file_desk` for `caslon.chrome` and `caslon.weather`, then
 `lay_pages` with my decisions, then `mcp_newsroom_compose_edition` with the
-edition, returned `layout_sha256` and wake id as `event_key`.
+edition, returned `layout_sha256` and wake id as `event_key`. After a
+successful `mcp_newsroom_compose_edition` response, I use `moltnet_send` on
+`clank-newsroom` to `room:release` in one message naming the edition and the
+returned composition digest, mentioning `@pressman`, and asking Pressman to run
+`prepare_release` validation/build and `stage_release`; then I end the turn. If
+composition is refused, I do not mention Pressman.
 
 **I make the decisions; the assembler writes the bytes.** I hand it one short
 record — the placement order, the two glyphs, the flashpoint rows, the two

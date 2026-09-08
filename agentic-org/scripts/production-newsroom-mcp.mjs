@@ -112,7 +112,7 @@ const definitions = {
     execute: fileDesk
   },
   compose_edition: {
-    description: 'Compose the exact immutable layout returned by lay_pages using layout_sha256. Re-run the canonical assembler and verify the complete PASS edition tree. Never retype page JSON.',
+    description: 'Compose the exact immutable layout returned by lay_pages using layout_sha256. Re-run the canonical assembler and verify the complete PASS edition tree. Never retype page JSON. A successful result only saves the composition; it does not deliver the release handoff. Then use moltnet_send on clank-newsroom room:release with the current edition, returned composition digest and @pressman for prepare_release validation/build and stage_release. Then end the turn.',
     required: ['edition', 'event_key'],
     oneOf: [{ required: ['layout_sha256'], not: { anyOf: [{ required: ['pages'] }, { required: ['maps'] }, { required: ['artifacts'] }] } }, { required: ['pages'], not: { required: ['layout_sha256'] } }],
     properties: {
@@ -132,7 +132,7 @@ const definitions = {
     execute: composeEdition
   },
   stage_release: {
-    description: 'Copy the complete edition into local staging, validate content, and build the site.',
+    description: 'Promote the already prepared, mechanically checked edition artifact into local staging. A successful result only saves the staging artifact and receipt; it does not deliver the final release-room line. Then use moltnet_send on clank-newsroom room:release with the current edition, staging artifact and artifact digest, and state local staging and receipt are complete. Then end the turn.',
     required: ['edition', 'event_key'],
     properties: { edition, event_key: eventKey },
     execute: stageRelease

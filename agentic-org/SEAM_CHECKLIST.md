@@ -4,13 +4,13 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-Eight generic repairs deployed; 43 native checks passed. All five live articles passed review, including three revised filings and fresh dissent. Agent-owned Moltnet handoffs and the real 4090 ad hoc research loop succeeded. Three desk documents accepted; World Desk filing is blocked by missing explicit mounted-source paths in Ledger’s MCP declaration. Composition and staging remain pending; publisher disabled. Original audit rows below remain historical evidence.
+The org produced and locally staged the 8 September edition: five reviewed articles, four desk documents, two illustrated pages, and a successful mechanical validation/build receipt. The real 4090 ad hoc research loop and agent-owned Moltnet handoffs worked. This first production run needed operator recovery prompts; unattended daily operation remains unproven. Eight generic repairs are deployed and passed 43 native isolation checks. Publisher disabled. Original audit rows below remain historical evidence.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
 | CF-01 | FIXED | SENSOR AND SNAPSHOT DEPLOYED | Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures. |
 | CF-02 | FIXED | DEPLOYED; LIVE ASSIGNMENT AND DISSENT RECORDED | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
-| CF-03 | FIXED | LIVE SOURCE-PATH BLOCKER; REPAIR IN PROGRESS | World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale. |
+| CF-03 | FIXED | DEPLOYED; LIVE WORLD DESK FILING VERIFIED | World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale. |
 | CF-04 | FIXED | PUBLISHER DISABLED | Workflow prepares a checked PR; explicit human merge remains the publication checkpoint. |
 | CF-05 | MERGED | DEPLOYED; COMPILED MODEL VERIFIED | Spawnfile PR15 preserves declared Codex model selection. |
 | CF-06 | MERGED | DEPLOYED; LIVE NATIVE PROBE PASSED | All 12 agents carry strict policy. Actual deployed native commands allow workspace/resource reads, deny accepted-state direct writes and direct network access. |
@@ -28,6 +28,10 @@ Eight generic repairs deployed; 43 native checks passed. All five live articles 
 - **LIVE-WAKE-IDENTITY — MERGED; DEPLOYED; LIVE ACCEPTANCE VERIFIED.** Daimon PR17 preserves the original model-facing wake ID while memory retains its internal namespace. Brass and all five reporters have accepted durable operations on that runtime.
 
 - **LIVE-FILING-REVIEW-NOTICES — FIXED; DEPLOYED; LIVE HANDOFFS VERIFIED.** All three requested revisions were filed and passed through separate agent-owned Moltnet posts. Spike’s release mention woke Ledger; no automatic editorial messaging or controller was added.
+
+- **LEDGER-SOURCE-ROOTS — FIXED; DEPLOYED; LIVE ACCEPTANCE VERIFIED.** Ledger’s MCP declares both mounted source roots explicitly; authentic figures file regardless of MCP cwd, altered figures reject. Wrong-cwd and missing-root regressions pass. Ledger filed World Desk and woke Caslon through Moltnet.
+
+- **LIVE-RELEASE-NOTICES — FIXED; TESTED; AWAITING SAFE DEPLOYMENT.** Successful compose and staging results now explicitly require the acting agent to send the remaining Moltnet handoff. Runtime-result deletion mutations fail and restored checks pass. The source update awaits the normal safe deployment window; today’s final Caslon handoff needed operator recovery and Pressman then built and staged autonomously.
 
 ## Original audit counts
 

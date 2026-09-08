@@ -358,6 +358,17 @@ runtimeTest('a day with the required forecast and no recorded dissent composes, 
     assert.equal(composed.forecasts, 1);
     assert.equal(composed.dissents, 0);
     assert.equal(composed.waiver, undefined, 'nothing was waived, because there is nothing left to waive');
+    assert.match(composed.next, /Composition saved only/u);
+    assert.match(composed.next, /no Moltnet message was sent/u);
+    assert.match(composed.next, /moltnet_send/u);
+    assert.match(composed.next, /clank-newsroom/u);
+    assert.match(composed.next, /room:release/u);
+    assert.match(composed.next, /edition 2026-09-05/u);
+    assert.match(composed.next, new RegExp(composed.receipt.digest));
+    assert.match(composed.next, /@pressman/u);
+    assert.match(composed.next, /prepare_release validation\/build/u);
+    assert.match(composed.next, /stage_release/u);
+    assert.match(composed.next, /end the turn/u);
     const receipt = await readComposedReceipt(state, edition);
     assert.equal(receipt.composition.compose_gates, composed.compose_gates);
     assert.equal(receipt.composition.forecasts, 1);

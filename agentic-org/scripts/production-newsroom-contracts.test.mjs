@@ -181,7 +181,33 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
   assert.match(reviewArticleTool.description, /PASS continues from the fresh INDEX/u);
   assert.match(reviewArticleTool.description, /passed>=5/u);
   assert.match(reviewArticleTool.description, /@ledger in room:release/u);
+
+  const caslon = await mcpToolsList('caslon');
+  const composeTool = caslon.find((tool) => tool.name === 'compose_edition');
+  assert.ok(composeTool, 'caslon must expose compose_edition');
+  assert.match(composeTool.description, /only saves the composition/u);
+  assert.match(composeTool.description, /does not deliver the release handoff/u);
+  assert.match(composeTool.description, /moltnet_send/u);
+  assert.match(composeTool.description, /clank-newsroom/u);
+  assert.match(composeTool.description, /room:release/u);
+  assert.match(composeTool.description, /@pressman/u);
+  assert.match(composeTool.description, /prepare_release validation\/build/u);
+  assert.match(composeTool.description, /stage_release/u);
+  assert.match(composeTool.description, /Then end the turn/u);
   // Everyone outside the six desks is refused the tool at the surface.
+  const pressman = await mcpToolsList('pressman');
+  const stageTool = pressman.find((tool) => tool.name === 'stage_release');
+  assert.ok(stageTool, 'pressman must expose stage_release');
+  assert.match(stageTool.description, /Promote the already prepared, mechanically checked edition artifact/u);
+  assert.match(stageTool.description, /only saves the staging artifact and receipt/u);
+  assert.match(stageTool.description, /does not deliver the final release-room line/u);
+  assert.match(stageTool.description, /moltnet_send/u);
+  assert.match(stageTool.description, /clank-newsroom/u);
+  assert.match(stageTool.description, /room:release/u);
+  assert.match(stageTool.description, /staging artifact/u);
+  assert.match(stageTool.description, /artifact digest/u);
+  assert.match(stageTool.description, /local staging and receipt are complete/u);
+  assert.match(stageTool.description, /Then end the turn/u);
   for (const role of ['spike', 'caslon', 'brass', 'ledger', 'pressman', 'klaxon']) {
     const tools = await mcpToolsList(role);
     assert.ok(!tools.some((tool) => tool.name === 'record_dissent'), `${role} must not be offered record_dissent`);

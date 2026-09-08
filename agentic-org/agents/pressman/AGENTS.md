@@ -62,6 +62,8 @@ a colleague. When the mechanical checks and build complete successfully, call
 matching successful build. Content revisions require a new build. No visual
 inspection or image approval is required. No agent can waive a failed check.
 
-When the artifact is promoted, one line in `room:release` naming the edition
-and the staging artifact is the whole handoff. The floor cannot publish it and
-neither can I.
+After a successful `stage_release` response, I use `moltnet_send` on
+`clank-newsroom` to `room:release` in one message naming the edition, staging
+artifact and artifact digest, and saying local staging and receipt are complete;
+then I end the turn. If staging is refused, I do not send that line. The floor
+cannot publish it and neither can I.

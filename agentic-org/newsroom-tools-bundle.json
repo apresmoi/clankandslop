@@ -2,10 +2,10 @@
   "version": "clank.newsroom-tools-bundle.v1",
   "archive": "newsroom-tools.tar",
   "mount": "tools/newsroom",
-  "sha256": "sha256:b568c26d02ca4e6f1b1e4b020afcac4b4558b8863b0bc69f2ebd8b8574266785",
+  "sha256": "sha256:74aa3446890c27e17f63dd6f8c9d223d4b2994c450680dd1b3d85926d86787e9",
   "file_count": 272,
-  "content_bytes": 42284250,
-  "source_commit": "c57652f57f50e5af1bce0c84210726389a7c0a7e",
+  "content_bytes": 42284713,
+  "source_commit": "7db7b5f89f4d7186e9ed1c4add4b5089a73f102b",
   "platform": "linux",
   "arch": "x64",
   "source_files": [
@@ -91,7 +91,7 @@
     },
     {
       "path": "newsroom/build/release.mjs",
-      "sha256": "sha256:b8ae677379886d11c3cd906dc07d7d4716726e0f57c5f7b6749f659ac8c9e0cc"
+      "sha256": "sha256:5e65a4832ce9bd31e2b13c403fe57af80f00d55228eb63b5bd8f5371c844203f"
     },
     {
       "path": "newsroom/build/worker.mjs",

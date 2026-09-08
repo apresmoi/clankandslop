@@ -2058,8 +2058,8 @@
   "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
   "artifact": "seam-checklist",
   "remediation": {
-    "updated_at": "2026-09-08T15:09:00Z",
-    "state": "Eight generic repairs deployed; 43 native checks passed. All five live articles passed review, including three revised filings and fresh dissent. Agent-owned Moltnet handoffs and the real 4090 ad hoc research loop succeeded. Three desk documents accepted; World Desk filing is blocked by missing explicit mounted-source paths in Ledger’s MCP declaration. Composition and staging remain pending; publisher disabled.",
+    "updated_at": "2026-09-08T16:25:00Z",
+    "state": "The org produced and locally staged the 8 September edition: five reviewed articles, four desk documents, two illustrated pages, and a successful mechanical validation/build receipt. The real 4090 ad hoc research loop and agent-owned Moltnet handoffs worked. This first production run needed operator recovery prompts; unattended daily operation remains unproven. Eight generic repairs are deployed and passed 43 native isolation checks. Publisher disabled.",
     "findings": [
       {
         "id": "CF-01",
@@ -2076,7 +2076,7 @@
       {
         "id": "CF-03",
         "source": "FIXED",
-        "deployment": "LIVE SOURCE-PATH BLOCKER; REPAIR IN PROGRESS",
+        "deployment": "DEPLOYED; LIVE WORLD DESK FILING VERIFIED",
         "result": "World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale."
       },
       {
@@ -2160,22 +2160,40 @@
         "id": "LIVE-FILING-REVIEW-NOTICES",
         "status": "FIXED; DEPLOYED; LIVE HANDOFFS VERIFIED",
         "result": "All three requested revisions were filed and passed through separate agent-owned Moltnet posts. Spike’s release mention woke Ledger; no automatic editorial messaging or controller was added."
+      },
+      {
+        "id": "LEDGER-SOURCE-ROOTS",
+        "status": "FIXED; DEPLOYED; LIVE ACCEPTANCE VERIFIED",
+        "result": "Ledger’s MCP declares both mounted source roots explicitly; authentic figures file regardless of MCP cwd, altered figures reject. Wrong-cwd and missing-root regressions pass. Ledger filed World Desk and woke Caslon through Moltnet."
+      },
+      {
+        "id": "LIVE-RELEASE-NOTICES",
+        "status": "FIXED; TESTED; AWAITING SAFE DEPLOYMENT",
+        "result": "Successful compose and staging results now explicitly require the acting agent to send the remaining Moltnet handoff. Runtime-result deletion mutations fail and restored checks pass. The source update awaits the normal safe deployment window; today’s final Caslon handoff needed operator recovery and Pressman then built and staged autonomously."
       }
     ],
     "live_observation": {
-      "at": "2026-09-08T15:05:06Z",
+      "at": "2026-09-08T16:08:29Z",
       "assignments": 5,
       "filings": 8,
       "dissents": 1,
       "verdicts": 8,
       "passed": 5,
-      "staged": 0,
+      "staged": 1,
       "runtime_prs_merged": 8,
       "native_checks_passed": 43,
       "publication": "disabled",
-      "desks": 3,
-      "composed": 0,
-      "ad_hoc_sensor_loop": "verified: Foreman requested through Moltnet; 4090 ChatGPT capture answered and resumed its revision"
+      "desks": 4,
+      "composed": 1,
+      "ad_hoc_sensor_loop": "verified: Foreman requested through Moltnet; 4090 ChatGPT capture answered and resumed its revision",
+      "illustrations": [
+        "chip",
+        "pumpjack"
+      ],
+      "composition_digest": "sha256:4d2f60aa017af82b40b8768553dccb3737a60e3acaa75259fad610942fe18186",
+      "artifact_digest": "sha256:0facae865c58250429dcea584846d7736958dc68e7e31d87deb1ab018ef361d3",
+      "operator_assisted": true,
+      "unattended_daily_run": "not yet demonstrated"
     }
   }
 }
