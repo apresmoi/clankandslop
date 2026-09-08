@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, parseArgs, pinFindings, seam, settle, sweepImages } from './seam-run.mjs';
+import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -13,7 +14,7 @@ const noop = () => {};
 function recorder(failAt, error = new SeamError('boom', 'deploy-failed')) {
   const calls = [];
   const stage = (name) => (options) => { calls.push(name); if (name === failAt) throw error; return options; };
-  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'build', 'deploy', 'settle', 'sweepImages'].map((name) => [name, stage(name)])) };
+  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'sweepImages'].map((name) => [name, stage(name)])) };
 }
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
 
@@ -25,7 +26,7 @@ test('the repin runs BEFORE the bundle, always', () => {
   const { calls, impl } = recorder(null);
   const result = seam([], { now, log: noop, stageImpl: impl, alarm: noop });
   assert.equal(result.ok, true);
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'deploy', 'settle', 'sweepImages']);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'sweepImages']);
   assert.ok(calls.indexOf('repin') < calls.indexOf('bundle'));
 });
 
@@ -49,11 +50,41 @@ test('check mode stops after the bundle check and never builds or deploys', () =
 test('no-deploy builds the image and stops before `up`', () => {
   const { calls, impl } = recorder(null);
   seam(['--no-deploy'], { now, log: noop, stageImpl: impl, alarm: noop });
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build']);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy']);
+});
+
+test('compiled Codex policy admission runs after build and before deploy', () => {
+  const { calls, impl } = recorder(null);
+  seam([], { now, log: noop, stageImpl: impl, alarm: noop });
+  assert.ok(calls.indexOf('build') < calls.indexOf('runtimePolicy'));
+  assert.ok(calls.indexOf('runtimePolicy') < calls.indexOf('deploy'));
+});
+
+test('compiled policy admission rejection stops before provider spawn', () => {
+  const { calls, impl } = recorder('runtimePolicy', new SeamError('missing strict policy', 'deploy-failed'));
+  const { alarm } = alarms();
+  const result = seam([], { now, log: noop, stageImpl: impl, alarm });
+  assert.equal(result.ok, false);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy']);
+  assert.ok(!calls.includes('deploy'));
+});
+
+test('compiled policy admission accepts generated strict config and rejects weak or missing policy', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-policy-test-'));
+  const file = path.join(root, 'daimon-organization-runtime.json');
+  const write = (engine) => writeFileSync(file, JSON.stringify({ agents: [{ id: 'pressman', engine }] }));
+  try {
+    write({ kind: 'codex', codexSandbox: { mode: 'workspace-write', networkAccess: false, webSearch: 'disabled' } });
+    assert.equal(runtimePolicy({ compiledOutput: root }, { log: noop }).checked, 1);
+    write({ kind: 'codex' });
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /missing strict Codex policy/u);
+    write({ kind: 'codex', codexSandbox: { mode: 'workspace-write', networkAccess: true, webSearch: 'disabled' } });
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /missing strict Codex policy/u);
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 test('each stage raises its own alarm reason, so the message says what broke', () => {
-  const expected = { repin: 'repin-failed', bundle: 'bundle-mismatch', build: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed' };
+  const expected = { repin: 'repin-failed', bundle: 'bundle-mismatch', build: 'deploy-failed', runtimePolicy: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed' };
   for (const [stage, reason] of Object.entries(expected)) {
     const { impl } = recorder(stage, new SeamError(`${stage} exploded`, reason));
     const { raised, alarm } = alarms();
@@ -112,7 +143,7 @@ test('the image sweep only ever touches the seam s own tags, and never the one j
     if (args[0] === 'images') return { toString: () => [
       'clank-and-slop:seam-2026-09-06-090000\t2026-09-06 09:00:00', 'clank-and-slop:seam-2026-09-05-090000\t2026-09-05 09:00:00',
       'clank-and-slop:seam-2026-09-04-090000\t2026-09-04 09:00:00', 'clank-and-slop:seam-2026-09-03-090000\t2026-09-03 09:00:00',
-      'clank-and-slop:local7\t2026-09-06 14:00:00', 'registry:2\t2026-09-01 00:00:00'
+      'clank-and-slop:seam-backup\t2026-09-01 01:00:00', 'clank-and-slop:seam-manual-test\t2026-09-01 00:00:00', 'clank-and-slop:local7\t2026-09-06 14:00:00', 'registry:2\t2026-09-01 00:00:00'
     ].join('\n') };
     removed.push(args[2]);
     return { toString: () => '' };
@@ -175,4 +206,29 @@ test('a pin check that matched nothing is a finding, not a pass', () => {
   // otherwise report a clean bill of health over zero evidence.
   const repo = pinWorld(['agent: cogsworth', 'resources: []'], descriptorOf(A, B));
   try { assert.match(pinFindings(repo).findings[0], /matched nothing/u); } finally { rmSync(repo, { recursive: true, force: true }); }
+});
+
+
+test('deployment shell round-trips literal arguments without substitution', () => {
+  const args = { cli: "a file's name", tag: 'tag;$(touch unexpected)', container: 'c`id`', deployment: 'd $HOME', envFile: '/tmp/env file' };
+  const command = deploymentCommand(args);
+  const capture = "set -- " + command + "; printf '%s\\0' \"$@\"";
+  const actual = execFileSync('/bin/sh', ['-c', capture]).toString().split('\0').slice(0, -1);
+  assert.deepEqual(actual, [process.execPath, args.cli, 'up', args.tag, '--image', '--name', args.container, '--deployment', args.deployment, '--env-file', args.envFile, '-d']);
+});
+
+test('policy checks every Codex member across nested compiled configs', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-multi-policy-'));
+  const strict = { mode: 'workspace-write', networkAccess: false, webSearch: 'disabled' };
+  const agents = Array.from({ length: 12 }, (_, i) => ({ id: `agent-${i}`, engine: { kind: 'codex', codexSandbox: strict } }));
+  try {
+    mkdirSync(path.join(root, 'nested'));
+    writeFileSync(path.join(root, 'daimon-organization-runtime.json'), JSON.stringify({ agents: agents.slice(0, 6) }));
+    const nested = path.join(root, 'nested', 'daimon-organization-runtime.json');
+    writeFileSync(nested, JSON.stringify({ agents: agents.slice(6) }));
+    assert.equal(runtimePolicy({ compiledOutput: root }, { log: noop }).checked, 12);
+    delete agents[11].engine.codexSandbox;
+    writeFileSync(nested, JSON.stringify({ agents: agents.slice(6) }));
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /agent-11 missing strict/u);
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

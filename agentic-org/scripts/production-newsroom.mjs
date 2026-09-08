@@ -9,9 +9,9 @@ import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, descri
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
 import { articleFormatFindings } from '../../ops/article-format.mjs';
 import { archiveIndex } from '../../ops/lay-page.mjs';
+import { authenticateWorldDeskFiling } from './worlddesk-filing.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
-const stable=value=>JSON.stringify(value,Object.keys(value).sort());
 const sha=value=>`sha256:${createHash('sha256').update(value).digest('hex')}`;
 const object=value=>{if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('object required');return value;};
 const exact=(value,required,optional=[])=>{object(value);const keys=Object.keys(value);const missing=required.filter(key=>!(key in value)),unexpected=keys.filter(key=>!required.includes(key)&&!optional.includes(key));if(missing.length||unexpected.length)throw new Error(`invalid fields — missing: [${missing.join(', ')}], unexpected: [${unexpected.join(', ')}]; required: [${required.join(', ')}]${optional.length?`, optional: [${optional.join(', ')}]`:''}`);return value;};
@@ -108,8 +108,10 @@ async function recordAssignmentAction(args){
   if(duplicates.length>0)throw new Error(`assignments[].id must be unique, got duplicates: ${[...new Set(duplicates)].join(', ')}`);
   const slotted=args.assignments.filter(item=>item.slot==='forecast');
   if(slotted.length>1)throw new Error(`at most one assignment may carry slot "forecast", got ${slotted.length}: ${slotted.map(item=>item.id).join(', ')}`);
+  if(slotted.length!==1)throw new Error(`exactly one assignment must carry slot "forecast", got ${slotted.length}`);
+  if(slotted[0].dissenter===undefined)throw new Error(`assignments[${args.assignments.indexOf(slotted[0])}].dissenter is required for the forecast slot and must name a different desk`);
   await convergeIndexed(args.edition,location(args.edition,'assignments',sha(args.event_key).slice(7,39)),{version:'clank.assignments.v1',...args});
-  const forecast=slotted[0]?{id:slotted[0].id,owner:slotted[0].owner,dissenter:slotted[0].dissenter??null}:null;
+  const forecast={id:slotted[0].id,owner:slotted[0].owner,dissenter:slotted[0].dissenter};
   return{recorded:args.assignments.length,forecast,receipt:await receipt(args,'assigned',args.assignments)};
 }
 const subdirNames=async(edition,kind)=>{try{return(await readdir(within(root(),'editions',edition,kind),{withFileTypes:true})).filter(entry=>entry.isDirectory()).map(entry=>entry.name).sort();}catch(error){if(error.code==='ENOENT')return[];throw error;}};
@@ -286,8 +288,9 @@ async function fileDeskAction(args){
   identity(args);exact(args,['edition','event_key','name','document']);
   const agent=process.env.CLANK_NEWSROOM_AGENT,allowed=agent==='ledger'?new Set(['ledger.settlements','ledger.worlddesk']):agent==='caslon'?new Set(['caslon.chrome','caslon.weather']):new Set();
   if(!allowed.has(args.name))throw new Error(`name ${JSON.stringify(args.name)} is not owned by "${agent}" — allowed names for "${agent}": ${allowed.size?[...allowed].join(', '):'none'}`);
-  const findings=deskDocumentFindings(args.name,object(args.document));
+  const findings=deskDocumentFindings(args.name,object(args.document),{profile:'filing'});
   if(findings.length>0)throw new Error(`desk document ${JSON.stringify(args.name)} does not match the shape the edition is assembled from — ${findings.join('; ')}`);
+  if(args.name==='ledger.worlddesk')await authenticateWorldDeskFiling(args);
   await converge(location(args.edition,'history',`desk/${args.name}/${sha(JSON.stringify(args.document)).slice(7)}`),args.document);
   await supersedeIndexed(args.edition,location(args.edition,'desk',args.name),args.document);
   return{name:args.name,receipt:await receipt(args,'desk-filed',args.document)};

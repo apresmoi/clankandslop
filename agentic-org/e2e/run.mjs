@@ -8,9 +8,9 @@ import { sourceManifest } from './provenance.mjs';
 
 const orgRoot=path.resolve(import.meta.dirname,'..');
 const ecosystem=path.resolve(orgRoot,'..','..');
-const spawnfileRoot=path.join(ecosystem,'noopolis-org','spawnfile');
-const daimonRoot=path.join(ecosystem,'noopolis-org','daimon');
-const moltnetRoot=path.join(ecosystem,'noopolis-org','moltnet');
+const spawnfileRoot=process.env.SPAWNFILE_ROOT ?? path.join(ecosystem,'noopolis-org','spawnfile');
+const daimonRoot=process.env.DAIMON_ROOT ?? path.join(ecosystem,'noopolis-org','daimon');
+const moltnetRoot=process.env.MOLTNET_ROOT ?? path.join(ecosystem,'noopolis-org','moltnet');
 const sha=bytes=>`sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 const run=(file,args,options={})=>execFileSync(file,args,{stdio:'inherit',...options});
 const output=(file,args,options={})=>execFileSync(file,args,{encoding:'utf8',...options}).trim();

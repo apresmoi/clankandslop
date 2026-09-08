@@ -5,6 +5,7 @@ runtime:
   name: daimon
   options:
     engine: codex
+    codex_policy: workspace-no-network
 execution:
   model:
     primary:
@@ -38,8 +39,8 @@ workspace:
   docs: { system: AGENTS.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:8da08cfffd98901a56c7abfb2c4e9680bd812a67a88678563d8f468459923256, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:3b3039d6ddba9c0ba1743fe86631c6b9be4e2eeafb26766bf3c21a93af7f2e6d, mount: ./repos/newsroom, mode: readonly }
-    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:c78289d0e15683876b1f88cd573067e8a6558e976db3dd03278fa371ff8b188c, mount: ./repos/newsroom-private, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:8475a2f71d8a66d471e14a617b9e7d300de025e0f33385164f809b44672a7783, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:1b9d4fad435d6263eb31d80f3685eee3ce5805841d308757ec32b0155b71048e, mount: ./repos/newsroom-private, mode: readonly }
     - { id: article-validation, kind: bundle, source: ../../article-validation-runtime.tar, sha256: sha256:0e402b3a4efc96e46c18e91931ce369eea26c20e4051faacf1a53ce720fdcd04, mount: ./tools/article-validation, mode: readonly }
 
 memory:

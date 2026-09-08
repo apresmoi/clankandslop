@@ -1,15 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { REPORTERS, RepinError, assertEditionInTree, berlinToday, parseArgs, resolveRef, run, verifyArchive } from './repin-private-source.mjs';
+import { REPORTERS, RepinError, assertEditionInTree, berlinToday, parseArgs, resolveRef, run, verifyArchive, verifyCorpusFreshness } from './repin-private-source.mjs';
 
 const EDITION = '2026-09-06';
 const STORIES = { cogsworth: ['s-11111111', 's-22222222'], sprockett: ['s-22222222'], foreman: ['s-33333333'], graves: ['s-33333333'], tinkerton: [], vesta: ['s-11111111'] };
 const DIGEST = /sha256:[a-f0-9]{64}/;
 const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
+const sha256 = (text) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
 
 const writeIndex = (root, edition, agent, ids) => {
   mkdirSync(join(root, edition, 'desks'), { recursive: true });
@@ -20,6 +22,25 @@ const writeIndex = (root, edition, agent, ids) => {
 const writeStory = (root, edition, id) => {
   mkdirSync(join(root, edition, 'stories'), { recursive: true });
   writeFileSync(join(root, edition, 'stories', `${id}.md`), `# ${id}\n`);
+};
+
+const writeRaw = (root, edition, site, slot, body = `# ${site} ${slot}\n\n## Output\n\nA prepared raw capture.\n`) => {
+  mkdirSync(join(root, edition, site), { recursive: true });
+  const rel = `${site}/${site}-rolling-${slot}.md`;
+  writeFileSync(join(root, edition, rel), body);
+  return { path: rel, sha256: sha256(body) };
+};
+
+const writeCorpusPrepared = (root, edition, sources, stories = STORIES) => {
+  mkdirSync(join(root, edition, 'desks'), { recursive: true });
+  writeFileSync(join(root, edition, 'desks', '_corpus.prepared.json'), `${JSON.stringify({
+    version: 'clank.research-corpus.prepared.v1',
+    edition,
+    generated: `${edition}T07:00:00.000Z`,
+    sources: [...sources].sort((a, b) => a.path.localeCompare(b.path)),
+    stories: Object.entries(stories).flatMap(([agent, ids]) => ids.map((id) => ({ id, source: agent }))),
+    stats: { source_files: sources.length, stories: 3, empty_sources: 0, unrouted: 0 },
+  }, null, 2)}\n`);
 };
 
 // A complete miniature of the real layout: a private git repo carrying an
@@ -35,11 +56,13 @@ const fixture = ({ edition = EDITION, stories = STORIES, withStoryFiles = true }
   git(priv, 'add', '-A');
   git(priv, 'commit', '--quiet', '-m', 'legacy corpus');
   git(priv, 'checkout', '--quiet', '-b', `edition/${edition}`);
+  const sources = [writeRaw(priv, edition, 'chatgpt', '0715'), writeRaw(priv, edition, 'grok', '0730')];
   for (const [agent, ids] of Object.entries(stories)) {
     writeIndex(priv, edition, agent, ids);
     if (withStoryFiles) for (const id of ids) writeStory(priv, edition, id);
   }
   if (!withStoryFiles) writeStory(priv, edition, 's-00000000'); // keep stories/ present but incomplete
+  writeCorpusPrepared(priv, edition, sources, stories);
   git(priv, 'add', '-A');
   git(priv, 'commit', '--quiet', '-m', `research: split ${edition} corpus`);
   const commit = git(priv, 'rev-parse', 'HEAD').trim();
@@ -104,6 +127,29 @@ test('verifyArchive reports index sizes and resolves every story row', () => {
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('verifyCorpusFreshness requires prepared metadata to cover every raw capture', () => {
+  const root = mkdtempSync(join(tmpdir(), 'clank-repin-verify-'));
+  try {
+    const first = writeRaw(root, EDITION, 'chatgpt', '0715', 'one');
+    const second = writeRaw(root, EDITION, 'grok', '0730', 'two');
+    writeCorpusPrepared(root, EDITION, [first, second]);
+    assert.deepEqual(verifyCorpusFreshness(root, EDITION), { sources: 2 });
+
+    writeRaw(root, EDITION, 'grok', '0830', 'newer raw capture');
+    assert.throws(() => verifyCorpusFreshness(root, EDITION), (error) => error instanceof RepinError && /does not cover latest raw capture/u.test(error.message));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('verifyCorpusFreshness accepts an unchanged rerun captured in a later commit', () => {
+  const root = mkdtempSync(join(tmpdir(), 'clank-repin-verify-'));
+  try {
+    const first = writeRaw(root, EDITION, 'chatgpt', '0715', 'same research');
+    const second = writeRaw(root, EDITION, 'grok', '0730', 'same research');
+    writeCorpusPrepared(root, EDITION, [first, second]);
+    assert.doesNotThrow(() => verifyCorpusFreshness(root, EDITION));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('verifyArchive fails loudly on a dangling story reference and on a missing index', () => {
   const root = mkdtempSync(join(tmpdir(), 'clank-repin-verify-'));
   try {
@@ -151,6 +197,24 @@ test('run refuses a date the pinned corpus cannot serve, and writes nothing', ()
     assert.throws(() => run(['--no-fetch', '--edition=2026-09-07'], { orgRoot: org, log: () => {} }), RepinError);
     assert.throws(() => run(['--no-fetch', `--edition=${EDITION}`, '--ref=main'], { orgRoot: org, log: () => {} }), (error) => error instanceof RepinError && /no 2026-09-06\/desks/u.test(error.message));
     assert.equal(readFileSync(join(org, 'policies/private-source.json'), 'utf8'), before, 'a failed repin must leave the pin untouched');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('run rejects a newer raw capture without mutating the previous mounted snapshot', () => {
+  const { root, org, priv } = fixture();
+  try {
+    const good = run(['--no-fetch', `--edition=${EDITION}`], { orgRoot: org, log: () => {} });
+    const archiveBefore = readFileSync(join(org, 'newsroom-private.tar'));
+    const pinBefore = readFileSync(join(org, 'policies/private-source.json'), 'utf8');
+
+    writeRaw(priv, EDITION, 'chatgpt', '0915', 'new raw capture omitted from prepared corpus');
+    git(priv, 'add', '-A');
+    git(priv, 'commit', '--quiet', '-m', `research(chatgpt): file ${EDITION} 0915 intake`);
+
+    assert.throws(() => run(['--no-fetch', `--edition=${EDITION}`], { orgRoot: org, log: () => {} }), (error) => error instanceof RepinError && /does not cover latest raw capture/u.test(error.message));
+    assert.equal(readFileSync(join(org, 'policies/private-source.json'), 'utf8'), pinBefore);
+    assert.deepEqual(readFileSync(join(org, 'newsroom-private.tar')), archiveBefore);
+    assert.equal(JSON.parse(readFileSync(join(org, 'newsroom-runtime-bundle.json'), 'utf8')).private.sha256, good.digest);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

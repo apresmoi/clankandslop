@@ -187,7 +187,7 @@ systemctl --user daemon-reload
 The drop-ins live in `~/.config/systemd/user/<unit>.d/alarm.conf` and add only
 `OnFailure=`; no timer is enabled, disabled or rescheduled by them.
 
-## The publication hop, unattended
+## Preparing publication for approval
 
 `clank-publish.timer` fires `publish-edition-branch.mjs` at 22:30 Berlin. It is
 the same job a person used to run by hand; three properties make it safe to run
@@ -233,15 +233,13 @@ also `repinBundleDescriptor` skipping when the base branch has no descriptor —
 there is nothing to repin, nothing on the branch checks it, and repinning
 unconditionally threw ENOENT on the first unattended publication.
 
-The first time an edition branch lands with `merge-edition.yml` on `main`, in
-order: `ci.yml` runs on the push (validate-content, the website data-layer test,
-`astro build`); `merge-edition.yml` re-asserts the ref shape, refuses any path
-outside the edition content, reads `ci-gate.mjs` for a `success` conclusion on
-that exact SHA, opens the pull request as `github-actions[bot]`, re-reads the
-gate and the head SHA, and merges into `main`; `deploy-website.yml` then
-deploys. Nobody reads the paper before it is live. That is the decision, taken
-deliberately: the airlock is branch protection plus the workflow's four locks,
-not a person's attention at 22:31.
+When an edition branch lands with `merge-edition.yml` on `main`, `ci.yml`
+validates the content and builds the site. The preparation workflow checks the
+exact head SHA, dated branch name, allowed paths and checksum-only changes, then
+opens or updates a pull request. It rechecks the head and CI before handing the
+pull request to a human. Its token has read-only content access and it does not
+merge. A human's explicit merge approves publication; the resulting push to
+`main` triggers the website deployment.
 
 ## What is deliberately not automated
 

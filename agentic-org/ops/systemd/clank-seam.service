@@ -26,7 +26,7 @@ EnvironmentFile=/etc/clank-alarm/alarm.env
 # stamp check — which is the compiler refusing an unstamped release correctly,
 # not a bug to route around. SPAWNFILE_ALLOW_LOCAL_E2E=1 is what admits it.
 Environment=SPAWNFILE_MOLTNET_TARGET_ARCH=amd64
-Environment=SPAWNFILE_CLI=/root/work/spawnfile/dist/cli/index.js
+Environment=SPAWNFILE_CLI=/home/clank/deploy-work/spawnfile-main/dist/cli/index.js
 Environment=SPAWNFILE_DAIMON_SOURCE_DIR=/root/work/daimon
 Environment=SPAWNFILE_DAIMON_PACKAGE_TARBALL=/root/work/noopolis-daimon-0.2.0.tgz
 Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/root/work/spawnfile/.local-daimon-runtime-identity.json

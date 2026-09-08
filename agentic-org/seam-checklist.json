@@ -2056,5 +2056,59 @@
     "CF-08 credential filesystem isolation remains UNKNOWN pending deployment/container/mount evidence."
   ],
   "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
-  "artifact": "seam-checklist"
+  "artifact": "seam-checklist",
+  "remediation": {
+    "updated_at": "2026-09-08T09:08:00Z",
+    "state": "Source fixes reviewed; runtime deployment and first full newsroom run pending. Original audit evidence below is retained unchanged.",
+    "findings": [
+      {
+        "id": "CF-01",
+        "source": "FIXED",
+        "deployment": "SENSOR DEPLOYED; NEWSROOM SNAPSHOT PENDING",
+        "result": "Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures."
+      },
+      {
+        "id": "CF-02",
+        "source": "FIXED",
+        "deployment": "PENDING",
+        "result": "Assignment admission requires exactly one forecast and a named different-desk dissenter."
+      },
+      {
+        "id": "CF-03",
+        "source": "FIXED",
+        "deployment": "PENDING",
+        "result": "World Desk filing verifies the mounted document and trace and recomputes canonical figures before committing."
+      },
+      {
+        "id": "CF-04",
+        "source": "FIXED",
+        "deployment": "PUBLISHER DISABLED",
+        "result": "Workflow prepares a checked PR; explicit human merge remains the publication checkpoint."
+      },
+      {
+        "id": "CF-05",
+        "source": "MERGED",
+        "deployment": "PENDING",
+        "result": "Spawnfile PR15 preserves declared Codex model selection."
+      },
+      {
+        "id": "CF-06",
+        "source": "MERGED",
+        "deployment": "PENDING LINUX PROBE",
+        "result": "Explicit strict Codex policy on all 12 agents; per-turn runtime guard removes unconfined Pi tools and pins terminal/network/search policy."
+      },
+      {
+        "id": "CF-07",
+        "source": "MERGED",
+        "deployment": "PENDING",
+        "result": "Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts."
+      },
+      {
+        "id": "CF-08",
+        "source": "UNKNOWN",
+        "deployment": "PENDING CREDENTIAL READ PROBE",
+        "result": "Nonroot runtime is prepared; filesystem credential isolation must be measured on the candidate."
+      }
+    ]
+  }
 }

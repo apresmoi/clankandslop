@@ -21,6 +21,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { deskDocumentFindings, EDITION_PART_FILES } from './desk-contract.mjs';
+import { worldDeskCanonicalFindings } from './worlddesk-contract.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const logRoot = resolve(root, 'content', 'log');
@@ -55,17 +56,7 @@ for (const date of editions) {
     assert.equal(trace.version, 'clank.worlddesk-trace.v1');
     assert.equal(trace.edition, date);
 
-    // Recompute the index from the trace's own terms rather than trusting it.
-    const denominator = trace.escalation.terms.reduce((sum, t) => sum + t.severity, 0);
-    const numerator = trace.escalation.terms.filter((t) => t.state === 'triggering').reduce((sum, t) => sum + t.severity, 0);
-    assert.equal(denominator, trace.escalation.denominator);
-    assert.equal(numerator, trace.escalation.numerator);
-    assert.equal(document.escalation_index, Number((numerator / denominator).toFixed(4)));
-
-    // Counts must equal the entries the trace actually classified.
-    assert.equal(document.open_conflicts, trace.flashpoints.entries.filter((e) => e.status === 'open').length);
-    assert.equal(document.watch, trace.flashpoints.entries.filter((e) => e.status === 'watch').length);
-    assert.equal(document.delta, trace.delta.word);
+    assert.deepEqual(worldDeskCanonicalFindings({ world_desk: document }, trace), []);
   });
 
   test(`${date}: every escalation term names a source a reader can re-fetch`, () => {

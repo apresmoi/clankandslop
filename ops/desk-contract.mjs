@@ -75,12 +75,18 @@ const SHAPES = {
   },
   'ledger.worlddesk': {
     keys: ['world_desk'],
+    filingKeys: ['world_desk'],
     check(document, out) {
       // index.astro reads .escalation_index.toFixed(2) with no guard, so a
       // missing world_desk is not a thin page — it is a build crash.
       if (!isObj(document.world_desk)) { out.push('world_desk must be an object {escalation_index, delta, open_conflicts, watch}'); return; }
       for (const key of ['escalation_index', 'open_conflicts', 'watch']) if (!isNum(document.world_desk[key])) out.push(`world_desk.${key} must be a number`);
       if (!isStr(document.world_desk.delta)) out.push('world_desk.delta must be a non-empty string');
+      if (out.profile === 'filing') {
+        if (document.world_desk.derived !== true) out.push('world_desk.derived must be true for a filed World Desk derivation');
+        if (!isStr(document.world_desk.from)) out.push('world_desk.from must be a non-empty trace path');
+        if (!isStr(document.world_desk.method)) out.push('world_desk.method must be a non-empty string');
+      }
     },
   },
 };
@@ -92,13 +98,16 @@ export const deskDocumentKeys = (name) => SHAPES[name]?.keys ?? null;
  * Every way `document` fails the contract for the desk part `name`, as plain
  * sentences. Empty means it will assemble and render.
  */
-export function deskDocumentFindings(name, document) {
+export function deskDocumentFindings(name, document, { profile = 'archive' } = {}) {
   const shape = SHAPES[name];
   if (!shape) return [`unknown desk document "${name}" — the edition carries exactly ${EDITION_PARTS.join(', ')}`];
   if (!isObj(document)) return [`${name} must be a JSON object`];
   const out = [];
-  const unexpected = Object.keys(document).filter((key) => !shape.keys.includes(key));
-  if (unexpected.length > 0) out.push(`unexpected key(s) [${unexpected.join(', ')}] — ${name} carries exactly [${shape.keys.join(', ')}]`);
+  out.profile = profile;
+  const keys = profile === 'filing' && shape.filingKeys ? shape.filingKeys : shape.keys;
+  const unexpected = Object.keys(document).filter((key) => !keys.includes(key));
+  if (unexpected.length > 0) out.push(`unexpected key(s) [${unexpected.join(', ')}] — ${name} carries exactly [${keys.join(', ')}]`);
   shape.check(document, out);
+  delete out.profile;
   return out;
 }

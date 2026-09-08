@@ -60,7 +60,8 @@
 // stale digest surviving the rewrite.
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { buildPrivateArchive, privateRoot } from './private-archive.mjs';
@@ -69,6 +70,7 @@ export const REPORTERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinker
 const EDITION_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/;
 const STORY_ID_PATTERN = /^s-[0-9a-f]{8}$/;
+const CORPUS_PREP_VERSION = 'clank.research-corpus.prepared.v1';
 const berlinDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' });
 
 export class RepinError extends Error {}
@@ -146,6 +148,44 @@ export function verifyArchive(root, edition) {
   return report;
 }
 
+const digestText = (text) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
+
+export function verifyCorpusFreshness(root, edition) {
+  const metadataPath = path.join(root, edition, 'desks', '_corpus.prepared.json');
+  let metadata;
+  try { metadata = JSON.parse(readFileSync(metadataPath, 'utf8')); } catch { fail(`extracted archive is missing parseable ${edition}/desks/_corpus.prepared.json`); }
+  if (metadata.version !== CORPUS_PREP_VERSION) fail(`${edition}/desks/_corpus.prepared.json has unsupported version ${JSON.stringify(metadata.version)}`);
+  if (metadata.edition !== edition) fail(`${edition}/desks/_corpus.prepared.json names edition ${JSON.stringify(metadata.edition)}`);
+  if (!Array.isArray(metadata.sources)) fail(`${edition}/desks/_corpus.prepared.json must declare sources[]`);
+
+  const rawSources = [];
+  for (const site of ['chatgpt', 'grok']) {
+    const dir = path.join(root, edition, site);
+    if (!existsSync(dir)) continue;
+    for (const name of readdirSync(dir).sort()) if (name.endsWith('.md')) rawSources.push(`${site}/${name}`);
+  }
+  if (!rawSources.length) fail(`${edition} has no raw chatgpt/grok research captures to prove freshness against`);
+
+  const declared = new Map();
+  for (const source of metadata.sources) {
+    if (!source || typeof source.path !== 'string' || typeof source.sha256 !== 'string') fail(`${edition}/desks/_corpus.prepared.json has malformed source entry`);
+    if (declared.has(source.path)) fail(`${edition}/desks/_corpus.prepared.json declares duplicate source ${source.path}`);
+    declared.set(source.path, source.sha256);
+  }
+  const missing = rawSources.filter((source) => !declared.has(source));
+  if (missing.length) fail(`${edition}/desks/_corpus.prepared.json does not cover latest raw capture(s): ${missing.join(', ')}`);
+  const stale = [];
+  for (const source of rawSources) {
+    const digest = digestText(readFileSync(path.join(root, edition, source), 'utf8'));
+    if (declared.get(source) !== digest) stale.push(source);
+  }
+  if (stale.length) fail(`${edition}/desks/_corpus.prepared.json has stale digest(s) for: ${stale.join(', ')}`);
+
+  const extra = [...declared.keys()].filter((source) => !rawSources.includes(source));
+  if (extra.length) fail(`${edition}/desks/_corpus.prepared.json declares source(s) absent from the archive: ${extra.join(', ')}`);
+  return { sources: rawSources.length };
+}
+
 export function run(argv = [], { orgRoot = path.resolve(import.meta.dirname, '..'), now = new Date(), log = console.log } = {}) {
   const options = parseArgs(argv);
   const repo = path.resolve(orgRoot, '..');
@@ -166,15 +206,23 @@ export function run(argv = [], { orgRoot = path.resolve(import.meta.dirname, '..
   const nextPin = `${JSON.stringify({ ...pin, commit: resolved.commit, ref, edition }, null, 2)}\n`;
 
   const archivePath = path.join(orgRoot, 'newsroom-private.tar');
-  const archive = buildPrivateArchive({ privateRepoPath, commit: resolved.commit, output: archivePath });
-  if (!DIGEST_PATTERN.test(archive.digest)) fail(`rebuilt archive produced a malformed digest: ${archive.digest}`);
-
-  const extractDir = mkdtempSync(path.join(tmpdir(), 'clank-repin-verify-'));
-  let report;
+  const archiveTmpDir = mkdtempSync(path.join(tmpdir(), 'clank-repin-archive-'));
+  const archiveTmp = path.join(archiveTmpDir, 'newsroom-private.tar');
+  let archive, report, freshness;
   try {
-    execFileSync('tar', ['-x', '-f', archivePath, '-C', extractDir], { maxBuffer: 1024 * 1024 * 1024 });
-    report = verifyArchive(extractDir, edition);
-  } finally { rmSync(extractDir, { recursive: true, force: true }); }
+    archive = buildPrivateArchive({ privateRepoPath, commit: resolved.commit, output: archiveTmp });
+    if (!DIGEST_PATTERN.test(archive.digest)) fail(`rebuilt archive produced a malformed digest: ${archive.digest}`);
+
+    const extractDir = mkdtempSync(path.join(tmpdir(), 'clank-repin-verify-'));
+    try {
+      execFileSync('tar', ['-x', '-f', archiveTmp, '-C', extractDir], { maxBuffer: 1024 * 1024 * 1024 });
+      report = verifyArchive(extractDir, edition);
+      freshness = verifyCorpusFreshness(extractDir, edition);
+    } finally { rmSync(extractDir, { recursive: true, force: true }); }
+  } catch (error) {
+    rmSync(archiveTmpDir, { recursive: true, force: true });
+    throw error;
+  }
 
   const bundlePath = path.join(orgRoot, 'newsroom-runtime-bundle.json');
   const bundle = JSON.parse(readFileSync(bundlePath, 'utf8'));
@@ -197,8 +245,10 @@ export function run(argv = [], { orgRoot = path.resolve(import.meta.dirname, '..
   if (options.check) {
     if (changed.length) fail(`--check: ${changed.length} file(s) are not repinned for edition ${edition}: ${changed.join(', ')}`);
   } else {
+    renameSync(archiveTmp, archivePath);
     for (const [file, next] of writes) writeFileSync(file, next);
   }
+  rmSync(archiveTmpDir, { recursive: true, force: true });
 
   // A stale digest surviving anywhere under agentic-org means a rewrite missed
   // a reference, which would deploy an archive some agent cannot verify.
@@ -220,6 +270,7 @@ export function run(argv = [], { orgRoot = path.resolve(import.meta.dirname, '..
   log(`private-archive ${previousDigest} -> ${archive.digest}`);
   log(`archive ${archive.count} files, ${archive.total} bytes; ${spawnfiles.length} Spawnfile(s) pin it`);
   for (const entry of report) log(`  ${edition}/desks/${entry.agent}.index  ${entry.bytes} bytes  ${entry.rows} row(s) -> ${entry.stories.join(', ') || '(none)'}`);
+  log(`freshness: ${freshness.sources} raw capture file(s) covered by ${edition}/desks/_corpus.prepared.json`);
   log(changed.length ? `updated: ${changed.join(', ')}` : 'already current: no file changed');
   return { edition, ref, commit: resolved.commit, previousCommit, digest: archive.digest, previousDigest, changed, report, spawnfiles: spawnfiles.length };
 }

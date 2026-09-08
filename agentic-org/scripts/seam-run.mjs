@@ -77,6 +77,7 @@ export function parseArgs(argv) {
   const options = {
     edition: null, ref: null, repo: DEFAULT_REPO, container: DEFAULT_CONTAINER, deployment: DEFAULT_DEPLOYMENT,
     cli: process.env.SPAWNFILE_CLI ?? DEFAULT_SPAWNFILE_CLI, envFile: process.env.CLANK_DEPLOY_ENV_FILE ?? DEFAULT_ENV_FILE,
+    compiledOutput: null,
     deployUser: DEFAULT_DEPLOY_USER, tag: null, check: false, deploy: true, skipContainer: false, leadMinutes: 30, tailMinutes: 120
   };
   for (const arg of argv) {
@@ -211,17 +212,54 @@ export function assertPinsMatchDescriptor(options, { log = console.log } = {}) {
 
 // --- stage 4: the image ------------------------------------------------------
 export function build(options, { log = console.log } = {}) {
-  run('build', 'deploy-failed', process.execPath, [options.cli, 'build', path.join(options.repo, 'agentic-org'), '--tag', options.tag], { cwd: options.repo, log });
+  options.compiledOutput = path.join(options.repo, '.runtime', `seam-compiled-${options.tag.replace(/[^a-zA-Z0-9_.-]/gu, '_')}`);
+  run('build', 'deploy-failed', process.execPath, [options.cli, 'build', path.join(options.repo, 'agentic-org'), '--tag', options.tag, '--out', options.compiledOutput], { cwd: options.repo, log });
   return options.tag;
 }
 
-// --- stage 5: the deployment -------------------------------------------------
+// --- stage 5: compiled Codex policy admission -------------------------------
+export function runtimePolicy(options, { log = console.log } = {}) {
+  if (!options.compiledOutput || !existsSync(options.compiledOutput)) throw new SeamError('compiled output missing after build', 'deploy-failed');
+  const configs = [];
+  const visit = directory => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const candidate = path.join(directory, entry.name);
+      if (entry.isDirectory()) visit(candidate);
+      else if (entry.name === 'daimon-organization-runtime.json') configs.push(candidate);
+    }
+  };
+  visit(options.compiledOutput);
+  if (!configs.length) throw new SeamError(`compiled output contains no Daimon organization runtime config: ${options.compiledOutput}`, 'deploy-failed');
+  const failures = [];
+  let checked = 0;
+  for (const file of configs) {
+    const config = JSON.parse(readFileSync(file, 'utf8'));
+    for (const agent of config.agents ?? []) {
+      if (agent.engine?.kind !== 'codex') continue;
+      checked += 1;
+      const policy = agent.engine.codexSandbox;
+      if (!policy || policy.mode !== 'workspace-write' || policy.networkAccess !== false || policy.webSearch !== 'disabled' || Object.keys(policy).length !== 3)
+        failures.push(`${file}:${agent.id ?? 'agent'} missing strict Codex policy`);
+    }
+  }
+  if (!checked) failures.push('compiled organization has no Codex agents');
+  if (failures.length) throw new SeamError(`compiled Codex policy refusal:\n  ${failures.join('\n  ')}`, 'deploy-failed');
+  log(`compiled policy: ${checked} Codex agent(s) carry workspace-write, network-disabled, web-search-disabled policy`);
+  return { configs, checked };
+}
+
+// --- stage 6: the deployment -------------------------------------------------
 // Through `runuser -l clank` because that is the identity the live deployment
 // record belongs to; deploying as root would mint a second record and orphan
 // the first.
+export function deploymentCommand(options) {
+  return [process.execPath, options.cli, 'up', options.tag, '--image', '--name', options.container,
+    '--deployment', options.deployment, '--env-file', options.envFile, '-d']
+    .map(value => `'${String(value).replaceAll("'", "'\\''")}'`).join(' ');
+}
+
 export function deploy(options, { log = console.log } = {}) {
-  const command = `${process.execPath} ${options.cli} up ${options.tag} --image --name ${options.container}`
-    + ` --deployment ${options.deployment} --env-file ${options.envFile} -d`;
+  const command = deploymentCommand(options);
   return run('deploy', 'deploy-failed', 'runuser', ['-l', options.deployUser, '-c', command], { log });
 }
 
@@ -250,7 +288,7 @@ export function settle(options, { log = console.log, sleepSeconds = 10, rounds =
 export function sweepImages(options, { log = console.log, exec = execFileSync } = {}) {
   try {
     const tags = exec('docker', ['images', '--format', '{{.Repository}}:{{.Tag}}\t{{.CreatedAt}}'], { stdio: ['ignore', 'pipe', 'pipe'] }).toString()
-      .split('\n').filter((line) => line.startsWith(TAG_PREFIX)).map((line) => line.split('\t'))
+      .split('\n').filter((line) => /^clank-and-slop:seam-\d{4}-\d{2}-\d{2}-\d{6}\t/u.test(line)).map((line) => line.split('\t'))
       .sort((a, b) => (a[1] < b[1] ? 1 : -1)).map(([tag]) => tag);
     for (const tag of tags.slice(KEEP_IMAGES)) {
       if (tag === options.tag) continue;
@@ -263,7 +301,7 @@ export function sweepImages(options, { log = console.log, exec = execFileSync } 
 // be asserted by a test rather than only asserted by this comment. Reversing
 // repin and bundle is the failure mode the header describes, and a test is the
 // only thing that keeps a future edit from doing it.
-export const STAGES = Object.freeze({ gate, repin, bundle, build, deploy, settle, sweepImages });
+export const STAGES = Object.freeze({ gate, repin, bundle, build, runtimePolicy, deploy, settle, sweepImages });
 
 export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES } = {}) {
   const options = parseArgs(argv);
@@ -278,7 +316,8 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     stageImpl.bundle(options, { log }); stages.push('bundle');
     if (options.check) { log('\ncheck PASSED: the pin, the descriptor and the deploy window are all current.'); return { ...options, stages, ok: true }; }
     stageImpl.build(options, { log }); stages.push('build');
-    if (!options.deploy) { log(`\nno-deploy: built ${options.tag} and stopped before \`up\`.`); return { ...options, stages, ok: true }; }
+    stageImpl.runtimePolicy(options, { log }); stages.push('runtimePolicy');
+    if (!options.deploy) { log(`\nno-deploy: built and checked ${options.tag} and stopped before \`up\`.`); return { ...options, stages, ok: true }; }
     stageImpl.deploy(options, { log }); stages.push('deploy');
     stageImpl.settle(options, { log }); stages.push('settle');
     stageImpl.sweepImages(options, { log });

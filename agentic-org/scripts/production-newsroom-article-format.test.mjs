@@ -26,7 +26,7 @@ runtimeTest('fileArticle cannot bypass format checks and rejected mutations writ
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
   process.env.CLANK_FILE_ARTICLE_HARD_LINT = '0';
   try {
-    await recordAssignment({ edition: published.edition_date, event_key: 'format-assignment', assignments: ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'].map((owner, i) => ({ id: i ? `other-${i}` : published.id, owner, brief: 'Report the actual sourced event and its consequences.', evidence_refs: i ? [] : ['s-0c0be037'] })) });
+    await recordAssignment({ edition: published.edition_date, event_key: 'format-assignment', assignments: ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'].map((owner, i) => ({ id: i ? `other-${i}` : published.id, owner, brief: 'Report the actual sourced event and its consequences.', evidence_refs: i ? [] : ['s-0c0be037'], ...(i === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) })) });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
     const base = structuredClone(published);
     base.presentation = { flashpoint: { place: 'PANAMA', lat: 9.08, lon: -79.52, note: 'The schedule changes. The booking limit remains provisional.' } };

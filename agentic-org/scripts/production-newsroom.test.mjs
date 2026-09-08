@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { chmod, lstat, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -22,8 +22,42 @@ const deskDocument = (name, edition, lead = 'story-0') => ({
   'caslon.chrome': { date: edition, edition_no: '0099', volume: 'I', issued_at: `${edition}T14:00:00Z`, revision: 1, tagline: "All the slop that's fit to print.", next_bell: '14:00 UTC', compiled_by: ['Cogsworth'], lead_story_id: lead },
   'caslon.weather': { weather: { city: 'Berlin', temp_c: 20, summary: 'partly cloudy', humidity_pct: 58, wind: 'W 11km/h' } },
   'ledger.settlements': { resolved_last_edition: [{ call: 'A dated call that came in.', outcome: 'hit', prior_p: 0.62 }] },
-  'ledger.worlddesk': { world_desk: { escalation_index: 0.68, delta: 'steady', open_conflicts: 8, watch: 5 } },
+  'ledger.worlddesk': { world_desk: { escalation_index: 0.68, delta: 'steady', open_conflicts: 8, watch: 5, derived: true, from: `content/log/${edition}/worlddesk.json`, method: 'clank.escalation-registry.v1 rev 1 · clank.flashpoint-registry.v1 rev 1' } },
 }[name]);
+function installWorldDeskPrivate(root, edition, document = deskDocument('ledger.worlddesk', edition)) {
+  const dir = path.join(root, edition, 'worlddesk');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(path.join(dir, 'ledger.worlddesk.json'), `${JSON.stringify(document, null, 2)}\n`);
+  writeFileSync(path.join(dir, 'trace.json'), `${JSON.stringify({
+    version: 'clank.worlddesk-trace.v1',
+    edition,
+    escalation: {
+      registry: { sha256: '1'.repeat(64) },
+      index: document.world_desk.escalation_index,
+      numerator: 17,
+      denominator: 25,
+      terms: [{ id: 'fixture-a', severity: 17, state: 'triggering' }, { id: 'fixture-b', severity: 8, state: 'not_triggering' }],
+    },
+    flashpoints: {
+      registry: { sha256: '2'.repeat(64) },
+      open_conflicts: document.world_desk.open_conflicts,
+      watch: document.world_desk.watch,
+      entries: [
+        ...Array.from({ length: document.world_desk.open_conflicts }, (_, index) => ({ id: `open-${index}`, status: 'open' })),
+        ...Array.from({ length: document.world_desk.watch }, (_, index) => ({ id: `watch-${index}`, status: 'watch' })),
+      ],
+    },
+    delta: { word: document.world_desk.delta, current: document.world_desk.escalation_index, previous: document.world_desk.escalation_index },
+  }, null, 2)}\n`);
+}
+function preparedDeskDocument(name, edition, root = path.join(os.tmpdir(), `clank-worlddesk-private-${process.pid}`), lead) {
+  const document = deskDocument(name, edition, lead);
+  if (name === 'ledger.worlddesk') {
+    process.env.CLANK_PRIVATE_SOURCE_ROOT = root;
+    installWorldDeskPrivate(root, edition, document);
+  }
+  return document;
+}
 const page = (name, ids, map) => name === 'front' ? { edition: '2026-08-25', page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], flow: [{ block: 'MapGlyph', props: { map } }, { block: 'GlyphArt', props: { shape: 'chip' } }] } : { edition: '2026-08-25', page: name, paper: 'ticker', articles: [ids[0]], article: ids[1], flow: [] };
 
 test('public references and the dated-forecast predicate use the exact contract', () => {
@@ -43,7 +77,7 @@ runtimeTest('production newsroom authenticates composition content and fails clo
   process.env.CLANK_NEWSROOM_AGENT = 'klaxon';
   await Promise.all([qualifySignal(qualified), qualifySignal(qualified)]);
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
-  const assignments = owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] })); await recordAssignment({ edition, event_key: assignmentEvent, assignments });
+  const assignments = owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) })); await recordAssignment({ edition, event_key: assignmentEvent, assignments });
   process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
   // A reporter's wake never carries assignment_event_key or the assigned id — file_article
   // resolves the assignment from (edition, owner) alone and self-corrects a wrong id.
@@ -60,8 +94,8 @@ runtimeTest('production newsroom authenticates composition content and fails clo
   process.env.CLANK_NEWSROOM_AGENT = 'spike'; await reviewArticle({ edition, event_key: 'request-0', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the opposing reading.' });
   process.env.CLANK_NEWSROOM_AGENT = 'cogsworth'; await fileArticle({ edition, event_key: 'refile-0', assignment_event_key: assignmentEvent, article: { ...article('story-0', 'Cogsworth', edition, 0), revision: 2, deck: 'A revised sourced deck.' } });
   process.env.CLANK_NEWSROOM_AGENT = 'spike'; for (let index = 0; index < owners.length; index++) await reviewArticle({ edition, event_key: `review-${index}`, article_id: `story-${index}`, revision: index === 0 ? 2 : 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
-  process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: name, name, document: deskDocument(name, edition) });
-  process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: name, name, document: deskDocument(name, edition) });
+  process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: name, name, document: preparedDeskDocument(name, edition) });
+  process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: name, name, document: preparedDeskDocument(name, edition) });
   const ids = owners.map((_, index) => `story-${index}`), pages = [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps = [{ name: 'hormuz', document: archivedMap('hormuz') }, { name: 'hormuz-hero', document: archivedMap('hormuz-hero') }];
   await assert.rejects(composeEdition({ edition, event_key: 'compose-incomplete', pages: [pages[0], { name: 'tape', document: page('tape', [ids[3]]) }], maps }), /page completeness/u);
   await assert.rejects(composeEdition({ edition, event_key: 'compose-extra-map', pages, maps: [...maps, { name: 'unused-map', document: {} }] }), /maps must exactly/u); await composeEdition({ edition, event_key: 'compose-valid', pages, maps });
@@ -115,7 +149,7 @@ async function citationFixture() {
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
   await recordAssignment({
     edition: EDITION, event_key: 'schedule:citation-gate',
-    assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism for story number ${index}.`, evidence_refs: [] }))
+    assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }))
   });
   process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
   return temporary;
@@ -253,11 +287,15 @@ runtimeTest('prose warnings reach the reporter at file time and the editor at re
 
     // A clean filing carries no warnings and no lint key at all, and the
     // advice never reaches the published article.
-    const article = JSON.parse(await readFile(path.join(process.env.CLANK_EDITION_STATE_ROOT, 'editions', EDITION, 'articles', 'story-0.json'), 'utf8'));
-    assert.equal(article.lint, undefined, 'filing-time advice must not reach content/editions');
-    assert.equal(article.assignment_ref, undefined);
-    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
-    assert.deepEqual((await fileArticle({ edition: EDITION, event_key: 'prose-warnings-clean', article: cited('story-1', 'Sprockett') })).warnings, []);
+    const publishedArticle = JSON.parse(await readFile(path.join(process.env.CLANK_EDITION_STATE_ROOT, 'editions', EDITION, 'articles', 'story-0.json'), 'utf8'));
+    assert.equal(publishedArticle.lint, undefined, 'filing-time advice must not reach content/editions');
+    assert.equal(publishedArticle.assignment_ref, undefined);
+    process.env.CLANK_NEWSROOM_AGENT = 'foreman';
+    const clean = article('story-2', 'Foreman', EDITION, 2);
+    clean.body[1] = 'Two [E2].';
+    clean.evidence_box.push({ ...clean.evidence_box[0], source: 'Second source', source_note: { ...clean.evidence_box[0].source_note, source_id: 'E2', source_url: 'https://second.example/evidence' } });
+    clean.refs.push('E2');
+    assert.deepEqual((await fileArticle({ edition: EDITION, event_key: 'prose-warnings-clean', article: clean })).warnings, []);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });
@@ -285,15 +323,15 @@ async function driveToCompose(state, edition, make, count = owners.length, befor
   process.env.CLANK_EDITION_STATE_ROOT = state;
   const day = [...owners, 'vesta'].slice(0, count);
   assert.equal(day.length, count, 'the fixture has no owner for that many stories');
-  const assignments = day.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] }));
+  const assignments = day.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
   await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments });
   for (const [index, owner] of day.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition, event_key: `filing-${edition}-${index}`, article: make(`story-${index}`, owner[0].toUpperCase() + owner.slice(1), edition, index) }); }
   if (beforeReview) await beforeReview();
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
   for (const index of day.keys()) await reviewArticle({ edition, event_key: `review-${edition}-${index}`, article_id: `story-${index}`, revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
-  process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: deskDocument(name, edition) });
-  process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: deskDocument(name, edition) });
+  process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: preparedDeskDocument(name, edition) });
+  process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: preparedDeskDocument(name, edition) });
   const ids = day.map((_, index) => `story-${index}`);
   return { edition, pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps: [{ name: 'hormuz', document: archivedMap('hormuz') }, { name: 'hormuz-hero', document: archivedMap('hormuz-hero') }] };
 }
@@ -308,22 +346,21 @@ async function readComposedReceipt(state, edition) {
 
 const stateOf = (result) => result.compose_gates;
 
-runtimeTest('a day with no forecast and no dissent composes, and the paper says so', async () => {
+runtimeTest('a day with the required forecast and no recorded dissent composes, and the paper says so', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-no-floor-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-05';
   try {
-    const composeArgs = await driveToCompose(state, edition, withoutForecast);
+    const composeArgs = await driveToCompose(state, edition, article);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    // The exact composition the old gate refused, and the reason it had to go:
-    // none of the six quality-target editions carried a forecast either.
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 forecast=0 dissent=0 {2}→ ready$/mu);
-    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-no-forecast' });
-    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=0 dissent=0  → ready');
-    assert.equal(composed.forecasts, 0);
+    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 forecast=1 dissent=0 {2}→ ready$/mu);
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-forecast-no-dissent' });
+    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=1 dissent=0  → ready');
+    assert.equal(composed.forecasts, 1);
     assert.equal(composed.dissents, 0);
     assert.equal(composed.waiver, undefined, 'nothing was waived, because there is nothing left to waive');
     const receipt = await readComposedReceipt(state, edition);
     assert.equal(receipt.composition.compose_gates, composed.compose_gates);
+    assert.equal(receipt.composition.forecasts, 1);
     assert.equal(receipt.composition.dissents, 0);
     assert.equal(receipt.composition.waiver, undefined);
   } finally {
@@ -337,7 +374,7 @@ runtimeTest('the waiver environment variable is inert — no value of it changes
   const state = path.join(temporary, 'state'), edition = '2026-09-05';
   const saved = process.env.CLANK_EDITION_DIVERSITY_WAIVER;
   try {
-    const composeArgs = await driveToCompose(state, edition, withoutForecast);
+    const composeArgs = await driveToCompose(state, edition, article);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     // "1" used to be refused outright and a date used to compose under a
     // recorded waiver. Now the variable is read by nothing at all, and the one
@@ -345,11 +382,11 @@ runtimeTest('the waiver environment variable is inert — no value of it changes
     for (const value of ['1', 'true', edition, '2026-01-01']) {
       process.env.CLANK_EDITION_DIVERSITY_WAIVER = value;
       const status = await readIndexFile(state, edition);
-      assert.match(status, /forecast=0 dissent=0 {2}→ ready$/mu, `${value} must not reach the gate line`);
+      assert.match(status, /forecast=1 dissent=0 {2}→ ready$/mu, `${value} must not reach the gate line`);
     }
     const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-junk-env' });
     assert.equal(composed.waiver, undefined);
-    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=0 dissent=0  → ready');
+    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=1 dissent=0  → ready');
   } finally {
     if (saved === undefined) delete process.env.CLANK_EDITION_DIVERSITY_WAIVER; else process.env.CLANK_EDITION_DIVERSITY_WAIVER = saved;
     delete process.env.CLANK_NEWSROOM_AGENT;
@@ -361,7 +398,7 @@ runtimeTest('no other compose gate went with it', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-gates-stand-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-05';
   try {
-    const composeArgs = await driveToCompose(state, edition, withoutForecast);
+    const composeArgs = await driveToCompose(state, edition, article);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     await rm(path.join(state, 'editions', edition, 'desk', 'caslon.weather.json'));
     await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-desk' }), /exactly 4 desk documents required.*found 3/su);
@@ -403,7 +440,7 @@ runtimeTest('an author cannot type a dissent into their own filing', async () =>
   try {
     process.env.CLANK_EDITION_STATE_ROOT = state;
     process.env.CLANK_NEWSROOM_AGENT = 'brass';
-    await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] })) });
+    await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) })) });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
     // The first-law hole. Nobody asked Tinkerton, and until now nothing asked
     // whether anyone had.
@@ -434,6 +471,10 @@ runtimeTest('the forecast slot binds its owner at filing time, in the wake that 
     await assert.rejects(recordAssignment({ edition, event_key: 'bad-dissenter', assignments: assignments.map((item, index) => (index === 1 ? { ...item, dissenter: 'sprockett' } : item)) }), /is the owner of the piece — nobody dissents from their own byline/u);
     await assert.rejects(recordAssignment({ edition, event_key: 'lonely-dissenter', assignments: assignments.map((item, index) => (index === 2 ? { ...item, dissenter: 'vesta' } : item)) }), /only meaningful beside slot "forecast"/u);
     await assert.rejects(recordAssignment({ edition, event_key: 'two-slots', assignments: assignments.map((item, index) => (index === 2 ? { ...item, slot: 'forecast' } : item)) }), /at most one assignment may carry slot "forecast", got 2/u);
+    await assert.rejects(recordAssignment({ edition, event_key: 'no-forecast-slot', assignments: assignments.map(({ slot, dissenter, ...item }) => item) }), /exactly one assignment must carry slot "forecast", got 0/u);
+    await assert.rejects(recordAssignment({ edition, event_key: 'forecast-no-dissenter', assignments: assignments.map((item, index) => (index === 1 ? (({ dissenter, ...rest }) => rest)(item) : item)) }), /dissenter is required for the forecast slot/u);
+    const duplicateOwner = assignments.map((item, index) => (index === 2 ? { ...item, owner: 'cogsworth' } : item));
+    assert.deepEqual((await recordAssignment({ edition, event_key: 'duplicate-owner-is-permitted', assignments: duplicateOwner })).forecast, { id: 'story-1', owner: 'sprockett', dissenter: 'vesta' });
 
     process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
     const base = article('story-1', 'Sprockett', edition, 1);
@@ -663,7 +704,7 @@ runtimeTest('a map pair ships both regions, and an unlisted region is refused in
   try {
     process.env.CLANK_EDITION_STATE_ROOT = state;
     process.env.CLANK_NEWSROOM_AGENT = 'brass';
-    await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] })) });
+    await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments: owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) })) });
 
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
     const spots = [{ name: 'HORMUZ', lat: 26.6, lon: 56.25 }];
@@ -703,9 +744,10 @@ runtimeTest('file_desk refuses a desk document the edition cannot be assembled f
     for (const [agent, names] of [['ledger', ['ledger.settlements', 'ledger.worlddesk']], ['caslon', ['caslon.chrome', 'caslon.weather']]]) {
       process.env.CLANK_NEWSROOM_AGENT = agent;
       for (const name of names) {
-        const filed = await fileDesk({ edition, event_key: `good-${name}`, name, document: deskDocument(name, edition) });
+        const document = preparedDeskDocument(name, edition);
+        const filed = await fileDesk({ edition, event_key: `good-${name}`, name, document });
         assert.equal(filed.name, name);
-        assert.deepEqual(JSON.parse(await readFile(deskFile(name), 'utf8')), deskDocument(name, edition));
+        assert.deepEqual(JSON.parse(await readFile(deskFile(name), 'utf8')), document);
       }
     }
 
@@ -729,7 +771,7 @@ runtimeTest('file_desk refuses a desk document the edition cannot be assembled f
     ];
     for (const [agent, name, key, pattern] of cases) {
       process.env.CLANK_NEWSROOM_AGENT = agent;
-      const { [key]: _dropped, ...document } = deskDocument(name, missingEdition);
+      const { [key]: _dropped, ...document } = preparedDeskDocument(name, missingEdition);
       await assert.rejects(fileDesk({ edition: missingEdition, event_key: `missing-${name}-${key}`, name, document }), pattern, `${name} without ${key}`);
     }
     assert.deepEqual(await readdir(path.join(state, 'editions', missingEdition, 'desk')).catch(() => []), []);
@@ -739,6 +781,10 @@ runtimeTest('file_desk refuses a desk document the edition cannot be assembled f
     process.env.CLANK_NEWSROOM_AGENT = 'ledger';
     await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'worlddesk-index', name: 'ledger.worlddesk', document: { world_desk: { escalation_index: 'high', delta: 'steady', open_conflicts: 8, watch: 5 } } }), /world_desk\.escalation_index must be a number/u);
     await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'worlddesk-delta', name: 'ledger.worlddesk', document: { world_desk: { escalation_index: 0.6, delta: '', open_conflicts: 8, watch: 5 } } }), /world_desk\.delta must be a non-empty string/u);
+    const worlddesk = preparedDeskDocument('ledger.worlddesk', missingEdition);
+    await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'worlddesk-no-from', name: 'ledger.worlddesk', document: { world_desk: { ...worlddesk.world_desk, from: undefined } } }), /world_desk\.from must be a non-empty trace path/u);
+    await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'worlddesk-mismatch', name: 'ledger.worlddesk', document: { world_desk: { ...worlddesk.world_desk, escalation_index: 0.7 } } }), /does not match the mounted private prepared document/u);
+    await fileDesk({ edition: missingEdition, event_key: 'worlddesk-prepared', name: 'ledger.worlddesk', document: worlddesk });
     await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'settle-outcome', name: 'ledger.settlements', document: { resolved_last_edition: [{ call: 'A call.', outcome: 'partial', prior_p: 0.5 }] } }), /resolved_last_edition\[0\]\.outcome must be hit\|miss\|open/u);
     await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'settle-prior', name: 'ledger.settlements', document: { resolved_last_edition: [{ call: 'A call.', outcome: 'hit', prior_p: 1.4 }] } }), /resolved_last_edition\[0\]\.prior_p must be a number in \[0,1\]/u);
     // Nothing settled is the empty array, which is a complete document.

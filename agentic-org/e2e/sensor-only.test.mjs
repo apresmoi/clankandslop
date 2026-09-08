@@ -11,8 +11,10 @@ import { assertProvenance } from './provenance.mjs';
 
 const load=async file=>JSON.parse(await readFile(file,'utf8'));const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));const compiled=(...parts)=>path.join(process.env.CLANK_E2E_COMPILED_ROOT,...parts);const sha=value=>`sha256:${createHash('sha256').update(value).digest('hex')}`;
 class Runtime{constructor(child){this.child=child;this.waiters=[];this.values=[];let buffer='';child.stdout.setEncoding('utf8');child.stdout.on('data',chunk=>{buffer+=chunk;for(let end;(end=buffer.indexOf('\n'))>=0;){const line=buffer.slice(0,end);buffer=buffer.slice(end+1);if(line){const value=JSON.parse(line),waiter=this.waiters.shift();waiter?waiter(value):this.values.push(value);}}});}request(value){this.child.stdin.write(`${JSON.stringify(value)}\n`);return this.values.length?Promise.resolve(this.values.shift()):new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('runtime timeout')),10000);this.waiters.push(result=>{clearTimeout(timer);resolve(result);});});}async stop(){if(this.child.exitCode!==null)return;await this.request({type:'stop'});this.child.stdin.end();await new Promise(resolve=>this.child.once('exit',resolve));}}
-const scheduleDelivery=(config,hour)=>{const agent=config.agents.find(item=>item.id==='agent:brass'),source=agent.schedule,schedule={kind:source.kind,cron:source.cron,timezone:source.timezone,prompt:source.prompt},identity=createHash('sha256').update(JSON.stringify({agentId:agent.id,schedule})).digest('hex');return`schedule:${identity}:2026-08-16T${hour}:00@GMT+02:00`;};
-async function startRuntime(config,root,now,promotion,clientConfig){const image=process.env.CLANK_E2E_DAIMON_IMAGE,linuxMoltnet=process.env.CLANK_E2E_MOLTNET_LINUX_BIN,e2eRoot=process.env.CLANK_E2E_ROOT;assert.ok(image&&linuxMoltnet&&e2eRoot);const hostRuntimePort=await port(),containerRuntimePort=await port();const prompt=config.agents.find(agent=>agent.id==='agent:brass').schedule.prompt,releaseText='@pressman execute the validated local release handoff.',common={edition:'2026-08-16',release:'2026-08-16T16:00:00+02:00[Europe/Berlin]',correlationId:promotion.correlation_id,editionStateRoot:'/state/edition-state',outputRoot:'/state/staging',evidenceDigest:promotion.evidence_digest},trigger=(agent_id,wake_kind,text,delivery_id)=>({agent_id,wake_kind,text_sha256:createHash('sha256').update(text).digest('hex'),...(delivery_id?{delivery_id}:{})});const cognition_actions=[{delivery_id:`moltnet:${promotion.occurrence_id}`,network_id:'clank-newsroom',target:'room:sensor',text:`${promotion.selected_desks.map(desk=>`@${desk}`).join(' ')} qualified browser-broker promotion; begin assigned grounding.`},{type:'mcp_call',trigger:trigger('agent:brass','schedule',prompt,scheduleDelivery(config,'14')),server_id:'newsroom-brass',tool:'checkpoint',arguments:{...common,phase:'drafting'}},{type:'mcp_call',trigger:trigger('agent:brass','schedule',prompt,scheduleDelivery(config,'15')),server_id:'newsroom-brass',tool:'checkpoint',arguments:{...common,phase:'finalization',assignments:[{id:'one',artifact_ref:'article/one',owner:'cogsworth',status:'PASS'}],artifacts:[{ref:'article/one',owner:'cogsworth',validated:true,digest:sha('filing')}]}},{delivery_id:scheduleDelivery(config,'16'),network_id:'clank-newsroom',target:'room:assignment',text:releaseText},{type:'mcp_call',trigger:trigger('agent:pressman','message',`[room assignment] klaxon\n${releaseText}`),server_id:'newsroom-pressman',tool:'checkpoint',arguments:{...common,phase:'release'}}];const child=spawn('docker',['run','--rm','-i','--platform','linux/amd64','--user',`${process.getuid()}:${process.getgid()}`,'-p',`127.0.0.1:${hostRuntimePort}:${containerRuntimePort}`,'-e','DAIMON_EXPLICIT_TEST_RUNTIME=1','-e','CLANK_MOLTNET_KLAXON_TOKEN=e2e-klaxon-token','-v',`${e2eRoot}:/e2e:ro`,'-v',`${root}:/state`,'-v',`${linuxMoltnet}:/opt/moltnet:ro`,image],{stdio:['pipe','pipe','pipe']});const runtime=new Runtime(child),started=await runtime.request({type:'start',acceptance_store_path:'/state/acceptance',config,control_token:'clank-e2e-control',now_ms:now,http_host:'0.0.0.0',http_port:containerRuntimePort,moltnet_cli_path:'/opt/moltnet',moltnet_client_config_path:`/state/${path.basename(clientConfig)}`,mcp_config_path:'/e2e/mcp/explicit-test-mcp.json',mcp_receipt_path:'/e2e/mcp/explicit-test-mcp-receipt.json',cognition_actions});assert.equal(started.type,'started',JSON.stringify(started));return{runtime,baseUrl:`http://127.0.0.1:${hostRuntimePort}`,container:child};}
+const scheduleDelivery=(config,at)=>{const agent=config.agents.find(item=>item.id==='agent:brass'),source=agent.schedule,schedule={kind:source.kind,cron:source.cron.trim().replace(/\s+/gu,' '),timezone:source.timezone,prompt:source.prompt,...(source.jitter_seconds===undefined?{}:{jitter_seconds:source.jitter_seconds})},identity=createHash('sha256').update(JSON.stringify({agentId:agent.id,schedule})).digest('hex');return`schedule:${identity}:${scheduleLocal(at,schedule.timezone)}`;};
+const scheduleLocal=(at,timezone)=>{const formatter=new Intl.DateTimeFormat('en-US',{timeZone:timezone,hourCycle:'h23',weekday:'short',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'}),values=formatter.formatToParts(at),get=name=>values.find(part=>part.type===name)?.value??'0',local=`${get('year')}-${String(get('month')).padStart(2,'0')}-${String(get('day')).padStart(2,'0')}T${String(get('hour')).padStart(2,'0')}:${String(get('minute')).padStart(2,'0')}`,offset=new Intl.DateTimeFormat('en-US',{timeZone:timezone,timeZoneName:'longOffset'});return`${local}@${offset.formatToParts(at).find(part=>part.type==='timeZoneName')?.value??'UTC'}`;};
+// Synthetic checkpoint release identity stays on the legacy Berlin release slot; the test clock follows the current native Brass schedule.
+async function startRuntime(config,root,now,promotion,clientConfig){const image=process.env.CLANK_E2E_DAIMON_IMAGE,linuxMoltnet=process.env.CLANK_E2E_MOLTNET_LINUX_BIN,e2eRoot=process.env.CLANK_E2E_ROOT;assert.ok(image&&linuxMoltnet&&e2eRoot);const hostRuntimePort=await port(),containerRuntimePort=await port();const prompt=config.agents.find(agent=>agent.id==='agent:brass').schedule.prompt,releaseText='@pressman execute the validated local release handoff.',finalizeText='@brass finalize the validated desk filing.',releaseCommandText='@brass release the validated edition to Pressman.',nativeDelivery=scheduleDelivery(config,Date.parse('2026-08-16T18:30:00+02:00')),common={edition:'2026-08-16',release:'2026-08-16T16:00:00+02:00[Europe/Berlin]',correlationId:promotion.correlation_id,editionStateRoot:'/state/edition-state',outputRoot:'/state/staging',evidenceDigest:promotion.evidence_digest},trigger=(agent_id,wake_kind,text,delivery_id)=>({agent_id,wake_kind,text_sha256:createHash('sha256').update(text).digest('hex'),...(delivery_id?{delivery_id}:{})});const cognition_actions=[{delivery_id:`moltnet:${promotion.occurrence_id}`,network_id:'clank-newsroom',target:'room:sensor',text:`${promotion.selected_desks.map(desk=>`@${desk}`).join(' ')} qualified browser-broker promotion; begin assigned grounding.`},{type:'mcp_call',trigger:trigger('agent:brass','schedule',prompt,nativeDelivery),server_id:'newsroom-brass',tool:'checkpoint',arguments:{...common,phase:'drafting'}},{type:'mcp_call',trigger:trigger('agent:brass','message',`[room sensor] klaxon\n${finalizeText}`,'moltnet:e2e-brass-finalize'),server_id:'newsroom-brass',tool:'checkpoint',arguments:{...common,phase:'finalization',assignments:[{id:'one',artifact_ref:'article/one',owner:'cogsworth',status:'PASS'}],artifacts:[{ref:'article/one',owner:'cogsworth',validated:true,digest:sha('filing')}]}},{delivery_id:'moltnet:e2e-brass-release',network_id:'clank-newsroom',target:'room:release',text:releaseText},{type:'mcp_call',trigger:trigger('agent:pressman','message',`[room release] brass\n${releaseText}`),server_id:'newsroom-pressman',tool:'checkpoint',arguments:{...common,phase:'release'}}];const child=spawn('docker',['run','--rm','-i','--platform','linux/amd64','--user',`${process.getuid()}:${process.getgid()}`,'-p',`127.0.0.1:${hostRuntimePort}:${containerRuntimePort}`,'-e','DAIMON_EXPLICIT_TEST_RUNTIME=1','-e','CLANK_MOLTNET_KLAXON_TOKEN=e2e-klaxon-token','-e','CLANK_MOLTNET_BRASS_TOKEN=e2e-brass-token','-v',`${e2eRoot}:/e2e:ro`,'-v',`${root}:/state`,'-v',`${linuxMoltnet}:/opt/moltnet:ro`,image],{stdio:['pipe','pipe','pipe']});const runtime=new Runtime(child),started=await runtime.request({type:'start',acceptance_store_path:'/state/acceptance',config,control_token:'clank-e2e-control',now_ms:now,http_host:'0.0.0.0',http_port:containerRuntimePort,moltnet_cli_path:'/opt/moltnet',moltnet_client_config_path:`/state/${path.basename(clientConfig)}`,mcp_config_path:'/e2e/mcp/explicit-test-mcp.json',mcp_receipt_path:'/e2e/mcp/explicit-test-mcp-receipt.json',cognition_actions});assert.equal(started.type,'started',JSON.stringify(started));return{runtime,baseUrl:`http://127.0.0.1:${hostRuntimePort}`,container:child,finalizeText,releaseCommandText};}
 const port=()=>new Promise((resolve,reject)=>{const server=net.createServer();server.once('error',reject);server.listen(0,'127.0.0.1',()=>{const value=server.address().port;server.close(error=>error?reject(error):resolve(value));});});
 async function healthy(url){for(let i=0;i<100;i++){try{if((await fetch(url)).ok)return;}catch{}await sleep(25);}throw new Error('Moltnet health timeout');}
 async function stop(child){if(!child||child.exitCode!==null)return;child.kill('SIGTERM');await Promise.race([new Promise(resolve=>child.once('exit',resolve)),sleep(5000).then(()=>child.kill('SIGKILL'))]);}
@@ -28,7 +30,7 @@ await chmod(serverFile,0o600);
 const server=spawn(binary,['start','--config',serverFile],{stdio:'ignore'});
 await healthy(`${baseUrl}/healthz`);
 const nodes=[];
-for(const agent of ['klaxon','cogsworth','vesta','pressman']){const nodeConfig=await load(compiled('container','rootfs','var','lib','spawnfile','moltnet','nodes',`clank-and-slop-clank-newsroom-${agent}.json`));
+for(const agent of ['klaxon','cogsworth','vesta','brass','pressman']){const nodeConfig=await load(compiled('container','rootfs','var','lib','spawnfile','moltnet','nodes',`clank-and-slop-clank-newsroom-${agent}.json`));
 nodeConfig.moltnet.base_url=baseUrl;
 nodeConfig.attachments[0].runtime.control_url=runtimeUrl;
 nodeConfig.attachments[0].runtime.receipt_store_path=path.join(root,`${agent}-delivery.json`);
@@ -36,13 +38,17 @@ const nodeFile=path.join(root,`MoltnetNode-${agent}.json`);
 await writeFile(nodeFile,JSON.stringify(nodeConfig));
 await chmod(nodeFile,0o600);
 nodes.push(spawn(binary,['node',nodeFile],{env:{...process.env,[`CLANK_MOLTNET_${agent.toUpperCase()}_TOKEN`]:`e2e-${agent}-token`,SPAWNFILE_DAIMON_CONTROL_TOKEN:'clank-e2e-control'},stdio:'ignore'}));
-}for(let attempt=0;attempt<1200;attempt++){const response=await fetch(`${baseUrl}/v1/agents?limit=100`,{headers:{authorization:'Bearer e2e-operator-token'}});if(response.ok){const page=await response.json();if(['klaxon','cogsworth','vesta','pressman'].every(id=>page.agents?.some(agent=>agent.id===id&&agent.connected)))break;}if(attempt===1199)throw new Error('Moltnet nodes did not become ready');await sleep(25);}
+}for(let attempt=0;attempt<1200;attempt++){const response=await fetch(`${baseUrl}/v1/agents?limit=100`,{headers:{authorization:'Bearer e2e-operator-token'}});if(response.ok){const page=await response.json();if(['klaxon','cogsworth','vesta','brass','pressman'].every(id=>page.agents?.some(agent=>agent.id===id&&agent.connected)))break;}if(attempt===1199)throw new Error('Moltnet nodes did not become ready');await sleep(25);}
 return{nodes,server,async send(sensor){const body={id:sensor.id,target:{kind:'dm',dm_id:'dm-research-sensor-klaxon',participant_ids:['klaxon','research-sensor']},from:{type:'agent',id:'research-sensor',network_id:'clank-newsroom'},parts:[{kind:'text',text:sensor.text}]};
 const response=await fetch(`${baseUrl}/v1/messages`,{method:'POST',headers:{authorization:'Bearer e2e-research-sensor-token','content-type':'application/json'},body:JSON.stringify(body)});
+assert.equal(response.status,202,await response.text());
+},async sendRoom(id,room,text){const body={id,target:{kind:'room',room_id:room},from:{type:'agent',id:'klaxon',network_id:'clank-newsroom'},parts:[{kind:'text',text}]};
+const response=await fetch(`${baseUrl}/v1/messages`,{method:'POST',headers:{authorization:'Bearer e2e-klaxon-token','content-type':'application/json'},body:JSON.stringify(body)});
 assert.equal(response.status,202,await response.text());
 }};
 }
 async function wake(runtime,...agents){for(let i=0;i<100;i++){const value=await runtime.request({type:'snapshot'});if(!Array.isArray(value.wakes))throw new Error(JSON.stringify(value));if(agents.every(agent=>value.wakes.some(item=>item.agent_id===agent)))return value;await sleep(25);}throw new Error(`missing ${agents.join(', ')} wake`);}
+async function settled(runtime){for(let i=0;i<200;i++){const value=await runtime.request({type:'snapshot'}),items=value.activity?.items??[];if(items.every(item=>item.active!==true&&!['accepted','running'].includes(item.state)))return value;await sleep(25);}throw new Error('runtime activity did not settle');}
 test('compiled sensor transport, native schedule, restart, and local release are durable',async t=>{for(const name of ['CLANK_E2E_COMPILED_ROOT','CLANK_E2E_DAIMON_IMAGE','CLANK_E2E_MOLTNET_BIN','CLANK_E2E_MOLTNET_LINUX_BIN','CLANK_E2E_PROVENANCE'])assert.ok(process.env[name],`${name} required`);
 const root=await realpath(await mkdtemp(path.join(process.env.CLANK_E2E_ROOT,'state-')));
 t.after(()=>rm(root,{recursive:true,force:true}));
@@ -54,8 +60,11 @@ assert.match(report.compile_fingerprint,/^sf1:[a-f0-9]{12}$/);
 assert.ok(Date.now()-Date.parse(report.generated_at)<600000);
 const config=await load(compiled('container','rootfs','var','lib','spawnfile','instances','daimon','daimon-organization','daimon','daimon-organization-runtime.json'));
 const brass=config.agents.find(agent=>agent.id==='agent:brass');
-assert.equal(brass.schedule.cron,'0 14,15,16 * * *');
+assert.equal(brass.schedule.cron,'30 18 * * *');
 assert.equal(brass.schedule.timezone,'Europe/Berlin');
+assert.equal(brass.schedule.jitter_seconds,900);
+assert.equal(brass.engine.model,'gpt-5.4-mini');
+assert.deepEqual(brass.engine.codexSandbox,{mode:'workspace-write',networkAccess:false,webSearch:'disabled'});
 const pressman=(await readFile(compiled('entrypoint.sh'),'utf8')).split('\n').find(line=>line.includes("prepare_volume_resource 'public-content'")&&line.includes('/agents/pressman/staging'));
 assert.match(pressman,/clank-release-staging/);
 assert.doesNotMatch(pressman,/github|https?:\/\/|credential|token|prepare_git_resource/i);
@@ -75,36 +84,39 @@ const state=path.join(root,'edition-state'),receipts=path.join(state,'receipts')
 await mkdir(receipts,{recursive:true});
 const promoted=await importBrowserBrokerResult({edition:'2026-08-16',release:'2026-08-16T16:00:00+02:00[Europe/Berlin]',result:await load(path.join(import.meta.dirname,'fixtures','promoted-broker.json')),selectedDesks:['cogsworth','vesta'],stateRoot:state});
 const baseUrl=`http://127.0.0.1:${await port()}`;
-const clientConfig=await load(compiled('runtimes','daimon','agents','klaxon','workspace','.moltnet','config.json'));
+const clientConfig=await load(compiled('runtimes','daimon','agents','brass','workspace','.moltnet','config.json'));
 clientConfig.attachments[0].base_url=`http://host.docker.internal:${new URL(baseUrl).port}`;
 const clientConfigPath=path.join(root,'klaxon-client.json');
 await writeFile(clientConfigPath,JSON.stringify(clientConfig));
 let active,transport;
-try{active=await startRuntime(config,root,Date.parse('2026-08-16T13:59:00+02:00'),promoted.record,clientConfigPath);
+try{active=await startRuntime(config,root,Date.parse('2026-08-16T18:29:00+02:00'),promoted.record,clientConfigPath);
 transport=await moltnet(root,active.baseUrl,baseUrl);
 await transport.send(promoted.sensor);
 const routed=await wake(active.runtime,'agent:cogsworth','agent:vesta');
 assert.ok(routed.wakes.some(item=>item.agent_id==='agent:cogsworth'));
 assert.equal(routed.action_receipts.filter(item=>item.delivery_id===`moltnet:${promoted.sensor.id}`).length,1);
-const draft=await active.runtime.request({type:'advance',now_ms:Date.parse('2026-08-16T14:00:00+02:00')});
+await settled(active.runtime);
+const draft=await active.runtime.request({type:'advance',now_ms:Date.parse('2026-08-16T18:45:00+02:00')});
 assert.equal(draft.wakes.filter(item=>item.agent_id==='agent:brass').length,1);
 assert.ok(draft.action_receipts.some(item=>item.type==='mcp_call'&&item.server_id==='newsroom-brass'&&!item.is_error),JSON.stringify(draft.action_receipts));
 await active.runtime.stop();
 await Promise.all(transport.nodes.map(stop));
 await stop(transport.server);transport=undefined;
-active=await startRuntime(config,root,Date.parse('2026-08-16T14:01:00+02:00'),promoted.record,clientConfigPath);
+active=await startRuntime(config,root,Date.parse('2026-08-16T18:45:00+02:00'),promoted.record,clientConfigPath);
 transport=await moltnet(root,active.baseUrl,baseUrl);
 await transport.send(promoted.sensor);
-const finalWake=await active.runtime.request({type:'advance',now_ms:Date.parse('2026-08-16T15:00:00+02:00')});
+await transport.sendRoom('e2e-brass-finalize','sensor',active.finalizeText);
+const finalWake=await wake(active.runtime,'agent:brass');
 assert.equal(finalWake.wakes.filter(item=>item.agent_id==='agent:brass').length,1);
 assert.equal(finalWake.wakes.some(item=>item.agent_id==='agent:klaxon'),false);
 assert.ok(finalWake.action_receipts.some(item=>item.type==='mcp_call'&&item.server_id==='newsroom-brass'&&!item.is_error));
 await active.runtime.stop();
 await Promise.all(transport.nodes.map(stop));
 await stop(transport.server);transport=undefined;
-active=await startRuntime(config,root,Date.parse('2026-08-16T15:01:00+02:00'),promoted.record,clientConfigPath);
+active=await startRuntime(config,root,Date.parse('2026-08-16T18:46:00+02:00'),promoted.record,clientConfigPath);
 transport=await moltnet(root,active.baseUrl,baseUrl);
-const releaseWake=await active.runtime.request({type:'advance',now_ms:Date.parse('2026-08-16T16:00:00+02:00')});
+await transport.sendRoom('e2e-brass-release','sensor',active.releaseCommandText);
+const releaseWake=await wake(active.runtime,'agent:brass');
 assert.equal(releaseWake.wakes.filter(item=>item.agent_id==='agent:brass').length,1);
 await wake(active.runtime,'agent:pressman');
 const released=await active.runtime.request({type:'snapshot'});

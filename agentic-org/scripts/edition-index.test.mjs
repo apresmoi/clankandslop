@@ -24,8 +24,14 @@ const deskDocument = (name) => ({
   'caslon.chrome': { date: EDITION, edition_no: '0070', volume: 'I', issued_at: `${EDITION}T14:00:00Z`, revision: 1, tagline: "All the slop that's fit to print.", next_bell: '14:00 UTC', compiled_by: ['Cogsworth'], lead_story_id: 'story-0' },
   'caslon.weather': { weather: { city: 'Berlin', temp_c: 20, summary: 'partly cloudy', humidity_pct: 58, wind: 'W 11km/h' } },
   'ledger.settlements': { resolved_last_edition: [] },
-  'ledger.worlddesk': { world_desk: { escalation_index: 0.68, delta: 'steady', open_conflicts: 8, watch: 5 } },
+  'ledger.worlddesk': { world_desk: { escalation_index: 0.68, delta: 'steady', open_conflicts: 8, watch: 5, derived: true, from: `content/log/${EDITION}/worlddesk.json`, method: 'clank.escalation-registry.v1 rev 1 · clank.flashpoint-registry.v1 rev 1' } },
 }[name]);
+
+async function prepareWorldDesk(root, edition, document) {
+  const directory = path.join(root, edition, 'worlddesk'); await mkdir(directory, { recursive: true });
+  await writeFile(path.join(directory, 'ledger.worlddesk.json'), `${JSON.stringify(document)}\n`);
+  await writeFile(path.join(directory, 'trace.json'), `${JSON.stringify({ version: 'clank.worlddesk-trace.v1', edition, escalation: { registry: { sha256: '1'.repeat(64) }, index: 0.68, numerator: 17, denominator: 25, terms: [{ id: 'fixture-a', severity: 17, state: 'triggering' }, { id: 'fixture-b', severity: 8, state: 'not_triggering' }] }, flashpoints: { registry: { sha256: '2'.repeat(64) }, open_conflicts: 8, watch: 5, entries: [...Array.from({ length: 8 }, (_, index) => ({ id: `open-${index}`, status: 'open' })), ...Array.from({ length: 5 }, (_, index) => ({ id: `watch-${index}`, status: 'watch' }))] }, delta: { word: 'steady', current: 0.68, previous: 0.68 } })}\n`);
+}
 
 const article = (id, agent, index) => ({
   id, edition_date: EDITION, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test',
@@ -58,6 +64,7 @@ const rows = (text, kind) => text.split('\n').filter((line) => line.startsWith(`
 // desk document and page each get their own before/after check.
 async function driveEdition(state) {
   process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_PRIVATE_SOURCE_ROOT = path.join(state, 'private-source');
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
   const seen = [];
   const step = async (label, run) => {
@@ -69,7 +76,7 @@ async function driveEdition(state) {
     return text;
   };
 
-  const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`] }));
+  const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
   const afterAssignment = await step('record_assignment', () => recordAssignment({ edition: EDITION, event_key: 'schedule:conference-1', assignments }));
   assert.equal(rows(afterAssignment, 'A').length, 5);
   assert.match(afterAssignment, /^A cogsworth story-0 refs=1 +\| Report the verified mechanism/mu);
@@ -110,7 +117,7 @@ async function driveEdition(state) {
   assert.match(afterPass, /^P story-0 rev=2 section=world epi=fact key_numbers=0 +\| Headline story-0 \| A revised sourced deck\.$/mu);
 
   const afterDesk = await step('file_desk', async () => {
-    process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition: EDITION, event_key: name, name, document: deskDocument(name) });
+    process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) { const document = deskDocument(name); if (name === 'ledger.worlddesk') await prepareWorldDesk(process.env.CLANK_PRIVATE_SOURCE_ROOT, EDITION, document); await fileDesk({ edition: EDITION, event_key: name, name, document }); }
     process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition: EDITION, event_key: name, name, document: deskDocument(name) });
   });
   assert.equal(rows(afterDesk, 'D').length, 4);
@@ -162,7 +169,7 @@ runtimeTest('a failed index write fails the tool call', async () => {
     // read-only mount would.
     await mkdir(path.join(state, 'editions', EDITION, 'INDEX'), { recursive: true });
     await writeFile(path.join(state, 'editions', EDITION, 'INDEX', 'occupied'), 'x');
-    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] }));
+    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
     await assert.rejects(recordAssignment({ edition: EDITION, event_key: 'schedule:blocked-index', assignments }), (error) => error.code === 'EISDIR' || /EISDIR|ENOTDIR|EPERM|EACCES/u.test(error.message));
 
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
@@ -307,7 +314,7 @@ runtimeTest('publication format always rejects invalid prose while source-domain
     return out;
   };
   try {
-    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [] }));
+    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
     await recordAssignment({ edition: EDITION, event_key: 'schedule:hardlint', assignments });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
     const broken = article('story-0', 'Cogsworth', 0);

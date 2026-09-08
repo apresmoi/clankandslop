@@ -2,7 +2,22 @@
 
 Reviewed checklist from stable new 2026-09-08 reports plus external-review report-only corrections. Source status is static design evidence; deployed/rehearsed state is separate.
 
-## Counts
+## Repair status — 8 September 2026
+
+Sensor repairs are deployed. The replacement newsroom runtime is being built; the production newsroom and host publisher remain parked pending runtime checks. Original audit rows below are historical evidence, not the current fix status.
+
+| Finding | Source | Deployment | Result |
+|---|---|---|---|
+| CF-01 | FIXED | SENSOR DEPLOYED; NEWSROOM SNAPSHOT PENDING | Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures. |
+| CF-02 | FIXED | PENDING | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
+| CF-03 | FIXED | PENDING | World Desk filing verifies the mounted document and trace and recomputes canonical figures before committing. |
+| CF-04 | FIXED | PUBLISHER DISABLED | Workflow prepares a checked PR; explicit human merge remains the publication checkpoint. |
+| CF-05 | MERGED | PENDING | Spawnfile PR15 preserves declared Codex model selection. |
+| CF-06 | MERGED | PENDING LINUX PROBE | Explicit strict Codex policy on all 12 agents; per-turn runtime guard removes unconfined Pi tools and pins terminal/network/search policy. |
+| CF-07 | MERGED | PENDING | Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts. |
+| CF-08 | UNKNOWN | PENDING CREDENTIAL READ PROBE | Nonroot runtime is prepared; filesystem credential isolation must be measured on the candidate. |
+
+## Original audit counts
 
 - Reports incorporated: 17
 - Rows: 55 (48 primary + 7 cross-review assertions)
