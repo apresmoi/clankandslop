@@ -2,16 +2,16 @@
   "version": "clank.newsroom-tools-bundle.v1",
   "archive": "newsroom-tools.tar",
   "mount": "tools/newsroom",
-  "sha256": "sha256:3d358495ab5fda5f005fc1a0c345dc467bc51d0f93afe60eb770ac0b7eba2fa7",
+  "sha256": "sha256:880d1d5baa9fc7509a8f557106086ae36d2073749054a5b71bf955ab5cb9ff14",
   "file_count": 272,
-  "content_bytes": 42288064,
-  "source_commit": "4952d38b57791475484ebd3ad626d5406604b2b1",
+  "content_bytes": 42294837,
+  "source_commit": "8f6b6e050232401900957347176ac5fc75d49a70",
   "platform": "linux",
   "arch": "x64",
   "source_files": [
     {
       "path": "newsroom/art/adapter.mjs",
-      "sha256": "sha256:ddac7df7e1619e4742fd1e47a162d8968955260a4522f35d2cad01d8b680ee83"
+      "sha256": "sha256:9d9a9d6faf07fde714241cf17d26e2633eed6263a2b6ed09fbc1f4a02707a816"
     },
     {
       "path": "newsroom/art/bakers.mjs",
@@ -19,11 +19,11 @@
     },
     {
       "path": "newsroom/art/catalogue.mjs",
-      "sha256": "sha256:01bc73847ba5a7f0e67fdbbbb036686b6c0eebf46aaef85166a9de8778316bb3"
+      "sha256": "sha256:469f0a0d65849c4890654b18fbde4eef3c0aba079c8d5e027b12192abfd24f35"
     },
     {
       "path": "newsroom/art/decisions.mjs",
-      "sha256": "sha256:6c3e56773698b16243d4bde8b14b49188b72b72d3680c81a5762f7ae11aa19ed"
+      "sha256": "sha256:713ae9266acc1f9dc03740ae71dd0661793bacf33892fd543f8f4c50eed70da5"
     },
     {
       "path": "newsroom/art/fonts.conf",
@@ -79,7 +79,7 @@
     },
     {
       "path": "newsroom/build/mechanical.mjs",
-      "sha256": "sha256:e252db425d43435e0a7572c9f0d3072288f4e2deff1cf657d74582d169aced76"
+      "sha256": "sha256:aec1e0fd7917a0f27869fb8ad11895aba66cdb6a9564bec1d6b96d9b974e43cc"
     },
     {
       "path": "newsroom/build/process.mjs",
