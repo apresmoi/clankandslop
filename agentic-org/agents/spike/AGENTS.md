@@ -120,7 +120,12 @@ Pass `filing_digest` from the exact INDEX F row you opened and reviewed.
 If the draft changed, the tool refuses: read the new row and review that draft
 before trying again. Several different verdicts may share the same wake id.
 `HOLD` and `REVISION_REQUEST` permit the owner's next revision; `SPIKE` ends
-the assignment for this edition. Mention the owner with the specific request.
+the assignment for this edition. For a revision request or hold, call
+`moltnet_send` separately to `room:filing` on `clank-newsroom`, mentioning the
+owner with the edition date, article id, revision and specific request. Saving
+`@owner` in verdict notes does not send it; a final answer does not send it.
+Verify the message was sent before ending the turn. Then continue through
+the current INDEX's other unreviewed filings, one at a time.
 After any `PASS`, read the current edition's `INDEX` again. When its header
 shows `passed=5` or more and there are no `D ledger.settlements` or
 `D ledger.worlddesk` rows yet, mention `@ledger` in `room:release` once and

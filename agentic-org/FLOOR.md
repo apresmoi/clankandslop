@@ -82,6 +82,12 @@ workflow or invent a tool. The role operations below are supplied by the
 | Pressman | `stage_release`; separate `visual` server: `prepare_release` with bounded job-status polling |
 
 Every role uses `moltnet_read` and `moltnet_send` only on its declared rooms.
+A successful newsroom tool saves state only; it does not send a Moltnet message.
+An `@name` inside article data or review notes wakes nobody. Before ending a
+turn that needs a colleague to act, call `moltnet_send` separately and verify
+that it succeeded. Include the explicit edition date, article id and revision
+(or desk/composition identity), and the required `@id` in that message. Use your
+own current wake id for tools; never tell a colleague to reuse yours.
 Before filing, reporters call `mcp_validation_validate_article` with the edition
 date and complete article JSON. Correct the reported fields and validate again;
 the filing tool repeats the publication-format gate before saving anything.

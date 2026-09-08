@@ -2058,8 +2058,8 @@
   "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
   "artifact": "seam-checklist",
   "remediation": {
-    "updated_at": "2026-09-08T12:32:47.865372+00:00",
-    "state": "Seven generic PRs merged green and deployed. Native sandbox and real Codex/Moltnet/validator probes passed. Private control-token bootstrap now authenticates on Hetzner; agent commands still cannot read the token. Org remains parked while the generic memory/wake-ID mismatch is corrected. Publisher disabled.",
+    "updated_at": "2026-09-08T14:15:00Z",
+    "state": "Eight generic repairs deployed; 43 native checks passed. Five live filings and one dissent accepted, two revision requests saved. Missing Moltnet notices stalled review; explicit agent-owned handoff guidance awaits live retest. No staged edition; publisher disabled.",
     "findings": [
       {
         "id": "CF-01",
@@ -2070,7 +2070,7 @@
       {
         "id": "CF-02",
         "source": "FIXED",
-        "deployment": "DEPLOYED; AUTONOMOUS RUN PENDING",
+        "deployment": "DEPLOYED; LIVE ASSIGNMENT AND DISSENT RECORDED",
         "result": "Assignment admission requires exactly one forecast and a named different-desk dissenter."
       },
       {
@@ -2148,14 +2148,31 @@
       },
       {
         "id": "LIVE-EDITION-HANDOFF",
-        "status": "FIXED; REVIEWED; DEPLOYMENT PENDING",
+        "status": "FIXED; DEPLOYED; LIVE ASSIGNMENT ACCEPTED",
         "result": "Shared rules scope room history to the explicit edition or Berlin date. Brass stops on assignment-save failure and mentions reporters once after acceptance; reporters require a saved assignment before writing."
       },
       {
         "id": "LIVE-WAKE-IDENTITY",
-        "status": "CONFIRMED; GENERIC REPAIR IN PROGRESS",
-        "result": "Memory preparation replaced the original manual wake ID with its internal namespaced event ID in the model prompt. Admission correctly requires the original delivery ID; Daimon must preserve that identity for tool calls."
+        "status": "MERGED; DEPLOYED; LIVE ACCEPTANCE VERIFIED",
+        "result": "Daimon PR17 preserves the original model-facing wake ID; Brass and all five reporters have accepted durable operations on the deployed runtime."
+      },
+      {
+        "id": "LIVE-FILING-REVIEW-NOTICES",
+        "status": "FIXED IN SOURCE; LIVE RETEST PENDING",
+        "result": "Accepted tool responses explicitly require the agent’s separate Moltnet post; saved notes and final answers do not deliver mentions. No automatic messaging or wake controller."
       }
-    ]
+    ],
+    "live_observation": {
+      "at": "2026-09-08T14:09:02Z",
+      "assignments": 5,
+      "filings": 5,
+      "dissents": 1,
+      "verdicts": 2,
+      "passed": 0,
+      "staged": 0,
+      "runtime_prs_merged": 8,
+      "native_checks_passed": 43,
+      "publication": "disabled"
+    }
   }
 }

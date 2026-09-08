@@ -165,6 +165,22 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
   assert.deepEqual(recordAssignment.inputSchema.properties.assignments.items.properties.slot.enum, ['forecast']);
   assert.deepEqual(new Set(recordAssignment.inputSchema.properties.assignments.items.properties.dissenter.enum), new Set(['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']));
 
+
+  assert.match(fileArticleTool.description, /moltnet_send/u);
+  assert.match(fileArticleTool.description, /room:filing/u);
+  assert.match(fileArticleTool.description, /@spike/u);
+  assert.match(fileArticleTool.description, /forecast filings mention @spike and the dissenter in the same message/u);
+
+  const spike = await mcpToolsList('spike');
+  const reviewArticleTool = spike.find((tool) => tool.name === 'review_article');
+  assert.ok(reviewArticleTool, 'spike must expose review_article');
+  assert.match(reviewArticleTool.description, /only saves notes and mentions/u);
+  assert.match(reviewArticleTool.description, /does not deliver/u);
+  assert.match(reviewArticleTool.description, /REVISION_REQUEST and HOLD/u);
+  assert.match(reviewArticleTool.description, /SPIKE/u);
+  assert.match(reviewArticleTool.description, /PASS continues from the fresh INDEX/u);
+  assert.match(reviewArticleTool.description, /passed>=5/u);
+  assert.match(reviewArticleTool.description, /@ledger in room:release/u);
   // Everyone outside the six desks is refused the tool at the surface.
   for (const role of ['spike', 'caslon', 'brass', 'ledger', 'pressman', 'klaxon']) {
     const tools = await mcpToolsList(role);

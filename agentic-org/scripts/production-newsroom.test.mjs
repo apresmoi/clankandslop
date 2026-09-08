@@ -484,15 +484,31 @@ runtimeTest('the forecast slot binds its owner at filing time, in the wake that 
     await assert.rejects(fileArticle({ edition, event_key: 'no-confidence', article: { ...base, confidence: { value: 1.4 } } }), /article\.confidence\.value \[range\] must be at most 1/u);
     await assert.rejects(readFile(path.join(state, 'editions', edition, 'filings', 'story-1', '1.json')));
 
-    // Filed correctly, the tool hands back the one instruction the wake needs.
+    // Filed correctly, the tool hands back the exact Moltnet handoff the wake still has to send.
     const filed = await fileArticle({ edition, event_key: 'good-forecast', article: base });
     assert.deepEqual(filed.forecast, { dissenter: 'vesta' });
-    assert.match(filed.next, /mention @vesta in room:filing/u);
-    // A story with no slot owes none of it.
+    assert.match(filed.next, /Filing saved only/u);
+    assert.match(filed.next, /no Moltnet message was sent/u);
+    assert.match(filed.next, /moltnet_send/u);
+    assert.match(filed.next, /clank-newsroom/u);
+    assert.match(filed.next, /room:filing/u);
+    assert.match(filed.next, /edition 2026-09-07/u);
+    assert.match(filed.next, /article story-1 revision 1/u);
+    assert.match(filed.next, /@spike/u);
+    assert.match(filed.next, /@vesta/u);
+    assert.match(filed.next, /one message/u);
+    // A story with no forecast slot still owes Spike a filing announcement.
     process.env.CLANK_NEWSROOM_AGENT = 'foreman';
     const plain = await fileArticle({ edition, event_key: 'plain-filing', article: article('story-2', 'Foreman', edition, 2) });
     assert.equal(plain.forecast, undefined);
-    assert.equal(plain.next, undefined);
+    assert.match(plain.next, /Filing saved only/u);
+    assert.match(plain.next, /no Moltnet message was sent/u);
+    assert.match(plain.next, /moltnet_send/u);
+    assert.match(plain.next, /room:filing/u);
+    assert.match(plain.next, /edition 2026-09-07/u);
+    assert.match(plain.next, /article story-2 revision 1/u);
+    assert.match(plain.next, /@spike/u);
+    assert.doesNotMatch(plain.next, /@vesta/u);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });
@@ -622,6 +638,59 @@ runtimeTest('a dissent is refused against a revision that does not exist, one th
     // not a call.
     await assert.rejects(recordDissent({ edition, event_key: 'thin-argument', article_id: 'story-2', revision: 1, stance: 'dissent', p: 0.4, argument: 'Nope.' }), /between 80 and 2000 characters/u);
     await assert.rejects(recordDissent({ edition, event_key: 'dissent-without-p', article_id: 'story-2', revision: 1, stance: 'dissent', argument: FORECAST_ARGUMENT }), /requires p — your own probability/u);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+
+runtimeTest('Spike review results distinguish saved notes from delivered Moltnet handoffs', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-review-handoff-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-07';
+  try {
+    await driveToForecastFiling(state, edition);
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    const sentBack = await reviewArticle({ edition, event_key: 'send-back', article_id: 'story-1', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Show the counter-series and quote the named source.' });
+    assert.match(sentBack.next, /notes were saved only/u);
+    assert.match(sentBack.next, /mentions inside notes were not delivered/u);
+    assert.match(sentBack.next, /moltnet_send/u);
+    assert.match(sentBack.next, /clank-newsroom/u);
+    assert.match(sentBack.next, /room:filing/u);
+    assert.match(sentBack.next, /edition 2026-09-07/u);
+    assert.match(sentBack.next, /article story-1 revision 1/u);
+    assert.match(sentBack.next, /@sprockett/u);
+    assert.match(sentBack.next, /actionable notes/u);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    await fileArticle({ edition, event_key: 'extra-filing', article: article('story-0', 'Cogsworth', edition, 0) });
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    const held = await reviewArticle({ edition, event_key: 'hold-story', article_id: 'story-0', revision: 1, verdict: 'HOLD', notes: 'Hold until the official denominator lands.' });
+    assert.match(held.next, /HOLD notes were saved only/u);
+    assert.match(held.next, /@cogsworth/u);
+    assert.match(held.next, /room:filing/u);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'foreman';
+    await fileArticle({ edition, event_key: 'spike-filing', article: article('story-2', 'Foreman', edition, 2) });
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    const spiked = await reviewArticle({ edition, event_key: 'spike-story', article_id: 'story-2', revision: 1, verdict: 'SPIKE', notes: 'Spike this item and ask Brass for a replacement if needed.' });
+    assert.match(spiked.next, /SPIKE notes were saved only/u);
+    assert.match(spiked.next, /@foreman/u);
+    assert.match(spiked.next, /@brass if a replacement is required/u);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'graves';
+    const story3 = await fileArticle({ edition, event_key: 'pass-filing', article: article('story-3', 'Graves', edition, 3) });
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    const passed = await reviewArticle({ edition, event_key: 'pass-story', article_id: 'story-3', revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+    assert.match(passed.next, /PASS was saved/u);
+    assert.match(passed.next, /fresh state\/edition\/editions\/2026-09-07\/INDEX/u);
+    assert.match(passed.next, /review other unreviewed filings one at a time/u);
+    assert.match(passed.next, /passed>=5/u);
+    assert.match(passed.next, /no D ledger\.settlements or D ledger\.worlddesk rows/u);
+    assert.match(passed.next, /moltnet_send/u);
+    assert.match(passed.next, /room:release/u);
+    assert.match(passed.next, /@ledger/u);
+        assert.equal(story3.next.includes('@spike'), true);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });

@@ -4,12 +4,12 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-Seven generic PRs merged green and deployed. Native sandbox and real Codex/Moltnet/validator probes passed. Private control-token bootstrap now authenticates on Hetzner; agent commands still cannot read the token. Org remains parked while the generic memory/wake-ID mismatch is corrected. Publisher disabled. Original audit rows below remain historical evidence.
+Eight generic PRs merged green and deployed. The current image passed 43 native isolation checks, authenticated credential bootstrap and a three-test scripted Docker rehearsal. Today’s real run has five accepted assignments, five filings, one dissent and two revision requests, but no PASS article or staged edition yet. Missing Moltnet notifications stalled review; explicit tool handoff guidance is being tested before recovery. Publisher disabled. Original audit rows below remain historical evidence.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
 | CF-01 | FIXED | SENSOR AND SNAPSHOT DEPLOYED | Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures. |
-| CF-02 | FIXED | DEPLOYED; AUTONOMOUS RUN PENDING | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
+| CF-02 | FIXED | DEPLOYED; LIVE ASSIGNMENT AND DISSENT RECORDED | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
 | CF-03 | FIXED | DEPLOYED; AUTONOMOUS RUN PENDING | World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale. |
 | CF-04 | FIXED | PUBLISHER DISABLED | Workflow prepares a checked PR; explicit human merge remains the publication checkpoint. |
 | CF-05 | MERGED | DEPLOYED; COMPILED MODEL VERIFIED | Spawnfile PR15 preserves declared Codex model selection. |
@@ -24,8 +24,10 @@ Seven generic PRs merged green and deployed. Native sandbox and real Codex/Moltn
 - **IMAGE-LAUNCH-POLICY — MERGED; DEPLOYED; LIVE PROBE PASSED.** Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed.
 - **SPIKE-LEDGER-HANDOFF — FIXED; DEPLOYED; LIVE HANDOFF PENDING.** Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested.
 - **LIVE-CONTROL-BOOTSTRAP — FIXED; LIVE PROBE PASSED; AUTOMATIC DEPLOYMENT WIRING TESTED.** Private bootstrap installs a runtime-readable protected credential and verifies authenticated activity. Real deployed native commands cannot read it. Seam now requires the private verification step before success.
-- **LIVE-EDITION-HANDOFF — FIXED; REVIEWED; DEPLOYMENT PENDING.** Shared rules scope room history to the explicit edition or Berlin date. Brass stops on assignment-save failure and mentions reporters once after acceptance; reporters require a saved assignment before writing.
-- **LIVE-WAKE-IDENTITY — CONFIRMED; GENERIC REPAIR IN PROGRESS.** Memory preparation replaced the original manual wake ID with its internal namespaced event ID in the model prompt. Admission correctly requires the original delivery ID; Daimon must preserve that identity for tool calls.
+- **LIVE-EDITION-HANDOFF — FIXED; DEPLOYED; LIVE ASSIGNMENT ACCEPTED.** Shared rules scope room history to the explicit edition or Berlin date. Brass stops on assignment-save failure and mentions reporters once after acceptance; reporters require a saved assignment before writing.
+- **LIVE-WAKE-IDENTITY — MERGED; DEPLOYED; LIVE ACCEPTANCE VERIFIED.** Daimon PR17 preserves the original model-facing wake ID while memory retains its internal namespace. Brass and all five reporters have accepted durable operations on that runtime.
+
+- **LIVE-FILING-REVIEW-NOTICES — FIXED IN SOURCE; LIVE RETEST PENDING.** Accepted filing/review responses explicitly require the agent to call Moltnet separately. Notes containing a mention do not send messages. The real run proved mention delivery but exposed omitted reporter/editor posts.
 
 ## Original audit counts
 

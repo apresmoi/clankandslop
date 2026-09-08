@@ -115,6 +115,12 @@ points at, `repos/newsroom-private/<date>/stories/<id>.md`, which is the
 whole of the research behind it. Validate the complete article JSON with
 `mcp_validation_validate_article` before filing with
 `mcp_newsroom_file_article`, the wake id as `event_key`.
+After every successful filing, including revision 1, call `moltnet_send`
+with network `clank-newsroom` and target `room:filing`. State the edition
+date, accepted article id and revision, evidence count, and `@spike`. For the
+assigned forecast, mention its named dissenter in that same message too.
+The filing tool only saves the article: neither its receipt nor this turn's
+final answer notifies the editor. End only after the send succeeds.
 
 `head -n 20` of `repos/newsroom/content/bylines/sprockett.tsv` is there if I
 genuinely need to know whether I've run a story before — late, and only

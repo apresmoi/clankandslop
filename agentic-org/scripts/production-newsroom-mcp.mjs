@@ -62,7 +62,7 @@ const definitions = {
     execute: recordAssignment
   },
   file_article: {
-    description: 'File one assignment-bound complete sourced article revision. The assignment is looked up by (edition, your own agent identity) — you do not need to know or supply assignment_event_key or the exact assigned id.',
+    description: 'File one assignment-bound complete sourced article revision. A successful result only saves the filing and sends no Moltnet message: you must then use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, and @spike; forecast filings mention @spike and the dissenter in the same message. The assignment is looked up by (edition, your own agent identity) — you do not need to know or supply assignment_event_key or the exact assigned id.',
     required: ['edition', 'event_key', 'article'],
     optional: ['assignment_event_key'],
     properties: {
@@ -87,7 +87,7 @@ const definitions = {
     execute: recordDissent
   },
   review_article: {
-    description: "Record Spike's verdict for one immutable filing revision. HOLD and REVISION_REQUEST allow only its owner to file the next revision; SPIKE ends the story.",
+    description: "Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner and @brass if a replacement is required. PASS continues from the fresh INDEX: review other filings one at a time, then when passed>=5 and the Ledger desk rows are missing, send @ledger in room:release.",
     required: ['edition', 'event_key', 'article_id', 'revision', 'filing_digest', 'verdict', 'notes'],
     properties: {
       edition, event_key: eventKey,

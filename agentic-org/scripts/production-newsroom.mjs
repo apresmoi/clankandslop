@@ -44,6 +44,15 @@ async function resolveAssignment(args,article,owner){
   if(!chosen)throw new Error(`multiple assignments exist for "${owner}" in edition ${args.edition}: ${unique.map(entry=>describeAssignment(entry.item)).join('; ')} — file with the matching article.id (or assignment_event_key) to select one`);
   return{assignment:chosen.item,event_key:chosen.event_key,corrected:article.id!==chosen.item.id};
 }
+
+const filingNoticeInstruction=(edition,articleId,revision,dissenter)=>dissenter
+  ?`Filing saved only; no Moltnet message was sent. Use moltnet_send on network clank-newsroom to target room:filing now: in one message include edition ${edition}, article ${articleId} revision ${revision}, and mention both @spike and @${dissenter} so Spike sees the filing and the dissenter can record before compose at 21:00`
+  :`Filing saved only; no Moltnet message was sent. Use moltnet_send on network clank-newsroom to target room:filing now: include edition ${edition}, article ${articleId} revision ${revision}, and mention @spike so the editor sees the filing`;
+const reviewNoticeInstruction=(args,owner)=>args.verdict==='PASS'
+  ?`PASS was saved. Continue from the fresh state/edition/editions/${args.edition}/INDEX: review other unreviewed filings one at a time; when the INDEX shows passed>=5 and no D ledger.settlements or D ledger.worlddesk rows, use moltnet_send on network clank-newsroom to target room:release mentioning @ledger.`
+  :args.verdict==='SPIKE'
+    ?`The ${args.verdict} notes were saved only; mentions inside notes were not delivered. Use moltnet_send on network clank-newsroom to target room:filing now: include edition ${args.edition}, article ${args.article_id} revision ${args.revision}, mention @${owner}, include your actionable notes, and mention @brass if a replacement is required.`
+    :`The ${args.verdict} notes were saved only; mentions inside notes were not delivered. Use moltnet_send on network clank-newsroom to target room:filing now: include edition ${args.edition}, article ${args.article_id} revision ${args.revision}, mention @${owner}, and include your actionable notes.`;
 const walkValues=(value,key,out=[])=>{if(Array.isArray(value))for(const item of value)walkValues(item,key,out);else if(value&&typeof value==='object')for(const[name,item]of Object.entries(value)){if(name===key&&typeof item==='string')out.push(item);walkValues(item,key,out);}return out;};
 const publicArticleRefs=(value,out=new Set())=>{if(Array.isArray(value)){for(const item of value)publicArticleRefs(item,out);return out;}if(!value||typeof value!=='object')return out;for(const[key,item]of Object.entries(value)){if(['article','lead','splitWith'].includes(key)&&typeof item==='string')out.add(item);else if(['rail','articles'].includes(key)){if(typeof item==='string')out.add(item);if(Array.isArray(item))for(const id of item)if(typeof id==='string')out.add(id);}publicArticleRefs(item,out);}return out;};
 export const collectPublicArticleReferences=(value)=>[...publicArticleRefs(value)].sort();
@@ -207,12 +216,8 @@ async function fileArticleAction(args){
   const result={article_id:assignment.id,revision,digest:sha(JSON.stringify(filing)),warnings,receipt:await receipt(args,'filed',filing,supersede)};
   if(priorFiling)result.replaced=`this replaces your earlier revision ${revision} of "${assignment.id}", which the editor had not yet reviewed`;
   if(corrected)result.note=`your assignment today is ${describeAssignment(assignment)} — filed under that id instead of the supplied ${JSON.stringify(article.id)}`;
-  if(assignment.slot==='forecast'){
-    result.forecast={dissenter:assignment.dissenter??null};
-    result.next=assignment.dissenter
-      ?`this is the day's forecast — mention @${assignment.dissenter} in room:filing now, with the article id and revision, so the dissent is on the record before compose at 21:00`
-      :"this is the day's forecast and the lineup named no dissenter — it will compose with dissent=0 unless a colleague records one";
-  }
+  result.next=filingNoticeInstruction(args.edition,assignment.id,revision,assignment.slot==='forecast'?assignment.dissenter:undefined);
+  if(assignment.slot==='forecast')result.forecast={dissenter:assignment.dissenter??null};
   return result;
 }
 async function recordDissentAction(args){
@@ -282,7 +287,7 @@ async function reviewArticleAction(args){
   const review={version:'clank.editorial-verdict.v1',article_id:args.article_id,revision:args.revision,article_digest:sha(JSON.stringify(filing)),verdict:args.verdict,notes:args.notes,event_key:args.event_key,...(merge?.dropped?{dissent_dropped:merge.dropped}:{})};
   await convergeIndexed(args.edition,location(args.edition,'verdicts',`${args.article_id}/${args.revision}`),review);
   if(args.verdict==='PASS'){const{assignment_ref:_,lint:__,...article}=filing;await converge(location(args.edition,'reviews',args.article_id),review);await convergeIndexed(args.edition,location(args.edition,'articles',args.article_id),merge?.dissent?{...article,dissent:merge.dissent}:article);}
-  return{...review,warnings:filing.lint?.warnings??[],...(merge?.dissent?{dissent:merge.dissent}:{}),receipt:await receipt(args,'reviewed',review)};
+  return{...review,warnings:filing.lint?.warnings??[],...(merge?.dissent?{dissent:merge.dissent}:{}),next:reviewNoticeInstruction(args,filing.assignment_ref?.owner??((filing.byline?.agents??[])[0]??'owner').toLowerCase()),receipt:await receipt(args,'reviewed',review)};
 }
 async function fileDeskAction(args){
   identity(args);exact(args,['edition','event_key','name','document']);
