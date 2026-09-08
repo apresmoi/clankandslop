@@ -60,6 +60,8 @@ natural language.
 
 ## How to act
 
+The active edition is the date in the current wake, or the date in the assignment that woke you. When you read Moltnet rooms, an explicit edition named in a message controls first; otherwise interpret the message's `created_at` and the wake timestamp in `Europe/Berlin`, because a previous UTC date can still belong to the current Berlin edition near midnight. A message from a previous Berlin edition that said "today" was an order for that previous edition only; it never kills or commissions work for the current edition. Explicit cross-day references can still be evidence if the current task asks for them, but historical decisions are not fresh instructions.
+
 `moltnet_send` (`network: clank-newsroom`, `target: room:<id>`, text under
 2048 bytes) is how you talk; `moltnet_read` catches you up on a room you
 missed. Your `mcp_newsroom_*` tool files the thing itself — assignment,
@@ -88,6 +90,9 @@ assignment. The reporter owns the final prose; Caslon composes accepted JSON.
 There is no separate research tool: send the service request as Moltnet text.
 If a declared tool is absent or refuses the call, report the missing capability;
 do not replace it with a shell write to another role's durable artifacts.
+Reporters need a current assignment row in `state/edition/editions/<date>/INDEX`;
+if it is missing, report the missing current assignment and stop instead of
+writing from chat alone.
 
 ## Research through the sensors
 

@@ -264,14 +264,25 @@ export function runtimePolicy(options, { log = console.log } = {}) {
 // record belongs to; deploying as root would mint a second record and orphan
 // the first.
 export function deploymentCommand(options) {
-  return [process.execPath, options.cli, 'up', options.tag, '--image', '--name', options.container,
+  const quote = value => `'${String(value).replaceAll("'", "'\\''")}'`;
+  const command = [process.execPath, options.cli, 'up', options.tag, '--image', '--name', options.container,
     '--deployment', options.deployment, '--env-file', options.envFile, '-d']
-    .map(value => `'${String(value).replaceAll("'", "'\\''")}'`).join(' ');
+    .map(quote).join(' ');
+  return `cd ${quote(path.dirname(options.cli))} && exec ${command}`;
 }
 
 export function deploy(options, { log = console.log } = {}) {
   const command = deploymentCommand(options);
   return run('deploy', 'deploy-failed', 'runuser', ['-l', options.deployUser, '-c', command], { log });
+}
+
+export function runtimeBootstrap(options, { log = console.log, execute = run } = {}) {
+  const script = process.env.CLANK_NEWSROOM_BOOTSTRAP ?? path.join(options.repo, 'clankandslop-private/newsroom/runtime/bootstrap-control-token.sh');
+  const output = execute('runtime-bootstrap', 'deploy-failed', '/bin/sh', [script, options.container], { log });
+  const rows = output.trim().split('\n').filter(Boolean).map(line => { try { return JSON.parse(line); } catch { return null; } });
+  if (!rows.some(row => row?.status === 'verified' && Number.isSafeInteger(row.items)))
+    throw new SeamError('runtime bootstrap produced no authenticated activity verification', 'deploy-failed');
+  return { verified: true };
 }
 
 // --- stage 6: it started is not it works -------------------------------------
@@ -312,7 +323,7 @@ export function sweepImages(options, { log = console.log, exec = execFileSync } 
 // be asserted by a test rather than only asserted by this comment. Reversing
 // repin and bundle is the failure mode the header describes, and a test is the
 // only thing that keeps a future edit from doing it.
-export const STAGES = Object.freeze({ gate, repin, bundle, build, runtimePolicy, deploy, settle, sweepImages });
+export const STAGES = Object.freeze({ gate, repin, bundle, build, runtimePolicy, deploy, settle, runtimeBootstrap, sweepImages });
 
 export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES } = {}) {
   const options = parseArgs(argv);
@@ -331,6 +342,7 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     if (!options.deploy) { log(`\nno-deploy: built and checked ${options.tag} and stopped before \`up\`.`); return { ...options, stages, ok: true }; }
     stageImpl.deploy(options, { log }); stages.push('deploy');
     stageImpl.settle(options, { log }); stages.push('settle');
+    stageImpl.runtimeBootstrap(options, { log }); stages.push('runtimeBootstrap');
     stageImpl.sweepImages(options, { log });
     log(`\nseam complete: edition ${options.edition} pinned, bundled, built as ${options.tag}, deployed and settled.`);
     return { ...options, stages, ok: true };

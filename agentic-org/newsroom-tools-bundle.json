@@ -2,10 +2,10 @@
   "version": "clank.newsroom-tools-bundle.v1",
   "archive": "newsroom-tools.tar",
   "mount": "tools/newsroom",
-  "sha256": "sha256:55967374d69de0e3e2b21d0eb3c9f4e0581516158caeb4405da115de593b9f0f",
-  "file_count": 270,
-  "content_bytes": 42275903,
-  "source_commit": "878eb80c1f1b7883062b711ed306e16b0933672e",
+  "sha256": "sha256:9042c22cee9eedfff0dcf1ebb455b3b4e92c411e6f42cd94e3c95ab5c9cebb94",
+  "file_count": 272,
+  "content_bytes": 42283829,
+  "source_commit": "1da4339a44db699991435fe7370c4285dbb418f8",
   "platform": "linux",
   "arch": "x64",
   "source_files": [
@@ -108,6 +108,14 @@
     {
       "path": "newsroom/history/index.mjs",
       "sha256": "sha256:b32149d3e181e265de8e6e52107f196660f1171a91b81dbf0633770881077cb0"
+    },
+    {
+      "path": "newsroom/runtime/bootstrap-control-token.sh",
+      "sha256": "sha256:6ab38dfcd1034d42878dd1cc3070f67b3f0aad6e438594683e6fbab8b861dc24"
+    },
+    {
+      "path": "newsroom/runtime/control-token-bootstrap.mjs",
+      "sha256": "sha256:010a7306735fe5bdeeb67f67466b3526ce3dbd16d8f6b0cf3c0a134933c6bc97"
     },
     {
       "path": "newsroom/state/admission.mjs",

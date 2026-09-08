@@ -69,6 +69,60 @@ test('Spike contract hands off to Ledger once current PASS coverage can support 
   }
 });
 
+
+test('shared floor scopes Moltnet history to the active edition', async () => {
+  const root = path.resolve(import.meta.dirname, '..');
+  const sharedFiles = [path.join(root, 'TEAM.md'), path.join(root, 'FLOOR.md')];
+  for (const file of sharedFiles) {
+    const text = await readFile(file, 'utf8');
+    assert.match(text, /active edition is the date in the current wake|active edition is the date in the assignment/u, `${file} must bind active edition to wake or assignment`);
+    assert.match(text, /created_at/u, `${file} must require Moltnet timestamp scoping`);
+    assert.match(text, /explicit edition.*controls|explicit edition named in a message controls/u, `${file} must give explicit edition precedence`);
+    assert.match(text, /Europe\/Berlin/u, `${file} must interpret timestamps in Europe/Berlin`);
+    assert.match(text, /previous UTC date can still belong to the current Berlin edition/u, `${file} must account for UTC/Berlin midnight skew`);
+    assert.match(text, /previous Berlin edition|historical edition/u, `${file} must make historical today decisions non-current`);
+    assert.match(text, /[Ee]xplicit cross-day references[^.]*evidence|Cross-day references[^.]*evidence/u, `${file} must preserve explicit cross-day evidence use`);
+    assert.match(text, /old decisions are not fresh orders|historical decisions are not fresh instructions/u, `${file} must reject stale orders`);
+  }
+
+  for (const role of ['klaxon', 'cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta', 'brass', 'spike', 'ledger', 'caslon', 'pressman']) {
+    const text = await readFile(path.join(root, 'agents', role, 'AGENTS.md'), 'utf8');
+    assert.match(text, /repos\/newsroom\/agentic-org\/FLOOR\.md/u, `${role} must receive the shared floor scoping rule`);
+  }
+});
+
+
+test('Brass records assignments before any reporter wake handoff', async () => {
+  const root = path.resolve(import.meta.dirname, '..');
+  const files = [
+    path.join(root, 'TEAM.md'),
+    path.join(root, 'agents', 'brass', 'AGENTS.md'),
+    path.join(root, 'agents', 'brass', 'Spawnfile'),
+  ];
+  for (const file of files) {
+    const text = await readFile(file, 'utf8');
+    assert.match(text, /Only a successful (tool )?response (permits|lets me) commission/u, `${file} must gate commissions on record_assignment success`);
+    assert.match(text, /refus(?:es|al) or errors?/u, `${file} must define record_assignment refusal behavior`);
+    assert.match(text, /without\s+(?:mentioning\s+reporters|reporter\s+mentions)/u, `${file} must prevent reporter wakes after assignment refusal`);
+    assert.match(text, /end(s)? the turn/u, `${file} must stop after assignment refusal`);
+    assert.match(text, /room:conference[\s\S]*plain names|plain names[\s\S]*room:conference/u, `${file} must keep accepted lineup summary non-waking`);
+    assert.match(text, /once in `?room:assignment`?|one actionable `@<id>` assignment in `room:assignment`/u, `${file} must limit actionable reporter mentions to assignment room`);
+  }
+
+  const brassBrief = await readFile(path.join(root, 'agents', 'brass', 'AGENTS.md'), 'utf8');
+  assert.doesNotMatch(brassBrief, /forecast=0|paper still goes out/u, 'Brass brief must not say missing forecast still publishes');
+  assert.match(brassBrief, /exactly one forecast assignment is mandatory/u, 'Brass brief must state the actual forecast contract');
+});
+
+test('shared floor tells reporters to stop without a current assignment row', async () => {
+  const root = path.resolve(import.meta.dirname, '..');
+  const text = await readFile(path.join(root, 'FLOOR.md'), 'utf8');
+  assert.match(text, /Reporters need a current assignment row/u, 'FLOOR must require current assignment state');
+  assert.match(text, /state\/edition\/editions\/<date>\/INDEX/u, 'FLOOR must name the edition INDEX as assignment authority');
+  assert.match(text, /missing current assignment and stop/u, 'FLOOR must stop reporters on missing assignment');
+  assert.match(text, /writing from chat alone/u, 'FLOOR must reject writing from chat alone');
+});
+
 test('mcp tool schemas type every property beyond edition/event_key', async () => {
   const brass = await mcpToolsList('brass');
   const recordAssignment = brass.find((tool) => tool.name === 'record_assignment');

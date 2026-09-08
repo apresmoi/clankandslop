@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
+import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, runtimeBootstrap, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -15,7 +15,7 @@ const repoRoot = path.resolve(import.meta.dirname, '..', '..');
 function recorder(failAt, error = new SeamError('boom', 'deploy-failed')) {
   const calls = [];
   const stage = (name) => (options) => { calls.push(name); if (name === failAt) throw error; return options; };
-  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'sweepImages'].map((name) => [name, stage(name)])) };
+  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages'].map((name) => [name, stage(name)])) };
 }
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
 
@@ -27,7 +27,7 @@ test('the repin runs BEFORE the bundle, always', () => {
   const { calls, impl } = recorder(null);
   const result = seam([], { now, log: noop, stageImpl: impl, alarm: noop });
   assert.equal(result.ok, true);
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'sweepImages']);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages']);
   assert.ok(calls.indexOf('repin') < calls.indexOf('bundle'));
 });
 
@@ -85,7 +85,7 @@ test('compiled policy admission accepts generated strict config and rejects weak
 });
 
 test('each stage raises its own alarm reason, so the message says what broke', () => {
-  const expected = { repin: 'repin-failed', bundle: 'bundle-mismatch', build: 'deploy-failed', runtimePolicy: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed' };
+  const expected = { repin: 'repin-failed', bundle: 'bundle-mismatch', build: 'deploy-failed', runtimePolicy: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed', runtimeBootstrap: 'deploy-failed' };
   for (const [stage, reason] of Object.entries(expected)) {
     const { impl } = recorder(stage, new SeamError(`${stage} exploded`, reason));
     const { raised, alarm } = alarms();
@@ -242,12 +242,28 @@ test('a pin check that matched nothing is a finding, not a pass', () => {
 });
 
 
-test('deployment shell round-trips literal arguments without substitution', () => {
-  const args = { cli: "a file's name", tag: 'tag;$(touch unexpected)', container: 'c`id`', deployment: 'd $HOME', envFile: '/tmp/env file' };
-  const command = deploymentCommand(args);
-  const capture = "set -- " + command + "; printf '%s\\0' \"$@\"";
-  const actual = execFileSync('/bin/sh', ['-c', capture]).toString().split('\0').slice(0, -1);
-  assert.deepEqual(actual, [process.execPath, args.cli, 'up', args.tag, '--image', '--name', args.container, '--deployment', args.deployment, '--env-file', args.envFile, '-d']);
+test('deployment shell sets readable cwd and round-trips literal arguments without substitution', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-deploy-cwd-'));
+  const cli = path.join(root, "a file's name.cjs");
+  writeFileSync(cli, "console.log(JSON.stringify({cwd:process.cwd(),args:process.argv.slice(2)}));\n");
+  const envFile = path.join(root, 'env file');
+  writeFileSync(envFile, '');
+  const args = { cli, tag: 'tag;$(touch unexpected)', container: 'c`id`', deployment: 'd $HOME', envFile };
+  try {
+    const actual = JSON.parse(execFileSync('/bin/sh', ['-c', deploymentCommand(args)], { cwd: '/', encoding: 'utf8' }));
+    assert.equal(actual.cwd, realpathSync(root));
+    assert.deepEqual(actual.args, ['up', args.tag, '--image', '--name', args.container, '--deployment', args.deployment, '--env-file', args.envFile, '-d']);
+    assert.deepEqual(readdirSync(root).sort(), [path.basename(cli), 'env file'].sort());
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('runtime bootstrap invokes private automation and requires positive authenticated verification', () => {
+  const options = { repo: '/repo', container: 'candidate' }, calls = [];
+  const execute = (...args) => { calls.push(args); return '{"status":"materialized"}\n{"status":"verified","items":0}\n'; };
+  assert.deepEqual(runtimeBootstrap(options, { log: noop, execute }), { verified: true });
+  assert.deepEqual(calls[0].slice(0, 4), ['runtime-bootstrap', 'deploy-failed', '/bin/sh', ['/repo/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh', 'candidate']]);
+  for (const output of ['', '{"status":"materialized"}', '{"status":"verified"}'])
+    assert.throws(() => runtimeBootstrap(options, { log: noop, execute: () => output }), /no authenticated activity verification/u);
 });
 
 test('policy checks every Codex member across nested compiled configs', () => {

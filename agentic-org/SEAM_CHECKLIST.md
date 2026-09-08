@@ -4,7 +4,7 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-Sensor repairs and today’s research snapshot are deployed. Seven generic PRs are merged with green CI. The current org image is healthy and parked; the corrected image launcher is deploying before the live sandbox probe. The host publisher remains disabled. Original audit rows below are historical evidence, not the current fix status.
+Seven generic PRs merged green and deployed. Native sandbox and real Codex/Moltnet/validator probes passed. Private control-token bootstrap now authenticates on Hetzner; agent commands still cannot read the token. Org remains parked while the generic memory/wake-ID mismatch is corrected. Publisher disabled. Original audit rows below remain historical evidence.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
@@ -13,16 +13,19 @@ Sensor repairs and today’s research snapshot are deployed. Seven generic PRs a
 | CF-03 | FIXED | DEPLOYED; AUTONOMOUS RUN PENDING | World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale. |
 | CF-04 | FIXED | PUBLISHER DISABLED | Workflow prepares a checked PR; explicit human merge remains the publication checkpoint. |
 | CF-05 | MERGED | DEPLOYED; COMPILED MODEL VERIFIED | Spawnfile PR15 preserves declared Codex model selection. |
-| CF-06 | MERGED | DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING | All 12 agents declare strict Codex policy; native Linux command probes allow resources and deny direct network access. Live image verification remains required. |
+| CF-06 | MERGED | DEPLOYED; LIVE NATIVE PROBE PASSED | All 12 agents carry strict policy. Actual deployed native commands allow workspace/resource reads, deny accepted-state direct writes and direct network access. |
 | CF-07 | MERGED | DEPLOYED; COMPILED JITTER VERIFIED | Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts. |
-| CF-08 | MERGED | DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING | Daimon PR16 protects own and peer credentials with native read denials; pinned Linux positive and mutation probes pass. Live org probe remains required. |
+| CF-08 | MERGED | DEPLOYED; LIVE NATIVE PROBE PASSED | Actual deployed native commands cannot read own/peer credentials or proc. Synthetic deny-removal mutation fails as required. |
 
 - **CF-03-RECOVERY — FIXED; SENSOR DEPLOYED.** Producer removes obsolete success/refusal counterpart; default-cwd MCP accepts proven stale carry and rejects altered or unproven figures.
 - **HOST-BUNDLE — FIXED; HOST ARCHIVES VERIFIED.** Daily bundling delegates to the private canonical dependency packager and checks provenance before writes; job uses the approved Node major.
 - **HOST-SEAM-SIDECARS — FIXED; DEPLOYED.** Host pin validation includes both tools/validation sidecar descriptors; all 47 resource pins match.
 - **ART-TRUSTED-ROOTS — FIXED; LIVE PROBE PASSED.** Trusted mount root symlinks resolve while child symlink escapes still reject; deployed catalogues show nine glyphs and 192 maps, configured ETOPO GRD map bake2.4s.
-- **IMAGE-LAUNCH-POLICY — MERGED; DEPLOYING.** Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed.
-- **SPIKE-LEDGER-HANDOFF — FIXED; REVIEWED; DEPLOYMENT PENDING.** Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested.
+- **IMAGE-LAUNCH-POLICY — MERGED; DEPLOYED; LIVE PROBE PASSED.** Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed.
+- **SPIKE-LEDGER-HANDOFF — FIXED; DEPLOYED; LIVE HANDOFF PENDING.** Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested.
+- **LIVE-CONTROL-BOOTSTRAP — FIXED; LIVE PROBE PASSED; AUTOMATIC DEPLOYMENT WIRING TESTED.** Private bootstrap installs a runtime-readable protected credential and verifies authenticated activity. Real deployed native commands cannot read it. Seam now requires the private verification step before success.
+- **LIVE-EDITION-HANDOFF — FIXED; REVIEWED; DEPLOYMENT PENDING.** Shared rules scope room history to the explicit edition or Berlin date. Brass stops on assignment-save failure and mentions reporters once after acceptance; reporters require a saved assignment before writing.
+- **LIVE-WAKE-IDENTITY — CONFIRMED; GENERIC REPAIR IN PROGRESS.** Memory preparation replaced the original manual wake ID with its internal namespaced event ID in the model prompt. Admission correctly requires the original delivery ID; Daimon must preserve that identity for tool calls.
 
 ## Original audit counts
 

@@ -2058,8 +2058,8 @@
   "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
   "artifact": "seam-checklist",
   "remediation": {
-    "updated_at": "2026-09-08T11:38:26.265233+00:00",
-    "state": "Seven generic PRs merged with green CI; current org image healthy and parked. Image-launch sandbox correction deploying; live native proof and autonomous run pending.",
+    "updated_at": "2026-09-08T12:32:47.865372+00:00",
+    "state": "Seven generic PRs merged green and deployed. Native sandbox and real Codex/Moltnet/validator probes passed. Private control-token bootstrap now authenticates on Hetzner; agent commands still cannot read the token. Org remains parked while the generic memory/wake-ID mismatch is corrected. Publisher disabled.",
     "findings": [
       {
         "id": "CF-01",
@@ -2094,8 +2094,8 @@
       {
         "id": "CF-06",
         "source": "MERGED",
-        "deployment": "DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING",
-        "result": "All 12 agents declare strict Codex policy; native Linux command probes allow resources and deny direct network access. Live image verification remains required."
+        "deployment": "DEPLOYED; LIVE NATIVE PROBE PASSED",
+        "result": "All 12 agents carry strict policy. Actual deployed native commands allow workspace/resource reads, deny accepted-state direct writes and direct network access."
       },
       {
         "id": "CF-07",
@@ -2106,8 +2106,8 @@
       {
         "id": "CF-08",
         "source": "MERGED",
-        "deployment": "DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING",
-        "result": "Daimon PR16 protects own and peer credentials with native read denials; pinned Linux positive and mutation probes pass. Live org probe remains required."
+        "deployment": "DEPLOYED; LIVE NATIVE PROBE PASSED",
+        "result": "Actual deployed native commands cannot read own/peer credentials or proc. Synthetic deny-removal mutation fails as required."
       }
     ],
     "followups": [
@@ -2133,13 +2133,28 @@
       },
       {
         "id": "IMAGE-LAUNCH-POLICY",
-        "status": "MERGED; DEPLOYING",
+        "status": "MERGED; DEPLOYED; LIVE PROBE PASSED",
         "result": "Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed."
       },
       {
         "id": "SPIKE-LEDGER-HANDOFF",
-        "status": "FIXED; REVIEWED; DEPLOYMENT PENDING",
+        "status": "FIXED; DEPLOYED; LIVE HANDOFF PENDING",
         "result": "Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested."
+      },
+      {
+        "id": "LIVE-CONTROL-BOOTSTRAP",
+        "status": "FIXED; LIVE PROBE PASSED; AUTOMATIC DEPLOYMENT WIRING TESTED",
+        "result": "Private bootstrap installs a runtime-readable protected credential and verifies authenticated activity. Real deployed native commands cannot read it. Seam now requires the private verification step before success."
+      },
+      {
+        "id": "LIVE-EDITION-HANDOFF",
+        "status": "FIXED; REVIEWED; DEPLOYMENT PENDING",
+        "result": "Shared rules scope room history to the explicit edition or Berlin date. Brass stops on assignment-save failure and mentions reporters once after acceptance; reporters require a saved assignment before writing."
+      },
+      {
+        "id": "LIVE-WAKE-IDENTITY",
+        "status": "CONFIRMED; GENERIC REPAIR IN PROGRESS",
+        "result": "Memory preparation replaced the original manual wake ID with its internal namespaced event ID in the model prompt. Admission correctly requires the original delivery ID; Daimon must preserve that identity for tool calls."
       }
     ]
   }
