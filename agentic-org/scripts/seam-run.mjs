@@ -174,13 +174,24 @@ export function bundle(options, { log = console.log } = {}) {
 // archive of that name in the descriptor. `check-bundle-descriptor.mjs` only
 // covers the source archive — deliberately, because it must be able to run in
 // CI without the private checkout or node_modules. This job has both, so it
-// checks all six.
-export function pinFindings(repo) {
+// checks every archive described by the runtime, tools and article-validation descriptors.
+const descriptorEntries = (descriptor) => [descriptor.source, descriptor.private, ...descriptor.dependencies ?? [], ...descriptor.assets ?? []]
+  .filter((entry) => entry?.archive);
+
+function describedArchives(repo) {
   const descriptorPath = path.join(repo, 'agentic-org/newsroom-runtime-bundle.json');
   const descriptor = JSON.parse(readFileSync(descriptorPath, 'utf8'));
+  const entries = descriptorEntries(descriptor);
+  for (const name of ['newsroom-tools-bundle.json', 'article-validation-runtime-bundle.json']) {
+    const file = path.join(repo, 'agentic-org', name);
+    if (existsSync(file)) entries.push(JSON.parse(readFileSync(file, 'utf8')));
+  }
+  return entries;
+}
+
+export function pinFindings(repo) {
   const byArchive = new Map();
-  for (const entry of [descriptor.source, descriptor.private, ...descriptor.dependencies ?? [], ...descriptor.assets ?? []])
-    if (entry?.archive) byArchive.set(entry.archive, entry.sha256);
+  for (const entry of describedArchives(repo)) byArchive.set(entry.archive, entry.sha256);
   // Caslon's relief grid is built by build-etopo-bundle.mjs from a ~395MB
   // external download, not by org:bundle, so the descriptor does not and should
   // not describe it. Named here rather than skipped silently: any OTHER archive

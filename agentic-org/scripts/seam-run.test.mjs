@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
+const repoRoot = path.resolve(import.meta.dirname, '..', '..');
 
 // A recorder for the stage sequence. Every stage is a no-op that writes its own
 // name down, so a test can assert the ORDER as well as the membership.
@@ -161,10 +162,11 @@ test('the image sweep only ever touches the seam s own tags, and never the one j
 const A = 'sha256:'.concat('a'.repeat(64));
 const B = 'sha256:'.concat('b'.repeat(64));
 
-function pinWorld(spawnfilePins, descriptor) {
+function pinWorld(spawnfilePins, descriptor, sidecars = []) {
   const repo = mkdtempSync(path.join(tmpdir(), 'clank-pin-test-'));
   mkdirSync(path.join(repo, 'agentic-org', 'agents', 'cogsworth'), { recursive: true });
   writeFileSync(path.join(repo, 'agentic-org', 'newsroom-runtime-bundle.json'), JSON.stringify(descriptor));
+  for (const [name, value] of sidecars) writeFileSync(path.join(repo, 'agentic-org', name), JSON.stringify(value));
   writeFileSync(path.join(repo, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), spawnfilePins.join('\n'));
   return repo;
 }
@@ -174,6 +176,37 @@ const descriptorOf = (source, dependency) => ({
   private: { archive: 'newsroom-private.tar', sha256: A },
   dependencies: [{ archive: 'newsroom-dependencies-a.tar', sha256: dependency }],
   assets: []
+});
+const toolsDescriptor = (sha256 = A) => ({ version: 'clank.newsroom-tools-bundle.v1', archive: 'newsroom-tools.tar', sha256 });
+const articleValidationDescriptor = (sha256 = A) => ({ version: 'clank.article-validation-runtime-bundle.v1', archive: 'article-validation-runtime.tar', sha256 });
+const bundlePinCount = () => readdirSync(path.join(repoRoot, 'agentic-org', 'agents'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .reduce((sum, agent) => sum + (readFileSync(path.join(repoRoot, 'agentic-org', 'agents', agent.name, 'Spawnfile'), 'utf8').match(/kind: bundle/gu)?.length ?? 0), 0);
+
+
+test('the checked-in descriptors cover every checksum-pinned bundle across the actual agent Spawnfiles', () => {
+  const result = pinFindings(repoRoot);
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.checked, bundlePinCount());
+  assert.equal(result.checked, 47);
+  assert.ok(result.archives.includes('newsroom-tools.tar'));
+  assert.ok(result.archives.includes('article-validation-runtime.tar'));
+});
+
+test('sidecar descriptor mismatches are findings for newsroom tools and article validation bundles', () => {
+  const repo = pinWorld([
+    line('newsroom-tools', 'newsroom-tools.tar', A),
+    line('article-validation', 'article-validation-runtime.tar', A),
+  ], descriptorOf(A, B), [
+    ['newsroom-tools-bundle.json', toolsDescriptor(B)],
+    ['article-validation-runtime-bundle.json', articleValidationDescriptor(B)],
+  ]);
+  try {
+    const findings = pinFindings(repo).findings;
+    assert.equal(findings.length, 2);
+    assert.match(findings.join('\n'), /newsroom-tools\.tar/u);
+    assert.match(findings.join('\n'), /article-validation-runtime\.tar/u);
+  } finally { rmSync(repo, { recursive: true, force: true }); }
 });
 
 test('a Spawnfile pin that disagrees with the descriptor is a finding, for every archive', () => {
