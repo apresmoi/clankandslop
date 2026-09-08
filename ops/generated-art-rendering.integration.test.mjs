@@ -15,7 +15,7 @@ const writeJson = (file, value) => writeFileSync(file, `${JSON.stringify(value, 
 const read = (root, file) => readFileSync(resolve(root, file), 'utf8');
 const copyRepo = () => {
   const root = mkdtempSync(resolve(tmpdir(), 'cns-main-art-render-'));
-  const filter = (source) => !/\/(node_modules|dist|\.astro|\.git)(?:\/|$)/.test(source);
+  const filter = (source) => !source.split('/').some((part) => ['node_modules', 'dist', '.astro', '.git'].includes(part));
   for (const name of ['content', 'ops', 'website']) {
     cpSync(resolve(repo, name), resolve(root, name), { recursive: true, dereference: true, filter });
   }
@@ -52,6 +52,7 @@ const assertRendered = (root) => {
   assert.match(front, /Zone One/);
   assert.match(front, /glyphart-generated/);
   assert.match(front, /Generated glyph caption\./);
+  assert.match(front, /#####/);
   const article = read(root, `website/dist/editions/${fixtureDate}/articles/${leadSlug}/index.html`);
   assert.match(article, /article-map/);
   assert.match(article, /mapglyph-print/);
@@ -71,13 +72,48 @@ test('content-only publication renders explicit Hero MapGlyph and generated Glyp
   }
 });
 
-test('front and article rendering fail when explicit Hero art is not honored', () => {
+test('legacy reporter article map keeps its hero caption and article presentation', () => {
   const root = copyRepo();
   try {
-    addEdition(root, { heroArt: false, glyphArt: false });
+    addEdition(root, { heroArt: false, articleArt: true, glyphArt: false });
     build(root);
-    assert.throws(() => assertRendered(root), /hero-art-map|article-map|PLACE|Hero map caption/);
+    const front = read(root, `website/dist/editions/${fixtureDate}/index.html`);
+    assert.match(front, /hero-art-map/);
+    assert.match(front, /mapglyph-print/);
+    assert.match(front, /REPORTER/);
+    assert.match(front, /▲ Reporter map caption\./);
+    const article = read(root, `website/dist/editions/${fixtureDate}/articles/${leadSlug}/index.html`);
+    assert.match(article, /article-map/);
+    assert.match(article, /mapglyph-print/);
+    assert.match(article, /REPORTER/);
+    assert.match(article, /Reporter map caption\./);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('explicit Hero GlyphArt overrides a legacy reporter map while article rendering keeps the reporter map', () => {
+  const root = copyRepo();
+  try {
+    addEdition(root, { heroArt: false, articleArt: true, glyphArt: false });
+    const pageFile = resolve(root, 'content/editions', fixtureDate, 'pages/front.json');
+    const page = JSON.parse(readFileSync(pageFile, 'utf8'));
+    page.head[0].props.art = { block: 'GlyphArt', props: { glyph: glyphSlug, caption: 'Generated glyph override.' } };
+    writeJson(pageFile, page);
+    build(root);
+    const front = read(root, `website/dist/editions/${fixtureDate}/index.html`);
+    assert.match(front, /hero-art-glyph/);
+    assert.match(front, /glyphart-generated/);
+    assert.match(front, /#####/);
+    assert.match(front, /Generated glyph override\./);
+    assert.doesNotMatch(front, /hero-art-map/);
+    assert.doesNotMatch(front, /▲ Reporter map caption\./);
+    const article = read(root, `website/dist/editions/${fixtureDate}/articles/${leadSlug}/index.html`);
+    assert.match(article, /article-map/);
+    assert.match(article, /REPORTER/);
+    assert.match(article, /Reporter map caption\./);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
