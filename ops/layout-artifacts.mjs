@@ -1,4 +1,5 @@
 import { glyphFormatFindings } from './glyph-format.mjs';
+import { mapPresentationFindings } from './map-presentation.mjs';
 
 const slug = /^[a-z0-9][a-z0-9-]{0,127}$/u;
 const identity = ref => `${ref.kind}:${ref.name}:${ref.sha256}`;
@@ -22,7 +23,11 @@ export function layoutArtifacts(decisions, artifacts, fail) {
     if (ref.kind === 'glyph') {
       const errors = glyphFormatFindings(document, ref.name);
       if (errors.length) fail('glyph grid', errors.join('; '));
-    } else maps[ref.name] = document;
+    } else {
+      const errors = mapPresentationFindings(choice, document);
+      if (errors.length) fail('map presentation', errors.join('; '));
+      maps[ref.name] = document;
+    }
     selected.set(identity(ref), ref);
   }
   return { maps, references: [...selected.values()] };

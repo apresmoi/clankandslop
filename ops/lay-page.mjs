@@ -2,6 +2,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
 import { layoutArtifacts } from './layout-artifacts.mjs';
+import { mapPresentationProps } from './map-presentation.mjs';
 import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-format.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -102,7 +103,7 @@ function artBlock(slug, article, choice, maps) {
     if (mapArt(article)) fail('art selection', `"${slug}" already owns map art; retain its approved geography`);
     if (!isStr(choice.caption)) fail('art caption', `generated art for "${slug}" needs a caption`);
     const ref = choice.artifact;
-    if (ref.kind === 'map') return { block: 'MapGlyph', props: { map: ref.name, tone: 'soft', locator_context: choice.locator_context ?? 'regional', rule: false, interactive: false, caption: choice.caption } };
+    if (ref.kind === 'map') return { block: 'MapGlyph', props: { map: ref.name, tone: 'soft', ...mapPresentationProps(choice), rule: false, interactive: false } };
     return { block: 'GlyphArt', props: { glyph: ref.name, scale: isNum(choice.scale) ? choice.scale : 0.9, caption: choice.caption } };
   }
   if (mapArt(article)) {
