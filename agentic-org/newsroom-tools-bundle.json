@@ -2,16 +2,16 @@
   "version": "clank.newsroom-tools-bundle.v1",
   "archive": "newsroom-tools.tar",
   "mount": "tools/newsroom",
-  "sha256": "sha256:8da08cfffd98901a56c7abfb2c4e9680bd812a67a88678563d8f468459923256",
+  "sha256": "sha256:55967374d69de0e3e2b21d0eb3c9f4e0581516158caeb4405da115de593b9f0f",
   "file_count": 270,
-  "content_bytes": 42275646,
-  "source_commit": "da3667d191ad02b76678c9580ad436bc756bc131",
+  "content_bytes": 42275903,
+  "source_commit": "878eb80c1f1b7883062b711ed306e16b0933672e",
   "platform": "linux",
   "arch": "x64",
   "source_files": [
     {
       "path": "newsroom/art/adapter.mjs",
-      "sha256": "sha256:85133df78163dda7631193818334b3055a3d2ea3ce88bb2b9ee2d85da7c4f00e"
+      "sha256": "sha256:626bb7c3d6233751c5b9546edf06b27c1d8dc4868a3d30fe63dcc8f08eb81291"
     },
     {
       "path": "newsroom/art/bakers.mjs",
