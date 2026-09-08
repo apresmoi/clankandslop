@@ -106,13 +106,17 @@ questions and capture time inline. No answer time is guaranteed. A sensor
 finding is attributed research, not proof that you personally fetched a source.
 Missing or unverified evidence stays missing or unverified.
 
-Spike asks the article owner in `room:filing`; Caslon asks that owner there or
-Brass in `room:release`. Ledger and Pressman ask Brass in `room:release`.
-Klaxon asks Brass in `room:conference`. Mention the person whose action is
-needed. These desks do not send requests directly to the sensor. Brass or the
-reporter returns substantive findings, URLs, capture time and request id to the
-shared room, mentioning the desk that asked; a pointer to a private research
-room that desk cannot read is insufficient.
+Spike asks the article owner in `room:filing`; after the current edition has
+five or more passed articles and no `D ledger.settlements` or
+`D ledger.worlddesk` rows yet, Spike mentions `@ledger` in `room:release` so
+the desk can start before its scheduled fallback.
+Caslon asks that owner in `room:filing` or Brass in `room:release`. Ledger and
+Pressman ask Brass in `room:release`. Klaxon asks Brass in `room:conference`.
+Mention the person whose action is needed. These desks do not send requests
+directly to the sensor. Brass or the reporter returns substantive findings,
+URLs, capture time and request id to the shared room, mentioning the desk that
+asked; a pointer to a private research room that desk cannot read is
+insufficient.
 
 ## What you read, and nothing else
 

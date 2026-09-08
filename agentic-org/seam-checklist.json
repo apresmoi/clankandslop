@@ -2058,25 +2058,25 @@
   "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
   "artifact": "seam-checklist",
   "remediation": {
-    "updated_at": "2026-09-08T10:13:15.033137+00:00",
-    "state": "All source fixes reviewed and generic PRs merged; policy2 runtime image built. Production stop marker is active; final org image and real newsroom run pending.",
+    "updated_at": "2026-09-08T11:38:26.265233+00:00",
+    "state": "Seven generic PRs merged with green CI; current org image healthy and parked. Image-launch sandbox correction deploying; live native proof and autonomous run pending.",
     "findings": [
       {
         "id": "CF-01",
         "source": "FIXED",
-        "deployment": "SENSOR DEPLOYED; NEWSROOM SNAPSHOT PENDING",
+        "deployment": "SENSOR AND SNAPSHOT DEPLOYED",
         "result": "Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures."
       },
       {
         "id": "CF-02",
         "source": "FIXED",
-        "deployment": "PENDING",
+        "deployment": "DEPLOYED; AUTONOMOUS RUN PENDING",
         "result": "Assignment admission requires exactly one forecast and a named different-desk dissenter."
       },
       {
         "id": "CF-03",
         "source": "FIXED",
-        "deployment": "PENDING",
+        "deployment": "DEPLOYED; AUTONOMOUS RUN PENDING",
         "result": "World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale."
       },
       {
@@ -2088,25 +2088,25 @@
       {
         "id": "CF-05",
         "source": "MERGED",
-        "deployment": "PENDING",
+        "deployment": "DEPLOYED; COMPILED MODEL VERIFIED",
         "result": "Spawnfile PR15 preserves declared Codex model selection."
       },
       {
         "id": "CF-06",
         "source": "MERGED",
-        "deployment": "IMAGE BUILT; LIVE PROBE PENDING",
+        "deployment": "DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING",
         "result": "All 12 agents declare strict Codex policy; native Linux command probes allow resources and deny direct network access. Live image verification remains required."
       },
       {
         "id": "CF-07",
         "source": "MERGED",
-        "deployment": "PENDING",
+        "deployment": "DEPLOYED; COMPILED JITTER VERIFIED",
         "result": "Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts."
       },
       {
         "id": "CF-08",
         "source": "MERGED",
-        "deployment": "IMAGE BUILT; LIVE PROBE PENDING",
+        "deployment": "DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING",
         "result": "Daimon PR16 protects own and peer credentials with native read denials; pinned Linux positive and mutation probes pass. Live org probe remains required."
       }
     ],
@@ -2118,8 +2118,28 @@
       },
       {
         "id": "HOST-BUNDLE",
-        "status": "FIXED; HOST VALIDATION PENDING",
+        "status": "FIXED; HOST ARCHIVES VERIFIED",
         "result": "Daily bundling delegates to the private canonical dependency packager and checks provenance before writes; job uses the approved Node major."
+      },
+      {
+        "id": "HOST-SEAM-SIDECARS",
+        "status": "FIXED; DEPLOYED",
+        "result": "Host pin validation includes both tools/validation sidecar descriptors; all 47 resource pins match."
+      },
+      {
+        "id": "ART-TRUSTED-ROOTS",
+        "status": "FIXED; LIVE PROBE PASSED",
+        "result": "Trusted mount root symlinks resolve while child symlink escapes still reject; deployed catalogues show nine glyphs and 192 maps, configured ETOPO GRD map bake2.4s."
+      },
+      {
+        "id": "IMAGE-LAUNCH-POLICY",
+        "status": "MERGED; DEPLOYING",
+        "result": "Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed."
+      },
+      {
+        "id": "SPIKE-LEDGER-HANDOFF",
+        "status": "FIXED; REVIEWED; DEPLOYMENT PENDING",
+        "result": "Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested."
       }
     ]
   }

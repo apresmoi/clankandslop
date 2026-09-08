@@ -4,20 +4,25 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-Sensor repairs are deployed. All six generic PRs are merged with green CI, and the replacement runtime image is built. The newsroom stop marker is active and the host publisher remains disabled pending runtime checks. Original audit rows below are historical evidence, not the current fix status.
+Sensor repairs and today’s research snapshot are deployed. Seven generic PRs are merged with green CI. The current org image is healthy and parked; the corrected image launcher is deploying before the live sandbox probe. The host publisher remains disabled. Original audit rows below are historical evidence, not the current fix status.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
-| CF-01 | FIXED | SENSOR DEPLOYED; NEWSROOM SNAPSHOT PENDING | Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures. |
-| CF-02 | FIXED | PENDING | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
-| CF-03 | FIXED | PENDING | World Desk filing verifies the current document and trace; refusal-day recovery accepts only the prior published derived figure, marked stale. |
+| CF-01 | FIXED | SENSOR AND SNAPSHOT DEPLOYED | Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures. |
+| CF-02 | FIXED | DEPLOYED; AUTONOMOUS RUN PENDING | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
+| CF-03 | FIXED | DEPLOYED; AUTONOMOUS RUN PENDING | World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale. |
 | CF-04 | FIXED | PUBLISHER DISABLED | Workflow prepares a checked PR; explicit human merge remains the publication checkpoint. |
-| CF-05 | MERGED | PENDING | Spawnfile PR15 preserves declared Codex model selection. |
-| CF-06 | MERGED | PENDING LINUX PROBE | Explicit strict Codex policy on all 12 agents; per-turn runtime guard removes unconfined Pi tools and pins terminal/network/search policy. |
-| CF-07 | MERGED | PENDING | Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts. |
-| CF-08 | MERGED | PENDING LIVE CREDENTIAL PROBE | Native Linux credential denials and mutation probes pass; the final deployed org still needs verification. |
+| CF-05 | MERGED | DEPLOYED; COMPILED MODEL VERIFIED | Spawnfile PR15 preserves declared Codex model selection. |
+| CF-06 | MERGED | DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING | All 12 agents declare strict Codex policy; native Linux command probes allow resources and deny direct network access. Live image verification remains required. |
+| CF-07 | MERGED | DEPLOYED; COMPILED JITTER VERIFIED | Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts. |
+| CF-08 | MERGED | DEPLOYED; IMAGE-LAUNCH FIX AND LIVE PROBE PENDING | Daimon PR16 protects own and peer credentials with native read denials; pinned Linux positive and mutation probes pass. Live org probe remains required. |
 
-The host bundle command now uses the private dependency packager, preserving the approved archives and their provenance. Four entrypoint regression tests and the provenance-removal mutation pass. The host job uses Node 24, matching the approved dependency major.
+- **CF-03-RECOVERY — FIXED; SENSOR DEPLOYED.** Producer removes obsolete success/refusal counterpart; default-cwd MCP accepts proven stale carry and rejects altered or unproven figures.
+- **HOST-BUNDLE — FIXED; HOST ARCHIVES VERIFIED.** Daily bundling delegates to the private canonical dependency packager and checks provenance before writes; job uses the approved Node major.
+- **HOST-SEAM-SIDECARS — FIXED; DEPLOYED.** Host pin validation includes both tools/validation sidecar descriptors; all 47 resource pins match.
+- **ART-TRUSTED-ROOTS — FIXED; LIVE PROBE PASSED.** Trusted mount root symlinks resolve while child symlink escapes still reject; deployed catalogues show nine glyphs and 192 maps, configured ETOPO GRD map bake2.4s.
+- **IMAGE-LAUNCH-POLICY — MERGED; DEPLOYING.** Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed.
+- **SPIKE-LEDGER-HANDOFF — FIXED; REVIEWED; DEPLOYMENT PENDING.** Spike mentions Ledger in release after five PASS articles if no Ledger desk documents exist; evening schedule stays fallback. Static contracts and independent review passed; live cognition remains untested.
 
 ## Original audit counts
 

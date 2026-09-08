@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -49,6 +49,25 @@ function mcpToolsList(role) {
     child.stdin.end();
   });
 }
+
+
+test('Spike contract hands off to Ledger once current PASS coverage can support desk filing', async () => {
+  const root = path.resolve(import.meta.dirname, '..');
+  const files = [
+    path.join(root, 'FLOOR.md'),
+    path.join(root, 'agents', 'spike', 'AGENTS.md'),
+    path.join(root, 'agents', 'spike', 'Spawnfile'),
+  ];
+  for (const file of files) {
+    const text = await readFile(file, 'utf8');
+    assert.match(text, /passed=5|five or more passed|five or more passed articles/u, `${file} must key the handoff to current PASS coverage`);
+    assert.match(text, /@ledger/u, `${file} must name Ledger with a real mention`);
+    assert.match(text, /room:release/u, `${file} must use Ledger's declared Moltnet room`);
+    assert.match(text, /D ledger\.settlements/u, `${file} must avoid duplicate handoff after Ledger documents exist`);
+    assert.match(text, /D ledger\.worlddesk/u, `${file} must avoid duplicate handoff after Ledger documents exist`);
+    assert.match(text, /20:30 schedule|scheduled fallback|schedule is only the fallback/u, `${file} must state the native schedule is fallback, not a required gate`);
+  }
+});
 
 test('mcp tool schemas type every property beyond edition/event_key', async () => {
   const brass = await mcpToolsList('brass');
