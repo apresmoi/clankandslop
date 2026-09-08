@@ -10,7 +10,7 @@ execution:
   model:
     primary:
       provider: openai
-      name: gpt-5.4-mini
+      name: gpt-5.5
       auth:
         method: codex
   sandbox:
@@ -37,7 +37,7 @@ workspace:
   docs: { system: AGENTS.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:3d358495ab5fda5f005fc1a0c345dc467bc51d0f93afe60eb770ac0b7eba2fa7, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:53e86e095d15193b3d8fd45dc4c7abcede4bcf2873a64ff6b55bd50a8bf27363, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:2bc388343adb65152b66dc6cbe00d14be6f88cf9c3b87a5ce4535c5e552f578b, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:1b9d4fad435d6263eb31d80f3685eee3ce5805841d308757ec32b0155b71048e, mount: ./repos/newsroom-private, mode: readonly }
     - { id: private-corpus, kind: volume, name: clank-klaxon-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }
 

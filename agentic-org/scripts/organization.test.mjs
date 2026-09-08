@@ -82,9 +82,14 @@ test('Daimon engine declarations preserve their real model-auth boundary', () =>
   // deployment, so no Grok agent is declared. The validator still enforces that a Grok
   // agent omits execution.model (Daimon owns its subscription auth); that branch is
   // unexercised here until a Grok agent exists again, rather than faked against a Codex one.
-  const codex = readFileSync(resolve(import.meta.dirname, '../agents/brass/Spawnfile'), 'utf8');
-  assert.doesNotThrow(() => validateAgentDeclaration('brass', codex));
-  assert.throws(() => validateAgentDeclaration('brass', codex.replace('method: codex', 'method: none')), /Codex subscription intent/);
+  for (const agent of agents) {
+    const codex = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.doesNotThrow(() => validateAgentDeclaration(agent, codex));
+    assert.match(codex, /name: gpt-5\.5/u, `${agent} must declare the supported Codex account model`);
+    assert.doesNotMatch(codex, /gpt-5\.4-mini/u, `${agent} must not declare the retired Codex account model`);
+  }
+  const brass = readFileSync(resolve(import.meta.dirname, '../agents/brass/Spawnfile'), 'utf8');
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace('method: codex', 'method: none')), /Codex subscription intent/);
 });
 test('workspace resources enforce public modes and private corpus least privilege', () => {
   const scout = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');

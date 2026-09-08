@@ -63,7 +63,7 @@ const brass=config.agents.find(agent=>agent.id==='agent:brass');
 assert.equal(brass.schedule.cron,'30 18 * * *');
 assert.equal(brass.schedule.timezone,'Europe/Berlin');
 assert.equal(brass.schedule.jitter_seconds,900);
-assert.equal(brass.engine.model,'gpt-5.4-mini');
+assert.equal(brass.engine.model,'gpt-5.5');
 assert.deepEqual(brass.engine.codexSandbox,{mode:'workspace-write',networkAccess:false,webSearch:'disabled'});
 const pressman=(await readFile(compiled('entrypoint.sh'),'utf8')).split('\n').find(line=>line.includes("prepare_volume_resource 'public-content'")&&line.includes('/agents/pressman/staging'));
 assert.match(pressman,/clank-release-staging/);
