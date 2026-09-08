@@ -4,7 +4,7 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-The org produced and locally staged the 8 September edition: five reviewed articles, four desk documents, two composed pages, and a successful mechanical validation/build receipt. The real 4090 ad hoc research loop and agent-owned Moltnet handoffs worked. This first production run needed operator recovery prompts; unattended daily operation remains unproven. Eight generic repairs are deployed and passed 43 native isolation checks. Publisher disabled. Original audit rows below remain historical evidence.
+The org produced and locally staged the 8 September edition: the original five articles and five reviews stayed byte-unchanged, four desk documents remained accepted, Caslon completed at 20:57:46 after bake_map, lay_pages, compose and a Moltnet @pressman handoff, and Pressman completed at 20:59:42. The staged 55,589-byte front page mechanically verifies the main map, regional locator minimap and positive locator footprint; the local mirror HTTP digest matched the 21:30 dist with 12 content files. The org is parked, healthy, at zero active wakes and zero restarts. Runtime fixes are deployed, all twelve agents declare gpt-5.5, native43 and deploy98 checks passed, and Spawnfile PR19 is merged and deployed. Publication remains disabled. This first production run needed operator recovery prompts; unattended daily operation remains unproven. Live public commit da70768 uses image e294... with private payload 4952 unchanged; rehearsal private 25df does not change the runtime payload. Original audit rows below remain historical evidence.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
@@ -31,7 +31,7 @@ The org produced and locally staged the 8 September edition: five reviewed artic
 
 - **LEDGER-SOURCE-ROOTS — FIXED; DEPLOYED; LIVE ACCEPTANCE VERIFIED.** Ledger’s MCP declares both mounted source roots explicitly; authentic figures file regardless of MCP cwd, altered figures reject. Wrong-cwd and missing-root regressions pass. Ledger filed World Desk and woke Caslon through Moltnet.
 
-- **LIVE-RELEASE-NOTICES — FIXED; TESTED; AWAITING SAFE DEPLOYMENT.** Successful compose and staging results now explicitly require the acting agent to send the remaining Moltnet handoff. Runtime-result deletion mutations fail and restored checks pass. The source update awaits the normal safe deployment window; today’s final Caslon handoff needed operator recovery and Pressman then built and staged autonomously.
+- **LIVE-RELEASE-NOTICES — FIXED; DEPLOYED; LIVE HANDOFF VERIFIED.** Successful compose and staging results explicitly require the acting agent to send the remaining Moltnet handoff. Runtime-result deletion mutations fail and restored checks pass. Caslon sent the @pressman handoff through Moltnet, and Pressman built and staged the recovered edition autonomously after operator recovery resumed the run.
 
 ## Original audit counts
 
@@ -169,4 +169,4 @@ The org produced and locally staged the 8 September edition: five reviewed artic
 - 16_research_consistency leaves UNKNOWN whether newsroom-tools/article-validation descriptor files are fresh builds of their listed source files.
 - CF-08 credential filesystem isolation remains UNKNOWN pending deployment/container/mount evidence.
 
-- **LEAD-ART-LOCATOR — SOURCE REPAIRED; RUNTIME ROLLOUT AND REBAKE PENDING.** Caslon supplies fitting lead art independently of reporter article JSON. New composition checks require explicit lead art; the build checks a lead map’s terrain, locator minimap and positive footprint. Frozen edition compatibility remains separate. The earlier handoff-only deployment timer is cancelled. The staged 8 September edition still awaits its new lead map.
+- **LEAD-ART-LOCATOR — FIXED; DEPLOYED; LIVE STAGE VERIFIED.** Caslon supplies fitting lead art independently of reporter article JSON. New composition checks require explicit lead art; the build checks a lead map’s terrain, locator minimap and positive footprint. Frozen edition compatibility remains separate. The staged 8 September edition now includes the Caslon-owned lead map and regional locator minimap.
