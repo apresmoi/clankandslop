@@ -2058,8 +2058,8 @@
   "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
   "artifact": "seam-checklist",
   "remediation": {
-    "updated_at": "2026-09-08T09:08:00Z",
-    "state": "Source fixes reviewed; runtime deployment and first full newsroom run pending. Original audit evidence below is retained unchanged.",
+    "updated_at": "2026-09-08T10:13:15.033137+00:00",
+    "state": "All source fixes reviewed and generic PRs merged; policy2 runtime image built. Production stop marker is active; final org image and real newsroom run pending.",
     "findings": [
       {
         "id": "CF-01",
@@ -2077,7 +2077,7 @@
         "id": "CF-03",
         "source": "FIXED",
         "deployment": "PENDING",
-        "result": "World Desk filing verifies the mounted document and trace and recomputes canonical figures before committing."
+        "result": "World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale."
       },
       {
         "id": "CF-04",
@@ -2094,8 +2094,8 @@
       {
         "id": "CF-06",
         "source": "MERGED",
-        "deployment": "PENDING LINUX PROBE",
-        "result": "Explicit strict Codex policy on all 12 agents; per-turn runtime guard removes unconfined Pi tools and pins terminal/network/search policy."
+        "deployment": "IMAGE BUILT; LIVE PROBE PENDING",
+        "result": "All 12 agents declare strict Codex policy; native Linux command probes allow resources and deny direct network access. Live image verification remains required."
       },
       {
         "id": "CF-07",
@@ -2105,9 +2105,21 @@
       },
       {
         "id": "CF-08",
-        "source": "UNKNOWN",
-        "deployment": "PENDING CREDENTIAL READ PROBE",
-        "result": "Nonroot runtime is prepared; filesystem credential isolation must be measured on the candidate."
+        "source": "MERGED",
+        "deployment": "IMAGE BUILT; LIVE PROBE PENDING",
+        "result": "Daimon PR16 protects own and peer credentials with native read denials; pinned Linux positive and mutation probes pass. Live org probe remains required."
+      }
+    ],
+    "followups": [
+      {
+        "id": "CF-03-RECOVERY",
+        "status": "FIXED; SENSOR DEPLOYED",
+        "result": "Producer removes obsolete success/refusal counterpart; default-cwd MCP accepts proven stale carry and rejects altered or unproven figures."
+      },
+      {
+        "id": "HOST-BUNDLE",
+        "status": "FIXED; HOST VALIDATION PENDING",
+        "result": "Daily bundling delegates to the private canonical dependency packager and checks provenance before writes; job uses the approved Node major."
       }
     ]
   }

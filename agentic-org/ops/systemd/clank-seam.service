@@ -27,10 +27,11 @@ EnvironmentFile=/etc/clank-alarm/alarm.env
 # not a bug to route around. SPAWNFILE_ALLOW_LOCAL_E2E=1 is what admits it.
 Environment=SPAWNFILE_MOLTNET_TARGET_ARCH=amd64
 Environment=SPAWNFILE_CLI=/home/clank/deploy-work/spawnfile-main/dist/cli/index.js
+Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 Environment=SPAWNFILE_DAIMON_SOURCE_DIR=/root/work/daimon
 Environment=SPAWNFILE_DAIMON_PACKAGE_TARBALL=/root/work/noopolis-daimon-0.2.0.tgz
 Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/root/work/spawnfile/.local-daimon-runtime-identity.json
 Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
 Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
-ExecStart=/usr/bin/node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs
+ExecStart=/home/clank/deploy-work/node24/bin/node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs
 TimeoutStartSec=3600

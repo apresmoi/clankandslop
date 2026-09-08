@@ -163,11 +163,17 @@ Not before: on a box where the publisher is disabled the cycle never reaches
 `staged`, so installing that drop-in early guarantees an alarm at 23:30 every
 single night.
 
-Arming the timers is **not** starting the org. The org's own guards are
-separate and unaffected: every agent cron is parked at `0 4 1 1 *`, and
-`fuse.stop` sits in the wake-fuse volume. The seam will happily repin, rebuild
-and redeploy a parked organization — which is exactly what you want to be able
-to rehearse before unparking anything.
+Arming host timers does not remove the newsroom's stop marker. The source
+declares evening agent schedules; create `fuse.stop` before replacing a parked
+deployment and retain it through verification. Record the prior fuse state and
+usage history before starting a new explicitly bounded run epoch.
+
+The seam runs under the scoped Node 24 binary at
+`/home/clank/deploy-work/node24/bin/node`, with that directory first in its PATH.
+Install it from the immutable builder image recorded in the approved website
+dependency provenance. The private dependency packager validates that provenance
+before rebuilding the same archives; host Node 22 is insufficient for this job.
+Do not regenerate provenance or advance dependency pins to make a daily refresh pass.
 
 ## Install (LeDeluge, user units)
 

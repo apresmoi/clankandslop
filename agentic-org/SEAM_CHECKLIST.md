@@ -4,18 +4,20 @@ Reviewed checklist from stable new 2026-09-08 reports plus external-review repor
 
 ## Repair status — 8 September 2026
 
-Sensor repairs are deployed. The replacement newsroom runtime is being built; the production newsroom and host publisher remain parked pending runtime checks. Original audit rows below are historical evidence, not the current fix status.
+Sensor repairs are deployed. All six generic PRs are merged with green CI, and the replacement runtime image is built. The newsroom stop marker is active and the host publisher remains disabled pending runtime checks. Original audit rows below are historical evidence, not the current fix status.
 
 | Finding | Source | Deployment | Result |
 |---|---|---|---|
 | CF-01 | FIXED | SENSOR DEPLOYED; NEWSROOM SNAPSHOT PENDING | Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures. |
 | CF-02 | FIXED | PENDING | Assignment admission requires exactly one forecast and a named different-desk dissenter. |
-| CF-03 | FIXED | PENDING | World Desk filing verifies the mounted document and trace and recomputes canonical figures before committing. |
+| CF-03 | FIXED | PENDING | World Desk filing verifies the current document and trace; refusal-day recovery accepts only the prior published derived figure, marked stale. |
 | CF-04 | FIXED | PUBLISHER DISABLED | Workflow prepares a checked PR; explicit human merge remains the publication checkpoint. |
 | CF-05 | MERGED | PENDING | Spawnfile PR15 preserves declared Codex model selection. |
 | CF-06 | MERGED | PENDING LINUX PROBE | Explicit strict Codex policy on all 12 agents; per-turn runtime guard removes unconfined Pi tools and pins terminal/network/search policy. |
 | CF-07 | MERGED | PENDING | Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts. |
-| CF-08 | UNKNOWN | PENDING CREDENTIAL READ PROBE | Nonroot runtime is prepared; filesystem credential isolation must be measured on the candidate. |
+| CF-08 | MERGED | PENDING LIVE CREDENTIAL PROBE | Native Linux credential denials and mutation probes pass; the final deployed org still needs verification. |
+
+The host bundle command now uses the private dependency packager, preserving the approved archives and their provenance. Four entrypoint regression tests and the provenance-removal mutation pass. The host job uses Node 24, matching the approved dependency major.
 
 ## Original audit counts
 
