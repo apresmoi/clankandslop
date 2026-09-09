@@ -16,6 +16,9 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: Validate content
         run: node ops/validate-content.mjs
+      - name: Install website deps
+        working-directory: website
+        run: npm ci
       # ops/lay-page.mjs assembles both page documents before compose_edition
       # sees them, so its guarantees are the ones that keep a composition from
       # being refused inside a wake. Run here rather than nowhere.
@@ -62,9 +65,6 @@ jobs:
         run: |
           node agentic-org/scripts/validate-org.mjs
           node --test agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs
-      - name: Install website deps
-        working-directory: website
-        run: npm ci
       # The page data layer has one build-time decision in it that a green
       # astro build cannot see: whether a story advertises an og:image for a
       # card that was never rendered. Fifteen editions have no cards at all, and

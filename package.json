@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "ops:test": "node --test ops/*.test.mjs",
+    "ops:test": "node --test ops/archive-index.test.mjs ops/article-format.test.mjs ops/glyph-format.test.mjs ops/lay-artifacts.test.mjs ops/lay-page.test.mjs ops/rendered-mapglyph.test.mjs ops/worlddesk-artifacts.test.mjs",
     "org:bundle": "node agentic-org/scripts/build-newsroom-bundle.mjs",
     "org:test": "node --test agentic-org/scripts/*.test.mjs && node agentic-org/e2e/run.mjs",
     "org:e2e": "node agentic-org/e2e/run.mjs",
