@@ -14,10 +14,13 @@ interface Props {
   art?: { block: 'MapGlyph' | 'GlyphArt'; props: Record<string, any> };
 }
 const { variant = 'lead-rail', lead, rail = [], splitWith, withArt = false, art } = Astro.props;
+const explicitMapArt = art?.block === 'MapGlyph' ? art.props : null;
+const explicitGlyphArt = art?.block === 'GlyphArt' ? art.props : null;
 const articleMapArt = lead.art?.kind === 'map' ? lead.art : null;
 const articleHeroMap = articleMapArt ? loadMap(lead.edition_date, articleMapArt.hero_map ?? articleMapArt.map) : null;
-const mapArt = art?.block === 'MapGlyph' ? art.props : articleMapArt && articleHeroMap ? { map: articleHeroMap, cols: 52, rows: 30, rotX: articleMapArt.rotX, rotY: articleMapArt.rotY, zoom: articleMapArt.zoom, overlays: articleMapArt.overlays, routes: articleMapArt.routes, spots: articleMapArt.spots, tone: articleMapArt.tone, locator_context: articleMapArt.locator_context, interactive: false, caption: articleMapArt.caption } : null;
-const glyphArt = art?.block === 'GlyphArt' ? art.props : lead.art?.kind === 'ascii' && lead.art.shape ? lead.art : null;
+const legacyMapArt = articleMapArt && articleHeroMap ? { map: articleHeroMap, cols: 52, rows: 30, rotX: articleMapArt.rotX, rotY: articleMapArt.rotY, zoom: articleMapArt.zoom, overlays: articleMapArt.overlays, routes: articleMapArt.routes, spots: articleMapArt.spots, tone: articleMapArt.tone, locator_context: articleMapArt.locator_context, interactive: false } : null;
+const mapArt = art ? explicitMapArt : legacyMapArt;
+const glyphArt = explicitGlyphArt ?? (!art && lead.art?.kind === 'ascii' && lead.art.shape ? lead.art : null);
 ---
 {variant === 'lead-rail' && (
   <div class="hero-grid">
@@ -37,6 +40,7 @@ const glyphArt = art?.block === 'GlyphArt' ? art.props : lead.art?.kind === 'asc
     {withArt && mapArt && (
       <div class="hero-art hero-art-map">
         <MapGlyph {...mapArt} />
+        {!explicitMapArt && articleMapArt?.caption && <div class="hero-art-caption">▲ {articleMapArt.caption}</div>}
       </div>
     )}
     {withArt && !mapArt && glyphArt && (

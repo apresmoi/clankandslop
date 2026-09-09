@@ -62,6 +62,9 @@ jobs:
         run: |
           node agentic-org/scripts/validate-org.mjs
           node --test agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs
+      - name: Install website deps
+        working-directory: website
+        run: npm ci
       # The page data layer has one build-time decision in it that a green
       # astro build cannot see: whether a story advertises an og:image for a
       # card that was never rendered. Fifteen editions have no cards at all, and
@@ -69,11 +72,11 @@ jobs:
       - name: Test the website data layer
         working-directory: website
         run: npm run test:lib
+      - name: Test generated art rendering
+        run: node ops/generated-art-rendering.integration.test.mjs
       - name: Build website
         working-directory: website
-        run: |
-          npm ci
-          npx astro build
+        run: npx astro build
       # A green build says nothing about whether the glyphcss scenes RENDER:
       # feeding the camera pre-0.1 units type-checks, builds, and draws the
       # whole globe into one character cell. This rasterizes it headlessly and
