@@ -1,0 +1,2199 @@
+{
+  "generated_at": "2026-09-08T01:01:59.553Z",
+  "scope": "Reviewed checklist based only on stable new 2026-09-08 reports plus external-review/agy.md report-only corrections; source audit and deployed/rehearsed state are separate.",
+  "reports": [
+    {
+      "packet_id": "01_sensor_archive",
+      "source_report": "01_sensor_archive.json",
+      "verdict": "GAP",
+      "raw_findings": 1,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "02_snapshot_mount",
+      "source_report": "02_snapshot_mount.json",
+      "verdict": "PASS for static design contract from private research branch to read-only agent mounts; UNKNOWN for live arming/current deployed freshness.",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "03_sensor_klaxon",
+      "source_report": "03_sensor_klaxon.json",
+      "verdict": "PASS",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "04_pitches_assignments",
+      "source_report": "04_pitches_assignments.json",
+      "verdict": "GAP",
+      "raw_findings": 2,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "05_reporter_filing",
+      "source_report": "05_reporter_filing.json",
+      "verdict": "PASS",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "06_adhoc_roundtrip",
+      "source_report": "06_adhoc_roundtrip.json",
+      "verdict": "PASS",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "07_review_revision",
+      "source_report": "07_review_revision.json",
+      "verdict": "PASS",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "08_dissent_forecast",
+      "source_report": "08_dissent_forecast.json",
+      "verdict": "GAP",
+      "raw_findings": 1,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "09_ledger_inputs",
+      "source_report": "09_ledger_inputs.json",
+      "verdict": "GAP",
+      "raw_findings": 1,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "10_art_assets",
+      "source_report": "10_art_assets.json",
+      "verdict": "PASS",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "11_layout_composition",
+      "source_report": "11_layout_composition.json",
+      "verdict": "PASS",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "12_build_staging",
+      "source_report": "12_build_staging.json",
+      "verdict": "PASS",
+      "raw_findings": 0,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "13_publication",
+      "source_report": "13_publication.json",
+      "verdict": "GAP",
+      "raw_findings": 1,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "14_runtime_contract",
+      "source_report": "14_runtime_contract.json",
+      "verdict": "GAP",
+      "raw_findings": 4,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "15_clock_recovery",
+      "source_report": "15_clock_recovery.json",
+      "verdict": "UNKNOWN",
+      "raw_findings": 0,
+      "rejected_findings": 2
+    },
+    {
+      "packet_id": "16_research_consistency",
+      "source_report": "16_research_consistency.json",
+      "verdict": "GAP",
+      "raw_findings": 1,
+      "rejected_findings": 0
+    },
+    {
+      "packet_id": "17_guard_consistency",
+      "source_report": "17_guard_consistency.json",
+      "verdict": "GAP",
+      "raw_findings": 2,
+      "rejected_findings": 0
+    }
+  ],
+  "counts": {
+    "reports": 17,
+    "total_rows": 55,
+    "primary_rows": 48,
+    "cross_review_rows": 7,
+    "unique_ids": 55,
+    "status_counts": {
+      "PASS": 43,
+      "GAP": 11,
+      "UNKNOWN": 1
+    },
+    "active_source_confirmed_findings": 5,
+    "publication_policy_findings": 1,
+    "unverified_operational_boundaries": 1,
+    "unknown_boundary_findings": 1,
+    "rejected_or_narrowed_claims": 8,
+    "unknowns": 5
+  },
+  "seams": [
+    {
+      "id": "01-S1",
+      "kind": "primary",
+      "packet_id": "01_sensor_archive",
+      "source_report": "01_sensor_archive.json",
+      "original_id": "S1",
+      "owner": "user systemd timers clank-research-chatgpt.timer and clank-research-grok.timer via clank-research@.service",
+      "trigger": "Persistent Europe/Berlin timer slots for chatgpt and grok before 15:00",
+      "input": "site argument chatgpt|grok, Moltnet sensor config, browser runner state, current Berlin edition date and slot",
+      "output": "<edition>/<site>/<site>-rolling-<HHMM>.md and <edition>/<site>/<site>-rolling-<HHMM>.<site>.reply.html committed by Morgue to edition/<YYYY-MM-DD>",
+      "consumer_access": "private Git archive branch and split-desks.mjs / private repo checkout; git origin branch edition/<date>",
+      "validation": "site/config/date/lock/duplicate-slot checks; runner non-zero removes intake and reply stubs",
+      "recovery": "failed capture exits with runner status after deleting stubs; duplicate/overlap exits 0; >=15:00 exits 0",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "clank-research-chatgpt.timer lines 4-8 and clank-research-grok.timer lines 4-8 define scheduled units",
+        "clank-research@.service lines 6-11 calls run-research.sh %i",
+        "run-research.sh lines 25-50 validate site and config",
+        "run-research.sh lines 64-89 writes intake, runs browser capture, and removes failed stubs",
+        "run-research.sh lines 91-109 commits and pushes raw capture files as Morgue"
+      ],
+      "test_evidence": "Existing downstream tests inspected; no direct shell/systemd wrapper test observed. Not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "01-S2",
+      "kind": "primary",
+      "packet_id": "01_sensor_archive",
+      "source_report": "01_sensor_archive.json",
+      "original_id": "S2",
+      "owner": "split-desks.mjs",
+      "trigger": "successful scheduled capture after raw capture commit",
+      "input": "usable <edition>/{chatgpt,grok}/*.md digest files under private repo",
+      "output": "<edition>/stories/<s-8hex>.md and <edition>/desks/<agent>.index plus _all.index and _unrouted.index",
+      "consumer_access": "reporters read own desk index then one story path; Brass reads _all.index / private archive/mounted edition directories",
+      "validation": "stub classification, no-source/no-story/dark-site/unrouted/ID-collision checks, post-write index/story verification",
+      "recovery": "stage tmp directories, verify before swap, leave prior corpus untouched on verification failure; wrapper sends split-failed notice and exits 1",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "split-desks.mjs lines 114-142 collect and parse source digests",
+        "split-desks.mjs lines 298-356 reject stubs, no usable sources, no stories, dark site, collisions, and unrouted drift",
+        "split-desks.mjs lines 154-194 define story and index artifacts",
+        "split-desks.mjs lines 206-224 verify index rows against story files",
+        "split-desks.mjs lines 260-279 stage and atomically swap stories/desks",
+        "run-research.sh lines 111-134 routes split failure to research-notify and exits 1"
+      ],
+      "test_evidence": "Existing desk-corpus.test.mjs and split-desks.test.mjs cover replay, stable IDs, index/story agreement, atomic writes, corruption detection, failure signalling, and prepared-file carry-forward. Not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "01-S3",
+      "kind": "primary",
+      "packet_id": "01_sensor_archive",
+      "source_report": "01_sensor_archive.json",
+      "original_id": "S3",
+      "owner": "desk-prep.mjs, desk-worlddesk.mjs, fetch-weather.mjs, research-notify.mjs orchestrated by run-research.sh",
+      "trigger": "successful split in a scheduled capture slot",
+      "input": "private edition corpus; public archive checkout; weather/worlddesk sensor inputs; current HEAD commit",
+      "output": "<edition>/desks/*.prepared.json, optional berlin-weather*.json, <edition>/worlddesk/*, updated stories/desks commit and Moltnet room:research research.capture.v1 notice",
+      "consumer_access": "private archive consumers and Klaxon via room:research / private Git branch, public checkout for archive-derived prep, Moltnet config for research-sensor",
+      "validation": "prep envelope includes version/part/owner/edition/archive_commit; notice validates identity, committed byte equality, parseable current lead, matching committed story packet, and 2048-byte bound",
+      "recovery": "prep/worlddesk/weather non-fatal with review holes or exit-code fields; notice failure writes diagnostic or undelivered breadcrumb and exits 75",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "desk-prep.mjs lines 48-75 define prep version/owners/envelope",
+        "desk-prep.mjs lines 92-118 gather public archive inputs and required worlddesk inputs",
+        "desk-prep.mjs lines 194-204 write prepared files and weather observations",
+        "desk-prep.mjs lines 288-295 always exits 0 after logging failure",
+        "run-research.sh lines 143-188 runs prep/worlddesk/weather, stages derived files, commits, and pushes",
+        "run-research.sh lines 190-194 sends notice with git rev-parse HEAD",
+        "research-notice.mjs lines 33-52 validate identity and compare working bytes to git show commit:path",
+        "research-notice.mjs lines 66-98 validate current capture/story and build bounded captured notice",
+        "research-notify.mjs preserves notice failure/undelivered breadcrumbs and returns 75"
+      ],
+      "test_evidence": "Existing desk-prep.test.mjs and research-notice.test.mjs cover prep envelopes/offline behavior/read-only failure shape, committed provenance, bounded notices, uncommitted evidence refusal, split-failed notices, and undelivered breadcrumbs. Not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "02-02A",
+      "kind": "primary",
+      "packet_id": "02_snapshot_mount",
+      "source_report": "02_snapshot_mount.json",
+      "original_id": "02A",
+      "owner": "LeDeluge scheduled research services, committing as Morgue",
+      "trigger": "systemd clank-research-chatgpt/grok timers invoke clank-research@.service and run-research.sh",
+      "input": "headed ChatGPT/Grok capture for Berlin edition date and slot",
+      "output": "<edition>/<site>/<stem>.md and reply HTML, then <edition>/stories/*.md and <edition>/desks/*.index pushed to edition/<edition>",
+      "consumer_access": "host seam resolves the private edition branch; reporters and Brass consume mounted indexes/stories / private repo mutable to sensor service; later read-only bundle mount to agents",
+      "validation": "failed capture removes stub; split refuses no usable digests, zero stories, dark model, high unrouted share, duplicate ids, and index/story mismatch",
+      "recovery": "split failure notifies room:research, exits 1, and leaves previous corpus untouched for write verification failures",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "sensors/automation/run-research.sh:33-45,91-108,111-133,136-187",
+        "sensors/automation/split-desks.mjs:18-23,114-123,253-279,282-381",
+        "sensors/automation/clank-research-chatgpt.timer:4-8",
+        "sensors/automation/clank-research-grok.timer:4-8",
+        "sensors/automation/clank-research@.service:6-11"
+      ],
+      "test_evidence": "existing tests read/not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "02-02B",
+      "kind": "primary",
+      "packet_id": "02_snapshot_mount",
+      "source_report": "02_snapshot_mount.json",
+      "original_id": "02B",
+      "owner": "host seam repin stage using repin-private-source.mjs",
+      "trigger": "seam-run.mjs repin invokes repin-private-source.mjs with --edition and --ref",
+      "input": "private repo commit resolved from edition/<edition>",
+      "output": "policies/private-source.json, newsroom-private.tar, descriptor private block, and private-archive Spawnfile digests",
+      "consumer_access": "build-newsroom-bundle.mjs and agent Spawnfile bundle resources / private checkout on host; archive becomes read-only workspace bundle",
+      "validation": "ref must exist; commit must contain all six reporter desk indexes; extracted archive must contain parseable indexes and referenced story files; stale prior digest is refused",
+      "recovery": "non-zero repin aborts seam before bundle/build/deploy and raises repin-failed",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/scripts/repin-private-source.mjs:102-124,132-146,149-224",
+        "agentic-org/scripts/private-archive.mjs:92-131",
+        "agentic-org/scripts/build-newsroom-bundle.mjs:22-47",
+        "agentic-org/policies/private-source.json:1-8",
+        "agentic-org/newsroom-runtime-bundle.json:41-48"
+      ],
+      "test_evidence": "existing repin tests read/not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "02-02C",
+      "kind": "primary",
+      "packet_id": "02_snapshot_mount",
+      "source_report": "02_snapshot_mount.json",
+      "original_id": "02C",
+      "owner": "org:bundle and seam descriptor pin checks",
+      "trigger": "seam order: gate, repin, check-bundle-descriptor --repin-source, org:bundle, descriptor check, pin check",
+      "input": "newsroom-runtime-bundle.json private archive/digest and generated tar archives",
+      "output": "all twelve agent Spawnfiles mount ../../newsroom-private.tar at ./repos/newsroom-private readonly with descriptor-matching digest",
+      "consumer_access": "reporters, Brass, Ledger, Klaxon, Caslon, Spike, Pressman declared workspaces / read-only private-archive bundle mounted into every declared agent; Pressman also sets CLANK_PRIVATE_SOURCE_ROOT to that mount",
+      "validation": "check-bundle-descriptor checks source descriptor and source pins; seam pinFindings checks every bundle resource against descriptor archives and refuses zero matches",
+      "recovery": "bundle mismatch aborts before build/deploy and raises bundle-mismatch",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/newsroom-runtime-bundle.json:41-48",
+        "agentic-org/agents/*/Spawnfile private-archive resource lines",
+        "agentic-org/scripts/check-bundle-descriptor.mjs:37-83",
+        "agentic-org/scripts/seam-run.mjs:160-209"
+      ],
+      "test_evidence": "existing seam tests read/not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "02-02D",
+      "kind": "primary",
+      "packet_id": "02_snapshot_mount",
+      "source_report": "02_snapshot_mount.json",
+      "original_id": "02D",
+      "owner": "Hetzner host clank-seam.timer/clank-seam.service",
+      "trigger": "OnCalendar 16:30 Europe/Berlin executes seam-run.mjs",
+      "input": "public checkout, private edition branch, declared agent schedules, and running container quiescence",
+      "output": "repinned/bundled/built/deployed and settled newsroom image before 18:00 reporter pitches",
+      "consumer_access": "reporters and Brass scheduled wakes / host root job; deployment command runs through clank user",
+      "validation": "gate derives schedule from Spawnfiles and fails closed on busy/unreadable container; settle requires stable healthy container",
+      "recovery": "stage-specific alarm and non-zero exit on failure; no later stages after failed gate/repin/bundle",
+      "source_status": "UNKNOWN",
+      "source_status_detail": "UNKNOWN",
+      "deployed_or_rehearsed_state": "UNKNOWN live arming/current freshness",
+      "source_evidence": [
+        "agentic-org/ops/systemd/clank-seam.timer:1-25",
+        "agentic-org/ops/systemd/clank-seam.service:1-36",
+        "agentic-org/scripts/seam-run.mjs:117-129,268-296",
+        "agentic-org/scripts/wake-window.mjs:128-147,199-263",
+        "agentic-org/agents/*/Spawnfile schedules"
+      ],
+      "test_evidence": "existing seam/wake-window tests read/not executed; live timer state not checked",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "03-S1",
+      "kind": "primary",
+      "packet_id": "03_sensor_klaxon",
+      "source_report": "03_sensor_klaxon.json",
+      "original_id": "S1",
+      "owner": "scheduled sensor automation",
+      "trigger": "successful rolling capture, Git archive commit and split/prep pass",
+      "input": "edition, sensor, slot, capturedAt, commit, split/worlddesk/weather exit codes and split log",
+      "output": "bounded JSON text sent by moltnet as research-sensor to room:research with kind research.capture.v1 and mention @klaxon",
+      "consumer_access": "Moltnet clank-newsroom room:research / research-sensor token is declared with write/attach/observe and room:research membership",
+      "validation": "identity regexes, committed capture/story byte verification, URL parsing, 2048-byte bound, room write policy",
+      "recovery": "split-failed notice exits 1; notice prep/delivery failure logs preserved notice and exits 75",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "run-research.sh:190-194",
+        "research-notify.mjs:7-33",
+        "research-notice.mjs:14-19,33-43,46-52,66-108",
+        "agentic-org/Spawnfile:42-48,77,101",
+        "moltnet/internal/rooms/messaging.go:17-63,86-108",
+        "moltnet/internal/rooms/access_policy.go:12-27,49-80"
+      ],
+      "test_evidence": "existing research-notice.test.mjs covers one @klaxon mention, send args, undelivered preservation and failure notices; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "03-S2",
+      "kind": "primary",
+      "packet_id": "03_sensor_klaxon",
+      "source_report": "03_sensor_klaxon.json",
+      "original_id": "S2",
+      "owner": "Moltnet service and bridge",
+      "trigger": "accepted message.created event with normalized Klaxon mention",
+      "input": "room:research message text containing @klaxon from research-sensor",
+      "output": "attachment wake/control POST to Daimon for Klaxon with sender and rendered message text",
+      "consumer_access": "Klaxon Daimon runtime / Klaxon declares room:research wake: mentions and DM wake all only from research-sensor",
+      "validation": "mentions resolve against room members; attachment wakes only matching local actor mention or DM participant; restricted DM requires credential-bound sender and exact participants",
+      "recovery": "bounded retries; permanent failures reported as agent.wake.failed and skipped/ACKed to prevent replay storms",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/klaxon/Spawnfile:18-26",
+        "agentic-org/Spawnfile:96-101",
+        "moltnet/pkg/protocol/mentions.go:5-48",
+        "moltnet/internal/rooms/mentions.go:11-47,50-99,155-178",
+        "moltnet/internal/transport/attach_filters.go:241-255",
+        "moltnet/internal/bridge/render.go:124-153,164-194",
+        "moltnet/internal/bridge/loop/control.go:77-91,176-219,262-287",
+        "moltnet/internal/bridge/loop/control_delivery.go:21-33,63-113,116-150",
+        "moltnet/internal/bridge/loop/classify.go:10-19,62-113"
+      ],
+      "test_evidence": "existing mention/wake/retry tests identified; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "03-S3",
+      "kind": "primary",
+      "packet_id": "03_sensor_klaxon",
+      "source_report": "03_sensor_klaxon.json",
+      "original_id": "S3",
+      "owner": "Klaxon via newsroom MCP",
+      "trigger": "Klaxon qualifies a sensor lead",
+      "input": "qualify_signal {edition,event_key,summary,selected_desks,evidence_refs}",
+      "output": "clank.qualified-signal.v1 candidate JSON and qualified receipt",
+      "consumer_access": "selected desks via Klaxon autonomous Moltnet mentions in room:research or room:sensor / Klaxon is instructed to use Moltnet; FLOOR declares moltnet_send as the talking route; Klaxon can write to research/sensor rooms; all six reporters are members and declare wake: mentions on both rooms",
+      "validation": "schema and implementation require non-empty unique selected desks from the six-desk set and evidence_refs strings",
+      "recovery": "bad tool args reject before write; state adapter write errors reject the call; missing evidence route asks Brass in conference by instruction; actual send execution remains a rehearsal question",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "production-newsroom-mcp.mjs:46-57,141-147,182-183",
+        "production-newsroom.mjs:79-89,341,367",
+        "agentic-org/agents/klaxon/Spawnfile:18-34",
+        "agentic-org/Spawnfile:96-101",
+        "reporter Spawnfiles:24-32",
+        "agentic-org/FLOOR.md:49-90,109-115",
+        "agentic-org/agents/klaxon/AGENTS.md:3-20,22-39"
+      ],
+      "test_evidence": "not run; actual Klaxon cognition and selected-desk send execution are unproven by this static pass",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "04-04A",
+      "kind": "primary",
+      "packet_id": "04_pitches_assignments",
+      "source_report": "04_pitches_assignments.json",
+      "original_id": "04A",
+      "owner": "six reporting desks, scheduled at 18:00 Europe/Berlin",
+      "trigger": "reporter Spawnfile cron 0 18 * * *",
+      "input": "room:conference plus repos/newsroom-private/<edition-date>/desks/<owner>.index",
+      "output": "natural-language pitch sent to room:conference",
+      "consumer_access": "brass reads room:conference at conference / team Spawnfile conference room includes reporters and brass; reporters have private-archive mount",
+      "validation": "prompt-level only; no durable pitch parser/schema found",
+      "recovery": "brass reads _all.index to fill holes when needed",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/*/Spawnfile schedule/prompt lines for 18:00 pitch",
+        "agentic-org/Spawnfile conference room members",
+        "agentic-org/agents/brass/AGENTS.md lines 128-136"
+      ],
+      "test_evidence": "existing tests not targeted to pitch messages; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "04-04B",
+      "kind": "primary",
+      "packet_id": "04_pitches_assignments",
+      "source_report": "04_pitches_assignments.json",
+      "original_id": "04B",
+      "owner": "brass",
+      "trigger": "brass Spawnfile cron 30 18 * * *",
+      "input": "room:conference pitches and repos/newsroom-private/<edition-date>/desks/_all.index",
+      "output": "state/edition/editions/<edition>/assignments/<sha(event_key)>.json clank.assignments.v1 plus assigned receipt",
+      "consumer_access": "reporters via shared edition-state and file_article assignment resolver / brass has record_assignment MCP tool; shared mutable edition-state mounted team-wide",
+      "validation": "edition/event_key, >=5 items, valid id/owner, brief, evidence_refs array, unique ids, at most one forecast, dissenter only beside forecast and not owner",
+      "recovery": "invalid calls reject before write; accepted changed retry conflicts in transaction layer",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/brass/AGENTS.md lines 97-126 require five different reporters and a forecast/dissenter",
+        "agentic-org/scripts/production-newsroom.mjs lines 90-113 lack distinct-owner and required-forecast/dissenter checks",
+        "newsroom/state/transaction.mjs lines 87-95 and 127-130 enforce transactional admission/conflict"
+      ],
+      "test_evidence": "newsroom.integration.test records six distinct owners but has no repeated-owner or missing-forecast mutation; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "04-04C",
+      "kind": "primary",
+      "packet_id": "04_pitches_assignments",
+      "source_report": "04_pitches_assignments.json",
+      "original_id": "04C",
+      "owner": "brass",
+      "trigger": "post-record_assignment @mentions in room:assignment",
+      "input": "durable assignment record and assignment-room message",
+      "output": "addressed reporter activation; reporter file_article resolves assignment by owner",
+      "consumer_access": "assigned reporter / assignment room includes all six reporters and brass; reporter Spawnfiles declare assignment wake on mentions",
+      "validation": "file_article refuses no assignment, disambiguates multiples, forces assigned id, checks assignment evidence_refs, and enforces forecast fields when slot is forecast",
+      "recovery": "refusals record nothing; no-assignment and multiple-assignment errors tell reporter how to proceed",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/Spawnfile assignment room members",
+        "agentic-org/agents/*/Spawnfile assignment wake and file_article tool declarations",
+        "agentic-org/scripts/production-newsroom.mjs lines 33-45 and 167-214"
+      ],
+      "test_evidence": "existing newsroom.integration.test verifies assignment state through real MCP processes; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "05-05A_validate_before_filing",
+      "kind": "primary",
+      "packet_id": "05_reporter_filing",
+      "source_report": "05_reporter_filing.json",
+      "original_id": "05A_validate_before_filing",
+      "owner": "Assigned reporter using validate_article",
+      "trigger": "After accepted assignment and before durable filing, reporter validates complete article JSON.",
+      "input": "{edition: YYYY-MM-DD, article: any JSON candidate}",
+      "output": "{format_version, scope:'publication_format', valid, reporter, edition, article_digest, errors, warnings, error_count, warning_count, truncated, not_checked}",
+      "consumer_access": "Same reporter; file_article later repeats the publication-format gate. / All six reporter Spawnfiles declare validation stdio server mounted from ./tools/article-validation with CLANK_NEWSROOM_AGENT and CLANK_PUBLIC_SOURCE_ROOT, tool [validate_article].",
+      "validation": "Private adapter imports public ops/article-format.mjs, loads content/topics.json, binds owner to host reporter, and calls articleFormatFindings with profile filing and editionDate.",
+      "recovery": "Invalid request/args return JSON-RPC error; invalid candidate returns valid:false with bounded field errors/warnings and no durable write.",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "ops/article-format-schema.mjs:20-33 defines clank.article-format.v1 filing fields including byline, evidence_box and refs.",
+        "ops/article-format.mjs:16-81 performs pure filing checks and says it does not authenticate evidence or assignment/revision lineage.",
+        "newsroom/validation/adapter.mjs:14-60 exposes validate_article and returns digest/errors/warnings/not_checked.",
+        "newsroom/validation/server.mjs:22-33 exposes only validate_article and error response handling.",
+        "agentic-org/agents/cogsworth/Spawnfile:33-43 and matching inspected reporter Spawnfiles declare validation access and mounts."
+      ],
+      "test_evidence": "Existing newsroom/validation/adapter.test.mjs and ops/article-format.test.mjs inspected by name/content search; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "05-05B_file_article_receipt_and_handoff",
+      "kind": "primary",
+      "packet_id": "05_reporter_filing",
+      "source_report": "05_reporter_filing.json",
+      "original_id": "05B_file_article_receipt_and_handoff",
+      "owner": "Assigned reporter via mcp_newsroom_file_article; private state/history automation persists acceptance.",
+      "trigger": "Reporter calls file_article with edition, wake event_key, complete article, and optional assignment_event_key.",
+      "input": "{edition, event_key, article, optional assignment_event_key}",
+      "output": "editions/<edition>/filings/<assignment.id>/<revision>.json, operations/file_article-<key>.json, receipts/filed-<key>.json, updated INDEX, and .history.git commit with .newsroom/operations/<acceptance-id>.json; tool returns article_id, revision, digest, warnings, receipt.",
+      "consumer_access": "Spike consumes filing from edition state after reporter handoff in room:filing; Spike owns review_article. / Reporter Spawnfiles declare newsroom MCP tools [file_article, record_dissent] and rooms assignment/filing with mention wakes; Spike is declared separately with review_article and filing room access.",
+      "validation": "fileArticleAction resolves assignment for reporter identity, refuses article.dissent, reruns articleFormatFindings, checks assignment evidence_refs against evidence_box source_note.source_url/source_id, enforces revision lifecycle, checks map art and hard lints before writes.",
+      "recovery": "Missing assignment, invalid format, missing assignment refs, reviewed-revision rewrite, invalid revision progression, missing art, and hard lint failures throw before write; transaction enforces active wake, lock, pending journal completion, changed retry rejection, history commit before files, and cache verification.",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "production-newsroom-mcp.mjs:64-73 defines file_article schema and assignment lookup contract.",
+        "production-newsroom-mcp.mjs:141-147 and 183 restrict reporter/Spike tool authority.",
+        "production-newsroom.mjs:167-215 implements filing admission, writes filing shape, return digest/receipt, and forecast next handoff text.",
+        "production-newsroom.mjs:360-371 wraps file_article in runEditionOperation with artifact identity.",
+        "newsroom/state/admission.mjs:22-41 verifies the sole active Daimon wake/event_key.",
+        "newsroom/state/transaction.mjs:127-151 serializes edition writes, handles journals/retries, and writes operation record.",
+        "newsroom/history/contract.mjs:30-38 and newsroom/history/index.mjs:90-115 define attributed local Git acceptance metadata and commit.",
+        "TEAM.md:19-26 and FLOOR.md:61-90 instruct reporter filing handoff in room:filing and Spike review consumption."
+      ],
+      "test_evidence": "Existing production-newsroom-article-format.test.mjs, edition-index.test.mjs, newsroom/state/*.test.mjs, and newsroom/history/history.test.mjs inspected by name/content search; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "06-06A_request_admission_and_routing",
+      "kind": "primary",
+      "packet_id": "06_adhoc_roundtrip",
+      "source_report": "06_adhoc_roundtrip.json",
+      "original_id": "06A_request_admission_and_routing",
+      "owner": "Six reporters and Brass",
+      "trigger": "Missing load-bearing fact after reading assigned/pitched evidence",
+      "input": "moltnet_send to clank-newsroom room:research with one <=2048-byte research.request.v1 JSON text object containing exactly kind, request_id, from, edition, story_id, question, discriminator",
+      "output": "Accepted responder record with digest, message id, received time, provider route and queued state, or ignored/refused before browser launch",
+      "consumer_access": "research-sensor service identity in room:research / Research room includes research-sensor, six reporters and Brass; parser requires credential_bound agent sender and configured requester",
+      "validation": "Room/network/from identity, exact fields, current Europe/Berlin edition, notBefore activation, ids/prose/bytes and requester allowlist",
+      "recovery": "Duplicate request id no-ops; digest collision logged without replacement; over-budget requests publish refused",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "RESEARCH_ROUND_TRIP.md:19-56",
+        "FLOOR.md:100-115",
+        "agents/graves/AGENTS.md:17-38",
+        "agents/brass/AGENTS.md:17-43",
+        "agents/graves/Spawnfile:23-32",
+        "agents/brass/Spawnfile:23-33",
+        "Spawnfile:96-102",
+        "adhoc/protocol.mjs:13-31",
+        "adhoc/main.mjs:16-31"
+      ],
+      "test_evidence": "Existing core.test.mjs covers credential-bound sender/network, activation/edition/bounds, routing, dedup/collision and budget refusal; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "06-06B_responder_capture_to_answer_publication",
+      "kind": "primary",
+      "packet_id": "06_adhoc_roundtrip",
+      "source_report": "06_adhoc_roundtrip.json",
+      "original_id": "06B_responder_capture_to_answer_publication",
+      "owner": "Private sensors/automation/adhoc responder",
+      "trigger": "Queued admitted request and free provider lock",
+      "input": "Durable request record",
+      "output": "research.answer.v1 in room:research with kind, request_id, to, status, findings, unresolved, ran_at, mention; found findings include claim, literal source_url and source_id",
+      "consumer_access": "Requester via research room mention; publication uses research-sensor token / Responder loads the configured Moltnet attachment/token, posts as research-sensor, and requires exact credential-bound history read-back",
+      "validation": "Launch intent fsynced before spawn; capture parser requires one structured result, valid status, bounded fields, literal source URLs, neutralized incidental mentions and <=2048-byte answer",
+      "recovery": "Malformed/empty/timeout/failed capture returns refused; uncertain interrupted run without marker refuses after lock free; lock miss/exec failure before browser ownership may requeue; queued records expire on edition change",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "adhoc/worker.mjs:23-64",
+        "adhoc/result.mjs:40-60",
+        "adhoc/protocol.mjs:39-45",
+        "adhoc/main.mjs:68-77",
+        "adhoc/client.mjs:49-69",
+        "adhoc/runner.mjs:7-29",
+        "adhoc/run.sh:1-12",
+        "adhoc/clank-adhoc-research@.service:1-15"
+      ],
+      "test_evidence": "Existing core.test.mjs covers source URL/size, mention neutralization, durable launch intent, indeterminate restart refusal, completed capture recovery and publication read-back. README records isolated Moltnet/browser rehearsal separately; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "06-06C_answer_matching_resume_and_admissible_use",
+      "kind": "primary",
+      "packet_id": "06_adhoc_roundtrip",
+      "source_report": "06_adhoc_roundtrip.json",
+      "original_id": "06C_answer_matching_resume_and_admissible_use",
+      "owner": "research-sensor publishes; requester owns editorial use",
+      "trigger": "research.answer.v1 includes literal @requester mention",
+      "input": "research.answer.v1 from research-sensor",
+      "output": "Requester resumes, accepts only matching request_id and to, reconciles E ids with article citation order, preserves URLs/ran_at/unresolved, or continues with unknown/refused evidence",
+      "consumer_access": "Reporters and Brass directly; Spike/Caslon/Ledger/Pressman through article owner or Brass in shared rooms / Reporters and Brass declare research wake; non-requesters declare shared-room escalation paths and may lack research room membership",
+      "validation": "Instruction-level matching and admissibility rules are explicit; no central editorial orchestrator is required",
+      "recovery": "No guaranteed answer time; requester ends turn and resumes on mention; not_found/refused establish no missing fact",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "RESEARCH_ROUND_TRIP.md:80-99",
+        "RESEARCH_ROUND_TRIP.md:107-119",
+        "FLOOR.md:100-115",
+        "agents/graves/AGENTS.md:29-38",
+        "agents/brass/AGENTS.md:29-43",
+        "agents/spike/AGENTS.md:17-21",
+        "agents/caslon/AGENTS.md:17-20",
+        "agents/ledger/AGENTS.md:15-18",
+        "Spawnfile:96-102"
+      ],
+      "test_evidence": "Not run. Existing tests cover producer-side mention and publication. Public protocol says real Daimon reporter request, mention-triggered second turn and answer use still need isolated agent acceptance.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "07-1",
+      "kind": "primary",
+      "packet_id": "07_review_revision",
+      "source_report": "07_review_revision.json",
+      "original_id": "07.1",
+      "owner": "Assigned reporter using file_article",
+      "trigger": "Reporter assignment wake or owner correction before/after review as allowed",
+      "input": "{edition,event_key,article}",
+      "output": "editions/<date>/filings/<article-id>/<revision>.json plus receipt and regenerated INDEX F row with digest/owner/revision/lint",
+      "consumer_access": "Spike via edition-state and filing-room wake / Spike has review_article MCP, edition-state mount, public/private bundles, and room:filing wake access",
+      "validation": "Assignment ownership, format, evidence_refs, unresolved prior verdict, revision transition, art, and hard citation lint",
+      "recovery": "Refused filings record nothing; same revision can be refiled until reviewed; reviewed revision cannot be rewritten",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "production-newsroom.mjs:167-205",
+        "production-newsroom.mjs:366-371",
+        "edition-index.mjs:288-327",
+        "edition-index.mjs:384-391",
+        "reporter AGENTS.md:43-46",
+        "spike Spawnfile:22,29-46"
+      ],
+      "test_evidence": "Existing tests not run; no rehearsal evidence used",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "07-2",
+      "kind": "primary",
+      "packet_id": "07_review_revision",
+      "source_report": "07_review_revision.json",
+      "original_id": "07.2",
+      "owner": "Spike using review_article",
+      "trigger": "20:00 schedule or filing/revision mention",
+      "input": "{edition,event_key,article_id,revision,filing_digest,verdict,notes}",
+      "output": "verdicts/<article-id>/<revision>.json; on PASS also reviews/<article-id>.json and articles/<article-id>.json",
+      "consumer_access": "Reporter for correction; Caslon/composition for PASS articles / Spike-only tool exposure; reporters and Caslon have shared edition-state via their declared mounts/tools",
+      "validation": "Spike identity, closed verdict enum, existing filing, exact filing_digest",
+      "recovery": "Missing filing or stale digest records no verdict; conflicting duplicate verdict rejected by transaction idempotence",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "production-newsroom-mcp.mjs:89-101",
+        "production-newsroom-mcp.mjs:141-147",
+        "production-newsroom.mjs:270-283",
+        "state/transaction.mjs:87-95",
+        "state/transaction.mjs:127-149"
+      ],
+      "test_evidence": "Existing tests not run; no rehearsal evidence used",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "07-3",
+      "kind": "primary",
+      "packet_id": "07_review_revision",
+      "source_report": "07_review_revision.json",
+      "original_id": "07.3",
+      "owner": "Original reporter filing next revision after Spike HOLD/REVISION_REQUEST",
+      "trigger": "Spike asks owner in room:filing and records HOLD or REVISION_REQUEST",
+      "input": "Next file_article call with same assignment id and revision + 1",
+      "output": "new filings/<article-id>/<next-revision>.json, INDEX F row, later digest-bound re-review",
+      "consumer_access": "Spike for re-review; Caslon composition for only PASS-promoted article set / Reporter has file_article and room:filing wake access; Spike has room:filing wake access; Caslon has compose_edition",
+      "validation": "Revision >1 requires prior verdict REVISION_REQUEST or HOLD; PASS/SPIKE block later revisions; composition rechecks PASS review digest and prose unchanged from filing",
+      "recovery": "Premature raised revision rejected with wait/refile guidance; terminal verdict blocks correction; stale/non-PASS composition rejected",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "reporter AGENTS.md:43-46",
+        "spike AGENTS.md:39-47",
+        "spike AGENTS.md:92-111",
+        "production-newsroom.mjs:186-197",
+        "production-newsroom.mjs:302-306",
+        "team Spawnfile:70",
+        "role Spawnfiles filing wake/tool declarations"
+      ],
+      "test_evidence": "Existing tests not run; no rehearsal evidence used",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "08-08A",
+      "kind": "primary",
+      "packet_id": "08_dissent_forecast",
+      "source_report": "08_dissent_forecast.json",
+      "original_id": "08A",
+      "owner": "Brass via record_assignment",
+      "trigger": "18:30 conference wake after reading room:conference and desks/_all.index",
+      "input": "{edition,event_key,assignments:[{id,owner,brief,evidence_refs,slot:\"forecast\",dissenter?}]}",
+      "output": "state/edition/editions/<date>/assignments/<sha(event_key)>.json, assigned receipt, and return forecast:{id,owner,dissenter|null}",
+      "consumer_access": "Assigned reporter resolves own assignment during file_article / Brass has record_assignment and assignment room access; reporters have assignment/filing room access and file_article",
+      "validation": "At least five assignments, valid desks, unique ids, at most one forecast slot, self-dissent rejected; forecast filing gets forecastRequired article checks",
+      "recovery": "Short lineup, bad assignment, missing owner assignment, malformed forecast filing all reject without recording",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/brass/AGENTS.md:111-123 requires one forecast with named dissenter and owner mention",
+        "agentic-org/agents/brass/Spawnfile:22 repeats the same operational instruction and room handoff",
+        "agentic-org/scripts/production-newsroom.mjs:95-113 treats dissenter as optional and returns null if omitted",
+        "agentic-org/scripts/production-newsroom.mjs:177,208-212 enforces forecast filing shape and then tells owner either to mention dissenter or that dissent=0 will compose",
+        "ops/article-format.mjs:33-34 and ops/article-format-schema.mjs:20-33 require forecast epistemic/confidence and clock fields"
+      ],
+      "test_evidence": "Existing tests only; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "08-08B",
+      "kind": "primary",
+      "packet_id": "08_dissent_forecast",
+      "source_report": "08_dissent_forecast.json",
+      "original_id": "08B",
+      "owner": "Named reporter/dissenter via record_dissent",
+      "trigger": "Owner's room:filing mention with article id and revision after forecast filing",
+      "input": "{edition,event_key,article_id,revision,stance:\"dissent\"|\"concur\",argument,p?}",
+      "output": "state/edition/editions/<date>/dissents/<article_id>/<revision>.json with clank.dissent.v1, article_digest, agent/name, stance, optional p, plus dissented receipt; PASS article may receive dissent object",
+      "consumer_access": "Spike review_article merges dissent on PASS; a later same-call revision can carry forward / Six reporters have record_dissent, shared edition state, and room:filing membership/wake route",
+      "validation": "Bound agent identity, reporter-only caller, not own byline, existing filing/revision, pre-compose, no REVISION_REQUEST target; dissent requires p in [0,1] and 80-2000 chars, concur forbids p",
+      "recovery": "Wrong id/revision reports filed choices; after compose refuses; revision carry drops if confidence.value or next_update_utc changed",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/tinkerton/AGENTS.md:104-117 gives trigger/read/tool shape",
+        "agentic-org/agents/tinkerton/AGENTS.md:125-132 gives deadline and revision carry rule",
+        "agentic-org/scripts/production-newsroom-mcp.mjs:75-87 defines record_dissent schema and identity semantics",
+        "agentic-org/scripts/production-newsroom-mcp.mjs:141-144 grants record_dissent only to reporters",
+        "agentic-org/scripts/production-newsroom.mjs:216-254 validates, records, and optionally merges dissent",
+        "agentic-org/scripts/production-newsroom.mjs:257-283 carries/drops dissent and merges on PASS"
+      ],
+      "test_evidence": "Existing tests only; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "08-08C",
+      "kind": "primary",
+      "packet_id": "08_dissent_forecast",
+      "source_report": "08_dissent_forecast.json",
+      "original_id": "08C",
+      "owner": "Spike PASS articles and Caslon compose_edition",
+      "trigger": "21:00 Caslon wake after INDEX and lay_pages",
+      "input": "{edition,event_key,layout_sha256} in production",
+      "output": "composed receipt, composition/current pointer, compose_gates line, forecasts count, dissents count",
+      "consumer_access": "Caslon composition and Pressman release handoff / Caslon has compose_edition, shared state, and release room access",
+      "validation": "Five PASS articles, matching reviews, four desk docs, five distinct bylines, three sections/sources/domains, page completeness, and unchanged reporter prose except recorded dissent",
+      "recovery": "Incomplete tree, stale PASS digest, prose changes, bad pages/maps/artifacts reject; forecast/dissent counts report and do not block",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/scripts/production-newsroom.mjs:295-339 validates tree and records forecast/dissent counts",
+        "agentic-org/scripts/compose-gate.mjs:24-29 states forecast/dissent count rather than refuse",
+        "agentic-org/scripts/compose-gate.mjs:42-48 defines forecast and named dissent counters",
+        "agentic-org/agents/caslon/AGENTS.md:89-102 documents the count semantics",
+        "agentic-org/agents/caslon/Spawnfile:22-38 grants compose path"
+      ],
+      "test_evidence": "Existing runtime layout test asserts forecast=0 dissent=0 can compose; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "09-S1",
+      "kind": "primary",
+      "packet_id": "09_ledger_inputs",
+      "source_report": "09_ledger_inputs.json",
+      "original_id": "S1",
+      "owner": "scheduled sensor slot via run-research.sh / desk-prep.mjs / desk-settlements.mjs",
+      "trigger": "clank-research@chatgpt/grok timers, after capture and split-desks succeed",
+      "input": "published public content archive previous edition articles and schedule",
+      "output": "<edition>/desks/ledger.settlements.prepared.json; clank.desk-prep.v1; document.resolved_last_edition rows with call, outcome open, prior_p; review holes",
+      "consumer_access": "Ledger reads repos/newsroom-private/<edition>/desks/ledger.settlements.prepared.json and files ledger.settlements / Ledger has read-only private archive and file_desk only for ledger.settlements/ledger.worlddesk",
+      "validation": "desk-contract top-level exact key resolved_last_edition; row shape and outcome/probability checks; file_desk owner check",
+      "recovery": "review holes; Ledger asks Brass for missing evidence or leaves open; malformed file_desk call refuses",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "run-research.sh:136-150",
+        "desk-settlements.mjs:94-124",
+        "agents/ledger/Spawnfile:22,39-42",
+        "agents/ledger/AGENTS.md:55-63,107-120",
+        "ops/desk-contract.mjs:62-74",
+        "production-newsroom.mjs:285-293"
+      ],
+      "test_evidence": "Existing desk-prep/desk-settlements tests read; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "09-S2",
+      "kind": "primary",
+      "packet_id": "09_ledger_inputs",
+      "source_report": "09_ledger_inputs.json",
+      "original_id": "S2",
+      "owner": "scheduled sensor slot via desk-worlddesk.mjs",
+      "trigger": "run-research.sh invokes desk-worlddesk after split/prep; nonfatal status is carried in notice",
+      "input": "sensors/registry/escalation-questions.json, sensors/registry/flashpoints.json, FRED series via allowlisted cached fetches, current/prior story corpus",
+      "output": "<edition>/worlddesk/ledger.worlddesk.json plus trace.json, or refusal.json with no document when any proxy unresolved",
+      "consumer_access": "Ledger reads repos/newsroom-private/<edition>/worlddesk/ledger.worlddesk.json and trace.json, copies document verbatim, or stale-carries on refusal / Ledger read-only private archive plus file_desk; release room mention access",
+      "validation": "file_desk validates only world_desk object and four old fields: escalation_index, delta, open_conflicts, watch",
+      "recovery": "unresolved source writes refusal.json and trace; Ledger carries prior figure with stale delta",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "run-research.sh:151-170",
+        "desk-worlddesk.mjs:46-60,86-160,163-202",
+        "sensor-fetch.mjs:27-99",
+        "agents/ledger/Spawnfile:22",
+        "agents/ledger/AGENTS.md:122-161",
+        "ops/desk-contract.mjs:76-84",
+        "production-newsroom.mjs:285-293"
+      ],
+      "test_evidence": "Existing desk-worlddesk.test.mjs read; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "09-S3",
+      "kind": "primary",
+      "packet_id": "09_ledger_inputs",
+      "source_report": "09_ledger_inputs.json",
+      "original_id": "S3",
+      "owner": "scheduled sensor slot via desk-prep.mjs and fetch-weather.mjs",
+      "trigger": "run-research.sh invokes weather prep and newer fetch-weather after split",
+      "input": "Open-Meteo current weather through sensor-fetch allowlist/cache",
+      "output": "<edition>/desks/caslon.weather.prepared.json and/or <edition>/worlddesk/caslon.weather.json plus trace; document is {weather:{city,temp_c,summary,humidity_pct,wind}} or {weather:null}",
+      "consumer_access": "Caslon, not Ledger, owns caslon.weather and files it through file_desk / Caslon file_desk authority for caslon.weather; Ledger has no weather filing authority",
+      "validation": "desk-contract permits weather object or null; file_desk owner check",
+      "recovery": "network/error/bad WMO/missing numeric field writes null, not partial weather",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "run-research.sh:136-150,167-176",
+        "fetch-weather.mjs:48-99",
+        "sensor-fetch.mjs:27-99",
+        "ops/desk-contract.mjs:48-60",
+        "production-newsroom-mcp.mjs:19,102-112"
+      ],
+      "test_evidence": "Existing desk-weather/fetch-weather tests read; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "09-S4",
+      "kind": "primary",
+      "packet_id": "09_ledger_inputs",
+      "source_report": "09_ledger_inputs.json",
+      "original_id": "S4",
+      "owner": "Ledger via mcp_newsroom_file_desk, then Moltnet mention to Caslon",
+      "trigger": "Ledger cron wake 20:30 Europe/Berlin with prompt to file both documents and mention @caslon",
+      "input": "prepared settlements, current worlddesk document+trace or refusal fallback, current wake id",
+      "output": "shared state desk JSON files, history copies, desk-filed receipts, INDEX compose gate line; release-room @caslon readiness message by instruction",
+      "consumer_access": "Caslon reads release room and state, then compose_edition; compose refuses without exactly four desk docs / Ledger release room wake-on-mentions; file_desk only. Caslon release room and compose_edition.",
+      "validation": "file_desk owner and shape validation; compose_edition requires exactly 4 desk documents and pass gates",
+      "recovery": "file_desk error is refusal; exact retry idempotent; changed correction uses later wake/history",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agents/ledger/Spawnfile:17-36",
+        "agents/ledger/AGENTS.md:159-161",
+        "production-newsroom.mjs:285-293,304-312",
+        "edition-index.mjs:288-305"
+      ],
+      "test_evidence": "Existing production-newsroom tests read; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "10-1",
+      "kind": "primary",
+      "packet_id": "10_art_assets",
+      "source_report": "10_art_assets.json",
+      "original_id": "10.1",
+      "owner": "trusted host/runtime packaging plus public Caslon Spawnfile",
+      "trigger": "Caslon scheduled wake starts the art MCP server from the mounted newsroom tools bundle",
+      "input": "CLANK_NEWSROOM_AGENT=caslon, absolute public/state/output roots, ETOPO env, mounted public/content/tool bundles",
+      "output": "tools/list exposes list_art_catalogue, bake_map, bake_glyph, inspect_artifact, inspect_catalogue_preview, lay_pages",
+      "consumer_access": "Caslon via the declared art MCP server / public and ETOPO bundles readonly; art-cache and etopo-cache mutable per-agent; adapter rejects non-Caslon",
+      "validation": "absolute roots, realpath directories, packaged font hash checks, active wake admission",
+      "recovery": "invalid identity/path/wake fails the call; exact retry is possible after host/config correction",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/caslon/Spawnfile:51-80 declares art MCP env/tools and resource mounts",
+        "newsroom/art/adapter.mjs:48-67 enforces Caslon identity, absolute roots, fonts, and calls lay_pages",
+        "newsroom/art/adapter.mjs:89-105 limits bake calls and records wake/request receipts"
+      ],
+      "test_evidence": "Existing tests read, not run: newsroom/art/admission.test.mjs, newsroom/art/art.test.mjs, newsroom/runtime/bundle.test.mjs.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "10-2",
+      "kind": "primary",
+      "packet_id": "10_art_assets",
+      "source_report": "10_art_assets.json",
+      "original_id": "10.2",
+      "owner": "private deterministic map/glyph bakers",
+      "trigger": "Caslon calls bake_map or bake_glyph",
+      "input": "bake_map bounded terrain crop plus ETOPO grid/cache; bake_glyph vetted model id microchip plus camera/grid options",
+      "output": "immutable state/edition/editions/<date>/art/<sha>/{map|glyph}.json, preview.svg, provenance.json; returned registration {kind,name,sha256}",
+      "consumer_access": "lay_pages and compose_edition artifact authentication / read-only ETOPO/public model inputs; mutable edition state/art cache",
+      "validation": "bounds, slug, row/col limits, ETOPO assertion, model hash and size, non-empty unclipped glyph, immutable digest path",
+      "recovery": "invalid crop/model/render/storage collision rejects without a partial accepted registration",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "newsroom/art/bakers.mjs:7-99 pins model, validates options, bakes maps and glyphs",
+        "newsroom/art/storage.mjs:56-100 prepares ETOPO cache and saves immutable artifacts/provenance",
+        "newsroom/art/fonts.mjs:5-18 pins and validates fonts",
+        "newsroom/runtime/bundle.mjs:41-47 validates glyphcss/core/sharp native dependencies and returns bundle metadata"
+      ],
+      "test_evidence": "Existing tests read, not run: newsroom/art/art.test.mjs, newsroom/art/netcdf.test.mjs, newsroom/art/fonts.test.mjs. Executed read-only shasum checks for microchip and two art fonts.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "10-3",
+      "kind": "primary",
+      "packet_id": "10_art_assets",
+      "source_report": "10_art_assets.json",
+      "original_id": "10.3",
+      "owner": "public committed glyph/map/model catalogue and private catalogue reader",
+      "trigger": "Caslon lists catalogue or selects shape/roll/artifact in decisions.art",
+      "input": "public website/src/data glyph txt, website/src/models/small-microchip.glb, content/editions/*/maps/*.json",
+      "output": "catalogue entries with digest previews/contact sheet; validated decision choices for GlyphArt/MapGlyph",
+      "consumer_access": "public lay-page assembler and website renderer / Caslon can read catalogue through art MCP and public readonly bundle",
+      "validation": "assembler rejects unknown shapes/rolls and invalid eclipse pairing; renderer imports same glyph set",
+      "recovery": "bad selection is a lay_pages refusal naming the allowed set; Caslon revises decisions",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/caslon/PAGES.md:176-216 documents shapes, rolls, and map atlas",
+        "newsroom/art/catalogue.mjs:7-63 reads glyph/map/model catalogue and writes digest previews",
+        "ops/lay-page.mjs:18-19 and 126-134 validate allowed shapes/rolls",
+        "website/src/components/GlyphArt.astro:9-70 imports/render same static/roll/glyph sources"
+      ],
+      "test_evidence": "Existing tests read, not run: newsroom/art/art.test.mjs, newsroom/art/decisions.test.mjs. Executed read-only existence/count check: 9 glyph files present, 192 map files present.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "10-4",
+      "kind": "primary",
+      "packet_id": "10_art_assets",
+      "source_report": "10_art_assets.json",
+      "original_id": "10.4",
+      "owner": "Caslon bake registration and lay_pages layout artifact",
+      "trigger": "Caslon embeds returned registration under decisions.art[slug].artifact, calls lay_pages, then compose_edition with layout_sha256",
+      "input": "decision record plus accepted edition inputs and authenticated artifact folders",
+      "output": "editions/<date>/layouts/<sha>.json and <sha>.decisions.json, then composed pages/maps/glyphs and current composition receipt",
+      "consumer_access": "private state adapter and public compose_edition / Caslon owns lay_pages and compose_edition; production compose accepts digest route only",
+      "validation": "artifact reference/provenance/digest validation, canonical rebuild of layout, article/desk/page/map/glyph completeness, generated glyph page-reference checks",
+      "recovery": "invalid layout/art/map/glyph/composition state rejects; Caslon corrects own decisions or asks owning reporter/Brass per PAGES",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/caslon/PAGES.md:99-112 and 263-270 require lay_pages digest route",
+        "newsroom/art/layout.mjs:7-44 authenticates artifacts and saves immutable layout",
+        "newsroom/state/transaction.mjs:19-27 rejects inline production composition and reads digest layout",
+        "newsroom/state/layout.mjs:21-36 verifies digest, decision edition, and canonical rebuild",
+        "agentic-org/scripts/production-newsroom.mjs:295-339 validates and writes composition artifacts"
+      ],
+      "test_evidence": "Existing tests read, not run: newsroom/art/layout.test.mjs, newsroom/runtime/layout.integration.test.mjs, newsroom/state/newsroom.integration.test.mjs.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "11-S1",
+      "kind": "primary",
+      "packet_id": "11_layout_composition",
+      "source_report": "11_layout_composition.json",
+      "original_id": "S1",
+      "owner": "Caslon via private art lay_pages",
+      "trigger": "Caslon 21:00 scheduled or mention wake after accepted inputs are present",
+      "input": "{edition, decisions}; decisions include order/briefly/tape plus optional art/flashpoints; art references are {kind,name,sha256}",
+      "output": "state/edition/editions/<date>/layouts/<sha256>.json with exactly {pages,maps,artifacts}, paired <sha256>.decisions.json, and returned layout_sha256/request receipt",
+      "consumer_access": "Caslon compose_edition call / Caslon declares newsroom and art MCP servers, shared edition-state volume, public source root and trusted active wake admission",
+      "validation": "assertLayoutDecisions, validateCompositionArtifact, public layEdition structural checks for four desk docs, five PASS articles, exact order, maps, art rhythm, paper diversity and alternation",
+      "recovery": "Invalid decisions or unresolved inputs throw before accepted layout; exact retry returns same immutable digest",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "ops/lay-page.mjs:262-305,329-339",
+        "ops/layout-artifacts.mjs:7-28",
+        "newsroom/art/layout.mjs:7-44",
+        "newsroom/art/adapter.mjs:48-70",
+        "newsroom/art/layout.test.mjs:14-39",
+        "newsroom/art/decisions.test.mjs:91-114"
+      ],
+      "test_evidence": "Existing targeted tests read; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "11-S2",
+      "kind": "primary",
+      "packet_id": "11_layout_composition",
+      "source_report": "11_layout_composition.json",
+      "original_id": "S2",
+      "owner": "Caslon via compose_edition",
+      "trigger": "Caslon calls compose_edition with current wake id and layout_sha256 returned by lay_pages",
+      "input": "Production schema requires {edition,event_key,layout_sha256}; inline pages/maps/artifacts are fixture-only",
+      "output": "pages/front.json, pages/tape.json, maps/glyphs, history paths, receipts/composed-<digest>.json and composition/current",
+      "consumer_access": "Pressman authenticatedCurrentComposition and later release preparation / State adapter reads layout only inside the current edition transaction; compose_edition is exposed only to caslon",
+      "validation": "Layout file SHA-256, no symlink escape, exact shape {pages,maps,artifacts}, current-edition pages, decision file, canonical reassembly, PASS review digests, reporter prose preservation, page/map/glyph reference completeness and artifact provenance",
+      "recovery": "Stale layout, changed input tree, stale PASS digest, prose tamper, map/glyph mismatch or changed retry are refused; exact retry preserves the same receipt",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "production-newsroom-mcp.mjs:114-145",
+        "production-newsroom.mjs:295-340,366-373",
+        "newsroom/state/layout.mjs:21-36",
+        "newsroom/state/transaction.mjs:19-27,127-151",
+        "newsroom/history/index.mjs:90-115",
+        "newsroom/state/newsroom.integration.test.mjs:112-149"
+      ],
+      "test_evidence": "Existing targeted tests read; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "11-S3",
+      "kind": "primary",
+      "packet_id": "11_layout_composition",
+      "source_report": "11_layout_composition.json",
+      "original_id": "S3",
+      "owner": "Caslon declared cognitive handoff; Moltnet/Daimon route",
+      "trigger": "After successful composition, Caslon sends @pressman in room:release with edition and composition digest; Pressman also has a 21:30 scheduled wake",
+      "input": "Moltnet room message; durable input is the current composed receipt already written by compose_edition",
+      "output": "Addressed @pressman wake route toward prepare_release/stage_release; no composition state mutation occurs in the handoff message",
+      "consumer_access": "Pressman / Caslon and Pressman are members of room:release with write/observe scopes and mention wakes; Pressman declares visual prepare_release and newsroom stage_release tools on shared state",
+      "validation": "Pressman release path calls authenticatedCurrentComposition, checking receipt digest, tree digest, current tree names and per-file digests before downstream work",
+      "recovery": "Pressman reports missing inputs to @brass in room:release; changed composition requires new prepare job",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/Spawnfile:49-102",
+        "agents/caslon/Spawnfile:17-67",
+        "agents/caslon/AGENTS.md:75-80,113-126,246-260",
+        "agents/pressman/Spawnfile:17-67",
+        "agents/pressman/AGENTS.md:57-67",
+        "production-newsroom.mjs:55-76,360-364",
+        "tool-bundle-contract.mjs:1-28"
+      ],
+      "test_evidence": "Existing organization/runtime contract tests read; not run.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "12-1",
+      "kind": "primary",
+      "packet_id": "12_build_staging",
+      "source_report": "12_build_staging.json",
+      "original_id": "12.1",
+      "owner": "Caslon composed receipt plus Pressman scheduled release wake",
+      "trigger": "Pressman 21:30 Europe/Berlin schedule calls visual prepare_release with poll 0 and same event_key while pending",
+      "input": "prepare_release {edition,event_key,poll}; authenticated current composition from state/edition/editions/<date>/composition/current.json or composed receipts",
+      "output": "state/edition/editions/<date>/release/jobs/<sha256(edition,event_key)>.json containing clank.preparation-job.v1, composition_digest, status, deadline and result",
+      "consumer_access": "private build worker launched from newsroom/build/jobs.mjs / visual adapter only constructs for agent pressman; admission requires sole active Pressman Daimon wake and signed prepare job capability",
+      "validation": "composition receipt digest/tree is authenticated; existing job must match composition_digest; reusable jobs must be current or succeeded",
+      "recovery": "pending returns next_poll/retry_after_seconds; stale heartbeat/deadline returns failed; failed jobs instruct new event_key",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/pressman/Spawnfile:17-22,49-67",
+        "newsroom/visual/adapter.mjs:4-21",
+        "newsroom/build/jobs.mjs:29-61",
+        "newsroom/state/admission.mjs:22-59",
+        "agentic-org/scripts/production-newsroom.mjs:55-75,360-375"
+      ],
+      "test_evidence": "existing tests read: visual/adapter.test.mjs, build/jobs.test.mjs, state/admission.test.mjs",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "12-2",
+      "kind": "primary",
+      "packet_id": "12_build_staging",
+      "source_report": "12_build_staging.json",
+      "original_id": "12.2",
+      "owner": "private release adapter prepareRelease",
+      "trigger": "detached worker re-authenticates current composition_digest and calls runtime.prepareRelease",
+      "input": "authenticated composed receipt plus absolute stateRoot/sourceRoot/stagingRoot, dependencyRoots, assetRoots and privateRoot",
+      "output": "candidate <stagingRoot>/<edition>-<compositionDigest[0..16]>; copied content/editions/<date>/{articles,desk,pages,maps,glyphs}; validation/build/cameras logs; built, mechanical and prepared JSON receipts under release/",
+      "consumer_access": "stageRelease and later host-side staging consumer / copies public source with excluded build/runtime dirs; merges read-only dependency and asset bundles; copies only composition tree names from edition state",
+      "validation": "absolute/distinct roots; composition digest matches JSON; dependencies match lock/provenance/platform/arch/Node; validate-content and Astro build must exit 0; front HTML >1000 bytes; offline glyph camera check must emit positive marker; mechanical digest binds logs and artifact_digest",
+      "recovery": "built receipt recovery verifies temporary digest before rename; refuses changed candidate, dependency drift, bad/missing logs or missing positive markers",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "newsroom/build/release.mjs:10-17,19-33,45-91",
+        "newsroom/build/worker.mjs:24-36",
+        "newsroom/build/process.mjs:3-12",
+        "newsroom/build/dependencies.mjs:9-55,67-81",
+        "newsroom/build/mechanical.mjs:11-27,29-53",
+        "newsroom/build/public-trace.mjs:5-28"
+      ],
+      "test_evidence": "existing tests read: build/release.test.mjs, build/dependencies.test.mjs, build/public-trace.test.mjs",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "12-3",
+      "kind": "primary",
+      "packet_id": "12_build_staging",
+      "source_report": "12_build_staging.json",
+      "original_id": "12.3",
+      "owner": "Pressman stage_release",
+      "trigger": "Pressman calls public newsroom MCP stage_release after successful prepare_release",
+      "input": "stage_release {edition,event_key}; runtime resolves current composition and private release adapter reads prepared-<digest>.json",
+      "output": "state/edition/editions/<date>/receipts/staged-<compositionDigest[0..16]>.json and <stagingRoot>/current-edition symlink to the candidate directory",
+      "consumer_access": "parked downstream publication/host job, out of this packet / public MCP exposes stage_release only to pressman; private adapter requires prepared/mechanical evidence and unchanged candidate digest",
+      "validation": "missing prepare evidence fails; prepared identity and candidate artifact digest are checked; dependency provenance and mechanical manifest/log markers are loaded; conflicting existing staged receipts and changed artifacts fail",
+      "recovery": "repeated staging returns the original compatible receipt; no visual proof or review gate is required or recorded",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/scripts/production-newsroom-mcp.mjs:134-144,182-183",
+        "agentic-org/scripts/production-newsroom.mjs:360-375",
+        "newsroom/build/release.mjs:94-110",
+        "newsroom/build/mechanical.mjs:17-27",
+        "agentic-org/agents/pressman/AGENTS.md:57-67"
+      ],
+      "test_evidence": "existing tests read: build/release.test.mjs, production-newsroom.test.mjs",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "13-staged_artifact_to_edition_branch",
+      "kind": "primary",
+      "packet_id": "13_publication",
+      "source_report": "13_publication.json",
+      "original_id": "staged-artifact-to-edition-branch",
+      "owner": "Pressman stage_release via private newsroom/build/release.mjs",
+      "trigger": "Pressman calls mcp_newsroom_stage_release after matching successful prepare_release/mechanical build",
+      "input": "Authenticated composed receipt with edition, kind=composed, digest matching composition JSON, stateRoot/sourceRoot/stagingRoot, selected artifact names",
+      "output": "stagingRoot/<edition>-<composition_digest[0:16]>/content/editions/<edition> plus stagingRoot/current-edition symlink and stateRoot/editions/<edition>/receipts/staged-<digest16>.json",
+      "consumer_access": "Host-side agentic-org/scripts/publish-edition-branch.mjs / Host process outside container reads Docker volumes and uses host deploy key; Pressman has no Git/publisher credential",
+      "validation": "Host resolves current-edition, requires sibling directory, verifies edition pattern, exactly one staged receipt, state=staged, matching edition, matching artifact basename, composition-derived artifact name, artifact_digest, and recomputed tree digest",
+      "recovery": "Missing symlink/source/receipt, stale edition, mismatched digest, symlink/device in artifact, or non-fast-forward push exits non-zero; systemd OnFailure alarms when timer/service is used",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "newsroom/build/release.mjs:94-110",
+        "agentic-org/scripts/publish-edition-branch.mjs:221-233",
+        "agentic-org/scripts/publish-edition-branch.mjs:283-297",
+        "agentic-org/scripts/publish-edition-branch.mjs:325-368"
+      ],
+      "test_evidence": "Existing tests read: publish-edition-branch.test.mjs receipt/digest/tamper/ref cases and release.test.mjs staging cases; not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "13-host_authorization_and_failure_feedback",
+      "kind": "primary",
+      "packet_id": "13_publication",
+      "source_report": "13_publication.json",
+      "original_id": "host-authorization-and-failure-feedback",
+      "owner": "Host systemd clank-publish.service",
+      "trigger": "clank-publish.timer at 22:30 Europe/Berlin when enabled",
+      "input": "/var/lib/docker/volumes/clank-release-staging/_data, /var/lib/docker/volumes/clank-edition-state/_data, /root/.ssh/clank_public, --edition today",
+      "output": "One public branch edition/YYYY-MM-DD on git@clankandslop.deploy:apresmoi/clankandslop.git; JSON/stdout result includes branch, commit, edition, remote, artifact, published:false",
+      "consumer_access": "GitHub repository receives edition branch; merge-edition.yml consumes push event / Host root service references operator key; script writes temporary SSH config with IdentitiesOnly, IdentityAgent none, pinned known_hosts",
+      "validation": "Fixed remote table, no CLI remote override, protected refs/forced flags refused, Berlin today guard, --edition requires --state",
+      "recovery": "Script exits non-zero on bad input/push failure; service declares OnFailure=clank-alarm@%n.service; already-published edition returns quiet success",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/ops/systemd/clank-publish.service:31-46",
+        "agentic-org/ops/systemd/clank-publish.timer:16-25",
+        "agentic-org/scripts/publish-edition-branch.mjs:36-43",
+        "agentic-org/scripts/publish-edition-branch.mjs:85-127",
+        "agentic-org/scripts/publish-edition-branch.mjs:141-149",
+        "agentic-org/scripts/publish-edition-branch.mjs:371-427"
+      ],
+      "test_evidence": "Existing tests read: publish-edition-branch.test.mjs covers remote, SSH config, ref/push refusals, stale edition, idempotence; not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "13-edition_branch_to_main_to_pages",
+      "kind": "primary",
+      "packet_id": "13_publication",
+      "source_report": "13_publication.json",
+      "original_id": "edition-branch-to-main-to-pages",
+      "owner": "GitHub push event for edition/YYYY-MM-DD branch",
+      "trigger": "on.push.branches edition/* in merge-edition.yml",
+      "input": "Branch diff against main containing only content/editions, content/topics.txt, content/bylines, and checksum-only agentic-org descriptor/pin changes",
+      "output": "GitHub Actions-created PR, merge commit into main, then deploy-website.yml builds website/dist and deploys GitHub Pages",
+      "consumer_access": "GitHub Actions merge-edition.yml and deploy-website.yml / merge-edition.yml uses GITHUB_TOKEN with contents:write, pull-requests:write, checks/actions:read; deploy-website.yml uses pages:write and id-token:write",
+      "validation": "Ref regex, path allowlist, checksum-only agentic-org diff, ci-gate exact-SHA push-run success check before and immediately before merge, PR head SHA recheck, conflict refusal, website build before Pages deploy",
+      "recovery": "Bad ref/path/checksum/CI/head movement/conflict exits workflow before merge; deploy failure remains a GitHub Actions failure. No human approval gate is present in source.",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        ".github/workflows/merge-edition.yml:48-57",
+        ".github/workflows/merge-edition.yml:79-137",
+        ".github/workflows/merge-edition.yml:150-196",
+        "agentic-org/scripts/ci-gate.mjs:63-85",
+        ".github/workflows/deploy-website.yml:3-17",
+        ".github/workflows/deploy-website.yml:44-60",
+        "agentic-org/TEAM.md:29-32",
+        "agentic-org/agents/pressman/AGENTS.md:36-45"
+      ],
+      "test_evidence": "Existing ci-gate.test.mjs read; no live workflow settings or runs checked",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "14-S1",
+      "kind": "primary",
+      "packet_id": "14_runtime_contract",
+      "source_report": "14_runtime_contract.json",
+      "original_id": "S1",
+      "owner": "Public agentic-org role Spawnfiles lowered by Spawnfile Daimon adapter",
+      "trigger": "spawnfile compile / Daimon container target creation",
+      "input": "Agent declarations with runtime.name daimon, runtime.options.engine codex, execution.model.primary.name gpt-5.4-mini, cron schedule and jitter_seconds 900",
+      "output": "daimon-organization-runtime.json agent rows with engine.kind, instructions, paths, MCP/Moltnet/memory, and normalized schedule",
+      "consumer_access": "Daimon organization runtime parser and engineDispatcher / Daimon control host reads generated config; Codex CLI uses optional engine.model only if present",
+      "validation": "Spawnfile accepts only OpenAI Codex subscription intent; Daimon parser validates engine fields strictly",
+      "recovery": "Invalid declarations fail compile/config parse; omitted optional model and jitter silently fall back to runtime defaults/no jitter",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/cogsworth/Spawnfile:4-22 declares daimon/codex/gpt-5.4-mini/cron/jitter",
+        "spawnfile/src/runtime/daimon/adapter.ts:41-46 validates OpenAI Codex subscription intent only",
+        "spawnfile/src/runtime/daimon/config.ts:48-61 normalizes schedule without jitter_seconds",
+        "spawnfile/src/runtime/daimon/config.ts:153-170 emits engine.kind only and schedule from normalizeSchedule",
+        "daimon/src/runtime/engineDispatcher.ts:97-110 passes engine.model/reasoningEffort to Codex only if present"
+      ],
+      "test_evidence": "existing tests read only; not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "14-S2",
+      "kind": "primary",
+      "packet_id": "14_runtime_contract",
+      "source_report": "14_runtime_contract.json",
+      "original_id": "S2",
+      "owner": "Public role Spawnfiles and root Moltnet declaration",
+      "trigger": "Compile emits workspace/Daimon config; wake starts production tools",
+      "input": "Explicit MCP server declarations with tool allowlists and per-role Moltnet room declarations",
+      "output": "Daimon config mcp entries and moltnet config path/networks/rooms/dms; generated Cognition tools mcp_<server>_<tool>, moltnet_send, moltnet_read",
+      "consumer_access": "Daimon productionAgentTools and Moltnet machine CLI / Only declared MCP tools and declared Moltnet networks/rooms/DMs are callable",
+      "validation": "Spawnfile requires MCP tools allowlist and absolute stdio command; Daimon compares server listTools result to allowlist",
+      "recovery": "Malformed/excess MCP exposure fails agent startup; out-of-scope Moltnet call throws before delivery",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/Spawnfile:60-102 declares tokens and room memberships",
+        "agentic-org/agents/cogsworth/Spawnfile:34-36 declares newsroom and validation tool allowlists",
+        "spawnfile/src/runtime/daimon/adapter.ts:92-95 validates allowlists/absolute commands",
+        "spawnfile/src/runtime/daimon/config.ts:157-166 emits mcp and moltnet config",
+        "daimon/src/runtime/productionAgentTools.ts:33-50 creates/checks declared tools",
+        "daimon/src/runtime/productionAgentTools.ts:118-127 enforces Moltnet network/room/DM scope"
+      ],
+      "test_evidence": "existing tests read only; not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "14-S3",
+      "kind": "primary",
+      "packet_id": "14_runtime_contract",
+      "source_report": "14_runtime_contract.json",
+      "original_id": "S3",
+      "owner": "Public workspace/memory declarations plus private runtime bundle/profile producers",
+      "trigger": "Compile resource materialization and runtime auth/profile provisioning",
+      "input": "Readonly bundles, mutable edition-state/team volume, per-agent durable SQLite memory, Moltnet token ids, Codex subscription auth",
+      "output": "Readonly bundles, durable state/edition, and one Daimon memory block per agent; helper can write <runtimeHome>/.codex/config.toml, but only rehearsal/test caller was found",
+      "consumer_access": "Daimon CLI child environment and Pi harness memory adapter / Per-agent HOME/XDG/runtime home and filtered child environment; this proves environment filtering, not same-container filesystem credential isolation",
+      "validation": "Resource overlap/divergence rejected; memory root unsupported/overlap rejected or degraded; runtime auth validates bounded 0600 caller-owned credential file; profile helper refuses differing existing config",
+      "recovery": "Unsupported memory degrades with diagnostics; missing/unsafe credential or dirty runtime bundle source fails preparation",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/cogsworth/Spawnfile:37-57 declares readonly resources and durable SQLite memory",
+        "spawnfile/src/compiler/workspaceResources.ts validates mount identity and overlap",
+        "spawnfile/src/runtime/daimon/memory.ts resolves one durable memory block and rejects instance-root overlap",
+        "daimon/src/pi/cliEnvironment.ts:13-42 builds a positive child environment and sets CODEX_HOME when engineHomePath is supplied",
+        "newsroom/runtime/profile.mjs:6-45 defines profile provisioning",
+        "newsroom/rehearsal/run.mjs:50-64 is the only non-test caller found; lines 140-144 pass its env only to rehearsal Daimon",
+        "daimon/src/pi/cliEngineSpawn.ts:28-37 consumes DAIMON_CODEX_SANDBOX but defaults to danger-full-access"
+      ],
+      "test_evidence": "existing tests read only; not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "14-S4",
+      "kind": "primary",
+      "packet_id": "14_runtime_contract",
+      "source_report": "14_runtime_contract.json",
+      "original_id": "S4",
+      "owner": "Public role AGENTS instructions and private Codex profile producer",
+      "trigger": "Profile provisioning before Codex wake",
+      "input": "Direct research prohibition, brokered research.request.v1 instructions, declared research room access for intended roles",
+      "output": "Helper-defined Codex profile with web_search disabled, network_access false, approval_policy never, and declared tools approved; production installation not established",
+      "consumer_access": "Codex CLI running in Daimon per-agent environment; Daimon Moltnet scoped tools / Codex consumes CODEX_HOME and DAIMON_CODEX_SANDBOX when supplied; otherwise Daimon renders --sandbox danger-full-access; Moltnet tools remain scoped",
+      "validation": "Profile validates Codex agent and tool slugs; Daimon rejects out-of-scope Moltnet calls",
+      "recovery": "Malformed profile inputs throw; existing differing profile throws; out-of-scope Moltnet calls throw",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/*/AGENTS.md lines matching Direct Internet research is prohibited",
+        "agentic-org/Spawnfile:101 declares research room members; Ledger/Pressman omit research room",
+        "newsroom/runtime/profile.mjs:22-32 can disable web_search/network and approve only declared tools",
+        "newsroom/rehearsal/run.mjs:61 and 140-144 invoke that helper and env only for rehearsal",
+        "daimon/src/pi/cliEngineSpawn.ts:28-37 consumes sandbox env but defaults to danger-full-access",
+        "daimon/src/runtime/engineDispatcher.ts:126-133 is instructional, not an enforcement binding"
+      ],
+      "test_evidence": "existing tests read only; not executed",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "15-S1",
+      "kind": "primary",
+      "packet_id": "15_clock_recovery",
+      "source_report": "15_clock_recovery.json",
+      "original_id": "S1",
+      "owner": "Daimon schedule controller plus role Spawnfile schedules",
+      "trigger": "cron schedules in role Spawnfiles",
+      "input": "organization-runtime.v2 agent schedule with prompt containing <edition-date>",
+      "output": "ScheduledOccurrence {agentId, deliveryId: schedule:<hash>:<local>, occurredAt, prompt}, persisted as wake v2 kind schedule",
+      "consumer_access": "Daimon control host dispatches persisted wake records to per-agent wake queue / known agent ids in runtime config; bearer token via control host",
+      "validation": "schedule state restore, WakeFuse.admit, WakeAcceptanceStore digest/agent/delivery validation",
+      "recovery": "startup coalesces missed due times into latest_pending and drains; busy agent leaves pending occurrence durable",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "UNKNOWN deployed state; source-only static trace",
+      "source_evidence": [
+        "agentic-org/policies/schedule.json lines 38-58 declares native schedules/no task orchestrator",
+        "agentic-org/agents/*/Spawnfile lines 17-22 declare cron and prompts",
+        "daimon/src/runtime/schedule.ts lines 37-46, 87-119, 130-140",
+        "daimon/src/runtime/organizationRuntimeControl.ts lines 233-249"
+      ],
+      "test_evidence": "existing tests only; not run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "15-S2",
+      "kind": "primary",
+      "packet_id": "15_clock_recovery",
+      "source_report": "15_clock_recovery.json",
+      "original_id": "S2",
+      "owner": "Moltnet bridge attachment/control delivery",
+      "trigger": "Moltnet event matching wake policy such as wake: mentions",
+      "input": "Moltnet message event with cursor/event id, target room, text, occurred_at",
+      "output": "POST /v2/wakes with agent_id, delivery_id, event {version, kind: message, text, occurred_at}; accepted receipt stored in bridge receipt store",
+      "consumer_access": "Daimon control host and Moltnet receipt follower / Moltnet attachment token plus Daimon bearer control token",
+      "validation": "codec validates 202 accepted response version, acceptance id, agent, delivery id and digest; Daimon validates exact request shape and token",
+      "recovery": "pre-accept transient errors retry up to five attempts; post-accept completion is async and failed/stopped terminal receipts are reported as agent.wake.failed",
+      "source_status": "PASS",
+      "source_status_detail": "PASS for source-level runtime retry model; private Moltnet/MoltnetNode active deployment reachability UNKNOWN",
+      "deployed_or_rehearsed_state": "UNKNOWN deployed state; source-only static trace",
+      "source_evidence": [
+        "moltnet/internal/bridge/loop/control_delivery.go lines 21-33, 63-105, 116-150",
+        "moltnet/internal/bridge/daimon/codec.go lines 71-158, 161-195",
+        "moltnet/internal/bridge/daimon/receipt_tracker.go lines 121-201",
+        "daimon/src/runtime/cli.ts lines 117-132"
+      ],
+      "test_evidence": "existing tests only; not run",
+      "limits": [
+        "No source caller found that proves current public organization deployment consumes private agentic-org/Moltnet or MoltnetNode"
+      ],
+      "entrypoints": []
+    },
+    {
+      "id": "15-S3",
+      "kind": "primary",
+      "packet_id": "15_clock_recovery",
+      "source_report": "15_clock_recovery.json",
+      "original_id": "S3",
+      "owner": "Daimon CLI sessions, wake fuse, wake acceptance store, control host",
+      "trigger": "accepted wake, operator fuse stop marker, host stop/restart",
+      "input": "engine terminal usage, agent id, wake id, acceptance store, fuse settings",
+      "output": "turn usage JSONL with outcome/reason; wake receipts accepted/running/completed/failed/stopped; fuse admissions/trip marker",
+      "consumer_access": "Wake fuse, activity endpoint, operational quiescence script / private runtime volume paths and control token",
+      "validation": "usage ledger bounded line rendering; WakeFuse.open validates ledger availability; WakeAcceptanceStore validates private path, digest, locks, transitions",
+      "recovery": "failed reported-usage turns are metered; startup dispatches accepted/running recoverable records; stop terminalizes queued accepted work and aborts active work",
+      "source_status": "PASS",
+      "source_status_detail": "PASS for source-level stop/restart contract and active operational caller; deployed mounted-store evidence UNKNOWN",
+      "deployed_or_rehearsed_state": "UNKNOWN deployed state; source-only static trace",
+      "source_evidence": [
+        "daimon/src/pi/cliSession.ts lines 377-408",
+        "daimon/src/runtime/turnUsageLedger.ts lines 66-80, 147-170, 193-211",
+        "daimon/src/runtime/wakeFuse.ts lines 51-85, 108-142, 223-280",
+        "daimon/src/runtime/wakeAcceptanceStore.ts lines 99-118, 181-210",
+        "daimon/src/runtime/organizationRuntimeControl.ts lines 95-145, 162-195, 210-288",
+        "agentic-org/scripts/wake-window.mjs lines 38-42, 209-218"
+      ],
+      "test_evidence": "existing tests only; not run",
+      "limits": [
+        "No live host/container inspection by packet rule"
+      ],
+      "entrypoints": [
+        "agentic-org/ops/systemd/clank-seam.service",
+        "agentic-org/scripts/seam-run.mjs",
+        "agentic-org/scripts/wake-window.mjs"
+      ]
+    },
+    {
+      "id": "16-01_sensor_archive_seam3_to_02_mount",
+      "kind": "cross-review",
+      "packet_id": "16_research_consistency",
+      "source_report": "16_research_consistency.json",
+      "original_id": "01_sensor_archive.seam3_to_02_mount",
+      "owner": "sensors/automation/run-research.sh",
+      "trigger": "successful scheduled browser capture",
+      "input": "new <edition>/<site>/<site>-rolling-<slot>.md and reply html plus existing private branch tree",
+      "output": "raw capture commit pushed first; derived desks/stories/worlddesk/weather commit pushed later only after split/prep",
+      "consumer_access": "agentic-org/scripts/repin-private-source.mjs and mounted agent private archive / public seam reads private repo branch and agents read readonly ./repos/newsroom-private",
+      "validation": "repin requires six reporter indexes and index rows pointing at story files; it does not tie newest raw capture to split output",
+      "recovery": "first raw-only edition with no indexes is rejected; later raw-only tip with older structurally valid indexes can be accepted",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "run-research.sh:105-108 commits and pushes raw capture before split",
+        "run-research.sh:119-133 exits after split failure without reverting the pushed raw commit",
+        "run-research.sh:181-187 pushes derived corpus only after later staging",
+        "repin-private-source.mjs:117-125 checks index presence only",
+        "repin-private-source.mjs:132-146 checks index row shape and story-file presence only"
+      ],
+      "test_evidence": "existing tests read; none run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "16-02_snapshot_mount_current_bundles_and_apis",
+      "kind": "cross-review",
+      "packet_id": "16_research_consistency",
+      "source_report": "16_research_consistency.json",
+      "original_id": "02_snapshot_mount.current_bundles_and_apis",
+      "owner": "agentic-org/scripts/seam-run.mjs, repin-private-source.mjs, check-bundle-descriptor.mjs, build-newsroom-bundle.mjs",
+      "trigger": "seam-run bundle path after gate and private repin",
+      "input": "private edition ref, public tracked tree, runtime/tool descriptors, agent Spawnfiles",
+      "output": "private/source/dependency/asset runtime descriptor entries, Spawnfile pins, readonly mounted bundles, role-scoped MCP tools",
+      "consumer_access": "twelve declared agents and production-newsroom-mcp role tools / checksum-pinned readonly bundles in Spawnfiles; MCP tools exposed according to CLANK_NEWSROOM_AGENT",
+      "validation": "source descriptor is measured against the tree; source/tool descriptor digests are checked in Spawnfiles; all runtime archive pins are compared to descriptor; MCP tools dispatch to production functions",
+      "recovery": "seam stage failures raise stage-specific alarms and stop subsequent stages",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "seam-run.mjs:132-169 runs private repin, source repin, bundle build, descriptor verify, and all-archive pin check",
+        "check-bundle-descriptor.mjs:37-63 validates source descriptor and newsroom-tools/article-validation descriptor pins",
+        "build-newsroom-bundle.mjs:22-47 builds runtime descriptor from private/source/dependency/asset inputs",
+        "production-newsroom-mcp.mjs:46-144 maps role-scoped MCP tool names to production functions",
+        "agentic-org/newsroom-runtime-bundle.json:1-50 declares current source/private/dependency/asset archives"
+      ],
+      "test_evidence": "existing seam-run and organization tests read; none run",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "17-04B_08A_forecast_assignment",
+      "kind": "cross-review",
+      "packet_id": "17_guard_consistency",
+      "source_report": "17_guard_consistency.json",
+      "original_id": "04B_08A_forecast_assignment",
+      "owner": "Brass via mcp_newsroom_record_assignment / recordAssignment",
+      "trigger": "18:30 Europe/Berlin conference wake after reading room:conference and desks/_all.index",
+      "input": "assignments array of {id, owner, brief, evidence_refs, optional slot, optional dissenter}",
+      "output": "state/edition/editions/<date>/assignments/<sha(event_key)>.json with version clank.assignments.v1 and result.forecast",
+      "consumer_access": "assigned reporters via file_article assignment resolver; named dissenter via owner mention in room:filing / Brass exposes record_assignment; reporters expose file_article and record_dissent; room handoff is instruction-level autonomous action",
+      "validation": "Requires array length >=5, valid owner, id shape, brief length, evidence_refs array, unique ids, at most one forecast slot, dissenter only beside forecast, valid different-desk dissenter if present. Missing: exactly one forecast and required dissenter on that forecast.",
+      "recovery": "Invalid calls reject before write; accepted missing-slot/missing-dissenter records have no validator correction path except a later changed correction wake/history.",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/agents/brass/AGENTS.md:111-123 requires one forecast with named different-desk dissenter and says nobody downstream can add it later.",
+        "agentic-org/agents/brass/Spawnfile:22 carries the same runtime prompt.",
+        "agentic-org/scripts/production-newsroom.mjs:90-113 validates assignments but only rejects more than one forecast and maps absent dissenter to null.",
+        "agentic-org/scripts/production-newsroom.mjs:208-212 only triggers forecast next-step messaging when assignment.slot is forecast and reports no-dissenter as compose with dissent=0.",
+        "Isolated fixture recordAssignment accepted no forecast and forecast-without-dissenter."
+      ],
+      "test_evidence": "Executed isolated scratch: recordAssignment with temporary CLANK_EDITION_STATE_ROOT and CLANK_STATE_OFFLINE_FIXTURE=1 accepted noForecast and noDissenter counterexamples.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "17-04B_duplicate_owner_admission",
+      "kind": "cross-review",
+      "packet_id": "17_guard_consistency",
+      "source_report": "17_guard_consistency.json",
+      "original_id": "04B_duplicate_owner_admission",
+      "owner": "Brass via record_assignment",
+      "trigger": "Conference assignment recording",
+      "input": "five or more assignment rows",
+      "output": "accepted assignment record, possibly with repeated owners",
+      "consumer_access": "reporters file assigned rows; Caslon composition consumes PASSed articles / Brass owns assignment admission; Caslon owns composition",
+      "validation": "record_assignment validates count and unique ids; compose_edition validates at least five distinct byline agents over PASSed articles.",
+      "recovery": "A duplicate-owner completed paper refuses at composition with a diversity-floor error; duplicate-owner assignments can also represent partial/additional assignments before final lineup completion.",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/scripts/production-newsroom.mjs:90-113 has no owner uniqueness check.",
+        "agentic-org/scripts/production-newsroom.mjs:307-310 computes owners from PASSed articles and refuses owners.size < 5.",
+        "Candidate packet asked to distinguish partial/additional assignments versus completed lineup."
+      ],
+      "test_evidence": "Executed isolated scratch: duplicateOwner was accepted by recordAssignment; source confirms completed-paper guard at compose_edition.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "17-08B_dissent_record",
+      "kind": "cross-review",
+      "packet_id": "17_guard_consistency",
+      "source_report": "17_guard_consistency.json",
+      "original_id": "08B_dissent_record",
+      "owner": "Named reporter/dissenter via mcp_newsroom_record_dissent",
+      "trigger": "Forecast owner mentions the named dissenter in room:filing after filing",
+      "input": "{edition,event_key,article_id,revision,stance,argument,optional p}",
+      "output": "state/edition/editions/<date>/dissent/<article>/<revision>.json and merge into PASS article by Spike",
+      "consumer_access": "Spike review_article and Caslon compose_edition / Reporters expose record_dissent; non-reporting roles do not.",
+      "validation": "Reporter-only process identity, not own byline, existing filing/revision, pre-compose, no REVISION_REQUEST target, dissent p in [0,1], argument length; concur forbids p.",
+      "recovery": "Wrong article/revision reports filed choices; after compose refuses; revision carry logic can drop stale dissent when core forecast fields change.",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/scripts/production-newsroom.mjs:216-230 validates reporter-only dissent shape and probability/argument constraints.",
+        "agentic-org/scripts/production-newsroom-contracts.test.mjs:80-99 verifies reporter tool exposure and non-reporter absence.",
+        "agentic-org/scripts/tool-bundle-contract.mjs:3-4 declares reporters receive file_article and record_dissent."
+      ],
+      "test_evidence": "Existing tests read; no live wake or production message executed.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "17-08C_composition_counts",
+      "kind": "cross-review",
+      "packet_id": "17_guard_consistency",
+      "source_report": "17_guard_consistency.json",
+      "original_id": "08C_composition_counts",
+      "owner": "Spike PASS articles and Caslon compose_edition",
+      "trigger": "Caslon compose wake",
+      "input": "two page documents plus matching maps/artifacts and edition state",
+      "output": "composition receipt with compose_gates, forecasts count, dissents count",
+      "consumer_access": "Pressman release handoff / Caslon exposes compose_edition; Pressman release follows composed receipt",
+      "validation": "Five PASS articles, authentic reviews, four desk docs, five distinct bylines, section/source/domain diversity, page completeness, paper diversity, front visual count, exact map/artifact references.",
+      "recovery": "Incomplete tree, stale PASS digest, prose changes, bad pages/maps/artifacts reject; forecast/dissent counts report but do not block by deliberate design.",
+      "source_status": "PASS",
+      "source_status_detail": "PASS",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "agentic-org/scripts/compose-gate.mjs:11-32 states forecast/dissent are no longer composition refusals and are counted only.",
+        "agentic-org/scripts/production-newsroom.mjs:302-339 enforces the structural composition gates and records forecast/dissent counts."
+      ],
+      "test_evidence": "Existing tests read; no compose execution.",
+      "limits": [],
+      "entrypoints": []
+    },
+    {
+      "id": "17-09_S2_worlddesk_provenance",
+      "kind": "cross-review",
+      "packet_id": "17_guard_consistency",
+      "source_report": "17_guard_consistency.json",
+      "original_id": "09_S2_worlddesk_provenance",
+      "owner": "Private scheduled sensor desk-worlddesk.mjs",
+      "trigger": "Sensor automation builds ledger.worlddesk.json and trace.json",
+      "input": "escalation registry, flashpoint registry, edition stories, source fetches/cache",
+      "output": "repos/newsroom-private/<edition>/worlddesk/ledger.worlddesk.json with world_desk fields, plus trace.json",
+      "consumer_access": "Ledger reads the private document and files ledger.worlddesk via file_desk / Ledger owns file_desk names ledger.settlements and ledger.worlddesk",
+      "validation": "file_desk owner check plus deskDocumentFindings requiring only top-level world_desk and nested escalation_index, delta, open_conflicts, watch. Missing: required derived/from/method and trace continuity validation.",
+      "recovery": "Producer refusal writes refusal.json and trace; Ledger can carry prior figure with stale delta. Accepted four-field invented values are not rejected by file_desk.",
+      "source_status": "GAP",
+      "source_status_detail": "GAP",
+      "deployed_or_rehearsed_state": "NOT CHECKED",
+      "source_evidence": [
+        "sensors/automation/desk-worlddesk.mjs:149-160 emits derived:true, from: TRACE_PUBLIC_PATH(edition), and method.",
+        "agentic-org/agents/ledger/AGENTS.md:141-145 says every published figure traces back through world_desk.from to the private trace.",
+        "ops/desk-contract.mjs:76-84 validates only world_desk object plus escalation_index, delta, open_conflicts, watch.",
+        "agentic-org/scripts/production-newsroom.mjs:285-293 delegates file_desk validation to deskDocumentFindings and then writes the document.",
+        "Pure deskDocumentFindings calls returned [] both with and without nested provenance fields."
+      ],
+      "test_evidence": "Executed pure validator call: withTrace [] and withoutTrace [].",
+      "limits": [],
+      "entrypoints": []
+    }
+  ],
+  "coverage": [
+    [
+      "01 Rolling research",
+      [
+        "01-S1",
+        "01-S2"
+      ]
+    ],
+    [
+      "02 Prepare the evidence",
+      [
+        "01-S2",
+        "01-S3",
+        "09-S1",
+        "09-S2",
+        "09-S3"
+      ]
+    ],
+    [
+      "03A Push research to private GitHub",
+      [
+        "01-S1",
+        "01-S3",
+        "16-01_sensor_archive_seam3_to_02_mount"
+      ]
+    ],
+    [
+      "03B Load the newsroom snapshot",
+      [
+        "02-02A",
+        "02-02B",
+        "02-02C",
+        "16-02_snapshot_mount_current_bundles_and_apis"
+      ]
+    ],
+    [
+      "04 Qualify and route signals",
+      [
+        "03-S1",
+        "03-S2",
+        "03-S3"
+      ]
+    ],
+    [
+      "05 Pitch meeting",
+      [
+        "04-04A"
+      ]
+    ],
+    [
+      "06 Conference and commissions",
+      [
+        "04-04B",
+        "04-04C",
+        "17-04B_08A_forecast_assignment"
+      ]
+    ],
+    [
+      "07 Report and write",
+      [
+        "05-05A_validate_before_filing",
+        "06-06A_request_admission_and_routing",
+        "06-06B_responder_capture_to_answer_publication",
+        "06-06C_answer_matching_resume_and_admissible_use"
+      ]
+    ],
+    [
+      "08 File the article",
+      [
+        "05-05B_file_article_receipt_and_handoff"
+      ]
+    ],
+    [
+      "09 Independent dissent or concurrence",
+      [
+        "08-08A",
+        "08-08B",
+        "08-08C",
+        "17-08B_dissent_record"
+      ]
+    ],
+    [
+      "10 Editorial review",
+      [
+        "07-1",
+        "07-2",
+        "07-3"
+      ]
+    ],
+    [
+      "11 Settle the desk",
+      [
+        "09-S1",
+        "09-S2",
+        "09-S4",
+        "17-09_S2_worlddesk_provenance"
+      ]
+    ],
+    [
+      "12 Compose the newspaper",
+      [
+        "10-1",
+        "10-2",
+        "10-3",
+        "10-4",
+        "11-S1",
+        "11-S2",
+        "11-S3"
+      ]
+    ],
+    [
+      "13A Validate the edition",
+      [
+        "12-1",
+        "12-2"
+      ]
+    ],
+    [
+      "13B Build and test mechanically",
+      [
+        "12-2"
+      ]
+    ],
+    [
+      "13C Stage the validated edition",
+      [
+        "12-3"
+      ]
+    ],
+    [
+      "14 Commit and push the edition",
+      [
+        "13-staged_artifact_to_edition_branch",
+        "13-host_authorization_and_failure_feedback"
+      ]
+    ],
+    [
+      "15 CI, pull request and merge",
+      [
+        "13-edition_branch_to_main_to_pages"
+      ]
+    ],
+    [
+      "16 Publish and retain the record",
+      [
+        "13-edition_branch_to_main_to_pages"
+      ]
+    ],
+    [
+      "Research loop R1 one missing fact",
+      [
+        "06-06A_request_admission_and_routing",
+        "06-06B_responder_capture_to_answer_publication",
+        "06-06C_answer_matching_resume_and_admissible_use"
+      ]
+    ],
+    [
+      "REPORTER TIMER STILL FIRES",
+      [
+        "02-02D",
+        "04-04A"
+      ]
+    ],
+    [
+      "REVISE",
+      [
+        "07-2",
+        "07-3"
+      ]
+    ],
+    [
+      "FAILED CHECKS",
+      [
+        "12-2"
+      ]
+    ],
+    [
+      "PASS",
+      [
+        "07-2",
+        "11-S2"
+      ]
+    ],
+    [
+      "Runtime/model/tool prerequisites",
+      [
+        "14-S1",
+        "14-S2"
+      ]
+    ],
+    [
+      "Clock/recovery prerequisites",
+      [
+        "15-S1",
+        "15-S2",
+        "15-S3"
+      ]
+    ],
+    [
+      "Secret/sandbox prerequisites",
+      [
+        "14-S3",
+        "14-S4"
+      ]
+    ],
+    [
+      "Memory prerequisites",
+      [
+        "14-S3"
+      ]
+    ],
+    [
+      "Attribution prerequisites",
+      [
+        "05-05B_file_article_receipt_and_handoff",
+        "11-S2"
+      ]
+    ]
+  ],
+  "consolidated_findings": [
+    {
+      "id": "CF-01",
+      "severity": "P1",
+      "status": "CONFIRMED",
+      "source_reports": [
+        "01_sensor_archive",
+        "16_research_consistency"
+      ],
+      "seams": [
+        "01-S3",
+        "16-01_sensor_archive_seam3_to_02_mount"
+      ],
+      "claim": "A raw-only private branch tip can be accepted for current agent mounts when older structurally valid desk indexes already exist.",
+      "consequence": "Reporters can pitch from stale mounted research while Git shows a newer archived capture.",
+      "owning_layer": "scheduled archive orchestration plus public repin freshness gate"
+    },
+    {
+      "id": "CF-02",
+      "severity": "P1",
+      "status": "CONFIRMED",
+      "source_reports": [
+        "04_pitches_assignments",
+        "08_dissent_forecast",
+        "17_guard_consistency"
+      ],
+      "seams": [
+        "04-04B",
+        "08-08A",
+        "17-04B_08A_forecast_assignment"
+      ],
+      "claim": "record_assignment does not require exactly one forecast slot and does not require that forecast slot to name a different-desk dissenter.",
+      "consequence": "The forecast gate may never activate, or may activate without an addressed dissent handoff.",
+      "owning_layer": "assignment admission guard"
+    },
+    {
+      "id": "CF-03",
+      "severity": "P1",
+      "status": "CONFIRMED",
+      "source_reports": [
+        "09_ledger_inputs",
+        "17_guard_consistency"
+      ],
+      "seams": [
+        "09-S2",
+        "17-09_S2_worlddesk_provenance"
+      ],
+      "claim": "file_desk / deskDocumentFindings do not require or validate World Desk trace provenance.",
+      "consequence": "Ledger can file a World Desk number without proving continuity to the private trace required by the brief.",
+      "owning_layer": "public desk validator/admission"
+    },
+    {
+      "id": "CF-04",
+      "severity": "P2",
+      "status": "CONFIRMED_PUBLICATION_POLICY_GAP",
+      "source_reports": [
+        "13_publication",
+        "external-review/agy.md"
+      ],
+      "seams": [
+        "13-edition_branch_to_main_to_pages"
+      ],
+      "claim": "Publication wiring auto-merges after CI/diff gates without a human/environment approval checkpoint required by publication policy.",
+      "consequence": "This blocks publication-policy readiness, but does not show broken newsroom staging/source wiring.",
+      "owning_layer": "GitHub workflow / publication policy"
+    },
+    {
+      "id": "CF-05",
+      "severity": "P1",
+      "status": "CONFIRMED",
+      "source_reports": [
+        "14_runtime_contract",
+        "external-review/agy.md"
+      ],
+      "seams": [
+        "14-S1"
+      ],
+      "claim": "Declared Codex model name does not survive Spawnfile-to-Daimon lowering.",
+      "consequence": "Production wakes can run with the Codex CLI default rather than the declared gpt-5.4-mini model.",
+      "owning_layer": "Spawnfile Daimon config lowering"
+    },
+    {
+      "id": "CF-06",
+      "severity": "P2",
+      "status": "UNVERIFIED_OPERATIONAL_BOUNDARY",
+      "source_reports": [
+        "14_runtime_contract",
+        "external-review/agy.md"
+      ],
+      "seams": [
+        "14-S4"
+      ],
+      "claim": "No production provisioning path was established for the direct-research-restriction profile/sandbox environment.",
+      "consequence": "Operational enforcement remains unverified; this is classified as a provisioning-boundary uncertainty.",
+      "owning_layer": "production runtime/profile provisioning"
+    },
+    {
+      "id": "CF-07",
+      "severity": "P2",
+      "status": "CONFIRMED",
+      "source_reports": [
+        "14_runtime_contract",
+        "external-review/agy.md"
+      ],
+      "seams": [
+        "14-S1"
+      ],
+      "claim": "Declared schedule jitter does not survive Spawnfile-to-Daimon lowering.",
+      "consequence": "Scheduled wakes run at exact normalized times instead of the declared 900-second jitter.",
+      "owning_layer": "Spawnfile Daimon schedule lowering"
+    },
+    {
+      "id": "CF-08",
+      "severity": "UNKNOWN",
+      "status": "UNKNOWN_UNVERIFIED_BOUNDARY",
+      "source_reports": [
+        "14_runtime_contract",
+        "external-review/agy.md"
+      ],
+      "seams": [
+        "14-S3"
+      ],
+      "claim": "Same-container credential filesystem isolation cannot be proven or disproven from the static source excerpts.",
+      "consequence": "Credential boundary remains an explicit UNKNOWN pending deployment/container/mount evidence.",
+      "owning_layer": "Daimon production filesystem/sandbox boundary"
+    }
+  ],
+  "rejected_or_narrowed_claims": [
+    {
+      "candidate": "04B-F1 duplicate owners accepted",
+      "disposition": "REJECTED by 17_guard_consistency",
+      "note": "Duplicate owners are not a required assignment-admission blocker because partial/additional assignments may exist; compose_edition refuses completed editions with fewer than five distinct byline agents."
+    },
+    {
+      "candidate": "02_snapshot_mount broad wiring gap",
+      "disposition": "REJECTED in part by 16_research_consistency",
+      "note": "Declared bundle/source/tool path is wired; the confirmed gap is narrower stale-valid-index acceptance after raw-first push."
+    },
+    {
+      "candidate": "Forecast/dissent as composition blocker",
+      "disposition": "REJECTED by 17_guard_consistency",
+      "note": "Composition intentionally reports forecast/dissent counts rather than refusing on them; the blocker belongs in assignment admission."
+    },
+    {
+      "candidate": "F15-1 private Moltnet config drift",
+      "disposition": "REJECTED by final 15 clarification as active production-seam claim",
+      "note": "Drift was observed in private files, but no current caller was found; reachability remains UNKNOWN, not an active GAP."
+    },
+    {
+      "candidate": "F15-2 wake-window obsolete state/store claim",
+      "disposition": "REJECTED by final 15 clarification",
+      "note": "Actual clank-seam.service -> seam-run -> wake-window path uses current v2 busy states accepted/running and expected store path; deployed mounted-store contents remain UNKNOWN."
+    },
+    {
+      "candidate": "CF-04 as newsroom wiring blocker",
+      "disposition": "RECLASSIFIED by external-review/agy.md",
+      "note": "The gap is publication-policy approval, blocking publication readiness; source execution is internally wired through staging/CI/merge."
+    },
+    {
+      "candidate": "CF-06 as confirmed code regression",
+      "disposition": "RECLASSIFIED by external-review/agy.md",
+      "note": "The source establishes a rehearsal/helper mechanism and Daimon environment hook, but production provisioning is unverified."
+    },
+    {
+      "candidate": "CF-08 as static code defect",
+      "disposition": "RECLASSIFIED by external-review/agy.md",
+      "note": "Static source shows positive environment filtering; filesystem credential isolation needs deployment/container evidence and remains UNKNOWN."
+    }
+  ],
+  "unknowns": [
+    "Live deployed/armed production state is not checked unless a source report explicitly says otherwise.",
+    "15_clock_recovery private Moltnet/MoltnetNode active reachability remains UNKNOWN.",
+    "15_clock_recovery deployed mounted-store evidence remains UNKNOWN.",
+    "16_research_consistency leaves UNKNOWN whether newsroom-tools/article-validation descriptor files are fresh builds of their listed source files.",
+    "CF-08 credential filesystem isolation remains UNKNOWN pending deployment/container/mount evidence."
+  ],
+  "publication_target_after_review": "agentic-org/SEAM_CHECKLIST.md and agentic-org/seam-checklist.json",
+  "artifact": "seam-checklist",
+  "remediation": {
+    "updated_at": "2026-09-08T16:25:00Z",
+    "state": "The org produced and locally staged the 8 September edition: five reviewed articles, four desk documents, two illustrated pages, and a successful mechanical validation/build receipt. The real 4090 ad hoc research loop and agent-owned Moltnet handoffs worked. This first production run needed operator recovery prompts; unattended daily operation remains unproven. Eight generic repairs are deployed and passed 43 native isolation checks. Publisher disabled.",
+    "findings": [
+      {
+        "id": "CF-01",
+        "source": "FIXED",
+        "deployment": "SENSOR AND SNAPSHOT DEPLOYED",
+        "result": "Prepared marker binds every raw capture by hash; stale tips refuse before replacing the prior bundle. Today: 17 stories from three captures."
+      },
+      {
+        "id": "CF-02",
+        "source": "FIXED",
+        "deployment": "DEPLOYED; LIVE ASSIGNMENT AND DISSENT RECORDED",
+        "result": "Assignment admission requires exactly one forecast and a named different-desk dissenter."
+      },
+      {
+        "id": "CF-03",
+        "source": "FIXED",
+        "deployment": "DEPLOYED; LIVE WORLD DESK FILING VERIFIED",
+        "result": "World Desk filing authenticates current prepared figures and trace; producer-refusal fallback preserves only the latest prior published derived document as stale."
+      },
+      {
+        "id": "CF-04",
+        "source": "FIXED",
+        "deployment": "PUBLISHER DISABLED",
+        "result": "Workflow prepares a checked PR; explicit human merge remains the publication checkpoint."
+      },
+      {
+        "id": "CF-05",
+        "source": "MERGED",
+        "deployment": "DEPLOYED; COMPILED MODEL VERIFIED",
+        "result": "Spawnfile PR15 preserves declared Codex model selection."
+      },
+      {
+        "id": "CF-06",
+        "source": "MERGED",
+        "deployment": "DEPLOYED; LIVE NATIVE PROBE PASSED",
+        "result": "All 12 agents carry strict policy. Actual deployed native commands allow workspace/resource reads, deny accepted-state direct writes and direct network access."
+      },
+      {
+        "id": "CF-07",
+        "source": "MERGED",
+        "deployment": "DEPLOYED; COMPILED JITTER VERIFIED",
+        "result": "Current compiler forwards jitter; Daimon PR14 persists randomized fire time across restarts."
+      },
+      {
+        "id": "CF-08",
+        "source": "MERGED",
+        "deployment": "DEPLOYED; LIVE NATIVE PROBE PASSED",
+        "result": "Actual deployed native commands cannot read own/peer credentials or proc. Synthetic deny-removal mutation fails as required."
+      }
+    ],
+    "followups": [
+      {
+        "id": "CF-03-RECOVERY",
+        "status": "FIXED; SENSOR DEPLOYED",
+        "result": "Producer removes obsolete success/refusal counterpart; default-cwd MCP accepts proven stale carry and rejects altered or unproven figures."
+      },
+      {
+        "id": "HOST-BUNDLE",
+        "status": "FIXED; HOST ARCHIVES VERIFIED",
+        "result": "Daily bundling delegates to the private canonical dependency packager and checks provenance before writes; job uses the approved Node major."
+      },
+      {
+        "id": "HOST-SEAM-SIDECARS",
+        "status": "FIXED; DEPLOYED",
+        "result": "Host pin validation includes both tools/validation sidecar descriptors; all 47 resource pins match."
+      },
+      {
+        "id": "ART-TRUSTED-ROOTS",
+        "status": "FIXED; LIVE PROBE PASSED",
+        "result": "Trusted mount root symlinks resolve while child symlink escapes still reject; deployed catalogues show nine glyphs and 192 maps, configured ETOPO GRD map bake2.4s."
+      },
+      {
+        "id": "IMAGE-LAUNCH-POLICY",
+        "status": "MERGED; DEPLOYED; LIVE PROBE PASSED",
+        "result": "Spawnfile PR18 applies baseline and conditional strict Codex Docker settings to image deployments before cutover; 3474 Vitest plus12 node tests passed."
+      },
+      {
+        "id": "SPIKE-LEDGER-HANDOFF",
+        "status": "FIXED; DEPLOYED; LIVE HANDOFF VERIFIED",
+        "result": "After five PASS articles, Spike mentioned Ledger in release at 14:54 UTC; Ledger accepted and filed settlements. Schedule remains fallback."
+      },
+      {
+        "id": "LIVE-CONTROL-BOOTSTRAP",
+        "status": "FIXED; LIVE PROBE PASSED; AUTOMATIC DEPLOYMENT WIRING TESTED",
+        "result": "Private bootstrap installs a runtime-readable protected credential and verifies authenticated activity. Real deployed native commands cannot read it. Seam now requires the private verification step before success."
+      },
+      {
+        "id": "LIVE-EDITION-HANDOFF",
+        "status": "FIXED; DEPLOYED; LIVE ASSIGNMENT ACCEPTED",
+        "result": "Shared rules scope room history to the explicit edition or Berlin date. Brass stops on assignment-save failure and mentions reporters once after acceptance; reporters require a saved assignment before writing."
+      },
+      {
+        "id": "LIVE-WAKE-IDENTITY",
+        "status": "MERGED; DEPLOYED; LIVE ACCEPTANCE VERIFIED",
+        "result": "Daimon PR17 preserves the original model-facing wake ID; Brass and all five reporters have accepted durable operations on the deployed runtime."
+      },
+      {
+        "id": "LIVE-FILING-REVIEW-NOTICES",
+        "status": "FIXED; DEPLOYED; LIVE HANDOFFS VERIFIED",
+        "result": "All three requested revisions were filed and passed through separate agent-owned Moltnet posts. Spike’s release mention woke Ledger; no automatic editorial messaging or controller was added."
+      },
+      {
+        "id": "LEDGER-SOURCE-ROOTS",
+        "status": "FIXED; DEPLOYED; LIVE ACCEPTANCE VERIFIED",
+        "result": "Ledger’s MCP declares both mounted source roots explicitly; authentic figures file regardless of MCP cwd, altered figures reject. Wrong-cwd and missing-root regressions pass. Ledger filed World Desk and woke Caslon through Moltnet."
+      },
+      {
+        "id": "LIVE-RELEASE-NOTICES",
+        "status": "FIXED; TESTED; AWAITING SAFE DEPLOYMENT",
+        "result": "Successful compose and staging results now explicitly require the acting agent to send the remaining Moltnet handoff. Runtime-result deletion mutations fail and restored checks pass. The source update awaits the normal safe deployment window; today’s final Caslon handoff needed operator recovery and Pressman then built and staged autonomously."
+      }
+    ],
+    "live_observation": {
+      "at": "2026-09-08T16:08:29Z",
+      "assignments": 5,
+      "filings": 8,
+      "dissents": 1,
+      "verdicts": 8,
+      "passed": 5,
+      "staged": 1,
+      "runtime_prs_merged": 8,
+      "native_checks_passed": 43,
+      "publication": "disabled",
+      "desks": 4,
+      "composed": 1,
+      "ad_hoc_sensor_loop": "verified: Foreman requested through Moltnet; 4090 ChatGPT capture answered and resumed its revision",
+      "illustrations": [
+        "chip",
+        "pumpjack"
+      ],
+      "composition_digest": "sha256:4d2f60aa017af82b40b8768553dccb3737a60e3acaa75259fad610942fe18186",
+      "artifact_digest": "sha256:0facae865c58250429dcea584846d7736958dc68e7e31d87deb1ab018ef361d3",
+      "operator_assisted": true,
+      "unattended_daily_run": "not yet demonstrated"
+    }
+  }
+}

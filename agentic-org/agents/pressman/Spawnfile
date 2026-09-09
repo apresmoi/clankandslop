@@ -1,0 +1,93 @@
+spawnfile_version: "0.1"
+kind: agent
+name: pressman
+runtime:
+  name: daimon
+  options:
+    engine: codex
+    codex_policy: workspace-no-network
+execution:
+  model:
+    primary:
+      provider: openai
+      name: gpt-5.5
+      auth:
+        method: codex
+  sandbox:
+    mode: workspace
+schedule:
+  kind: cron
+  cron: "30 16 * * *"
+  timezone: Europe/Berlin
+  jitter_seconds: 900
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md. If the current composition is ready, call prepare_release using the current wake id. Follow its bounded job polling until complete, then call stage_release for that exact composition. Mechanical content, layout and build checks are the release gate. Report failures to the owning colleague; never edit content or bypass a gate. Produce only a local staging artifact and receipt. Production publishing is parked."
+surfaces:
+  moltnet:
+    - network: clank-newsroom
+      auth: { token_id: pressman }
+      rooms:
+        release: { wake: mentions }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env:
+        CLANK_NEWSROOM_AGENT: pressman
+        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/state/edition
+        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/state/transaction.mjs
+        CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
+        CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
+        CLANK_DAIMON_AGENT_ID: "agent:pressman"
+        CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom
+        CLANK_WEBSITE_DEPS_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-b
+        CLANK_PUBLIC_ASSET_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-b
+        CLANK_RELEASE_STAGING_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/staging
+        CLANK_NEWSROOM_RELEASE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/build/release.mjs
+        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom-private
+      tools: [stage_release]
+    - name: visual
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/visual/server.mjs]
+      env:
+        CLANK_NEWSROOM_AGENT: pressman
+        CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom
+        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/state/edition
+        CLANK_NEWSROOM_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/state/edition
+        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/state/transaction.mjs
+        CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
+        CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
+        CLANK_DAIMON_AGENT_ID: "agent:pressman"
+        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom-private
+        CLANK_NEWSROOM_RELEASE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/build/release.mjs
+        CLANK_RELEASE_STAGING_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/staging
+        CLANK_WEBSITE_DEPS_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-b
+        CLANK_PUBLIC_ASSET_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-b
+      tools: [prepare_release]
+workspace:
+  docs: { system: AGENTS.md }
+  resources:
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:880d1d5baa9fc7509a8f557106086ae36d2073749054a5b71bf955ab5cb9ff14, mount: ./tools/newsroom, mode: readonly }
+    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:d2ea66ddbe1923d48a30ffbb9ecbce567a91dd94e7b36559365a51108eb43c39, mount: ./repos/newsroom, mode: readonly }
+    - { id: website-deps-a, kind: bundle, source: ../../newsroom-dependencies-a.tar, sha256: sha256:3682eb4edaa1092fb08dcc2629da683b7690ff03e2a248301c56c7bfccc6de9d, mount: ./deps-a, mode: readonly }
+    - { id: website-deps-b, kind: bundle, source: ../../newsroom-dependencies-b.tar, sha256: sha256:c7bb3c23e59c0e66257eeb2d5dde6bd131987f0ce228dc4b6c96f5b2b8509142, mount: ./deps-b, mode: readonly }
+    - { id: public-assets-a, kind: bundle, source: ../../newsroom-assets-a.tar, sha256: sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a, mount: ./assets-a, mode: readonly }
+    - { id: public-assets-b, kind: bundle, source: ../../newsroom-assets-b.tar, sha256: sha256:f55844657ff8ed2dccd234fef7a697c5d0bd529b1f0f97eccdade69f64664ca5, mount: ./assets-b, mode: readonly }
+    - { id: public-content, kind: volume, name: clank-release-staging, mount: ./staging, mode: mutable, sharing: per_agent }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-pressman/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

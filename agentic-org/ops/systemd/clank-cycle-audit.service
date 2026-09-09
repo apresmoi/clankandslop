@@ -1,0 +1,14 @@
+# "Did today's cycle produce an edition?" — asked by something that is not an
+# agent, after every agent has gone to sleep.
+[Unit]
+Description=Clank newsroom cycle audit (did an edition come out?)
+After=network-online.target docker.service
+Wants=network-online.target
+OnFailure=clank-alarm@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/work/clankandslop
+EnvironmentFile=/etc/clank-alarm/alarm.env
+ExecStart=/usr/bin/node /root/work/clankandslop/agentic-org/scripts/cycle-audit.mjs
+TimeoutStartSec=600

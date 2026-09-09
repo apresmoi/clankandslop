@@ -1,0 +1,81 @@
+{
+  "version": "v4",
+  "timezone": "Europe/Berlin",
+  "deadline": "18:00",
+  "checkpoints": [
+    {
+      "id": "pitch",
+      "time": "13:00",
+      "owner": "reporters"
+    },
+    {
+      "id": "conference",
+      "time": "13:30",
+      "owner": "brass"
+    },
+    {
+      "id": "review",
+      "time": "15:00",
+      "owner": "spike"
+    },
+    {
+      "id": "settlement",
+      "time": "15:30",
+      "owner": "ledger"
+    },
+    {
+      "id": "composition",
+      "time": "16:00",
+      "owner": "caslon"
+    },
+    {
+      "id": "pressman_release",
+      "time": "16:30",
+      "owner": "pressman",
+      "target": "validate and build mechanically; stage by 17:00"
+    },
+    {
+      "id": "publication",
+      "time": "18:00",
+      "owner": "host-publisher",
+      "target": "public release clock"
+    }
+  ],
+  "spawnfile_schedule": {
+    "status": "native",
+    "owners": {
+      "cogsworth": "0 13 * * *",
+      "sprockett": "0 13 * * *",
+      "foreman": "0 13 * * *",
+      "graves": "0 13 * * *",
+      "tinkerton": "0 13 * * *",
+      "vesta": "0 13 * * *",
+      "brass": "30 13 * * *",
+      "spike": "0 15 * * *",
+      "ledger": "30 15 * * *",
+      "caslon": "0 16 * * *",
+      "pressman": "30 16 * * *"
+    }
+  },
+  "downstream_activation": "moltnet-addressed-only",
+  "polling": false,
+  "operator_kickoff": false,
+  "task_orchestrator": false,
+  "effective_from": "2026-09-09",
+  "previous_deadline": "22:00",
+  "release_clock": [
+    {
+      "before": "2026-09-08",
+      "deadline": "16:00"
+    },
+    {
+      "from": "2026-09-08",
+      "before": "2026-09-09",
+      "deadline": "22:00"
+    },
+    {
+      "from": "2026-09-09",
+      "deadline": "18:00"
+    }
+  ]
+}

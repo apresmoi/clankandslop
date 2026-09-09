@@ -1,0 +1,51 @@
+{
+  "version": "clank.newsroom-runtime-bundle.v2",
+  "source": {
+    "archive": "newsroom-runtime.tar",
+    "sha256": "sha256:d2ea66ddbe1923d48a30ffbb9ecbce567a91dd94e7b36559365a51108eb43c39",
+    "file_count": 1460,
+    "content_bytes": 11212778
+  },
+  "dependencies": [
+    {
+      "archive": "newsroom-dependencies-a.tar",
+      "sha256": "sha256:3682eb4edaa1092fb08dcc2629da683b7690ff03e2a248301c56c7bfccc6de9d",
+      "mount": "deps-a",
+      "file_count": 4448,
+      "content_bytes": 71906185
+    },
+    {
+      "archive": "newsroom-dependencies-b.tar",
+      "sha256": "sha256:c7bb3c23e59c0e66257eeb2d5dde6bd131987f0ce228dc4b6c96f5b2b8509142",
+      "mount": "deps-b",
+      "file_count": 5680,
+      "content_bytes": 74492331
+    }
+  ],
+  "assets": [
+    {
+      "archive": "newsroom-assets-a.tar",
+      "sha256": "sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a",
+      "mount": "assets-a",
+      "file_count": 143,
+      "content_bytes": 42411043
+    },
+    {
+      "archive": "newsroom-assets-b.tar",
+      "sha256": "sha256:f55844657ff8ed2dccd234fef7a697c5d0bd529b1f0f97eccdade69f64664ca5",
+      "mount": "assets-b",
+      "file_count": 138,
+      "content_bytes": 42380061
+    }
+  ],
+  "private": {
+    "archive": "newsroom-private.tar",
+    "sha256": "sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d",
+    "mount": "repos/newsroom-private",
+    "file_count": 3401,
+    "content_bytes": 63213355,
+    "commit": "628e8477086678f97ee4b4f6f1760ca855e652e5"
+  },
+  "lockfile": "website/package-lock.json",
+  "entrypoint": "agentic-org/scripts/production-newsroom-mcp.mjs"
+}

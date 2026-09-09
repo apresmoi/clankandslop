@@ -1,0 +1,408 @@
+import { archiveResolver } from '../../ops/lay-page.mjs';
+import { createHash } from 'node:crypto';
+import assert from 'node:assert/strict';
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+import { CITATION_GATE_NAMES, HARD_LINT_NAMES, advisoryFilingWarnings, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
+import { proseLintFindings } from '../../ops/prose-lint.mjs';
+import { composeEdition, fileArticle, fileDesk, recordAssignment, recordDissent, reviewArticle as reviewArticleWithDigest } from './production-newsroom.mjs';
+
+const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
+const reviewArticle = async args => { const filing = JSON.parse(await readFile(path.join(process.env.CLANK_EDITION_STATE_ROOT, 'editions', args.edition, 'filings', args.article_id, `${args.revision}.json`), 'utf8')); return reviewArticleWithDigest({ ...args, filing_digest: `sha256:${createHash('sha256').update(JSON.stringify(filing)).digest('hex')}` }); };
+const EDITION = '2026-09-04';
+const OWNERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
+// Real slugs from content/topics.json: the index and file_article both read
+// the live glossary, so a placeholder slug would flag every fixture.
+const TOPICS = new Set(['oil', 'rates']);
+const capitalize = (value) => value[0].toUpperCase() + value.slice(1);
+
+// Desk documents in the shape ops/desk-contract.mjs requires; file_desk
+// refuses anything else, so these are the real four, not placeholders.
+const deskDocument = (name) => ({
+  'caslon.chrome': { date: EDITION, edition_no: '0070', volume: 'I', issued_at: `${EDITION}T14:00:00Z`, revision: 1, tagline: "All the slop that's fit to print.", next_bell: '14:00 UTC', compiled_by: ['Cogsworth'], lead_story_id: 'story-0' },
+  'caslon.weather': { weather: { city: 'Berlin', temp_c: 20, summary: 'partly cloudy', humidity_pct: 58, wind: 'W 11km/h' } },
+  'ledger.settlements': { resolved_last_edition: [] },
+  'ledger.worlddesk': { world_desk: { escalation_index: 0.68, delta: 'steady', open_conflicts: 8, watch: 5, derived: true, from: `content/log/${EDITION}/worlddesk.json`, method: 'clank.escalation-registry.v1 rev 1 · clank.flashpoint-registry.v1 rev 1' } },
+}[name]);
+
+async function prepareWorldDesk(root, edition, document) {
+  const directory = path.join(root, edition, 'worlddesk'); await mkdir(directory, { recursive: true });
+  await writeFile(path.join(directory, 'ledger.worlddesk.json'), `${JSON.stringify(document)}\n`);
+  await writeFile(path.join(directory, 'trace.json'), `${JSON.stringify({ version: 'clank.worlddesk-trace.v1', edition, escalation: { registry: { sha256: '1'.repeat(64) }, index: 0.68, numerator: 17, denominator: 25, terms: [{ id: 'fixture-a', severity: 17, state: 'triggering' }, { id: 'fixture-b', severity: 8, state: 'not_triggering' }] }, flashpoints: { registry: { sha256: '2'.repeat(64) }, open_conflicts: 8, watch: 5, entries: [...Array.from({ length: 8 }, (_, index) => ({ id: `open-${index}`, status: 'open' })), ...Array.from({ length: 5 }, (_, index) => ({ id: `watch-${index}`, status: 'watch' }))] }, delta: { word: 'steady', current: 0.68, previous: 0.68 } })}\n`);
+}
+
+const article = (id, agent, index) => ({
+  id, edition_date: EDITION, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test',
+  headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact',
+  byline: { desk: 'Test Desk', agents: [agent] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30',
+  topics: ['oil'],
+  body: [`Alpha reports the mechanism [E1].`, `Beta confirms the second reading [E2].`, `Gamma disputes the timing [E1].`, `Delta closes on the operating fact [E2].`],
+  key_numbers: [],
+  evidence_box: [
+    { source: `Official ${index}`, fragment: 'fact', as_of: EDITION, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: `https://source${index}.example/evidence`, retrieved_at: `${EDITION}T10:00:00Z` } },
+    { source: `Second ${index}`, fragment: 'fact', as_of: EDITION, source_note: { source_id: 'E2', source_kind: 'public_url', used_by_agent: agent, source_url: `https://second${index}.example/evidence`, retrieved_at: `${EDITION}T10:00:00Z` } }
+  ],
+  refs: ['E1', 'E2'],
+  ...(index === 1 ? { confidence: { label: 'TEST CALL', value: 0.42 } } : {}),
+  // A real archived pair: the wide region the story page loads and the narrow
+  // re-crop the front panel loads. compose_edition ships both.
+  ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {})
+});
+const page = (name, ids, map) => name === 'front'
+  ? { edition: EDITION, page: name, paper: 'broadsheet', lead: ids[0], splitWith: ids[1], rail: [ids[2]], head: [{ block: 'Hero', props: { variant: 'lead-only', withArt: true, lead: ids[0], art: { block: 'MapGlyph', props: { map, caption: 'Lead map.', locator_context: 'regional', interactive: false } } } }], flow: [{ block: 'GlyphArt', props: { shape: 'chip' } }] }
+  : { edition: EDITION, page: name, paper: 'ticker', articles: [ids[0]], article: ids[1], flow: [] };
+
+const indexPath = (state) => path.join(state, 'editions', EDITION, 'INDEX');
+const readIndex = (state) => readFile(indexPath(state), 'utf8');
+const rows = (text, kind) => text.split('\n').filter((line) => line.startsWith(`${kind} `));
+
+// Drives the newsroom to a complete edition through the real tool functions,
+// asserting after each one that its own write refreshed the INDEX. This is the
+// "every converge path" test: assignment, filing, verdict, PASS promotion,
+// desk document and page each get their own before/after check.
+async function driveEdition(state) {
+  process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_PRIVATE_SOURCE_ROOT = path.join(state, 'private-source');
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
+  const seen = [];
+  const step = async (label, run) => {
+    await rm(indexPath(state), { force: true });
+    await run();
+    const text = await readIndex(state).catch(() => undefined);
+    assert.ok(text !== undefined, `${label} did not regenerate the edition INDEX`);
+    seen.push([label, text]);
+    return text;
+  };
+
+  const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [`https://source${index}.example/evidence`], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
+  const afterAssignment = await step('record_assignment', () => recordAssignment({ edition: EDITION, event_key: 'schedule:conference-1', assignments }));
+  assert.equal(rows(afterAssignment, 'A').length, 5);
+  assert.match(afterAssignment, /^A cogsworth story-0 refs=1 +\| Report the verified mechanism/mu);
+  // Every compose gate is legible from the first write of the day, not one per
+  // failed compose run.
+  assert.match(afterAssignment, /^# compose: passed=0\/5 desks=0\/4 forecast=0 dissent=0 {2}→ blocked$/mu);
+
+  const afterFiling = await step('file_article', async () => {
+    for (const [index, owner] of OWNERS.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition: EDITION, event_key: `filing-${index}`, article: article(`story-${index}`, capitalize(owner), index) }); }
+  });
+  assert.equal(rows(afterFiling, 'F').length, 5);
+  assert.match(afterFiling, /^F story-0 rev=1 digest=sha256:[a-f0-9]{64} owner=cogsworth epi=fact words=\d+ refs=2 domains=2 art=hormuz\/hormuz-hero topics=ok lint=ok$/mu);
+  assert.match(afterFiling, /^F story-1 rev=1 digest=sha256:[a-f0-9]{64} owner=sprockett epi=forecast words=\d+ refs=2 domains=2 art=- topics=ok lint=ok$/mu);
+
+  // The dissent, written by the dissenter. Vesta is not on today's lineup and
+  // needs no assignment: what authorises the call is the agent this MCP server
+  // runs as, and nothing in the arguments names anybody.
+  process.env.CLANK_NEWSROOM_AGENT = 'vesta';
+  const afterDissent = await step('record_dissent', () => recordDissent({
+    edition: EDITION, event_key: 'dissent-story-1', article_id: 'story-1', revision: 1, stance: 'dissent', p: 0.62,
+    argument: 'The call rests on a single quarter of shipment data and reads a pause as a turn; the same series moved this far twice last year without one, and the clock the piece sets is inside the revision window.'
+  }));
+  assert.match(afterDissent, /^N story-1 rev=1 by=vesta dissent p=0\.62$/mu);
+  assert.match(afterDissent, /^# rows: A assignment · F filing · N dissent · V verdict/mu);
+
+  process.env.CLANK_NEWSROOM_AGENT = 'spike';
+  const afterRevision = await step('review_article REVISION_REQUEST', () => reviewArticle({ edition: EDITION, event_key: 'verdict-request', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the opposing reading.' }));
+  assert.match(afterRevision, /^V story-0 rev=1 REVISION_REQUEST by=spike$/mu);
+  assert.equal(rows(afterRevision, 'P').length, 0, 'a REVISION_REQUEST must not promote a P row');
+
+  process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+  await fileArticle({ edition: EDITION, event_key: 'refile-0', article: { ...article('story-0', 'Cogsworth', 0), revision: 2, deck: 'A revised sourced deck.' } });
+  process.env.CLANK_NEWSROOM_AGENT = 'spike';
+  const afterPass = await step('review_article PASS promotion', async () => {
+    for (const [index] of OWNERS.entries()) await reviewArticle({ edition: EDITION, event_key: `verdict-pass-${index}`, article_id: `story-${index}`, revision: index === 0 ? 2 : 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+  });
+  assert.equal(rows(afterPass, 'P').length, 5);
+  assert.match(afterPass, /^P story-0 rev=2 section=world epi=fact key_numbers=0 +\| Headline story-0 \| A revised sourced deck\.$/mu);
+
+  const afterDesk = await step('file_desk', async () => {
+    process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) { const document = deskDocument(name); if (name === 'ledger.worlddesk') await prepareWorldDesk(process.env.CLANK_PRIVATE_SOURCE_ROOT, EDITION, document); await fileDesk({ edition: EDITION, event_key: name, name, document }); }
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition: EDITION, event_key: name, name, document: deskDocument(name) });
+  });
+  assert.equal(rows(afterDesk, 'D').length, 4);
+  assert.match(afterDesk, /^D caslon\.chrome keys=9$/mu);
+  // Both gates met. The two counts ride the same line and refuse on neither:
+  // story-1 is the dated forecast, and Vesta's dissent against it is on the
+  // record because Vesta recorded it, not because Sprockett typed it.
+  assert.match(afterDesk, /^# compose: passed=5\/5 desks=4\/4 forecast=1 dissent=1 {2}→ ready$/mu);
+
+  const ids = OWNERS.map((_, index) => `story-${index}`);
+  const afterCompose = await step('compose_edition', () => composeEdition({
+    edition: EDITION, event_key: 'compose-1',
+    pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }],
+    maps: [{ name: 'hormuz', document: archiveResolver()('hormuz') }, { name: 'hormuz-hero', document: archiveResolver()('hormuz-hero') }]
+  }));
+  assert.equal(rows(afterCompose, 'G').length, 2);
+  assert.match(afterCompose, /^G front articles=3 visuals=2 papers=broadsheet lead=story-0$/mu);
+
+  assert.equal(seen.length, 7, 'seven converge paths must each regenerate the index');
+  return afterCompose;
+}
+
+runtimeTest('every converge path regenerates the edition INDEX', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-'));
+  try {
+    const text = await driveEdition(path.join(temporary, 'state'));
+    assert.match(text, /^# clank\.edition-index\.v1 edition=2026-09-04 generated=\S+ assignments=5 filings=6 verdicts=6 passed=5$/mu);
+    assert.match(text, /^# rows: A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page$/mu);
+    assert.match(text, /^# read one: cat filings\/<id>\/<rev>\.json \| cat articles\/<id>\.json \| cat verdicts\/<id>\/<rev>\.json \| cat dissents\/<id>\/<rev>\.json$/mu);
+    // The whole point of the file: it stays small enough to read every wake.
+    assert.ok(Buffer.byteLength(text) < 6000, `edition INDEX grew to ${Buffer.byteLength(text)} bytes`);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+// Mutation guard for the fail-closed contract. If writeEditionIndex ever
+// swallows its errors (or a caller wraps it in try/catch), the tool call below
+// starts succeeding and this test goes red.
+runtimeTest('a failed index write fails the tool call', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-fail-'));
+  const state = path.join(temporary, 'state');
+  process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
+  try {
+    // A non-empty directory where the INDEX file belongs: the rename that
+    // publishes the index fails with EISDIR, exactly as a full disk or a
+    // read-only mount would.
+    await mkdir(path.join(state, 'editions', EDITION, 'INDEX'), { recursive: true });
+    await writeFile(path.join(state, 'editions', EDITION, 'INDEX', 'occupied'), 'x');
+    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
+    await assert.rejects(recordAssignment({ edition: EDITION, event_key: 'schedule:blocked-index', assignments }), (error) => error.code === 'EISDIR' || /EISDIR|ENOTDIR|EPERM|EACCES/u.test(error.message));
+
+    process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    await assert.rejects(fileArticle({ edition: EDITION, event_key: 'blocked-filing', article: article('story-0', 'Cogsworth', 0) }), /EISDIR|ENOTDIR|EPERM|EACCES/u);
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('lint flags are computed from the filing, not re-derived by the editor', () => {
+  const clean = article('story-0', 'Cogsworth', 0);
+  assert.deepEqual(lintFiling(clean, TOPICS), []);
+
+  // A citation with no source note behind it.
+  const missing = structuredClone(clean);
+  missing.body = [...clean.body.slice(0, 3), 'Epsilon leans on a note nobody filed [E4].'];
+  assert.deepEqual(lintFiling(missing, TOPICS), ['cite_missing:E4']);
+
+  // References listed out of evidence_box order.
+  const disordered = structuredClone(clean);
+  disordered.refs = ['E2', 'E1'];
+  assert.deepEqual(lintFiling(disordered, TOPICS), ['refs_order']);
+
+  // A reference the evidence box does not carry at all. The flag names the
+  // offending token so the refusal can hand it back rather than describe it.
+  const stray = structuredClone(clean);
+  stray.refs = ['E1', 'E2', 'E9'];
+  assert.deepEqual(lintFiling(stray, TOPICS), ['refs_subset:E9']);
+
+  // A private research id printed in the body: an internal handle into a store
+  // no reader can open, so it is not a citation at all.
+  const privateId = structuredClone(clean);
+  privateId.body = [...clean.body.slice(0, 3), 'Delta closes on the operating fact [s-5adc90c2].'];
+  assert.deepEqual(lintFiling(privateId, TOPICS), ['private_id_in_body:s-5adc90c2']);
+
+  // The same id living in the evidence box is the audit trail, and stays.
+  const privateInBox = structuredClone(clean);
+  privateInBox.evidence_box[0].source_note.source_id = 's-5adc90c2';
+  privateInBox.refs = ['s-5adc90c2', 'E2'];
+  assert.deepEqual(lintFiling(privateInBox, TOPICS), []);
+
+  // A source note the body never reaches, by label or by id.
+  const unused = structuredClone(clean);
+  unused.body = clean.body.map((paragraph) => paragraph.replaceAll('[E2]', '[E1]'));
+  assert.deepEqual(lintFiling(unused, TOPICS), ['cite_unused:E2']);
+
+  const oneDomain = structuredClone(clean);
+  oneDomain.evidence_box[1].source_note.source_url = 'https://source0.example/other';
+  assert.deepEqual(lintFiling(oneDomain, TOPICS), ['domains<2']);
+
+  const named = structuredClone(clean);
+  named.body = [...clean.body.slice(0, 3), 'Cogsworth walked the line himself [E2].'];
+  assert.deepEqual(lintFiling(named, TOPICS), ['persona_in_body']);
+
+  const offGlossary = structuredClone(clean);
+  offGlossary.topics = ['oil', 'not-a-real-slug'];
+  assert.deepEqual(lintFiling(offGlossary, TOPICS), ['topic_unknown:not-a-real-slug']);
+
+  const stuck = structuredClone(clean);
+  stuck.body = ['Beijing opened [E1].', 'Beijing closed [E2].', 'Gamma disputes [E1].', 'Delta closes [E2].'];
+  assert.deepEqual(lintFiling(stuck, TOPICS), ['openers']);
+
+  // Two paragraphs opening on "The" is ordinary English, not a stuck rhythm.
+  const ordinary = structuredClone(clean);
+  ordinary.body = ['The ministry opened [E1].', 'The ministry closed [E2].', 'Gamma disputes [E1].', 'Delta closes [E2].'];
+  assert.deepEqual(lintFiling(ordinary, TOPICS), []);
+
+  const noUrl = structuredClone(clean);
+  delete noUrl.evidence_box[1].source_note.source_url;
+  assert.deepEqual(lintFiling(noUrl, TOPICS), ['domains<2', 'public_url_no_url']);
+
+  // The older archive convention: long source ids, cited positionally.
+  const positional = structuredClone(clean);
+  positional.evidence_box[0].source_note.source_id = 'press:reuters:one';
+  positional.evidence_box[1].source_note.source_id = 'gov:ministry:two';
+  positional.refs = ['press:reuters:one', 'gov:ministry:two'];
+  assert.deepEqual(lintFiling(positional, TOPICS), []);
+
+  assert.deepEqual(hardLintFlags(['refs_order', 'openers', 'cite_unused:E2', 'domains<2', 'topic_unknown:x', 'cite_missing:E4', 'persona_in_body', 'refs_subset:E9']), ['domains<2', 'topic_unknown:x', 'cite_missing:E4', 'persona_in_body', 'refs_subset:E9']);
+  assert.match(describeLintFlag('cite_missing:E4'), /^article\.body cites a source id .*\(E4\)$/u);
+  assert.match(describeLintFlag('private_id_in_body:s-5adc90c2'), /^article\.body prints a private research id,.*\(s-5adc90c2\)$/u);
+  // The citation gates are their own closed set, disjoint from the arming
+  // switch: nothing can turn them off, and nothing turns them on either.
+  assert.deepEqual(hardLintFlags(['refs_order', 'openers', 'cite_unused:E2', 'domains<2', 'cite_missing:E4', 'persona_in_body', 'refs_subset:E9', 'private_id_in_body:s-1234abcd'], CITATION_GATE_NAMES), ['cite_missing:E4', 'refs_subset:E9', 'private_id_in_body:s-1234abcd']);
+  assert.throws(() => armedHardLintNames('private_id_in_body'), /no such hard lint flag: private_id_in_body/u);
+});
+
+// ---------------------------------------------------------------------------
+// The prose warnings, moved out of the release validator.
+//
+// They ran only inside ops/validate-content.mjs at stage_release — 16:00, two
+// hours after Spike passed the piece at 14:00 — so nobody had ever read one.
+// ---------------------------------------------------------------------------
+test('prose warnings are computed from the article and never gate it', () => {
+  const clean = article('story-0', 'Cogsworth', 0);
+  assert.deepEqual(proseLintFindings(clean), []);
+
+  const wall = structuredClone(clean);
+  wall.body = ['The ministry opened [E1].', 'The ministry held [E2].', 'The ministry closed [E1].', 'Delta closes [E2].'];
+  assert.deepEqual(proseLintFindings(wall).map((finding) => finding.flag), ['openers_run:the×3']);
+  assert.match(proseLintFindings(wall)[0].message, /^3 consecutive paragraphs open with "The" \(para 1\+\) — vary the openers$/u);
+
+  const reflex = structuredClone(clean);
+  reflex.deck = 'A story about the permit, not the promise.';
+  assert.deepEqual(proseLintFindings(reflex).map((finding) => finding.flag), ['binary_contrast']);
+
+  const dashes = structuredClone(clean);
+  dashes.body = ['Alpha — the port — reports [E1].', 'Beta — the yard — confirms [E2].', 'Gamma disputes [E1].', 'Delta closes [E2].'];
+  assert.deepEqual(proseLintFindings(dashes).map((finding) => finding.flag), ['em_dashes:4/4']);
+
+  // Advisory means advisory: a prose flag is not a hard lint and cannot be armed.
+  for (const name of ['openers_run', 'binary_contrast', 'em_dashes']) assert.throws(() => armedHardLintNames(name), /no such hard lint flag/u);
+  assert.deepEqual(hardLintFlags(['openers_run:the×3', 'binary_contrast', 'em_dashes:4/4'], CITATION_GATE_NAMES), []);
+
+  // And they reach file_article's caller through the advisory channel, beside
+  // the mechanical flags the filing was not refused for.
+  const both = structuredClone(wall);
+  both.refs = ['E2', 'E1'];
+  const advisory = advisoryFilingWarnings(both, TOPICS);
+  // The coarse `openers` flag is dropped in favour of the run finding that
+  // supersedes it, so the reporter reads one sentence about openers, not two.
+  assert.ok(lintFiling(both, TOPICS).includes('openers'), 'the coarse flag does fire on this body');
+  assert.deepEqual(advisory.flags, ['refs_order', 'openers_run:the×3']);
+  assert.equal(advisory.warnings.length, 2);
+  assert.match(advisory.warnings[0], /^article\.refs is not in article\.evidence_box order$/u);
+  assert.match(advisory.warnings[1], /vary the openers$/u);
+});
+
+runtimeTest('publication format always rejects invalid prose while source-domain lint remains optional', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-hardlint-'));
+  const state = path.join(temporary, 'state');
+  process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
+  const snapshot = async (dir = state) => {
+    const out = {};
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) Object.assign(out, await snapshot(file));
+      else out[file] = await readFile(file, 'utf8');
+    }
+    return out;
+  };
+  try {
+    const assignments = OWNERS.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
+    await recordAssignment({ edition: EDITION, event_key: 'schedule:hardlint', assignments });
+    process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    const broken = article('story-0', 'Cogsworth', 0);
+    broken.body = [...broken.body.slice(0, 3), 'Cogsworth walked the line himself [E2].'];
+    const assigned = await snapshot();
+    for (const setting of [undefined, '0', '1']) {
+      if (setting === undefined) delete process.env.CLANK_FILE_ARTICLE_HARD_LINT;
+      else process.env.CLANK_FILE_ARTICLE_HARD_LINT = setting;
+      await assert.rejects(
+        fileArticle({ edition: EDITION, event_key: `format-persona-${setting ?? 'default'}`, article: broken }),
+        /article format rejected.*article\.body\[3\] \[persona_in_body\]/u
+      );
+      assert.deepEqual(await snapshot(), assigned, `format refusal with lint ${setting ?? 'default'} changed state`);
+    }
+
+    // Source diversity is editorial policy: one domain remains admissible until armed.
+    const oneDomain = article('story-0', 'Cogsworth', 0);
+    oneDomain.evidence_box[1].source_note.source_url = 'https://source0.example/other';
+    delete process.env.CLANK_FILE_ARTICLE_HARD_LINT;
+    const filed = await fileArticle({ edition: EDITION, event_key: 'hardlint-off', article: oneDomain });
+    assert.equal(filed.article_id, 'story-0');
+    assert.match(await readIndex(state), /^F story-0 rev=1 .* lint=domains<2$/mu);
+    const accepted = await snapshot();
+    process.env.CLANK_FILE_ARTICLE_HARD_LINT = '1';
+    await assert.rejects(
+      fileArticle({ edition: EDITION, event_key: 'hardlint-on', article: { ...oneDomain, deck: 'Another deck.' } }),
+      /filing rejected on 1 mechanical check .*domains<2 — article\.evidence_box spans fewer than two/u
+    );
+    assert.deepEqual(await snapshot(), accepted, 'armed lint refusal changed the accepted filing or INDEX');
+
+    const advisory = structuredClone(article('story-1', 'Sprockett', 1));
+    advisory.refs = ['E2', 'E1'];
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    await assert.doesNotReject(fileArticle({ edition: EDITION, event_key: 'hardlint-advisory', article: advisory }));
+    assert.match(await readIndex(state), /^F story-1 rev=1 .* lint=refs_order$/mu);
+  } finally {
+    delete process.env.CLANK_FILE_ARTICLE_HARD_LINT;
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+// 78 of the 362 published headlines carry an embedded newline, and a deck can
+// run past a screen. One row must stay one line whatever the content is.
+test('a row is one line no matter what the headline carries', () => {
+  const hostile = {
+    edition: EDITION, generated: 'now',
+    assignments: [{ id: 'x', owner: 'foreman', brief: 'A brief\nsplit across\nlines and | carrying a separator, then padded out well past the hundred and twenty character cut so the truncation itself is exercised too.', evidence_refs: [] }],
+    filings: [{ id: 'x', revision: 1, owner: 'fore man', epistemic: 'fa ct', words: 1, refs: 1, domains: 1, flags: ['topic_unknown:od d', 'domains<2'] }],
+    verdicts: [{ id: 'x', revision: 1, verdict: 'PA\nSS' }],
+    articles: [{ id: 'x', revision: 1, section: 'wo\nrld', epistemic: 'fact', key_numbers: 0, headline: 'A Headline\nBroken Over\nThree Lines', deck: 'A deck | with a separator\nand a newline.' }],
+    desks: [{ name: 'ledger.settlements', keys: 1 }],
+    pages: [{ name: 'front', articles: 1, visuals: 2, papers: 'broad sheet', lead: 'x' }]
+  };
+  const lines = renderEditionIndex(hostile).trim().split('\n');
+  assert.equal(lines.length, 4 + 6, 'four header lines and exactly one line per record');
+  for (const line of lines) assert.doesNotMatch(line, /[\n\r]/u);
+  // No compose status supplied: the forecast floor is reported as unknown
+  // rather than guessed at, and an unknown floor is not a green light.
+  assert.equal(lines[1], '# compose: passed=1/5 desks=1/4 forecast=? dissent=?  → blocked');
+  assert.match(lines[4], /^A foreman x refs=0 +\| A brief split across lines and \/ carrying a separator.*…$/u);
+  assert.match(lines[5], /^F x rev=1 owner=fore-man epi=fa-ct words=1 refs=1 domains=1 art=- topics=unknown:od-d lint=domains<2$/u);
+  assert.match(lines[6], /^V x rev=1 PA-SS by=spike$/u);
+  assert.match(lines[7], /^P x rev=1 section=wo-rld epi=fact key_numbers=0 +\| A Headline Broken Over Three Lines \| A deck \/ with a separator and a newline\.$/u);
+});
+
+test('an empty edition still renders a readable index', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-empty-'));
+  try {
+    const text = await writeEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS });
+    assert.equal(text.trim().split('\n').length, 4, 'an empty edition is four header lines and nothing else');
+    assert.match(text, /assignments=0 filings=0 verdicts=0 passed=0/u);
+    assert.match(text, /^# compose: passed=0\/5 desks=0\/4 forecast=0 dissent=0 {2}→ blocked$/mu);
+    assert.equal(await buildEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS, now: new Date(0) }).then((value) => value.includes('generated=1970-01-01T00:00:00.000Z')), true);
+    await assert.rejects(writeEditionIndex(path.join(temporary, 'state'), 'not-a-date'), /must be an ISO date/u);
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('the hard lint switch arms nothing, everything, or a named subset', () => {
+  assert.deepEqual(armedHardLintNames(undefined), []);
+  assert.deepEqual(armedHardLintNames('0'), []);
+  assert.deepEqual(armedHardLintNames('1'), HARD_LINT_NAMES);
+  assert.deepEqual(armedHardLintNames('cite_missing,persona_in_body'), ['cite_missing', 'persona_in_body']);
+  assert.throws(() => armedHardLintNames('openers'), /no such hard lint flag: openers/u);
+  // The legacy selector still supports these names; mandatory publication
+  // checks apply independently of its selected flags.
+  const staged = ['refs_subset', 'cite_missing', 'topic_unknown', 'persona_in_body'];
+  assert.deepEqual(hardLintFlags(['domains<2', 'cite_missing:E4'], staged), ['cite_missing:E4']);
+});

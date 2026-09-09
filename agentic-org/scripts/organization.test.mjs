@@ -1,0 +1,385 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync, existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { bundleDescriptorFindings } from './check-bundle-descriptor.mjs';
+import { measureSourceArchive, sourceDescriptorFindings } from './source-archive.mjs';
+import { checkRuntime } from './check-runtime.mjs';
+import { provision } from './provision.mjs';
+import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
+import { PUBLISHER_TOOLS, engineByAgent, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
+
+const messages = () => JSON.parse(readFileSync(new URL('../fixtures/daily-cycle.json', import.meta.url), 'utf8')).messages;
+const validate = (items) => { const prior = []; for (const item of items) { validateMessage(item, prior); prior.push(item); } };
+const admittedEnv = (root) => {
+  const env = { CLANK_PRIVATE_ROOT: root, CLANK_BROKER_READY: 'yes', CLANK_MOLTNET_READY: 'yes', CLANK_NETWORK_POLICY_READY: 'yes', CLANK_GIT_POLICY_READY: 'yes' };
+  for (const secretRef of declaredMoltnetSecretRefs) env[secretRef] = 'opaque';
+  for (const agent of ['WORLD_SCOUT','KLAXON','FRONTIER','CLOSURE','COGSWORTH','SPROCKETT','FOREMAN','GRAVES','TINKERTON','VESTA','BRASS','SPIKE','LEDGER','CASLON','MORGUE','PRESSMAN']) { for (const part of ['HOME','XDG','WORKSPACE']) { const path = join(root, agent, part); mkdirSync(path, { recursive: true }); env[`CLANK_${agent}_${part}`] = path; } env[`CLANK_${agent}_CLI_LOGIN`] = 'opaque'; }
+  return env;
+};
+
+// Writes one agent's Spawnfile into a throwaway org root so a declaration
+// mutation can be validated without touching the real tree.
+const mutatedOrg = (agent, mutate) => {
+  const root = mkdtempSync(join(tmpdir(), 'clank-org-'));
+  for (const name of agents) {
+    mkdirSync(join(root, 'agents', name), { recursive: true });
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${name}/Spawnfile`), 'utf8');
+    writeFileSync(join(root, 'agents', name, 'Spawnfile'), name === agent ? mutate(source) : source);
+  }
+  return root;
+};
+
+test('digest-linked reporter lifecycle accepts the fixture', () => assert.doesNotThrow(validateFixtures));
+test('hostile envelope mutations reject for their intended reason', () => {
+  const cases = [
+    ['assigned recipient', 0, (m) => ({ ...m, recipient: 'nobody' }), /assignment recipient/],
+    ['causal parent', 5, (m) => ({ ...m, causal_parent: 'assign-20260816' }), /parent transition/],
+    ['edition', 5, (m) => ({ ...m, edition: '2026-08-17', release: '2026-08-17T16:00:00+02:00[Europe/Berlin]' }), /lifecycle identity/],
+    ['release', 5, (m) => ({ ...m, release: '2026-08-16T16:19:00+02:00[Europe\/Berlin]' }), /release must/],
+    ['correlation', 5, (m) => ({ ...m, correlation_id: 'wrong-correlation' }), /lifecycle correlation/],
+    ['artifact lineage', 5, (m) => ({ ...m, derived_from: m.derived_from.slice(1) }), /causal artifact lineage/],
+    ['revision', 7, (m) => ({ ...m, revision: 0 }), /refile must increment/],
+    ['refile source', 7, (m) => ({ ...m, derived_from: m.derived_from.slice(0, 1) }), /refile requires filed artifact lineage/],
+    ['article owner', 9, (m) => ({ ...m, article_owner: 'vesta' }), /article owner identity/],
+    ['terminal state', 5, (m) => ({ ...m, terminal_state: 'OPEN' }), /terminal state/],
+    ['unauthorized role', 8, (m) => ({ ...m, owner: 'cogsworth' }), /unauthorized PASS owner/]
+  ];
+  for (const [, index, mutate, reason] of cases) { const cycle = messages(); cycle[index] = mutate(cycle[index]); assert.throws(() => validate(cycle.slice(0, index + 1)), reason); }
+});
+test('native Brass checkpoints replace operator kickoff and polling', () => assert.doesNotThrow(validateSchedule));
+test('all current policy files agree on 18:00 with historical receipts preserved',()=>{const runtime=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/runtime.json'),'utf8'));const schedule=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/schedule.json'),'utf8'));assert.equal(runtime.deadline,'18:00');assert.equal(schedule.deadline,runtime.deadline);assert.deepEqual(schedule.release_clock,[{before:'2026-09-08',deadline:'16:00'},{from:'2026-09-08',before:'2026-09-09',deadline:'22:00'},{from:'2026-09-09',deadline:'18:00'}]);const root=resolve(import.meta.dirname,'..');const visit=(directory)=>{for(const name of readdirSync(directory)){const file=join(directory,name);if(statSync(file).isDirectory())visit(file);else if(!name.endsWith('.test.mjs')&&!name.endsWith('.tar'))assert.doesNotMatch(readFileSync(file,'utf8'),/16:20/);}};visit(root);});
+test('autonomy mutations fail closed', () => {
+  const schedulePath=resolve(import.meta.dirname,'../policies/schedule.json'); const original=readFileSync(schedulePath,'utf8');
+  // try/finally throughout: an assertion that fails here must not leave a
+  // mutated declaration behind for every later test and run to trip over.
+  writeFileSync(schedulePath,original.replace('"operator_kickoff": false','"operator_kickoff": true'));
+  try { assert.throws(validateSchedule,/operator kickoff/); } finally { writeFileSync(schedulePath,original); }
+  const klaxonPath=resolve(import.meta.dirname,'../agents/klaxon/Spawnfile'); const klaxon=readFileSync(klaxonPath,'utf8');
+  writeFileSync(klaxonPath,klaxon.replace('wake: all, allowed_wake_senders: [research-sensor]','wake: all'));
+  try { assert.throws(validateSchedule,/Klaxon selective/); } finally { writeFileSync(klaxonPath,klaxon); }
+});
+test('lifecycle release receipts reject duplicate publication and broken lineage', () => { const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts; assert.doesNotThrow(()=>validateLifecycle(source)); assert.throws(()=>validateLifecycle([...source,source.at(-1)]),/unique|cardinality/); const broken=structuredClone(source); broken.at(-1).causal_parent='missing'; assert.throws(()=>validateLifecycle(broken),/parent/); });
+test('receipt shape adapter rejects extra and missing fields',()=>{const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts;const extra=structuredClone(source);extra[0].unexpected=true;assert.throws(()=>validateLifecycle(extra),/shape/);const missing=structuredClone(source);delete missing[0].receipt_ref;assert.throws(()=>validateLifecycle(missing),/shape/);});
+test('actual agent Spawnfile bytes select the assigned Daimon CLI engines', () => {
+  assert.doesNotThrow(validateRuntimeBindings);
+  assert.deepEqual(engineByAgent, {
+    klaxon: 'codex', cogsworth: 'codex', sprockett: 'codex', foreman: 'codex', graves: 'codex', tinkerton: 'codex', vesta: 'codex',
+    brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', pressman: 'codex'
+  });
+  const root = mkdtempSync(join(tmpdir(), 'clank-runtime-bindings-'));
+  mkdirSync(join(root, 'agents', 'klaxon'), { recursive: true });
+  const source = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
+  writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace('engine: codex', 'engine: agy'));
+  assert.throws(() => validateRuntimeBindings(root), /klaxon runtime engine declaration invalid/);
+  writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace('execution:', 'policy: { mode: strict, on_degrade: error }\nexecution:'));
+  assert.throws(() => validateRuntimeBindings(root), /klaxon must not override Spawnfile policy/);
+});
+test('Daimon engine declarations preserve their real model-auth boundary', () => {
+  // Every agent currently runs on Codex: the Grok sandbox cannot initialise under this
+  // deployment, so no Grok agent is declared. The validator still enforces that a Grok
+  // agent omits execution.model (Daimon owns its subscription auth); that branch is
+  // unexercised here until a Grok agent exists again, rather than faked against a Codex one.
+  for (const agent of agents) {
+    const codex = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.doesNotThrow(() => validateAgentDeclaration(agent, codex));
+    assert.match(codex, /name: gpt-5\.5/u, `${agent} must declare the supported Codex account model`);
+    assert.doesNotMatch(codex, /gpt-5\.4-mini/u, `${agent} must not declare the retired Codex account model`);
+  }
+  const brass = readFileSync(resolve(import.meta.dirname, '../agents/brass/Spawnfile'), 'utf8');
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace('method: codex', 'method: none')), /Codex subscription intent/);
+});
+test('workspace resources enforce public modes and private corpus least privilege', () => {
+  const scout = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
+  const publicLine = scout.split('\n').find(line => line.includes('{ id: public-content,'));
+  assert.ok(publicLine?.includes('mode: readonly'));
+  assert.throws(() => validateAgentDeclaration('klaxon', scout.replace(publicLine, publicLine.replace('mode: readonly', 'mode: mutable'))), /public content resource/);
+  const reporter = readFileSync(resolve(import.meta.dirname, '../agents/cogsworth/Spawnfile'), 'utf8');
+  assert.throws(() => validateAgentDeclaration('cogsworth', reporter.replace('  resources:', '  resources:\n    - { id: private-corpus, kind: volume, name: clank-cogsworth-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }')), /must not receive a private corpus/);
+  const pressman = readFileSync(resolve(import.meta.dirname, '../agents/pressman/Spawnfile'), 'utf8');
+  assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('mode: mutable', 'mode: readonly')), /public content resource/);
+  assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('kind: volume', 'kind: git').replace('name: clank-release-staging, ', 'url: https://github.com/apresmoi/clankandslop.git, branch: staging, ')), /public content resource/);
+});
+test('all six reporter declarations reject broken validation identity, tools and read-only bundles', () => {
+  for (const agent of ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']) {
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    const server = source.split('\n').find((line) => line.includes('name: validation,'));
+    const bundle = source.split('\n').find((line) => line.includes('id: article-validation,'));
+    assert.ok(server && bundle, `${agent} must carry the validation declaration`);
+    assert.doesNotThrow(() => validateAgentDeclaration(agent, source));
+    const mutations = [
+      ['missing server', source.replace(server, '')],
+      ['duplicate server', source.replace(server, `${server}\n${server}`)],
+      ['wrong transport', source.replace(server, server.replace('transport: stdio', 'transport: http'))],
+      ['wrong entry point', source.replace(server, server.replace('/tools/article-validation/server.mjs', '/repos/newsroom/server.mjs'))],
+      ['another reporter identity', source.replace(server, server.replace(`CLANK_NEWSROOM_AGENT: ${agent}`, 'CLANK_NEWSROOM_AGENT: spike'))],
+      ['another source root', source.replace(server, server.replace('/repos/newsroom }', '/repos/newsroom-private }'))],
+      ['missing tools', source.replace(server, server.replace('tools: [validate_article]', 'tools: []'))],
+      ['write tool added', source.replace(server, server.replace('tools: [validate_article]', 'tools: [validate_article, file_article]'))],
+      ['missing bundle', source.replace(bundle, '')],
+      ['duplicate bundle', source.replace(bundle, `${bundle}\n${bundle}`)],
+      ['wrong source', source.replace(bundle, bundle.replace('article-validation-runtime.tar', 'newsroom-runtime.tar'))],
+      ['unpinned bundle', source.replace(bundle, bundle.replace(/sha256: sha256:[a-f0-9]{64}, /u, ''))],
+      ['wrong mount', source.replace(bundle, bundle.replace('./tools/article-validation', './tools/elsewhere'))],
+      ['writable bundle', source.replace(bundle, bundle.replace('mode: readonly', 'mode: mutable'))],
+    ];
+    for (const [name, changed] of mutations) {
+      assert.notEqual(changed, source, `${agent}: ${name} must mutate the actual declaration`);
+      assert.throws(() => validateAgentDeclaration(agent, changed), /validation/u, `${agent}: ${name}`);
+    }
+    const doc = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/AGENTS.md`), 'utf8').replace(/\s+/gu, ' ');
+    for (const phrase of ['ARTICLE_FORMAT.md', 'mcp_validation_validate_article', '{edition, article}', 'complete candidate', 'revalidate in the same wake', 'before any durable write', 'not proof of a source or quote', `"agents": ["${agent[0].toUpperCase()}${agent.slice(1)}"]`]) assert.ok(doc.includes(phrase), `${agent} needs ${phrase}`);
+  }
+});
+test('Pressman implementation contains no network publisher, push, credential, or process execution path', () => { const source=readFileSync(resolve(import.meta.dirname,'newsroom.mjs'),'utf8'); assert.doesNotMatch(source,/child_process|execFile|spawn\(|fetch\(|https?:|git\s+push|credential|token/i); });
+test('Ledger declares mounted source roots for desk filing from runtime MCP cwd', () => {
+  const source = readFileSync(resolve(import.meta.dirname, '../agents/ledger/Spawnfile'), 'utf8');
+  assert.doesNotThrow(() => validateAgentDeclaration('ledger', source));
+  const publicRoot = 'CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom, ';
+  const privateRoot = 'CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom-private, ';
+  for (const [name, changed] of [['missing public root', source.replace(publicRoot, '')], ['missing private root', source.replace(privateRoot, '')]]) {
+    assert.notEqual(changed, source, name);
+    assert.throws(() => validateAgentDeclaration('ledger', changed), /ledger newsroom .* source root invalid/u, name);
+  }
+});
+
+test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
+// identical SKILL.md files at the top of every wake. Their content now
+// lives in AGENTS.md, which Codex loads into the prefix natively, so the
+// closure to hold is the opposite one — no agent declares a skill, and the
+// editorial constraints those skills carried are in the reporter's own doc.
+const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance','six to eight flowing paragraphs'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);assert.match(source,/transport: stdio/u);assert.match(source,/command: \/usr\/local\/bin\/node/u);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
+test('production instructions describe natural-language handoffs, mechanical staging and external publication', () => {
+  const team = readFileSync(resolve(import.meta.dirname, '../TEAM.md'), 'utf8');
+  for (const phrase of ['natural-language', 'at least five articles', 'never pushes Git', 'host job holds the deploy key', 'A prompt prohibition is not network isolation', 'No agent opens a page or approves an image'])
+    assert.ok(team.includes(phrase), `missing workflow rule: ${phrase}`);
+  assert.doesNotMatch(team, /by path — never search for them/u);
+});
+test('production declarations consume only checksum-pinned offline newsroom bundles',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.ok(source.includes(`sha256: ${descriptor.source.sha256}`));assert.doesNotMatch(source,/kind: git|github\.com\/apresmoi\/clankandslop|branch: staging/u);}const pressman=readFileSync(resolve(import.meta.dirname,'../agents/pressman/Spawnfile'),'utf8');for(const dependency of [...descriptor.dependencies,...descriptor.assets]){assert.ok(pressman.includes(`sha256: ${dependency.sha256}`));assert.ok(pressman.includes(`mount: ./${dependency.mount}`));}assert.match(pressman,/CLANK_WEBSITE_DEPS_ROOTS: .*deps-a:.*deps-b/u);});
+// The private research archive is the one bundle whose digest changes on its
+// own cadence (a daily repin, see scripts/repin-private-source.mjs), and it
+// was the only one nothing asserted: the Spawnfiles kept a digest the
+// descriptor no longer named, and the checked-in pin went stale unnoticed.
+test('every agent pins the private research archive at the descriptor digest and commit',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));assert.match(descriptor.private.sha256,/^sha256:[a-f0-9]{64}$/u);assert.equal(descriptor.private.mount,'repos/newsroom-private');const pin=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/private-source.json'),'utf8'));assert.match(pin.commit,/^[0-9a-f]{40}$/u);assert.equal(descriptor.private.commit,pin.commit,'newsroom-runtime-bundle.json describes a different private commit than policies/private-source.json pins');for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');const line=source.split('\n').filter((row)=>row.includes('id: private-archive'));assert.equal(line.length,1,`${agent} must declare exactly one private-archive resource`);assert.ok(line[0].includes(`sha256: ${descriptor.private.sha256}`),`${agent} pins a stale private-archive digest`);assert.ok(line[0].includes('mount: ./repos/newsroom-private')&&line[0].includes('mode: readonly'),`${agent} private-archive mount or mode is wrong`);}});
+test('lifecycle schema is closed and covers every autonomous terminal', () => { const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8')); assert.equal(schema.additionalProperties,false); assert.deepEqual(schema.properties.kind.enum,['readiness','blocker','finalization','released','staged']); });
+test('receipt-ref JSON Schema and runtime reject the same hostile components',()=>{const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8'));const pattern=new RegExp(schema.properties.receipt_ref.pattern);const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts;assert.equal(pattern.test('state/edition/receipts/lower-case_1.0/file.json'),true);for(const ref of ['state/edition/receipts/has space','state/edition/receipts/Upper','state/edition/receipts/back\\slash','state/edition/receipts/é','state/edition/receipts/../bad','state/edition/receipts//bad','state/edition/receipts/bad/','state/edition/receipts/./bad']){assert.equal(pattern.test(ref),false,ref);const changed=structuredClone(source);changed[1].receipt_ref=ref;assert.throws(()=>validateLifecycle(changed),/reference/);}});
+test('Vesta and DATA boundary mutations fail closed',()=>{const vesta=readFileSync(resolve(import.meta.dirname,'../agents/vesta/AGENTS.md'),'utf8');const data=readFileSync(resolve(import.meta.dirname,'../DATA.md'),'utf8');const voices=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/voice-boundaries.json'),'utf8'));assert.doesNotThrow(()=>validateEditorialContracts(vesta,data,voices));for(const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike'])assert.throws(()=>validateEditorialContracts(vesta.replaceAll(phrase,'removed'),data,voices),/Vesta constraint/);assert.throws(()=>validateEditorialContracts(vesta,data.replace('public content: read-only','public content: mutable'),voices),/DATA boundary/);const forged=structuredClone(voices);forged.vesta.bad='A fine pattern.';assert.throws(()=>validateEditorialContracts(vesta,data,forged),/Vesta voice/);});
+test('root declaration keeps Moltnet durable, authenticated, direct and secret-backed', () => {
+  const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
+  assert.doesNotThrow(() => validateRootDeclaration(root));
+  assert.throws(() => validateRootDeclaration(root.replace('        mode: bearer', '        mode: none')), /bearer admission/);
+  assert.throws(() => validateRootDeclaration(root.replace('        kind: sqlite', '        kind: memory')), /durable store/);
+  assert.throws(() => validateRootDeclaration(root.replace('secret: CLANK_MOLTNET_OPERATOR_TOKEN', 'value: hardcoded-relay-token')), /token reference|token declaration/);
+  assert.throws(() => validateRootDeclaration(root.replace('scopes: [attach, observe, write]', 'scopes: [attach, write]')), /Moltnet token boundary/);
+  assert.throws(() => validateRootDeclaration(root.replace('scopes: [observe]', 'scopes: [observe, write]')), /observe-only console token/);
+  assert.throws(() => validateRootDeclaration(root.replace('secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN', 'secret: CLANK_MOLTNET_GATHERER_TOKEN')), /research sensor token boundary/);
+  assert.throws(() => validateRootDeclaration(root.replace('federation: [clank-observer]', 'federation: [legacy-peer]')), /federate only to the read-only clank-observer pairing/);
+  assert.throws(() => validateRootDeclaration(root.replace(', research-sensor, klaxon', ', klaxon')), /research sensor local identity/);
+  assert.throws(() => validateRootDeclaration(root.replace('members: [gatherer, klaxon', 'members: [klaxon')), /assignment kickoff participant/);
+});
+test('the observer pairing relaxation still forbids everything else', () => {
+  const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
+  const pairing = '        - id: clank-observer';
+  assert.doesNotThrow(() => validateRootDeclaration(root));
+  // A second pairing — even a well-formed one — reintroduces the federation
+  // dependency the policy exists to prevent.
+  const second = root.replace(pairing, [
+    '        - id: rogue-peer',
+    '          remote_network_id: rogue-peer',
+    '          remote_network_name: Rogue Peer',
+    '          token_secret: CLANK_MOLTNET_PAIR_ROGUE_TOKEN',
+    '          relay: { url: "wss://rogue.invalid", room: rogue-room, token_secret: CLANK_MOLTNET_RELAY_ROGUE_TOKEN }',
+    pairing
+  ].join('\n'));
+  assert.throws(() => validateRootDeclaration(second), /exactly one read-only observer pairing/);
+  // federation: all would silently widen every future pairing -- on one room or all six.
+  assert.throws(() => validateRootDeclaration(root.replaceAll('federation: [clank-observer]', 'federation: all')), /federate only to the read-only clank-observer pairing/);
+  // Per-room coverage: no room -- conference included -- may be quietly pointed at
+  // a pairing this server does not declare, or opened up with `all`.
+  for (const room of ['conference', 'assignment', 'filing', 'sensor', 'research', 'release']) {
+    const prefix = `id: ${room}, visibility: private, write_policy: members, federation: `;
+    assert.ok(root.includes(`${prefix}[clank-observer]`), `${room} is not federated to the observer`);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}[rogue-peer]`)), /federate only to the read-only clank-observer pairing/, room);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}[clank-observer, rogue-peer]`)), /federate only to the read-only clank-observer pairing/, room);
+    assert.throws(() => validateRootDeclaration(root.replace(`${prefix}[clank-observer]`, `${prefix}all`)), /federate only to the read-only clank-observer pairing/, room);
+  }
+  // The inbound pair credential must stay agent-free, pair-only, and bound to the pairing secret.
+  assert.throws(() => validateRootDeclaration(root.replace('{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }', '{ id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair], agents: [brass] }')), /pair-scoped, agent-free/);
+  assert.throws(() => validateRootDeclaration(root.replace('scopes: [pair] }', 'scopes: [pair, admin] }')), /pair-scoped, agent-free/);
+  assert.throws(() => validateRootDeclaration(root.replace('- { id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }\n', '')), /pair-scoped, agent-free|token declaration/);
+  // Pairing identity and transport must keep pointing at the paired laptop.
+  assert.throws(() => validateRootDeclaration(root.replace('remote_network_id: clank-observer', 'remote_network_id: clank-newsroom')), /observer pairing identity invalid/);
+  assert.throws(() => validateRootDeclaration(root.replace('room: VdoP-HC5isGQksHo5dYpnQ', 'room: some-other-room')), /paired laptop coordinates/);
+  assert.throws(() => validateRootDeclaration(root.replace('          relay: { url: "wss://moltnet-relay.alicenet.workers.dev", room: VdoP-HC5isGQksHo5dYpnQ, token_secret: CLANK_MOLTNET_RELAY_OBSERVER_TOKEN }', '          remote_base_url: https://observer.invalid')), /inbound base url|inbound federation peer/);
+  // Secrets stay references: a literal token value in the declaration fails.
+  assert.throws(() => validateRootDeclaration(root.replace('token_secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN', 'token: an-actual-secret-value')), /secret references only|pairing identity/);
+});
+test('runtime and provision fail closed', () => { assert.equal(checkRuntime({}).ok, false); assert.throws(() => provision({ edition: '2026-08-16', privateRoot: '/tmp/nope', env: {} }), /runtime admission denied/); });
+test('runtime rejects a repository private root and shared isolation paths', () => { const bad = { CLANK_PRIVATE_ROOT: process.cwd(), CLANK_WORLD_SCOUT_HOME: process.cwd(), CLANK_KLAXON_HOME: process.cwd() }; assert.match(checkRuntime(bad).missing.join(','), /private-root|not-isolated/); });
+test('runtime rejects a private root equal to the repository root', () => { const root = mkdtempSync(join(tmpdir(), 'clank-runtime-')); const env = admittedEnv(root); env.CLANK_PRIVATE_ROOT = resolve(import.meta.dirname, '../..'); assert.deepEqual(checkRuntime(env).missing, ['private-root']); });
+test('runtime requires Moltnet readiness and declaration-derived secret references', () => { const root = mkdtempSync(join(tmpdir(), 'clank-runtime-')); const env = admittedEnv(root); delete env.CLANK_MOLTNET_READY; delete env.CLANK_MOLTNET_CONSOLE_TOKEN; delete env.CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN; assert.deepEqual(checkRuntime(env).missing, ['moltnet', 'moltnet-secret:CLANK_MOLTNET_CONSOLE_TOKEN', 'moltnet-secret:CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN']); });
+test('provision is dry by default', () => { const root = mkdtempSync(join(tmpdir(), 'clank-private-')); const env = admittedEnv(root); const result = provision({ edition: '2026-08-16', privateRoot: root, env }); assert.equal(result.dryRun, true); assert.equal(existsSync(join(root, '2026-08-16')), false); });
+
+test('no agent declares a publishing credential, the publisher included', () => {
+  const pressman = readFileSync(resolve(import.meta.dirname, '../agents/pressman/Spawnfile'), 'utf8');
+  assert.doesNotThrow(() => validatePublisherSurface(pressman));
+  assert.deepEqual([...PUBLISHER_TOOLS], ['stage_release']);
+  assert.doesNotThrow(validateRuntimeBindings);
+  // Each way the key could creep back into a container has to fail on its own.
+  const creep = [
+    ['a push tool', 'tools: [stage_release]', 'tools: [stage_release, push_edition]'],
+    ['a secret reference', 'workspace:\n', '  secrets:\n    - { name: CLANK_DEPLOY_KEY_PUBLIC, required: true }\nworkspace:\n'],
+    ['a key mount', '  resources:\n', '  resources:\n    - { id: deploy-keys, kind: volume, name: clank-pressman-deploy-keys, mount: ./secrets/ssh, mode: readonly, sharing: per_agent }\n'],
+    ['the push binaries', 'workspace:\n', '  packages:\n    - { id: git, manager: apt, name: git }\nworkspace:\n'],
+    ['key material', 'workspace:\n', '  # -----BEGIN OPENSSH PRIVATE KEY-----\nworkspace:\n'],
+    ['an ssh identity path', 'workspace:\n', '  # IdentityFile /keys/id_ed25519\nworkspace:\n'],
+    ['the host-side publisher itself', 'tools: [stage_release]', 'tools: [stage_release]\n      # runs scripts/publish-edition-branch.mjs']
+  ];
+  for (const [label, from, to] of creep) {
+    assert.notEqual(pressman.indexOf(from), -1, label);
+    assert.throws(() => validatePublisherSurface(pressman.replace(from, to)), /release tools|stay on the host/u, label);
+  }
+});
+
+test('the deploy key and every ref restriction live outside every container', () => {
+  // The host-side job must be unreachable from a compiled workspace: no agent
+  // names it, and no agent declares anything a push would need.
+  for (const agent of agents) {
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.doesNotThrow(() => validateNoPublishingCredential(agent, source), agent);
+  }
+  const publisher = readFileSync(resolve(import.meta.dirname, 'publish-edition-branch.mjs'), 'utf8');
+  assert.match(publisher, /THIS RUNS ON THE HOST, OUTSIDE EVERY CONTAINER/u);
+  // The MCP surface is the other half: the server can only ever expose
+  // stage_release to pressman, whatever else exists in the tree.
+  const mcp = readFileSync(resolve(import.meta.dirname, 'production-newsroom-mcp.mjs'), 'utf8');
+  assert.match(mcp, /pressman:\['stage_release'\]/u);
+  assert.doesNotMatch(mcp, /push_edition|publish-edition-branch/u);
+  const production = readFileSync(resolve(import.meta.dirname, 'production-newsroom.mjs'), 'utf8');
+  assert.doesNotMatch(production, /push_edition|publish-edition-branch|DEPLOY_KEY|GIT_SSH_COMMAND/u);
+  assert.throws(() => validateRuntimeBindings(mutatedOrg('ledger', (source) => source.replace('tools: [file_desk]', 'tools: [file_desk, push_edition]'))), /ledger runtime tools invalid: newsroom entry point or exact role tools are invalid/u);
+});
+
+test('every scheduled checkpoint owner carries a schedule that actually fires', () => {
+  assert.doesNotThrow(validateSchedule);
+  const owners = JSON.parse(readFileSync(resolve(import.meta.dirname, '../policies/schedule.json'), 'utf8')).spawnfile_schedule.owners;
+  // Both publishing desks described a daily slot in prose and had no schedule
+  // wiring at all, so neither had ever run on its own. This is the check: that
+  // each one carries a real cron wired identically in policy and in its own
+  // Spawnfile. The literal times are an operational choice that moves with the
+  // edition (see policies/schedule.json), so they are read from policy rather
+  // than frozen here -- pinning them made this test fail on every reschedule
+  // while proving nothing about the wiring it exists to protect.
+  for (const agent of ['ledger', 'pressman']) {
+    const cron = owners[agent];
+    assert.match(cron ?? '', /^\d+ \d+ \* \* \*$/u, agent);
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.ok(source.startsWith(`schedule:\n  kind: cron\n  cron: "${cron}"\n  timezone: Europe/Berlin\n  jitter_seconds: 900\n  prompt: `, source.indexOf('schedule:\n')) && /^schedule:$/mu.test(source), agent);
+  }
+});
+
+test('removing either publishing desk schedule fails closed', () => {
+  const schedulePath = resolve(import.meta.dirname, '../policies/schedule.json');
+  const original = readFileSync(schedulePath, 'utf8');
+  for (const agent of ['ledger', 'pressman']) {
+    const agentPath = resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`);
+    const source = readFileSync(agentPath, 'utf8');
+    const start = source.indexOf('schedule:\n'), end = source.indexOf('\nsurfaces:\n') + 1;
+    writeFileSync(agentPath, source.slice(0, start) + source.slice(end));
+    try { assert.throws(validateSchedule, /schedule authority invalid/u, agent); } finally { writeFileSync(agentPath, source); }
+    // And the reverse: dropping it from the roster while the Spawnfile keeps it.
+    writeFileSync(schedulePath, original.replace(new RegExp(`\\s*"${agent}": "[^"]+",?`, 'u'), '').replace(',\n    }', '\n    }'));
+    try { assert.throws(validateSchedule, new RegExp(`${agent} checkpoint clock disagrees with native cron`, 'u'), agent); } finally { writeFileSync(schedulePath, original); }
+  }
+});
+
+// The descriptor and the Spawnfiles have always been checked against each
+// other and never against the tree, so both could be — and three times were —
+// consistently wrong. This is the check that has an opinion about the tree.
+test('the runtime bundle descriptor describes the tree that is committed', () => {
+  assert.deepEqual(bundleDescriptorFindings(), []);
+  const tool = JSON.parse(readFileSync(resolve(import.meta.dirname, '../article-validation-runtime-bundle.json'), 'utf8'));
+  assert.equal(tool.file_count, 2);
+  assert.match(tool.source_commit, /^[a-f0-9]{40}$/u);
+  for (const agent of ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']) {
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.ok(source.split('\n').find(line => line.includes('id: article-validation,')).includes(`sha256: ${tool.sha256},`));
+  }
+});
+
+test('the descriptor drift check has an opinion about the source archive and the pins', () => {
+  const repo = resolve(import.meta.dirname, '../..');
+  const scratch = mkdtempSync(join(tmpdir(), 'clank-descriptor-'));
+  try {
+    // A throwaway checkout, so the mutations below cannot touch the tree the
+    // rest of the suite is reading. The baseline is measured rather than
+    // assumed, so this stays honest whatever state that checkout is in.
+    execFileSync('git', ['worktree', 'add', '--detach', scratch, 'HEAD'], { cwd: repo, stdio: 'pipe' });
+    const measured = measureSourceArchive(scratch);
+    const baseline = { sha256: measured.digest, file_count: measured.count, content_bytes: measured.total };
+
+    // One tracked, bundled file changed without a rebuild — the exact shape of
+    // the defect: the tree moves, the pin does not.
+    const bundled = join(scratch, 'ops', 'desk-contract.mjs');
+    writeFileSync(bundled, `${readFileSync(bundled, 'utf8')}// drift\n`);
+    const drifted = measureSourceArchive(scratch);
+    assert.notEqual(drifted.digest, baseline.sha256, 'a changed bundled file must change the source digest');
+    assert.equal(drifted.total, baseline.content_bytes + '// drift\n'.length);
+    assert.deepEqual(sourceDescriptorFindings({ source: baseline }, drifted).map((finding) => finding.split(' is ')[0]), ['source.sha256', 'source.content_bytes']);
+    assert.ok(bundleDescriptorFindings(scratch).some((finding) => /^source\.sha256 is .* a fresh build of this tree is /u.test(finding)));
+
+    // A new bundled file moves the count too — the descriptor that shipped
+    // three times carried a count from before files it did not know about.
+    writeFileSync(join(scratch, 'ops', 'drift-probe.mjs'), 'export const probe = 1;\n');
+    execFileSync('git', ['-C', scratch, 'add', '--', 'ops/drift-probe.mjs'], { stdio: 'pipe' });
+    assert.equal(measureSourceArchive(scratch).count, baseline.file_count + 1);
+    assert.ok(sourceDescriptorFindings({ source: baseline }, measureSourceArchive(scratch)).some((finding) => finding.startsWith('source.file_count is')));
+
+    // And a Spawnfile that no longer carries the descriptor's digest is named.
+    execFileSync('git', ['-C', scratch, 'rm', '-q', '-f', '--', 'ops/drift-probe.mjs'], { stdio: 'pipe' });
+    execFileSync('git', ['-C', scratch, 'checkout', '--', 'ops/desk-contract.mjs'], { stdio: 'pipe' });
+    const spawnfile = join(scratch, 'agentic-org', 'agents', 'caslon', 'Spawnfile');
+    const descriptor = JSON.parse(readFileSync(join(scratch, 'agentic-org', 'newsroom-runtime-bundle.json'), 'utf8'));
+    writeFileSync(spawnfile, readFileSync(spawnfile, 'utf8').replace(descriptor.source.sha256, 'sha256:0000000000000000000000000000000000000000000000000000000000000000'));
+    assert.ok(bundleDescriptorFindings(scratch).some((finding) => /agents\/caslon\/Spawnfile does not pin/u.test(finding)));
+    const toolDescriptor = 'agentic-org/article-validation-runtime-bundle.json';
+    const tool = JSON.parse(readFileSync(join(repo, toolDescriptor), 'utf8'));
+    writeFileSync(join(scratch, toolDescriptor), JSON.stringify(tool));
+    const reporter = 'agentic-org/agents/cogsworth/Spawnfile';
+    writeFileSync(join(scratch, reporter), readFileSync(join(repo, reporter), 'utf8').replace(tool.sha256, `sha256:${'0'.repeat(64)}`));
+    assert.ok(bundleDescriptorFindings(scratch).some(finding => /cogsworth.*article-validation descriptor/u.test(finding)));
+  } finally {
+    execFileSync('git', ['worktree', 'remove', '--force', scratch], { cwd: repo, stdio: 'pipe' });
+    rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
+// c65e6d3 is the private commit whose tree carries zero `.index` files: every
+// reporter wakes, finds no research rows, and files nothing. #111 repinned off
+// it. This branch merged #111, and the merge put the public-content digest one
+// line above the private-archive digest in all twelve Spawnfiles — a
+// take-ours resolution restores this pin consistently across the descriptor
+// and every declaration, so nothing else in the suite would notice.
+const STARVING_PRIVATE_COMMIT = 'c65e6d375bcaebe53f63d6d2aa4569dc34d38735';
+const STARVING_PRIVATE_DIGEST = 'sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e';
+
+test('the private research corpus is never repinned back to the commit with no research in it', () => {
+  const descriptor = JSON.parse(readFileSync(resolve(import.meta.dirname, '../newsroom-runtime-bundle.json'), 'utf8'));
+  const pin = JSON.parse(readFileSync(resolve(import.meta.dirname, '../policies/private-source.json'), 'utf8'));
+  assert.notEqual(pin.commit, STARVING_PRIVATE_COMMIT, 'policies/private-source.json is back on the corpus commit that has no desk index files');
+  assert.notEqual(descriptor.private.commit, STARVING_PRIVATE_COMMIT);
+  assert.notEqual(descriptor.private.sha256, STARVING_PRIVATE_DIGEST);
+  for (const agent of agents) {
+    const line = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8')
+      .split('\n').find((row) => row.includes('id: private-archive'));
+    assert.ok(!line.includes(STARVING_PRIVATE_DIGEST), `${agent} was resolved back onto the starving corpus digest`);
+  }
+});
+
+test('shared Git package is required by accepted revision history', () => {
+  const source = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
+  assert.doesNotThrow(() => validateRootDeclaration(source));
+  assert.throws(() => validateRootDeclaration(source.replace('name: git }', 'name: missing-git }')), /shared Git package/);
+});

@@ -1,0 +1,56 @@
+spawnfile_version: "0.1"
+kind: agent
+name: klaxon
+runtime:
+  name: daimon
+  options:
+    engine: codex
+    codex_policy: workspace-no-network
+execution:
+  model:
+    primary:
+      provider: openai
+      name: gpt-5.5
+      auth:
+        method: codex
+  sandbox:
+    mode: workspace
+surfaces:
+  moltnet:
+    - network: clank-newsroom
+      auth: { token_id: klaxon }
+      dms: { enabled: true, wake: all, allowed_wake_senders: [research-sensor] }
+      rooms:
+        conference: { wake: mentions }
+        assignment: { wake: mentions }
+        sensor: { wake: mentions }
+        research: { wake: mentions }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env: { CLANK_NEWSROOM_AGENT: klaxon, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/klaxon/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:klaxon" }
+      tools: [qualify_signal]
+workspace:
+  docs: { system: AGENTS.md }
+  resources:
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:880d1d5baa9fc7509a8f557106086ae36d2073749054a5b71bf955ab5cb9ff14, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:d2ea66ddbe1923d48a30ffbb9ecbce567a91dd94e7b36559365a51108eb43c39, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
+    - { id: private-corpus, kind: volume, name: clank-klaxon-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-klaxon/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

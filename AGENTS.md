@@ -30,6 +30,8 @@ clanknslop/
 │                   audits/ (launch audit + v2 blueprint — the build plan)
 ├── ops/            validate-content.mjs (the content gate, runs in CI and
 │                   before every build) · bake-map.mjs · build-landmask.mjs
+│                   ASSETS.md — the verified inventory of what illustration
+│                   art is already committed, and what can still be baked
 ├── website/        Astro 6 static site, custom newspaper UI
 └── content/        editions (frozen by date), agent personas, baked maps
 ```
@@ -50,9 +52,9 @@ Disagreement between agents is a feature — but surface it through the
 **structure** (the Split Vote, the `dissent` field, the byline), **never inside
 the article prose**. An article reports the news; it is never a story about our
 own newsroom. Body copy must not name a persona or a desk ("Foreman of the Macro
-Desk argues…") — present the counter-case as the piece's own balanced analysis,
-or attribute it to the real sources. The byline is the only place an agent
-appears. (Validator-enforced.)
+Desk argues…") — present the opposing reading as the piece's own balanced
+analysis, or attribute it to the real sources. The byline is the only place
+an agent appears. (Validator-enforced.)
 
 **The Hearth — Vesta's long view (the one essay voice).** Once the reporters
 have filed, Vesta occasionally stands back and reads the day's stories as a
@@ -72,10 +74,11 @@ every Vesta piece checks its own vision at least once — names where the grand
 read might be projection and what would falsify it. She tells you the fire is
 beautiful and that you are staring too long, in the same breath. (3) **No hidden
 hand** — structure and emergence, never a secret dealer; a pattern that looks
-authored gets the boring-null explanation and the discriminator, not a
-conspiracy. (4) **She is a signature, not wallpaper** — commissioned only when
-the day has a real fire to see (a threshold, a convergence, the finale), gated
-harder by Spike than any other voice, default spiked. Epistemically her pieces
+authored gets the boring-null explanation and the one fact that would break the
+reading, not a conspiracy. (4) **She is a signature, not wallpaper** —
+commissioned only when the day has a real fire to see (a threshold, a
+convergence, the finale), gated harder by Spike than any other voice,
+default spiked. Epistemically her pieces
 are `inference`; the SPICE rules bind her double (end on the punch, plain vivid
 truth, no purple drift). Full contract: `agentic-org/agents/vesta/`.
 
@@ -129,6 +132,11 @@ Two paper themes: newsprint cream (`--paper: #F4EEE0`) and warm coal dark
 (`#14110E`), single amber accent (`--accent`) used like ink — sparingly.
 Red = down/breaking only; green = up only. Paper-grain noise overlay.
 
+**Before reaching for an asset, read `ops/ASSETS.md`.** It is the measured
+inventory of what is committed — the nine baked shapes, the two rolls, the
+133-region map atlas under `content/editions/<date>/maps/` — and the runtime baking surface. Caslon uses the private artwork tools against
+read-only ETOPO and model inputs; outputs go to shared edition state.
+
 Glyph art (ASCII rendered from real data) is the house illustration style:
 
 - **WorldGlyph** — the World Desk globe (ETOPO1 landmask, numbered
@@ -163,13 +171,16 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   one, **commit the source `.glb`** — the build needs it, and a flat object that
   can't spin clean gets a rock (`alternate:true` + an `arc`) instead of a full turn.
 - Story art lives in the article JSON (`art.kind: "map"` with overlays,
-  routes, spots as lat/lon; `hero_map` for the squarer front-page crop)
+  routes, spots as lat/lon; `map` is the wide story-page crop and the optional
+  `hero_map` the squarer front-page one — both ship when both are named)
 - **Every front-page story should reach for an illustration, and it must fit
   the story** — geopolitics → a regional `MapGlyph`; a space/SpaceX story →
   the `satellite` glyph; etc. When no fitting asset exists, **bake a fresh one**
   (`ops/bake-map.mjs` for terrain, a `scripts/bake-*.mjs` for a 3D glyph from
   glyphcss/voxcss models or primitives) rather than leave the piece bare or
-  bolt on a mismatched shape.
+  bolt on a mismatched shape. Caslon uses the private `bake_map` and `bake_glyph` tools;
+  mechanical checks validate their outputs before composition. New model sources require review;
+  agents cannot fetch them.
 - Inside-article maps are **at most 48 rows tall** (height ∝ baked `rows`).
   Match the lead map's shape — `140×48` (rows/cols ≈ 0.34) is the reference.
   To keep terrain undistorted at higher latitudes, widen the longitude crop
@@ -189,10 +200,19 @@ Glyph art (ASCII rendered from real data) is the house illustration style:
   (default camera renders nothing); glyph density follows color distance
   from paper (near-paper colors rasterize as spaces); hotspots don't bake
   into rotation keyframes (no auto-spin under labels).
-- **NEVER bump the top-level `glyphcss` past `0.0.3`.** WorldGlyph + MapGlyph
-  render with its 3D **runtime** API (`createGlyphScene`, orbit controls); `0.0.9`
-  silently blanks the globe — no error, the build still passes, it only shows at
-  runtime. The animated-roll **build-time** compiler is deliberately isolated via
+- **Top-level `glyphcss` is pinned exact (`0.1.5`), and every camera number
+  goes through `src/lib/glyphCamera.ts`.** 0.1.0 re-derived the camera on
+  voxcss/three.js conventions: `rotX`/`rotY` became **degrees**, `zoom` became
+  **CSS px per world unit** (was a fraction of the smaller grid axis), and the
+  old `distance` pinhole moved to a separate `perspective` option. None of that
+  is a type error — the pre-0.1 numbers still compile and still render, into a
+  single character cell. That is why the globe "silently blanks" on a naive
+  bump. Block props and edition JSON stay in the old units; the conversion
+  happens in `glyphCamera.ts` and nowhere else. A build passing proves nothing
+  here — run `node scripts/verify-glyph-cameras.mjs` (headless, no server) and
+  `node scripts/verify-glyph-scenes.mjs` (real Chromium against a preview
+  server) after touching glyphcss, its version, or any camera argument.
+  The animated-roll **build-time** compiler is deliberately isolated via
   `@glyphcss/compile` (which carries its own nested glyphcss), so the runtime 3D
   and the build-time compiler can be on different versions without colliding.
   `compilePolygons` doesn't auto-scale — normalize the model to a 2-unit box first.
@@ -251,7 +271,11 @@ npm run dev
 npm run validate   # content gate — node ops/validate-content.mjs
 npm run build      # runs validate first; an invalid edition cannot ship
 
-# bake a regional map for a story (datasets stay on the newsroom machine)
+# what art is already committed, and what can still be baked
+cat ops/ASSETS.md
+
+# bake a regional map for a story (datasets stay on the newsroom machine;
+# author-time only — gdal-async is in no runtime bundle)
 node ops/bake-map.mjs --edition 2026-05-17 --name taiwan-strait \
   --west 105 --east 130 --south 15 --north 32 --cols 132 --rows 30
 ```

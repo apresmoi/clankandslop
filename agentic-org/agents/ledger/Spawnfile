@@ -1,0 +1,57 @@
+spawnfile_version: "0.1"
+kind: agent
+name: ledger
+runtime:
+  name: daimon
+  options:
+    engine: codex
+    codex_policy: workspace-no-network
+execution:
+  model:
+    primary:
+      provider: openai
+      name: gpt-5.5
+      auth:
+        method: codex
+  sandbox:
+    mode: workspace
+schedule:
+  kind: cron
+  cron: "30 15 * * *"
+  timezone: Europe/Berlin
+  jitter_seconds: 900
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md. Read repos/newsroom-private/<edition-date>/desks/ledger.settlements.prepared.json. Resolve calls only from recorded evidence. Read the current derived document at repos/newsroom-private/<edition-date>/worlddesk/ledger.worlddesk.json and its trace.json; copy the document verbatim. If a refusal.json exists instead, follow the explicit stale carry-forward rule in your brief; never use ledger.worlddesk.prepared.json to invent current readings. File both documents with file_desk and the current wake id; both calls must succeed. Mention @caslon in room:release when ready."
+surfaces:
+  moltnet:
+    - network: clank-newsroom
+      auth: { token_id: ledger }
+      rooms:
+        release: { wake: mentions }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env: { CLANK_NEWSROOM_AGENT: ledger, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/tools/newsroom/state/transaction.mjs, CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom, CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom-private, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:ledger" }
+      tools: [file_desk]
+workspace:
+  docs: { system: AGENTS.md }
+  resources:
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:880d1d5baa9fc7509a8f557106086ae36d2073749054a5b71bf955ab5cb9ff14, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:d2ea66ddbe1923d48a30ffbb9ecbce567a91dd94e7b36559365a51108eb43c39, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-ledger/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

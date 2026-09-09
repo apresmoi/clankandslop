@@ -21,6 +21,7 @@ import campfireAscii from '../data/glyphart-campfire.txt?raw';
 import { bakeRoll } from '../lib/glyphRoll.ts';
 import { bakeEclipse } from '../lib/glyphEclipse.ts';
 import { join } from 'node:path';
+import { glyphFormatFindings } from '../../../ops/glyph-format.mjs';
 import type { loadGlyph } from '../lib/edition.ts';
 
 interface Props {
@@ -33,8 +34,10 @@ interface Props {
 }
 const { shape, roll, glyph, scale = 1, caption = '' } = Astro.props;
 
-if (glyph !== undefined && (shape !== undefined || roll !== undefined)) {
-  throw new Error('GlyphArt: generated glyph cannot also select a shape or roll');
+if (glyph !== undefined) {
+  if (shape !== undefined || roll !== undefined) throw new Error('GlyphArt: generated glyph cannot also select a shape or roll');
+  const errors = glyphFormatFindings(glyph);
+  if (errors.length) throw new Error(`GlyphArt: ${errors.join('; ')}`);
 }
 
 if (shape === 'eclipse' && roll !== 'eclipse') {

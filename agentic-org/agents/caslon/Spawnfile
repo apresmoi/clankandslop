@@ -1,0 +1,95 @@
+spawnfile_version: "0.1"
+kind: agent
+name: caslon
+runtime:
+  name: daimon
+  options:
+    engine: codex
+    codex_policy: workspace-no-network
+execution:
+  model:
+    primary:
+      provider: openai
+      name: gpt-5.5
+      auth:
+        method: codex
+  sandbox:
+    mode: workspace
+schedule:
+  kind: cron
+  cron: "0 16 * * *"
+  timezone: Europe/Berlin
+  jitter_seconds: 900
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md plus repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed, including decisions.art[order[0]] lead art when the lead lacks reporter art; generated lead maps need locator_context. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. The tools enforce the baked page structure. Mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."
+
+surfaces:
+  moltnet:
+    - network: clank-newsroom
+      auth: { token_id: caslon }
+      rooms:
+        conference: { wake: mentions }
+        assignment: { wake: mentions }
+        filing: { wake: mentions }
+        release: { wake: mentions }
+environment:
+  mcp_servers:
+    - name: newsroom
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      env:
+        CLANK_NEWSROOM_AGENT: caslon
+        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
+        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/state/transaction.mjs
+        CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
+        CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
+        CLANK_DAIMON_AGENT_ID: "agent:caslon"
+        # Relief grid for ops/bake-map.mjs. Read-only source; the decompressed
+        # cache is regenerable scratch and is never an artifact.
+        CLANK_ETOPO_GZ: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/etopo/ETOPO1_Ice_g_gmt4.grd.gz
+        CLANK_ETOPO_GRD: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/etopo-cache/etopo1.grd
+      tools: [file_desk, compose_edition]
+    - name: art
+      transport: stdio
+      command: /usr/local/bin/node
+      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/art/server.mjs]
+      env:
+        CLANK_NEWSROOM_AGENT: caslon
+        CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom
+        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
+        CLANK_NEWSROOM_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
+        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/state/transaction.mjs
+        CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
+        CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
+        CLANK_DAIMON_AGENT_ID: "agent:caslon"
+        CLANK_ART_OUTPUT_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/art-cache
+        CLANK_ETOPO_GZ: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/etopo/ETOPO1_Ice_g_gmt4.grd.gz
+        CLANK_ETOPO_GRD: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/etopo-cache/etopo1.grd
+      tools: [list_art_catalogue, bake_map, bake_glyph, inspect_artifact, inspect_catalogue_preview, lay_pages]
+workspace:
+  docs: { system: AGENTS.md }
+  resources:
+    - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:880d1d5baa9fc7509a8f557106086ae36d2073749054a5b71bf955ab5cb9ff14, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:d2ea66ddbe1923d48a30ffbb9ecbce567a91dd94e7b36559365a51108eb43c39, mount: ./repos/newsroom, mode: readonly }
+    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
+    # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
+    # every archived map was baked from it, so an edition must not be able to
+    # alter it. Ships outside the newsroom bundle because it is ~395MB.
+    - { id: etopo-relief, kind: bundle, source: ../../etopo-relief.tar, sha256: sha256:ae1177ef2885c339f227c67b4efb27907eae0274a5aa61c1038eaac56ce50eeb, mount: ./etopo, mode: readonly }
+    # Regenerable decompressed cache (~890MB). Scratch, never an artifact.
+    - { id: etopo-cache, kind: volume, name: clank-etopo-cache, mount: ./state/etopo-cache, mode: mutable, sharing: per_agent }
+
+memory:
+  - id: self
+    store:
+      kind: sqlite
+      path: /var/lib/spawnfile/memory/clank-caslon/self.sqlite
+      persistence:
+        mode: durable
+    index:
+      lexical:
+        enabled: true
+        engine: sqlite_fts
+      vector:
+        enabled: false

@@ -5,6 +5,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
+import { articleFormatFindings } from './article-format.mjs';
+import { glyphFormatFindings, glyphSelectionFindings } from './glyph-format.mjs';
+import { EDITION_PART_FILES, OUTCOMES as DESK_OUTCOMES, deskDocumentFindings } from './desk-contract.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const contentRoot = resolve(root, 'content');
@@ -15,10 +18,7 @@ const BLOCKS = new Set([
   'AgentRoster', 'AgentCard', 'Divider', 'WorldGlyph', 'MapGlyph', 'WorldIndex', 'RankBars', 'GlyphArt', 'SectionHeader', 'Grid',
 ]);
 
-const EPISTEMIC = new Set(['fact', 'inference', 'forecast']);
-const GLYPH_ROLLS = new Set(['chip', 'eclipse']);
-const OUTCOMES = new Set(['hit', 'miss', 'open']);
-const KEYNUM_DIRS = new Set(['up', 'down', 'flat']);
+const OUTCOMES = DESK_OUTCOMES;
 
 const errors = [];
 const err = (file, msg) => errors.push(`${file}: ${msg}`);
@@ -103,6 +103,7 @@ for (const date of ls(editionsDir)) {
   scopes.push({ date, dir: resolve(editionsDir, date), desk: true });
 }
 scopes.push({ date: 'fixtures', dir: resolve(contentRoot, 'fixtures'), desk: false });
+const previousArticles = new Set(scopes.flatMap(({ date, dir }) => ls(resolve(dir, 'articles')).filter(f => f.endsWith('.json')).map(f => `${date}/${f.slice(0, -5)}`)));
 
 for (const { date, dir: edDir, desk } of scopes) {
   const articleDir = resolve(edDir, 'articles');
@@ -114,18 +115,15 @@ for (const { date, dir: edDir, desk } of scopes) {
   // edition chrome — per-owner part files under desk/. Filename = owner +
   // artifact; the set must be complete and assemble into the Edition view.
   if (desk) {
-  const EDITION_PARTS = [
-    'caslon.chrome.json',
-    'caslon.weather.json',
-    'ledger.settlements.json',
-    'ledger.worlddesk.json',
-  ];
   const deskDir = resolve(edDir, 'desk');
   const edFile = rel(deskDir);
   let ed = {};
-  for (const part of EDITION_PARTS) {
+  for (const part of EDITION_PART_FILES) {
     const p = readJson(resolve(deskDir, part));
     if (p === null) { err(`${edFile}/${part}`, 'missing edition part'); ed = null; break; }
+    // The same contract file_desk applies hours earlier, so a document that
+    // reaches here malformed has already been refused once at filing time.
+    for (const finding of deskDocumentFindings(part.slice(0, -5), p)) err(`${edFile}/${part}`, finding);
     Object.assign(ed, p);
   }
   if (ed) {
@@ -166,139 +164,20 @@ for (const { date, dir: edDir, desk } of scopes) {
         err(file, `bands[${i}] must be ${m.cols} chars of 0-8`);
   }
 
+  for (const name of glyphSlugs) {
+    const file = resolve(edDir, 'glyphs', `${name}.json`);
+    for (const finding of glyphFormatFindings(readJson(file), name)) err(rel(file), finding);
+  }
+
   // articles
   for (const slug of articleSlugs) {
     const file = rel(resolve(articleDir, `${slug}.json`));
     const a = readJson(resolve(articleDir, `${slug}.json`));
     if (!a) continue;
-    if (a.id !== slug) err(file, `id "${a.id}" does not match filename`);
-    if (a.edition_date !== date) err(file, `edition_date "${a.edition_date}" does not match edition ${date}`);
-    for (const k of ['section', 'kicker', 'headline', 'timestamp'])
-      if (!isStr(a[k])) err(file, `missing ${k}`);
-    if (a.epistemic !== undefined && !EPISTEMIC.has(a.epistemic))
-      err(file, 'epistemic must be fact|inference|forecast');
-    if (!a.byline || !isStr(a.byline.desk)) err(file, 'missing byline.desk');
-    if (!Array.isArray(a.byline?.agents) || a.byline.agents.length === 0)
-      err(file, 'byline.agents must be a non-empty array');
-    for (const name of a.byline?.agents ?? []) checkAgentName(file, 'byline.agents', name);
-    if (!isNum(a.revision)) err(file, 'revision must be a number');
-    for (const [i, prior] of (a.previous_coverage ?? []).entries()) {
-      if (!prior || !/^\d{4}-\d{2}-\d{2}$/.test(prior.date) || !isStr(prior.slug)) {
-        err(file, `previous_coverage[${i}] must contain date and slug`);
-        continue;
-      }
-      if (prior.date >= date) err(file, `previous_coverage[${i}] must reference an earlier edition`);
-      if (!ls(resolve(editionsDir, prior.date, 'articles')).includes(`${prior.slug}.json`))
-        err(file, `previous_coverage[${i}] references missing article ${prior.date}/${prior.slug}`);
-    }
-    // Body items are paragraphs (strings) or inline figure blocks
-    // ({ glyph, side?, caption? }) — a floated GlyphImage the prose wraps around.
-    const isFigureItem = (x) => x && typeof x === 'object' && isStr(x.glyph);
-    if (!Array.isArray(a.body) || a.body.length === 0 || !a.body.every((x) => isStr(x) || isFigureItem(x)))
-      err(file, 'body must be a non-empty array of paragraphs (strings) or figure blocks ({ glyph })');
-    for (const item of Array.isArray(a.body) ? a.body : []) {
-      if (isFigureItem(item)) {
-        if (!glyphSlugs.has(item.glyph)) err(file, `body figure references missing glyph "${item.glyph}" (bake with ops/bake-image.mjs)`);
-        if (item.side !== undefined && !['left', 'right', 'full'].includes(item.side))
-          err(file, `body figure side must be left|right|full`);
-      }
-    }
-    if (!Array.isArray(a.refs)) err(file, 'missing refs array');
-    if (a.confidence && !isP(a.confidence.value)) err(file, 'confidence.value must be in [0,1]');
-    if (a.dissent) {
-      checkAgentName(file, 'dissent.agent', a.dissent.agent);
-      if (!isP(a.dissent.p)) err(file, 'dissent.p must be in [0,1]');
-      if (!isStr(a.dissent.argument)) err(file, 'dissent.argument must be a non-empty string (the component renders this field)');
-    }
-    for (const [i, k] of (a.key_numbers ?? []).entries()) {
-      if (!isStr(k.label) || !isStr(k.value)) err(file, `key_numbers[${i}] missing label/value`);
-      if (k.dir !== undefined && !KEYNUM_DIRS.has(k.dir)) err(file, `key_numbers[${i}].dir must be up|down|flat`);
-    }
-    if (a.art) {
-      if (a.art.kind === 'ascii') {
-        // Either raw ascii text, or a glyph shape name rendered by GlyphArt.
-        if (!isStr(a.art.ascii) && !isStr(a.art.shape)) err(file, 'art.ascii or art.shape (glyph) is required');
-        if (a.art.roll !== undefined && !GLYPH_ROLLS.has(a.art.roll)) err(file, `unknown art.roll "${a.art.roll}"`);
-        if (a.art.roll === 'eclipse' && a.art.shape !== 'eclipse') err(file, 'art.roll "eclipse" requires art.shape "eclipse"');
-      } else if (a.art.kind === 'map') {
-        if (!mapSlugs.has(a.art.map)) err(file, `art.map references missing map "${a.art.map}"`);
-        if (a.art.hero_map !== undefined && !mapSlugs.has(a.art.hero_map))
-          err(file, `art.hero_map references missing map "${a.art.hero_map}"`);
-        for (const [i, spot] of (a.art.spots ?? []).entries()) {
-          if (!isStr(spot.name) || !isNum(spot.lat) || !isNum(spot.lon))
-            err(file, `art.spots[${i}] must contain name, lat and lon`);
-        }
-        if (isStr(a.art.map)) articleMapArts.set(a.art.map, { slug, spots: a.art.spots ?? [] });
-      } else {
-        err(file, 'art.kind must be ascii|map');
-      }
-      if (!isStr(a.art.caption)) err(file, 'art.caption is required');
-    }
-    const box = a.evidence_box ?? [];
-    for (const [i, e] of box.entries())
-      if (!isStr(e.source) || !isStr(e.fragment)) err(file, `evidence_box[${i}] missing source/fragment`);
-    // References must reference: every ref resolves to a Record row.
-    const recordIds = new Set(box.map((e) => e.source_note?.source_id).filter(Boolean));
-    for (const r of a.refs ?? [])
-      if (!recordIds.has(r)) err(file, `ref "${r}" has no Record row — references must reference`);
-    // Prose-only view of the body: skip inline figure blocks for the text gates.
-    const bodyParas = (Array.isArray(a.body) ? a.body : []).filter((x) => typeof x === 'string');
-    // every [En] marker in body must land on an evidence_box row
-    for (const para of bodyParas)
-      for (const m of String(para).matchAll(/\[E(\d+)\]/g)) {
-        const n = Number(m[1]);
-        if (n < 1 || n > box.length)
-          err(file, `body cites [E${n}] but evidence_box has ${box.length} entries`);
-      }
-    // No newsroom self-reference: an article reports the news; it is never a
-    // story about our own desks. Body prose must not name a persona or a desk —
-    // the byline is the only place an agent appears. (Case-sensitive: flags the
-    // capitalized proper-noun use, not the common-noun "foreman"/"graves".)
-    const DESK_PHRASES = ['Hardware Desk', 'Escalation Desk', 'Macro Desk', 'Commodities Desk', 'Policy Desk'];
-    for (const para of bodyParas) {
-      for (const nm of personaNames)
-        if (new RegExp(`\\b${nm}\\b`).test(para))
-          err(file, `body self-references the newsroom ("${nm}") — report the news, never our own agents`);
-      for (const d of DESK_PHRASES)
-        if (para.includes(d))
-          err(file, `body self-references the newsroom ("${d}") — report the news, never our own desks`);
-    }
-
-    // Editorial variety: don't open three or more consecutive paragraphs with the
-    // same word. The composer's default reflex is to start everything with "The";
-    // monotonous openers read as a wall, not a newspaper. (Warning, not a gate —
-    // legacy editions carry the debt; new copy should clear it.)
-    const openers = bodyParas
-      .map((p) => (String(p).trim().match(/^[“"”']?([A-Za-z]+)/) || [])[1] || '');
-    for (let i = 0; i + 2 < openers.length; i++) {
-      const w = openers[i].toLowerCase();
-      if (w && openers[i + 1].toLowerCase() === w && openers[i + 2].toLowerCase() === w) {
-        let run = 3;
-        while (openers[i + run]?.toLowerCase() === w) run++;
-        warn(file, `${run} consecutive paragraphs open with "${openers[i]}" (para ${i + 1}+) — vary the openers`);
-        break;
-      }
-    }
-
-    // The "X, not Y" / "not X, it's Y" binary-contrast reflex — a machine tic the
-    // headline/deck over-reach for. Fine once; flag it so it doesn't become the house
-    // formula. (Warning, not a gate.)
-    const hd = `${isStr(a.headline) ? a.headline : ''} ${isStr(a.deck) ? a.deck : ''}`.replace(/\n/g, ' ');
-    if (/,\s*not\s|\bnot\b[^.]{0,40}\b(?:but|it['’]?s|its)\b|\bno longer\b|\bisn['’]?t\b[^.]{0,30}\bit['’]?s\b/i.test(hd))
-      warn(file, `headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form`);
-
-    // Em dashes as a default connector are a loud AI tell. Flag overuse — more than
-    // one per ~two paragraphs (min 3) — not the occasional deliberate one.
-    const emDashes = (bodyParas.join(' ').match(/—/g) || []).length;
-    if (emDashes >= 3 && emDashes * 2 > bodyParas.length)
-      warn(file, `${emDashes} em dashes across ${bodyParas.length} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`);
-
-    // topics (optional) must resolve to the glossary
-    if (a.topics !== undefined) {
-      if (!Array.isArray(a.topics)) err(file, 'topics must be an array of slugs');
-      else for (const t of a.topics)
-        if (!validTopics.has(t)) err(file, `topic "${t}" not in content/topics.json glossary`);
-    }
+    const findings = articleFormatFindings(a, { profile: 'archive', editionDate: date, articleId: slug, agentNames, personaNames, topicSlugs: validTopics, mapSlugs, glyphSlugs, previousArticles });
+    for (const finding of findings.errors) err(file, `${finding.path}: ${finding.message}`);
+    for (const finding of findings.warnings) warn(file, finding.message);
+    if (a.art?.kind === 'map' && isStr(a.art.map)) articleMapArts.set(a.art.map, { slug, spots: a.art.spots ?? [] });
   }
 
   // pages
@@ -314,7 +193,7 @@ for (const { date, dir: edDir, desk } of scopes) {
     if (!isStr(p.active)) err(file, 'missing active');
     for (const slot of ['head', 'flow']) {
       if (!Array.isArray(p[slot])) { err(file, `missing ${slot} array`); continue; }
-      p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { date, articleSlugs, mapSlugs, articleMapArts }));
+      p[slot].forEach((b, i) => checkBlock(file, `${slot}[${i}]`, b, { date, articleSlugs, mapSlugs, glyphSlugs, articleMapArts }));
     }
     pageFeatureRefs.set(p.page, collectFeatureArticleRefs([...(p.head ?? []), ...(p.flow ?? [])]));
     if (date >= '2026-07-30' && p.page === 'front')
@@ -407,6 +286,11 @@ function checkBlock(file, path, b, refs) {
   if (!b || !isStr(b.block)) { err(file, `${path} missing block name`); return; }
   if (!BLOCKS.has(b.block))
     err(file, `${path} unknown block "${b.block}" — known: ${[...BLOCKS].join(', ')}`);
+  if (b.block === 'Hero' && b.props?.art !== undefined) {
+    const art = b.props.art;
+    if (!art || !['MapGlyph', 'GlyphArt'].includes(art.block)) err(file, `${path}.props.art must be a MapGlyph or GlyphArt block`);
+    else checkBlock(file, `${path}.props.art`, art, refs);
+  }
   if (b.block === 'Grid') {
     for (const [c, col] of (b.props?.columns ?? []).entries())
       for (const [i, nested] of (Array.isArray(col) ? col : []).entries())
@@ -423,6 +307,7 @@ function checkBlock(file, path, b, refs) {
         err(file, `${path}.spots must match article "${articleArt.slug}" art.spots for map "${b.props.map}"`);
     }
   }
+  if (b.block === 'GlyphArt') for (const finding of glyphSelectionFindings(b.props)) err(file, `${path}: ${finding}`);
   checkRefs(file, path, b.props, refs);
 }
 
@@ -438,6 +323,8 @@ function checkRefs(file, path, props, refs) {
       for (const s of v) if (!refs.articleSlugs.has(s)) err(file, `${path}.${k} references missing article "${s}"`);
     } else if (k === 'map' && isStr(v)) {
       if (!refs.mapSlugs.has(v)) err(file, `${path}.map references missing map "${v}"`);
+    } else if (k === 'glyph' && isStr(v)) {
+      if (!refs.glyphSlugs.has(v)) err(file, `${path}.glyph references missing glyph \"${v}\"`);
     } else if (k === 'agentSlug' && isStr(v)) {
       if (!agentSlugs.has(v)) err(file, `${path}.agentSlug references missing agent file "${v}"`);
     } else if (k === 'agentSlugs' && Array.isArray(v)) {

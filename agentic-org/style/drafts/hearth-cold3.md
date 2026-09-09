@@ -1,0 +1,19 @@
+The Verbs That Come First
+
+Institutions halt, ban, warn and count before a full explanation is available; governments can also withhold an account.
+
+Metinvest said a Russian ballistic strike killed workers at Kametstal, its civilian steel plant in Kamianske, and forced all production to stop. Sinter-blast production facilities, energy and transport equipment were damaged. Five industrial workers had been named among the dead. The company gave no restart time. [E1] Stopping production was an immediate decision; telling the surviving workers when ordinary shifts might resume would require more answers.
+
+In New South Wales, the Rural Fire Service listed Greater Sydney at Extreme fire danger for September 5 and imposed a Total Fire Ban. Reuters reported unusual spring heat, dry air and gusty northwesterlies. No large destructive Sydney fire had been reported. [E2] The service had enough information to restrict burning before knowing whether a destructive fire would follow. People were being asked to change their day because of something that might happen. Preventive authority works in that interval, or arrives too late.
+
+The U.S. Embassy in Havana issued a health alert on September 4 reporting a significant increase in diarrheal illness across Cuba. It associated the increase with continuing degradation of water and energy infrastructure but identified no pathogen. [E3] The embassy could warn about illness and the conditions surrounding it while leaving the narrower question of what was making people sick unanswered.
+
+Perhaps these are only separate emergencies that rhyme. Damaged equipment warrants a halt; dangerous weather warrants a ban; reports of illness warrant a warning. Officials can understand enough to act without possessing a complete explanation. If the missing information would change neither those decisions nor the reasons for them, the resemblance may amount to ordinary institutions doing different jobs. The short public statements would tell little about how much their authors understood.
+
+In Nepal, police said the flood death toll had risen to 1,344, including recovered bodies and dismembered remains. On the eleventh day after an ice-rock avalanche near the Nepal-Tibet border, 4,898 people were still missing. Rescue teams continued working at hydropower and tunnel sites. Those conducting temporary burials had taken samples for identification. [E4] Authorities could count the dead before completing the work of naming them. For a family waiting for identification, an increase in the toll still leaves the particular question open.
+
+Near Kharg Island, Iranian outlets reported explosions or blast sounds. Local claims that U.S. missiles had struck a tanker remained unconfirmed. No vessel had been identified, and neither Tehran nor Washington had issued an official account. Kharg’s place in Iran’s crude-export chain makes verified damage there consequential. [E5] Those facts establish the importance of an answer, without supplying one.
+
+Governments can withhold an account, though the silence around Kharg does not establish whether either government had a settled explanation to release. That distinction matters: an unanswered public question may already have an answer inside an institution. Outside it, even the basic event remained unresolved. The distance between action and understanding can include the distance between people who know and people who have been told.
+
+A public announcement can change what people are permitted to do, what work they can return to, or what they must prepare for. It cannot always give them the answer they need to live with that change. In Nepal, samples taken before temporary burial preserved the possibility of a later identification. The count had been announced. Families were still waiting for names.

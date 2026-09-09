@@ -3,6 +3,12 @@ node_modules/
 website/dist/
 website/.astro/
 website/.screenshots/
+agentic-org/newsroom-runtime.tar
+agentic-org/article-validation-runtime.tar
+agentic-org/newsroom-tools.tar
+agentic-org/newsroom-dependencies*.tar
+agentic-org/newsroom-assets*.tar
+agentic-org/etopo-relief.tar
 .env
 .env.local
 *.log
@@ -14,4 +20,19 @@ website/.screenshots/
 *.shp
 *.dbf
 *.shx
+.glyph-catalog.html
+.map-catalog.html
+.glyph-catalog*.html
+.glyph-angles-*.html
+# private research archive - must never enter the public repo
+agentic-org/newsroom-private.tar
+# compiled org output
+.spawn-local/
 
+# Build inputs linked in beside the tree on a bundle-build box. `node_modules/`
+# above matches a directory, not a symlink named node_modules, and the private
+# checkout was only ever excluded in one machine's .git/info/exclude — so both
+# have been staged by a `git add -A` during a rebuild. Naming them here is what
+# stops that from reaching a commit.
+/clankandslop-private
+/website/node_modules

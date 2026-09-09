@@ -1,0 +1,15 @@
+# 18:15 Europe/Berlin: after the 17:00 publisher buffer and public 18:00 release
+# clock, which is late enough to read the published outcome and early enough
+# that a person hears about a missing edition the same evening.
+#
+# NOT enabled. `systemctl enable --now clank-cycle-audit.timer` arms it.
+[Unit]
+Description=Audit the day's cycle after press time
+
+[Timer]
+OnCalendar=*-*-* 18:15:00 Europe/Berlin
+Persistent=true
+Unit=clank-cycle-audit.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,9 @@
+{
+  "receipts":[
+    {"version":"v1","id":"ready-20260816","kind":"readiness","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"brass","correlation_id":"edition-20260816","causal_parent":null,"artifact_digest":"sha256:1111111111111111111111111111111111111111111111111111111111111111","receipt_ref":"state/edition/receipts/readiness.json","status":"ready"},
+    {"version":"v1","id":"blocker-20260816","kind":"blocker","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"brass","correlation_id":"edition-20260816","causal_parent":"ready-20260816","artifact_digest":"sha256:2222222222222222222222222222222222222222222222222222222222222222","receipt_ref":"state/edition/receipts/blocker-cleared.json","status":"blocked"},
+    {"version":"v1","id":"final-20260816","kind":"finalization","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"brass","correlation_id":"edition-20260816","causal_parent":"blocker-20260816","artifact_digest":"sha256:3333333333333333333333333333333333333333333333333333333333333333","receipt_ref":"state/edition/receipts/finalization.json","status":"finalized"},
+    {"version":"v1","id":"released-20260816","kind":"released","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"pressman","correlation_id":"edition-20260816","causal_parent":"final-20260816","artifact_digest":"sha256:4444444444444444444444444444444444444444444444444444444444444444","receipt_ref":"state/edition/receipts/released.json","status":"released"},
+    {"version":"v1","id":"staged-20260816","kind":"staged","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"pressman","correlation_id":"edition-20260816","causal_parent":"released-20260816","artifact_digest":"sha256:4444444444444444444444444444444444444444444444444444444444444444","receipt_ref":"state/edition/receipts/staged.json","status":"staged"}
+  ]
+}

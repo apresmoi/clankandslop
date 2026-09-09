@@ -1,0 +1,36 @@
+{
+  "source_commit": "5a538921c0bfe91b924521834e33f0ed4db94291",
+  "evidence_ref": "origin/run/2026-09-06-evidence",
+  "test_snapshot": "/Users/apresmoi/Documents/clankandslop/clankandslop-private/.claude/worktrees/daimon-rehearsals/.runtime/inventory/validator-31lni96h",
+  "tests_exit": 0,
+  "validator_exit": 1,
+  "september6_errors": [
+    "  \u26a0 content/editions/2026-09-06/articles/s-653b6e87.json: 4 consecutive paragraphs open with \"The\" (para 2+) \u2014 vary the openers",
+    "content validation failed \u2014 13 error(s):",
+    "  \u2717 content/editions/2026-09-06/desk/caslon.chrome.json: unreadable JSON \u2014 ENOENT: no such file or directory, open '/Users/apresmoi/Documents/clankandslop/clankandslop-private/.claude/worktrees/daimon-rehearsals/.runtime/inventory/validator-31lni96h/content/editions/2026-09-06/desk/caslon.chrome.json'",
+    "  \u2717 content/editions/2026-09-06/desk/caslon.chrome.json: missing edition part",
+    "  \u2717 content/editions/2026-09-06/articles/s-13c65efc.json: byline.agents names unknown agent \"sprockett\"",
+    "  \u2717 content/editions/2026-09-06/articles/s-13c65efc.json: key_numbers[0] missing label/value",
+    "  \u2717 content/editions/2026-09-06/articles/s-13c65efc.json: key_numbers[1] missing label/value",
+    "  \u2717 content/editions/2026-09-06/articles/s-43f44309.json: byline.agents names unknown agent \"tinkerton\"",
+    "  \u2717 content/editions/2026-09-06/articles/s-43f44309.json: key_numbers[0] missing label/value",
+    "  \u2717 content/editions/2026-09-06/articles/s-43f44309.json: key_numbers[1] missing label/value",
+    "  \u2717 content/editions/2026-09-06/articles/s-653b6e87.json: byline.agents names unknown agent \"graves\"",
+    "  \u2717 content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[0] missing label/value",
+    "  \u2717 content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[1] missing label/value",
+    "  \u2717 content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[2] missing label/value",
+    "  \u2717 content/editions/2026-09-06/articles/s-653b6e87.json: key_numbers[3] missing label/value"
+  ],
+  "test_summary": [
+    "  ...",
+    "1..7",
+    "# tests 7",
+    "# suites 0",
+    "# pass 7",
+    "# fail 0",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0",
+    "# duration_ms 517.573708"
+  ]
+}

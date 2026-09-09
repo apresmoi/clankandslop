@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: a dated forecast is epistemic plus a clock, and nothing about dissent
+ok 1 - a dated forecast is epistemic plus a clock, and nothing about dissent
+  ---
+  duration_ms: 0.349417
+  type: 'test'
+  ...
+# Subtest: the gate line reports the forecast and dissent counts and refuses on neither
+ok 2 - the gate line reports the forecast and dissent counts and refuses on neither
+  ---
+  duration_ms: 0.110833
+  type: 'test'
+  ...
+# Subtest: the waiver mechanism is gone, not merely unused
+ok 3 - the waiver mechanism is gone, not merely unused
+  ---
+  duration_ms: 0.081125
+  type: 'test'
+  ...
+# Subtest: event_key must equal DAIMON_WAKE_ID when Daimon binds one, and is unconstrained otherwise
+ok 4 - event_key must equal DAIMON_WAKE_ID when Daimon binds one, and is unconstrained otherwise
+  ---
+  duration_ms: 5.972625
+  type: 'test'
+  ...
+# Subtest: mcp tool schemas type every property beyond edition/event_key
+ok 5 - mcp tool schemas type every property beyond edition/event_key
+  ---
+  duration_ms: 230.625375
+  type: 'test'
+  ...
+# Subtest: the peer closing its end of stdout ends the server quietly, not with a crash
+ok 6 - the peer closing its end of stdout ends the server quietly, not with a crash
+  ---
+  duration_ms: 50.439833
+  type: 'test'
+  ...
+# Subtest: a transport that is broken rather than closed still fails loudly
+ok 7 - a transport that is broken rather than closed still fails loudly
+  ---
+  duration_ms: 192.803167
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 517.573708

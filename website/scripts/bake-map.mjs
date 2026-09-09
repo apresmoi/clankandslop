@@ -110,7 +110,19 @@ const polygons = rings
   .map((ring) => ({ vertices: ring.map(([x, y]) => toMeshXY(x, y)), color: '#222' }));
 
 // ── Render ──────────────────────────────────────────────────────────
-const camera = createGlyphOrthographicCamera({ rotX: 0, rotY: 0, zoom: 0.5 });
+// glyphcss 0.1.x zoom is CSS px per world unit, not a fraction of the smaller
+// grid axis (see src/lib/glyphCamera.ts). Headless there is no <pre> to
+// measure, so glyphcss falls back to a 50px cell (BASE_TILE) with the width
+// derived from cellAspect — the same constant the conversion below uses, which
+// makes this render cell-for-cell identical to the pre-0.1 one. Left as the
+// bare 0.5 the whole map collapses into one character.
+const BASE_TILE = 50;
+const ZOOM_FRACTION = 0.5;
+const camera = createGlyphOrthographicCamera({
+  rotX: 0,
+  rotY: 0,
+  zoom: ZOOM_FRACTION * 1.5 * Math.min(cols, rows) * BASE_TILE,
+});
 const ctx = buildRasterizeContext({
   camera,
   grid: { cols, rows, cellAspect: 0.5 },

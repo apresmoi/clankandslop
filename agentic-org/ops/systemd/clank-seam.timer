@@ -1,0 +1,24 @@
+# 12:00 Europe/Berlin, DERIVED — not picked.
+#
+#   * AFTER the producers: the private research sensors prepare the daily
+#     snapshot before noon, so today's corpus is on edition/<date> by 12:00.
+#   * BEFORE the newsroom: the earliest declared wake in the tree is 13:00
+#     Berlin (agents/*/Spawnfile), and a redeploy kills an in-flight wake. That
+#     leaves one hour of clearance for a repin, a bundle build, an image build
+#     and a settle.
+#
+# The job recomputes both edges from the Spawnfiles on every run and refuses to
+# deploy if this hour has stopped being safe, so moving the crons cannot
+# silently make this timer wrong — it makes the job decline.
+#
+# NOT enabled. `systemctl enable --now clank-seam.timer` arms it.
+[Unit]
+Description=Run the newsroom seam before the reporters wake
+
+[Timer]
+OnCalendar=*-*-* 12:00:00 Europe/Berlin
+Persistent=false
+Unit=clank-seam.service
+
+[Install]
+WantedBy=timers.target
