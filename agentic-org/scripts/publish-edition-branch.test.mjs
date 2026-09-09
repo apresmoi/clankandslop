@@ -270,17 +270,16 @@ test('an unattended caller must name the edition, and naming it binds the receip
 });
 
 test('the timer publishes today\'s paper or nothing, on the Berlin clock', () => {
-  // 2026-09-06 22:30 Berlin is 20:30 UTC, and 00:30 UTC on the 7th is still the
-  // 6th's evening in Berlin — the two hours a UTC "today" would get wrong are
-  // exactly the hours this timer runs in.
-  assert.equal(berlinToday(new Date('2026-09-06T20:30:00Z')), '2026-09-06');
+  // 2026-09-06 17:00 Berlin is 15:00 UTC. Berlin remains the edition clock for
+  // timer runs and manual retries near local midnight.
+  assert.equal(berlinToday(new Date('2026-09-06T15:00:00Z')), '2026-09-06');
   assert.equal(berlinToday(new Date('2026-09-06T22:30:00Z')), '2026-09-07');
   assert.equal(assertRequestedEdition('2026-09-06', undefined), '2026-09-06');
-  assert.equal(assertRequestedEdition('2026-09-06', 'today', new Date('2026-09-06T20:30:00Z')), '2026-09-06');
+  assert.equal(assertRequestedEdition('2026-09-06', 'today', new Date('2026-09-06T15:00:00Z')), '2026-09-06');
   assert.equal(assertRequestedEdition('2026-09-06', '2026-09-06'), '2026-09-06');
   // A stale current-edition — yesterday's paper, or a rehearsal's — is the
   // failure this exists for: it refuses and nothing is pushed.
-  assert.throws(() => assertRequestedEdition('2026-09-05', 'today', new Date('2026-09-06T20:30:00Z')), /the promoted edition is 2026-09-05, but "today" means 2026-09-06/u);
+  assert.throws(() => assertRequestedEdition('2026-09-05', 'today', new Date('2026-09-06T15:00:00Z')), /the promoted edition is 2026-09-05, but "today" means 2026-09-06/u);
   assert.throws(() => assertRequestedEdition('2026-09-05', '2026-09-06'), /the promoted edition is 2026-09-05/u);
   assert.throws(() => assertRequestedEdition('2026-09-05', 'tomorrow'), /must be "today" or YYYY-MM-DD/u);
 });
@@ -325,20 +324,20 @@ test('the generated indexes are rebuilt from the branch tree, and only those pat
 
 test('a real push creates the edition branch and leaves main exactly where it was', async () => {
   const origin = remote(), before = origin.head();
-  const staged = stagedEdition('2026-09-05');
+  const staged = stagedEdition('2026-09-09');
   const work = scratch('work');
   const result = await pushStagedEditionTree({
-    url: origin.url, branch: editionBranch('2026-09-05'), editionSource: staged.source, editionPath: staged.path,
-    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-09-05')
+    url: origin.url, branch: editionBranch('2026-09-09'), editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-09-09')
   });
-  assert.equal(result.branch, 'edition/2026-09-05');
+  assert.equal(result.branch, 'edition/2026-09-09');
   assert.match(result.commit, /^[0-9a-f]{40}$/u);
   assert.equal(result.base, before);
-  assert.deepEqual(origin.refs().sort(), ['refs/heads/edition/2026-09-05', 'refs/heads/main']);
+  assert.deepEqual(origin.refs().sort(), ['refs/heads/edition/2026-09-09', 'refs/heads/main']);
   assert.equal(origin.head(), before, 'main moved');
   const bare = origin.url;
-  assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%s', result.commit], { encoding: 'utf8' }).trim(), 'chore(edition): add the 2026-09-05 edition');
-  assert.match(execFileSync('git', ['-C', bare, 'show', `${result.commit}:content/editions/2026-09-05/articles/one.json`], { encoding: 'utf8' }), /"id":"one"/u);
+  assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%s', result.commit], { encoding: 'utf8' }).trim(), 'chore(edition): add the 2026-09-09 edition');
+  assert.match(execFileSync('git', ['-C', bare, 'show', `${result.commit}:content/editions/2026-09-09/articles/one.json`], { encoding: 'utf8' }), /"id":"one"/u);
   // The pushed tree is what ci.yml will check out: regenerating both indexes
   // over it must leave the working tree clean, which is `git diff --exit-code`.
   const checkout = scratch('ci');
@@ -346,7 +345,7 @@ test('a real push creates the edition branch and leaves main exactly where it wa
   assert.equal(ciDriftCheck(checkout), '', 'the pushed branch would fail the CI drift check');
   // The commit is pinned to the edition's release instant, so a retry after a
   // failed push rebuilds the identical object rather than a new one.
-  assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%aI', result.commit], { encoding: 'utf8' }).trim(), '2026-09-05T16:00:00+02:00');
+  assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%aI', result.commit], { encoding: 'utf8' }).trim(), '2026-09-09T18:00:00+02:00');
 });
 
 test('a push aimed at main is refused before git runs and the remote is untouched', async () => {

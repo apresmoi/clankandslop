@@ -29,6 +29,7 @@ import path from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
 import { repinSource } from './check-bundle-descriptor.mjs';
+import { releaseClock } from './release-time.mjs';
 
 // One ed25519 deploy key per repository, reached through an SSH host alias so
 // the generated config — not ssh's agent or default key search — decides which
@@ -69,14 +70,14 @@ const COMMIT_EMAIL = 'release@clankandslop.invalid';
 // --- which edition a timer is allowed to publish -----------------------------
 // `current-edition` is durable: it keeps naming last night's artifact until
 // pressman promotes a new one. A job a person runs reads that as "publish what
-// was staged"; a job a TIMER runs at 22:30 every night must read it as "publish
+// was staged"; a job a TIMER runs at 17:00 every day must read it as "publish
 // TODAY'S paper or nothing", or the first evening the org fails to compose it
 // re-pushes yesterday's — silently, unattended, for as many nights as the org
 // stays down. Hence `--edition`: the caller states which date it means, and a
 // mismatch is a refusal that alarms rather than a push.
 //
 // Berlin, not UTC, because every other clock in this system is Berlin: the
-// crons, the 16:00 release instant, the seam, the audit. A UTC "today" would
+// crons, the edition release instant, the seam, the audit. A UTC "today" would
 // disagree with all of them for two hours every night, which is exactly the
 // window this timer runs in.
 const berlinDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -357,9 +358,10 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   generated.descriptor = await repinBundleDescriptor(workdir);
   const descriptorPaths = generated.descriptor.skipped ? [] : REPINNED_DESCRIPTOR_PATHS;
   if (descriptorPaths.length > 0) await git(['-C', workdir, 'add', '--', ...descriptorPaths], options);
-  // Pinned to the edition's own 16:00 Berlin release instant so a retry after a
+  // Pinned to the edition's own Berlin release instant so a retry after a
   // failed push rebuilds the identical commit instead of a new one every run.
-  const date = `${branch.slice('edition/'.length)}T16:00:00+02:00`;
+  const edition = branch.slice('edition/'.length);
+  const date = `${edition}T${releaseClock(edition)}:00+02:00`;
   const committed = [scoped, ...GENERATED_INDEX_PATHS, ...descriptorPaths];
   await git(['-C', workdir, '-c', `user.name=${COMMIT_NAME}`, '-c', `user.email=${COMMIT_EMAIL}`, 'commit', '-q', '-m', message, '--', ...committed], { ...options, date });
   const commit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);

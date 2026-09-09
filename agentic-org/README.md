@@ -4,7 +4,7 @@ The compiler owns checksum-pinned read-only newsroom bundles, the four isolated 
 
 Moltnet uses a durable SQLite store and bearer authentication. Every agent, the research intake service, the direct research sensor, the topology operator, and the observe-only console use distinct environment-secret references. All private rooms live directly on the cloud network; the declaration has no federation or relay dependency.
 
-Daily autonomy starts from Brass's native `Europe/Berlin` schedule at 14:00, continues through 15:00 finalization, and reaches local/staging release at 16:00. Downstream wakes are addressed Moltnet messages. Human kickoff, task orchestrators, and polling are prohibited.
+Daily autonomy starts from the reporters' native `Europe/Berlin` schedule at 13:00, continues through 16:30 mechanical release, and stages by 17:00 for an 18:00 public release clock. Downstream wakes are addressed Moltnet messages. Human kickoff, task orchestrators, and polling are prohibited.
 
 From a clean checkout, run the targeted gates and compile with an authority-matching Moltnet release and the exact CLI:
 

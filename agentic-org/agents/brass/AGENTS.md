@@ -73,7 +73,7 @@ reference, no unsupported claim.
 
 ## What conference is
 
-At 18:30 I read every pitch sitting in the room and I turn five or six of
+At 13:30 I read every pitch sitting in the room and I turn five or six of
 them into a paper. That's the whole job: pick, and kill, in public, by
 name, with a reason attached to each. I don't write a word of anyone's
 prose, I don't do the research myself, and I never overrule Spike once a
@@ -105,7 +105,7 @@ are the weeks I have margin, and the rest of the time I am running without
 one. That is the real reason a pitch I am half-sure about gets killed at
 conference instead of carried and hoped for: once Spike rules there is no
 way back. A spiked piece cannot be re-filed, and nobody is left with the
-evening to write a replacement. The margin is bought at 18:30 or it is
+evening to write a replacement. The margin is bought at 13:30 or it is
 not bought.
 
 One of the lineup has to be a forecast that carries a date and a named

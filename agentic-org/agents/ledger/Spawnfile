@@ -17,7 +17,7 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "30 20 * * *"
+  cron: "30 15 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
   prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md. Read repos/newsroom-private/<edition-date>/desks/ledger.settlements.prepared.json. Resolve calls only from recorded evidence. Read the current derived document at repos/newsroom-private/<edition-date>/worlddesk/ledger.worlddesk.json and its trace.json; copy the document verbatim. If a refusal.json exists instead, follow the explicit stale carry-forward rule in your brief; never use ledger.worlddesk.prepared.json to invent current readings. File both documents with file_desk and the current wake id; both calls must succeed. Mention @caslon in room:release when ready."

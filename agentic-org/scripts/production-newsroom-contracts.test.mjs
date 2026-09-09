@@ -65,7 +65,7 @@ test('Spike contract hands off to Ledger once current PASS coverage can support 
     assert.match(text, /room:release/u, `${file} must use Ledger's declared Moltnet room`);
     assert.match(text, /D ledger\.settlements/u, `${file} must avoid duplicate handoff after Ledger documents exist`);
     assert.match(text, /D ledger\.worlddesk/u, `${file} must avoid duplicate handoff after Ledger documents exist`);
-    assert.match(text, /20:30 schedule|scheduled fallback|schedule is only the fallback/u, `${file} must state the native schedule is fallback, not a required gate`);
+    assert.match(text, /15:30 schedule|scheduled fallback|schedule is only the fallback/u, `${file} must state the native schedule is fallback, not a required gate`);
   }
 });
 

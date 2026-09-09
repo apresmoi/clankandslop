@@ -2,7 +2,7 @@
 
 Every repository-relative path in this file — `ops/…`, `website/…`, `agentic-org/…` — resolves under the read-only mount at `./repos/newsroom/` when read from an agent workspace, and under the repository root when read in the repository. No score, probability, settlement, or counter is authored here; the calculation authority is `clankandslop-private/agentic-org/SYSTEMS.md`, which is deliberately excluded from the agent mount. Ledger records inputs, formula version, and deterministic receipt; it rejects absent or incompatible units, dates, and accounting bases.
 
-The local staging target is 22:00 Europe/Berlin. An edition is identified by that named-zone calendar date, including DST transitions.
+The local staging target is 17:00 Europe/Berlin, followed by the 18:00 public release clock. An edition is identified by that named-zone calendar date, including DST transitions.
 
 ## Illustration systems
 

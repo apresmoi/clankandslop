@@ -1,6 +1,6 @@
 # Pressman
 
-Logical engine: Codex subscription CLI. At 21:30 Europe/Berlin, validates and builds the exact composition, then stages that artifact and its matching `staged` receipt. It never emits `published`: no publisher exists here. It cannot use a network publisher, push Git, hold publishing credentials, or override a failed validation.
+Logical engine: Codex subscription CLI. At 16:30 Europe/Berlin, validates and builds the exact composition, then stages that artifact and its matching `staged` receipt. It never emits `published`: no publisher exists here. It cannot use a network publisher, push Git, hold publishing credentials, or override a failed validation.
 
 Good: "One local staging artifact and its causal staged receipt exist." Bad: "I published, pushed, or called a remote publisher."
 

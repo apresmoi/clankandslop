@@ -10,11 +10,11 @@ const at = (iso) => new Date(iso);
 const berlin = 'Europe/Berlin';
 
 test('cron resolves in the declared timezone, across DST', () => {
-  // 18:00 Berlin is 16:00Z in summer and 17:00Z in winter. A window computed in
+  // 13:00 Berlin is 11:00Z in summer and 12:00Z in winter. A window computed in
   // UTC would be an hour wrong for half the year.
-  assert.equal(new Date(nextFire('0 18 * * *', berlin, at('2026-09-06T12:00:00Z'))).toISOString(), '2026-09-06T16:00:00.000Z');
-  assert.equal(new Date(nextFire('0 18 * * *', berlin, at('2026-12-06T12:00:00Z'))).toISOString(), '2026-12-06T17:00:00.000Z');
-  assert.equal(new Date(previousFire('30 21 * * *', berlin, at('2026-09-06T12:00:00Z'))).toISOString(), '2026-09-05T19:30:00.000Z');
+  assert.equal(new Date(nextFire('0 13 * * *', berlin, at('2026-09-06T08:00:00Z'))).toISOString(), '2026-09-06T11:00:00.000Z');
+  assert.equal(new Date(nextFire('0 13 * * *', berlin, at('2026-12-06T08:00:00Z'))).toISOString(), '2026-12-06T12:00:00.000Z');
+  assert.equal(new Date(previousFire('30 16 * * *', berlin, at('2026-09-06T12:00:00Z'))).toISOString(), '2026-09-05T14:30:00.000Z');
 });
 
 test('the parked cron is found a year out rather than reported as never', () => {
@@ -49,17 +49,17 @@ test('the window is read from the Spawnfiles, which are what the compiler lowers
 test('the derived window moves when the schedule moves — it is not a hardcoded hour', () => {
   const morning = deriveWindow([{ agent: 'a', cron: '0 10 * * *', timezone: berlin }, { agent: 'b', cron: '0 16 * * *', timezone: berlin }], { leadMinutes: 15, tailMinutes: 60 });
   assert.deepEqual([morning.gap.from, morning.gap.to], ['16:00', '10:00']);
-  const evening = deriveWindow([{ agent: 'a', cron: '0 18 * * *', timezone: berlin }, { agent: 'b', cron: '30 21 * * *', timezone: berlin }], { leadMinutes: 15, tailMinutes: 60 });
-  assert.deepEqual([evening.gap.from, evening.gap.to], ['21:30', '18:00']);
+  const evening = deriveWindow([{ agent: 'a', cron: '0 13 * * *', timezone: berlin }, { agent: 'b', cron: '30 16 * * *', timezone: berlin }], { leadMinutes: 15, tailMinutes: 60 });
+  assert.deepEqual([evening.gap.from, evening.gap.to], ['16:30', '13:00']);
   assert.notDeepEqual(morning.recommended, evening.recommended);
 });
 
 test('the clock refuses a deploy inside the lead before a wake and the tail after one', () => {
-  const schedule = [{ agent: 'cogsworth', cron: '0 18 * * *', timezone: berlin }];
-  // 17:45 Berlin = 15:45Z: fifteen minutes before the wake.
-  assert.match(clockFindings(schedule, { now: at('2026-09-06T15:45:00Z'), leadMinutes: 30, tailMinutes: 120 }).findings.join(' '), /wakes in 15 min/u);
-  // 18:30 Berlin = 16:30Z: thirty minutes after it.
-  assert.match(clockFindings(schedule, { now: at('2026-09-06T16:30:00Z'), leadMinutes: 30, tailMinutes: 120 }).findings.join(' '), /woke 30 min ago/u);
+  const schedule = [{ agent: 'cogsworth', cron: '0 13 * * *', timezone: berlin }];
+  // 12:45 Berlin = 10:45Z: fifteen minutes before the wake.
+  assert.match(clockFindings(schedule, { now: at('2026-09-06T10:45:00Z'), leadMinutes: 30, tailMinutes: 120 }).findings.join(' '), /wakes in 15 min/u);
+  // 13:30 Berlin = 11:30Z: thirty minutes after it.
+  assert.match(clockFindings(schedule, { now: at('2026-09-06T11:30:00Z'), leadMinutes: 30, tailMinutes: 120 }).findings.join(' '), /woke 30 min ago/u);
   // 09:00 Berlin = 07:00Z: clear on both sides.
   assert.deepEqual(clockFindings(schedule, { now: at('2026-09-06T07:00:00Z'), leadMinutes: 30, tailMinutes: 120 }).findings, []);
 });

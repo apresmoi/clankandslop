@@ -290,13 +290,15 @@ export function validateRuntimeBindings(root = orgRoot) {
 export function validateTree() { for (const agent of agents) for (const file of ['Spawnfile', 'AGENTS.md', 'CLAUDE.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
 export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
-  assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '22:00' && schedule.effective_from === '2026-09-08', 'schedule zone or deadline invalid');
+  assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '18:00' && schedule.effective_from === '2026-09-09', 'schedule zone or deadline invalid');
   assert(policy.deadline === schedule.deadline, 'runtime and schedule deadline drift');
-  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'18:00',owner:'reporters'},{id:'conference',time:'18:30',owner:'brass'},{id:'review',time:'20:00',owner:'spike'},{id:'settlement',time:'20:30',owner:'ledger'},{id:'composition',time:'21:00',owner:'caslon'},{id:'release',time:'21:30',owner:'pressman'}]), 'conference checkpoints invalid');
+  assert(JSON.stringify(schedule.release_clock) === JSON.stringify([{before:'2026-09-08',deadline:'16:00'},{from:'2026-09-08',before:'2026-09-09',deadline:'22:00'},{from:'2026-09-09',deadline:'18:00'}]), 'release clock history invalid');
+  assert(JSON.stringify(schedule.checkpoints?.map(({id,time,owner}) => ({id,time,owner}))) === JSON.stringify([{id:'pitch',time:'13:00',owner:'reporters'},{id:'conference',time:'13:30',owner:'brass'},{id:'review',time:'15:00',owner:'spike'},{id:'settlement',time:'15:30',owner:'ledger'},{id:'composition',time:'16:00',owner:'caslon'},{id:'pressman_release',time:'16:30',owner:'pressman'},{id:'publication',time:'18:00',owner:'host-publisher'}]), 'conference checkpoints invalid');
   assert(schedule.operator_kickoff === false && schedule.task_orchestrator === false, 'operator kickoff and task orchestrators are prohibited');
   assert(schedule.downstream_activation === 'moltnet-addressed-only' && schedule.polling === false, 'downstream work must be addressed through Moltnet without polling');
   const owners = schedule.spawnfile_schedule?.owners ?? {};
   for (const checkpoint of schedule.checkpoints) {
+    if (!agents.includes(checkpoint.owner) && checkpoint.owner !== 'reporters') continue;
     const assigned = checkpoint.owner === 'reporters' ? [...reporters] : [checkpoint.owner];
     for (const owner of assigned) {
       const [minute,hour] = (owners[owner] ?? '').split(' ');

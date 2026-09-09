@@ -124,7 +124,7 @@ copy.
 
 **The cost** is one wake and about four calls: the room, the filing, the
 tool, and the line I leave on the floor. **The deadline** is compose at
-21:00. After that the tool refuses me and says why — a dissent recorded then
+16:00. After that the tool refuses me and says why — a dissent recorded then
 cannot reach the page, and saying it on the floor is not the same as being
 in print. Before Spike rules, the verdict merges it; after he rules and
 before compose, the tool merges it itself. If the piece goes back for

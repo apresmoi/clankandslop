@@ -14,8 +14,8 @@ was:  research lands on edition/<date>   →  a person repins, rebuilds, redeplo
                                          →  a person opens and merges the PR
       something breaks                   →  systemd says Failed into a void
 
-now:  clank-seam.timer         (Hetzner)      repin → bundle → build → deploy
-      clank-publish.timer      (Hetzner)      staged artifact → edition/<date>
+now:  clank-seam.timer         (Hetzner)      noon snapshot → bundle → build → deploy
+      clank-publish.timer      (Hetzner)      17:00 staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
       clank-alarm@.service     (both boxes)   ntfy → a phone
 ```
@@ -24,10 +24,10 @@ now:  clank-seam.timer         (Hetzner)      repin → bundle → build → dep
 
 | File | Runs | Does |
 |---|---|---|
-| `scripts/seam-run.mjs` | Hetzner, 16:30 Berlin | repin → `org:bundle` → build → `up` → settle |
+| `scripts/seam-run.mjs` | Hetzner, 12:00 Berlin | repin → `org:bundle` → build → `up` → settle |
 | `scripts/wake-window.mjs` | inside the seam | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
-| `scripts/publish-edition-branch.mjs` | Hetzner, 22:30 Berlin | today's staged artifact → `edition/<date>` on GitHub |
-| `scripts/cycle-audit.mjs` | Hetzner, 23:30 Berlin | did today's cycle reach `composed`? |
+| `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
+| `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |
 | `scripts/alarm.mjs` | both boxes | one HTTPS POST that reaches a person |
 | `../../.github/workflows/merge-edition.yml` | GitHub | opens and merges the edition PR, only on green CI |
 
@@ -40,7 +40,7 @@ A redeploy kills every in-flight wake. `wake-window.mjs` therefore answers
   `policies/schedule.json`, and never hardcoded, because the Spawnfile is the
   only file the compiler lowers into the container's cron. The crons have
   already moved once: the repin script's own header still says the reporters
-  wake at 10:00; the tree says 18:00.
+  wake at 10:00; the tree now says 13:00.
 - **the running container** — daimon's wake-acceptance receipts (any in
   `accepted` or `running`), the turn usage ledger (any incomplete turn, or any
   turn metered in the last 15 minutes), and the process table (anything outside
@@ -160,11 +160,11 @@ systemctl daemon-reload
 ```
 
 Not before: on a box where the publisher is disabled the cycle never reaches
-`staged`, so installing that drop-in early guarantees an alarm at 23:30 every
+`staged`, so installing that drop-in early guarantees an alarm at 18:15 every
 single night.
 
 Arming host timers does not remove the newsroom's stop marker. The source
-declares evening agent schedules; create `fuse.stop` before replacing a parked
+declares midday agent schedules; create `fuse.stop` before replacing a parked
 deployment and retain it through verification. Record the prior fuse state and
 usage history before starting a new explicitly bounded run epoch.
 
@@ -195,7 +195,7 @@ The drop-ins live in `~/.config/systemd/user/<unit>.d/alarm.conf` and add only
 
 ## Preparing publication for approval
 
-`clank-publish.timer` fires `publish-edition-branch.mjs` at 22:30 Berlin. It is
+`clank-publish.timer` fires `publish-edition-branch.mjs` at 17:00 Berlin. It is
 the same job a person used to run by hand; three properties make it safe to run
 without one, and none of them relaxes anything the manual job enforced.
 

@@ -1,13 +1,13 @@
-# 23:30 Europe/Berlin: two hours after the last declared wake (pressman, 21:30),
-# which is long enough for a press run to finish and short enough that a person
-# still hears about a missing edition the same night.
+# 18:15 Europe/Berlin: after the 17:00 publisher buffer and public 18:00 release
+# clock, which is late enough to read the published outcome and early enough
+# that a person hears about a missing edition the same evening.
 #
 # NOT enabled. `systemctl enable --now clank-cycle-audit.timer` arms it.
 [Unit]
 Description=Audit the day's cycle after press time
 
 [Timer]
-OnCalendar=*-*-* 23:30:00 Europe/Berlin
+OnCalendar=*-*-* 18:15:00 Europe/Berlin
 Persistent=true
 Unit=clank-cycle-audit.service
 

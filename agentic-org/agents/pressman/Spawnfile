@@ -17,7 +17,7 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "30 21 * * *"
+  cron: "30 16 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
   prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md. If the current composition is ready, call prepare_release using the current wake id. Follow its bounded job polling until complete, then call stage_release for that exact composition. Mechanical content, layout and build checks are the release gate. Report failures to the owning colleague; never edit content or bypass a gate. Produce only a local staging artifact and receipt. Production publishing is parked."

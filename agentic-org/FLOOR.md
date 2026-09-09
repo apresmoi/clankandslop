@@ -35,11 +35,11 @@ number a formula owns. Break either and the piece doesn't run.
 
 ## The day (Europe/Berlin)
 
-18:00 reporters read their beat and pitch one story worth the paper. 18:30
+13:00 reporters read their beat and pitch one story worth the paper. 13:30
 conference — Brass reads the pitches, calls the lineup by name, with a
-reason. 20:00 review — Spike passes or spikes what's filed. 20:30 Ledger files both desk documents. 21:00 compose —
-Caslon lays out front and tape. 21:30 Pressman runs the mechanical checks and
-build, then stages the accepted edition. The local staging target is 22:00.
+reason. 15:00 review — Spike passes or spikes what's filed. 15:30 Ledger files both desk documents. 16:00 compose —
+Caslon lays out front and tape. 16:30 Pressman runs the mechanical checks and
+build, then stages the accepted edition by 17:00. The public release clock is 18:00.
 
 These are independent agent wakes, followed by addressed Moltnet handoffs.
 There is no editorial workflow controller. Sensors are separate scheduled

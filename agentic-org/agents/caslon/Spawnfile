@@ -17,7 +17,7 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "0 21 * * *"
+  cron: "0 16 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
   prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md plus repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed, including decisions.art[order[0]] lead art when the lead lacks reporter art; generated lead maps need locator_context. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. The tools enforce the baked page structure. Mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."

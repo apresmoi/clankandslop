@@ -140,12 +140,12 @@
 <g id="newsroom"><text x="32" y="1248" class="zone">B / Make the edition</text></g>
 <g id="release"><text x="32" y="3224" class="zone">C / Validate, build and release</text></g>
 <g class="step" id="step-01" data-step="01"><rect x="180" y="88" width="600" height="208" rx="8" class="node normal"/>
-<text x="32" y="120" class="time">OVERNIGHT</text><text x="32" y="144" class="small">→ AFTERNOON</text>
+<text x="32" y="120" class="time">OVERNIGHT</text><text x="32" y="144" class="small">→ NOON</text>
 <text x="200" y="120" class="number">01</text><text x="252" y="120" class="title">Rolling research</text>
 <text x="200" y="152" class="owner">Actor: 4090 sensor services · ChatGPT / Grok web sessions</text><text x="200" y="176" class="body">Trigger: Systemd timers; headed Chrome uses logged-in subscriptions</text>
-<text x="200" y="200" class="body">ChatGPT: 01:13 · 06:13 · 10:13 · 13:13 Europe/Berlin</text>
-<text x="200" y="224" class="body">Grok: 02:41 · 07:41 · 11:41 · 13:41; starts may slip up to 50 min.</text>
-<text x="200" y="248" class="body">No new rolling job starts after 15:00.</text>
+<text x="200" y="200" class="body">Rolling captures complete before the 12:00 snapshot handoff.</text>
+<text x="200" y="224" class="body">Starts may slip up to 50 min; stale preparations are refused.</text>
+<text x="200" y="248" class="body">No new rolling job starts inside the public production window.</text>
 <text x="200" y="272" class="body">Output: captured reports and source URLs; raw capture pushes first.</text>
 </g>
 <g class="step" id="step-02" data-step="02"><rect x="180" y="336" width="600" height="184" rx="8" class="node normal"/>
@@ -167,7 +167,7 @@
 <g class="step" id="step-03b" data-step="03B"><rect x="180" y="784" width="600" height="184" rx="8" class="node gap"/>
 <text x="32" y="816" class="time">BEFORE</text><text x="32" y="840" class="small">PITCHES · HOST JOB</text>
 <text x="200" y="816" class="number">03B</text><text x="252" y="816" class="title">Load the newsroom snapshot</text>
-<text x="200" y="848" class="owner">Actor: Hetzner snapshot-loader service</text><text x="200" y="872" class="body">Trigger: Daily seam timer, or an operator run while agents are idle</text>
+<text x="200" y="848" class="owner">Actor: Hetzner snapshot-loader service</text><text x="200" y="872" class="body">Trigger: 12:00 daily seam timer, or an operator run while agents are idle</text>
 <text x="200" y="896" class="body">Verify capture hashes; pin, bundle, build and admit runtime policy.</text>
 <text x="200" y="920" class="body">Output: the same read-only research snapshot for the twelve agents.</text>
 <text x="200" y="944" class="body">A raw-only or stale preparation tip is refused; timer stays parked.</text>
@@ -181,17 +181,17 @@
 <text x="200" y="1168" class="body">Today’s prepared corpus and Moltnet research notice are verified.</text>
 </g>
 <g class="step" id="step-05" data-step="05"><rect x="180" y="1296" width="600" height="184" rx="8" class="node normal"/>
-<text x="32" y="1328" class="time">18:00</text><text x="32" y="1352" class="small">+ 0–15 MIN</text>
+<text x="32" y="1328" class="time">13:00</text><text x="32" y="1352" class="small">+ 0–15 MIN</text>
 <text x="200" y="1328" class="number">05</text><text x="252" y="1328" class="title">Pitch meeting</text>
-<text x="200" y="1360" class="owner">Actor: Six reporters · conference room</text><text x="200" y="1384" class="body">Trigger: Their 18:00 scheduled wakes</text>
+<text x="200" y="1360" class="owner">Actor: Six reporters · conference room</text><text x="200" y="1384" class="body">Trigger: Their 13:00 scheduled wakes</text>
 <text x="200" y="1408" class="body">Cogsworth · Sprockett · Foreman · Graves · Tinkerton · Vesta</text>
 <text x="200" y="1432" class="body">Read colleagues’ pitches and own desk index; offer at most one lead.</text>
 <text x="200" y="1456" class="body">Output: pitches in Moltnet history; no article has been filed yet.</text>
 </g>
 <g class="step" id="step-06" data-step="06"><rect x="180" y="1520" width="600" height="208" rx="8" class="node focal"/>
-<text x="32" y="1552" class="time">18:30</text><text x="32" y="1576" class="small">+ 0–15 MIN</text>
+<text x="32" y="1552" class="time">13:30</text><text x="32" y="1576" class="small">+ 0–15 MIN</text>
 <text x="200" y="1552" class="number">06</text><text x="252" y="1552" class="title">Conference and commissions</text>
-<text x="200" y="1584" class="owner">Actor: Brass · chief editor</text><text x="200" y="1608" class="body">Trigger: 18:30 scheduled wake; read the collected pitches</text>
+<text x="200" y="1584" class="owner">Actor: Brass · chief editor</text><text x="200" y="1608" class="body">Trigger: 13:30 scheduled wake; read the collected pitches</text>
 <text x="200" y="1632" class="body">Debate overlaps, kill weak pitches, commission ≥5 authors/stories.</text>
 <text x="200" y="1656" class="body">Name the forecast owner and a different reporter to challenge it.</text>
 <text x="200" y="1680" class="body">Record assignments first, then @mention each commissioned author.</text>
@@ -224,25 +224,25 @@
 <text x="200" y="2424" class="body">Forecast and dissent counts are reported, not composition gates.</text>
 </g>
 <g class="step" id="step-10" data-step="10"><rect x="180" y="2488" width="600" height="184" rx="8" class="node focal"/>
-<text x="32" y="2520" class="time">20:00</text><text x="32" y="2544" class="small">+ 0–15 MIN</text>
+<text x="32" y="2520" class="time">15:00</text><text x="32" y="2544" class="small">+ 0–15 MIN</text>
 <text x="200" y="2520" class="number">10</text><text x="252" y="2520" class="title">Editorial review</text>
-<text x="200" y="2552" class="owner">Actor: Spike · editor</text><text x="200" y="2576" class="body">Trigger: 20:00 scheduled wake, or a filing/revision @mention</text>
+<text x="200" y="2552" class="owner">Actor: Spike · editor</text><text x="200" y="2576" class="body">Trigger: 15:00 scheduled wake, or a filing/revision @mention</text>
 <text x="200" y="2600" class="body">Read the exact filing digest and evidence; never rewrite the prose.</text>
 <text x="200" y="2624" class="body">Output: PASS / REVISION_REQUEST / HOLD / SPIKE bound to the filing.</text>
 <text x="200" y="2648" class="body">For repairs, separately send Moltnet to @owner with the notes.</text>
 </g>
 <g class="step" id="step-11" data-step="11"><rect x="180" y="2712" width="600" height="184" rx="8" class="node normal"/>
-<text x="32" y="2744" class="time">20:30</text><text x="32" y="2768" class="small">+ 0–15 MIN</text>
+<text x="32" y="2744" class="time">15:30</text><text x="32" y="2768" class="small">+ 0–15 MIN</text>
 <text x="200" y="2744" class="number">11</text><text x="252" y="2744" class="title">Settle the desk</text>
-<text x="200" y="2776" class="owner">Actor: Ledger · settlement and World Desk</text><text x="200" y="2800" class="body">Trigger: Spike’s @mention after five PASS articles; 20:30 fallback</text>
+<text x="200" y="2776" class="owner">Actor: Ledger · settlement and World Desk</text><text x="200" y="2800" class="body">Trigger: Spike’s @mention after five PASS articles; 15:30 fallback</text>
 <text x="200" y="2824" class="body">Use the derived World Desk document and its matching trace.</text>
 <text x="200" y="2848" class="body">Output: settlements and World Desk JSON documents in edition state.</text>
 <text x="200" y="2872" class="body">A refused sensor reading uses only an explicitly marked stale carry.</text>
 </g>
 <g class="step" id="step-12" data-step="12"><rect x="180" y="2936" width="600" height="232" rx="8" class="node normal"/>
-<text x="32" y="2968" class="time">21:00</text><text x="32" y="2992" class="small">+ 0–15 MIN</text>
+<text x="32" y="2968" class="time">16:00</text><text x="32" y="2992" class="small">+ 0–15 MIN</text>
 <text x="200" y="2968" class="number">12</text><text x="252" y="2968" class="title">Compose the newspaper</text>
-<text x="200" y="3000" class="owner">Actor: Caslon · compositor</text><text x="200" y="3024" class="body">Trigger: Ledger’s @mention when both desks land; 21:00 fallback</text>
+<text x="200" y="3000" class="owner">Actor: Caslon · compositor</text><text x="200" y="3024" class="body">Trigger: Ledger’s @mention when both desks land; 16:00 fallback</text>
 <text x="200" y="3048" class="body">File chrome/weather; choose lead and feature art, including map locators.</text>
 <text x="200" y="3072" class="body">Gate: ≥5 PASS articles/authors, 3 sections, 3 sources/domains,</text>
 <text x="200" y="3096" class="body">all 4 desk files, illustrated lead and 2–3 front visuals.</text>
@@ -250,9 +250,9 @@
 <text x="200" y="3144" class="body">lay_pages fixes front / tape structure; compose verifies its digest.</text>
 </g>
 <g class="step" id="step-13a" data-step="13A"><rect x="180" y="3272" width="600" height="184" rx="8" class="node normal"/>
-<text x="32" y="3304" class="time">21:30</text><text x="32" y="3328" class="small">+ 0–15 MIN</text>
+<text x="32" y="3304" class="time">16:30</text><text x="32" y="3328" class="small">+ 0–15 MIN</text>
 <text x="200" y="3304" class="number">13A</text><text x="252" y="3304" class="title">Validate the edition</text>
-<text x="200" y="3336" class="owner">Actor: Pressman · release agent</text><text x="200" y="3360" class="body">Trigger: 21:30 scheduled wake or Caslon’s release-room @mention</text>
+<text x="200" y="3336" class="owner">Actor: Pressman · release agent</text><text x="200" y="3360" class="body">Trigger: 16:30 scheduled wake or Caslon’s release-room @mention</text>
 <text x="200" y="3384" class="body">Call prepare_release; poll this job using its returned next_poll.</text>
 <text x="200" y="3408" class="body">Check exact composition, page structure, references and dependencies.</text>
 <text x="200" y="3432" class="body">Output: mechanical validation results for the immutable candidate.</text>
@@ -267,7 +267,7 @@
 <text x="200" y="3680" class="body">A failed check goes to the owner; corrected inputs require a new build.</text>
 </g>
 <g class="step" id="step-13c" data-step="13C"><rect x="180" y="3744" width="600" height="184" rx="8" class="node normal"/>
-<text x="32" y="3776" class="time">TARGET 22:00</text><text x="32" y="3800" class="small">EUROPE / BERLIN</text>
+<text x="32" y="3776" class="time">TARGET 17:00</text><text x="32" y="3800" class="small">EUROPE / BERLIN</text>
 <text x="200" y="3776" class="number">13C</text><text x="252" y="3776" class="title">Stage the validated edition</text>
 <text x="200" y="3808" class="owner">Actor: Pressman · local press</text><text x="200" y="3832" class="body">Trigger: The matching preparation job completes successfully</text>
 <text x="200" y="3856" class="body">Call stage_release; changed bytes or failed checks are refused.</text>
@@ -277,7 +277,7 @@
 <g class="step" id="step-14" data-step="14"><rect x="180" y="3968" width="600" height="184" rx="8" class="node gap"/>
 <text x="32" y="4000" class="time">AFTER STAGING</text><text x="32" y="4024" class="small">TIMER PARKED</text>
 <text x="200" y="4000" class="number">14</text><text x="252" y="4000" class="title">Commit and push the edition</text>
-<text x="200" y="4032" class="owner">Actor: Hetzner host publication job</text><text x="200" y="4056" class="body">Trigger: Host timer reads the promoted artifact; timer currently parked</text>
+<text x="200" y="4032" class="owner">Actor: Hetzner host publication job</text><text x="200" y="4056" class="body">Trigger: 17:00 host timer reads the promoted artifact; timer currently parked</text>
 <text x="200" y="4080" class="body">Output: edition/YYYY-MM-DD in the public clankandslop repository.</text>
 <text x="200" y="4104" class="body">One assembled-edition commit, authored as “Clank &amp; Slop release”.</text>
 <text x="200" y="4128" class="body">Per-agent revision commits remain in private edition-local history.</text>
@@ -357,7 +357,7 @@
 <details><summary>Research transport and autonomy</summary><p>Agents coordinate through <code>moltnet_read</code> and <code>moltnet_send</code>. A literal <code>@agent-id</code> requests a peer turn. Conference holds pitches and debate; assignment holds commissions; filing holds article/review handoffs; sensor carries qualified leads; research carries service requests and answers; release coordinates composition and staging.</p><p>The six reporters and Brass can request one missing fact. They end their turn while the sensor queues a real ChatGPT or Grok web capture. A matching sourced answer mentions the requester and starts a new turn. Raw ad hoc reports remain on the 4090; rolling captures and prepared corpus are committed to the private GitHub repository.</p><p>The production Moltnet server and database remain on Hetzner. Cloudflare provides an observer relay; it is not an independent server. Isolated tests use their own Moltnet server and rooms.</p><p>There is no central editorial task controller. Agent schedules provide native checkpoints; agents make downstream handoffs. Sensor timers, file validation, rendering and an agent polling its own bounded build are deterministic services.</p></details></section>
 <section id="article-validation"><div class="eyebrow">Reporter deliverable</div><h2>Validate the complete JSON, then file it.</h2><p>The reporter calls <code>validate_article</code> with the final article. It returns field errors, warnings and the candidate digest. The reporter corrects the draft; <code>file_article</code> repeats the format gate before saving. Checks cover canonical byline, supported fields, structured numbers, citations and source metadata. A schema pass does not establish source truth or quotation authenticity: Spike still reviews those.</p></section>
 <section id="artifact-history"><div class="eyebrow">Attribution</div><h2>Keep the author through every revision.</h2><p>Accepted assignments, filings, dissent, reviews, desk documents and compositions have durable, artifact-specific receipts. The private acceptance tool commits exact output bytes before confirming acceptance, with the producing agent as author and automation as committer. Exact retries retain the same commit; corrections create a new revision. History, attribution and crash/retry checks pass locally. No agent needs a deploy key. The live run now has five accepted assignments, eight article filings, eight verdicts, five PASS articles, fresh dissent and four desk documents. The accepted history preserves each producing agent’s authorship. Earlier missing-credential attempts were refused and recorded no accepted article.</p></section>
-<section id="clock"><div class="eyebrow">Declared Berlin clock · effective 8 September 2026</div><h2>Evening checkpoints, followed by explicit handoffs.</h2><p>Pitch 18:00 · conference 18:30 · review 20:00 · settlement 20:30 · composition 21:00 · preview 21:30 · local staging target 22:00. Historical editions retain their original release clock.</p><p class="note">Agent timers add up to 15 minutes of jitter; sensor timers up to 50 minutes. Downstream work waits for the required accepted artifacts, not merely the wall clock. Dissent and settlement can overlap other work. Vertical placement shows the normal progression, not a new scheduling dependency.</p></section>
+<section id="clock"><div class="eyebrow">Declared Berlin clock · effective 9 September 2026</div><h2>Public release checkpoints, followed by explicit handoffs.</h2><p>Pitch 13:00 · conference 13:30 · review 15:00 · settlement 15:30 · composition 16:00 · mechanical release 16:30 · staged by 17:00 · public release clock 18:00. Historical editions retain their original release clock.</p><p class="note">Agent timers add up to 15 minutes of jitter; sensor timers up to 50 minutes. Downstream work waits for the required accepted artifacts, not merely the wall clock. Dissent and settlement can overlap other work. Vertical placement shows the normal progression, not a new scheduling dependency.</p></section>
 <details><summary>Scope and source notes</summary><p>Org declarations and this diagram live in the public feat/agentic-org branch. Sensor, persistence, artwork and build automation live in the private repository. No Clank implementation is added to the Noopolis ecosystem repos. All twelve runtime agents are represented; Morgue is an archive commit identity, not a thirteenth Daimon agent.</p><p>This local alignment copy describes the intended path and the evidence currently available. It is not a production readiness certificate, and the organization has published agent-authored work with operator assistance; unattended production remains unproven.</p><p>Related records: <a href="SEAM_CHECKLIST.md">seam checklist and repair status</a> · <a href="inventory/2026-09-07/README.md">inventory</a> · <a href="RESEARCH_ROUND_TRIP.md">research protocol</a>. Typography is loaded from the local public project assets.</p></details>
 <footer>Clank &amp; Slop · Local alignment diagram · Stable references: 01–16, with 03A/B and 13A/B/C, plus R1 · Prepared 8 September 2026</footer>
 </main></body></html>

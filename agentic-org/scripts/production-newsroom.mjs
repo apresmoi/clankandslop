@@ -47,7 +47,7 @@ async function resolveAssignment(args,article,owner){
 }
 
 const filingNoticeInstruction=(edition,articleId,revision,dissenter)=>dissenter
-  ?`Filing saved only; no Moltnet message was sent. Use moltnet_send on network clank-newsroom to target room:filing now: in one message include edition ${edition}, article ${articleId} revision ${revision}, and mention both @spike and @${dissenter} so Spike sees the filing and the dissenter can record before compose at 21:00`
+  ?`Filing saved only; no Moltnet message was sent. Use moltnet_send on network clank-newsroom to target room:filing now: in one message include edition ${edition}, article ${articleId} revision ${revision}, and mention both @spike and @${dissenter} so Spike sees the filing and the dissenter can record before compose at 16:00`
   :`Filing saved only; no Moltnet message was sent. Use moltnet_send on network clank-newsroom to target room:filing now: include edition ${edition}, article ${articleId} revision ${revision}, and mention @spike so the editor sees the filing`;
 const reviewNoticeInstruction=(args,owner)=>args.verdict==='PASS'
   ?`PASS was saved. Continue from the fresh state/edition/editions/${args.edition}/INDEX: review other unreviewed filings one at a time; when the INDEX shows passed>=5 and no D ledger.settlements or D ledger.worlddesk rows, use moltnet_send on network clank-newsroom to target room:release mentioning @ledger.`

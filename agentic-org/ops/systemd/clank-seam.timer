@@ -1,12 +1,11 @@
-# 16:30 Europe/Berlin, DERIVED — not picked.
+# 12:00 Europe/Berlin, DERIVED — not picked.
 #
-#   * AFTER the producers: the private research sensors on LeDeluge run their
-#     last slot at 13:13 and 13:41 Berlin with RandomizedDelaySec=3000 and a
-#     two-hour timeout, so today's corpus is on edition/<date> by ~16:30.
-#   * BEFORE the newsroom: the earliest declared wake in the tree is 18:00
+#   * AFTER the producers: the private research sensors prepare the daily
+#     snapshot before noon, so today's corpus is on edition/<date> by 12:00.
+#   * BEFORE the newsroom: the earliest declared wake in the tree is 13:00
 #     Berlin (agents/*/Spawnfile), and a redeploy kills an in-flight wake. That
-#     leaves 90 minutes of clearance for a repin, a bundle build, an image
-#     build and a settle.
+#     leaves one hour of clearance for a repin, a bundle build, an image build
+#     and a settle.
 #
 # The job recomputes both edges from the Spawnfiles on every run and refuses to
 # deploy if this hour has stopped being safe, so moving the crons cannot
@@ -17,7 +16,7 @@
 Description=Run the newsroom seam before the reporters wake
 
 [Timer]
-OnCalendar=*-*-* 16:30:00 Europe/Berlin
+OnCalendar=*-*-* 12:00:00 Europe/Berlin
 Persistent=false
 Unit=clank-seam.service
 

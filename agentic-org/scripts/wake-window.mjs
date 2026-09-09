@@ -11,7 +11,7 @@
 //
 //   * hardcoding "safe before 09:45" and never noticing the schedule moved.
 //     The crons live in agents/<agent>/Spawnfile and have already moved once
-//     (the repin script's own header still says 10:00; the tree says 18:00).
+//     (the repin script's own header still says 10:00; the tree says 13:00).
 //     So the window is DERIVED from those files, every run.
 //   * trusting the clock. Being outside the wake window does not prove nothing
 //     is running: a wake can overrun, and an operator can fire a manual one at

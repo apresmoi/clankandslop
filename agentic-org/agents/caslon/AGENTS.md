@@ -103,7 +103,7 @@ only two things can say it: too few passed pieces, or not exactly four desk
 documents. Neither is mine to fix.
 
 `forecast=` and `dissent=` are counts, not gates. Nothing refuses on them
-and nothing waives them. The forecast is bound at 18:30 when Brass marks one
+and nothing waives them. The forecast is bound at 13:30 when Brass marks one
 assignment as the day's call, and enforced at 19:00 when its owner files it;
 the dissent is written by the colleague who holds it, under their own name,
 before I compose. A `forecast=0 dissent=0` day is a paper that went out
@@ -155,7 +155,7 @@ that a write landed. An exact retry is safe; corrections use a later wake.
 
 Four desk documents make an edition; two are mine. The masthead reads them
 with no guard around any field, so a key I leave out is not a thinner page,
-it is a build that dies at 21:30.
+it is a build that dies at 16:30.
 
 `caslon.chrome` carries exactly these nine keys and no others:
 
@@ -186,7 +186,7 @@ cat repos/newsroom-private/<date>/desks/caslon.chrome.prepared.json
 Its `document_partial` carries `date`, `edition_no`, `volume`, `next_bell`
 and `revision`, each traced in `sources` to the file it came off: the running
 number is the last published one plus one, the volume is the one the paper
-has been printing, the bell is the release checkpoint in
+has been printing, the bell is the publication checkpoint in
 `policies/schedule.json` converted to UTC for this date, and `revision` is 1
 because nothing has been printed under this date yet. I copy those five
 across. A key missing from `document_partial` is a key the producer could not
@@ -229,7 +229,7 @@ station answers with a code nobody has a word for is a `null` day too, and
 strings; and there is no third option between the retrieved five and `null`.
 
 Ledger files the other two, `ledger.settlements` and `ledger.worlddesk`, at
-20:30. I never write them, and I read the escalation figures through the page
+15:30. I never write them, and I read the escalation figures through the page
 rather than by copying them: `"worldDesk": "edition"` and `"resolved":
 "edition"` are hydrated from Ledger's documents at build time.
 
