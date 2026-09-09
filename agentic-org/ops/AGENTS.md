@@ -14,7 +14,7 @@ was:  research lands on edition/<date>   →  a person repins, rebuilds, redeplo
                                          →  a person opens and merges the PR
       something breaks                   →  systemd says Failed into a void
 
-now:  clank-seam.timer         (Hetzner)      noon snapshot → bundle → build → deploy
+now:  clank-seam.timer         (Hetzner)      12:00 clean public main snapshot → corpus/archive refresh → bundle → build → deploy
       clank-publish.timer      (Hetzner)      17:00 staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
       clank-alarm@.service     (both boxes)   ntfy → a phone
@@ -24,7 +24,7 @@ now:  clank-seam.timer         (Hetzner)      noon snapshot → bundle → build
 
 | File | Runs | Does |
 |---|---|---|
-| `scripts/seam-run.mjs` | Hetzner, 12:00 Berlin | repin → `org:bundle` → build → `up` → settle |
+| `scripts/seam-run.mjs` | Hetzner, 12:00 Berlin | clean public main snapshot → repin → `org:bundle` → build → `up` → settle |
 | `scripts/wake-window.mjs` | inside the seam | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
 | `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |

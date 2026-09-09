@@ -193,17 +193,12 @@ export async function regenerateIndexes(workdir) {
 // exactly the files the generators just wrote, and the branch lands red on the
 // same check this exists to satisfy.
 //
-// And it is skipped, loudly and in the result, when the base branch does not
-// carry a descriptor at all. That is not a hypothetical: `main` today has no
-// `agentic-org/` in it — the org tree lives on `feat/agentic-org` — so an
-// edition branch cut from `main` has no descriptor to repin, no Spawnfile to
-// follow it, and no descriptor check in `main`'s ci.yml to satisfy. Repinning
-// unconditionally throws ENOENT on the very first unattended publication;
-// committing a path that is not in the tree makes `git commit` refuse the
-// pathspec. What is committed is therefore a function of what the base branch
-// actually carries, read from the branch. The moment `agentic-org/` lands on
-// the base, the descriptor is there and the repin runs again — nothing about
-// this decides not to repin a tree that has one.
+// And it is skipped, loudly and in the result, when a historical base branch
+// does not carry a descriptor at all. Public main now carries `agentic-org/`,
+// so normal unattended publication repins the descriptor and Spawnfile pins
+// from that main-based tree. What is committed remains a function of what the
+// base branch actually carries, read from the branch; nothing here decides not
+// to repin a tree that has a descriptor.
 export const DESCRIPTOR_FILE = 'agentic-org/newsroom-runtime-bundle.json';
 
 export async function repinBundleDescriptor(workdir) {
