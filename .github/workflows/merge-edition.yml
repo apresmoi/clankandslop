@@ -1,8 +1,49 @@
-# Prepare an edition pull request after dated-ref, content, checksum and CI
-# checks. Publication is an explicit human merge outside this workflow.
-# The host publisher holds the branch-only deploy key; this job receives no
-# content-write grant and never merges a pull request.
-name: Prepare edition review
+# The publication hop, without the person — and without loosening one property
+# of the airlock that person was standing in.
+#
+# WHAT STAYS EXACTLY AS IT WAS
+# ----------------------------
+# `agentic-org/scripts/publish-edition-branch.mjs` still runs on the host,
+# outside every container, with a restricted deploy key the container never
+# sees, a pinned GitHub host key, a refspec that can only ever be
+# `edition/YYYY-MM-DD`, and an explicit refusal of `main`, `master`, `staging`,
+# `gh-pages` and `HEAD` as whole refs or as any component. None of that moves.
+# The container still cannot write `main`.
+#
+# WHAT THIS ADDS
+# --------------
+# The second half of the hop — the merge a person did by hand — runs here
+# instead, in GitHub Actions, where the credential is GitHub's own short-lived
+# GITHUB_TOKEN rather than anything the newsroom holds.
+#
+# FOUR LOCKS, EACH INDEPENDENT
+# ----------------------------
+#  1. TRIGGER. `push` on `edition/*` only. No workflow_dispatch, no schedule, no
+#     pull_request trigger — there is no way to ask this workflow to run against
+#     any other ref.
+#  2. REF SHAPE. The trigger filter is re-asserted inside the job against
+#     `^refs/heads/edition/\d{4}-\d{2}-\d{2}$`, because a glob is a convenience
+#     and this is the check that means it.
+#  3. CI. `agentic-org/scripts/ci-gate.mjs` reads the CI workflow's own run
+#     against THIS EXACT head SHA and refuses anything but `success`. It never
+#     re-runs the checks itself (a second opinion is not the gate), never uses
+#     `--admin`, and never merges while a run is queued or in progress. It is
+#     read TWICE — once before the pull request exists and once immediately
+#     before the merge, with the head SHA re-asserted in between. The rule
+#     lives in a unit-tested script, not in inline YAML.
+#  4. CONTENT. The diff against `main` must touch nothing outside the paths
+#     `publish-edition-branch.mjs` is allowed to commit, and the two of those
+#     that are not content are admitted on a much shorter leash: every changed
+#     line under `agentic-org/` must differ only in a checksum or one of the
+#     descriptor's own size fields. That is the whole of what the publisher's
+#     descriptor repin can produce, and it is what lets those paths through
+#     without letting a Spawnfile edit through. An edition branch carrying a
+#     workflow change, a script change or a website change is refused and left
+#     for a person — automation that can merge arbitrary code into `main` on a
+#     branch-name match is a worse hole than the one it closes.
+#
+# `permissions` is the whole grant: no packages, no id-token, no deployments.
+name: Merge edition
 
 on:
   push:
@@ -10,12 +51,12 @@ on:
       - "edition/*"
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   checks: read
-  actions: read
+  actions: write
 
-# One review preparation at a time per branch.
+# One merge at a time per branch, and never cancel a merge half-done.
 concurrency:
   group: merge-edition-${{ github.ref }}
   cancel-in-progress: false
@@ -32,7 +73,7 @@ env:
   CHECKSUM_ONLY_PATHS: "agentic-org/"
 
 jobs:
-  prepare:
+  merge:
     runs-on: ubuntu-latest
     steps:
       - name: Refuse any ref that is not a dated edition branch
@@ -72,7 +113,7 @@ jobs:
             done
             if [ "$ok" -eq 0 ]; then echo "::error::$file is outside the edition content paths"; bad=1; fi
           done <<< "$changed"
-          [ "$bad" -eq 0 ] || { echo "::error::refusing to prepare a pull request for a branch that changes more than the edition"; exit 1; }
+          [ "$bad" -eq 0 ] || { echo "::error::refusing to auto-merge a branch that changes more than the edition"; exit 1; }
           echo "every changed path is edition content"
 
       - name: Refuse any change under agentic-org that is not a checksum
@@ -88,7 +129,7 @@ jobs:
             echo "changed lines under $prefix:"; printf '%s\n' "$lines" | sed 's/^/  /'
             offending="$(printf '%s\n' "$lines" | grep -vE 'sha256:[0-9a-f]{64}|"(file_count|content_bytes)": [0-9]+,?$' || true)"
             if [ -n "$offending" ]; then
-              echo "::error::a change under $prefix is not a checksum — refusing to prepare a pull request for it"
+              echo "::error::a change under $prefix is not a checksum — refusing to auto-merge it"
               printf '%s\n' "$offending" | sed 's/^/::error::  /'
               exit 1
             fi
@@ -127,18 +168,19 @@ jobs:
           if [ -z "$number" ]; then
             gh pr create --head "$BRANCH" --base "$BASE" \
               --title "chore(edition): publish ${BRANCH#edition/}" \
-              --body "Automated publication of the ${BRANCH#edition/} edition. Prepared after CI concluded success on this exact commit and the diff was confined to edition content. Awaiting explicit human publication approval and merge."
+              --body "Automated publication of the ${BRANCH#edition/} edition. Merged by \`merge-edition.yml\` only after CI concluded success on this exact commit and the diff was confined to edition content."
             number="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number')"
           fi
           echo "number=$number" >> "$GITHUB_OUTPUT"
           echo "pull request #$number"
 
       # Read it a second time, after the pull request exists and immediately
-      # before handing off for human review. Two reads separated in time close the race
-      # between the gate above and the review handoff below — and the head SHA is
+      # before merging. Two reads separated in time is what closes the race
+      # between the gate above and the merge below — and the head SHA is
       # re-asserted, so a branch that moved while CI ran is refused rather than
       # merged on the strength of a run for a commit that is no longer the tip.
-      - name: Verify the review is still green and still the same commit
+      - name: Merge, but only if it is still green and still the same commit
+        id: merge
         if: steps.ci.outputs.green == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -151,4 +193,15 @@ jobs:
           node agentic-org/scripts/ci-gate.mjs --sha="$SHA" --repo="${{ github.repository }}" --timeout-seconds=300  # short, but not zero: the duplicate run the PR itself created may still be queued
           state="$(gh pr view "$NUMBER" --json mergeable --jq .mergeable)"
           [ "$state" != "CONFLICTING" ] || { echo "::error::pull request #$NUMBER conflicts with the base — refusing"; exit 1; }
-          echo "Ready for explicit human publication approval: #$NUMBER ($SHA)"
+          gh pr merge "$NUMBER" --merge --delete-branch=false
+          echo "merged=true" >> "$GITHUB_OUTPUT"
+          echo "merged #$NUMBER ($SHA)"
+
+      - name: Dispatch website deploy for the merged edition
+        if: steps.merge.outputs.merged == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          node agentic-org/scripts/dispatch-pages-deploy.mjs --repo="${{ github.repository }}" --merged-head-sha="$SHA"
