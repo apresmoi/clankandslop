@@ -54,7 +54,7 @@ permissions:
   contents: write
   pull-requests: write
   checks: read
-  actions: read
+  actions: write
 
 # One merge at a time per branch, and never cancel a merge half-done.
 concurrency:
@@ -180,6 +180,7 @@ jobs:
       # re-asserted, so a branch that moved while CI ran is refused rather than
       # merged on the strength of a run for a commit that is no longer the tip.
       - name: Merge, but only if it is still green and still the same commit
+        id: merge
         if: steps.ci.outputs.green == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -193,4 +194,14 @@ jobs:
           state="$(gh pr view "$NUMBER" --json mergeable --jq .mergeable)"
           [ "$state" != "CONFLICTING" ] || { echo "::error::pull request #$NUMBER conflicts with the base — refusing"; exit 1; }
           gh pr merge "$NUMBER" --merge --delete-branch=false
+          echo "merged=true" >> "$GITHUB_OUTPUT"
           echo "merged #$NUMBER ($SHA)"
+
+      - name: Dispatch website deploy for the merged edition
+        if: steps.merge.outputs.merged == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          node agentic-org/scripts/dispatch-pages-deploy.mjs --repo="${{ github.repository }}" --merged-head-sha="$SHA"
