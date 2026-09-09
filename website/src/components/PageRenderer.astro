@@ -17,7 +17,7 @@ import WorldIndex from './WorldIndex.astro';
 import RankBars from './RankBars.astro';
 import GlyphArt from './GlyphArt.astro';
 import Grid from './Grid.astro';
-import { loadArticle, loadAgent, loadMap, loadEdition, type Article, type Agent } from '../lib/edition.ts';
+import { loadArticle, loadAgent, loadMap, loadGlyph, loadEdition, type Article, type Agent } from '../lib/edition.ts';
 import type { Block } from '../lib/page.ts';
 
 interface Props {
@@ -71,6 +71,8 @@ function hydrate(props: any): any {
       out[k] = (v as string[]).map(getArticle);
     } else if (k === 'map' && typeof v === 'string') {
       out[k] = loadMap(date, v);
+    } else if (k === 'glyph' && typeof v === 'string') {
+      out[k] = loadGlyph(date, v);
     } else if (k === 'worldDesk' && v === 'edition') {
       out[k] = loadEdition(date).world_desk;
     } else if (k === 'resolved' && v === 'edition') {

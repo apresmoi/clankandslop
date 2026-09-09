@@ -9,13 +9,18 @@ interface Props {
   lead: Article;
   rail?: Article[];
   splitWith?: Article;
-  /** When true, render the lead's art (or a placeholder) left of the lead. */
+  /** When true, render the explicit Caslon-selected art block left of the lead. */
   withArt?: boolean;
+  art?: { block: 'MapGlyph' | 'GlyphArt'; props: Record<string, any> };
 }
-const { variant = 'lead-rail', lead, rail = [], splitWith, withArt = false } = Astro.props;
-const mapArt = lead.art?.kind === 'map' ? lead.art : null;
-const heroMap = mapArt ? loadMap(lead.edition_date, mapArt.hero_map ?? mapArt.map) : null;
-const glyphArt = lead.art?.kind === 'ascii' && lead.art.shape ? lead.art : null;
+const { variant = 'lead-rail', lead, rail = [], splitWith, withArt = false, art } = Astro.props;
+const explicitMapArt = art?.block === 'MapGlyph' ? art.props : null;
+const explicitGlyphArt = art?.block === 'GlyphArt' ? art.props : null;
+const articleMapArt = lead.art?.kind === 'map' ? lead.art : null;
+const articleHeroMap = articleMapArt ? loadMap(lead.edition_date, articleMapArt.hero_map ?? articleMapArt.map) : null;
+const legacyMapArt = articleMapArt && articleHeroMap ? { map: articleHeroMap, cols: 52, rows: 30, rotX: articleMapArt.rotX, rotY: articleMapArt.rotY, zoom: articleMapArt.zoom, overlays: articleMapArt.overlays, routes: articleMapArt.routes, spots: articleMapArt.spots, tone: articleMapArt.tone, locator_context: articleMapArt.locator_context, interactive: false } : null;
+const mapArt = art ? explicitMapArt : legacyMapArt;
+const glyphArt = explicitGlyphArt ?? (!art && lead.art?.kind === 'ascii' && lead.art.shape ? lead.art : null);
 ---
 {variant === 'lead-rail' && (
   <div class="hero-grid">
@@ -32,28 +37,15 @@ const glyphArt = lead.art?.kind === 'ascii' && lead.art.shape ? lead.art : null;
 
 {variant === 'lead-only' && (
   <div class={`hero-grid hero-grid-solo${withArt ? ' hero-grid-art' : ''}`}>
-    {withArt && mapArt && heroMap && (
+    {withArt && mapArt && (
       <div class="hero-art hero-art-map">
-        <MapGlyph
-          map={heroMap}
-          cols={52}
-          rows={30}
-          rotX={mapArt.rotX}
-          rotY={mapArt.rotY}
-          zoom={mapArt.zoom}
-          overlays={mapArt.overlays}
-          routes={mapArt.routes}
-          spots={mapArt.spots}
-          tone={mapArt.tone}
-          locator_context={mapArt.locator_context}
-          interactive={false}
-        />
-        <div class="hero-art-caption">▲ {mapArt.caption}</div>
+        <MapGlyph {...mapArt} />
+        {!explicitMapArt && articleMapArt?.caption && <div class="hero-art-caption">▲ {articleMapArt.caption}</div>}
       </div>
     )}
     {withArt && !mapArt && glyphArt && (
       <div class="hero-art hero-art-glyph">
-        <GlyphArt shape={glyphArt.shape} roll={glyphArt.roll} scale={glyphArt.scale} caption={glyphArt.caption} />
+        <GlyphArt {...glyphArt} />
       </div>
     )}
     {withArt && !mapArt && !glyphArt && (

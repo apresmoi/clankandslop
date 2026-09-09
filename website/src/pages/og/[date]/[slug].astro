@@ -7,6 +7,7 @@ import '../../../styles/tokens.css';
 import GlyphArt from '../../../components/GlyphArt.astro';
 import MapGlyph from '../../../components/MapGlyph.astro';
 import { loadArticle, loadMap, listAllArticleRefs } from '../../../lib/edition.ts';
+import { loadArticleMapArt } from '../../../lib/composed-map.ts';
 
 export async function getStaticPaths() {
   return listAllArticleRefs().map(({ date, slug }) => ({ params: { date, slug } }));
@@ -15,7 +16,7 @@ export async function getStaticPaths() {
 const { date, slug } = Astro.params as { date: string; slug: string };
 const article = loadArticle(date, slug);
 
-const mapArt = article.art?.kind === 'map' ? article.art : null;
+const mapArt = loadArticleMapArt(date, article);
 const asciiArt = article.art?.kind === 'ascii' ? article.art : null;
 const artMap = mapArt ? loadMap(date, mapArt.map) : null;
 
