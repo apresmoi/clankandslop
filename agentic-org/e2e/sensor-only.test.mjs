@@ -89,14 +89,14 @@ clientConfig.attachments[0].base_url=`http://host.docker.internal:${new URL(base
 const clientConfigPath=path.join(root,'klaxon-client.json');
 await writeFile(clientConfigPath,JSON.stringify(clientConfig));
 let active,transport;
-try{active=await startRuntime(config,root,Date.parse('2026-08-16T18:29:00+02:00'),promoted.record,clientConfigPath);
+try{active=await startRuntime(config,root,Date.parse('2026-08-16T13:29:00+02:00'),promoted.record,clientConfigPath);
 transport=await moltnet(root,active.baseUrl,baseUrl);
 await transport.send(promoted.sensor);
 const routed=await wake(active.runtime,'agent:cogsworth','agent:vesta');
 assert.ok(routed.wakes.some(item=>item.agent_id==='agent:cogsworth'));
 assert.equal(routed.action_receipts.filter(item=>item.delivery_id===`moltnet:${promoted.sensor.id}`).length,1);
 await settled(active.runtime);
-const draft=await active.runtime.request({type:'advance',now_ms:Date.parse('2026-08-16T18:45:00+02:00')});
+const draft=await active.runtime.request({type:'advance',now_ms:Date.parse('2026-08-16T13:45:00+02:00')});
 assert.equal(draft.wakes.filter(item=>item.agent_id==='agent:brass').length,1);
 assert.ok(draft.action_receipts.some(item=>item.type==='mcp_call'&&item.server_id==='newsroom-brass'&&!item.is_error),JSON.stringify(draft.action_receipts));
 await active.runtime.stop();
