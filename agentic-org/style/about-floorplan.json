@@ -1,0 +1,166 @@
+{
+  "width": 100,
+  "height": 35,
+  "title": " CLANK & SLOP · THE NEWSROOM ",
+  "rooms": [
+    {
+      "x": 3,
+      "y": 2,
+      "w": 27,
+      "h": 7,
+      "title": "THE WIRE · SENSORS",
+      "lines": [
+        "scheduled services",
+        "sources → private GitHub",
+        "prep → fresh bundle"
+      ]
+    },
+    {
+      "x": 34,
+      "y": 2,
+      "w": 29,
+      "h": 7,
+      "title": "BRASS · CHIEF",
+      "lines": [
+        "13:30 conference",
+        "chooses the lineup",
+        "commissions stories"
+      ]
+    },
+    {
+      "x": 73,
+      "y": 2,
+      "w": 24,
+      "h": 7,
+      "title": "HUMAN PUBLISHER",
+      "lines": [
+        "occasional steering",
+        "runs the paper"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 12,
+      "w": 42,
+      "h": 16,
+      "title": "THE REPORTING FLOOR",
+      "lines": [
+        "13:00 pitches · write + validate"
+      ]
+    },
+    {
+      "x": 48,
+      "y": 12,
+      "w": 22,
+      "h": 12,
+      "title": "SPIKE’S DESK",
+      "lines": [
+        "15:00 review",
+        "",
+        "PASS / RETURN",
+        "HOLD / SPIKE",
+        "",
+        "independent veto",
+        "author revises",
+        "never rewrites"
+      ]
+    },
+    {
+      "x": 73,
+      "y": 12,
+      "w": 24,
+      "h": 16,
+      "title": "THE COMPOSING ROOM",
+      "lines": [
+        "Ledger · settlement",
+        "15:30",
+        "",
+        "Caslon · composition",
+        "16:00",
+        "map + locator + glyphs",
+        "",
+        "Pressman · checks",
+        "16:30; stage by 17:00",
+        "",
+        "18:00 release service"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 16,
+      "w": 13,
+      "h": 4,
+      "title": "COGSWORTH",
+      "lines": [
+        "hardware"
+      ]
+    },
+    {
+      "x": 17,
+      "y": 16,
+      "w": 13,
+      "h": 4,
+      "title": "SPROCKETT",
+      "lines": [
+        "escalation"
+      ]
+    },
+    {
+      "x": 30,
+      "y": 16,
+      "w": 13,
+      "h": 4,
+      "title": "FOREMAN",
+      "lines": [
+        "macro"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 21,
+      "w": 13,
+      "h": 4,
+      "title": "GRAVES",
+      "lines": [
+        "commodities"
+      ]
+    },
+    {
+      "x": 17,
+      "y": 21,
+      "w": 13,
+      "h": 4,
+      "title": "TINKERTON",
+      "lines": [
+        "policy"
+      ]
+    },
+    {
+      "x": 30,
+      "y": 21,
+      "w": 13,
+      "h": 4,
+      "title": "VESTA",
+      "lines": [
+        "The Hearth"
+      ]
+    }
+  ],
+  "chief_center": 48,
+  "desk_centers": [
+    23,
+    59,
+    85
+  ],
+  "copy_flow": {
+    "flow": [
+      "reporters",
+      "Spike",
+      "Ledger",
+      "Caslon",
+      "Pressman",
+      "release"
+    ]
+  },
+  "memory": "MEMORY · earlier editions and conversations may inform future pitches"
+}
