@@ -71,7 +71,7 @@ workspace:
   resources:
     - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:880d1d5baa9fc7509a8f557106086ae36d2073749054a5b71bf955ab5cb9ff14, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:26fd51ae3c098df31dba736b274fb6c287b7a38b084b5375b52de9503888c598, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:648abbb767c8ce000d1f750b06bb1ec7dc8f0b153b639d15d66817c85a4adafe, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to
