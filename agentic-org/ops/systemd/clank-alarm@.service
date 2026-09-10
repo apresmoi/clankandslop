@@ -1,26 +1,32 @@
 # The OnFailure= handler. %i is the unit that failed.
 #
-# This is the piece CLANK_TO_PROD.md §1.6 says never existed: systemd reported
-# `Failed` for two days into an endpoint nobody had built. Every unit in this
-# directory names this handler, so a unit that fails for ANY reason — including
-# one its own code never anticipated, including being killed — still reaches a
-# human. The alarm script writes a breadcrumb before it sends, so even an
-# undeliverable alarm leaves the text on disk.
+# IT RECORDS LOCALLY AND SENDS NOTHING. The previous revision ran alarm.mjs,
+# which POSTed the alarm to a public ntfy.sh topic held in
+# /etc/clank-alarm/alarm.env. Both are retired: the alarm text names the box,
+# the failed unit and its exit status, and no third party needs to see any of
+# it. What replaces the channel is a local record, so there is somewhere to
+# look. See clank-alarm.sh for what is written and why.
 #
 # IT POINTS AT A STANDALONE COPY, NOT AT THE CHECKOUT. Verified the hard way on
-# 2026-09-06: pointed at /root/work/clankandslop/agentic-org/scripts/alarm.mjs,
-# the handler died with MODULE_NOT_FOUND because that tree had not been updated
-# yet — an alarm that only works when the repository is in the right state is
-# an alarm that is missing exactly when the repository is the problem. alarm.mjs
-# imports nothing but node builtins, so a copy at /usr/local/lib/clank-alarm/
-# is self-sufficient and survives a rebase, a half-finished deploy, or a
-# checkout that is not there at all.
+# 2026-09-06: pointed into /root/work/clankandslop, the handler died with
+# MODULE_NOT_FOUND because that tree had not been updated yet. An alarm that
+# only works when the repository is in the right state is missing exactly when
+# the repository is the problem. clank-alarm.sh needs nothing but /bin/sh,
+# coreutils and util-linux.
+#
+# These are SYSTEM units, not the user units the 4090 runs, so the script is
+# invoked with CLANK_ALARM_SCOPE=--system; the file is otherwise the merged
+# sensors/automation/clank-alarm.sh from clankandslop-private.
+#
+# Prove it before trusting it:
+#   systemctl start clank-alarm@some-unit.service
+#   tail -5 /var/lib/clank-alarm/alarm.log
+#   journalctl -t clank-alarm -n 5
 [Unit]
-Description=Raise the newsroom alarm for %i
+Description=Record the newsroom alarm for %i
 
 [Service]
 Type=oneshot
-EnvironmentFile=/etc/clank-alarm/alarm.env
-ExecStart=/bin/sh -c 'systemctl status --no-pager --lines=40 %i > /run/clank-alarm-%i.log 2>&1 || true; \
-  /usr/bin/node /usr/local/lib/clank-alarm/alarm.mjs \
-    --reason=unit-failed --message="systemd unit %i failed on hetzner" --detail-file=/run/clank-alarm-%i.log'
+Environment=CLANK_ALARM_SCOPE=--system
+StateDirectory=clank-alarm
+ExecStart=/usr/local/lib/clank-alarm/clank-alarm.sh %i

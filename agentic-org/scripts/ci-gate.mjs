@@ -10,18 +10,14 @@
 // push run is the authoritative one: it is triggered by the deploy key that
 // created the branch and it runs against the branch tip itself.
 //
-// The pull_request duplicate is created by whoever opened the pull request —
-// which, for an automated publication, is `github-actions[bot]`. GitHub parks
-// workflow runs from that author behind "Approve and run", so the duplicate
-// concludes `action_required`: a run that was never allowed to START. Observed
-// on 2026-09-06 for edition/2026-08-21 at c0b5cc2e, where the push run was
-// green and the parked duplicate would otherwise have vetoed a correct merge
-// forever.
-//
-// So `action_required` is admitted in exactly one shape and no other: a
-// non-push duplicate, of the same workflow, on the same SHA, whose push run
-// concluded success. Every other non-success — including an `action_required`
-// PUSH run, which really is a check that never ran — is red.
+// The pull_request duplicate is created by the workflow after the push run has
+// passed. GitHub has produced two harmless duplicate shapes in production:
+// `action_required`, where the bot-authored run was parked before it started,
+// and `failure` with zero jobs from github-actions[bot], where no check
+// actually ran. Both are admitted only beside a green push run for this exact
+// SHA. A failed duplicate with even one job, a human actor, or unknown job
+// evidence still blocks, because that is real CI or unknown CI. A failed push
+// run always blocks, because the push run is the authority.
 //
 // USAGE
 //   node agentic-org/scripts/ci-gate.mjs --sha=<40 hex> --repo=owner/name
@@ -76,19 +72,36 @@ export function verdict(runs) {
   const pushAllGreen = push.every((run) => run.conclusion === 'success');
   for (const run of runs.filter((item) => item.event !== 'push')) {
     if (run.conclusion === 'success') continue;
-    // The one admitted exception, and it is narrow: a duplicate that GitHub
-    // never let start, alongside an authoritative push run that did and passed.
-    if (run.conclusion === 'action_required' && pushAllGreen) continue;
+    // The admitted duplicate shapes are narrow: a non-push run that GitHub did
+    // not actually execute, alongside an authoritative push run that did pass.
+    if (pushAllGreen && run.event === 'pull_request' && run.conclusion === 'action_required') continue;
+    if (pushAllGreen && run.event === 'pull_request' && run.conclusion === 'failure' && run.actor === 'github-actions[bot]' && run.jobCount === 0) continue;
     reasons.push(`the ${run.event} run ${run.id ?? ''} concluded ${run.conclusion}`.trim());
   }
   if (reasons.length) return { verdict: RED, reasons, counts };
   return { verdict: GREEN, reasons: [`${counts.pushSuccess} push run(s) concluded success and nothing else objected`], counts };
 }
 
-const fetchRuns = (options) => JSON.parse(execFileSync('gh', [
-  'api', `repos/${options.repo}/actions/workflows/${options.workflow}/runs?head_sha=${options.sha}&per_page=100`,
-  '--jq', '[.workflow_runs[] | {id, event, status, conclusion}]'
-], { encoding: 'utf8', maxBuffer: 1 << 24 }));
+export function parseJobCount(raw) {
+  let parsed;
+  try { parsed = JSON.parse(raw); } catch { throw new GateError('job-count response was not valid JSON'); }
+  if (!Number.isSafeInteger(parsed) || parsed < 0) throw new GateError('job-count response was not a non-negative integer');
+  return parsed;
+}
+
+export function fetchRuns(options, { exec = execFileSync } = {}) {
+  const listing = JSON.parse(exec('gh', [
+    'api', `repos/${options.repo}/actions/workflows/${options.workflow}/runs?head_sha=${options.sha}&per_page=100`,
+    '--jq', '[.workflow_runs[] | {id, event, status, conclusion, actor: .actor.login}]'
+  ], { encoding: 'utf8', maxBuffer: 1 << 24 }));
+  return listing.map((run) => {
+    if (run.event !== 'pull_request' || run.status !== 'completed' || run.conclusion !== 'failure') return run;
+    const jobCount = parseJobCount(exec('gh', [
+      'api', `repos/${options.repo}/actions/runs/${run.id}/jobs`, '--jq', '.total_count'
+    ], { encoding: 'utf8', maxBuffer: 1 << 20 }));
+    return { ...run, jobCount };
+  });
+}
 
 export async function waitForGreen(options, { runs = fetchRuns, log = console.log, now = () => Date.now(), sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
   const deadline = now() + options.timeoutSeconds * 1000;
