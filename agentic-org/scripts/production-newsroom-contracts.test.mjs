@@ -123,6 +123,16 @@ test('shared floor tells reporters to stop without a current assignment row', as
   assert.match(text, /writing from chat alone/u, 'FLOOR must reject writing from chat alone');
 });
 
+
+test('shared floor names Codex Moltnet deferred tools exactly', async () => {
+  const root = path.resolve(import.meta.dirname, '..');
+  const text = await readFile(path.join(root, 'FLOOR.md'), 'utf8');
+  assert.match(text, /mcp__daimon\.moltnet_read/u, 'FLOOR must name Codex deferred Moltnet read exactly');
+  assert.match(text, /mcp__daimon\.moltnet_send/u, 'FLOOR must name Codex deferred Moltnet send exactly');
+  assert.match(text, /shorter\s+`moltnet_read`\s+and\s+`moltnet_send`\s+names in prompts are the operations/u, 'FLOOR must distinguish operation names from advertised Codex tool names');
+  assert.match(text, /not proof that the runtime connection is absent/u, 'FLOOR must prevent false unavailable-tool conclusions');
+});
+
 test('mcp tool schemas type every property beyond edition/event_key', async () => {
   const brass = await mcpToolsList('brass');
   const recordAssignment = brass.find((tool) => tool.name === 'record_assignment');
