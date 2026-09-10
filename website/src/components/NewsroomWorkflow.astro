@@ -18,6 +18,10 @@ import mobileFloorPlan from '../data/newsroom-floorplan-mobile.txt?raw';
   .org-map-narrow { display: none; }
   @container (width < 660px) {
     .org-map-wide { display: none; }
-    .org-map-narrow { display: block; font-size: min(12px, 3.9cqi); }
+    .org-map-narrow { display: block; font-size: min(16px, 3.95cqi); }
+  }
+  @media (max-width: 640px) {
+    .newsroom-workflow { margin-inline: -8px; }
+    figcaption { margin-inline: 8px; }
   }
 </style>
