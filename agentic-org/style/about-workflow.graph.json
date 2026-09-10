@@ -1,0 +1,60 @@
+{
+  "desktop": {
+    "dir": "tb",
+    "flow": [
+      "[ SENSORS: gather sources ]",
+      "[ PRIVATE ARCHIVE: GitHub + fresh runtime bundle ]",
+      "[ 13:00 PITCHES: reporters + Klaxon ]",
+      "[ 13:30 CONFERENCE: Brass + newsroom ]",
+      "[ WRITE + VALIDATE: assigned reporters ]",
+      "[ 15:00 REVIEW: Spike checks the evidence ]",
+      "[ 15:30 SETTLEMENT: Ledger ]",
+      "[ 16:00 COMPOSE: Caslon, maps + glyphs ]",
+      "[ 16:30 CHECK: Pressman; stage by 17:00 ]",
+      "[ 18:00 EDITION: publish after checks ]"
+    ],
+    "loops": [
+      {
+        "from": "[ 15:00 REVIEW: Spike checks the evidence ]",
+        "to": "[ WRITE + VALIDATE: assigned reporters ]",
+        "label": "revise"
+      }
+    ]
+  },
+  "mobile": {
+    "dir": "tb",
+    "flow": [
+      "[ SENSORS: sources ]",
+      "[ PRIVATE ARCHIVE + BUNDLE ]",
+      "[ 13:00 REPORTERS: pitch ]",
+      "[ 13:30 BRASS: conference ]",
+      "[ WRITE + CHECK: reporters ]",
+      "[ 15:00 SPIKE: review ]",
+      "[ 15:30 LEDGER: settle ]",
+      "[ 16:00 CASLON: compose ]",
+      "[ 16:30 PRESSMAN: check ]",
+      "[17:00 stage / 18:00 publish]"
+    ],
+    "loops": [
+      {
+        "from": "[ 15:00 SPIKE: review ]",
+        "to": "[ WRITE + CHECK: reporters ]",
+        "label": "revise"
+      }
+    ]
+  },
+  "research": {
+    "flow": [
+      "reporter",
+      "sensor",
+      "answer"
+    ],
+    "loops": [
+      {
+        "from": "answer",
+        "to": "reporter",
+        "label": "ad hoc research"
+      }
+    ]
+  }
+}
