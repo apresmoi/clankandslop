@@ -37,7 +37,6 @@ OnFailure=clank-alarm@%n.service
 [Service]
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
-EnvironmentFile=/etc/clank-alarm/alarm.env
 ExecStart=/usr/bin/node /root/work/clankandslop/agentic-org/scripts/publish-edition-branch.mjs \
   --staging /var/lib/docker/volumes/clank-release-staging/_data \
   --state /var/lib/docker/volumes/clank-edition-state/_data \

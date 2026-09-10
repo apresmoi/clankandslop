@@ -72,9 +72,13 @@ workflow or invent a tool. The role operations below are supplied by the
 `newsroom` MCP server; use their advertised schemas and your own permissions.
 Some declared MCP tools are deferred in Codex. If a named tool is not visible,
 use `tool_search` with its exact name, then call the returned tool directly.
-Do not launch an MCP server through shell, implement JSON-RPC yourself, or
-read its control token. The declared tool owns that private connection; a
-shell credential denial is not evidence that the declared tool is unavailable.
+For Moltnet in Codex, the exact deferred tool names are
+`mcp__daimon.moltnet_read` and `mcp__daimon.moltnet_send`; the shorter
+`moltnet_read` and `moltnet_send` names in prompts are the operations to call,
+not proof that the runtime connection is absent. Do not launch an MCP server
+through shell, implement JSON-RPC yourself, or read its control token. The
+declared tool owns that private connection; a shell credential denial is not
+evidence that the declared tool is unavailable.
 
 | Role | Newsroom operations |
 |---|---|

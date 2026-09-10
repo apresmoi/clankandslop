@@ -17,7 +17,6 @@ OnFailure=clank-alarm@%n.service
 [Service]
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
-EnvironmentFile=/etc/clank-alarm/alarm.env
 # Verified by running the seam end to end on the box, 2026-09-06.
 # SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR, not SPAWNFILE_MOLTNET_RELEASE_DIR: the
 # published-release path wants moltnet_release_stamp_<arch>.json, and what the

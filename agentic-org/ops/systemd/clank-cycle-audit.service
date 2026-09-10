@@ -9,6 +9,5 @@ OnFailure=clank-alarm@%n.service
 [Service]
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
-EnvironmentFile=/etc/clank-alarm/alarm.env
 ExecStart=/usr/bin/node /root/work/clankandslop/agentic-org/scripts/cycle-audit.mjs
 TimeoutStartSec=600
