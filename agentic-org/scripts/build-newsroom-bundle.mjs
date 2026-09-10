@@ -3,6 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { buildPrivateArchive, buildTar, gitModeMap, normalizeMode, privateArchivePlan, privateRoot } from './private-archive.mjs';
 import { SOURCE_REQUIRED, buildSourceArchive, sourceArchivePlan } from './source-archive.mjs';
+import { repinPublicAssetPins } from './repin-runtime-bundle-pins.mjs';
 
 const repo=path.resolve(import.meta.dirname,'../..');
 const required=SOURCE_REQUIRED;
@@ -46,4 +47,4 @@ const assetShards=[new Set(),new Set()];let assetSizes=[0,0];for(const name of [
 const privateArchive=buildPrivateArchive({privateRepoPath,commit:privateCommit,output:path.join(repo,'agentic-org/newsroom-private.tar'),modeFor});
 const source=buildSourceArchive(repo,path.join(repo,'agentic-org/newsroom-runtime.tar'),sourcePlan),assetA=build(assetShards[0],path.join(repo,'agentic-org/newsroom-assets-a.tar')),assetB=build(assetShards[1],path.join(repo,'agentic-org/newsroom-assets-b.tar'));
 const value={version:'clank.newsroom-runtime-bundle.v2',source:{archive:'newsroom-runtime.tar',sha256:source.digest,file_count:source.count,content_bytes:source.total},dependencies:[{archive:'newsroom-dependencies-a.tar',sha256:dependencyA.digest,mount:'deps-a',file_count:dependencyA.count,content_bytes:dependencyA.total},{archive:'newsroom-dependencies-b.tar',sha256:dependencyB.digest,mount:'deps-b',file_count:dependencyB.count,content_bytes:dependencyB.total}],assets:[{archive:'newsroom-assets-a.tar',sha256:assetA.digest,mount:'assets-a',file_count:assetA.count,content_bytes:assetA.total},{archive:'newsroom-assets-b.tar',sha256:assetB.digest,mount:'assets-b',file_count:assetB.count,content_bytes:assetB.total}],private:{archive:'newsroom-private.tar',sha256:privateArchive.digest,mount:'repos/newsroom-private',file_count:privateArchive.count,content_bytes:privateArchive.total,commit:privateCommit},lockfile:'website/package-lock.json',entrypoint:'agentic-org/scripts/production-newsroom-mcp.mjs'};
-writeFileSync(path.join(repo,'agentic-org/newsroom-runtime-bundle.json'),`${JSON.stringify(value,null,2)}\n`);console.log(`${source.digest}\n${privateArchive.digest}\n${dependencyA.digest}\n${dependencyB.digest}\n${assetA.digest}\n${assetB.digest}`);
+writeFileSync(path.join(repo,'agentic-org/newsroom-runtime-bundle.json'),`${JSON.stringify(value,null,2)}\n`);repinPublicAssetPins(repo,value);console.log(`${source.digest}\n${privateArchive.digest}\n${dependencyA.digest}\n${dependencyB.digest}\n${assetA.digest}\n${assetB.digest}`);
