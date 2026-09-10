@@ -91,22 +91,20 @@ and silently detaches every agent's mneme memory. `--repo` defaults to
 ## Install (Hetzner, root) — complete from clean state
 
 ```bash
-# 1. the alarm channel: one random ntfy topic, 0600, outside every repository
-install -d -m 700 /etc/clank-alarm
-printf 'CLANK_ALARM_URL=https://ntfy.sh/<topic>\nCLANK_ALARM_HOST=hetzner\n' > /etc/clank-alarm/alarm.env
-chmod 600 /etc/clank-alarm/alarm.env
-install -d -m 700 /var/lib/clank-alarm/spool
-
-# 2. a STANDALONE copy of the alarm, independent of every checkout. alarm.mjs
-#    imports nothing but node builtins on purpose: an alarm that only works
-#    when the repository is in the right state is missing exactly when the
-#    repository is the problem.
+# 1. the local alarm recorder, independent of every checkout. It records locally
+#    and sends nothing; the script is shipped from the private host automation
+#    release because the public repository must not carry host-local runtime
+#    scripts as publication content.
 install -d -m 755 /usr/local/lib/clank-alarm
-install -m 755 /root/work/clankandslop/agentic-org/scripts/alarm.mjs /usr/local/lib/clank-alarm/alarm.mjs
+install -m 755 /root/work/clankandslop-private/sensors/automation/clank-alarm.sh /usr/local/lib/clank-alarm/clank-alarm.sh
 
-# 3. prove the channel before trusting it
-set -a; . /etc/clank-alarm/alarm.env; set +a
-node /usr/local/lib/clank-alarm/alarm.mjs --selftest
+# 2. the local alarm state directory
+install -d -m 700 /var/lib/clank-alarm
+
+# 3. prove the recorder before trusting it
+CLANK_ALARM_SCOPE=--system CLANK_ALARM_STATE=/var/lib/clank-alarm \
+  /usr/local/lib/clank-alarm/clank-alarm.sh clank-alarm-selftest.service
+tail -5 /var/lib/clank-alarm/alarm.log
 
 # 4. the units, loaded and DISABLED
 install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/*.service \
@@ -233,19 +231,18 @@ independent and catches the hand-edited volume the path comparison never could.
 An edition branch is cut from `main` and pushed, and a `push`-triggered workflow
 runs **the workflow file on the branch it was pushed to** — which is `main`'s.
 So `merge-edition.yml` is live only once it is on `main`, and it invokes
-`agentic-org/scripts/ci-gate.mjs`, which must be on `main` too. `main` carries
-no `agentic-org/` otherwise: the org tree lives on `feat/agentic-org`. Hence
-also `repinBundleDescriptor` skipping when the base branch has no descriptor —
-there is nothing to repin, nothing on the branch checks it, and repinning
-unconditionally threw ENOENT on the first unattended publication.
+`agentic-org/scripts/ci-gate.mjs`, which must be on `main` too. The org tree now
+lives on public `main`, and the daily host job takes a clean fast-forward
+snapshot from it before building the next runtime image.
 
-When an edition branch lands with `merge-edition.yml` on `main`, `ci.yml`
-validates the content and builds the site. The preparation workflow checks the
-exact head SHA, dated branch name, allowed paths and checksum-only changes, then
-opens or updates a pull request. It rechecks the head and CI before handing the
-pull request to a human. Its token has read-only content access and it does not
-merge. A human's explicit merge approves publication; the resulting push to
-`main` triggers the website deployment.
+When an edition branch lands with `merge-edition.yml`, `ci.yml` validates the
+content and builds the site. The merge workflow checks the exact head SHA, dated
+branch name, allowed paths and checksum-only changes, then opens or updates a
+pull request. It rechecks the same head and CI immediately before merging. A
+green push CI run is mandatory; a duplicate pull-request run can be ignored only
+when it is from `github-actions[bot]` and GitHub did not execute any jobs for
+it. After the guarded merge, the
+workflow explicitly dispatches the website deployment for `main`.
 
 ## What is deliberately not automated
 
