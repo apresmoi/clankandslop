@@ -19,11 +19,12 @@
 // (1) before (2): repinning rewrites policies/private-source.json, which is a
 // tracked file and therefore part of the source archive, so the source digest
 // is only measurable once the pin is in.
-// (2) before (3): `--repin-source` finds the twelve Spawnfile pins by searching
-// for the descriptor's CURRENT source digest. `org:bundle` advances the
-// descriptor and writes into no Spawnfile at all, so running it first leaves
-// the repin nothing to match and produces an image whose agents pin an archive
-// that no longer exists. Confirmed on the box, 2026-09-06, by doing it wrong.
+// (2) before (3): `--repin-source` finds the twelve source archive pins by
+// searching for the descriptor's CURRENT source digest. `org:bundle` advances
+// the descriptor and refreshes generated public asset pins, so running it first
+// leaves source repin nothing to match and produces an image whose agents pin a
+// source archive that no longer exists. Confirmed on the box, 2026-09-06, by
+// doing it wrong.
 //
 // A REDEPLOY KILLS IN-FLIGHT WAKES
 // --------------------------------
@@ -147,17 +148,18 @@ export function repin(options, { log = console.log } = {}) {
 //      policies/private-source.json — a tracked file, therefore part of the
 //      source archive — so the measurement is only correct once the pin is in.
 //   b. `org:bundle` SECOND. It writes the six tars and the descriptor, and it
-//      writes NOTHING into any Spawnfile. Running it before (a) advances the
-//      descriptor, leaves (a) nothing to match, and silently produces an image
-//      whose agents pin an archive that no longer exists.
+//      refreshes generated public asset pins in Spawnfiles. Running it before
+//      (a) advances the source descriptor, leaves (a) nothing to match, and
+//      silently produces an image whose agents pin a source archive that no
+//      longer exists.
 //   c. the plain check LAST, as the proof rather than the hope.
 //
-// The dependency and asset archives have no repin at all: their digests are
-// only ever in the Spawnfiles, so if `npm ci` moved node_modules underneath
-// this job, the descriptor advances and the pins do not. That is what
-// assertPinsMatchDescriptor catches, and it is a refusal, not a repair —
-// rewriting a dependency pin from an unreviewed rebuild is how you deploy an
-// archive nobody chose.
+// Dependency archives have no automatic repin: their digests are only advanced
+// by reviewed source changes, so if `npm ci` moved node_modules underneath this
+// job, the descriptor advances and the pins do not. Generated public assets are
+// repinned by `org:bundle` and then checked here against the descriptor.
+// Dependency drift remains a refusal, not a repair — rewriting a dependency pin
+// from an unreviewed rebuild is how you deploy an archive nobody chose.
 export function bundle(options, { log = console.log } = {}) {
   if (options.check) {
     log('\n(check mode: not rebuilding the archives; verifying the descriptor against the tree instead)');

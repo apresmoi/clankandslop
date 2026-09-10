@@ -155,10 +155,9 @@ test('the image sweep only ever touches the seam s own tags, and never the one j
 });
 
 // --- the pin check org:bundle cannot do for itself ---------------------------
-// `check-bundle-descriptor.mjs` only covers the source archive, because it has
-// to be able to run in CI without the private checkout or node_modules. The
-// seam has both, and a dependency archive that moved under an unchanged pin is
-// an image whose agents refuse to start.
+// `check-bundle-descriptor.mjs` covers the source archive. The bundle build
+// refreshes generated public asset pins, while the seam keeps dependency,
+// private, and tool archive drift fail-closed against each Spawnfile pin.
 const A = 'sha256:'.concat('a'.repeat(64));
 const B = 'sha256:'.concat('b'.repeat(64));
 
