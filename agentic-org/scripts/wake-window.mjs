@@ -21,10 +21,10 @@
 // WHAT COUNTS AS AWAKE
 // --------------------
 // Three independent signals, any one of which blocks a deploy:
-//   1. the wake-acceptance store — a receipt in state `accepted` or `running`
-//      is daimon's own statement that a wake is outstanding;
-//   2. the turn usage ledger — an incomplete turn record, or any turn written
-//      in the last few minutes;
+//   1. authenticated runtime executions; older runtimes without that field
+//      retain the outstanding wake-receipt check;
+//   2. the turn usage ledger — an incomplete turn record, plus a recent-turn
+//      quiet period only when the runtime lacks execution authority;
 //   3. the container's process table — an engine process that is not part of
 //      the steady-state set.
 // A signal that cannot be read is NOT quiescence: an unreadable container
@@ -34,6 +34,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { ACTIVITY_PROBE, executionAuthority, isRuntimeHealthcheck } from './quiescence-activity.mjs';
 
 export const ACCEPTANCE_STORE = '/var/lib/spawnfile/instances/daimon/daimon-organization/state/wake-acceptance';
 export const USAGE_LEDGER = '/var/lib/spawnfile/daimon/usage/usage.jsonl';
@@ -206,8 +207,16 @@ export function quiescence(container, { docker = 'docker', now = new Date(), qui
   observed.container = running;
   if (!running.startsWith('running')) findings.push(`container ${container} is ${running}, not running — a deploy into an unhealthy container is not the fix, and this job will not paper over it`);
 
-  // 1. daimon's own outstanding-wake receipts.
+  // Durable pending deliveries survive a deploy; only live executions are cognition.
+  let authority;
   try {
+    authority = executionAuthority(exec(container, ACTIVITY_PROBE, { docker }));
+    observed.authority = authority.authority;
+    observed.executions = authority.executions;
+    for (const execution of authority.executions) findings.push(`execution ${execution.execution_id} for ${execution.agent_id} is running — a redeploy would kill it`);
+  } catch { findings.push('could not read valid authenticated runtime activity — refusing to infer legacy quiescence'); }
+
+  if (authority?.authority === 'legacy-receipts') try {
     const raw = exec(container, `for f in ${acceptanceStore}/*.json; do [ -e "$f" ] || continue; cat "$f"; echo; done`, { docker });
     for (const line of raw.split('\n').filter((item) => item.trim())) {
       let record;
@@ -227,7 +236,7 @@ export function quiescence(container, { docker = 'docker', now = new Date(), qui
     const last = records.filter((record) => typeof record.at === 'string').map((record) => Date.parse(record.at)).filter(Number.isFinite).sort((a, b) => b - a)[0];
     if (last !== undefined) {
       observed.lastTurnMinutesAgo = Math.round((now.getTime() - last) / 60000);
-      if (observed.lastTurnMinutesAgo < quietMinutes) findings.push(`the last metered turn was ${observed.lastTurnMinutesAgo} min ago; the ledger must be quiet for ${quietMinutes} min before a redeploy`);
+      if (authority?.authority !== 'executions' && observed.lastTurnMinutesAgo < quietMinutes) findings.push(`the last metered turn was ${observed.lastTurnMinutesAgo} min ago; the ledger must be quiet for ${quietMinutes} min before a redeploy`);
     }
   } catch (error) { findings.push(`could not read the usage ledger (${String(error.message).trim().slice(0, 200)})`); }
 
@@ -252,7 +261,7 @@ export function foreignProcesses(table) {
   // anyway, so a shell that forks once more cannot reappear as a finding.
   for (let round = 0; round < 4; round += 1)
     for (const row of rows) if (probe.has(row.ppid)) probe.add(row.pid);
-  return rows.filter((row) => !probe.has(row.pid) && !STEADY_STATE.some((pattern) => pattern.test(row.args))).map((row) => row.args);
+  return rows.filter((row) => !probe.has(row.pid) && !STEADY_STATE.some((pattern) => pattern.test(row.args)) && !isRuntimeHealthcheck(row.args)).map((row) => row.args);
 }
 
 export function assess(orgRoot, container, options = {}) {

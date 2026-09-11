@@ -77,6 +77,7 @@ const IDLE_PS = [
 
 const container = (files, { ps = IDLE_PS, usage = '' } = {}) =>
   (_name, script) => {
+    if (script.includes('/v2/activity')) return JSON.stringify({ status: 404 });
     if (script.includes('wake-acceptance')) return files.join('\n');
     if (script.includes('usage.jsonl')) return usage;
     if (script.startsWith('ps ')) return ps;
