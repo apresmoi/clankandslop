@@ -92,7 +92,7 @@ const definitions = {
     execute: recordDissent
   },
   review_article: {
-    description: "Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner and @brass if a replacement is required. PASS continues from the fresh INDEX: review other filings one at a time, then when passed>=5 and the Ledger desk rows are missing, send @ledger in room:release.",
+    description: "Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner and @brass if a replacement is required. PASS continues from the fresh INDEX: when the result says the composition prerequisites are ready, use moltnet_send on clank-newsroom to @caslon in room:release with the edition, article id and revision; ask Caslon to read the fresh INDEX and compose. Verify the send succeeded before completing the inbox item or ending the turn; do not repeat an already delivered handoff. Otherwise review other filings one at a time, then when passed>=5 and the Ledger desk rows are missing, send @ledger in room:release.",
     required: ['edition', 'event_key', 'article_id', 'revision', 'filing_digest', 'verdict', 'notes'],
     properties: {
       edition, event_key: eventKey,

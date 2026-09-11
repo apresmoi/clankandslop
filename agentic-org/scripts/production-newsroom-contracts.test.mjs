@@ -69,6 +69,17 @@ test('Spike contract hands off to Ledger once current PASS coverage can support 
   }
 });
 
+test('Spike carries the identified ready-to-compose handoff in every instruction surface', async () => {
+  const root = path.resolve(import.meta.dirname, '..');
+  for (const relative of ['FLOOR.md', 'agents/spike/AGENTS.md', 'agents/spike/Spawnfile']) {
+    const text = await readFile(path.join(root, relative), 'utf8');
+    assert.match(text, /composition prerequisites (?:are )?ready/u, relative);
+    assert.match(text, /@caslon/u, relative);
+    assert.match(text, /edition date,?\s+article id and revision/u, relative);
+    assert.match(text, /[Vv]erif(?:y|ies) the send succeeded before completing/u, relative);
+  }
+});
+
 
 test('shared floor scopes Moltnet history to the active edition', async () => {
   const root = path.resolve(import.meta.dirname, '..');
@@ -225,6 +236,9 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
   assert.match(reviewArticleTool.description, /PASS continues from the fresh INDEX/u);
   assert.match(reviewArticleTool.description, /passed>=5/u);
   assert.match(reviewArticleTool.description, /@ledger in room:release/u);
+  assert.match(reviewArticleTool.description, /composition prerequisites are ready/u);
+  assert.match(reviewArticleTool.description, /@caslon in room:release with the edition, article id and revision/u);
+  assert.match(reviewArticleTool.description, /Verify the send succeeded before completing/u);
 
   const caslon = await mcpToolsList('caslon');
   const composeTool = caslon.find((tool) => tool.name === 'compose_edition');
