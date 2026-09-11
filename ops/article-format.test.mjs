@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { articleFormatFindings, articleFilingSchema, ARTICLE_REPORTER_NAMES } from './article-format.mjs';
+import { articleFormatFindings, articleFilingSchema, ARTICLE_REPORTER_NAMES, proseLeakFindings } from './article-format.mjs';
 
 const read = (file) => JSON.parse(readFileSync(new URL(`../content/${file}`, import.meta.url), 'utf8'));
 const fact = read('editions/2026-08-21/articles/deepseek-ships-flash-vision-on-the-api.json');
 const publishedForecast = read('editions/2026-08-09/articles/syria-takes-the-airport-russia-keeps-the-question.json');
+const hormuzForecast = read('editions/2026-09-11/articles/s-df5507bc.json');
+const alstomOrder = read('editions/2026-09-11/articles/s-044c222e.json');
+const khasabStrike = read('editions/2026-09-11/articles/s-69b40b89.json');
 const topicSlugs = Object.keys(read('topics.json').topics);
 const context = { owner: 'cogsworth', topicSlugs };
 
@@ -140,4 +143,108 @@ test('eclipse art requires both shape "eclipse" and roll "eclipse"', () => {
   mismatchedShape.art = { kind: 'ascii', shape: 'eclipse', roll: 'chip', caption: 'Mismatched.' };
   const mismatchedShapeErrors = articleFormatFindings(mismatchedShape, context).errors;
   assert.ok(mismatchedShapeErrors.some(e => e.path === 'article.art.shape' && e.code === 'asset'));
+});
+
+test('high-confidence prose leaks report bounded reader-facing paths', () => {
+  const article = structuredClone(fact);
+  article.headline = 'A Sensor Answer Becomes Policy';
+  article.deck = 'The only assigned source row carries the count.';
+  article.body = [
+    'A sensor answer found the posted order [E1].',
+    'This filing does not treat adjacent claims as proof [E1].',
+    'The fuller sensor return gives the geography [E1].',
+    'The null reading has to be paid in full [E1].'
+  ];
+  article.art = { kind: 'map', map: 'hormuz', caption: 'A sensor-supplied review fixes the point.' };
+  article.presentation = { flashpoint: { place: 'HORMUZ', lat: 26.57, lon: 56.25, note: 'The null case is boring and important.' } };
+  const before = JSON.stringify(article);
+  const findings = proseLeakFindings(article);
+  assert.deepEqual(findings.map((finding) => finding.path), [
+    'article.headline',
+    'article.deck',
+    'article.body[0]',
+    'article.body[1]',
+    'article.body[2]',
+    'article.body[3]',
+    'article.art.caption',
+    'article.presentation.flashpoint.note'
+  ]);
+  assert.ok(findings.every((finding) => finding.code === 'prose_leak'));
+  assert.equal(JSON.stringify(article), before);
+});
+
+test('prose leak gate catches actual September defects in filings only', () => {
+  const gravesErrors = articleFormatFindings(hormuzForecast, { ...context, owner: 'graves' }).errors;
+  assert.ok(gravesErrors.some((error) => error.path === 'article.body[0]' && error.code === 'prose_leak'));
+  assert.ok(gravesErrors.some((error) => error.path === 'article.body[1]' && error.code === 'prose_leak'));
+
+  const cogsworthErrors = articleFormatFindings(alstomOrder, { ...context, owner: 'cogsworth' }).errors;
+  assert.ok(cogsworthErrors.some((error) => error.path === 'article.body[6]' && error.code === 'prose_leak'));
+
+  const sprockettErrors = articleFormatFindings(khasabStrike, { ...context, owner: 'sprockett' }).errors;
+  assert.ok(sprockettErrors.some((error) => error.path === 'article.body[4]' && error.code === 'prose_leak'));
+
+  assert.deepEqual(articleFormatFindings(hormuzForecast, { ...context, profile: 'archive' }).errors, []);
+  assert.deepEqual(articleFormatFindings(alstomOrder, { ...context, profile: 'archive' }).errors, []);
+  assert.deepEqual(articleFormatFindings(khasabStrike, { ...context, profile: 'archive' }).errors, []);
+});
+
+test('prose leak checks do not ban ordinary source language or provenance notes', () => {
+  const article = structuredClone(fact);
+  article.body = [
+    'A sensor-equipped match ball helped officials mark the contact point [E1].',
+    'The null hypothesis survived the first test, while the SEC filing named a risk factor [E1].',
+    'The company submitted its response to the SEC. This filing does not name a buyer [E1].',
+    'The record describes a sensor model, not a newsroom process [E1].',
+    'The sensor readout showed the reactor had cooled [E1].',
+    'The robot uses sensor-provided temperature measurements [E1].'
+  ];
+  article.evidence_box[0].fragment = 'Sensor-supplied finding: this filing does not treat adjacent reports as proof.';
+  article.evidence_box[0].source_note.provenance_note = 'A sensor answer supplied this source row to the reporter.';
+  article.art = { kind: 'map', map: 'hormuz', caption: 'A sensor buoy reported wave height near the strait.' };
+  const before = JSON.stringify(article);
+  assert.deepEqual(proseLeakFindings(article), []);
+  assert.deepEqual(articleFormatFindings(article, context).errors, []);
+  assert.equal(JSON.stringify(article), before);
+});
+
+test('known internal wording is rejected in the reader-facing kicker', () => {
+  const article = structuredClone(fact);
+  article.kicker = 'The assigned source row';
+  assert.ok(articleFormatFindings(article, context).errors.some(row => row.path === 'article.kicker' && row.code === 'prose_leak'));
+});
+
+test('physical sensor prose does not exempt separate newsroom prose leaks', () => {
+  const article = structuredClone(fact);
+  article.body = [
+    'The sensor readout showed the reactor had cooled [E1].',
+    'The robot uses sensor-provided temperature measurements [E1].',
+    'The same sensor answer says Reuters did not publish individual crossing times [E1].',
+    'A sensor-supplied UKMTO report plotted the count [E1].'
+  ];
+  const findings = proseLeakFindings(article);
+  assert.deepEqual(findings.map((finding) => finding.path), ['article.body[2]', 'article.body[3]']);
+  const errors = articleFormatFindings(article, context).errors;
+  assert.ok(errors.some((error) => error.path === 'article.body[2]' && error.code === 'prose_leak'));
+  assert.ok(errors.some((error) => error.path === 'article.body[3]' && error.code === 'prose_leak'));
+});
+
+test('prose leak checks exempt only evidenced quoted spans', () => {
+  const article = structuredClone(fact);
+  article.body = [
+    'The quoted finding says “The null case is boring and important” [E1].',
+    'The quoted finding says “The null case is boring and important.”',
+    'The quoted finding says “The null case is boring and important” [E1]. The null case is boring and important outside the quote [E1].',
+    'The quoted finding says “A sensor answer found the permit” [E1].'
+  ];
+  article.evidence_box[0].fragment = 'The null case is boring and important';
+  const findings = proseLeakFindings(article);
+  assert.deepEqual(findings.map((finding) => finding.path), [
+    'article.body[1]',
+    'article.body[2]',
+    'article.body[3]'
+  ]);
+  assert.ok(articleFormatFindings(article, context).errors.some((error) => error.path === 'article.body[1]' && error.code === 'prose_leak'));
+  assert.ok(articleFormatFindings(article, context).errors.some((error) => error.path === 'article.body[2]' && error.code === 'prose_leak'));
+  assert.ok(articleFormatFindings(article, context).errors.some((error) => error.path === 'article.body[3]' && error.code === 'prose_leak'));
 });

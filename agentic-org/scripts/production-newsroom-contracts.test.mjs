@@ -11,6 +11,14 @@ import { qualifySignal } from './production-newsroom.mjs';
 // DAIMON_WAKE_ID when Daimon injects one, and the MCP layer's schemas
 // actually being typed (not `{}`) for every tool.
 
+async function instructionText(file) {
+  const text = await readFile(file, 'utf8');
+  if (path.basename(file) !== 'AGENTS.md') return text;
+  const role = path.basename(path.dirname(file));
+  assert.ok(text.includes(`repos/newsroom/agentic-org/agents/${role}/RUNBOOK.md`), `${role} must explicitly load its task runbook`);
+  return `${text}\n${await readFile(path.join(path.dirname(file), 'RUNBOOK.md'), 'utf8')}`;
+}
+
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
 runtimeTest('event_key must equal DAIMON_WAKE_ID when Daimon binds one, and is unconstrained otherwise', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-wake-bind-'));
@@ -59,7 +67,7 @@ test('Spike contract hands off to Ledger once current PASS coverage can support 
     path.join(root, 'agents', 'spike', 'Spawnfile'),
   ];
   for (const file of files) {
-    const text = await readFile(file, 'utf8');
+    const text = await instructionText(file);
     assert.match(text, /passed=5|five or more passed|five or more passed articles/u, `${file} must key the handoff to current PASS coverage`);
     assert.match(text, /@ledger/u, `${file} must name Ledger with a real mention`);
     assert.match(text, /room:release/u, `${file} must use Ledger's declared Moltnet room`);
@@ -72,10 +80,10 @@ test('Spike contract hands off to Ledger once current PASS coverage can support 
 test('Spike carries the identified ready-to-compose handoff in every instruction surface', async () => {
   const root = path.resolve(import.meta.dirname, '..');
   for (const relative of ['FLOOR.md', 'agents/spike/AGENTS.md', 'agents/spike/Spawnfile']) {
-    const text = await readFile(path.join(root, relative), 'utf8');
+    const text = await instructionText(path.join(root, relative));
     assert.match(text, /composition prerequisites (?:are )?ready/u, relative);
     assert.match(text, /@caslon/u, relative);
-    assert.match(text, /edition date,?\s+article id and revision/u, relative);
+    assert.match(text, /edition date,?\s+article id and\s+revision/u, relative);
     assert.match(text, /[Vv]erif(?:y|ies) the send succeeded before completing/u, relative);
   }
 });
@@ -85,7 +93,7 @@ test('shared floor scopes Moltnet history to the active edition', async () => {
   const root = path.resolve(import.meta.dirname, '..');
   const sharedFiles = [path.join(root, 'TEAM.md'), path.join(root, 'FLOOR.md')];
   for (const file of sharedFiles) {
-    const text = await readFile(file, 'utf8');
+    const text = await instructionText(file);
     assert.match(text, /active edition is the date in the current wake|active edition is the date in the assignment/u, `${file} must bind active edition to wake or assignment`);
     assert.match(text, /created_at/u, `${file} must require Moltnet timestamp scoping`);
     assert.match(text, /explicit edition.*controls|explicit edition named in a message controls/u, `${file} must give explicit edition precedence`);
@@ -111,8 +119,8 @@ test('Brass records assignments before any reporter wake handoff', async () => {
     path.join(root, 'agents', 'brass', 'Spawnfile'),
   ];
   for (const file of files) {
-    const text = await readFile(file, 'utf8');
-    assert.match(text, /Only a successful (tool )?response (permits|lets me) commission/u, `${file} must gate commissions on record_assignment success`);
+    const text = await instructionText(file);
+    assert.match(text, /Only (?:a successful (?:tool )?response (?:permits|lets me) commission|success permits handoffs)/u, `${file} must gate commissions on record_assignment success`);
     assert.match(text, /refus(?:es|al) or errors?/u, `${file} must define record_assignment refusal behavior`);
     assert.match(text, /without\s+(?:mentioning\s+reporters|reporter\s+mentions)/u, `${file} must prevent reporter wakes after assignment refusal`);
     assert.match(text, /end(s)? the turn/u, `${file} must stop after assignment refusal`);
@@ -120,9 +128,9 @@ test('Brass records assignments before any reporter wake handoff', async () => {
     assert.match(text, /once in `?room:assignment`?|one actionable `@<id>` assignment in `room:assignment`/u, `${file} must limit actionable reporter mentions to assignment room`);
   }
 
-  const brassBrief = await readFile(path.join(root, 'agents', 'brass', 'AGENTS.md'), 'utf8');
+  const brassBrief = await instructionText(path.join(root, 'agents', 'brass', 'AGENTS.md'));
   assert.doesNotMatch(brassBrief, /forecast=0|paper still goes out/u, 'Brass brief must not say missing forecast still publishes');
-  assert.match(brassBrief, /exactly one forecast assignment is mandatory/u, 'Brass brief must state the actual forecast contract');
+  assert.match(brassBrief, /exactly one forecast assignment|Exactly one assignment must be the forecast/u, 'Brass brief must state the actual forecast contract');
 });
 
 test('shared floor tells reporters to stop without a current assignment row', async () => {
@@ -139,18 +147,18 @@ test('shared floor tells reporters to stop without a current assignment row', as
 test('lead-interest rules do not commission or require assignment-chasing wakes', async () => {
   const root = path.resolve(import.meta.dirname, '..');
   const team = await readFile(path.join(root, 'TEAM.md'), 'utf8');
-  const klaxon = await readFile(path.join(root, 'agents/klaxon/AGENTS.md'), 'utf8');
+  const klaxon = await instructionText(path.join(root, 'agents/klaxon/AGENTS.md'));
   const floor = await readFile(path.join(root, 'FLOOR.md'), 'utf8');
   assert.doesNotMatch(team, /mentioning every returned selected desk/u);
   assert.match(team, /Selected desks express interest, not an assignment or a wake list/u);
   for (const choice of ['qualified', 'ignore', 'defer', 'duplicate']) assert.match(klaxon, new RegExp('`' + choice + '`'));
-  assert.match(klaxon, /with plain desk names and no reporter\nmentions/u);
+  assert.match(klaxon, /with plain desk names and no reporter\s+mentions/u);
   assert.match(floor, /send no assignment request/u);
   assert.match(floor, /genuine\naccepted assignment or actionable revision request still needs prompt work/u);
   assert.match(floor, /do not repeat it for later copies of the same lead/u);
   assert.match(floor, /terminal research answer may wake its waiting requester once/u);
-  const brass = await readFile(path.join(root, 'agents/brass/AGENTS.md'), 'utf8');
-  assert.match(brass, /not_found or refused result\nonce only to a colleague waiting for that request/u);
+  const brass = await instructionText(path.join(root, 'agents/brass/AGENTS.md'));
+  assert.match(brass, /`?not_found`? or `?refused`? result\s+once only to (?:a|the) colleague waiting for that request/u);
   for (const role of ['graves', 'foreman']) {
     const brief = await readFile(path.join(root, 'agents', role, 'AGENTS.md'), 'utf8');
     assert.doesNotMatch(brief, /@brass (understood|fair kill)/u);

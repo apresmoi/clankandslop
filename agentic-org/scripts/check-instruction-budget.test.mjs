@@ -3,6 +3,8 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { sourceArchivePlan } from './source-archive.mjs';
+import { validateAgentDeclaration } from './validate-org.mjs';
 
 import {
   DAIMON_APPEND_POINTER_ALLOWANCE,
@@ -79,9 +81,30 @@ test('block sequences, compact items and flow collections read as YAML does', ()
 // workspace.docs rendered as `# <role>\n\n<content>`, joined and trimmed.
 test('instructions are built from every declared workspace doc', () => {
   const { docs, instructions } = agentInstructions('caslon');
-  assert.deepEqual(docs, { system: 'AGENTS.md' });
+  assert.deepEqual(docs, { system: 'AGENTS.md', soul: 'SOUL.md' });
   const brief = readFileSync(path.join(orgRoot, 'agents/caslon/AGENTS.md'), 'utf8');
-  assert.equal(instructions, `# system\n\n${brief}`.trim());
+  const soul = readFileSync(path.join(orgRoot, 'agents/caslon/SOUL.md'), 'utf8');
+  assert.equal(instructions, `# soul\n\n${soul}\n\n# system\n\n${brief}`.trim());
+});
+
+test('every identity is declared in instructions and every task runbook ships in the mounted source', () => {
+  const { entries } = sourceArchivePlan(path.resolve(orgRoot, '..'));
+  assert.ok(entries.has('agentic-org/WRITING.md'));
+  for (const agent of listAgents()) {
+    const source = manifest(`agents/${agent}/Spawnfile`);
+    const { docs, instructions } = agentInstructions(agent);
+    assert.deepEqual(docs, { system: 'AGENTS.md', soul: 'SOUL.md' });
+    const soul = manifest(`agents/${agent}/SOUL.md`);
+    assert.ok(soul.trim().length > 0);
+    assert.ok(instructions.includes(soul.trim()), `${agent} identity must reach instructions`);
+    assert.ok(instructions.includes(`repos/newsroom/agentic-org/agents/${agent}/RUNBOOK.md`));
+    for (const file of ['AGENTS.md', 'SOUL.md', 'RUNBOOK.md']) {
+      assert.ok(entries.has(`agentic-org/agents/${agent}/${file}`), `${agent}/${file} missing from mounted source`);
+    }
+    const missingSoul = source.replace(', soul: SOUL.md', '');
+    assert.notEqual(missingSoul, source);
+    assert.throws(() => validateAgentDeclaration(agent, missingSoul), /must compile AGENTS.md and SOUL.md/u);
+  }
 });
 
 test('every agent compiles inside the Daimon instruction budget', () => {
@@ -107,7 +130,7 @@ test('the budget reports an agent that outgrows it, counting every declared doc'
       'runtime:',
       '  name: daimon',
       'workspace:',
-      '  docs: { system: AGENTS.md, pages: PAGES.md }',
+      '  docs: { system: AGENTS.md, extras: { pages: PAGES.md } }',
       ''
     ].join('\n'));
     writeFileSync(path.join(agent, 'AGENTS.md'), 'brief\n');

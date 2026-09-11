@@ -13,7 +13,12 @@ also checks the assignment and revision. A rejected filing records nothing;
 fix and revalidate without inventing a new revision. If a fact or capability
 is missing, report that blocker rather than manufacture a value to pass.
 
-A format pass establishes field shape and local reference consistency. It
+A format pass establishes field shape, local reference consistency and absence
+of the known internal prose leaks checked by the contract. A `prose_leak` error
+names the reader-facing field to correct; it does not authorize deleting a
+source quotation or falsifying provenance. Read `WRITING.md` for the prose
+standard. The same leak check applies when Spike tries to PASS a saved draft.
+These checks do not judge prose quality. A valid result
 does not establish source or quotation truth, assignment lineage, permission
 to replace a revision, asset or previous-coverage existence, or whole-page readiness. Those checks
 and Spike's editorial decision still apply.
@@ -35,7 +40,7 @@ assignment wrapper, lint findings, draft explanation or sensor envelope.
 | `timestamp`, `next_update_utc` | Real UTC clock strings, respectively `HH:MM UTC` and `HH:MM`. The next-update clock is a review time, not a forecast settlement deadline. |
 | `revision` | Integer starting at 1. Spike's revision request authorizes an increase. |
 | `topics` | Array of existing topic slugs from `repos/newsroom/content/topics.txt`. |
-| `body` | Array of prose paragraphs. The format minimum is four; the standing editorial brief remains six to eight. Use positional `[En]` citations and supported `**bold**`, without raw HTML or private research ids. |
+| `body` | Array of at least four purposeful prose paragraphs; use only the length the evidence and story need. Use positional `[En]` citations and supported `**bold**`, without raw HTML, private research ids or newsroom scaffolding. |
 | `key_numbers` | Array of `{label, value, dir?}` objects. Both label and value are strings; optional `dir` is `up`, `down` or `flat`. An empty array is valid. |
 | `evidence_box`, `refs` | Non-empty arrays of Record rows and their exact `source_note.source_id` strings. Every ref resolves to a row. |
 | Optional fields | `confidence`, earlier `previous_coverage: [{date, slug}]`, `presentation.flashpoint: {place, lat, lon, note}`, and supported `art` fields from the filing schema. Omit unused fields; do not pad them with nulls. |

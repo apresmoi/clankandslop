@@ -25,7 +25,7 @@ schedule:
   cron: "0 16 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read your AGENTS.md plus repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed, including decisions.art[order[0]] lead art when the lead lacks reporter art; generated lead maps need locator_context. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. The tools enforce the baked page structure. Mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read repos/newsroom/agentic-org/agents/caslon/RUNBOOK.md plus repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed, including decisions.art[order[0]] lead art when the lead lacks reporter art; generated lead maps need locator_context. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. The tools enforce the baked page structure. Mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."
 
 surfaces:
   moltnet:
@@ -72,11 +72,11 @@ environment:
         CLANK_ETOPO_GRD: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/etopo-cache/etopo1.grd
       tools: [list_art_catalogue, bake_map, bake_glyph, inspect_artifact, inspect_catalogue_preview, lay_pages]
 workspace:
-  docs: { system: AGENTS.md }
+  docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:beb200e68d9f59ca8b954b420dd42345f960ca5a6eb7d0261201182d5f1a17be, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:6bdcde2943f42953f2387e948dfedbf0383325713e937636a23624404900a2aa, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:02cba9deea7e0ba7a8d62a130de4ed3284bc546070e93ee7be25a446ed8d45e2, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to

@@ -192,8 +192,11 @@ naming the single file that answers it. Topic slugs are
 never read it whole.
 
 Never `ls`. Never open a whole desk, a directory of filings, or a SKILL.md
-file: there are none, and everything a skill used to say is already in this
-document. The rest of the shelf, for the rare piece of work that truly
+file: there are no skill documents. Your AGENTS.md and SOUL.md are compiled
+instructions. Read your task runbook at
+`repos/newsroom/agentic-org/agents/<you>/RUNBOOK.md` when doing that work;
+reporters and Spike read `repos/newsroom/agentic-org/WRITING.md` before filing
+or judging prose. The rest of the shelf, for the rare piece of work that truly
 needs it — sensor request contract
 `repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`, reporter article format
 `repos/newsroom/agentic-org/ARTICLE_FORMAT.md`, Caslon's page vocabulary
