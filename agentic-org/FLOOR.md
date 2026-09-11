@@ -167,7 +167,10 @@ Missing or unverified evidence stays missing or unverified.
 Spike asks the article owner in `room:filing`; after the current edition has
 five or more passed articles and no `D ledger.settlements` or
 `D ledger.worlddesk` rows yet, Spike mentions `@ledger` in `room:release` so
-the desk can start before its scheduled fallback.
+the desk can start before its scheduled fallback. When a PASS makes the
+composition prerequisites ready, Spike sends `@caslon` in `room:release` the
+edition date, article id and revision and asks Caslon to read the fresh INDEX
+and compose. Spike verifies the send succeeded before completing that handoff.
 Caslon asks that owner in `room:filing` or Brass in `room:release`. Ledger and
 Pressman ask Brass in `room:release`. Klaxon asks Brass in `room:conference`.
 Mention the person whose action is needed. These desks do not send requests
