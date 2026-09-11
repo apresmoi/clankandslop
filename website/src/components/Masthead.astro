@@ -261,9 +261,7 @@ const {
     color: var(--ink-soft);
   }
 
-  /* Phone meta-strip: two real columns (date · toggle); the mini-nameplate
-     is taken out of flow and centered so it never reserves width or forces
-     the bar wider than the viewport. */
+  /* Give the visible compact nameplate its own row so it cannot cover the date. */
   @media (max-width: 640px) {
     .meta-strip-inner {
       grid-template-columns: 1fr auto;
@@ -283,7 +281,23 @@ const {
     }
     .meta-strip[data-collapsed] .meta-nameplate,
     .meta-strip[data-compact] .meta-nameplate {
-      transform: translate(-50%, -50%);
+      position: static;
+      grid-area: brand;
+      justify-self: start;
+      transform: none;
+    }
+    .meta-strip[data-collapsed] .meta-strip-inner,
+    .meta-strip[data-compact] .meta-strip-inner {
+      grid-template-areas: 'brand controls' 'date date';
+      row-gap: 4px;
+    }
+    .meta-strip[data-collapsed] .meta-left,
+    .meta-strip[data-compact] .meta-left {
+      grid-area: date;
+    }
+    .meta-strip[data-collapsed] .meta-right,
+    .meta-strip[data-compact] .meta-right {
+      grid-area: controls;
     }
   }
   /* Archive lives in the section nav on small screens, so drop it from the

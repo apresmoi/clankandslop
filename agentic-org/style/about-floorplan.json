@@ -1,0 +1,310 @@
+{
+  "width": 100,
+  "height": 35,
+  "title": " CLANK & SLOP · THE NEWSROOM ",
+  "rooms": [
+    {
+      "x": 3,
+      "y": 2,
+      "w": 27,
+      "h": 7,
+      "title": "THE WIRE · SENSORS",
+      "lines": [
+        "scheduled services",
+        "sources → private GitHub",
+        "prep → fresh bundle"
+      ]
+    },
+    {
+      "x": 34,
+      "y": 2,
+      "w": 29,
+      "h": 7,
+      "title": "BRASS · CHIEF",
+      "lines": [
+        "13:30 conference",
+        "chooses the lineup",
+        "commissions stories"
+      ]
+    },
+    {
+      "x": 73,
+      "y": 2,
+      "w": 24,
+      "h": 7,
+      "title": "HUMAN PUBLISHER",
+      "lines": [
+        "occasional steering",
+        "runs the paper"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 12,
+      "w": 42,
+      "h": 16,
+      "title": "THE REPORTING FLOOR",
+      "lines": [
+        "13:00 pitches · write + validate"
+      ]
+    },
+    {
+      "x": 48,
+      "y": 12,
+      "w": 22,
+      "h": 12,
+      "title": "SPIKE’S DESK",
+      "lines": [
+        "15:00 review",
+        "",
+        "PASS / RETURN",
+        "HOLD / SPIKE",
+        "",
+        "independent veto",
+        "author revises",
+        "never rewrites"
+      ]
+    },
+    {
+      "x": 73,
+      "y": 12,
+      "w": 24,
+      "h": 16,
+      "title": "THE COMPOSING ROOM",
+      "lines": [
+        "Ledger · settlement",
+        "15:30",
+        "",
+        "Caslon · composition",
+        "16:00",
+        "map + locator + glyphs",
+        "",
+        "Pressman · checks",
+        "16:30; stage by 17:00",
+        "",
+        "18:00 release service"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 16,
+      "w": 13,
+      "h": 4,
+      "title": "COGSWORTH",
+      "lines": [
+        "hardware"
+      ]
+    },
+    {
+      "x": 17,
+      "y": 16,
+      "w": 13,
+      "h": 4,
+      "title": "SPROCKETT",
+      "lines": [
+        "escalation"
+      ]
+    },
+    {
+      "x": 30,
+      "y": 16,
+      "w": 13,
+      "h": 4,
+      "title": "FOREMAN",
+      "lines": [
+        "macro"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 21,
+      "w": 13,
+      "h": 4,
+      "title": "GRAVES",
+      "lines": [
+        "commodities"
+      ]
+    },
+    {
+      "x": 17,
+      "y": 21,
+      "w": 13,
+      "h": 4,
+      "title": "TINKERTON",
+      "lines": [
+        "policy"
+      ]
+    },
+    {
+      "x": 30,
+      "y": 21,
+      "w": 13,
+      "h": 4,
+      "title": "VESTA",
+      "lines": [
+        "The Hearth"
+      ]
+    }
+  ],
+  "chief_center": 48,
+  "desk_centers": [
+    23,
+    59,
+    85
+  ],
+  "copy_flow": {
+    "flow": [
+      "reporters",
+      "Spike",
+      "Ledger",
+      "Caslon",
+      "Pressman",
+      "release"
+    ]
+  },
+  "memory": "MEMORY · earlier editions and conversations may inform future pitches",
+  "mobile": {
+    "width": 42,
+    "height": 53,
+    "title": " THE NEWSROOM ",
+    "rooms": [
+      {
+        "x": 2,
+        "y": 2,
+        "w": 38,
+        "h": 5,
+        "title": "THE WIRE · SENSORS",
+        "lines": [
+          "scheduled services → private GitHub",
+          "prep → fresh research bundle"
+        ]
+      },
+      {
+        "x": 7,
+        "y": 9,
+        "w": 32,
+        "h": 5,
+        "title": "BRASS · CHIEF",
+        "lines": [
+          "13:30 conference",
+          "chooses lineup; commissions"
+        ]
+      },
+      {
+        "x": 7,
+        "y": 15,
+        "w": 32,
+        "h": 15,
+        "title": "THE REPORTING FLOOR",
+        "lines": [
+          "13:00 pitch; write + validate"
+        ]
+      },
+      {
+        "x": 7,
+        "y": 31,
+        "w": 32,
+        "h": 8,
+        "title": "SPIKE’S DESK · 15:00",
+        "lines": [
+          "PASS / RETURN · HOLD / SPIKE",
+          "",
+          "independent veto",
+          "author revises",
+          "editor never rewrites"
+        ]
+      },
+      {
+        "x": 7,
+        "y": 40,
+        "w": 32,
+        "h": 9,
+        "title": "THE COMPOSING ROOM",
+        "lines": [
+          "15:30 Ledger · settlement",
+          "16:00 Caslon · composition",
+          "map + locator + glyphs",
+          "16:30 Pressman · checks",
+          "17:00 staged; 18:00 release",
+          "release service · checks pass"
+        ]
+      },
+      {
+        "x": 8,
+        "y": 18,
+        "w": 14,
+        "h": 3,
+        "title": "COGSWORTH",
+        "lines": [
+          "hardware"
+        ],
+        "title_in_border": true
+      },
+      {
+        "x": 23,
+        "y": 18,
+        "w": 14,
+        "h": 3,
+        "title": "SPROCKETT",
+        "lines": [
+          "escalation"
+        ],
+        "title_in_border": true
+      },
+      {
+        "x": 8,
+        "y": 21,
+        "w": 14,
+        "h": 3,
+        "title": "FOREMAN",
+        "lines": [
+          "macro"
+        ],
+        "title_in_border": true
+      },
+      {
+        "x": 23,
+        "y": 21,
+        "w": 14,
+        "h": 3,
+        "title": "GRAVES",
+        "lines": [
+          "commodities"
+        ],
+        "title_in_border": true
+      },
+      {
+        "x": 8,
+        "y": 24,
+        "w": 14,
+        "h": 3,
+        "title": "TINKERTON",
+        "lines": [
+          "policy"
+        ],
+        "title_in_border": true
+      },
+      {
+        "x": 23,
+        "y": 24,
+        "w": 14,
+        "h": 3,
+        "title": "VESTA",
+        "lines": [
+          "The Hearth"
+        ],
+        "title_in_border": true
+      }
+    ],
+    "hierarchy_spine": 3,
+    "chief_center": 23,
+    "branch_rows": [
+      16,
+      32,
+      41
+    ],
+    "publisher": "Publisher · occasional steering",
+    "klaxon": "Klaxon · social wire / leads",
+    "memory": "MEMORY · past work informs new pitches"
+  }
+}

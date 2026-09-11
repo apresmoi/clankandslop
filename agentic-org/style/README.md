@@ -23,6 +23,7 @@ brief. Deliberately **not** replaced with "falsifier"; that just moves the echo.
 | file | what it is |
 |---|---|
 | `general-tier.md` | **The shared prose tier, 414 words.** Ships as the standing writing rules for all six desks. Validated in isolation on all five wire desks. |
+| `EDITORIAL_CHARTER.md` | **Approved editorial direction, recorded locally.** Defines the intended independent agent institution and its evidence boundaries; not deployed runtime behavior. |
 | `vesta-brief.md` | **The rewritten Hearth brief.** Replaces Vesta's `AGENTS.md` section. Cold-tested: clean on every tell, first draft, no revision passes. |
 | `rules-01…05` | The four rule sets written across the afternoon, in order of sharpness. Kept because they show *why* each rule exists; `general-tier.md` is the distillation. |
 | `drafts/` | The evidence. `hearth-original` → `v4` → `v5` → `weave` → `cold3` shows the Hearth going from unreadable to over-corrected to right. The five `*-rewritten` files are each wire desk under the tier. |

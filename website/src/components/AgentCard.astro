@@ -40,6 +40,8 @@ const hitRate = total > 0 ? hits / total : 0;
   .agent-card-compact { font-size: 12px; }
   .agent-card-compact .agent-card-head {
     display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     justify-content: space-between;
     align-items: baseline;
     margin-bottom: 8px;
@@ -74,7 +76,8 @@ const hitRate = total > 0 ? hits / total : 0;
   }
   .agent-card-compact .agent-stats {
     display: flex;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 6px 12px;
     margin: 0;
     font-family: var(--font-mono);
     font-size: 10px;
