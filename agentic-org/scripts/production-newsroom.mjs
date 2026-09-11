@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { validateCompositionArtifact } from './composition-contract.mjs';
-import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
+import { assertCompositionCoverage, compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
 import { articleFormatFindings } from '../../ops/article-format.mjs';
@@ -313,12 +313,8 @@ async function composeEditionAction(args){
   if(reviews.length!==articles.length)throw new Error(`edition tree incomplete — reviews (${reviews.length}) must match articles (${articles.length})`);
   if(desk.length!==4)throw new Error(`edition tree incomplete — exactly 4 desk documents required (ledger.settlements, ledger.worlddesk, caslon.chrome, caslon.weather), found ${desk.length}`);
   const values=[];for(const name of articles){const article=await readJson(location(args.edition,'articles',name)),review=await readJson(location(args.edition,'reviews',name)),filing=await readJson(location(args.edition,'filings',`${name}/${article.revision}`));if(review.verdict!=='PASS'||review.article_digest!==sha(JSON.stringify(filing)))throw new Error(`composition requires selected authentic PASS articles — "${name}" carries verdict "${review.verdict}" or a stale digest`);const{assignment_ref:_,lint:__,...filedArticle}=filing,{dissent:___,...publishedArticle}=article;if(JSON.stringify(publishedArticle)!==JSON.stringify(filedArticle))throw new Error(`composition requires reporter-owned prose unchanged from the PASS filing — "${name}" differs`);values.push(article);}
-  const sections=new Set(values.map(value=>value.section)),owners=new Set(values.map(value=>value.byline?.agents?.[0])),sources=new Set(values.flatMap(value=>value.evidence_box.map(item=>item.source))),domains=new Set(values.flatMap(value=>value.evidence_box.map(item=>{try{return new URL(item.source_note?.source_url).hostname;}catch{return'';}})).filter(Boolean));
-  if(sections.size<3)throw new Error(`edition diversity floor missing — at least 3 distinct sections required, found ${sections.size}: ${[...sections].join(', ')}`);
-  if(owners.size<5)throw new Error(`edition diversity floor missing — at least 5 distinct byline agents required, found ${owners.size}: ${[...owners].join(', ')}`);
-  if(sources.size<3)throw new Error(`edition diversity floor missing — at least 3 distinct evidence sources required, found ${sources.size}`);
-  if(domains.size<3)throw new Error(`edition diversity floor missing — at least 3 distinct source_url domains required, found ${domains.size}`);
-  const gates=composeGateStatus({edition:args.edition,passed:articles.length,desks:desk.length,forecasts:values.filter(isDatedForecast).length,dissents:values.filter(hasNamedDissent).length});
+  const coverage=compositionCoverage(values);assertCompositionCoverage(coverage);
+  const gates=composeGateStatus({edition:args.edition,passed:articles.length,desks:desk.length,coverage,forecasts:values.filter(isDatedForecast).length,dissents:values.filter(hasNamedDissent).length});
   const pageArticles=new Set(),pageMaps=new Set(),papers=new Set();for(const page of args.pages){object(page.document);for(const value of publicArticleRefs(page.document))pageArticles.add(value);for(const value of walkValues(page.document,'map'))pageMaps.add(value);for(const value of walkValues(page.document,'paper'))papers.add(value);}
   if([...pageArticles].sort().join()!==articles.join())throw new Error(`page completeness invalid — pages must reference exactly the PASSed articles [${articles.join(', ')}], got [${[...pageArticles].sort().join(', ')}]`);
   if(papers.size<2)throw new Error(`paper diversity invalid — pages must use at least 2 distinct "paper" values, found ${papers.size}`);

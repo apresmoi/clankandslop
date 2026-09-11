@@ -82,7 +82,7 @@ async function driveEdition(state) {
   assert.match(afterAssignment, /^A cogsworth story-0 refs=1 +\| Report the verified mechanism/mu);
   // Every compose gate is legible from the first write of the day, not one per
   // failed compose run.
-  assert.match(afterAssignment, /^# compose: passed=0\/5 desks=0\/4 forecast=0 dissent=0 {2}→ blocked$/mu);
+  assert.match(afterAssignment, /^# compose: passed=0\/5 desks=0\/4 sections=0\/3 owners=0\/5 sources=0\/3 domains=0\/3 forecast=0 dissent=0 {2}→ blocked$/mu);
 
   const afterFiling = await step('file_article', async () => {
     for (const [index, owner] of OWNERS.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition: EDITION, event_key: `filing-${index}`, article: article(`story-${index}`, capitalize(owner), index) }); }
@@ -125,7 +125,7 @@ async function driveEdition(state) {
   // Both gates met. The two counts ride the same line and refuse on neither:
   // story-1 is the dated forecast, and Vesta's dissent against it is on the
   // record because Vesta recorded it, not because Sprockett typed it.
-  assert.match(afterDesk, /^# compose: passed=5\/5 desks=4\/4 forecast=1 dissent=1 {2}→ ready$/mu);
+  assert.match(afterDesk, /^# compose: passed=5\/5 desks=4\/4 sections=3\/3 owners=5\/5 sources=10\/3 domains=10\/3 forecast=1 dissent=1 {2}→ ready$/mu);
 
   const ids = OWNERS.map((_, index) => `story-${index}`);
   const afterCompose = await step('compose_edition', () => composeEdition({
@@ -374,7 +374,7 @@ test('a row is one line no matter what the headline carries', () => {
   for (const line of lines) assert.doesNotMatch(line, /[\n\r]/u);
   // No compose status supplied: the forecast floor is reported as unknown
   // rather than guessed at, and an unknown floor is not a green light.
-  assert.equal(lines[1], '# compose: passed=1/5 desks=1/4 forecast=? dissent=?  → blocked');
+  assert.equal(lines[1], '# compose: passed=1/5 desks=1/4 sections=?/3 owners=?/5 sources=?/3 domains=?/3 forecast=? dissent=?  → blocked');
   assert.match(lines[4], /^A foreman x refs=0 +\| A brief split across lines and \/ carrying a separator.*…$/u);
   assert.match(lines[5], /^F x rev=1 owner=fore-man epi=fa-ct words=1 refs=1 domains=1 art=- topics=unknown:od-d lint=domains<2$/u);
   assert.match(lines[6], /^V x rev=1 PA-SS by=spike$/u);
@@ -387,7 +387,7 @@ test('an empty edition still renders a readable index', async () => {
     const text = await writeEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS });
     assert.equal(text.trim().split('\n').length, 4, 'an empty edition is four header lines and nothing else');
     assert.match(text, /assignments=0 filings=0 verdicts=0 passed=0/u);
-    assert.match(text, /^# compose: passed=0\/5 desks=0\/4 forecast=0 dissent=0 {2}→ blocked$/mu);
+    assert.match(text, /^# compose: passed=0\/5 desks=0\/4 sections=0\/3 owners=0\/5 sources=0\/3 domains=0\/3 forecast=0 dissent=0 {2}→ blocked$/mu);
     assert.equal(await buildEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS, now: new Date(0) }).then((value) => value.includes('generated=1970-01-01T00:00:00.000Z')), true);
     await assert.rejects(writeEditionIndex(path.join(temporary, 'state'), 'not-a-date'), /must be an ISO date/u);
   } finally {

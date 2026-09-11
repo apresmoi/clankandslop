@@ -476,9 +476,13 @@ cannot be laid out, and it names the gate and the missing input:
   `kicker`, `agent` or `what`.
 - **`agent reference`** — a name with no persona file. Only the six bylined
   reporters have one; `Caslon`, `Brass`, `Spike` and `Ledger` do not.
-- **`edition tree incomplete`** — fewer than five PASSed articles, or fewer
-  than four desk documents. That is the `# compose:` line in the INDEX, and
-  it is Brass's or Ledger's to fix, never mine to work around.
+- **`edition tree incomplete`** — fewer than five PASSed articles, or a desk
+  document count other than four. The `# compose:` INDEX row reports these
+  prerequisites; Brass or Ledger owns the missing inputs.
+- **`edition diversity floor missing`** — the PASSed set needs at least three
+  sections, five distinct primary byline agents, three evidence source names
+  and three source URL domains. The same INDEX row reports each count. Brass
+  owns coverage; I cannot relabel, rewrite or omit passed work to evade a floor.
 - **`markets shape` / `watch shape` / `flashpoint shape`** — a rail row whose
   `dir` is not `up`/`down`/`flat`, a watch item with no date, an index row
   with no latitude. The globe needs a real coordinate, not a place name.
