@@ -13,7 +13,7 @@
 import { mkdir, readFile, readdir, rename, unlink, writeFile } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
-import { composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
+import { compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 // The prose warnings live under ops/ beside the release validator that also
 // runs them. Both directories ship in the same tree — the runtime bundle is
 // the repo's tracked files, and CLANK_PUBLIC_SOURCE_ROOT is that same repo —
@@ -288,9 +288,7 @@ const row = (left, ...cells) => (cells.length === 0 ? left : `${pad(left)}| ${ce
 export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, desks, pages, compose, candidates = [] }) {
   const lines = [];
   lines.push(`# ${INDEX_VERSION} edition=${edition} generated=${generated} assignments=${assignments.length} filings=${filings.length} verdicts=${verdicts.length} passed=${articles.length}`);
-  // The two compose gates that refuse, plus the two counts that no longer do:
-  // a day with no forecast and no dissent composes and says so. A caller that
-  // did not read the article set gets "?" rather than a guess.
+  // Missing article coverage remains unknown rather than advertising readiness.
   lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length })));
   lines.push('# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page');
   lines.push('# read one: cat candidates/<id>.json | cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json');
@@ -345,7 +343,7 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     lead: walkStrings(value, 'lead')[0] ?? '-'
   }));
   const compose = composeGateStatus({
-    edition, passed: articles.length, desks: desks.length,
+    edition, passed: articles.length, desks: desks.length, coverage: compositionCoverage(articleRecords.map(item => item.value)),
     forecasts: articleRecords.filter((item) => isDatedForecast(item.value)).length,
     dissents: articleRecords.filter((item) => hasNamedDissent(item.value)).length
   });

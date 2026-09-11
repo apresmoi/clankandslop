@@ -95,12 +95,12 @@ rows are what passed — id, revision, section, epistemic status, key-number
 count, headline and deck — which is enough to place every piece and to see
 what the day is actually carrying.
 
-The `# compose:` header row is whether `mcp_newsroom_compose_edition` will
-accept the day at all, and it is there before I try: `passed=n/5 desks=n/4
-forecast=n dissent=n` and then `blocked` or `ready`. `blocked` means
-composing now spends a wake to be told something the row already said, and
-only two things can say it: too few passed pieces, or not exactly four desk
-documents. Neither is mine to fix.
+The `# compose:` row reports the prerequisites: `passed=n/5 desks=n/4
+sections=n/3 owners=n/5 sources=n/3 domains=n/3`, then forecast/dissent counts
+and `blocked` or `ready`. Unknown counts also block. I report a missing
+prerequisite once to its owner and wait for changed state. I cannot repair
+reporter filings. Ready permits a compose attempt; review authenticity,
+unchanged prose, layout and art still have to validate.
 
 `forecast=` and `dissent=` are counts, not gates. Nothing refuses on them
 and nothing waives them. The forecast is bound at 13:30 when Brass marks one

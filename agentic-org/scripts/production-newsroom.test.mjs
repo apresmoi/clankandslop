@@ -393,9 +393,9 @@ runtimeTest('a day with the required forecast and no recorded dissent composes, 
   try {
     const composeArgs = await driveToCompose(state, edition, article);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 forecast=1 dissent=0 {2}→ ready$/mu);
+    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 sections=3\/3 owners=5\/5 sources=5\/3 domains=5\/3 forecast=1 dissent=0 {2}→ ready$/mu);
     const composed = await composeEdition({ ...composeArgs, event_key: 'compose-forecast-no-dissent' });
-    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=1 dissent=0  → ready');
+    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 sections=3/3 owners=5/5 sources=5/3 domains=5/3 forecast=1 dissent=0  → ready');
     assert.equal(composed.forecasts, 1);
     assert.equal(composed.dissents, 0);
     assert.equal(composed.waiver, undefined, 'nothing was waived, because there is nothing left to waive');
@@ -438,7 +438,7 @@ runtimeTest('the waiver environment variable is inert — no value of it changes
     }
     const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-junk-env' });
     assert.equal(composed.waiver, undefined);
-    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 forecast=1 dissent=0  → ready');
+    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 sections=3/3 owners=5/5 sources=5/3 domains=5/3 forecast=1 dissent=0  → ready');
   } finally {
     if (saved === undefined) delete process.env.CLANK_EDITION_DIVERSITY_WAIVER; else process.env.CLANK_EDITION_DIVERSITY_WAIVER = saved;
     delete process.env.CLANK_NEWSROOM_AGENT;
@@ -802,11 +802,11 @@ runtimeTest('a recorded dissent is counted by compose and reported in the receip
     });
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-dissent' });
-    assert.equal(composed.compose_gates, '# compose: passed=5/5 desks=4/4 forecast=1 dissent=1  → ready');
+    assert.equal(composed.compose_gates, '# compose: passed=5/5 desks=4/4 sections=3/3 owners=5/5 sources=5/3 domains=5/3 forecast=1 dissent=1  → ready');
     assert.equal(composed.forecasts, 1);
     assert.equal(composed.dissents, 1);
     assert.equal((await readComposedReceipt(state, edition)).composition.dissents, 1);
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 forecast=1 dissent=1 {2}→ ready$/mu);
+    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 sections=3\/3 owners=5\/5 sources=5\/3 domains=5\/3 forecast=1 dissent=1 {2}→ ready$/mu);
     assert.match(await readIndexFile(state, edition), /^N story-1 rev=1 by=vesta dissent p=0\.62$/mu);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
@@ -1077,4 +1077,16 @@ test('two read-only bundles merging into one directory: the second one lands', a
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });
   }
+});
+
+runtimeTest('five authentic PASS articles in two sections report blocked and composition refuses the same floor', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-two-sections-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-11';
+  try {
+    const sections = ['Business', 'World', 'World', 'Business', 'World'];
+    const composeArgs = await driveToCompose(state, edition, (id, owner, day, index) => ({ ...article(id, owner, day, index), section: sections[index] }));
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 sections=2\/3 owners=5\/5 sources=5\/3 domains=5\/3 .*→ blocked$/mu);
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-two-sections' }), /at least 3 distinct sections required, found 2/);
+  } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
