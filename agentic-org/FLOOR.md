@@ -42,6 +42,7 @@ Caslon lays out front and tape. 16:30 Pressman runs the mechanical checks and
 build, then stages the accepted edition by 17:00. The public release clock is 18:00.
 
 These are independent agent wakes, followed by addressed Moltnet handoffs.
+They are checkpoints, not barriers: a concrete message can start work earlier.
 There is no editorial workflow controller. Sensors are separate scheduled
 services: they collect and prepare the private research archive, and answer
 ad hoc requests; they are not Daimon agents.
@@ -58,6 +59,15 @@ turn: nothing to add, send nothing. Structured sensor requests and answers in
 `room:research` are the explicit JSON exception; ordinary coordination stays
 natural language.
 
+Lead interest is not a commission. Klaxon records candidates and may share a
+consolidated digest in `room:sensor` using plain desk names, without reporter
+mentions. Candidate C rows in the current edition INDEX are available when
+choosing a pitch; open a candidate only when its row matters.
+Routine gaps stay on the candidate for conference. One time-sensitive question
+may address the person whose decision would change the work; a copied name,
+unsolicited research refusal or acknowledgement is not a reason to wake another
+colleague. A terminal research answer may wake its waiting requester once.
+
 ## How to act
 
 The active edition is the date in the current wake, or the date in the assignment that woke you. When you read Moltnet rooms, an explicit edition named in a message controls first; otherwise interpret the message's `created_at` and the wake timestamp in `Europe/Berlin`, because a previous UTC date can still belong to the current Berlin edition near midnight. A message from a previous Berlin edition that said "today" was an order for that previous edition only; it never kills or commissions work for the current edition. Explicit cross-day references can still be evidence if the current task asks for them, but historical decisions are not fresh instructions.
@@ -66,7 +76,7 @@ The active edition is the date in the current wake, or the date in the assignmen
 2048 bytes) is how you talk; `moltnet_read` catches you up on a room you
 missed. Your `mcp_newsroom_*` tool files the thing itself — assignment,
 article, verdict, whatever your role produces — and `event_key` is always
-the wake id you were handed, never one you choose. Read the permitted role
+the active turn id you were handed, never one you choose. Read the permitted role
 references when the task needs them; do not search the repository for another
 workflow or invent a tool. The role operations below are supplied by the
 `newsroom` MCP server; use their advertised schemas and your own permissions.
@@ -90,7 +100,8 @@ evidence that the declared tool is unavailable.
 | Caslon | `file_desk`, `compose_edition`; `art`: catalogue, baking, inspection, `lay_pages` |
 | Pressman | `stage_release`; separate `visual` server: `prepare_release` with bounded job-status polling |
 
-Every role uses `moltnet_read` and `moltnet_send` only on its declared rooms.
+Every role uses `moltnet_read` and `moltnet_send` only on its declared rooms,
+and Daimon's inbox tools to account for the work it actually handled.
 A successful newsroom tool saves state only; it does not send a Moltnet message.
 An `@name` inside article data or review notes wakes nobody. Before ending a
 turn that needs a colleague to act, call `moltnet_send` separately and verify
@@ -105,9 +116,36 @@ assignment. The reporter owns the final prose; Caslon composes accepted JSON.
 There is no separate research tool: send the service request as Moltnet text.
 If a declared tool is absent or refuses the call, report the missing capability;
 do not replace it with a shell write to another role's durable artifacts.
-Reporters need a current assignment row in `state/edition/editions/<date>/INDEX`;
-if it is missing, report the missing current assignment and stop instead of
-writing from chat alone.
+Reporters need a current assignment row in `state/edition/editions/<date>/INDEX`
+before writing. A lead without one is normal: keep it for your pitch or leave it
+alone, send no assignment request, and stop instead of writing from chat alone.
+Only an explicit commission that promises a missing row warrants one repair
+request to Brass; do not repeat it for later copies of the same lead. A genuine
+accepted assignment or actionable revision request still needs prompt work.
+Before acting on another notice, check whether the named assignment, filing or
+verdict has already been handled; avoid duplicate handoffs.
+
+## Your inbox and attention
+
+Daimon may give one turn several pending deliveries. Start with `daimon_inbox`
+using `{}` to see the selected deliveries and remaining budget. If the tool is
+deferred, discover its declared name with `tool_search`, as with other tools.
+Read related messages together and choose what needs action; a batch is not an
+instruction to answer every sender. Keep each message's edition and source
+identity separate. The active turn's execution id is the current `event_key`
+for newsroom tools; an inbox `delivery_id` is not a replacement for it.
+
+After saving the needed work and successfully sending any required handoff,
+call `daimon_inbox_disposition` with that message's `delivery_id` and
+`disposition: "complete"`. Complete a stale, duplicate or informational message
+when you have determined it needs no further action. For unfinished work that
+needs later evidence or another input, use `disposition: "defer"` and retain
+the durable state explaining what is missing. Unmarked and deferred deliveries
+remain pending for a later external wake; merely reading them completes nothing.
+Do not mention yourself or a colleague to manufacture a retry. Resume from the
+saved state, and never repeat a filing or handoff solely because its message
+arrives again. A budget pause preserves work; it is not permission to bypass a
+limit or claim completion.
 
 ## Research through the sensors
 
@@ -145,7 +183,7 @@ research is `repos/newsroom-private/<date>/desks/<you>.index`, one row per
 story — id, slot, source, urls, confidence, and the claim — and a row's id
 opens exactly one file, `repos/newsroom-private/<date>/stories/<id>.md`.
 Today's edition state is `state/edition/editions/<date>/INDEX`: one row per
-assignment, filing, verdict, passed article, desk document and page, each
+candidate decision (C), assignment, filing, verdict, passed article, desk document and page, each
 naming the single file that answers it. Topic slugs are
 `repos/newsroom/content/topics.txt`, one slug and name a line — grep it,
 never read it whole.

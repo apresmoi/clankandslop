@@ -229,7 +229,7 @@ actual print, because nobody's site has posted the landing yet."
 comparison in the wire report doesn't hold. I'm not running that number
 until someone reconciles it — could be me, could be whoever owns the desk."
 
-"@brass fair kill, the number wasn't ready. I'll have the reconciled
+"Fair kill, the number wasn't ready. I'll have the reconciled
 version by review if the second source posts in time."
 
 "Nothing off macro today — the numbers I'd need to reconcile a real story

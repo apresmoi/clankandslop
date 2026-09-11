@@ -100,7 +100,7 @@ async function driveEdition(state) {
     argument: 'The call rests on a single quarter of shipment data and reads a pause as a turn; the same series moved this far twice last year without one, and the clock the piece sets is inside the revision window.'
   }));
   assert.match(afterDissent, /^N story-1 rev=1 by=vesta dissent p=0\.62$/mu);
-  assert.match(afterDissent, /^# rows: A assignment · F filing · N dissent · V verdict/mu);
+  assert.match(afterDissent, /^# rows: C candidate · A assignment · F filing · N dissent · V verdict/mu);
 
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
   const afterRevision = await step('review_article REVISION_REQUEST', () => reviewArticle({ edition: EDITION, event_key: 'verdict-request', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the opposing reading.' }));
@@ -145,8 +145,8 @@ runtimeTest('every converge path regenerates the edition INDEX', async () => {
   try {
     const text = await driveEdition(path.join(temporary, 'state'));
     assert.match(text, /^# clank\.edition-index\.v1 edition=2026-09-04 generated=\S+ assignments=5 filings=6 verdicts=6 passed=5$/mu);
-    assert.match(text, /^# rows: A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page$/mu);
-    assert.match(text, /^# read one: cat filings\/<id>\/<rev>\.json \| cat articles\/<id>\.json \| cat verdicts\/<id>\/<rev>\.json \| cat dissents\/<id>\/<rev>\.json$/mu);
+    assert.match(text, /^# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page$/mu);
+    assert.match(text, /^# read one: cat candidates\/<id>\.json \| cat filings\/<id>\/<rev>\.json \| cat articles\/<id>\.json \| cat verdicts\/<id>\/<rev>\.json \| cat dissents\/<id>\/<rev>\.json$/mu);
     // The whole point of the file: it stays small enough to read every wake.
     assert.ok(Buffer.byteLength(text) < 6000, `edition INDEX grew to ${Buffer.byteLength(text)} bytes`);
   } finally {

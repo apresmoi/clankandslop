@@ -142,6 +142,8 @@ export function validateAgentDeclaration(agent, bytes) {
   const surfaces = section(bytes, 'surfaces');
   const workspace = section(bytes, 'workspace');
   assert(runtime.includes(`engine: ${engine}`), `${agent} runtime engine declaration invalid`);
+  const attention = parseManifest(bytes).runtime?.options?.attention;
+  assert(attention && ['max_batch_messages', 'max_batch_bytes', 'max_executions', 'max_tokens'].every(key => Number.isSafeInteger(attention[key]) && attention[key] > 0), `${agent} explicit bounded attention declaration required`);
   assert(execution.includes('sandbox:\n    mode: workspace'), `${agent} workspace sandbox declaration invalid`);
   if (engine === 'codex') {
     assert(execution.includes('provider: openai') && execution.includes('method: codex') && !execution.includes('endpoint:'), `${agent} Codex subscription intent invalid`);

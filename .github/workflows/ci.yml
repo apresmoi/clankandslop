@@ -64,7 +64,7 @@ jobs:
       - name: Check declared agent tools and release clock
         run: |
           node agentic-org/scripts/validate-org.mjs
-          node --test agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs
+          node --test agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs agentic-org/scripts/signal-disposition.test.mjs agentic-org/scripts/production-newsroom-contracts.test.mjs
       - name: Check unattended publication recovery guards
         run: node --test agentic-org/scripts/ci-gate.test.mjs agentic-org/scripts/systemd-contract.test.mjs
       # The page data layer has one build-time decision in it that a green

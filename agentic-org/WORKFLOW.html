@@ -174,10 +174,10 @@
 </g>
 <g class="step" id="step-04" data-step="04"><rect x="180" y="1008" width="600" height="184" rx="8" class="node gap"/>
 <text x="32" y="1040" class="time">ON A SENSOR</text><text x="32" y="1064" class="small">MENTION / DM</text>
-<text x="200" y="1040" class="number">04</text><text x="252" y="1040" class="title">Qualify and route signals</text>
+<text x="200" y="1040" class="number">04</text><text x="252" y="1040" class="title">Record lead decisions</text>
 <text x="200" y="1072" class="owner">Actor: Klaxon · sensor wire</text><text x="200" y="1096" class="body">Trigger: A sensor @mention, or an allowed sensor DM</text>
-<text x="200" y="1120" class="body">Qualify the lead and mention the selected reporting desks.</text>
-<text x="200" y="1144" class="body">Output: qualification record + claims and URLs in the sensor room.</text>
+<text x="200" y="1120" class="body">Record qualified, ignored, deferred or duplicate leads.</text>
+<text x="200" y="1144" class="body">Output: indexed candidates; optional digest without desk mentions.</text>
 <text x="200" y="1168" class="body">Today’s prepared corpus and Moltnet research notice are verified.</text>
 </g>
 <g class="step" id="step-05" data-step="05"><rect x="180" y="1296" width="600" height="184" rx="8" class="node normal"/>
@@ -337,7 +337,7 @@
 <section id="readiness"><div class="eyebrow">Published late edition · guarded daily launch</div><h2>Tools for each owner, with separate review gates.</h2>
 <div class="table-scroll"><table><thead><tr><th>Owner</th><th>Tools and deliverables</th><th>Handoff</th></tr></thead><tbody>
 <tr><td>4090 sensors</td><td>Scheduled web captures, prepared story packets, citations and numerical inputs; bounded ad hoc research replies.</td><td>Private GitHub archive and Moltnet research room. These are services, not Daimon agents.</td></tr>
-<tr><td>Klaxon</td><td>Qualify incoming leads with <code>qualify_signal</code>.</td><td>Mention selected desks with claims, source URLs and verification gaps.</td></tr>
+<tr><td>Klaxon</td><td>Qualify incoming leads with <code>qualify_signal</code>.</td><td>Index lead decisions; share useful claims, URLs and gaps without desk mentions.</td></tr>
 <tr><td>Six reporters</td><td><code>validate_article</code>, <code>file_article</code>, <code>record_dissent</code>; complete article JSON in the established public format.</td><td>Filing room: article id, revision and digest, mentioning Spike and the named dissenter.</td></tr>
 <tr><td>Brass</td><td><code>record_assignment</code>; sourced lineup and forecast commission.</td><td>Conference for debate; assignment room for accepted commissions with reporter mentions.</td></tr>
 <tr><td>Spike</td><td><code>review_article</code>; verdict bound to the exact filing digest.</td><td>After five PASS articles, mention Ledger in release if its desk documents have not landed. HOLD and REVISION_REQUEST permit the owner’s next revision. SPIKE is terminal.</td></tr>

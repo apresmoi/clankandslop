@@ -11,6 +11,7 @@ import { articleFormatFindings } from '../../ops/article-format.mjs';
 import { glyphSelectionFindings } from '../../ops/glyph-format.mjs';
 import { archiveIndex } from '../../ops/lay-page.mjs';
 import { authenticateWorldDeskFiling } from './worlddesk-filing.mjs';
+import { saveSignalDisposition, signalKey } from './signal-disposition.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
 const sha=value=>`sha256:${createHash('sha256').update(value).digest('hex')}`;
@@ -35,7 +36,7 @@ async function assignmentsForEdition(edition){const files=await jsonNames(editio
 async function resolveAssignment(args,article,owner){
   const records=await assignmentsForEdition(args.edition),mine=[];
   for(const record of records)for(const item of record.assignments)if(item.owner===owner)mine.push({item,event_key:record.event_key});
-  if(mine.length===0)throw new Error(`you have no assignment for edition ${args.edition} — ask the editor (brass) to record one for "${owner}" before filing`);
+  if(mine.length===0)throw new Error(`you have no assignment for edition ${args.edition} — a lead is not a commission; wait for Brass to record one for "${owner}" before filing. Only an explicit commission that lacks its promised row warrants one request for repair`);
   const seen=new Map();for(const entry of mine)if(!seen.has(entry.item.id))seen.set(entry.item.id,entry);
   const unique=[...seen.values()];
   if(unique.length===1){const only=unique[0];return{assignment:only.item,event_key:only.event_key,corrected:article.id!==only.item.id};}
@@ -89,15 +90,12 @@ export async function authenticatedCurrentComposition(edition){
 async function promoteCandidate(temporary,target){const digest=await directoryDigest(temporary);try{await rename(temporary,target);}catch(error){if(error.code!=='EEXIST'&&error.code!=='ENOTEMPTY')throw error;const existing=await directoryDigest(target);if(existing!==digest)throw new Error('existing release target digest conflict');await rm(temporary,{recursive:true,force:true});}return digest;}
 
 async function qualifySignalAction(args){
-  identity(args);exact(args,['edition','event_key','summary','selected_desks','evidence_refs']);
-  if(typeof args.summary!=='string'||args.summary.length<20||args.summary.length>8000)throw new Error(`summary must be a string between 20 and 8000 characters, got ${typeof args.summary==='string'?`${args.summary.length} characters`:typeof args.summary}`);
-  if(!Array.isArray(args.selected_desks)||args.selected_desks.length===0)throw new Error('selected_desks must be a non-empty array of desk names');
-  if(args.selected_desks.some(value=>!desks.has(value)))throw new Error(`selected_desks must only contain: ${[...desks].join(', ')} — got ${JSON.stringify(args.selected_desks)}`);
-  if(new Set(args.selected_desks).size!==args.selected_desks.length)throw new Error(`selected_desks must not repeat a desk, got ${JSON.stringify(args.selected_desks)}`);
-  if(!Array.isArray(args.evidence_refs)||args.evidence_refs.some(value=>typeof value!=='string'||value.length>1024))throw new Error('evidence_refs must be an array of strings, each at most 1024 characters');
-  const value={version:'clank.qualified-signal.v1',...args,selected_desks:[...args.selected_desks].sort()};
-  await converge(location(args.edition,'candidates',sha(args.event_key).slice(7,39)),value);
-  return{qualified:true,selected_desks:value.selected_desks,receipt:await receipt(args,'qualified',value)};
+  identity(args);
+  return saveSignalDisposition(args,{
+    read: id=>readJson(location(args.edition,'candidates',id)).catch(error=>error.code==='ENOENT'?undefined:Promise.reject(error)),
+    write: (id,value,options)=>options.replace?supersede(location(args.edition,'candidates',id),value):converge(location(args.edition,'candidates',id),value),
+    receipt: value=>receipt(args,'qualified',value)
+  });
 }
 async function recordAssignmentAction(args){
   identity(args);exact(args,['edition','event_key','assignments']);
@@ -377,7 +375,7 @@ async function releaseAction(method,args){
   return release[method]({args,compositionReceipt,stateRoot:root(),sourceRoot:process.env.CLANK_PUBLIC_SOURCE_ROOT,stagingRoot:process.env.CLANK_RELEASE_STAGING_ROOT,dependencyRoots:(process.env.CLANK_WEBSITE_DEPS_ROOTS??'').split(':').filter(Boolean),assetRoots:(process.env.CLANK_PUBLIC_ASSET_ROOTS??'').split(':').filter(Boolean),helpers:{stagePublicSource,mergeBundle,makeOwnerWritable}});
 }
 async function operation(name,args,action,resource=name,{cache=true}={}){identity(args);const state=await stateAdapter();return state.runEditionOperation({root:root(),edition:args.edition,operation:name,role:process.env.CLANK_NEWSROOM_AGENT??null,wakeId:args.event_key,request:args,resource,cache,afterCommit:()=>writeEditionIndex(root(),args.edition)},()=>action(args));}
-export const qualifySignal=args=>operation('qualify_signal',args,qualifySignalAction);
+export const qualifySignal=args=>operation('qualify_signal',args,qualifySignalAction,args.source_id===undefined?'qualify_signal':signalKey(args.source_id));
 export const recordAssignment=args=>operation('record_assignment',args,recordAssignmentAction);
 export const fileArticle=args=>operation('file_article',args,fileArticleAction,async()=>{const {assignment}=await resolveAssignment(args,object(args.article),process.env.CLANK_NEWSROOM_AGENT);return `${assignment.id}/${args.article.revision}`;});
 export const recordDissent=args=>operation('record_dissent',args,recordDissentAction,`${args.article_id}/${args.revision}`);
