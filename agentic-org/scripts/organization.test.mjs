@@ -383,3 +383,15 @@ test('shared Git package is required by accepted revision history', () => {
   assert.doesNotThrow(() => validateRootDeclaration(source));
   assert.throws(() => validateRootDeclaration(source.replace('name: git }', 'name: missing-git }')), /shared Git package/);
 });
+
+
+test('each newsroom role declares bounded attention and removing it fails admission', () => {
+  for (const agent of agents) {
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.doesNotThrow(() => validateAgentDeclaration(agent, source));
+    const removed = source.replace(/    attention:\n(?:      [^\n]+\n)+/u, '');
+    assert.notEqual(removed, source);
+    assert.throws(() => validateAgentDeclaration(agent, removed), /explicit bounded attention declaration required/u);
+    assert.throws(() => validateAgentDeclaration(agent, source.replace('max_batch_messages: 8', 'max_batch_messages: 0')), /explicit bounded attention declaration required/u);
+  }
+});

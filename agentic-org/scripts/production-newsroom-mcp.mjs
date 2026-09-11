@@ -45,12 +45,17 @@ const article = articleFilingSchema;
 
 const definitions = {
   qualify_signal: {
-    description: 'Durably qualify one sensor event and return the selected desks to mention.',
-    required: ['edition', 'event_key', 'summary', 'selected_desks', 'evidence_refs'],
+    description: 'Record a durable lead decision: qualified, ignore, defer or duplicate. Interested desks are tags, not recipients to mention. Read candidate rows in the edition INDEX before repeating work. A stable source_id lets overlapping notices converge; changed decisions require the current expected_revision. This tool sends no message and never commissions work.',
+    required: ['edition', 'event_key', 'summary', 'evidence_refs'],
+    optional: ['selected_desks', 'source_id', 'disposition', 'duplicate_of', 'expected_revision'],
     properties: {
       edition, event_key: eventKey,
       summary: { type: 'string', minLength: 20, maxLength: 8000 },
-      selected_desks: { type: 'array', items: { type: 'string', enum: DESKS }, minItems: 1, uniqueItems: true },
+      selected_desks: { type: 'array', items: { type: 'string', enum: DESKS }, uniqueItems: true, description: 'Interested desks. Required and non-empty for qualified; optional for other dispositions. These names are not wake instructions.' },
+      source_id: { type: 'string', minLength: 3, maxLength: 1024, description: 'Reuse the corpus story id or canonical primary URL for this lead across notices. Required for ignore, defer and duplicate. Legacy qualified calls without it remain event-scoped.' },
+      disposition: { type: 'string', enum: ['qualified', 'ignore', 'defer', 'duplicate'], description: 'Default qualified. Summary records the reason; defer also names what would make reconsideration worthwhile.' },
+      duplicate_of: { type: 'string', minLength: 3, maxLength: 1024, description: 'Required only for duplicate: the existing non-duplicate source_id in this edition.' },
+      expected_revision: { type: 'integer', minimum: 1, description: 'Current candidate revision, required when intentionally changing a saved decision. New evidence needs a new inbound wake event_key.' },
       evidence_refs: { type: 'array', items: { type: 'string', maxLength: 1024 } }
     },
     execute: qualifySignal

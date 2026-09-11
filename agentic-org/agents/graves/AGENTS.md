@@ -224,7 +224,7 @@ chase why traders reacted to a local outage like it was a shortage."
 cut, not because cargo volume changed — pitching the slot cut, not the
 rate, because the rate is downstream of it."
 
-"@brass understood on the kill — the physical number wasn't dramatic
+"Understood on the kill — the physical number wasn't dramatic
 enough for today's lineup. I'll keep tracking it in case the trend holds."
 
 "Nothing off commodities worth the paper today. Plant hours are flat,

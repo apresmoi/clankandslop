@@ -119,10 +119,44 @@ test('shared floor tells reporters to stop without a current assignment row', as
   const text = await readFile(path.join(root, 'FLOOR.md'), 'utf8');
   assert.match(text, /Reporters need a current assignment row/u, 'FLOOR must require current assignment state');
   assert.match(text, /state\/edition\/editions\/<date>\/INDEX/u, 'FLOOR must name the edition INDEX as assignment authority');
-  assert.match(text, /missing current assignment and stop/u, 'FLOOR must stop reporters on missing assignment');
+  assert.match(text, /send no assignment request/u, 'FLOOR must not turn uncommissioned leads into assignment-chasing wakes');
+  assert.match(text, /Only an explicit commission that promises a missing row/u, 'FLOOR must retain genuine commission repair');
   assert.match(text, /writing from chat alone/u, 'FLOOR must reject writing from chat alone');
 });
 
+
+test('lead-interest rules do not commission or require assignment-chasing wakes', async () => {
+  const root = path.resolve(import.meta.dirname, '..');
+  const team = await readFile(path.join(root, 'TEAM.md'), 'utf8');
+  const klaxon = await readFile(path.join(root, 'agents/klaxon/AGENTS.md'), 'utf8');
+  const floor = await readFile(path.join(root, 'FLOOR.md'), 'utf8');
+  assert.doesNotMatch(team, /mentioning every returned selected desk/u);
+  assert.match(team, /Selected desks express interest, not an assignment or a wake list/u);
+  for (const choice of ['qualified', 'ignore', 'defer', 'duplicate']) assert.match(klaxon, new RegExp('`' + choice + '`'));
+  assert.match(klaxon, /with plain desk names and no reporter\nmentions/u);
+  assert.match(floor, /send no assignment request/u);
+  assert.match(floor, /genuine\naccepted assignment or actionable revision request still needs prompt work/u);
+  assert.match(floor, /do not repeat it for later copies of the same lead/u);
+  assert.match(floor, /terminal research answer may wake its waiting requester once/u);
+  const brass = await readFile(path.join(root, 'agents/brass/AGENTS.md'), 'utf8');
+  assert.match(brass, /not_found or refused result\nonce only to a colleague waiting for that request/u);
+  for (const role of ['graves', 'foreman']) {
+    const brief = await readFile(path.join(root, 'agents', role, 'AGENTS.md'), 'utf8');
+    assert.doesNotMatch(brief, /@brass (understood|fair kill)/u);
+  }
+});
+
+test('shared inbox guidance separates execution authority from message completion', async () => {
+  const text = await readFile(path.join(import.meta.dirname, '../FLOOR.md'), 'utf8');
+  assert.match(text, /`daimon_inbox`/u);
+  assert.match(text, /`daimon_inbox_disposition`/u);
+  assert.match(text, /execution id is the current `event_key`/u);
+  assert.match(text, /`delivery_id` is not a replacement/u);
+  assert.match(text, /disposition: "complete"/u);
+  assert.match(text, /disposition: "defer"/u);
+  assert.match(text, /merely reading them completes nothing/u);
+  assert.match(text, /After saving the needed work and successfully sending any required handoff/u);
+});
 
 test('shared floor names Codex Moltnet deferred tools exactly', async () => {
   const root = path.resolve(import.meta.dirname, '..');

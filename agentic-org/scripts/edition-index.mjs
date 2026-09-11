@@ -285,15 +285,16 @@ const token = (value, fallback = '?') => String(value ?? '').replace(/\s+/gu, '-
 const pad = (value) => (value.length >= COLUMN ? `${value} ` : value.padEnd(COLUMN + 1));
 const row = (left, ...cells) => (cells.length === 0 ? left : `${pad(left)}| ${cells.join(' | ')}`);
 
-export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, desks, pages, compose }) {
+export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, desks, pages, compose, candidates = [] }) {
   const lines = [];
   lines.push(`# ${INDEX_VERSION} edition=${edition} generated=${generated} assignments=${assignments.length} filings=${filings.length} verdicts=${verdicts.length} passed=${articles.length}`);
   // The two compose gates that refuse, plus the two counts that no longer do:
   // a day with no forecast and no dissent composes and says so. A caller that
   // did not read the article set gets "?" rather than a guess.
   lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length })));
-  lines.push('# rows: A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page');
-  lines.push('# read one: cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json');
+  lines.push('# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page');
+  lines.push('# read one: cat candidates/<id>.json | cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json');
+  for (const item of candidates) lines.push(row(`C ${token(item.id)} rev=${item.revision} ${token(item.disposition)} desks=${token(item.selected_desks.join(','), '-')} refs=${item.evidence_refs.length}`, clean(item.source_id, 160), clean(item.summary, 160)));
   for (const item of assignments) lines.push(row(`A ${token(item.owner)} ${token(item.id)} refs=${item.evidence_refs.length}`, clean(item.brief, 120)));
   for (const item of filings) {
     const unknown = item.flags.filter((flag) => flag.startsWith('topic_unknown:')).map((flag) => flag.slice('topic_unknown:'.length));
@@ -316,6 +317,7 @@ export function renderEditionIndex({ edition, generated, assignments, filings, v
 export async function buildEditionIndex(root, edition, { now = new Date(), knownTopics } = {}) {
   const base = editionRoot(root, edition);
   const topics = knownTopics === undefined ? await knownTopicSlugs() : knownTopics;
+  const candidates = (await readKind(base, 'candidates')).map(({ name, value }) => ({ id: name, revision: value.revision ?? 1, disposition: value.disposition ?? 'qualified', source_id: value.source_id ?? value.event_key, summary: value.summary, selected_desks: value.selected_desks ?? [], evidence_refs: value.evidence_refs ?? [] }));
   const assignmentRecords = await readKind(base, 'assignments');
   const seen = new Map();
   for (const record of assignmentRecords) for (const item of record.value.assignments ?? []) if (!seen.has(item.id)) seen.set(item.id, item);
@@ -347,7 +349,7 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     forecasts: articleRecords.filter((item) => isDatedForecast(item.value)).length,
     dissents: articleRecords.filter((item) => hasNamedDissent(item.value)).length
   });
-  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, desks, pages, compose });
+  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, desks, pages, compose, candidates });
 }
 
 // Same shapes production-newsroom.mjs already walks when it checks page
