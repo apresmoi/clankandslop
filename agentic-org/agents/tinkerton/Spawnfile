@@ -9,7 +9,7 @@ runtime:
       max_batch_messages: 8
       max_batch_bytes: 12000
       max_executions: 30
-      max_tokens: 4000000
+      max_tokens: 5000000
     codex_policy: workspace-no-network
 execution:
   model:
