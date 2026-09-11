@@ -1,15 +1,15 @@
 {
   "version": "clank.article-validation-runtime-bundle.v1",
   "archive": "article-validation-runtime.tar",
-  "sha256": "sha256:0e402b3a4efc96e46c18e91931ce369eea26c20e4051faacf1a53ce720fdcd04",
+  "sha256": "sha256:f989562895409311130e5d2bd01ac7a246c6acb9a946f4e21ae3c81f59880fa0",
   "file_count": 2,
-  "content_bytes": 6651,
+  "content_bytes": 6759,
   "mount": "tools/article-validation",
-  "source_commit": "de00483ffaca80a8868b6ce0d809d3ae03c4f0b8",
+  "source_commit": "2dc1934c7a96122364e455449037128c694ef313",
   "source_files": [
     {
       "path": "newsroom/validation/adapter.mjs",
-      "sha256": "sha256:0621c0edcdfd42c401f41fcd2ddceee565081bed9f39d553897e7839ac171c98"
+      "sha256": "sha256:c1f13d04ae0ef8b5bc1e70ac4abe0609ede3fadff6b718842723f474a7f57889"
     },
     {
       "path": "newsroom/validation/server.mjs",

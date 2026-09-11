@@ -66,7 +66,7 @@ jobs:
           node agentic-org/scripts/validate-org.mjs
           node --test agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs agentic-org/scripts/signal-disposition.test.mjs agentic-org/scripts/production-newsroom-contracts.test.mjs
       - name: Check unattended publication recovery guards
-        run: node --test agentic-org/scripts/ci-gate.test.mjs agentic-org/scripts/systemd-contract.test.mjs agentic-org/scripts/wake-window.test.mjs agentic-org/scripts/quiescence-activity.test.mjs agentic-org/scripts/seam-run.test.mjs agentic-org/scripts/compose-gate.test.mjs agentic-org/scripts/composition-readiness.test.mjs agentic-org/scripts/staged-edition.test.mjs agentic-org/scripts/publish-edition-branch.test.mjs agentic-org/scripts/review-handoff.test.mjs
+        run: node --test agentic-org/scripts/ci-gate.test.mjs agentic-org/scripts/systemd-contract.test.mjs agentic-org/scripts/wake-window.test.mjs agentic-org/scripts/quiescence-activity.test.mjs agentic-org/scripts/seam-run.test.mjs agentic-org/scripts/compose-gate.test.mjs agentic-org/scripts/composition-readiness.test.mjs agentic-org/scripts/staged-edition.test.mjs agentic-org/scripts/publish-edition-branch.test.mjs agentic-org/scripts/review-handoff.test.mjs agentic-org/scripts/production-newsroom-prose-review.test.mjs
       # The page data layer has one build-time decision in it that a green
       # astro build cannot see: whether a story advertises an og:image for a
       # card that was never rendered. Fifteen editions have no cards at all, and

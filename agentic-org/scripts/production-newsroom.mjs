@@ -8,6 +8,7 @@ import { assertCompositionCoverage, compositionCoverage, composeGateLine, compos
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
 import { articleFormatFindings } from '../../ops/article-format.mjs';
+import { proseLeakFindings } from '../../ops/prose-leaks.mjs';
 import { glyphSelectionFindings } from '../../ops/glyph-format.mjs';
 import { archiveIndex } from '../../ops/lay-page.mjs';
 import { authenticateWorldDeskFiling } from './worlddesk-filing.mjs';
@@ -280,6 +281,10 @@ async function reviewArticleAction(args){
   if(typeof args.notes!=='string'||args.notes.length>8000)throw new Error(`notes must be a string of at most 8000 characters, got ${typeof args.notes==='string'?`${args.notes.length} characters`:typeof args.notes}`);
   const filing=await readJson(location(args.edition,'filings',`${args.article_id}/${args.revision}`)).catch(()=>{throw new Error(`no filing found for article_id ${JSON.stringify(args.article_id)} revision ${args.revision} — the reporter must file_article that revision before it can be reviewed`);});
   if(!/^sha256:[a-f0-9]{64}$/u.test(args.filing_digest??'')||args.filing_digest!==sha(JSON.stringify(filing)))throw new Error('filing_digest is stale or invalid — read the current filing and its INDEX digest before reviewing; no verdict was recorded');
+  if(args.verdict==='PASS'){
+    const leaks=proseLeakFindings(filing);
+    if(leaks.length)throw new Error(`PASS refused — saved filing still contains reader-facing prose leaks, so no verdict was recorded and no article was published. Record REVISION_REQUEST for this exact revision, then explicitly notify the owner with these fields and reasons; do not rewrite reporter-owned prose yourself: ${leaks.map(item=>`${item.path} [${item.code}] ${item.message}`).join('; ')}`);
+  }
   const merge=args.verdict==='PASS'?await dissentToMerge(args,filing):undefined;
   const review={version:'clank.editorial-verdict.v1',article_id:args.article_id,revision:args.revision,article_digest:sha(JSON.stringify(filing)),verdict:args.verdict,notes:args.notes,event_key:args.event_key,...(merge?.dropped?{dissent_dropped:merge.dropped}:{})};
   await convergeIndexed(args.edition,location(args.edition,'verdicts',`${args.article_id}/${args.revision}`),review);

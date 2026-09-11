@@ -142,7 +142,9 @@ export function validateAgentDeclaration(agent, bytes) {
   const surfaces = section(bytes, 'surfaces');
   const workspace = section(bytes, 'workspace');
   assert(runtime.includes(`engine: ${engine}`), `${agent} runtime engine declaration invalid`);
-  const attention = parseManifest(bytes).runtime?.options?.attention;
+  const manifest = parseManifest(bytes);
+  assert(JSON.stringify(manifest.workspace?.docs) === JSON.stringify({system: 'AGENTS.md', soul: 'SOUL.md'}), `${agent} must compile AGENTS.md and SOUL.md, leaving task details in the mounted RUNBOOK.md`);
+  const attention = manifest.runtime?.options?.attention;
   assert(attention && ['max_batch_messages', 'max_batch_bytes', 'max_executions', 'max_tokens'].every(key => Number.isSafeInteger(attention[key]) && attention[key] > 0), `${agent} explicit bounded attention declaration required`);
   assert(execution.includes('sandbox:\n    mode: workspace'), `${agent} workspace sandbox declaration invalid`);
   if (engine === 'codex') {
@@ -289,7 +291,7 @@ export function validateRuntimeBindings(root = orgRoot) {
   }
 }
 
-export function validateTree() { for (const agent of agents) for (const file of ['Spawnfile', 'AGENTS.md', 'CLAUDE.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
+export function validateTree() { for (const agent of agents) for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md', 'RUNBOOK.md', 'CLAUDE.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
 export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
   assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '18:00' && schedule.effective_from === '2026-09-09', 'schedule zone or deadline invalid');
@@ -334,6 +336,6 @@ export function validateLifecycle(receipts, options = {}) {
   const adapt=(receipt)=>{assert(receipt&&Object.keys(receipt).sort().join()===[...keys].sort().join()&&receipt.version==='v1','lifecycle receipt shape invalid');return{id:receipt.id,kind:receipt.kind,parent:receipt.causal_parent,edition:receipt.edition,release:receipt.release,correlation:receipt.correlation_id,digest:receipt.artifact_digest,ref:receipt.receipt_ref,owner:receipt.owner,status:receipt.status};};
   const nodes=receipts.map(adapt);validateLifecycleGraph(nodes,{mode:options.mode??'full',externalFinalization:options.externalFinalization?adapt(options.externalFinalization):undefined});
 }
-export function validateFixtures() { const cycle = readJson(resolve(orgRoot, 'fixtures/daily-cycle.json')); const prior = []; for (const message of cycle.messages) { validateMessage(message, prior); prior.push(message); } validateManifest(readJson(resolve(orgRoot, 'fixtures/corpus-manifest.json'))); validateLifecycle(readJson(resolve(orgRoot, 'fixtures/lifecycle-receipts.json')).receipts); const voices=readJson(resolve(orgRoot,'fixtures/voice-boundaries.json')); assert(agents.every((agent)=>voices[agent]?.good && voices[agent]?.bad), 'every persona requires concrete good/bad voice examples'); validateEditorialContracts(readFileSync(resolve(orgRoot,'agents/vesta/AGENTS.md'),'utf8'),readFileSync(resolve(orgRoot,'DATA.md'),'utf8'),voices); const vestaSpike = cycle.messages.find((message) => message.id === 'spike-vesta-20260816'); assert(vestaSpike?.owner === 'spike', 'Spike must own Vesta editorial spike'); }
+export function validateFixtures() { const cycle = readJson(resolve(orgRoot, 'fixtures/daily-cycle.json')); const prior = []; for (const message of cycle.messages) { validateMessage(message, prior); prior.push(message); } validateManifest(readJson(resolve(orgRoot, 'fixtures/corpus-manifest.json'))); validateLifecycle(readJson(resolve(orgRoot, 'fixtures/lifecycle-receipts.json')).receipts); const voices=readJson(resolve(orgRoot,'fixtures/voice-boundaries.json')); assert(agents.every((agent)=>voices[agent]?.good && voices[agent]?.bad), 'every persona requires concrete good/bad voice examples'); validateEditorialContracts(['AGENTS.md','RUNBOOK.md'].map(file=>readFileSync(resolve(orgRoot,'agents/vesta',file),'utf8')).join('\n'),readFileSync(resolve(orgRoot,'DATA.md'),'utf8'),voices); const vestaSpike = cycle.messages.find((message) => message.id === 'spike-vesta-20260816'); assert(vestaSpike?.owner === 'spike', 'Spike must own Vesta editorial spike'); }
 export function main() { validateTree(); validateSchedule(); validateFixtures(); console.log('organization validation: passed'); }
 if (process.argv[1] === new URL(import.meta.url).pathname) { try { main(); } catch (error) { console.error(`organization validation: failed: ${error.message}`); process.exitCode = 1; } }

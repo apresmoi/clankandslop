@@ -265,7 +265,7 @@ export const listAgents = (root = orgRoot) =>
 
 /**
  * The instructions Spawnfile would compile for one agent, byte-for-byte:
- * every declared `workspace.docs` entry, in declaration order.
+ * every declared `workspace.docs` entry, in Spawnfile's resolved role order.
  */
 export function agentInstructions(agent, root = orgRoot) {
   const directory = path.join(root, 'agents', agent);
@@ -274,11 +274,19 @@ export function agentInstructions(agent, root = orgRoot) {
   if (!docs || typeof docs !== 'object' || Array.isArray(docs)) {
     throw new ManifestParseError(`agents/${agent}/Spawnfile declares no workspace.docs mapping`);
   }
-  const rendered = Object.entries(docs)
+  const roles = ['heartbeat', 'identity', 'memory', 'soul', 'system'];
+  if (Object.keys(docs).some(role => !roles.includes(role) && role !== 'extras')) {
+    throw new ManifestParseError(`agents/${agent}/Spawnfile declares an unsupported workspace.docs role`);
+  }
+  const resolved = [
+    ...roles.filter(role => docs[role]).map(role => [role, docs[role]]),
+    ...Object.entries(docs.extras ?? {}).map(([name, file]) => [`extras.${name}`, file])
+  ];
+  const rendered = resolved
     .map(([role, file]) => `# ${role}\n\n${readFileSync(path.join(directory, file), 'utf8')}`)
     .join('\n\n')
     .trim();
-  return { docs, instructions: rendered };
+  return { docs, documentFiles: resolved.map(([, file]) => file), instructions: rendered };
 }
 
 /** Every way the twelve briefs would fail to compile, as plain sentences. */
@@ -295,7 +303,7 @@ export function instructionBudgetFindings(root = orgRoot) {
     }
     const bytes = Buffer.byteLength(resolved.instructions, 'utf8');
     const codepoints = [...resolved.instructions].length;
-    rows.push({ agent, bytes, codepoints, docs: Object.values(resolved.docs) });
+    rows.push({ agent, bytes, codepoints, docs: resolved.documentFiles });
     if (bytes > INSTRUCTION_BUDGET_BYTES) {
       findings.push(`${agent} compiles to ${bytes} instruction bytes, ${bytes - INSTRUCTION_BUDGET_BYTES} over the ${INSTRUCTION_BUDGET_BYTES}-byte budget (${DAIMON_MAX_INSTRUCTION_BYTES} ceiling less ${DAIMON_APPEND_POINTER_ALLOWANCE} bytes of appended team context)`);
     }
