@@ -4,10 +4,9 @@ The twelve live agents have their declared role tools. Their complete tasks
 are not yet proven. Production remains parked. Read-only deployment checks
 completed September 7, 19:26–19:31 UTC.
 
-The local [workflow diagram](../../WORKFLOW.html) provides seventeen numbered
-stages, Berlin start times, the research and revision loops, and unresolved
-handoffs. It follows the executable declarations, while displaying the
-conflicting daytime playbook separately. It does not change the schedule.
+The current [workflow guide](../../README.md#daily-workflow) provides numbered
+stages, Berlin start times, actors, deliverables and the research/revision loops.
+It follows the current declarations; the observations below describe September 7.
 
 ## Live availability
 

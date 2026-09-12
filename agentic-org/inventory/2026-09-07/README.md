@@ -2,7 +2,7 @@
 
 **Production is healthy and deliberately parked. The org has not completed a valid autonomous edition. Keep it parked while testing the real Daimon agents in isolation.**
 
-**Workflow alignment:** the [vertical diagram](../../WORKFLOW.html) covers the full day with numbered steps. The [agent-tool audit](agent-tools.md) records installed capabilities, corrected branch instructions and the remaining deployment/enforcement gaps.
+**Workflow alignment:** the [workflow guide](../../README.md#daily-workflow) covers the full day with numbered steps, actors and deliverables. The [agent-tool audit](agent-tools.md) records installed capabilities, corrected branch instructions and the remaining deployment/enforcement gaps.
 
 **Later update, September 7 16:00 UTC:** the missing sensor display is repaired and both browser captures completed. Two research-runner issues remain. See [sensor-display-fix.md](sensor-display-fix.md); the inventory below records the earlier inspection.
 
