@@ -75,7 +75,7 @@ workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:beb200e68d9f59ca8b954b420dd42345f960ca5a6eb7d0261201182d5f1a17be, mount: ./tools/newsroom, mode: readonly }
-    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:52c7442c086311e5d3a43f6c0f590ce82772db841b4cca3f149cc6c7400554d5, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:f68c854b7ba416cf066d2c1f7d319a34bff69680179c8426b7befca32bb03685, mount: ./repos/newsroom, mode: readonly }
     - { id: website-deps-a, kind: bundle, source: ../../newsroom-dependencies-a.tar, sha256: sha256:3682eb4edaa1092fb08dcc2629da683b7690ff03e2a248301c56c7bfccc6de9d, mount: ./deps-a, mode: readonly }
     - { id: website-deps-b, kind: bundle, source: ../../newsroom-dependencies-b.tar, sha256: sha256:c7bb3c23e59c0e66257eeb2d5dde6bd131987f0ce228dc4b6c96f5b2b8509142, mount: ./deps-b, mode: readonly }
     - { id: public-assets-a, kind: bundle, source: ../../newsroom-assets-a.tar, sha256: sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a, mount: ./assets-a, mode: readonly }

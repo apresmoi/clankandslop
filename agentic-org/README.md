@@ -198,6 +198,29 @@ The separate private repository owns `sensors/automation/`,
 under dated directories there. Credentials, private research and generated
 runtime state must stay out of this public repository.
 
+## Planned authoring cleanup
+
+**Agreed direction; not implemented.** The [Spawnfile packaging design](https://github.com/noopolis/spawnfile/blob/main/specs/research/WORKSPACE-PACKAGING.md)
+records the proposed source-directory and toolset support, examples and
+acceptance checks. The current agent declarations still require prebuilt
+bundles and exact checksums; the archives themselves are Git-ignored.
+
+The migration will declare common tool packages once, keep their source and
+build recipes in the private repository, and select each agent's permitted
+operations explicitly. Spawnfile will generate file manifests, hashes and
+deployment packages instead of requiring repeated archive pins. File-backed
+scheduled prompts will move long instructions out of YAML.
+
+Shared tool installation must preserve individual identity and tool authority:
+reporters validate/file/dissent, Spike reviews, and Caslon makes art and composes.
+It must also preserve durable memories, edition state, Moltnet history, current
+schedules and the separate publication boundary. A built snapshot stays fixed
+until an explicit rebuild; research pushes will not hot-reload running agents.
+
+Apply the new syntax only after Spawnfile implements it and the compatibility,
+tool-denial and state-preservation checks pass. Until then, use the existing
+bundle build and repinning procedures below.
+
 ## Local validation
 
 From the repository root with Node.js 22.18+ and npm:
