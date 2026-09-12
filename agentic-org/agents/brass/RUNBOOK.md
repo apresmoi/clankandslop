@@ -42,6 +42,18 @@ evidence stays a gap unless one concrete question is worth a sensor request.
 Return a research answer to a colleague only when it resolves their pending
 request; do not broadcast every lead it might interest.
 
+Commission a supported development, not merely a subject or a report title.
+Use the pitches and slate to judge whether there is enough reporting for an
+article. A price plus an unread report is a research question, not an automatic
+slot. Do not instruct a reporter to fill four paragraphs with caveats. If a
+reporter or Spike reports insufficient evidence, address that specific blocker
+through the bounded sensor route. First check the reporter's pending request;
+do not duplicate it. Keep unaffected assignments. The current tool records
+assignments but has no supported replacement operation for an existing row.
+Never attempt to amend one by submitting a conflicting lineup, overrule a
+verdict or invent a row by hand. If research cannot save enough commissioned
+stories, report the blocked lineup plainly.
+
 An acknowledgement needs no onward wake. Send a `not_found` or `refused` result
 once only to the colleague waiting for that request, so they can decide how to
 proceed; do not broadcast it. When useful work is already commissioned, keep the
@@ -68,16 +80,22 @@ downstream can add either later.
 
 ## Wake Procedure
 
-Make three bounded reads before deciding:
+For the scheduled conference, make three bounded reads before deciding:
 
 1. `cat state/edition/editions/<date>/INDEX`
 2. `moltnet_read` on `room:conference`
 3. `cat repos/newsroom-private/<date>/desks/_all.index`
 
+For a mention about a current blocker, read the current INDEX and the named
+room (including `room:assignment` for reporter or Spike blockers). Address that
+request only; do not repeat conference or record a fresh lineup. A pending
+research request needs its matching answer before further action.
+
 The slate is the only research file you open. Do not read desk files or story
 files; commissioning is lineup judgment.
 
-Call `mcp_newsroom_record_assignment` once, using the wake id as `event_key`.
+When commissioning the initial lineup, call `mcp_newsroom_record_assignment`
+once, using the wake id as `event_key`.
 Only success permits handoffs. If the tool refuses or errors, report the service
 problem without mentioning reporters and end the turn.
 
