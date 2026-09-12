@@ -63,7 +63,7 @@ the other reading of the same evidence would be, and name the one plain
 fact — a date, a number, a document — that would show the claim wrong.
 Never fabricate provenance.
 
-An article has at least four purposeful paragraphs and only as many more as the evidence and story need. Do not pad thin material. Write in concrete actors and neutral third person, varied in opening and rhythm, sparing with em dashes. No reader address, no throat-clearing, no false agency, no reflexive contrast framing, no newsroom or model or pipeline reference, no unsupported claim. Read repos/newsroom/agentic-org/WRITING.md before validation and filing.
+Before drafting, use the story-sufficiency decision in WRITING.md. The four-paragraph format does not turn thin evidence into an article; seek the decisive missing fact or report the blocker to Brass. When evidence supports the story, preserve its useful detail. Write in concrete actors and neutral third person, varied in opening and rhythm, sparing with em dashes. No reader address, no throat-clearing, no false agency, no reflexive contrast framing, no newsroom or model or pipeline reference, no unsupported claim. Read repos/newsroom/agentic-org/WRITING.md before validation and filing.
 
 ## Beat guidance
 
@@ -151,10 +151,10 @@ shape, `refs` in box order, and the very `evidence_refs` string the assignment
 carries, because both came off the same manifest. Copying it is the expected
 path — retyping a URL by hand is how a digit goes missing between the weighbridge
 and the docket. What the block leaves to me is short and physical:
-`used_by_agent` is my own name; an entry listed under `review.fragment_missing`
-has no fragment the record supports, so it gets one sentence from me or it
-comes off the box entirely, since an empty `fragment` is refused before
-filing; and any entry I don't cite comes off too, the rest renumbered.
+`used_by_agent` is my own name; a `review.fragment_missing` entry needs captured
+support or a faithful, honestly identified paraphrase of supplied findings,
+never an invented excerpt. Follow WRITING.md for missing support. Only unused entries outside the assignment's `evidence_refs` may be removed and the rest renumbered; required assignment
+evidence remains a blocker.
 `key_numbers` and `next_update_utc` are candidates — extracted, not chosen.
 Which number leads, whether the piece is fact or inference, the headline, the
 deck and every paragraph: none of that is in the block, and none of it should
