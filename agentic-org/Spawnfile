@@ -2,6 +2,11 @@ spawnfile_version: "0.1"
 kind: team
 name: clank-and-slop
 description: Bounded daily newspaper organization. Runtime admission is external and fail-closed.
+# Token policy: allow ordinary drafting and review revisions to finish.
+# Monitor former ceilings as warnings: reporters 4M; Spike/Caslon 5M;
+# Brass 6M; Ledger/Pressman 2M. Klaxon remains capped at 3M.
+# Execution caps still apply. Private host automation owns the separate
+# aggregate budget and pause alerts; these declarations retain hard ceilings.
 mode: hierarchical
 lead: brass
 shared:
