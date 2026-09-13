@@ -84,17 +84,13 @@ const section = (source, name) => {
 const resourceLine = (workspace, id) => workspace.split('\n').find((line) => line.includes(`{ id: ${id},`));
 const csv = (value) => value.split(',').map((item) => item.trim()).filter(Boolean);
 
-// The one federation link the newsroom is allowed to declare: a read-only
-// laptop observer reached over the Moltnet relay. Its transport coordinates are
-// pinned here on purpose — a relay room id that silently drifts out of sync with
-// ~/.moltnet/clank-observer/Moltnet produces no error, just an empty console.
-const OBSERVER_PAIRING_ID = 'clank-observer';
-const OBSERVER_NETWORK_ID = 'clank-observer';
-const OBSERVER_NETWORK_NAME = 'Clank & Slop Observer';
-const OBSERVER_PAIR_SECRET = 'CLANK_MOLTNET_PAIR_OBSERVER_TOKEN';
-const OBSERVER_RELAY_SECRET = 'CLANK_MOLTNET_RELAY_OBSERVER_TOKEN';
-const OBSERVER_RELAY_URL = 'wss://moltnet-relay.alicenet.workers.dev';
-const OBSERVER_RELAY_ROOM = 'VdoP-HC5isGQksHo5dYpnQ';
+// Pin both independent relay peers; neither is a runtime dependency.
+const DECLARED_PAIRINGS = [
+  { id: 'clank-observer', name: 'Clank & Slop Observer', pairSecret: 'CLANK_MOLTNET_PAIR_OBSERVER_TOKEN', relaySecret: 'CLANK_MOLTNET_RELAY_OBSERVER_TOKEN', room: 'VdoP-HC5isGQksHo5dYpnQ' },
+  { id: 'clank-luna', name: 'Luna operator liaison', pairSecret: 'CLANK_MOLTNET_PAIR_LUNA_TOKEN', relaySecret: 'CLANK_MOLTNET_RELAY_LUNA_TOKEN', room: 'JevE69AjzwXEk6fCBxAsug' },
+];
+const RELAY_URL = 'wss://moltnet-relay.alicenet.workers.dev';
+const LUNA_MEMBER = 'clank-luna:luna';
 
 export function declaredPairings(bytes) {
   const lines = bytes.split('\n');
@@ -208,21 +204,17 @@ export function validateRootDeclaration(bytes) {
   assert(consoleToken?.secret === 'CLANK_MOLTNET_CONSOLE_TOKEN' && consoleToken.scopes.join(',') === 'observe' && consoleToken.agents.length === 0, 'observe-only console token boundary invalid');
   const researchSensor = tokens.get('research-sensor');
   assert(researchSensor?.secret === 'CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN' && researchSensor.scopes.join(',') === 'attach,observe,write' && researchSensor.agents.join(',') === 'research-sensor', 'research sensor token boundary invalid');
-  assert(tokens.size === agents.length + 5, 'unexpected Moltnet token declaration');
-  // Narrowed federation policy. The newsroom still must not *depend* on
-  // federation: it runs identically whether the laptop observer is connected or
-  // not. What is now permitted is exactly one declared pairing — the read-only
-  // clank-observer relay link — carrying a pair-scoped credential bound to no
-  // agent. A second pairing, a different remote network, an inbound
-  // remote_base_url peer, or a pair token with agents or extra scopes still fails.
+  assert(tokens.size === agents.length + 6, 'unexpected Moltnet token declaration');
   const pairings = declaredPairings(bytes);
-  assert(pairings.length === 1, 'cloud Moltnet may declare exactly one read-only observer pairing');
-  const [pairing] = pairings;
-  assert(pairing.id === OBSERVER_PAIRING_ID && pairing.remote_network_id === OBSERVER_NETWORK_ID && pairing.remote_network_name === OBSERVER_NETWORK_NAME && pairing.token_secret === OBSERVER_PAIR_SECRET, 'observer pairing identity invalid');
-  assert(pairing.remote_base_url === undefined && pairing.relay !== undefined, 'observer pairing must reach the laptop over the relay, never an inbound base url');
-  assert(inlineField(pairing.relay, 'url') === OBSERVER_RELAY_URL && inlineField(pairing.relay, 'room') === OBSERVER_RELAY_ROOM && inlineField(pairing.relay, 'token_secret') === OBSERVER_RELAY_SECRET, 'observer relay transport must match the paired laptop coordinates');
-  const pairToken = tokens.get(OBSERVER_PAIRING_ID);
-  assert(pairToken?.secret === pairing.token_secret && pairToken.scopes.join(',') === 'pair' && pairToken.agents.length === 0, 'observer pair token must be pair-scoped, agent-free and bound to the pairing secret');
+  assert(pairings.length === DECLARED_PAIRINGS.length && new Set(pairings.map(pairing => pairing.id)).size === pairings.length, 'cloud Moltnet must declare exactly the observer and Luna pairings');
+  for (const expected of DECLARED_PAIRINGS) {
+    const pairing = pairings.find(candidate => candidate.id === expected.id);
+    assert(pairing?.remote_network_id === expected.id && pairing.remote_network_name === expected.name && pairing.token_secret === expected.pairSecret, `${expected.id} pairing identity invalid`);
+    assert(pairing.remote_base_url === undefined && pairing.relay !== undefined, `${expected.id} pairing must use the relay, never an inbound base url`);
+    assert(inlineField(pairing.relay, 'url') === RELAY_URL && inlineField(pairing.relay, 'room') === expected.room && inlineField(pairing.relay, 'token_secret') === expected.relaySecret, `${expected.id} relay transport must match the paired client coordinates`);
+    const pairToken = tokens.get(expected.id);
+    assert(pairToken?.secret === pairing.token_secret && pairToken.scopes.join(',') === 'pair' && pairToken.agents.length === 0, `${expected.id} pair token must be pair-scoped, agent-free and bound to the pairing secret`);
+  }
   assert(!/^\s+remote_base_url:/m.test(bytes), 'cloud Moltnet must not accept an inbound federation peer');
   assert(bytes.includes('id: gatherer') && bytes.includes('network: clank-newsroom') && bytes.includes('auth: { token_id: gatherer }') && bytes.includes('dms: { enabled: true }'), 'research intake participant invalid');
   assert(bytes.includes('id: research-sensor') && bytes.includes('auth: { token_id: research-sensor }'), 'direct research sensor participant invalid');
@@ -234,16 +226,15 @@ export function validateRootDeclaration(bytes) {
   const conference = rooms.get('conference');
   assert(conference !== undefined, 'conference room declaration missing');
   assert(conference !== undefined && !conference.members.includes('gatherer') && !conference.members.includes('research-sensor'), 'conference room must exclude external feeds');
-  // Every room, conference included, is either cloud-local or federated to the
-  // single read-only observer pairing and nothing else. The narrowing is about
-  // *who* may federate, never which room: `federation: all` stays forbidden so
-  // that adding a future pairing can never widen an existing room implicitly,
-  // and a room may never name a pairing this server does not declare.
-  assert([...rooms.values()].every((room) => room.federation === 'none' || room.federation === `[${OBSERVER_PAIRING_ID}]`), `Moltnet rooms must stay cloud-local or federate only to the read-only ${OBSERVER_PAIRING_ID} pairing`);
+  for (const [id, room] of rooms) {
+    assert(room.federation === '[clank-observer, clank-luna]', `${id} must federate only to the observer and Luna pairings`);
+    assert(room.members.includes(LUNA_MEMBER), `${id} must include the remote Luna operator`);
+    assert(room.members.filter(member => member.includes(':')).every(member => member === LUNA_MEMBER), `${id} has an unauthorized remote member`);
+  }
   assert(rooms.get('assignment')?.members.includes('gatherer'), 'assignment kickoff participant invalid');
   const research = rooms.get('research');
   assert(research?.members.includes('research-sensor'), 'research sensor local identity invalid');
-  assert(research && new Set(research.members).size === researchMembers.size && research.members.every((member) => researchMembers.has(member)), 'research room membership invalid');
+  assert(research && new Set(research.members).size === researchMembers.size + 1 && research.members.every((member) => member === LUNA_MEMBER || researchMembers.has(member)), 'research room membership invalid');
 }
 
 // What the publisher may NOT reach. The deploy key that pushes an edition
