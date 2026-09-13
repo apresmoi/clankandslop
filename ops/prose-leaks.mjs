@@ -23,6 +23,16 @@ const LEAK_PATTERNS = [
     message: 'reader-facing prose refers to the article as a filing; write the reported fact directly'
   },
   {
+    code: 'prepared_research_file',
+    pattern: /\b(?:the|this|our)\s+(?:(?:supplied|prepared)\s+(?:record|file)|story\s+file)\b/iu,
+    message: 'reader-facing prose names an internal research file; report the source finding and keep access details in provenance'
+  },
+  {
+    code: 'article_self_description',
+    pattern: /\bthe\s+(?:article|filing)\s+(?:can|cannot|can['’]t)\s+(?:say|make)\b/iu,
+    message: 'reader-facing prose describes the article or filing itself; state the supported news or consequential uncertainty directly'
+  },
+  {
     code: 'null_case_formula',
     pattern: /\bthe\s+null\s+(?:case|reading)\s+(?:is|has\s+to\s+be|must\s+be|needs\s+to\s+be)\b/iu,
     message: 'reader-facing prose exposes review/scaffolding language around the null case; state the caveat directly'
@@ -33,6 +43,9 @@ function readerFields(article) {
   const fields = [];
   for (const key of ['headline', 'deck', 'kicker']) if (isText(article?.[key])) fields.push({ path: `article.${key}`, text: article[key] });
   for (const [index, paragraph] of rows(article?.body).entries()) if (isText(paragraph)) fields.push({ path: `article.body[${index}]`, text: paragraph, citedFragments: citedFragments(article, paragraph) });
+  for (const [index, number] of rows(article?.key_numbers).entries()) {
+    for (const key of ['label', 'value']) if (isText(number?.[key])) fields.push({ path: `article.key_numbers[${index}].${key}`, text: number[key] });
+  }
   if (isText(article?.art?.caption)) fields.push({ path: 'article.art.caption', text: article.art.caption });
   if (isText(article?.art?.title)) fields.push({ path: 'article.art.title', text: article.art.title });
   if (isText(article?.presentation?.flashpoint?.note)) fields.push({ path: 'article.presentation.flashpoint.note', text: article.presentation.flashpoint.note });
