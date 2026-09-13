@@ -248,3 +248,55 @@ test('prose leak checks exempt only evidenced quoted spans', () => {
   assert.ok(articleFormatFindings(article, context).errors.some((error) => error.path === 'article.body[2]' && error.code === 'prose_leak'));
   assert.ok(articleFormatFindings(article, context).errors.some((error) => error.path === 'article.body[3]' && error.code === 'prose_leak'));
 });
+
+
+test('September 12 process leaks fail new filing without changing the frozen archive', () => {
+  for (const [id, owner, path] of [
+    ['s-879a23cb', 'graves', 'article.body[1]'],
+    ['s-ab60303c', 'tinkerton', 'article.body[0]'],
+    ['s-ab60303c', 'tinkerton', 'article.body[2]'],
+    ['s-b70d24bb', 'sprockett', 'article.body[3]'],
+    ['s-4bd5de6c', 'cogsworth', 'article.body[3]'],
+  ]) {
+    const article = read(`editions/2026-09-12/articles/${id}.json`);
+    const before = JSON.stringify(article);
+    const filing = articleFormatFindings(article, { ...context, owner });
+    assert.ok(filing.errors.some(error => error.path === path && error.code === 'prose_leak'), id);
+    assert.deepEqual(articleFormatFindings(article, { ...context, profile: 'archive' }).errors, []);
+    assert.equal(JSON.stringify(article), before);
+  }
+});
+
+test('key number labels and values cannot bypass the public prose gate', () => {
+  const article = structuredClone(fact);
+  article.key_numbers = [
+    { label: 'The supplied Record', value: 'Two rows' },
+    { label: 'Source', value: 'The story file does not establish the figure' },
+    { label: 'The assigned source row', value: 'No count' }
+  ];
+  assert.deepEqual(proseLeakFindings(article).map(row => row.path), [
+    'article.key_numbers[0].label',
+    'article.key_numbers[1].value',
+    'article.key_numbers[2].label'
+  ]);
+  assert.equal(articleFormatFindings(article, context).errors.filter(row => row.code === 'prose_leak').length, 3);
+});
+
+test('new leak checks preserve ordinary reporting, source notes and evidenced quotations', () => {
+  const article = structuredClone(fact);
+  article.body = [
+    'The company supplied records to the regulator, which prepared a report [E1].',
+    'An attacker-supplied file escaped the filter, while a user-supplied file did not [E1].',
+    'The court-prepared record and a specially prepared file supported the appeal [E1].',
+    'The court filing does not name a buyer; the public record remains incomplete [E1].',
+    'The agency supplied evidence to the committee, whose report does not establish the cause [E1].',
+    'The supplied fuel reached the port, while the record shows deliveries fell [E1].',
+    'The witness said “the story file does not establish the count” [E1].'
+  ];
+  article.key_numbers = [{ label: 'Public record', value: 'Two crossings' }];
+  article.evidence_box[0].fragment = 'the story file does not establish the count';
+  article.evidence_box[0].source_note.provenance_note = 'The supplied Record is a summary from the story file.';
+  assert.deepEqual(proseLeakFindings(article), []);
+  article.body.push('The article can say the crossing closed [E1].');
+  assert.deepEqual(proseLeakFindings(article).map(row => row.path), ['article.body[7]']);
+});
