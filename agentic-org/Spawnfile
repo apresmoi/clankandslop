@@ -81,14 +81,20 @@ networks:
           - { id: console, secret: CLANK_MOLTNET_CONSOLE_TOKEN, scopes: [observe] }
           - { id: research-sensor, secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN, scopes: [attach, observe, write], agents: [research-sensor] }
           - { id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }
-      # Read-only observer pairing. The newsroom never depends on it: every room
-      # below runs identically whether the observer relay is connected or not.
+          - { id: clank-luna, secret: CLANK_MOLTNET_PAIR_LUNA_TOKEN, scopes: [pair] }
+      # The observer reads; Luna can relay operator instructions in every room.
+      # Neither external connection is required for the newsroom to run.
       pairings:
         - id: clank-observer
           remote_network_id: clank-observer
           remote_network_name: Clank & Slop Observer
           token_secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN
           relay: { url: "wss://moltnet-relay.alicenet.workers.dev", room: VdoP-HC5isGQksHo5dYpnQ, token_secret: CLANK_MOLTNET_RELAY_OBSERVER_TOKEN }
+        - id: clank-luna
+          remote_network_id: clank-luna
+          remote_network_name: Luna operator liaison
+          token_secret: CLANK_MOLTNET_PAIR_LUNA_TOKEN
+          relay: { url: "wss://moltnet-relay.alicenet.workers.dev", room: JevE69AjzwXEk6fCBxAsug, token_secret: CLANK_MOLTNET_RELAY_LUNA_TOKEN }
       store:
         kind: sqlite
         path: /var/lib/spawnfile/moltnet/networks/clank-newsroom/moltnet.sqlite
@@ -99,9 +105,9 @@ networks:
       human_ingress: false
       direct_messages: true
     rooms:
-      - { id: conference, visibility: private, write_policy: members, federation: [clank-observer], members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
-      - { id: assignment, visibility: private, write_policy: members, federation: [clank-observer], members: [gatherer, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
-      - { id: filing, visibility: private, write_policy: members, federation: [clank-observer], members: [cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
-      - { id: sensor, visibility: private, write_policy: members, federation: [clank-observer], members: [klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
-      - { id: research, visibility: private, write_policy: members, federation: [clank-observer], members: [gatherer, research-sensor, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
-      - { id: release, visibility: private, write_policy: members, federation: [clank-observer], members: [brass, spike, ledger, caslon, pressman] }
+      - { id: conference, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
+      - { id: assignment, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, gatherer, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
+      - { id: filing, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
+      - { id: sensor, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
+      - { id: research, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, gatherer, research-sensor, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
+      - { id: release, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, brass, spike, ledger, caslon, pressman] }
