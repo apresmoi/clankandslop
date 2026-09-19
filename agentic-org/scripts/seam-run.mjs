@@ -55,6 +55,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
+import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, compiledArtifacts, compiledEngineFindings, grokBrokerFindings } from './engine-policy.mjs';
 
 export const DEFAULT_REPO = '/root/work/clankandslop';
 export const DEFAULT_CONTAINER = 'spawnfile-clank-and-slop';
@@ -230,35 +231,46 @@ export function build(options, { log = console.log } = {}) {
   return options.tag;
 }
 
-// --- stage 5: compiled Codex policy admission -------------------------------
+// --- stage 5: compiled engine policy admission ------------------------------
+// Was "compiled Codex policy admission", and it refused any organization with
+// no Codex agent in it — which is not a safety property, it is an assumption
+// about the roster. What it was protecting is: nothing reaches `up` unless
+// EVERY compiled agent carries its engine's confinement.
+//
+// Codex states that confinement on the agent (`engine.codexSandbox`). Grok
+// does not: its workers run behind Daimon's engine broker, and the
+// confinement is the broker apparatus the compiler renders into the container
+// entrypoint — a network-restricted Landlock profile pinned by digest, a
+// loopback-only provider proxy with backend search off, and a dedicated worker
+// uid per agent. So both artifacts are read here, and an engine this job has
+// no equivalent for is a refusal by name rather than a `continue`.
 export function runtimePolicy(options, { log = console.log } = {}) {
   if (!options.compiledOutput || !existsSync(options.compiledOutput)) throw new SeamError('compiled output missing after build', 'deploy-failed');
-  const configs = [];
-  const visit = directory => {
-    for (const entry of readdirSync(directory, { withFileTypes: true })) {
-      const candidate = path.join(directory, entry.name);
-      if (entry.isDirectory()) visit(candidate);
-      else if (entry.name === 'daimon-organization-runtime.json') configs.push(candidate);
-    }
-  };
-  visit(options.compiledOutput);
+  const configs = compiledArtifacts(options.compiledOutput, DAIMON_RUNTIME_CONFIG);
   if (!configs.length) throw new SeamError(`compiled output contains no Daimon organization runtime config: ${options.compiledOutput}`, 'deploy-failed');
   const failures = [];
-  let checked = 0;
+  const byEngine = new Map();
+  const grokAgents = new Map();
   for (const file of configs) {
     const config = JSON.parse(readFileSync(file, 'utf8'));
     for (const agent of config.agents ?? []) {
-      if (agent.engine?.kind !== 'codex') continue;
-      checked += 1;
-      const policy = agent.engine.codexSandbox;
-      if (!policy || policy.mode !== 'workspace-write' || policy.networkAccess !== false || policy.webSearch !== 'disabled' || Object.keys(policy).length !== 3)
-        failures.push(`${file}:${agent.id ?? 'agent'} missing strict Codex policy`);
+      const kind = agent.engine?.kind;
+      byEngine.set(kind, (byEngine.get(kind) ?? 0) + 1);
+      failures.push(...compiledEngineFindings(file, agent));
+      if (kind === 'grok' && agent.id) grokAgents.set(agent.id, { model: agent.engine.model, reasoningEffort: agent.engine.reasoningEffort });
     }
   }
-  if (!checked) failures.push('compiled organization has no Codex agents');
-  if (failures.length) throw new SeamError(`compiled Codex policy refusal:\n  ${failures.join('\n  ')}`, 'deploy-failed');
-  log(`compiled policy: ${checked} Codex agent(s) carry workspace-write, network-disabled, web-search-disabled policy`);
-  return { configs, checked };
+  const checked = [...byEngine.values()].reduce((total, count) => total + count, 0);
+  if (!checked) failures.push('compiled organization declares no agents at all — the policy check matched nothing, which is not the same as passing');
+  if (grokAgents.size) {
+    const entrypoints = compiledArtifacts(options.compiledOutput, DAIMON_UID_ENTRYPOINT);
+    if (!entrypoints.length) failures.push(`compiled output has ${grokAgents.size} Grok agent(s) but no ${DAIMON_UID_ENTRYPOINT}, so their broker confinement cannot be verified at all`);
+    for (const file of entrypoints) failures.push(...grokBrokerFindings(file, readFileSync(file, 'utf8'), grokAgents));
+  }
+  if (failures.length) throw new SeamError(`compiled engine policy refusal:\n  ${failures.join('\n  ')}`, 'deploy-failed');
+  const summary = [...byEngine.entries()].map(([kind, count]) => `${count} ${kind}`).join(', ');
+  log(`compiled policy: ${summary} agent(s) carry their engine's workspace, network-disabled and search-disabled confinement`);
+  return { configs, checked, engines: Object.fromEntries(byEngine) };
 }
 
 // --- stage 6: the deployment -------------------------------------------------
