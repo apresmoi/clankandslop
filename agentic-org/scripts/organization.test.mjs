@@ -9,6 +9,8 @@ import { measureSourceArchive, sourceDescriptorFindings } from './source-archive
 import { checkRuntime } from './check-runtime.mjs';
 import { provision } from './provision.mjs';
 import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
+import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
+import { parseManifest } from './check-instruction-budget.mjs';
 import { PUBLISHER_TOOLS, engineByAgent, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
 
 const messages = () => JSON.parse(readFileSync(new URL('../fixtures/daily-cycle.json', import.meta.url), 'utf8')).messages;
@@ -63,33 +65,53 @@ test('autonomy mutations fail closed', () => {
 });
 test('lifecycle release receipts reject duplicate publication and broken lineage', () => { const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts; assert.doesNotThrow(()=>validateLifecycle(source)); assert.throws(()=>validateLifecycle([...source,source.at(-1)]),/unique|cardinality/); const broken=structuredClone(source); broken.at(-1).causal_parent='missing'; assert.throws(()=>validateLifecycle(broken),/parent/); });
 test('receipt shape adapter rejects extra and missing fields',()=>{const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts;const extra=structuredClone(source);extra[0].unexpected=true;assert.throws(()=>validateLifecycle(extra),/shape/);const missing=structuredClone(source);delete missing[0].receipt_ref;assert.throws(()=>validateLifecycle(missing),/shape/);});
+// The invariant is NOT "everyone is on Codex" — that is a roster, and it was
+// encoded here as though it were a safety property, so moving the newsroom onto
+// Grok broke eight tests that were only ever asserting the old roster. What has
+// to hold is: every agent is assigned an engine that has a confinement contract,
+// and its Spawnfile declares that engine and nothing else.
 test('actual agent Spawnfile bytes select the assigned Daimon CLI engines', () => {
   assert.doesNotThrow(validateRuntimeBindings);
-  assert.deepEqual(engineByAgent, {
-    klaxon: 'codex', cogsworth: 'codex', sprockett: 'codex', foreman: 'codex', graves: 'codex', tinkerton: 'codex', vesta: 'codex',
-    brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', pressman: 'codex'
-  });
+  assert.deepEqual(Object.keys(engineByAgent).sort(), [...agents].sort());
+  for (const agent of agents) {
+    assert.ok(SUPPORTED_ENGINES.includes(engineByAgent[agent]), `${agent} must be assigned an engine with a confinement contract`);
+    assert.match(readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8'), new RegExp(`engine: ${engineByAgent[agent]}\\b`, 'u'), agent);
+  }
   const root = mkdtempSync(join(tmpdir(), 'clank-runtime-bindings-'));
   mkdirSync(join(root, 'agents', 'klaxon'), { recursive: true });
   const source = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
-  writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace('engine: codex', 'engine: agy'));
-  assert.throws(() => validateRuntimeBindings(root), /klaxon runtime engine declaration invalid/);
+  const declared = `engine: ${engineByAgent.klaxon}`;
+  // The Spawnfile moved off the assigned engine on its own, in both directions:
+  // onto the deferred one, and onto the other supported one.
+  for (const other of ['agy', ...SUPPORTED_ENGINES.filter((engine) => engine !== engineByAgent.klaxon)]) {
+    writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace(declared, `engine: ${other}`));
+    assert.throws(() => validateRuntimeBindings(root), /klaxon runtime engine declaration invalid/, other);
+  }
   writeFileSync(join(root, 'agents', 'klaxon', 'Spawnfile'), source.replace('execution:', 'policy: { mode: strict, on_degrade: error }\nexecution:'));
   assert.throws(() => validateRuntimeBindings(root), /klaxon must not override Spawnfile policy/);
 });
 test('Daimon engine declarations preserve their real model-auth boundary', () => {
-  // Every agent currently runs on Codex: the Grok sandbox cannot initialise under this
-  // deployment, so no Grok agent is declared. The validator still enforces that a Grok
-  // agent omits execution.model (Daimon owns its subscription auth); that branch is
-  // unexercised here until a Grok agent exists again, rather than faked against a Codex one.
+  // Per engine, against the contract in engine-policy.mjs, so this stays true
+  // whichever engine an agent is on. The exhaustive per-field mutations live in
+  // engine-policy.test.mjs; what is checked here is that the real declarations
+  // satisfy their own engine and that the validator refuses a broken one.
   for (const agent of agents) {
-    const codex = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
-    assert.doesNotThrow(() => validateAgentDeclaration(agent, codex));
-    assert.match(codex, /name: gpt-5\.5/u, `${agent} must declare the supported Codex account model`);
-    assert.doesNotMatch(codex, /gpt-5\.4-mini/u, `${agent} must not declare the retired Codex account model`);
+    const bytes = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.doesNotThrow(() => validateAgentDeclaration(agent, bytes));
+    const primary = parseManifest(bytes).execution?.model?.primary;
+    if (engineByAgent[agent] === 'codex') {
+      assert.equal(primary.name, 'gpt-5.5', `${agent} must declare the supported Codex account model`);
+      assert.doesNotMatch(bytes, /gpt-5\.4-mini/u, `${agent} must not declare the retired Codex account model`);
+    } else {
+      assert.equal(primary.provider, 'xai', agent);
+      assert.equal(primary.auth?.method, 'grok', `${agent} must reach Grok through Daimon's broker, never an API key`);
+      assert.ok(GROK_BROKER.models.includes(primary.name) && GROK_BROKER.efforts.includes(primary.reasoning_effort), `${agent} must pin a brokered model and effort`);
+    }
   }
   const brass = readFileSync(resolve(import.meta.dirname, '../agents/brass/Spawnfile'), 'utf8');
-  assert.throws(() => validateAgentDeclaration('brass', brass.replace('method: codex', 'method: none')), /Codex subscription intent/);
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace('method: grok', 'method: api_key')), /Grok broker auth invalid/u);
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace('reasoning_effort: low', 'reasoning_effort: xhigh')), /Grok reasoning_effort invalid/u);
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace('name: grok-4.6', 'name: grok-9')), /Grok broker model invalid/u);
 });
 test('workspace resources enforce public modes and private corpus least privilege', () => {
   const scout = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
