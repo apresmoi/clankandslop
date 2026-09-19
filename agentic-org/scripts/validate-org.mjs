@@ -5,6 +5,7 @@ import { validateLifecycleGraph } from './lifecycle-graph.mjs';
 import { isBerlinRelease } from './release-time.mjs';
 import { runtimeToolFindings } from './tool-bundle-contract.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
+import { SUPPORTED_ENGINES, engineDeclarationFindings } from './engine-policy.mjs';
 
 const TYPES = new Set(['ASSIGNMENT', 'ACK', 'PINPOINT_REQUEST', 'PINPOINT_CLAIM', 'PINPOINT_RESULT', 'PINPOINT_NOT_FOUND', 'FILED', 'REVISION_REQUEST', 'REFILED', 'PASS', 'HOLD', 'SPIKE', 'COMPOSITION_ISSUE', 'COMPOSED', 'RELEASE_HANDOFF']);
 const TERMINALS = { ACK: 'ACKED', PINPOINT_CLAIM: 'CLAIMED', PINPOINT_RESULT: 'CLAIMED', PINPOINT_NOT_FOUND: 'CLAIMED', FILED: 'FILED', REVISION_REQUEST: 'REVISION_REQUESTED', REFILED: 'REFILED', PASS: 'PASSED', HOLD: 'HELD', SPIKE: 'SPIKED', COMPOSED: 'COMPOSED', RELEASE_HANDOFF: 'HANDED_OFF' };
@@ -61,9 +62,14 @@ export function validateMessage(message, prior = []) {
 }
 
 export function validateManifest(manifest) { for (const artifact of manifest.artifacts) { assert(privateKinds.has(artifact.kind), 'unknown private kind'); assert(artifact.path.startsWith(`${artifact.kind}/`) && digest.test(artifact.digest), 'private manifest artifact invalid'); } }
+// The roster is the DECLARED assignment, not a derivation from the tree: an
+// engine flip has to be made here and in the Spawnfile, so neither one alone
+// can move an agent onto a different runtime. What each engine then has to
+// declare lives in engine-policy.mjs, per engine, so an unknown engine is a
+// refusal instead of an unchecked pass.
 export const engineByAgent = Object.freeze({
-  klaxon: 'codex', cogsworth: 'codex', sprockett: 'codex', foreman: 'codex', graves: 'codex', tinkerton: 'codex', vesta: 'codex',
-  brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', pressman: 'codex'
+  klaxon: 'grok', cogsworth: 'grok', sprockett: 'grok', foreman: 'grok', graves: 'grok', tinkerton: 'grok', vesta: 'grok',
+  brass: 'grok', spike: 'grok', ledger: 'grok', caslon: 'grok', pressman: 'grok'
 });
 
 const corpusAgents = new Set(['klaxon']);
@@ -137,18 +143,13 @@ export function validateAgentDeclaration(agent, bytes) {
   const execution = section(bytes, 'execution');
   const surfaces = section(bytes, 'surfaces');
   const workspace = section(bytes, 'workspace');
-  assert(runtime.includes(`engine: ${engine}`), `${agent} runtime engine declaration invalid`);
   const manifest = parseManifest(bytes);
+  const engineErrors = engineDeclarationFindings(agent, engine, manifest);
+  assert(engineErrors.length === 0, engineErrors.join('; '));
   assert(JSON.stringify(manifest.workspace?.docs) === JSON.stringify({system: 'AGENTS.md', soul: 'SOUL.md'}), `${agent} must compile AGENTS.md and SOUL.md, leaving task details in the mounted RUNBOOK.md`);
   const attention = manifest.runtime?.options?.attention;
   assert(attention && ['max_batch_messages', 'max_batch_bytes', 'max_executions', 'max_tokens'].every(key => Number.isSafeInteger(attention[key]) && attention[key] > 0), `${agent} explicit bounded attention declaration required`);
   assert(execution.includes('sandbox:\n    mode: workspace'), `${agent} workspace sandbox declaration invalid`);
-  if (engine === 'codex') {
-    assert(execution.includes('provider: openai') && execution.includes('method: codex') && !execution.includes('endpoint:'), `${agent} Codex subscription intent invalid`);
-  } else {
-    assert(!/^\s+model:/m.test(execution), `${agent} Daimon ${engine} execution.model must be omitted`);
-  }
-  assert(!bytes.includes('engine: agy'), `${agent} must not declare deferred AGY engine`);
   assert(!/^policy:/m.test(bytes), `${agent} must not override Spawnfile policy`);
   assert(surfaces.includes('network: clank-newsroom') && surfaces.includes(`token_id: ${agent}`), `${agent} Moltnet binding invalid`);
   assert(surfaces.includes('research:') === researchMembers.has(agent), `${agent} research room binding invalid`);
@@ -272,6 +273,7 @@ export function validatePublisherSurface(bytes) {
 
 export function validateRuntimeBindings(root = orgRoot) {
   assert(Object.keys(engineByAgent).length === agents.length, 'runtime assignment incomplete');
+  for (const agent of agents) assert(SUPPORTED_ENGINES.includes(engineByAgent[agent]), `${agent} is assigned engine ${engineByAgent[agent] ?? 'none'}, which has no confinement contract in engine-policy.mjs`);
   assert(policy.enginePolicy?.active?.grok === 10 && policy.enginePolicy?.active?.codex === 6, 'active engine policy invalid');
   assert(policy.enginePolicy?.agy?.hostAuthCheck === true && policy.enginePolicy?.agy?.linuxPortable === false && policy.enginePolicy?.agy?.status === 'deferred-broker', 'AGY portability policy invalid');
   for (const agent of agents) {

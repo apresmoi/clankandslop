@@ -4,20 +4,20 @@ name: foreman
 runtime:
   name: daimon
   options:
-    engine: codex
+    engine: grok
     attention:
       max_batch_messages: 8
       max_batch_bytes: 12000
       max_executions: 30
       max_tokens: 8000000
-    codex_policy: workspace-no-network
 execution:
   model:
     primary:
-      provider: openai
-      name: gpt-5.5
+      provider: xai
+      name: grok-4.6
       auth:
-        method: codex
+        method: grok
+      reasoning_effort: low
   sandbox:
     mode: workspace
 schedule:
@@ -44,7 +44,7 @@ workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:beb200e68d9f59ca8b954b420dd42345f960ca5a6eb7d0261201182d5f1a17be, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:5038c93f2f383b47f6575eb05de13a9b100942a20336ba6d9178d37f0a145535, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:899ada96bfafc0140657515de138c2a3c266008248b3d9345d15febdb3f4436a, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
     - { id: article-validation, kind: bundle, source: ../../article-validation-runtime.tar, sha256: sha256:f989562895409311130e5d2bd01ac7a246c6acb9a946f4e21ae3c81f59880fa0, mount: ./tools/article-validation, mode: readonly }
 

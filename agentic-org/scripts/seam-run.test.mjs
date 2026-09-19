@@ -5,6 +5,7 @@ import { mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, runtimeBootstrap, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
+import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -72,7 +73,7 @@ test('compiled policy admission rejection stops before provider spawn', () => {
 
 test('compiled policy admission accepts generated strict config and rejects weak or missing policy', () => {
   const root = mkdtempSync(path.join(tmpdir(), 'clank-policy-test-'));
-  const file = path.join(root, 'daimon-organization-runtime.json');
+  const file = path.join(root, DAIMON_RUNTIME_CONFIG);
   const write = (engine) => writeFileSync(file, JSON.stringify({ agents: [{ id: 'pressman', engine }] }));
   try {
     write({ kind: 'codex', codexSandbox: { mode: 'workspace-write', networkAccess: false, webSearch: 'disabled' } });
@@ -81,6 +82,57 @@ test('compiled policy admission accepts generated strict config and rejects weak
     assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /missing strict Codex policy/u);
     write({ kind: 'codex', codexSandbox: { mode: 'workspace-write', networkAccess: true, webSearch: 'disabled' } });
     assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /missing strict Codex policy/u);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// A Grok-only organization — what the newsroom now compiles to. The old stage
+// refused this outright ("compiled organization has no Codex agents"); what it
+// has to do instead is check the confinement Grok actually has, which lives in
+// the rendered broker provisioning rather than on the agent.
+const GROK_ENTRYPOINT = [
+  `const config = '[model.daimon-broker-grok]\\nmodel = "grok-4.6"\\nbase_url = "${GROK_BROKER.providerProxy}"\\nsupports_backend_search = false\\nweb_fetch = false\\n';`,
+  `const profile = '[profiles.daimon-strict]\\nextends = "strict"\\nrestrict_network = true\\ndeny = []\\n';`,
+  `const service = {"version":"${GROK_BROKER.serviceVersionPrefix}2","registrations":[{"agentId":"agent:brass","slot":0,"workerUid":2200,"profileSha256":"${'a'.repeat(64)}","model":{"id":"grok-4.6","reasoningEffort":"low"}}]};`
+].join('\n');
+
+test('a Grok-only organization is admitted on its broker confinement, and refused without it', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-grok-policy-'));
+  const rootfs = path.join(root, 'container', 'rootfs', 'opt', 'spawnfile');
+  mkdirSync(rootfs, { recursive: true });
+  const config = path.join(root, DAIMON_RUNTIME_CONFIG);
+  const entrypoint = path.join(rootfs, DAIMON_UID_ENTRYPOINT);
+  const write = (engine) => writeFileSync(config, JSON.stringify({ agents: [{ id: 'agent:brass', engine }] }));
+  try {
+    write({ kind: 'grok', model: 'grok-4.6', reasoningEffort: 'low' });
+    writeFileSync(entrypoint, GROK_ENTRYPOINT);
+    assert.deepEqual(runtimePolicy({ compiledOutput: root }, { log: noop }).engines, { grok: 1 });
+
+    // The network restriction, the search restriction and the model/effort pin,
+    // one at a time — the three things the Codex check asserted directly.
+    writeFileSync(entrypoint, GROK_ENTRYPOINT.replace('restrict_network = true', 'restrict_network = false'));
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /networkAccess:false/u);
+    writeFileSync(entrypoint, GROK_ENTRYPOINT.replace('supports_backend_search = false', 'supports_backend_search = true'));
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /webSearch:disabled/u);
+    writeFileSync(entrypoint, GROK_ENTRYPOINT);
+    write({ kind: 'grok', model: 'grok-4.6', reasoningEffort: 'high' });
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /does not pin grok-4\.6\/high/u);
+
+    // No entrypoint at all is the case that must never read as a pass: an
+    // unverifiable confinement is not an exempt one.
+    write({ kind: 'grok', model: 'grok-4.6', reasoningEffort: 'low' });
+    rmSync(entrypoint);
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /no daimon-uid-entrypoint\.sh/u);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('an engine the job has no policy for stops the deploy instead of being skipped', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-engine-policy-'));
+  const file = path.join(root, DAIMON_RUNTIME_CONFIG);
+  try {
+    writeFileSync(file, JSON.stringify({ agents: [{ id: 'agent:klaxon', engine: { kind: 'agy' } }] }));
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /has no deploy-time policy equivalent/u);
+    writeFileSync(file, JSON.stringify({ agents: [] }));
+    assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /matched nothing, which is not the same as passing/u);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
