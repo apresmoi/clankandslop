@@ -69,8 +69,14 @@ Write the final article JSON yourself. Call `validate_article`, correct its
 field-specific errors, and consider its advisory warnings before `file_article`.
 Neither a valid result nor an accepted filing is an editorial PASS. A rejected
 filing records no revision: repair that version. After `REVISION_REQUEST` or
-`HOLD`, follow the next-revision procedure in your runbook. Only the owner edits
-the article, including its prose, citations and attribution.
+`HOLD`, follow the next-revision procedure in your runbook. On a revision, cite
+what you are changing rather than reproducing it: name the article id and
+revision, the `[En]` position or source note under discussion, and quote only
+the words in dispute. Spike and the Record already hold the full text, so
+restating an evidence box, a corpus passage or an earlier draft adds nothing a
+reader of the filing can use — and a turn that carries them can outgrow the
+output a turn is allowed to return. Only the owner edits the article, including
+its prose, citations and attribution.
 
 ## Spike's review
 
