@@ -127,6 +127,45 @@ test('a process outside the steady-state set blocks the deploy', () => {
   assert.deepEqual(result.observed.extraProcesses, ['codex exec --sandbox danger-full-access']);
 });
 
+// Copied verbatim from `docker exec spawnfile-clank-and-slop ps -eo pid,ppid,args`
+// on 2026-09-20, on an idle Grok organization that had just finished two turns.
+// The first four lines are boot-time processes; the four zombies are what those
+// two turns left behind, two per turn, which nothing reaps.
+const GROK_BROKER_PS = [
+  '  227     1 /opt/daimon/bin/daimon-engine-broker',
+  '  233     1 node /opt/spawnfile/runtime-installs/daimon/bin/daimon-runtime engine-broker serve',
+  '  266   233 /bin/sh -c "$1" --exclusive --nonblock --conflict-exit-code 73 3 || exit 73; printf "ready\\n"; IFS= read -r _hold || : daimon-grok-broker-lease flock',
+  '  276     1 /opt/daimon/bin/daimon-engine-broker --relay',
+  ' 1089   276 [daimon-engine-b] <defunct>',
+  ' 1091   227 [daimon-engine-b] <defunct>',
+  ' 1137   276 [daimon-engine-b] <defunct>',
+  ' 1139   227 [daimon-engine-b] <defunct>'
+].join('\n');
+
+test('an idle Grok broker is steady state, not work in flight', () => {
+  // Before this, the gate refused every Grok deployment with eight findings and
+  // the seam could never reach repin. The broker is as permanent as the runtime.
+  const ps = `${IDLE_PS}\n${GROK_BROKER_PS}`;
+  assert.deepEqual(foreignProcesses(ps), []);
+  const result = quiescence('c', { exec: container([], { ps }), inspect: healthy, now: at('2026-09-06T09:00:00Z') });
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.quiet, true);
+});
+
+test('a Grok worker mid-turn still blocks the deploy', () => {
+  // What the broker excuses is two exact argv forms, not the string
+  // "daimon-engine-broker" wherever it appears. Both rows below are refusals:
+  // the bwrap'd CLI a worker actually is, and any broker argv that is not one
+  // of the two the container boots with — an unanchored pattern would excuse
+  // the second, which is the whole reason the patterns are anchored.
+  const worker = 'bwrap --unshare-all --die-with-parent /usr/local/bin/grok --config /var/lib/spawnfile/daimon/worker-2200/grok.toml';
+  const spawned = '/opt/daimon/bin/daimon-engine-broker --worker --slot 3';
+  const ps = `${IDLE_PS}\n${GROK_BROKER_PS}\n 1400   227 ${worker}\n 1401   227 ${spawned}`;
+  const result = quiescence('c', { exec: container([], { ps }), inspect: healthy, now: at('2026-09-06T09:00:00Z') });
+  assert.match(result.findings.join(' '), /outside the steady-state set/u);
+  assert.deepEqual(result.observed.extraProcesses, [worker, spawned]);
+});
+
 test('a container that cannot be read is NOT quiet — the check fails closed', () => {
   const unreadable = quiescence('nope', { inspect: () => { throw new Error('No such container'); } });
   assert.equal(unreadable.quiet, false);
