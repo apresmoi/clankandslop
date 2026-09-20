@@ -44,7 +44,30 @@ export const BUSY_STATES = Object.freeze(new Set(['accepted', 'running']));
 // The processes a healthy idle container always has: the two entrypoints, the
 // Moltnet server, the organization runtime, and one Moltnet node per agent.
 // Anything else running under the runtime is work in flight.
-export const STEADY_STATE = Object.freeze([/daimon-uid-entrypoint\.sh/u, /\/opt\/spawnfile\/entrypoint\.sh/u, /moltnet start --config/u, /moltnet node /u, /daimon-runtime run --config/u]);
+//
+// A Grok organization adds four more, all started at container boot and all
+// still there when nothing is running: the native engine broker, its relay,
+// the `daimon-runtime engine-broker serve` supervisor, and the `flock` holding
+// `daimon-grok-broker-lease` open. Without them here the gate refused every
+// Grok deployment with eight `seam-blocked` findings — the pipeline could not
+// run at all, because the broker is exactly as permanent as the runtime is.
+//
+// The reaped `[daimon-engine-b] <defunct>` entries are listed for the same
+// reason and are not the same claim. Each Grok turn leaves two zombies behind
+// (one under the broker, one under the relay) and nothing reaps them, so after
+// the first turn of any edition the gate would block forever. A zombie is a
+// dead child awaiting a wait(2), never work in flight.
+//
+// Each pattern is anchored end to end. A worker mid-turn is a `bwrap`/CLI
+// process under the broker, not the broker, and must still block the deploy —
+// an unanchored `daimon-engine-broker` would have excused it.
+export const STEADY_STATE = Object.freeze([
+  /daimon-uid-entrypoint\.sh/u, /\/opt\/spawnfile\/entrypoint\.sh/u, /moltnet start --config/u, /moltnet node /u, /daimon-runtime run --config/u,
+  /^\/opt\/daimon\/bin\/daimon-engine-broker(?: --relay)?$/u,
+  /^node \S*daimon-runtime engine-broker serve$/u,
+  /daimon-grok-broker-lease/u,
+  /^\[daimon-engine-b[a-z]*\] <defunct>$/u
+]);
 // `docker exec … sh -c 'ps …'` shows up in its own output as the shell plus the
 // ps it spawned. Excluding those by pattern would mean excluding `sh -c`, which
 // is exactly the shape an engine turn takes — so the probe carries a sentinel
