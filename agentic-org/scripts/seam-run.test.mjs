@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, runtimeBootstrap, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
+import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
@@ -371,6 +371,64 @@ test('the build refuses to start below the disk floor, after reclaiming what it 
     log: () => undefined,
     exec: () => 'avail\nnot-a-number\n'
   }), (error) => error.reason === 'seam-blocked' && /unreadable free space/u.test(error.message));
+});
+
+test('the compiled-output scratch is swept, bounded, and never the tree this run will write', () => {
+  // Twelve of these had accumulated on the host by 2026-09-20 — 8.2GB, more
+  // than the images the tag sweep bounds — and they are what pushed the box
+  // under its own build floor. Exercised against a real directory rather than
+  // stubs, because "did the bytes actually go" is the whole claim.
+  const repo = mkdtempSync(path.join(tmpdir(), 'clank-scratch-test-'));
+  const root = path.join(repo, '.runtime');
+  const make = (name, at) => {
+    const dir = path.join(root, name);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, 'container.json'), '{}');
+    utimesSync(dir, at, at);
+    return dir;
+  };
+  try {
+    const tag = 'clank-and-slop:seam-2026-09-20-061603';
+    const current = make(`seam-compiled-${tag.replace(/[^a-zA-Z0-9_.-]/gu, '_')}`, 100);
+    const newest = make('seam-compiled-clank-and-slop_seam-2026-09-19-020345_', 90);
+    const second = make('seam-compiled-clank-and-slop_seam-2026-09-19-020003_', 80);
+    const stale = ['a', 'b', 'c'].map((suffix, index) => make(`seam-compiled-clank-and-slop_seam-2026-09-1${index}-0000${suffix}`, 10 + index));
+    const unrelated = make('some-other-scratch', 5);
+
+    sweepCompiledOutputs({ repo, tag }, { log: () => undefined });
+
+    // The current run's tree survives even though it is the newest: it is about
+    // to be written into, and `keep` is counted over the others.
+    assert.ok(existsSync(current), 'the tree this run will write must never be swept');
+    assert.ok(existsSync(newest) && existsSync(second), 'the two most recent other trees are kept');
+    assert.ok(existsSync(unrelated), 'only the seam-compiled- prefix is ever touched');
+    for (const dir of stale) assert.ok(!existsSync(dir), `${dir} should have been retired`);
+    assert.deepEqual(readdirSync(root).sort(), [
+      'seam-compiled-clank-and-slop_seam-2026-09-19-020003_',
+      'seam-compiled-clank-and-slop_seam-2026-09-19-020345_',
+      `seam-compiled-${tag.replace(/[^a-zA-Z0-9_.-]/gu, '_')}`,
+      'some-other-scratch'
+    ].sort());
+
+    // A missing .runtime is a no-op, not a crash: the first seam on a fresh
+    // checkout has nothing to sweep and must still reach the floor check.
+    rmSync(root, { recursive: true, force: true });
+    assert.doesNotThrow(() => sweepCompiledOutputs({ repo, tag }, { log: () => undefined }));
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('reclaiming disk sweeps the compiled-output scratch as well as the image tags', () => {
+  const swept = [];
+  const calls = [];
+  reclaimBuildSpace({ repo: '/root/work/clankandslop', tag: 'clank-and-slop:seam-2026-09-20-010101' }, {
+    log: () => undefined,
+    exec: (command, args) => { calls.push(`${command} ${args[0]}`); return command === 'df' ? `avail\n${12 * 1024 ** 3}\n` : ''; },
+    sweepScratch: (options) => swept.push(options.tag)
+  });
+  assert.deepEqual(swept, ['clank-and-slop:seam-2026-09-20-010101']);
+  assert.ok(calls.includes('docker images'), 'the image tag sweep still runs too');
 });
 
 test('the seam reclaims before it builds, never after', () => {
