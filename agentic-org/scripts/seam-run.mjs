@@ -51,7 +51,7 @@
 // Every stage that fails raises the alarm (alarm.mjs) before exiting non-zero.
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
@@ -67,6 +67,17 @@ export const DEFAULT_DEPLOY_USER = 'clank';
 // `local<n>`, and so the retention sweep below can only ever touch its own.
 export const TAG_PREFIX = 'clank-and-slop:seam-';
 export const KEEP_IMAGES = 3;
+// `build` writes the compiler's whole output tree to
+// `.runtime/seam-compiled-<tag>/` and nothing ever removed it. Twelve of them
+// had accumulated by 2026-09-20 — 8.2GB of pure scratch on a 75GB disk, more
+// than the images the sweep above bounds — and a run that leaves the host below
+// its own build floor blocks the next one. Two are kept: the live deployment's
+// tree and the one before it, which is what a "what changed in the compiled
+// output" comparison needs. Everything in them is a pure function of the tree
+// and the tag, so a deleted one is reproducible by rebuilding.
+export const COMPILED_OUTPUT_DIR = '.runtime';
+export const COMPILED_OUTPUT_PREFIX = 'seam-compiled-';
+export const KEEP_COMPILED_OUTPUTS = 2;
 // Archives an agent may pin that newsroom-runtime-bundle.json deliberately does
 // not describe, because org:bundle does not build them.
 export const KNOWN_UNDESCRIBED = Object.freeze(['etopo-relief.tar']);
@@ -235,7 +246,7 @@ export function assertPinsMatchDescriptor(options, { log = console.log } = {}) {
 // halfway through an image export.
 export const BUILD_FLOOR_BYTES = 10 * 1024 * 1024 * 1024;
 
-export function reclaimBuildSpace(options, { log = console.log, exec = execFileSync, floorBytes = BUILD_FLOOR_BYTES } = {}) {
+export function reclaimBuildSpace(options, { log = console.log, exec = execFileSync, floorBytes = BUILD_FLOOR_BYTES, sweepScratch = sweepCompiledOutputs } = {}) {
   const free = () => {
     const line = exec('df', ['-B1', '--output=avail', options.repo], { stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim().split('\n').at(-1);
     const bytes = Number(String(line).trim());
@@ -248,6 +259,7 @@ export function reclaimBuildSpace(options, { log = console.log, exec = execFileS
   try { exec('docker', ['builder', 'prune', '-af', '--filter', 'until=24h'], { stdio: ['ignore', 'pipe', 'pipe'] }); }
   catch (error) { log(`  (build cache prune skipped: ${String(error.message).trim().slice(0, 120)})`); }
   sweepImages(options, { log, exec });
+  sweepScratch(options, { log });
   const after = free();
   log(`disk: ${gib(before)} free before reclaim, ${gib(after)} after (floor ${gib(floorBytes)})`);
   if (after < floorBytes) {
@@ -256,9 +268,34 @@ export function reclaimBuildSpace(options, { log = console.log, exec = execFileS
   return { before, after };
 }
 
+// The scratch equivalent of sweepImages: bounded, prefix-scoped, and it never
+// touches the tree THIS run is about to write. Sorted by modification time
+// rather than by the timestamp in the name, because the name is the image tag
+// and a rebuild of an older tag is still the newer tree.
+export function sweepCompiledOutputs(options, { log = console.log, keep = KEEP_COMPILED_OUTPUTS, list = readdirSync, stat = statSync, remove = rmSync } = {}) {
+  const root = path.join(options.repo, COMPILED_OUTPUT_DIR);
+  const current = path.basename(compiledOutputPath(options));
+  try {
+    const trees = list(root)
+      .filter((name) => name.startsWith(COMPILED_OUTPUT_PREFIX) && name !== current)
+      .map((name) => ({ name, at: Number(stat(path.join(root, name)).mtimeMs) }))
+      .sort((a, b) => b.at - a.at);
+    for (const tree of trees.slice(keep)) {
+      try { remove(path.join(root, tree.name), { recursive: true, force: true }); log(`  retired compiled output ${tree.name}`); }
+      catch (error) { log(`  (could not retire ${tree.name}: ${String(error.message).trim().slice(0, 120)})`); }
+    }
+  } catch (error) { log(`  (compiled output sweep skipped: ${String(error.message).trim().slice(0, 120)})`); }
+}
+
 // --- stage 4: the image ------------------------------------------------------
+// One definition of where the compiler writes, so the sweep above and the build
+// below cannot disagree about which tree belongs to this run.
+export function compiledOutputPath(options) {
+  return path.join(options.repo, COMPILED_OUTPUT_DIR, `${COMPILED_OUTPUT_PREFIX}${String(options.tag ?? '').replace(/[^a-zA-Z0-9_.-]/gu, '_')}`);
+}
+
 export function build(options, { log = console.log } = {}) {
-  options.compiledOutput = path.join(options.repo, '.runtime', `seam-compiled-${options.tag.replace(/[^a-zA-Z0-9_.-]/gu, '_')}`);
+  options.compiledOutput = compiledOutputPath(options);
   run('build', 'deploy-failed', process.execPath, [options.cli, 'build', path.join(options.repo, 'agentic-org'), '--tag', options.tag, '--out', options.compiledOutput], { cwd: options.repo, log });
   return options.tag;
 }
