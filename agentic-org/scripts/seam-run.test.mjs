@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, runtimeBootstrap, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
+import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, runtimeBootstrap, runtimePolicy, seam, settle, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
@@ -16,7 +16,7 @@ const repoRoot = path.resolve(import.meta.dirname, '..', '..');
 function recorder(failAt, error = new SeamError('boom', 'deploy-failed')) {
   const calls = [];
   const stage = (name) => (options) => { calls.push(name); if (name === failAt) throw error; return options; };
-  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages'].map((name) => [name, stage(name)])) };
+  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages'].map((name) => [name, stage(name)])) };
 }
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
 
@@ -28,7 +28,7 @@ test('the repin runs BEFORE the bundle, always', () => {
   const { calls, impl } = recorder(null);
   const result = seam([], { now, log: noop, stageImpl: impl, alarm: noop });
   assert.equal(result.ok, true);
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages']);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages']);
   assert.ok(calls.indexOf('repin') < calls.indexOf('bundle'));
 });
 
@@ -52,7 +52,7 @@ test('check mode stops after the bundle check and never builds or deploys', () =
 test('no-deploy builds the image and stops before `up`', () => {
   const { calls, impl } = recorder(null);
   seam(['--no-deploy'], { now, log: noop, stageImpl: impl, alarm: noop });
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy']);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
 });
 
 test('compiled Codex policy admission runs after build and before deploy', () => {
@@ -67,7 +67,7 @@ test('compiled policy admission rejection stops before provider spawn', () => {
   const { alarm } = alarms();
   const result = seam([], { now, log: noop, stageImpl: impl, alarm });
   assert.equal(result.ok, false);
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'build', 'runtimePolicy']);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
   assert.ok(!calls.includes('deploy'));
 });
 
@@ -340,4 +340,50 @@ test('policy checks every Codex member across nested compiled configs', () => {
     writeFileSync(nested, JSON.stringify({ agents: agents.slice(6) }));
     assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /agent-11 missing strict/u);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// --- stage 3b: room to build in ---------------------------------------------
+test('the build refuses to start below the disk floor, after reclaiming what it safely can', () => {
+  const calls = [];
+  const exec = (avail) => (command, args) => {
+    calls.push(`${command} ${args[0]}`);
+    if (command === 'df') return `avail\n${avail()}\n`;
+    return '';
+  };
+  let free = 4 * 1024 ** 3;
+  // Reclaim first, floor second: the prune is what usually clears the failure.
+  const reclaimed = reclaimBuildSpace({ repo: '/root/work/clankandslop', tag: 'clank-and-slop:seam-2026-09-20-010101' }, {
+    log: () => undefined,
+    exec: exec(() => { const now = free; free = 12 * 1024 ** 3; return now; })
+  });
+  assert.deepEqual([reclaimed.before, reclaimed.after], [4 * 1024 ** 3, 12 * 1024 ** 3]);
+  assert.ok(calls.includes('docker builder'), calls.join(', '));
+  assert.ok(calls.includes('docker images'), 'the existing image sweep still runs');
+
+  // Still short after reclaiming: refuse while the deployment is whole.
+  assert.throws(() => reclaimBuildSpace({ repo: '/root/work/clankandslop', tag: 't' }, {
+    log: () => undefined,
+    exec: exec(() => 9 * 1024 ** 3)
+  }), (error) => error.reason === 'seam-blocked' && /below the 10\.0GiB floor/u.test(error.message));
+
+  // An unreadable df is a refusal too, never an assumed pass.
+  assert.throws(() => reclaimBuildSpace({ repo: '/x', tag: 't' }, {
+    log: () => undefined,
+    exec: () => 'avail\nnot-a-number\n'
+  }), (error) => error.reason === 'seam-blocked' && /unreadable free space/u.test(error.message));
+});
+
+test('the seam reclaims before it builds, never after', () => {
+  const order = [];
+  const stub = (name, result) => (...args) => { order.push(name); return result ?? args[0]; };
+  const stageImpl = {
+    gate: stub('gate'), repin: stub('repin'), bundle: stub('bundle'),
+    reclaimBuildSpace: stub('reclaimBuildSpace'), build: stub('build'),
+    runtimePolicy: stub('runtimePolicy'), deploy: stub('deploy'), settle: stub('settle'),
+    runtimeBootstrap: stub('runtimeBootstrap'), sweepImages: stub('sweepImages')
+  };
+  const result = seam(['--edition=2026-09-19', '--ref=edition/2026-09-19'], { log: () => undefined, alarm: () => undefined, stageImpl });
+  assert.equal(result.ok, true);
+  assert.ok(order.indexOf('reclaimBuildSpace') < order.indexOf('build'), order.join(' -> '));
+  assert.ok(order.indexOf('bundle') < order.indexOf('reclaimBuildSpace'), order.join(' -> '));
 });
