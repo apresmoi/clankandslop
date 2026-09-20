@@ -10,6 +10,10 @@ runtime:
       max_batch_bytes: 12000
       max_executions: 30
       max_tokens: 8000000
+    turn_limits:
+      max_tokens: 1100000
+      timeout_ms: 900000
+      max_requests: 48
 execution:
   model:
     primary:
