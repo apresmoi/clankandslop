@@ -65,6 +65,39 @@ test('an undeliverable alarm exits the raise path as undelivered, with the bread
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
+test('a host with no channel still records the alarm — a missing URL costs delivery, not the text', async () => {
+  // The production box runs with no CLANK_ALARM_URL, because the ntfy channel
+  // was retired in favour of local recording. While the URL was read before the
+  // message was composed, that box wrote NOTHING for an unattended failure: the
+  // one thing this module promises never to do.
+  const directory = scratch();
+  try {
+    const sent = [];
+    const result = await raise({ reason: 'seam-blocked', edition: '2026-09-20', message: 'gate refused' }, {
+      environment: { CLANK_ALARM_HOST: 'testbox', CLANK_ALARM_SPOOL: directory },
+      now: new Date('2026-09-20T06:00:00Z'), log: () => {},
+      fetchImpl: async (...args) => { sent.push(args); return { ok: true }; }, sleep: async () => {}
+    });
+    assert.equal(result.delivered, false);
+    assert.equal(result.channel, false);
+    assert.deepEqual(sent, [], 'nothing may be posted when there is no channel to post to');
+    assert.equal(readdirSync(directory).length, 1);
+    const written = JSON.parse(readFileSync(result.breadcrumb, 'utf8'));
+    assert.equal(written.reason, 'seam-blocked');
+    assert.equal(written.edition, '2026-09-20');
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('a self-test with no channel is still a refusal — nothing to prove is not a pass', async () => {
+  const directory = scratch();
+  try {
+    await assert.rejects(() => raise({ reason: 'seam-blocked', selftest: true }, {
+      environment: { CLANK_ALARM_HOST: 'testbox', CLANK_ALARM_SPOOL: directory },
+      now: new Date('2026-09-20T06:00:00Z'), log: () => {}, sleep: async () => {}
+    }), /CLANK_ALARM_URL is not set/u);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
 test('a POST that is accepted but never appears in the topic is a FAILED self-test, not a pass', async () => {
   const directory = scratch();
   try {

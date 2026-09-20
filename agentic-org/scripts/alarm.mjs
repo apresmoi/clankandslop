@@ -31,13 +31,22 @@
 // text a human was supposed to see still exists on disk. Exit 0 = delivered,
 // 75 = spooled but undelivered, 64 = misuse.
 //
+// "Cannot be delivered" includes HAVING NO CHANNEL. A host with no
+// `CLANK_ALARM_URL` spools and exits 75; only `--selftest`, whose entire job is
+// to prove the channel, refuses outright when there is none. This is not a
+// theoretical branch: the ntfy channel was retired in favour of local
+// recording, so the production box runs without a URL, and for as long as the
+// URL was read before the message was composed every unattended failure on it
+// wrote nothing whatsoever.
+//
 // USAGE
 //   node agentic-org/scripts/alarm.mjs --reason=deploy-failed \
 //     --edition=2026-09-06 --message="spawnfile up exited 1" [--detail-file=f]
 //   node agentic-org/scripts/alarm.mjs --selftest
 //
 // CONFIG (names only; values never printed)
-//   CLANK_ALARM_URL    ntfy topic URL, e.g. https://ntfy.sh/<random-topic>
+//   CLANK_ALARM_URL    ntfy topic URL, e.g. https://ntfy.sh/<random-topic>; absent
+//                      means record-only, never a silent failure
 //   CLANK_ALARM_SPOOL  breadcrumb directory (default /var/lib/clank-alarm/spool)
 //   CLANK_ALARM_HOST   label for which box is speaking (default: hostname)
 
@@ -168,12 +177,26 @@ export async function readBack(target, alarm, { fetchImpl = fetch, sinceSeconds 
 }
 
 export async function raise(options, { environment = process.env, now = new Date(), log = console.log, ...rest } = {}) {
-  const target = readTopicUrl(environment);
   const detail = options.detailFile ? readFileSync(options.detailFile, 'utf8').slice(-2000) : null;
   const alarm = composeAlarm({ ...options, detail, host: environment.CLANK_ALARM_HOST ?? hostname(), at: now.toISOString() });
+  // Compose and spool BEFORE the channel is read. This used to read the URL
+  // first, so a box with no `CLANK_ALARM_URL` exited 64 out of `readTopicUrl`
+  // and wrote nothing at all — the one case where "never swallowed" was not
+  // true, and precisely the case an unattended host is in once the ntfy
+  // channel has been retired. A missing channel now costs delivery, not the
+  // record: the text lands on disk and the exit code is 75, "spooled but
+  // undelivered", which is what that code already meant.
   const breadcrumb = spool(alarm, { directory: environment.CLANK_ALARM_SPOOL ?? DEFAULT_SPOOL });
   log(`alarm ${alarm.body.reason} spooled at ${breadcrumb}`);
+  // A self-test is a test OF THE CHANNEL, so it still refuses outright when
+  // there is none — "there was nothing to prove" must never read as a pass.
+  const target = options.selftest || environment.CLANK_ALARM_URL ? readTopicUrl(environment) : null;
   if (options.dryRun) return { ...alarm.body, breadcrumb, delivered: false, dryRun: true };
+  if (target === null) {
+    process.stderr.write(`no CLANK_ALARM_URL is configured, so ${alarm.body.reason} reached nobody.\n`
+      + `  the message is preserved at ${breadcrumb}\n`);
+    return { ...alarm.body, breadcrumb, delivered: false, channel: false };
+  }
   const result = await deliver(target, alarm, rest);
   if (!result.delivered) {
     process.stderr.write(`alarm NOT DELIVERED to topic ${target.topic} after ${result.attempt} attempt(s):\n  ${result.errors.join('\n  ')}\n`
@@ -199,7 +222,15 @@ export function raiseDetached(reason, { edition, message, detail } = {}, { scrip
     if (detail) { const file = path.join(process.env.CLANK_ALARM_SPOOL ?? DEFAULT_SPOOL, 'detail.txt'); mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 }); writeFileSync(file, detail, { mode: 0o600 }); args.push(`--detail-file=${file}`); }
     execFileSync(process.execPath, args, { stdio: 'inherit' });
     return true;
-  } catch (error) { process.stderr.write(`alarm could not be raised (${reason}): ${error.message}\n`); return false; }
+  } catch (error) {
+    // 75 is the documented "spooled but undelivered" exit, which is what a box
+    // with no channel now produces. Reporting that as "could not be raised"
+    // would hide the fact that the text IS on disk, and send whoever reads the
+    // journal looking for a breadcrumb they were told did not exist.
+    if (error?.status === 75) { process.stderr.write(`alarm ${reason} was recorded locally but not delivered\n`); return false; }
+    process.stderr.write(`alarm could not be raised (${reason}): ${error.message}\n`);
+    return false;
+  }
 }
 
 if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
