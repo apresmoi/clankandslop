@@ -89,11 +89,20 @@ test('compiled policy admission accepts generated strict config and rejects weak
 // refused this outright ("compiled organization has no Codex agents"); what it
 // has to do instead is check the confinement Grok actually has, which lives in
 // the rendered broker provisioning rather than on the agent.
-const GROK_ENTRYPOINT = [
-  `const config = '[model.daimon-broker-grok]\\nmodel = "grok-4.6"\\nbase_url = "${GROK_BROKER.providerProxy}"\\nsupports_backend_search = false\\nweb_fetch = false\\n';`,
-  `const profile = '[profiles.daimon-strict]\\nextends = "strict"\\nrestrict_network = true\\ndeny = []\\n';`,
-  `const service = {"version":"${GROK_BROKER.serviceVersionPrefix}2","registrations":[{"agentId":"agent:brass","slot":0,"workerUid":2200,"profileSha256":"${'a'.repeat(64)}","model":{"id":"grok-4.6","reasoningEffort":"low"}}]};`
-].join('\n');
+// Shaped like real compiler output: each worker's config.toml and sandbox.toml
+// arrive as JSON string values inside `grokWorkers`, escaped, which is why the
+// policy reads the parsed structure rather than the script text.
+const GROK_WORKER = {
+  agentId: 'agent:brass', uid: 2200, slot: 0, model: 'grok-4.6', reasoningEffort: 'low',
+  config: `[model.daimon-broker-grok]\nmodel = "grok-4.6"\nbase_url = "${GROK_BROKER.providerProxy}"\nsupports_backend_search = false\nweb_fetch = false\n`,
+  profile: '[profiles.daimon-strict]\nextends = "strict"\nrestrict_network = true\ndeny = []\n'
+};
+const grokEntrypoint = (worker = GROK_WORKER) => [
+  `const grokWorkers = ${JSON.stringify([worker])};`,
+  `const service = {"version":"${GROK_BROKER.serviceVersionPrefix}2","registrations":[{"agentId":"agent:brass","slot":0,"workerUid":2200,"profileSha256":"${'a'.repeat(64)}","model":{"id":"grok-4.6","reasoningEffort":"low"}}]};`,
+  `const providerProxy = '${GROK_BROKER.providerProxy}';`
+].join('\n') + '\n';
+const GROK_ENTRYPOINT = grokEntrypoint();
 
 test('a Grok-only organization is admitted on its broker confinement, and refused without it', () => {
   const root = mkdtempSync(path.join(tmpdir(), 'clank-grok-policy-'));
@@ -109,9 +118,9 @@ test('a Grok-only organization is admitted on its broker confinement, and refuse
 
     // The network restriction, the search restriction and the model/effort pin,
     // one at a time — the three things the Codex check asserted directly.
-    writeFileSync(entrypoint, GROK_ENTRYPOINT.replace('restrict_network = true', 'restrict_network = false'));
+    writeFileSync(entrypoint, grokEntrypoint({ ...GROK_WORKER, profile: GROK_WORKER.profile.replace('restrict_network = true', 'restrict_network = false') }));
     assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /networkAccess:false/u);
-    writeFileSync(entrypoint, GROK_ENTRYPOINT.replace('supports_backend_search = false', 'supports_backend_search = true'));
+    writeFileSync(entrypoint, grokEntrypoint({ ...GROK_WORKER, config: GROK_WORKER.config.replace('supports_backend_search = false', 'supports_backend_search = true') }));
     assert.throws(() => runtimePolicy({ compiledOutput: root }, { log: noop }), /webSearch:disabled/u);
     writeFileSync(entrypoint, GROK_ENTRYPOINT);
     write({ kind: 'grok', model: 'grok-4.6', reasoningEffort: 'high' });

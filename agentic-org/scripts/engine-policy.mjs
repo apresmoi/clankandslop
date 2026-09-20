@@ -158,28 +158,102 @@ export function compiledEngineFindings(where, agent) {
 // so these read the literal contract bytes the compiler embedded. A Grok
 // organization whose entrypoint carries none of this is refused: an absent
 // confinement is not an exempt one.
+/**
+ * The compiler embeds each worker's `sandbox.toml` and `config.toml` as JSON string
+ * values inside `const grokWorkers = [...]`, so their bytes reach the entrypoint
+ * ESCAPED: the profile that every worker actually applies appears as
+ * `extends = \\"strict\\"`, and a substring search for `extends = "strict"` over the
+ * raw script never matches it. That false negative refused a correctly confined
+ * production organization at seam stage 5 on 2026-09-20 — the confinement was
+ * present and applied, the matcher simply could not see it. Read the values the way
+ * the runtime does instead: parse the array, then assert against each worker's own
+ * profile and config. Encoding-agnostic, and per worker rather than once per file,
+ * so one confined worker can no longer vouch for eleven others.
+ */
+export function parseCompiledGrokWorkers(source) {
+  return parseCompiledArray(source, /const grokWorkers = (\[[\s\S]*?\]);\n/u);
+}
+
+export function parseCompiledBrokerRegistrations(source) {
+  const match = /const service = (\{[\s\S]*?\});\n/u.exec(source);
+  if (!match) return undefined;
+  try {
+    const service = JSON.parse(match[1]);
+    return Array.isArray(service?.registrations) ? service.registrations : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function parseCompiledArray(source, pattern) {
+  const match = pattern.exec(source);
+  if (!match) return undefined;
+  try {
+    const parsed = JSON.parse(match[1]);
+    return Array.isArray(parsed) ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The compiled broker apparatus, read as structure rather than as text.
+ *
+ * Both halves of this used to be substring searches over the whole script, and both
+ * were wrong on real compiler output. The worker profile and config reach the
+ * entrypoint as JSON string values, so their bytes are ESCAPED — the profile every
+ * worker actually applies appears as `extends = \\"strict\\"`, which a search for
+ * `extends = "strict"` never matches. And the per-agent slice anchored on the first
+ * `"agentId":"…"` in the file, which belongs to the broker's *provisioning* array,
+ * not its service registrations, so the worker uid, profile digest and model pin were
+ * looked for in a slice that never contains them. Together they refused a correctly
+ * confined production organization at seam stage 5 on 2026-09-20.
+ *
+ * Reading the parsed arrays fixes both, and checks each worker on its own: one
+ * confined worker can no longer vouch for its eleven neighbours.
+ */
 export function grokBrokerFindings(where, source, expected) {
   const findings = [];
   const requires = (needle, reason) => { if (!source.includes(needle)) findings.push(`${where} ${reason} (${JSON.stringify(needle)} absent)`); };
   requires(`"${GROK_BROKER.serviceVersionPrefix}`, 'carries no Daimon engine-broker service registration — every Grok worker would run unbrokered');
-  requires(GROK_BROKER.sandboxBase, 'carries no strict Grok worker sandbox profile');
-  requires(GROK_BROKER.sandboxProfile, 'does not confine the Grok workers to no network — this is the equivalent of the Codex networkAccess:false policy');
-  requires(GROK_BROKER.backendSearch, 'does not disable Grok backend search — this is the equivalent of the Codex webSearch:disabled policy');
-  requires(GROK_BROKER.webFetch, 'does not disable Grok web fetch');
   requires(GROK_BROKER.providerProxy, 'does not pin the workers to the broker loopback provider proxy');
+
+  const workers = parseCompiledGrokWorkers(source);
+  if (workers === undefined) findings.push(`${where} carries no readable Grok worker provisioning array, so no worker confinement can be checked`);
+  else if (workers.length === 0) findings.push(`${where} provisions no Grok workers at all, so their confinement cannot be checked`);
+  else {
+    for (const worker of workers) {
+      const id = typeof worker?.agentId === 'string' && worker.agentId ? worker.agentId : '(unnamed worker)';
+      const profile = typeof worker?.profile === 'string' ? worker.profile : '';
+      const config = typeof worker?.config === 'string' ? worker.config : '';
+      const needs = (haystack, needle, reason) => {
+        if (!haystack.includes(needle)) findings.push(`${where}:${id} ${reason} (${JSON.stringify(needle)} absent)`);
+      };
+      needs(profile, GROK_BROKER.sandboxBase, 'carries no strict Grok worker sandbox profile');
+      needs(profile, GROK_BROKER.sandboxProfile, 'does not confine the Grok worker to no network — this is the equivalent of the Codex networkAccess:false policy');
+      needs(config, GROK_BROKER.backendSearch, 'does not disable Grok backend search — this is the equivalent of the Codex webSearch:disabled policy');
+      needs(config, GROK_BROKER.webFetch, 'does not disable Grok web fetch');
+    }
+  }
+
+  const registrations = parseCompiledBrokerRegistrations(source);
+  if (registrations === undefined) {
+    findings.push(`${where} carries no readable Grok broker service registrations, so no worker identity can be checked`);
+    return findings;
+  }
+  const byAgent = new Map(registrations.filter((entry) => typeof entry?.agentId === 'string').map((entry) => [entry.agentId, entry]));
   const uids = new Map();
   for (const [id, model] of expected) {
-    const start = source.indexOf(`"agentId":"${id}"`);
-    if (start < 0) { findings.push(`${where} has no Grok broker registration for ${id}`); continue; }
-    const next = source.indexOf('"agentId":"', start + 1);
-    const registration = source.slice(start, next < 0 ? undefined : next);
-    const uid = /"workerUid":(\d+)/u.exec(registration)?.[1];
-    if (uid === undefined || Number(uid) < GROK_BROKER.firstWorkerUid) findings.push(`${where}:${id} has no dedicated Grok worker uid at or above ${GROK_BROKER.firstWorkerUid}`);
+    const registration = byAgent.get(id);
+    if (registration === undefined) { findings.push(`${where} has no Grok broker registration for ${id}`); continue; }
+    const uid = registration.workerUid;
+    if (!Number.isInteger(uid) || uid < GROK_BROKER.firstWorkerUid) findings.push(`${where}:${id} has no dedicated Grok worker uid at or above ${GROK_BROKER.firstWorkerUid}`);
     else if (uids.has(uid)) findings.push(`${where}:${id} shares Grok worker uid ${uid} with ${uids.get(uid)} — one confinement cannot cover two agents`);
     else uids.set(uid, id);
-    if (!/"profileSha256":"[a-f0-9]{64}"/u.test(registration)) findings.push(`${where}:${id} Grok sandbox profile is not pinned by digest`);
-    const pair = `"model":{"id":"${model.model}","reasoningEffort":"${model.reasoningEffort}"}`;
-    if (!registration.includes(pair)) findings.push(`${where}:${id} broker registration does not pin ${model.model}/${model.reasoningEffort}; the compiled agent and its worker config disagree`);
+    if (!/^[a-f0-9]{64}$/u.test(String(registration.profileSha256 ?? ''))) findings.push(`${where}:${id} Grok sandbox profile is not pinned by digest`);
+    if (registration.model?.id !== model.model || registration.model?.reasoningEffort !== model.reasoningEffort) {
+      findings.push(`${where}:${id} broker registration does not pin ${model.model}/${model.reasoningEffort}; the compiled agent and its worker config disagree`);
+    }
   }
   return findings;
 }
