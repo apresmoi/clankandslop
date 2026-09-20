@@ -224,6 +224,38 @@ export function assertPinsMatchDescriptor(options, { log = console.log } = {}) {
   return result;
 }
 
+// --- stage 3b: room to build in ----------------------------------------------
+// On 2026-09-20 the host reached 100% disk mid-`up`: the candidate container died,
+// the rollback worked, and `spawnfile`'s own diagnostics file was written zero bytes
+// long because there was nowhere to put it - so the failure arrived with no reason
+// attached and cost twenty minutes to identify. Reclaiming first is what makes the
+// difference: docker build cache was 17.7GB of the 75GB volume that night and a
+// prune returned 13.2GB in seconds. The floor is the second half: a build that
+// cannot fit must be refused while the deployment is still whole, not discovered
+// halfway through an image export.
+export const BUILD_FLOOR_BYTES = 10 * 1024 * 1024 * 1024;
+
+export function reclaimBuildSpace(options, { log = console.log, exec = execFileSync, floorBytes = BUILD_FLOOR_BYTES } = {}) {
+  const free = () => {
+    const line = exec('df', ['-B1', '--output=avail', options.repo], { stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim().split('\n').at(-1);
+    const bytes = Number(String(line).trim());
+    if (!Number.isSafeInteger(bytes) || bytes < 0) throw new SeamError(`unreadable free space for ${options.repo}: ${line}`, 'seam-blocked');
+    return bytes;
+  };
+  const gib = (bytes) => `${(bytes / 1024 ** 3).toFixed(1)}GiB`;
+  const before = free();
+  // Cache only: never an image, never a volume, never a running container's layers.
+  try { exec('docker', ['builder', 'prune', '-af', '--filter', 'until=24h'], { stdio: ['ignore', 'pipe', 'pipe'] }); }
+  catch (error) { log(`  (build cache prune skipped: ${String(error.message).trim().slice(0, 120)})`); }
+  sweepImages(options, { log, exec });
+  const after = free();
+  log(`disk: ${gib(before)} free before reclaim, ${gib(after)} after (floor ${gib(floorBytes)})`);
+  if (after < floorBytes) {
+    throw new SeamError(`refusing to build with ${gib(after)} free below the ${gib(floorBytes)} floor - reclaim space before deploying`, 'seam-blocked');
+  }
+  return { before, after };
+}
+
 // --- stage 4: the image ------------------------------------------------------
 export function build(options, { log = console.log } = {}) {
   options.compiledOutput = path.join(options.repo, '.runtime', `seam-compiled-${options.tag.replace(/[^a-zA-Z0-9_.-]/gu, '_')}`);
@@ -337,7 +369,7 @@ export function sweepImages(options, { log = console.log, exec = execFileSync } 
 // be asserted by a test rather than only asserted by this comment. Reversing
 // repin and bundle is the failure mode the header describes, and a test is the
 // only thing that keeps a future edit from doing it.
-export const STAGES = Object.freeze({ gate, repin, bundle, build, runtimePolicy, deploy, settle, runtimeBootstrap, sweepImages });
+export const STAGES = Object.freeze({ gate, repin, bundle, reclaimBuildSpace, build, runtimePolicy, deploy, settle, runtimeBootstrap, sweepImages });
 
 export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES } = {}) {
   const options = parseArgs(argv);
@@ -351,6 +383,7 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     stageImpl.repin(options, { log }); stages.push('repin');
     stageImpl.bundle(options, { log }); stages.push('bundle');
     if (options.check) { log('\ncheck PASSED: the pin, the descriptor and the deploy window are all current.'); return { ...options, stages, ok: true }; }
+    stageImpl.reclaimBuildSpace(options, { log }); stages.push('reclaimBuildSpace');
     stageImpl.build(options, { log }); stages.push('build');
     stageImpl.runtimePolicy(options, { log }); stages.push('runtimePolicy');
     if (!options.deploy) { log(`\nno-deploy: built and checked ${options.tag} and stopped before \`up\`.`); return { ...options, stages, ok: true }; }
