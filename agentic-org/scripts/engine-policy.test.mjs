@@ -119,29 +119,48 @@ test('the strict Codex policy check is unchanged', () => {
 // The literal contract bytes Spawnfile renders into daimon-uid-entrypoint.sh
 // for a Grok organization. Trimmed to the lines this check reads; every one of
 // them is a byte the compiler actually emits.
-const registration = (id, uid, model = 'grok-4.6', effort = 'low') =>
-  `{"agentId":"${id}","slot":0,"workerUid":${uid},"workspace":"/w/${uid}","profilePath":"/h/${uid}/.grok/sandbox.toml","profileSha256":"${'a'.repeat(64)}","model":{"id":"${model}","reasoningEffort":"${effort}"}}`;
-const entrypoint = (registrations) => [
-  `const config = '[model.daimon-broker-grok]\\nmodel = "grok-4.6"\\nbase_url = "${GROK_BROKER.providerProxy}"\\nsupports_backend_search = false\\nweb_fetch = false\\n';`,
-  `const profile = '[profiles.daimon-strict]\\nextends = "strict"\\nrestrict_network = true\\ndeny = []\\n';`,
-  `const service = {"version":"${GROK_BROKER.serviceVersionPrefix}2","registrations":[${registrations.join(',')}]};`
-].join('\n');
+const registration = (id, uid, model = 'grok-4.6', effort = 'low') => ({
+  agentId: id, slot: 0, workerUid: uid, workspace: `/w/${uid}`,
+  profilePath: `/h/${uid}/.grok/sandbox.toml`, profileSha256: 'a'.repeat(64),
+  model: { id: model, reasoningEffort: effort }
+});
+
+// The compiler embeds each worker's config.toml and sandbox.toml as JSON string
+// values, so their bytes arrive ESCAPED and only the parsed structure can be read;
+// `fixtures/compiled-grok-entrypoint.sh` is the real article, and this builder
+// mirrors its shape so the unit cases stay honest about the encoding.
+const worker = (id, uid, model = 'grok-4.6', effort = 'low') => ({
+  agentId: id, uid, slot: uid - GROK_BROKER.firstWorkerUid, model, reasoningEffort: effort,
+  config: `[model.daimon-broker-grok]\nmodel = "${model}"\nbase_url = "${GROK_BROKER.providerProxy}"\n${GROK_BROKER.backendSearch}\n${GROK_BROKER.webFetch}\n`,
+  profile: `[profiles.daimon-strict]\n${GROK_BROKER.sandboxBase}\n${GROK_BROKER.sandboxProfile}\ndeny = []\n`
+});
+
+const entrypoint = (registrations, workers = registrations.map((entry) => worker(entry.agentId, entry.workerUid, entry.model.id, entry.model.reasoningEffort))) => [
+  `const grokWorkers = ${JSON.stringify(workers)};`,
+  `const service = {"version":"${GROK_BROKER.serviceVersionPrefix}2","registrations":${JSON.stringify(registrations)}};`
+].join('\n') + '\n';
 
 test('a Grok organization is admitted only when the compiled entrypoint carries the broker confinement', () => {
   const expected = new Map([['agent:foreman', { model: 'grok-4.6', reasoningEffort: 'low' }], ['agent:brass', { model: 'grok-4.6', reasoningEffort: 'low' }]]);
-  const source = entrypoint([registration('agent:foreman', 2200), registration('agent:brass', 2201)]);
+  const registrations = [registration('agent:foreman', 2200), registration('agent:brass', 2201)];
+  const source = entrypoint(registrations);
   assert.deepEqual(grokBrokerFindings('entrypoint.sh', source, expected), []);
-  // Each confinement byte removed on its own. Every one of these is a property
-  // the Codex policy check asserted directly and Grok reaches another way.
+  // Each confinement byte removed on its own, from the structure the runtime reads
+  // rather than from the script text: a text edit cannot even reach the escaped copy.
   const removals = [
-    [GROK_BROKER.sandboxProfile, /equivalent of the Codex networkAccess:false policy/u],
-    [GROK_BROKER.backendSearch, /equivalent of the Codex webSearch:disabled policy/u],
-    [GROK_BROKER.webFetch, /does not disable Grok web fetch/u],
-    [GROK_BROKER.sandboxBase, /no strict Grok worker sandbox profile/u],
-    [GROK_BROKER.providerProxy, /loopback provider proxy/u],
-    [`"${GROK_BROKER.serviceVersionPrefix}`, /no Daimon engine-broker service registration/u]
+    ['profile', GROK_BROKER.sandboxProfile, /equivalent of the Codex networkAccess:false policy/u],
+    ['config', GROK_BROKER.backendSearch, /equivalent of the Codex webSearch:disabled policy/u],
+    ['config', GROK_BROKER.webFetch, /does not disable Grok web fetch/u],
+    ['profile', GROK_BROKER.sandboxBase, /no strict Grok worker sandbox profile/u]
   ];
-  for (const [needle, reason] of removals) {
+  for (const [field, needle, reason] of removals) {
+    const workers = registrations.map((entry, index) => {
+      const built = worker(entry.agentId, entry.workerUid);
+      return index === 0 ? { ...built, [field]: built[field].replace(needle, 'REMOVED') } : built;
+    });
+    assert.match(grokBrokerFindings('entrypoint.sh', entrypoint(registrations, workers), expected).join('; '), reason, needle);
+  }
+  for (const [needle, reason] of [[GROK_BROKER.providerProxy, /loopback provider proxy/u], [`"${GROK_BROKER.serviceVersionPrefix}`, /no Daimon engine-broker service registration/u]]) {
     const stripped = source.replaceAll(needle, 'REMOVED');
     assert.notEqual(stripped, source, `${needle} must be present to begin with`);
     assert.match(grokBrokerFindings('entrypoint.sh', stripped, expected).join('; '), reason, needle);
@@ -154,7 +173,8 @@ test('every Grok agent needs its own registration, its own worker uid and a dige
   assert.match(grokBrokerFindings('e', entrypoint([registration('agent:foreman', 2200)]), two).join('; '), /no Grok broker registration for agent:brass/u);
   assert.match(grokBrokerFindings('e', entrypoint([registration('agent:foreman', 2200), registration('agent:brass', 2200)]), two).join('; '), /shares Grok worker uid 2200/u);
   assert.match(grokBrokerFindings('e', entrypoint([registration('agent:foreman', 12)]), one).join('; '), /no dedicated Grok worker uid/u);
-  assert.match(grokBrokerFindings('e', entrypoint([registration('agent:foreman', 2200)]).replace(/"profileSha256":"[a-f0-9]{64}"/u, '"profileSha256":""'), one).join('; '), /sandbox profile is not pinned by digest/u);
+  const unpinned = [{ ...registration('agent:foreman', 2200), profileSha256: '' }];
+  assert.match(grokBrokerFindings('e', entrypoint(unpinned), one).join('; '), /sandbox profile is not pinned by digest/u);
   // The compiled agent and its worker config must name the same pair: the
   // broker's provider proxy refuses a request body carrying any other one.
   assert.match(grokBrokerFindings('e', entrypoint([registration('agent:foreman', 2200, 'grok-4.6', 'high')]), one).join('; '), /does not pin grok-4\.6\/low/u);
