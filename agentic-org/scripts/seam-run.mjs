@@ -260,8 +260,25 @@ export function reclaimBuildSpace(options, { log = console.log, exec = execFileS
   catch (error) { log(`  (build cache prune skipped: ${String(error.message).trim().slice(0, 120)})`); }
   sweepImages(options, { log, exec });
   sweepScratch(options, { log });
-  const after = free();
+  let after = free();
   log(`disk: ${gib(before)} free before reclaim, ${gib(after)} after (floor ${gib(floorBytes)})`);
+  // Still short, so the 24h filter was the thing holding space back. On a daily
+  // cadence yesterday's cache is right on that boundary and may or may not be
+  // caught: on 2026-09-21 the box came out of a successful run with 12.8GB of
+  // build cache of which only 3.3GB was older than a day, and 9.8GB free —
+  // under its own floor, with nothing wrong except the filter.
+  //
+  // Build cache is pure cache. Dropping all of it costs the next build time and
+  // nothing else, which is unambiguously better than refusing to run. It stays
+  // a SECOND pass rather than the first so the ordinary day keeps its warm
+  // cache, and it still never touches an image, a volume or a container.
+  if (after < floorBytes) {
+    log(`  below the floor after the filtered prune; dropping the whole build cache`);
+    try { exec('docker', ['builder', 'prune', '-af'], { stdio: ['ignore', 'pipe', 'pipe'] }); }
+    catch (error) { log(`  (full build cache prune skipped: ${String(error.message).trim().slice(0, 120)})`); }
+    after = free();
+    log(`disk: ${gib(after)} free after dropping the build cache (floor ${gib(floorBytes)})`);
+  }
   if (after < floorBytes) {
     throw new SeamError(`refusing to build with ${gib(after)} free below the ${gib(floorBytes)} floor - reclaim space before deploying`, 'seam-blocked');
   }
