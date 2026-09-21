@@ -53,10 +53,13 @@ Keep useful detail when it exists. Shortness is not the editorial objective.
   what the cited source is reported to have said. A fragment is never the slate's
   commentary about why to cover a story or which sources are missing. Identify a
   summary-based paraphrase in `source_note.provenance_note`; reserve `raw_excerpt`
-  for captured text. Never invent an excerpt, turn a title into evidence for
-  unseen findings, or claim direct access to satisfy validation. Required
-  assignment evidence cannot be dropped; missing
-  support goes through the research and blocker route above.
+  for captured text. A claim is supported only by what the captured sentence
+  itself says. The summary around an excerpt is the sensor's paraphrase, not
+  evidence: if a name, a number or a date appears only there, either request the
+  sentence that carries it or leave the claim out. Never invent an excerpt, turn
+  a title into evidence for unseen findings, or claim direct access to satisfy
+  validation. Required assignment evidence cannot be dropped; missing support
+  goes through the research and blocker route above.
 - Read headline, deck, body and `key_numbers` as public copy. Sentences about what “the filing,”
   “the supplied Record” or “the article can say” describe our work, not the news.
   Removing those words is insufficient if the passage still only inventories
