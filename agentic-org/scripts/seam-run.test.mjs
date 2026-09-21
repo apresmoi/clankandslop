@@ -373,6 +373,42 @@ test('the build refuses to start below the disk floor, after reclaiming what it 
   }), (error) => error.reason === 'seam-blocked' && /unreadable free space/u.test(error.message));
 });
 
+test('a floor still short after the filtered prune drops the whole build cache before refusing', () => {
+  // 2026-09-21: the box finished a successful run holding 12.8GB of build cache
+  // of which only 3.3GB was older than a day, and 9.8GB free. Nothing was wrong
+  // except the `until=24h` filter, and the next run would have refused.
+  const prunes = [];
+  const freeSequence = [3 * 1024 ** 3, 9 * 1024 ** 3, 14 * 1024 ** 3];
+  const exec = (command, args) => {
+    if (command === 'df') return `avail\n${freeSequence.shift()}\n`;
+    if (command === 'docker' && args[0] === 'builder') prunes.push(args.join(' '));
+    return '';
+  };
+  const result = reclaimBuildSpace({ repo: '/root/work/clankandslop', tag: 't' }, { log: () => undefined, exec, sweepScratch: () => undefined });
+  assert.deepEqual(prunes, ['builder prune -af --filter until=24h', 'builder prune -af'], 'the filtered prune runs first, the unfiltered one only as a fallback');
+  assert.equal(result.after, 14 * 1024 ** 3);
+
+  // A day that clears the floor on the first pass keeps its warm cache.
+  const warm = [];
+  reclaimBuildSpace({ repo: '/root/work/clankandslop', tag: 't' }, {
+    log: () => undefined, sweepScratch: () => undefined,
+    exec: (command, args) => {
+      if (command === 'df') return `avail\n${14 * 1024 ** 3}\n`;
+      if (command === 'docker' && args[0] === 'builder') warm.push(args.join(' '));
+      return '';
+    }
+  });
+  assert.deepEqual(warm, ['builder prune -af --filter until=24h']);
+
+  // Short even with no cache left is still a refusal: the fallback frees cache,
+  // it does not lower the bar.
+  const empty = [9 * 1024 ** 3, 9 * 1024 ** 3, 9 * 1024 ** 3];
+  assert.throws(() => reclaimBuildSpace({ repo: '/root/work/clankandslop', tag: 't' }, {
+    log: () => undefined, sweepScratch: () => undefined,
+    exec: (command) => (command === 'df' ? `avail\n${empty.shift()}\n` : '')
+  }), (error) => error.reason === 'seam-blocked' && /below the 10\.0GiB floor/u.test(error.message));
+});
+
 test('the compiled-output scratch is swept, bounded, and never the tree this run will write', () => {
   // Twelve of these had accumulated on the host by 2026-09-20 — 8.2GB, more
   // than the images the tag sweep bounds — and they are what pushed the box
