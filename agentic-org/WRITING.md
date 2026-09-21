@@ -60,7 +60,10 @@ Keep useful detail when it exists. Shortness is not the editorial objective.
 - Read headline, deck, body and `key_numbers` as public copy. Sentences about what “the filing,”
   “the supplied Record” or “the article can say” describe our work, not the news.
   Removing those words is insufficient if the passage still only inventories
-  missing material. Explain a consequential uncertainty once, in ordinary prose.
+  missing material. Report a gap once, in the sentence where it bears on the
+  story, and then write the rest of the piece as if it were the only thing you
+  had. A paragraph whose subject is the absence of evidence is not a paragraph.
+  Explain a consequential uncertainty once, in ordinary prose.
 - Reread the whole article aloud in your head. Vary openings and sentence length;
   remove throat-clearing, repetitive contrasts and unnecessary qualifications.
   End where the story lands, without reciting the method or repeating its lead.
