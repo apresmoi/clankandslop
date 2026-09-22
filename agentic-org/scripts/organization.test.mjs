@@ -379,3 +379,54 @@ test('each newsroom role declares bounded attention and removing it fails admiss
     assert.throws(() => validateAgentDeclaration(agent, source.replace('max_batch_messages: 8', 'max_batch_messages: 0')), /explicit bounded attention declaration required/u);
   }
 });
+
+// --- an org that cannot compile must not be able to merge -------------------
+// 2026-09-22: `operator` was added to room:release's member list so a host-side
+// alarm bridge could post there. It compiled in nobody's head and in no test:
+// `operator` is declared with `scopes: [admin, observe, write]` and NO
+// `agents:` binding, so it is a client token, not something that can join a
+// room. The compiler refuses the manifest outright —
+//
+//   Invalid Spawnfile manifest: network clank-newsroom room release
+//   references unknown member operator
+//
+// — and the tree went green through CI and merged anyway, because every check
+// here read the Spawnfile as text and none of them resolved a reference. The
+// bridge never needed it: the successful live post at 09:43Z ran against the
+// 09:02Z image, which predates the change, so a client token with `admin`
+// scope already reaches the room.
+//
+// A real `spawnfile compile` needs Docker and a pinned runtime image, so it is
+// out of reach in CI. The reference itself is not, and that is what broke.
+export function roomMemberFindings(source) {
+  const bound = new Set([...source.matchAll(/- \{ id: ([a-z-]+), secret: [A-Z_]+, scopes: \[[^\]]*\], agents: \[([a-z-]+)\] \}/gu)].map((match) => match[1]));
+  const declared = new Set([...source.matchAll(/- \{ id: ([a-z-]+), secret: [A-Z_]+, scopes: \[[^\]]*\][^}]*\}/gu)].map((match) => match[1]));
+  const findings = [];
+  for (const room of source.matchAll(/- \{ id: ([a-z-]+), visibility: private, write_policy: members, federation: [^,]+(?:, )?[^,]*, members: \[([^\]]+)\] \}/gu)) {
+    const [, id, members] = room;
+    for (const member of members.split(',').map((item) => item.trim())) {
+      if (member.includes(':')) continue; // a remote pairing, checked by validate-org
+      if (bound.has(member)) continue;
+      findings.push(declared.has(member)
+        ? `room ${id} lists ${member}, which is declared but binds no agent — the compiler reads it as a client token, not a member`
+        : `room ${id} references unknown member ${member}`);
+    }
+  }
+  return findings;
+}
+
+test('every room member resolves to an agent-bound network member', () => {
+  const source = readFileSync(resolve(import.meta.dirname, '..', 'Spawnfile'), 'utf8');
+  assert.deepEqual(roomMemberFindings(source), []);
+
+  // The exact shape that shipped: a client token in a room's member list.
+  assert.deepEqual(
+    roomMemberFindings(source.replace('caslon, pressman]', 'caslon, pressman, operator]')),
+    ['room release lists operator, which is declared but binds no agent — the compiler reads it as a client token, not a member']
+  );
+  // And an id that is not declared at all.
+  assert.deepEqual(
+    roomMemberFindings(source.replace('caslon, pressman]', 'caslon, pressman, nobody]')),
+    ['room release references unknown member nobody']
+  );
+});
