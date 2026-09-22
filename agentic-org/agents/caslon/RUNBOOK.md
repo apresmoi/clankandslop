@@ -163,6 +163,12 @@ After successful compose, send one Moltnet message to `room:release` mentioning
 Pressman to run `prepare_release` validation/build and `stage_release`. If
 composition is refused, do not mention Pressman.
 
+Read the refusal before you end the wake. When it names a prerequisite you own
+— one of your two desk documents missing, your layout digest stale against the
+accepted inputs — repair it in this same wake and compose again. Only a
+prerequisite another desk owns ends the wake, and then you say which one in
+`room:release` without mentioning Pressman.
+
 ## Illustration References
 
 Three story illustration slots are always bounded: generated lead art when
