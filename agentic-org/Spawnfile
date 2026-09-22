@@ -110,4 +110,4 @@ networks:
       - { id: filing, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike, caslon] }
       - { id: sensor, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
       - { id: research, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, gatherer, research-sensor, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass] }
-      - { id: release, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, brass, spike, ledger, caslon, pressman] }
+      - { id: release, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, brass, spike, ledger, caslon, pressman, operator] }
