@@ -166,6 +166,73 @@ test('a Grok worker mid-turn still blocks the deploy', () => {
   assert.deepEqual(result.observed.extraProcesses, [worker, spawned]);
 });
 
+// A runtime that reports its executions, with the two shapes the leaked-worker
+// rule turns on: nothing running, and something running.
+const v2 = (executions = []) => JSON.stringify({
+  status: 200,
+  body: { version: 'noopolis.daimon.organization-runtime-activity.v2', items: [], executions }
+});
+const runtime = (activity, { ps = IDLE_PS, usage = '' } = {}) =>
+  (_name, script) => {
+    if (script.includes('/v2/activity')) return activity;
+    if (script.includes('wake-acceptance')) return '';
+    if (script.includes('usage.jsonl')) return usage;
+    if (script.startsWith('ps ')) return ps;
+    throw new Error(`unexpected script ${script}`);
+  };
+// Verbatim from `docker exec spawnfile-clank-and-slop ps -eo pid,ppid,args` on
+// 2026-09-21: two workers still alive 48 minutes after their turns had sealed.
+const LEAKED_WORKERS = [
+  ' 1176  1172 bwrap --cap-drop ALL --bind / / --bind /var /var --bind /var/lib /var/lib --bind /var/lib/daimon-workers /var/lib/daimon-workers',
+  ' 1198  1176 /usr/local/bin/grok --sandbox daimon-strict --always-approve --no-subagents --prompt-file /proc/self/fd/3'
+].join('\n');
+
+test('a leaked Grok worker with no running execution does not block the deploy', () => {
+  // The gate refused the 2026-09-22 09:00Z run over these two processes. They
+  // had no turn behind them: the runtime was the authority and reported zero
+  // executions. Reaping is the broker's job; deciding what "work in flight"
+  // means is this job's, and a process name was never the right test.
+  const ps = `${IDLE_PS}\n${GROK_BROKER_PS}\n${LEAKED_WORKERS}`;
+  const result = quiescence('c', { exec: runtime(v2([]), { ps }), inspect: healthy, now: at('2026-09-06T09:00:00Z') });
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.quiet, true);
+  assert.equal(result.observed.leakedWorkers.length, 2, 'both are recorded rather than silently dropped');
+  assert.deepEqual(result.observed.extraProcesses, []);
+});
+
+test('the same worker processes DO block while an execution is running', () => {
+  const ps = `${IDLE_PS}\n${GROK_BROKER_PS}\n${LEAKED_WORKERS}`;
+  const activity = v2([{ agent_id: 'agent:vesta', execution_id: 'e1', state: 'running', delivery_ids: ['d1'] }]);
+  const result = quiescence('c', { exec: runtime(activity, { ps }), inspect: healthy, now: at('2026-09-06T09:00:00Z') });
+  assert.equal(result.quiet, false);
+  assert.equal(result.observed.extraProcesses.length, 2, 'a worker is work in flight whenever a turn is');
+  assert.deepEqual(result.observed.leakedWorkers, []);
+  assert.match(result.findings.join(' '), /outside the steady-state set/u);
+});
+
+test('without execution authority a worker still blocks — the rule cannot fail open', () => {
+  // A legacy runtime (404) cannot say whether a turn is running, and an
+  // unreadable activity endpoint says nothing at all. Neither may be read as
+  // "nothing is running", so the worker remains a refusal in both.
+  const ps = `${IDLE_PS}\n${GROK_BROKER_PS}\n${LEAKED_WORKERS}`;
+  for (const activity of [JSON.stringify({ status: 404 }), 'not json at all']) {
+    const result = quiescence('c', { exec: runtime(activity, { ps }), inspect: healthy, now: at('2026-09-06T09:00:00Z') });
+    assert.equal(result.quiet, false, activity);
+    assert.equal(result.observed.extraProcesses.length, 2, activity);
+    assert.deepEqual(result.observed.leakedWorkers, [], activity);
+  }
+});
+
+test('a settled runtime still refuses a process that is not a Grok worker', () => {
+  // The exemption is scoped to the worker shapes, not to "anything left over".
+  const rogue = ' 1700    39 codex exec --sandbox danger-full-access';
+  const ps = `${IDLE_PS}\n${GROK_BROKER_PS}\n${LEAKED_WORKERS}\n${rogue}`;
+  const result = quiescence('c', { exec: runtime(v2([]), { ps }), inspect: healthy, now: at('2026-09-06T09:00:00Z') });
+  assert.equal(result.quiet, false);
+  assert.deepEqual(result.observed.extraProcesses, ['codex exec --sandbox danger-full-access']);
+  assert.equal(result.observed.leakedWorkers.length, 2);
+});
+
 test('a container that cannot be read is NOT quiet — the check fails closed', () => {
   const unreadable = quiescence('nope', { inspect: () => { throw new Error('No such container'); } });
   assert.equal(unreadable.quiet, false);
