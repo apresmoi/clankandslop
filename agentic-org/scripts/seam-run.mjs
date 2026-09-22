@@ -66,7 +66,18 @@ export const DEFAULT_DEPLOY_USER = 'clank';
 // Seam-built images are tagged so they can be told apart from every hand-built
 // `local<n>`, and so the retention sweep below can only ever touch its own.
 export const TAG_PREFIX = 'clank-and-slop:seam-';
-export const KEEP_IMAGES = 3;
+// Two, not three. Each org image is 4.93GB on a 75GB disk with roughly 55GB
+// otherwise committed, so three of them put steady-state free space at 9-11GB —
+// straddling this job's own 10GiB build floor. It sat at 9.1GB after the
+// 2026-09-22 build, and the run before that had to be unblocked by hand.
+//
+// The third image was never the rollback target anyway. What a bad deploy rolls
+// back to is the image that ran yesterday; the one before it belongs to a
+// different corpus pin and a different day's paper, so restoring it would not
+// restore a state anyone wants. Keeping the live image and its immediate
+// predecessor is the whole of what rollback means here, and it buys back 4.93GB
+// of permanent headroom.
+export const KEEP_IMAGES = 2;
 // `build` writes the compiler's whole output tree to
 // `.runtime/seam-compiled-<tag>/` and nothing ever removed it. Twelve of them
 // had accumulated by 2026-09-20 — 8.2GB of pure scratch on a 75GB disk, more
