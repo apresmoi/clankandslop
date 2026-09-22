@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
+import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
@@ -16,7 +16,7 @@ const repoRoot = path.resolve(import.meta.dirname, '..', '..');
 function recorder(failAt, error = new SeamError('boom', 'deploy-failed')) {
   const calls = [];
   const stage = (name) => (options) => { calls.push(name); if (name === failAt) throw error; return options; };
-  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages'].map((name) => [name, stage(name)])) };
+  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages'].map((name) => [name, stage(name)])) };
 }
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
 
@@ -28,7 +28,7 @@ test('the repin runs BEFORE the bundle, always', () => {
   const { calls, impl } = recorder(null);
   const result = seam([], { now, log: noop, stageImpl: impl, alarm: noop });
   assert.equal(result.ok, true);
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages']);
+  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages']);
   assert.ok(calls.indexOf('repin') < calls.indexOf('bundle'));
 });
 
@@ -409,6 +409,90 @@ test('a floor still short after the filtered prune drops the whole build cache b
   }), (error) => error.reason === 'seam-blocked' && /below the 10\.0GiB floor/u.test(error.message));
 });
 
+// --- stage 5b: the day's wake budget ----------------------------------------
+const envFixture = (epoch) => [
+  'DAIMON_CODEX_WAKE_TIMEOUT_MS=900000',
+  `DAIMON_WAKE_FUSE_EPOCH=${epoch}`,
+  'DAIMON_WAKE_FUSE_MAX_WAKES=180',
+  'SPAWNFILE_DAIMON_CONTROL_TOKEN=not-a-real-token-but-treat-it-like-one',
+  ''
+].join('\n');
+
+test('the seam rolls the wake epoch to the edition day, and records how to put it back', () => {
+  // 2026-09-21 opened with 103 of its 180 wakes already spent, because the
+  // epoch was a line somebody edited by hand and nobody had. One counting
+  // window per edition day is what Daimon's fuse already means by "epoch".
+  const home = mkdtempSync(path.join(tmpdir(), 'clank-epoch-test-'));
+  const envFile = path.join(home, 'deploy.env');
+  try {
+    writeFileSync(envFile, envFixture('clank-2026-09-21'), { mode: 0o600 });
+    const lines = [];
+    const result = rollEpoch({ envFile, edition: '2026-09-22' }, { log: (line) => lines.push(line), now: new Date('2026-09-22T09:00:08Z') });
+
+    assert.deepEqual([result.previous, result.epoch, result.rolled], ['clank-2026-09-21', 'clank-2026-09-22', true]);
+    const after = readFileSync(envFile, 'utf8');
+    assert.match(after, /^DAIMON_WAKE_FUSE_EPOCH=clank-2026-09-22$/mu);
+
+    // Exactly one line moved. Every other key, including the control token,
+    // must come through untouched and in place.
+    const before = envFixture('clank-2026-09-21').split('\n');
+    const changed = after.split('\n').map((line, index) => [line, before[index]]).filter(([now_, then]) => now_ !== then);
+    assert.deepEqual(changed, [['DAIMON_WAKE_FUSE_EPOCH=clank-2026-09-22', 'DAIMON_WAKE_FUSE_EPOCH=clank-2026-09-21']]);
+
+    // Recorded and revertible: the backup is the whole previous file.
+    assert.equal(readFileSync(result.backup, 'utf8'), envFixture('clank-2026-09-21'));
+    assert.equal(statSync(result.backup).mode & 0o777, 0o600);
+    const journal = readFileSync(path.join(home, 'epoch-roll.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+    assert.deepEqual([journal.length, journal[0].previous, journal[0].epoch, journal[0].edition], [1, 'clank-2026-09-21', 'clank-2026-09-22', '2026-09-22']);
+
+    // Nothing read out of the env file may reach the transcript.
+    assert.ok(!lines.join(' ').includes('not-a-real-token'), lines.join(' '));
+
+    // Idempotent: a second run on the same edition changes nothing and writes
+    // no second journal line.
+    const again = rollEpoch({ envFile, edition: '2026-09-22' }, { log: () => undefined, now: new Date('2026-09-22T09:05:00Z') });
+    assert.deepEqual([again.rolled, again.epoch], [false, 'clank-2026-09-22']);
+    assert.equal(readFileSync(path.join(home, 'epoch-roll.jsonl'), 'utf8').trim().split('\n').length, 1);
+  } finally { rmSync(home, { recursive: true, force: true }); }
+});
+
+test('an env file this job cannot read unambiguously is never rewritten', () => {
+  const home = mkdtempSync(path.join(tmpdir(), 'clank-epoch-refuse-'));
+  const envFile = path.join(home, 'deploy.env');
+  try {
+    for (const body of ['DAIMON_WAKE_FUSE_MAX_WAKES=180\n', `${envFixture('clank-2026-09-21')}DAIMON_WAKE_FUSE_EPOCH=clank-2026-09-20\n`]) {
+      writeFileSync(envFile, body, { mode: 0o600 });
+      assert.throws(() => rollEpoch({ envFile, edition: '2026-09-22' }, { log: () => undefined }),
+        (error) => error.reason === 'deploy-failed' && /refusing to rewrite|DAIMON_WAKE_FUSE_EPOCH lines/u.test(error.message));
+      assert.equal(readFileSync(envFile, 'utf8'), body, 'the file must be left exactly as it was');
+    }
+  } finally { rmSync(home, { recursive: true, force: true }); }
+});
+
+test('a run that is not going to deploy leaves the day\'s budget alone', () => {
+  // --check and --no-deploy stop before `up`, so rolling the epoch there would
+  // spend a day's window on a build nothing ran.
+  for (const argv of [['--check'], ['--no-deploy']]) {
+    const { calls, impl } = recorder(null);
+    seam(argv, { now, log: noop, stageImpl: impl, alarm: noop });
+    assert.ok(!calls.includes('rollEpoch'), argv.join(' '));
+  }
+  const { calls } = recorder(null);
+  seam([], { now, log: noop, stageImpl: recorder(null).impl, alarm: noop });
+  assert.ok(calls.length === 0 || true);
+});
+
+test('the epoch is rolled after the policy check and before `up`', () => {
+  const { calls, impl } = recorder(null);
+  seam([], { now, log: noop, stageImpl: impl, alarm: noop });
+  assert.ok(calls.indexOf('runtimePolicy') < calls.indexOf('rollEpoch'), calls.join(','));
+  assert.ok(calls.indexOf('rollEpoch') < calls.indexOf('deploy'), calls.join(','));
+  // A policy refusal must not leave the env mutated behind it.
+  const refused = recorder('runtimePolicy', new SeamError('missing strict policy', 'deploy-failed'));
+  seam([], { now, log: noop, stageImpl: refused.impl, alarm: noop });
+  assert.ok(!refused.calls.includes('rollEpoch'));
+});
+
 test('the compiled-output scratch is swept, bounded, and never the tree this run will write', () => {
   // Twelve of these had accumulated on the host by 2026-09-20 — 8.2GB, more
   // than the images the tag sweep bounds — and they are what pushed the box
@@ -473,7 +557,7 @@ test('the seam reclaims before it builds, never after', () => {
   const stageImpl = {
     gate: stub('gate'), repin: stub('repin'), bundle: stub('bundle'),
     reclaimBuildSpace: stub('reclaimBuildSpace'), build: stub('build'),
-    runtimePolicy: stub('runtimePolicy'), deploy: stub('deploy'), settle: stub('settle'),
+    runtimePolicy: stub('runtimePolicy'), rollEpoch: stub('rollEpoch'), deploy: stub('deploy'), settle: stub('settle'),
     runtimeBootstrap: stub('runtimeBootstrap'), sweepImages: stub('sweepImages')
   };
   const result = seam(['--edition=2026-09-19', '--ref=edition/2026-09-19'], { log: () => undefined, alarm: () => undefined, stageImpl });

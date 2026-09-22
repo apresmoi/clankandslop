@@ -51,7 +51,7 @@
 // Every stage that fails raises the alarm (alarm.mjs) before exiting non-zero.
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { appendFileSync, chmodSync, chownSync, existsSync, readFileSync, readdirSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
@@ -359,6 +359,80 @@ export function runtimePolicy(options, { log = console.log } = {}) {
   return { configs, checked, engines: Object.fromEntries(byEngine) };
 }
 
+// --- stage 5b: the day's wake budget ----------------------------------------
+// `DAIMON_WAKE_FUSE_EPOCH` names one counting window, and Daimon's wake fuse
+// treats it as exactly that: admissions are counted per epoch, `maxWakes` and
+// `maxTokens` apply per epoch, tokens are summed from the epoch's own
+// `epoch_start` record, and a trip marker belongs to one epoch so selecting a
+// new one deliberately clears it. The fuse volume has carried
+// `daily-quota-rollover-clank-<date>-to-clank-<date>` directories since
+// 2026-09-09, so the day-shaped name is the established convention, not an
+// invention here.
+//
+// It was still a line somebody edited by hand, and that is what makes it
+// dangerous: leave it and the second day shares the first day's budget. On
+// 2026-09-21 the edition began with 103 of 180 wakes already gone, and the
+// only reason it finished is that a person noticed and bumped the value.
+//
+// The seam's deploy is the one moment per edition day that already rewrites
+// what the container runs with, so it is where the turnover belongs.
+//
+// THREE PROPERTIES, deliberately:
+//   * DERIVABLE — the value is `clank-<edition>` and nothing else, so what the
+//     container ran with can be recomputed from the edition date alone.
+//   * RECORDED — every roll appends one line to `epoch-roll.jsonl` beside the
+//     env file, and keeps a 0600 copy of the file as it was.
+//   * REVERTIBLE — that copy is a whole `deploy.env`, so a revert is one `cp`.
+//
+// It rewrites ONE line. The key must be present exactly once or the stage
+// refuses: deploy.env also holds the runtime control token, and a file this
+// job cannot parse confidently is a file it must not rewrite at all. Nothing
+// here ever logs a value read from it.
+export const EPOCH_PREFIX = 'clank-';
+export const EPOCH_KEY = 'DAIMON_WAKE_FUSE_EPOCH';
+export const KEEP_ENV_BACKUPS = 7;
+
+export function rollEpoch(options, { log = console.log, now = new Date() } = {}) {
+  const envFile = options.envFile;
+  const wanted = `${EPOCH_PREFIX}${options.edition}`;
+  let original;
+  try { original = readFileSync(envFile, 'utf8'); }
+  catch (error) { throw new SeamError(`cannot read the deploy env file ${envFile}: ${error.message}`, 'deploy-failed'); }
+  const lines = original.split('\n');
+  const indexes = lines.map((line, index) => [line, index]).filter(([line]) => line.startsWith(`${EPOCH_KEY}=`)).map(([, index]) => index);
+  if (indexes.length !== 1) {
+    throw new SeamError(`${envFile} has ${indexes.length} ${EPOCH_KEY} lines; refusing to rewrite an env file this job cannot read unambiguously`, 'deploy-failed');
+  }
+  const previous = lines[indexes[0]].slice(EPOCH_KEY.length + 1);
+  if (previous === wanted) { log(`epoch: already ${wanted}; nothing to roll`); return { previous, epoch: wanted, rolled: false }; }
+  if (!/^[A-Za-z0-9._-]*$/u.test(previous)) throw new SeamError(`${envFile} carries a ${EPOCH_KEY} value this job will not overwrite blind`, 'deploy-failed');
+
+  const stamp = now.toISOString().replace(/[-:.]/gu, '').replace(/\d{3}Z$/u, 'Z');
+  const backup = `${envFile}.bak-epoch-${stamp}`;
+  const { uid, gid, mode } = statSync(envFile);
+  writeFileSync(backup, original, { mode: 0o600 });
+  chownSync(backup, uid, gid);
+
+  // Write beside the original and rename, so a crash mid-write cannot leave a
+  // truncated env file where the deployment expects a whole one.
+  const scratch = `${envFile}.roll-${stamp}`;
+  lines[indexes[0]] = `${EPOCH_KEY}=${wanted}`;
+  writeFileSync(scratch, lines.join('\n'), { mode: 0o600 });
+  chownSync(scratch, uid, gid);
+  chmodSync(scratch, mode & 0o7777);
+  renameSync(scratch, envFile);
+
+  appendFileSync(path.join(path.dirname(envFile), 'epoch-roll.jsonl'),
+    `${JSON.stringify({ v: 'clank.epoch-roll.v1', at: now.toISOString(), edition: options.edition, previous, epoch: wanted, env_file: envFile, backup })}\n`, { mode: 0o600 });
+
+  const stale = readdirSync(path.dirname(envFile))
+    .filter((name) => name.startsWith(`${path.basename(envFile)}.bak-epoch-`)).sort().slice(0, -KEEP_ENV_BACKUPS);
+  for (const name of stale) { try { unlinkSync(path.join(path.dirname(envFile), name)); } catch { /* a backup that is already gone is fine */ } }
+
+  log(`epoch: ${previous} -> ${wanted} (${envFile} copied to ${backup}; revert with cp -a ${backup} ${envFile})`);
+  return { previous, epoch: wanted, rolled: true, backup };
+}
+
 // --- stage 6: the deployment -------------------------------------------------
 // Through `runuser -l clank` because that is the identity the live deployment
 // record belongs to; deploying as root would mint a second record and orphan
@@ -423,7 +497,7 @@ export function sweepImages(options, { log = console.log, exec = execFileSync } 
 // be asserted by a test rather than only asserted by this comment. Reversing
 // repin and bundle is the failure mode the header describes, and a test is the
 // only thing that keeps a future edit from doing it.
-export const STAGES = Object.freeze({ gate, repin, bundle, reclaimBuildSpace, build, runtimePolicy, deploy, settle, runtimeBootstrap, sweepImages });
+export const STAGES = Object.freeze({ gate, repin, bundle, reclaimBuildSpace, build, runtimePolicy, rollEpoch, deploy, settle, runtimeBootstrap, sweepImages });
 
 export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES } = {}) {
   const options = parseArgs(argv);
@@ -441,6 +515,9 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     stageImpl.build(options, { log }); stages.push('build');
     stageImpl.runtimePolicy(options, { log }); stages.push('runtimePolicy');
     if (!options.deploy) { log(`\nno-deploy: built and checked ${options.tag} and stopped before \`up\`.`); return { ...options, stages, ok: true }; }
+    // After the policy refusal and before `up`: a run that is not going to
+    // deploy must not leave the day's budget rolled behind it.
+    stageImpl.rollEpoch(options, { log, now }); stages.push('rollEpoch');
     stageImpl.deploy(options, { log }); stages.push('deploy');
     stageImpl.settle(options, { log }); stages.push('settle');
     stageImpl.runtimeBootstrap(options, { log }); stages.push('runtimeBootstrap');
