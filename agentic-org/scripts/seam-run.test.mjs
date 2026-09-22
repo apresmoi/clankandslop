@@ -4,11 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-<<<<<<< HEAD
-import { DEFAULT_REPO, KEEP_IMAGES, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
-=======
-import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
->>>>>>> origin/main
+import { DEFAULT_REPO, KEEP_IMAGES, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
