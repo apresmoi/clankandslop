@@ -89,11 +89,41 @@ export function pendingAlarms(directory = DEFAULT_SPOOL, { list = readdirSync, r
     });
 }
 
+// `POST /v1/messages`, with an explicit `from.id` — the room-scoped
+// `/v1/rooms/<id>/messages` route is GET only and answers a POST with 405.
+//
+// AND THE STATUS IS READ. The first version of this ran `curl -sS`, which
+// exits 0 on a 405 as happily as on a 202, and reported twelve alarms
+// delivered that the room never received. An alarm path that cannot tell the
+// difference between sent and refused is worse than no alarm path, so the
+// transport now returns the body and this asserts on it: 2xx, `accepted:
+// true`, and a `message_id` the server minted. Anything else throws, the
+// entry stays pending, and the next run tries again.
+export const SEND_PATH = '/v1/messages';
+export const SENDER_ID = 'operator';
+
 const dockerPost = (container, room, text, token) => execFileSync('docker', [
   'exec', '-i', container, 'sh', '-c',
-  `curl -sS -X POST -H "Authorization: Bearer $1" -H 'Content-Type: application/json' --data-binary @- "http://127.0.0.1:8787/v1/rooms/$2/messages"`,
-  'sh', token, room
-], { input: JSON.stringify({ network: NETWORK, text }), encoding: 'utf8', timeout: 20_000 });
+  `curl -sS -o /tmp/clank-alarm-post.json -w '%{http_code}' -X POST -H "Authorization: Bearer $1" -H 'Content-Type: application/json' --data-binary @- "http://127.0.0.1:8787${SEND_PATH}"; printf ' '; cat /tmp/clank-alarm-post.json; rm -f /tmp/clank-alarm-post.json`,
+  'sh', token
+], {
+  input: JSON.stringify({ from: { type: 'agent', id: SENDER_ID }, target: { kind: 'room', room_id: room }, parts: [{ kind: 'text', text }] }),
+  encoding: 'utf8', timeout: 20_000
+});
+
+/** Throws unless the server says it accepted the message. */
+export function assertAccepted(response) {
+  const text = String(response ?? '');
+  const [status, ...rest] = text.trim().split(' ');
+  const body = rest.join(' ');
+  if (!/^2\d\d$/u.test(status)) throw new BridgeError(`Moltnet answered HTTP ${status || '(nothing)'}: ${body.slice(0, 200)}`);
+  let parsed;
+  try { parsed = JSON.parse(body); } catch { throw new BridgeError(`Moltnet returned ${status} with a body this job cannot read: ${body.slice(0, 200)}`); }
+  if (parsed?.accepted !== true || typeof parsed.message_id !== 'string' || !parsed.message_id) {
+    throw new BridgeError(`Moltnet returned ${status} without accepting the message: ${body.slice(0, 200)}`);
+  }
+  return parsed.message_id;
+}
 
 export function bridge(options = {}, { post = dockerPost, list = readdirSync, read = readFileSync, write = writeFileSync, log = console.log } = {}) {
   const directory = options.spool ?? DEFAULT_SPOOL;
@@ -106,7 +136,7 @@ export function bridge(options = {}, { post = dockerPost, list = readdirSync, re
     const findings = mentionFindings(text);
     if (findings.length) { log(`  REFUSED ${path.basename(entry.file)}: ${findings.join('; ')}`); results.push({ file: entry.file, posted: false, refused: findings }); continue; }
     try {
-      post(options.container ?? 'spawnfile-clank-and-slop', options.room ?? ALARM_ROOM, text, token);
+      assertAccepted(post(options.container ?? 'spawnfile-clank-and-slop', options.room ?? ALARM_ROOM, text, token));
       // Marked only after the post returns. A crash between the two reposts the
       // alarm next run, which is the safe direction to be wrong in.
       write(`${entry.file}.posted`, `${new Date().toISOString()}\n`, { mode: 0o600 });

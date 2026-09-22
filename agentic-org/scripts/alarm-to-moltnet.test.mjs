@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { ALARM_ROOM, BridgeError, bridge, composeAlarmMessage, mentionFindings, pendingAlarms } from './alarm-to-moltnet.mjs';
+import { ALARM_ROOM, BridgeError, assertAccepted, bridge, composeAlarmMessage, mentionFindings, pendingAlarms } from './alarm-to-moltnet.mjs';
 
 const scratch = () => mkdtempSync(path.join(tmpdir(), 'clank-alarm-bridge-'));
 const alarm = (extra = {}) => ({
@@ -32,7 +32,7 @@ test('an alarm that would mention a newsroom agent is refused, not rewritten', (
   try {
     writeFileSync(path.join(directory, 'a.json'), JSON.stringify(alarm({ message: 'compose blocked, @caslon owns the missing desk' })));
     const sent = [];
-    const results = bridge({ spool: directory, token: 't' }, { post: (...args) => sent.push(args), log: () => undefined });
+    const results = bridge({ spool: directory, token: 't' }, { post: (...args) => { sent.push(args); return '202 {"message_id":"msg_1","event_id":"evt_1","accepted":true}'; }, log: () => undefined });
     assert.deepEqual(sent, [], 'nothing may be posted');
     assert.equal(results[0].posted, false);
     assert.ok(results[0].refused[0].includes('@caslon'));
@@ -54,7 +54,7 @@ test('a transport failure costs the notification and never the record', () => {
 
     // And the retry on the next run succeeds and marks it exactly once.
     const sent = [];
-    bridge({ spool: directory, token: 't' }, { post: (...args) => sent.push(args), log: () => undefined });
+    bridge({ spool: directory, token: 't' }, { post: (...args) => { sent.push(args); return '202 {"message_id":"msg_1","event_id":"evt_1","accepted":true}'; }, log: () => undefined });
     assert.equal(sent.length, 1);
     assert.ok(readdirSync(directory).includes('a.json.posted'));
     // A posted alarm is still an alarm: the evidence survives the notification.
@@ -70,13 +70,36 @@ test('it posts to room:release, oldest first, and refuses to run with no token',
     writeFileSync(path.join(directory, '2026-09-22T09-00-00Z.deploy-failed.json'), JSON.stringify(alarm()));
     writeFileSync(path.join(directory, '2026-09-22T08-00-00Z.repin-failed.json'), JSON.stringify(alarm({ reason: 'repin-failed', message: 'ref missing' })));
     const sent = [];
-    bridge({ spool: directory, token: 't' }, { post: (_container, room, text) => sent.push([room, text.split('\n')[0]]), log: () => undefined });
+    bridge({ spool: directory, token: 't' }, { post: (_container, room, text) => { sent.push([room, text.split('\n')[0]]); return '202 {"message_id":"msg_1","event_id":"evt_1","accepted":true}'; }, log: () => undefined });
     assert.deepEqual(sent.map(([room]) => room), [ALARM_ROOM, ALARM_ROOM]);
     assert.match(sent[0][1], /repin-failed/u, 'oldest first');
 
     // No token is a refusal, not a silent no-op: an alarm that goes nowhere
     // quietly is the failure this whole path exists to prevent.
     assert.throws(() => bridge({ spool: directory }, { log: () => undefined }), BridgeError);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('a POST that was not accepted is not a delivery', () => {
+  // The first version ran `curl -sS`, which exits 0 on a 405 as happily as on
+  // a 202, and reported twelve alarms delivered that the room never received.
+  assert.equal(assertAccepted('202 {"message_id":"msg_1","accepted":true}'), 'msg_1');
+  for (const response of [
+    '405 Method Not Allowed',
+    '422 {"code":"unprocessable_entity","error":"from.id is required"}',
+    '200 not json at all',
+    '200 {"accepted":false}',
+    '200 {"accepted":true}',
+    ''
+  ]) assert.throws(() => assertAccepted(response), BridgeError, response);
+
+  // And an unaccepted post leaves the entry pending, exactly like a throw.
+  const directory = scratch();
+  try {
+    writeFileSync(path.join(directory, 'a.json'), JSON.stringify(alarm()));
+    const results = bridge({ spool: directory, token: 't' }, { post: () => '405 Method Not Allowed', log: () => undefined });
+    assert.equal(results[0].posted, false);
+    assert.deepEqual(readdirSync(directory), ['a.json'], 'nothing may be marked posted');
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
