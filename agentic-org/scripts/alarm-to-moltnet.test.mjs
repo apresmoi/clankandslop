@@ -3,11 +3,13 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { ALARM_ROOM, BridgeError, assertAccepted, assertLunaReachable, bridge, composeAlarmMessage, mentionFindings, pendingAlarms } from './alarm-to-moltnet.mjs';
+import { ALARM_ROOM, BridgeError, assertAccepted, bridge, composeAlarmMessage, lunaPairingReachable, mentionFindings, pendingAlarms } from './alarm-to-moltnet.mjs';
 
 const connected = () => JSON.stringify({ id: 'clank-luna' });
 
 const scratch = () => mkdtempSync(path.join(tmpdir(), 'clank-alarm-bridge-'));
+// The bridge keeps an attempt log beside the alarms; it is never an alarm.
+const spoolFiles = (directory) => readdirSync(directory).filter((name) => name !== 'attempts.jsonl').sort();
 const alarm = (extra = {}) => ({
   reason: 'deploy-failed', edition: '2026-09-22', message: 'the container never settled',
   at: '2026-09-22T09:06:38.000Z', host: 'clankandslop', ...extra
@@ -51,7 +53,7 @@ test('a transport failure costs the notification and never the record', () => {
       lunaNetwork: connected, post: () => { throw new Error('container is not running'); }, log: () => undefined
     });
     assert.equal(results[0].posted, false);
-    assert.deepEqual(readdirSync(directory), ['a.json'], 'no marker, nothing deleted, nothing moved');
+    assert.deepEqual(spoolFiles(directory), ['a.json'], 'no marker, nothing deleted, nothing moved');
     assert.equal(JSON.parse(readFileSync(path.join(directory, 'a.json'), 'utf8')).reason, 'deploy-failed');
 
     // And the retry on the next run succeeds and marks it exactly once.
@@ -61,7 +63,7 @@ test('a transport failure costs the notification and never the record', () => {
     assert.ok(readdirSync(directory).includes('a.json.posted'));
     // A posted alarm is still an alarm: the evidence survives the notification.
     assert.equal(JSON.parse(readFileSync(path.join(directory, 'a.json'), 'utf8')).reason, 'deploy-failed');
-    assert.deepEqual(readdirSync(directory).sort(), ['a.json', 'a.json.posted']);
+    assert.deepEqual(spoolFiles(directory), ['a.json', 'a.json.posted']);
     bridge({ spool: directory, token: 't' }, { lunaNetwork: connected, post: () => { throw new Error('must not be called again'); }, log: () => undefined });
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
@@ -101,7 +103,7 @@ test('a POST that was not accepted is not a delivery', () => {
     writeFileSync(path.join(directory, 'a.json'), JSON.stringify(alarm()));
     const results = bridge({ spool: directory, token: 't' }, { lunaNetwork: connected, post: () => '405 Method Not Allowed', log: () => undefined });
     assert.equal(results[0].posted, false);
-    assert.deepEqual(readdirSync(directory), ['a.json'], 'nothing may be marked posted');
+    assert.deepEqual(spoolFiles(directory), ['a.json'], 'nothing may be marked posted');
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
@@ -113,33 +115,71 @@ test('an unreadable spool entry is reported and left alone, and a missing spool 
     const results = bridge({ spool: directory, token: 't' }, { lunaNetwork: connected, post: () => { throw new Error('must not be called'); }, log: (line) => lines.push(line) });
     assert.equal(results[0].posted, false);
     assert.match(lines.join(' '), /skipped broken\.json/u);
-    assert.deepEqual(readdirSync(directory), ['broken.json']);
+    assert.deepEqual(spoolFiles(directory), ['broken.json']);
     assert.deepEqual(pendingAlarms(path.join(directory, 'nope')), []);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
-test('an unreachable Luna network leaves the alarm for a later bridge run', () => {
-  assertLunaReachable(connected());
-  assert.throws(() => assertLunaReachable(JSON.stringify({ id: 'another-network' })), BridgeError);
+test('an unreachable relay costs the confirmation, never the local alarm', () => {
+  // The first version of this withheld the room post entirely while Luna was
+  // unreachable — trading a visible alarm for an invisible one. The local post
+  // is verifiable and the relay is not, so they are decided separately.
+  assert.deepEqual(lunaPairingReachable(connected()), { reachable: true });
+  assert.equal(lunaPairingReachable(JSON.stringify({ id: 'another-network' })).reachable, false);
+  assert.equal(lunaPairingReachable('not json').reachable, false);
+
   const directory = scratch();
   try {
     writeFileSync(path.join(directory, 'a.json'), JSON.stringify(alarm()));
     writeFileSync(path.join(directory, 'b.json'), JSON.stringify(alarm()));
     const sent = [];
     let probes = 0;
-    const first = bridge({ spool: directory, token: 't' }, {
+    const results = bridge({ spool: directory, token: 't' }, {
       lunaNetwork: () => { probes++; throw new Error('remote request failed'); },
       post: () => { sent.push('sent'); return '202 {"message_id":"msg_1","accepted":true}'; }, log: () => undefined
     });
-    assert.ok(first.every((entry) => !entry.posted));
-    assert.equal(probes, 1, 'a down relay is probed once per bridge run');
-    assert.deepEqual(sent, []);
-    assert.deepEqual(readdirSync(directory).sort(), ['a.json', 'b.json']);
-    const second = bridge({ spool: directory, token: 't' }, {
-      lunaNetwork: connected,
-      post: () => { sent.push('sent'); return '202 {"message_id":"msg_1","accepted":true}'; }, log: () => undefined
+    assert.deepEqual(sent, ['sent', 'sent'], 'both alarms still reach the room');
+    assert.ok(results.every((entry) => entry.posted));
+    assert.ok(results.every((entry) => entry.relay === 'pairing_unreachable'));
+
+    // And the marker says exactly what was proven, and not one word more.
+    const marker = JSON.parse(readFileSync(path.join(directory, 'a.json.posted'), 'utf8'));
+    assert.equal(marker.posted_to_room, ALARM_ROOM);
+    assert.equal(marker.message_id, 'msg_1');
+    assert.equal(marker.relay, 'pairing_unreachable');
+    assert.equal(marker.delivery_confirmed, false);
+    assert.equal(probes, 1, 'a down relay is probed once per bridge run, not once per alarm');
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('a reachable pairing is still not a delivery, and the record says so', () => {
+  // This is the honest limit: the relay is asynchronous and this host never
+  // sees an acknowledgement for a specific message. Anything that called this
+  // "delivered" would be the silent-success bug in a new hat.
+  const directory = scratch();
+  try {
+    writeFileSync(path.join(directory, 'a.json'), JSON.stringify(alarm()));
+    const results = bridge({ spool: directory, token: 't' }, {
+      lunaNetwork: connected, post: () => '202 {"message_id":"msg_9","accepted":true}', log: () => undefined
     });
-    assert.ok(second.every((entry) => entry.posted));
-    assert.deepEqual(sent, ['sent', 'sent']);
+    assert.equal(results[0].relay, 'pairing_reachable');
+    const marker = JSON.parse(readFileSync(path.join(directory, 'a.json.posted'), 'utf8'));
+    assert.equal(marker.relay, 'pairing_reachable');
+    assert.equal(marker.delivery_confirmed, false, 'reachable is never delivered');
+    assert.match(marker.note, /not observable from this host/u);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('every attempt is recorded, so a silent week is distinguishable from a quiet one', () => {
+  const directory = scratch();
+  try {
+    writeFileSync(path.join(directory, 'a.json'), JSON.stringify(alarm()));
+    bridge({ spool: directory, token: 't' }, { lunaNetwork: connected, post: () => { throw new Error('down'); }, log: () => undefined });
+    bridge({ spool: directory, token: 't' }, { lunaNetwork: connected, post: () => '202 {"message_id":"m","accepted":true}', log: () => undefined });
+    const attempts = readFileSync(path.join(directory, 'attempts.jsonl'), 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+    assert.deepEqual(attempts.map((row) => row.posted), [false, true]);
+    assert.deepEqual(attempts.map((row) => row.relay), [null, 'pairing_reachable']);
+    // The attempt log is never mistaken for an alarm.
+    assert.deepEqual(pendingAlarms(directory).map((entry) => path.basename(entry.file)), []);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
