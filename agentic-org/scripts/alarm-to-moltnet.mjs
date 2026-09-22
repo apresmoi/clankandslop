@@ -101,6 +101,22 @@ export function pendingAlarms(directory = DEFAULT_SPOOL, { list = readdirSync, r
 // entry stays pending, and the next run tries again.
 export const SEND_PATH = '/v1/messages';
 export const SENDER_ID = 'operator';
+export const LUNA_PAIRING = 'clank-luna';
+
+// ListPairings is cached. This endpoint makes a live request to Luna and
+// refreshes pairing diagnostics, so a recovered connection can retry alarms.
+const dockerLunaNetwork = (container, token) => execFileSync('docker', [
+  'exec', container, 'sh', '-c',
+  `curl -fsS --max-time 12 -H "Authorization: Bearer $1" http://127.0.0.1:8787/v1/pairings/${LUNA_PAIRING}/network`,
+  'sh', token
+], { encoding: 'utf8', timeout: 20_000 });
+
+export function assertLunaReachable(response) {
+  let parsed;
+  try { parsed = JSON.parse(String(response)); }
+  catch { throw new BridgeError('Luna network response is unreadable'); }
+  if (parsed?.id !== LUNA_PAIRING) throw new BridgeError('Luna network identity does not match the pairing');
+}
 
 const dockerPost = (container, room, text, token) => execFileSync('docker', [
   'exec', '-i', container, 'sh', '-c',
@@ -125,17 +141,23 @@ export function assertAccepted(response) {
   return parsed.message_id;
 }
 
-export function bridge(options = {}, { post = dockerPost, list = readdirSync, read = readFileSync, write = writeFileSync, log = console.log } = {}) {
+export function bridge(options = {}, { post = dockerPost, lunaNetwork = dockerLunaNetwork, list = readdirSync, read = readFileSync, write = writeFileSync, log = console.log } = {}) {
   const directory = options.spool ?? DEFAULT_SPOOL;
   const token = options.token;
   if (!token) throw new BridgeError('no Moltnet operator token; the alarm stays on disk rather than going nowhere quietly');
   const results = [];
+  let lunaCheck;
   for (const entry of pendingAlarms(directory, { list, read })) {
     if (entry.unreadable) { log(`  skipped ${path.basename(entry.file)}: ${entry.unreadable}`); results.push({ file: entry.file, posted: false }); continue; }
     const text = composeAlarmMessage(entry.body, { breadcrumb: entry.file });
     const findings = mentionFindings(text);
     if (findings.length) { log(`  REFUSED ${path.basename(entry.file)}: ${findings.join('; ')}`); results.push({ file: entry.file, posted: false, refused: findings }); continue; }
     try {
+      if (lunaCheck === undefined) {
+        try { assertLunaReachable(lunaNetwork(options.container ?? 'spawnfile-clank-and-slop', token)); lunaCheck = true; }
+        catch (error) { lunaCheck = error; }
+      }
+      if (lunaCheck !== true) throw lunaCheck;
       assertAccepted(post(options.container ?? 'spawnfile-clank-and-slop', options.room ?? ALARM_ROOM, text, token));
       // Marked only after the post returns. A crash between the two reposts the
       // alarm next run, which is the safe direction to be wrong in.
