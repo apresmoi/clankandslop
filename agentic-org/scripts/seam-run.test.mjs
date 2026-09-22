@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { DEFAULT_REPO, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
+import { DEFAULT_REPO, KEEP_IMAGES, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
@@ -211,7 +211,13 @@ test('the image sweep only ever touches the seam s own tags, and never the one j
     return { toString: () => '' };
   };
   sweepImages({ tag: 'clank-and-slop:seam-2026-09-06-090000' }, { log: noop, exec });
-  assert.deepEqual(removed, ['clank-and-slop:seam-2026-09-03-090000']);
+  // KEEP_IMAGES is 2: the live image and the one it would roll back to. The
+  // third and fourth are a different corpus pin and a different day's paper,
+  // and on a 75GB disk they are 9.9GB standing between the build and its own
+  // floor. Asserted against the constant so the two cannot drift apart.
+  assert.equal(KEEP_IMAGES, 2);
+  assert.deepEqual(removed, ['clank-and-slop:seam-2026-09-04-090000', 'clank-and-slop:seam-2026-09-03-090000']);
+  assert.ok(!removed.includes('clank-and-slop:seam-2026-09-05-090000'), 'yesterday stays: it is the rollback target');
   assert.ok(!removed.some((tag) => tag.includes('local7') || tag.includes('registry')));
 });
 
