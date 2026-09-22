@@ -322,7 +322,40 @@ export function compiledOutputPath(options) {
   return path.join(options.repo, COMPILED_OUTPUT_DIR, `${COMPILED_OUTPUT_PREFIX}${String(options.tag ?? '').replace(/[^a-zA-Z0-9_.-]/gu, '_')}`);
 }
 
+// The corpus the image will mount is decided by one tracked file,
+// `policies/private-source.json`, and it is rewritten by `repin` at the top of
+// every run. Which means a run that SKIPS repin builds an image whose twelve
+// agents mount whatever corpus that file last named — silently, with no
+// diagnostic, because a stale pin is a perfectly valid pin.
+//
+// That is not hypothetical. On 2026-09-22 the checkout was reset to `main`
+// several times, and `main`'s committed pin is `edition/2026-09-09-prepared`:
+// a bare `spawnfile build` from that tree would have mounted two-week-old
+// research into tonight's paper and nothing would have said so. The pin cannot
+// simply be committed correctly either — it is per-edition by construction, so
+// whatever is committed is stale by the next morning.
+//
+// So the build asserts the pin names the edition being built. It is the cheap
+// version of the check: a `spawnfile build` invoked outside this job entirely
+// is still unguarded from here, and that is worth knowing rather than
+// pretending otherwise.
+export function assertCorpusPin(options, { read = readFileSync } = {}) {
+  const file = path.join(options.repo, 'agentic-org/policies/private-source.json');
+  let pin;
+  try { pin = JSON.parse(read(file, 'utf8')); }
+  catch (error) { throw new SeamError(`cannot read the private corpus pin ${file}: ${error.message}`, 'deploy-failed'); }
+  if (pin?.edition !== options.edition) {
+    throw new SeamError(
+      `the private corpus pin names edition ${pin?.edition ?? '(none)'} but this build is for ${options.edition} —`
+      + ` refusing to mount research from another day. Run repin first (${file} is rewritten by repin-private-source.mjs).`,
+      'deploy-failed');
+  }
+  return pin;
+}
+
 export function build(options, { log = console.log } = {}) {
+  const pin = assertCorpusPin(options);
+  log(`corpus: ${pin.ref} @ ${String(pin.commit).slice(0, 12)} (edition ${pin.edition})`);
   options.compiledOutput = compiledOutputPath(options);
   run('build', 'deploy-failed', process.execPath, [options.cli, 'build', path.join(options.repo, 'agentic-org'), '--tag', options.tag, '--out', options.compiledOutput], { cwd: options.repo, log });
   return options.tag;
