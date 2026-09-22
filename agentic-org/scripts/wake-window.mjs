@@ -68,6 +68,34 @@ export const STEADY_STATE = Object.freeze([
   /daimon-grok-broker-lease/u,
   /^\[daimon-engine-b[a-z]*\] <defunct>$/u
 ]);
+// A brokered Grok worker: the `bwrap` jail and the CLI inside it. These are
+// NOT steady state — a worker running a turn must block a redeploy, which is
+// what it meant to anchor the broker patterns above.
+//
+// They are named separately because a worker can also be a LEAK. On
+// 2026-09-21 two of them were still alive 48 minutes after their turns had
+// sealed: broker (R) → bwrap (S) → `/usr/local/bin/grok --sandbox
+// daimon-strict` (Sl), with no turn behind them. The gate refused the next
+// morning's run over processes that were doing nothing, and only a manual
+// container restart cleared it.
+//
+// Reaping the worker is the broker's job and the leak is its bug — that fix
+// lives in Daimon, behind a pinned runtime image and its capability receipt,
+// not here. But deciding whether a process means "work in flight" is THIS
+// job's, and answering it from a process name was wrong on its own terms: a
+// turn is an execution, the runtime reports its executions, and when it
+// authoritatively reports none there is no turn for a worker to belong to.
+// `quiescence` therefore keeps these as findings whenever the runtime cannot
+// answer or says something IS running, and records them as leaked otherwise.
+//
+// The leak stays bounded without anyone watching: the seam's own deploy
+// restarts the container, so at most one day of workers can accumulate.
+export const GROK_WORKER = Object.freeze([
+  /^bwrap /u,
+  /^\S*\/grok (?:--|$)/u
+]);
+export const isGrokWorkerProcess = (args) => GROK_WORKER.some((pattern) => pattern.test(args));
+
 // `docker exec … sh -c 'ps …'` shows up in its own output as the shell plus the
 // ps it spawned. Excluding those by pattern would mean excluding `sh -c`, which
 // is exactly the shape an engine turn takes — so the probe carries a sentinel
@@ -220,7 +248,7 @@ const dockerInspect = (container, { docker = 'docker' } = {}) =>
 // Fails closed. Every branch that cannot read a signal returns a finding, so
 // "the container is unreachable" blocks a deploy exactly as "an agent is awake"
 // does.
-export function quiescence(container, { docker = 'docker', now = new Date(), quietMinutes = 15, exec = dockerExec, inspect = dockerInspect, acceptanceStore = ACCEPTANCE_STORE, usageLedger = USAGE_LEDGER } = {}) {
+export function quiescence(container, { docker = 'docker', now = new Date(), quietMinutes = 15, exec = dockerExec, inspect = dockerInspect, acceptanceStore = ACCEPTANCE_STORE, usageLedger = USAGE_LEDGER, log } = {}) {
   const findings = [];
   const observed = { outstanding: [], incompleteTurns: 0, lastTurnMinutesAgo: null, extraProcesses: [] };
 
@@ -265,7 +293,17 @@ export function quiescence(container, { docker = 'docker', now = new Date(), qui
 
   // 3. the process table.
   try {
-    observed.extraProcesses = foreignProcesses(exec(container, `ps -eo pid,ppid,args # ${PROBE_SENTINEL}`, { docker }));
+    const foreign = foreignProcesses(exec(container, `ps -eo pid,ppid,args # ${PROBE_SENTINEL}`, { docker }));
+    // A turn is an execution. When the runtime is the authority AND reports no
+    // execution running, a Grok worker still on the process table has no turn
+    // to belong to: it is a leak (see GROK_WORKER), not work in flight, and it
+    // must not block a redeploy forever. Every other branch — legacy receipts,
+    // an unreadable activity endpoint, or an execution actually running —
+    // leaves every foreign process a finding, so this cannot fail open.
+    const settled = authority?.authority === 'executions' && authority.executions.length === 0;
+    observed.leakedWorkers = settled ? foreign.filter((args) => isGrokWorkerProcess(args)) : [];
+    observed.extraProcesses = settled ? foreign.filter((args) => !isGrokWorkerProcess(args)) : foreign;
+    if (observed.leakedWorkers.length) log?.(`  ${observed.leakedWorkers.length} leaked Grok worker process(es) with no running execution — not work in flight; the redeploy will reap them`);
     for (const args of observed.extraProcesses) findings.push(`a process outside the steady-state set is running in the container: ${args.slice(0, 160)}`);
   } catch (error) { findings.push(`could not read the container process table (${String(error.message).trim().slice(0, 200)})`); }
 
