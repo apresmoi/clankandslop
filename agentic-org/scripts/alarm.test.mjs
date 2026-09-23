@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { AlarmError, REASONS, composeAlarm, deliver, parseArgs, raise, readBack, readTopicUrl, spool } from './alarm.mjs';
+import { AlarmError, REASONS, composeAlarm, composePage, deliver, parseArgs, raise, readBack, readTopicUrl, scrubPaths, spool } from './alarm.mjs';
 
 const scratch = () => mkdtempSync(path.join(tmpdir(), 'clank-alarm-test-'));
 const url = 'https://ntfy.sh/topic-abcdef';
@@ -116,4 +116,85 @@ test('read-back matches on the alarm instant, so it cannot pass on somebody else
   const mine = JSON.stringify({ event: 'message', id: 'mine', message: `x ${alarm.body.at}` });
   const seen = await readBack(readTopicUrl(environment()), alarm, { fetchImpl: async () => ({ ok: true, text: async () => `${other}\n${mine}` }), sleep: async () => {} });
   assert.deepEqual(seen.map((entry) => entry.id), ['mine']);
+});
+
+
+// --- what may leave the box on a PUBLIC topic --------------------------------
+
+const alarmBody = (overrides = {}) => composeAlarm({
+  reason: 'deploy-failed', edition: '2026-09-24', host: 'clankandslop',
+  at: '2026-09-24T09:05:33.187Z',
+  message: 'deploy-failed after [gate, repin, bundle, build, deploy]',
+  detail: 'Candidate container did not become ready\n/home/clank/deploy-work/grok-runtime-identity-20260922.json',
+  ...overrides
+}).body;
+
+test('a page says what broke and when, and never carries the detail line', () => {
+  const page = composePage(alarmBody());
+  // What a person needs at 3am.
+  assert.match(page, /deploy-failed/u);
+  assert.match(page, /clankandslop/u);
+  assert.match(page, /2026-09-24/u);
+  assert.match(page, /\[gate, repin, bundle, build, deploy\]/u, 'the stage list is the useful part');
+  // MUTATION CHECK: the topic is a public URL. Put the detail line or the
+  // alarm JSON back into the body and this goes red.
+  assert.ok(!page.includes('Candidate container did not become ready'), `detail leaked: ${page}`);
+  assert.ok(!page.includes('grok-runtime-identity'), `detail leaked: ${page}`);
+  assert.ok(!page.includes('"version"'), `the alarm JSON leaked: ${page}`);
+  assert.ok(!page.includes('clank.alarm.v1'), `the alarm JSON leaked: ${page}`);
+});
+
+test('no filesystem path reaches a public topic, wherever it came from', () => {
+  // The seam composes `message` itself, but --message is caller-supplied and
+  // nothing stops a path ending up in it.
+  const page = composePage(alarmBody({ message: 'up failed, see /var/lib/clank-alarm/spool/x.json' }));
+  assert.ok(!page.includes('/var/lib/clank-alarm'), `a path reached the page: ${page}`);
+  assert.match(page, /<path>/u);
+  // The scrubber is about paths, not about ordinary prose or dates.
+  assert.equal(scrubPaths('deploy-failed after [build] on 2026-09-24'), 'deploy-failed after [build] on 2026-09-24');
+  assert.equal(scrubPaths('/etc/clank-alarm/alarm.env'), '<path>');
+  assert.equal(scrubPaths('a/b'), 'a/b', 'a single slash is not a path worth scrubbing');
+});
+
+test('the timestamp survives into the page, because --selftest matches on it', () => {
+  // readBack() proves delivery by finding its own `at` in the topic. Drop `at`
+  // from the page and the self-test can never pass again.
+  const body = alarmBody();
+  assert.ok(composePage(body).includes(body.at), 'the self-test reads this back out of the topic');
+});
+
+test('the spooled record still keeps everything the page drops', () => {
+  const directory = scratch();
+  try {
+    const alarm = composeAlarm({ reason: 'deploy-failed', edition: '2026-09-24', host: 'h', at: '2026-09-24T09:05:33.187Z', message: 'm', detail: '/home/clank/secret' });
+    const file = spool(alarm, { directory });
+    const stored = JSON.parse(readFileSync(file, 'utf8'));
+    // The evidence is not lost — it is on the box, which is the whole trade.
+    assert.equal(stored.detail, '/home/clank/secret');
+    assert.ok(!composePage(alarm.body).includes('/home/clank/secret'));
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+
+test('what is actually SENT carries no detail, no JSON and no path', async () => {
+  // Asserting on composePage() alone proves the composer is clean but not that
+  // the transport uses it. This captures the body handed to fetch.
+  const sent = [];
+  const fetchImpl = async (url, init) => { sent.push(init.body); return { ok: true, status: 200, json: async () => ({}) }; };
+  const alarm = composeAlarm({
+    reason: 'deploy-failed', edition: '2026-09-24', host: 'clankandslop', at: '2026-09-24T09:05:33.187Z',
+    message: 'deploy-failed after [build], see /var/lib/clank-alarm/spool/x.json',
+    detail: 'Candidate container did not become ready\n/home/clank/deploy-work/grok-runtime-identity.json'
+  });
+  const result = await deliver(readTopicUrl({ CLANK_ALARM_URL: 'https://ntfy.sh/topic' }), alarm, { fetchImpl, sleep: async () => {} });
+  assert.equal(result.delivered, true);
+  assert.equal(sent.length, 1);
+  const body = sent[0];
+  assert.ok(!body.includes('Candidate container did not become ready'), `detail was SENT: ${body}`);
+  assert.ok(!body.includes('grok-runtime-identity'), `detail was SENT: ${body}`);
+  assert.ok(!body.includes('clank.alarm.v1'), `the alarm JSON was SENT: ${body}`);
+  assert.ok(!body.includes('/var/lib/clank-alarm'), `a path was SENT: ${body}`);
+  // Still useful.
+  assert.match(body, /deploy-failed/u);
+  assert.ok(body.includes('2026-09-24T09:05:33.187Z'), 'the self-test reads this back');
 });

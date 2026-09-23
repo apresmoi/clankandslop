@@ -111,8 +111,38 @@ export function readTopicUrl(environment = process.env) {
   return { url: parsed, topic, origin: parsed.origin };
 }
 
+// WHAT MAY LEAVE THE BOX
+// ----------------------
+// The ntfy topic is a PUBLIC URL: the topic name is the only secret, and
+// anyone who holds it reads every page ever sent. So a page carries what broke,
+// when, and which stage — never a filesystem path, never the spool breadcrumb,
+// never the alarm JSON, and never the `detail` line, which is where build
+// output and host paths live.
+//
+// None of that evidence is lost. It is on the box, in the spool, before
+// anything is sent (see spool() below), and the room:release copy — which is
+// access-controlled — still carries the detail. This is the one channel that
+// leaves the premises, so it is the one that says least.
+//
+// `at` MUST survive into the page text: --selftest proves delivery by reading
+// its own message back out of the topic and matching on that timestamp.
+const PATHLIKE = /(?:\/[A-Za-z0-9._@-]+){2,}\/?/gu;
+
+/** Anything that looks like a filesystem path becomes `<path>`; the page says what broke, not where the box keeps it. */
+export function scrubPaths(text) { return String(text ?? '').replace(PATHLIKE, '<path>'); }
+
+/** The public page. Deliberately not the alarm body. */
+export function composePage(body) {
+  return [
+    `${body.host} \u00b7 ${body.reason}${body.edition ? ` \u00b7 ${body.edition}` : ''}`,
+    scrubPaths(body.message),
+    `at ${body.at}`,
+    'evidence stays on the box'
+  ].filter(Boolean).join('\n');
+}
+
 // A stable, machine-readable body. The human sees the first line on a lock
-// screen; whatever is diagnosing later gets the JSON.
+// screen; whatever is diagnosing later reads the JSON ON THE BOX, not here.
 export function composeAlarm({ reason, edition, message, detail, host, at }) {
   const spec = REASONS[reason];
   const headline = `${host} · ${reason}${edition ? ` · ${edition}` : ''}: ${message ?? spec.title}`;
@@ -127,7 +157,7 @@ const post = async (target, alarm, { fetchImpl = fetch, timeoutMs = 15000 } = {}
     const response = await fetchImpl(target.url.toString(), {
       method: 'POST', signal: controller.signal,
       headers: { Title: alarm.title, Priority: alarm.priority, Tags: alarm.tags, 'Content-Type': 'text/plain; charset=utf-8' },
-      body: `${alarm.headline}\n${JSON.stringify(alarm.body)}`
+      body: composePage(alarm.body)
     });
     if (!response.ok) throw new Error(`ntfy responded ${response.status}`);
     return await response.json().catch(() => ({}));
