@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, berlinToday, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
+import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, assertCorpusPin, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
@@ -435,6 +435,37 @@ test('once the container is healthy only the running image is kept', () => {
     during.push(args[2]); return { toString: () => '' };
   } });
   assert.deepEqual(during, ['clank-and-slop:seam-2026-09-21-090022']);
+});
+
+test('the build refuses a corpus pin from another edition', () => {
+  // 2026-09-22: the checkout was reset to `main` several times, and `main`'s
+  // committed pin reads `edition/2026-09-09-prepared`. A build that skipped
+  // repin would have mounted two-week-old research into that night's paper
+  // with no diagnostic at all, because a stale pin is a perfectly valid pin.
+  const pin = (edition) => () => JSON.stringify({ version: 'v1', repo: 'clankandslop-private', commit: 'a'.repeat(40), ref: `edition/${edition}`, edition });
+
+  assert.equal(assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: pin('2026-09-23') }).edition, '2026-09-23');
+
+  assert.throws(() => assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: pin('2026-09-09') }),
+    (error) => error.reason === 'deploy-failed' && /names edition 2026-09-09 but this build is for 2026-09-23/u.test(error.message));
+
+  // An unreadable or shapeless pin is a refusal too, never an assumed pass.
+  assert.throws(() => assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: () => { throw new Error('ENOENT'); } }),
+    (error) => error.reason === 'deploy-failed' && /cannot read the private corpus pin/u.test(error.message));
+  assert.throws(() => assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: () => '{}' }),
+    (error) => /names edition \(none\)/u.test(error.message));
+
+  // And `build` must actually consult it — the assertion is worth nothing if
+  // the stage does not run it. A real repo tree with a foreign pin, and the
+  // refusal must happen BEFORE the compiler is spawned.
+  const repo = mkdtempSync(path.join(tmpdir(), 'clank-pin-build-'));
+  try {
+    mkdirSync(path.join(repo, 'agentic-org', 'policies'), { recursive: true });
+    writeFileSync(path.join(repo, 'agentic-org/policies/private-source.json'),
+      JSON.stringify({ version: 'v1', commit: 'b'.repeat(40), ref: 'edition/2026-09-09-prepared', edition: '2026-09-09' }));
+    assert.throws(() => build({ repo, edition: '2026-09-23', tag: 'clank-and-slop:seam-t', cli: '/nonexistent/cli.js' }, { log: () => undefined }),
+      (error) => error.reason === 'deploy-failed' && /refusing to mount research from another day/u.test(error.message));
+  } finally { rmSync(repo, { recursive: true, force: true }); }
 });
 
 test('the compiled-output scratch is swept, bounded, and never the tree this run will write', () => {
