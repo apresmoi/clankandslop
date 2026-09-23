@@ -66,18 +66,21 @@ export const DEFAULT_DEPLOY_USER = 'clank';
 // Seam-built images are tagged so they can be told apart from every hand-built
 // `local<n>`, and so the retention sweep below can only ever touch its own.
 export const TAG_PREFIX = 'clank-and-slop:seam-';
-// Two, not three. Each org image is 4.93GB on a 75GB disk with roughly 55GB
-// otherwise committed, so three of them put steady-state free space at 9-11GB —
-// straddling this job's own 10GiB build floor. It sat at 9.1GB after the
-// 2026-09-22 build, and the run before that had to be unblocked by hand.
+// TWO during the run, ONE once the new container is healthy.
 //
-// The third image was never the rollback target anyway. What a bad deploy rolls
-// back to is the image that ran yesterday; the one before it belongs to a
-// different corpus pin and a different day's paper, so restoring it would not
-// restore a state anyone wants. Keeping the live image and its immediate
-// predecessor is the whole of what rollback means here, and it buys back 4.93GB
-// of permanent headroom.
+// Two while the build is in flight because the running image cannot be removed
+// and the new one does not exist yet. One afterwards because image-level
+// rollback is worth almost nothing here: every org image is pinned to ONE day's
+// corpus, so "rolling back" does not restore a working newsroom — it restores
+// yesterday's research under today's date, which is the exact failure this
+// pipeline spent two days removing. A broken build is fixed by fixing it and
+// rebuilding, not by running a stale image.
+//
+// This is a deliberate trade, not an oversight: we give up image rollback and
+// get ~5GB of permanent headroom per retired image. Do not reinstate retention
+// without a reason that survives the corpus-pinning argument.
 export const KEEP_IMAGES = 2;
+export const KEEP_IMAGES_AFTER_SETTLE = 1;
 // `build` writes the compiler's whole output tree to
 // `.runtime/seam-compiled-<tag>/` and nothing ever removed it. Twelve of them
 // had accumulated by 2026-09-20 — 8.2GB of pure scratch on a 75GB disk, more
@@ -255,7 +258,22 @@ export function assertPinsMatchDescriptor(options, { log = console.log } = {}) {
 // prune returned 13.2GB in seconds. The floor is the second half: a build that
 // cannot fit must be refused while the deployment is still whole, not discovered
 // halfway through an image export.
-export const BUILD_FLOOR_BYTES = 10 * 1024 * 1024 * 1024;
+// MEASURED, not chosen. The 2026-09-23 run logged "10.2GiB free before reclaim,
+// 10.2GiB after (floor 10.0GiB)", passed, and then died in `deploy` with 2.1GB
+// left: the build had eaten 8.1GiB between the check and the container start.
+// A floor that passes and then starves mid-build is worse than no floor,
+// because it reads as a guarantee.
+//
+// What one run actually consumes: ~4.94GB for the image, ~0.7GB of compile
+// scratch, and several GB of fresh build cache — call it 10GB. The candidate
+// container then has to start while the outgoing one is still up, so the floor
+// has to cover a build AND leave a box's worth of room behind it. 20GiB.
+export const BUILD_FLOOR_BYTES = 20 * 1024 * 1024 * 1024;
+
+export function pruneBuildCache({ log = console.log, exec = execFileSync } = {}) {
+  try { exec('docker', ['builder', 'prune', '-af'], { stdio: ['ignore', 'pipe', 'pipe'] }); return true; }
+  catch (error) { log(`  (build cache prune skipped: ${String(error.message).trim().slice(0, 120)})`); return false; }
+}
 
 export function reclaimBuildSpace(options, { log = console.log, exec = execFileSync, floorBytes = BUILD_FLOOR_BYTES, sweepScratch = sweepCompiledOutputs } = {}) {
   const free = () => {
@@ -266,9 +284,17 @@ export function reclaimBuildSpace(options, { log = console.log, exec = execFileS
   };
   const gib = (bytes) => `${(bytes / 1024 ** 3).toFixed(1)}GiB`;
   const before = free();
+  // The WHOLE cache, every run, not the 24h slice and not as a fallback.
+  //
+  // The box was holding 22.9GB of build cache on 2026-09-23 — a third of the
+  // disk — of which the `until=24h` filter could reclaim 3.3GB. What that cache
+  // buys is a faster next build, and the next build changes the corpus layer
+  // anyway, so most of it is dead on arrival. Trading 23GB for a couple of
+  // minutes on a box that then fails to build is a bad trade, and it is the
+  // trade that broke the first unattended morning.
+  //
   // Cache only: never an image, never a volume, never a running container's layers.
-  try { exec('docker', ['builder', 'prune', '-af', '--filter', 'until=24h'], { stdio: ['ignore', 'pipe', 'pipe'] }); }
-  catch (error) { log(`  (build cache prune skipped: ${String(error.message).trim().slice(0, 120)})`); }
+  pruneBuildCache({ log, exec });
   sweepImages(options, { log, exec });
   sweepScratch(options, { log });
   let after = free();
@@ -283,13 +309,6 @@ export function reclaimBuildSpace(options, { log = console.log, exec = execFileS
   // nothing else, which is unambiguously better than refusing to run. It stays
   // a SECOND pass rather than the first so the ordinary day keeps its warm
   // cache, and it still never touches an image, a volume or a container.
-  if (after < floorBytes) {
-    log(`  below the floor after the filtered prune; dropping the whole build cache`);
-    try { exec('docker', ['builder', 'prune', '-af'], { stdio: ['ignore', 'pipe', 'pipe'] }); }
-    catch (error) { log(`  (full build cache prune skipped: ${String(error.message).trim().slice(0, 120)})`); }
-    after = free();
-    log(`disk: ${gib(after)} free after dropping the build cache (floor ${gib(floorBytes)})`);
-  }
   if (after < floorBytes) {
     throw new SeamError(`refusing to build with ${gib(after)} free below the ${gib(floorBytes)} floor - reclaim space before deploying`, 'seam-blocked');
   }
@@ -492,12 +511,12 @@ export function settle(options, { log = console.log, sleepSeconds = 10, rounds =
 
 // Keeps the seam's own image tags bounded. Only ever removes tags this job
 // created, never a volume, never a dangling-image sweep, never `prune`.
-export function sweepImages(options, { log = console.log, exec = execFileSync } = {}) {
+export function sweepImages(options, { log = console.log, exec = execFileSync, keep = KEEP_IMAGES } = {}) {
   try {
     const tags = exec('docker', ['images', '--format', '{{.Repository}}:{{.Tag}}\t{{.CreatedAt}}'], { stdio: ['ignore', 'pipe', 'pipe'] }).toString()
       .split('\n').filter((line) => /^clank-and-slop:seam-\d{4}-\d{2}-\d{2}-\d{6}\t/u.test(line)).map((line) => line.split('\t'))
       .sort((a, b) => (a[1] < b[1] ? 1 : -1)).map(([tag]) => tag);
-    for (const tag of tags.slice(KEEP_IMAGES)) {
+    for (const tag of tags.slice(keep)) {
       if (tag === options.tag) continue;
       try { exec('docker', ['image', 'rm', tag], { stdio: ['ignore', 'pipe', 'pipe'] }); log(`  retired image ${tag}`); } catch { /* still referenced; leave it */ }
     }
@@ -532,7 +551,14 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     stageImpl.deploy(options, { log }); stages.push('deploy');
     stageImpl.settle(options, { log }); stages.push('settle');
     stageImpl.runtimeBootstrap(options, { log }); stages.push('runtimeBootstrap');
-    stageImpl.sweepImages(options, { log });
+    // The container is up and healthy, so the image it replaced is no longer
+    // the thing a rollback would want (see KEEP_IMAGES) and the cache this
+    // build filled is spent. Reclaiming here rather than only before the next
+    // build is what keeps the box from sitting at 98% all day, which is how the
+    // 2026-09-23 run found itself with 2.1GB and a container that could not
+    // start.
+    stageImpl.sweepImages(options, { log, keep: KEEP_IMAGES_AFTER_SETTLE });
+    pruneBuildCache({ log });
     log(`\nseam complete: edition ${options.edition} pinned, bundled, built as ${options.tag}, deployed and settled.`);
     return { ...options, stages, ok: true };
   } catch (error) {
