@@ -26,7 +26,7 @@ At conference, read the current edition INDEX, `room:conference`, and the
 permitted slate at `repos/newsroom-private/<date>/desks/_all.index`. Choose the
 lineup that can make a paper: five passed articles by five different reporters,
 at least three sections, at least three named sources across at least three
-domains, plus exactly one forecast assignment with a different named dissenter.
+domains, plus exactly one forecast assignment with a different named dissenter. Five passed is the floor the edition must clear, not the number to commission: commission six whose evidence can already carry a piece, because a five-story lineup has no spare and one spike ends the day. The sixth is usually The Hearth — it is the margin, so do not withhold it for lack of margin.
 
 Record the lineup with `mcp_newsroom_record_assignment` before announcing it.
 Only a successful tool response permits handoffs. After success, summarize the
