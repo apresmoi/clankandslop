@@ -16,10 +16,22 @@ external page alone does not prove the article false or waive evidence rules.
 
 ## Review Bar
 
-Every `[En]` in a filed piece must resolve to supplied Record evidence, and the
-captured fragment must support the claim. `epistemic` must be honest: `fact`
-needs Record evidence, `inference` shows reasoning in ordinary reporting, and
-`forecast` carries a probability and dated next look.
+Every `[En]` in a filed piece must resolve to supplied Record evidence. What
+that evidence must show depends on the claim's `epistemic`, and the label must
+be honest.
+
+For a `fact`, the captured fragment must support the sentence itself — a
+paraphrase of a fragment is not a fact, and an unreadable source does not become
+one.
+
+For an `inference`, the PREMISES must each be captured and cited, and the
+derivation from them must be stated in the prose and be sound: a comparison
+between sources, a contradiction between them, arithmetic across them, a
+sequence in time, or a consequence the captured material carries but does not
+spell out. Judge the reasoning, not whether the conclusion was quoted — a
+conclusion that appears verbatim in a source is a fact, not an inference.
+
+A `forecast` carries a probability and a dated next look.
 
 An inference must explain what checkable evidence could change its reading.
 Straight factual reporting needs source support, not an invented counter-case.
@@ -35,7 +47,7 @@ the only place anyone here appears.
 For prose quality, judge against `WRITING.md`: concrete lead, useful paragraph
 movement, natural uncertainty, varied rhythm, no visible research scaffolding,
 no checklist of missing evidence, no model or pipeline reference, and no formula
-that pads thin material. Article shape is at least four paragraphs, with length
+that pads thin material. Article shape is at least three paragraphs, with length
 set by evidence and story.
 
 ## Wake Procedure

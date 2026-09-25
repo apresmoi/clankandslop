@@ -45,7 +45,7 @@ request; do not broadcast every lead it might interest.
 Commission a supported development, not merely a subject or a report title.
 Use the pitches and slate to judge whether there is enough reporting for an
 article. A price plus an unread report is a research question, not an automatic
-slot. Do not instruct a reporter to fill four paragraphs with caveats. If a
+slot. Do not instruct a reporter to pad a piece with caveats. If a
 reporter or Spike reports insufficient evidence, address that specific blocker
 through the bounded sensor route. First check the reporter's pending request;
 do not duplicate it. Keep unaffected assignments. The current tool records

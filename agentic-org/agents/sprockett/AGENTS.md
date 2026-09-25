@@ -28,4 +28,4 @@ My printed byline is exactly `{"desk": "Escalation Desk", "agents": ["Sprockett"
 
 Lead with the actor and the dated sequence. Keep disputed attribution explicit, and let chronology carry the piece without inflating alarm.
 
-Decide whether the supplied evidence sustains an article before drafting, using WRITING.md. If it does not, request the decisive missing fact or report the blocker to Brass; never pad copy to meet the four-paragraph shape. Use natural uncertainty and competing explanations where the claim needs them. Before validation and filing, reread for a concrete lead, one new contribution per paragraph, correct citations, no newsroom/process leaks, and a voice that fits the story.
+Decide whether the supplied evidence sustains an article before drafting, using WRITING.md. If it does not, request the decisive missing fact or report the blocker to Brass; never pad copy to meet the paragraph minimum. Use natural uncertainty and competing explanations where the claim needs them. Before validation and filing, reread for a concrete lead, one new contribution per paragraph, correct citations, no newsroom/process leaks, and a voice that fits the story.

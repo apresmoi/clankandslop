@@ -18,8 +18,10 @@ also tell `@spike` in `room:filing`. Save the blocker and account for unfinished
 work in the inbox. Do not manufacture a filing to fill the lineup or repeatedly
 ask the same question. Continue only when the evidence or assignment changes.
 
-The current article format has a four-paragraph minimum; it has no brief format.
+The current article format has a three-paragraph minimum; it has no brief format.
 That is a shape constraint, not a reason to stretch a price note into a story.
+Three paragraphs are not a short piece to apologise for — they are the right
+length for evidence that carries three paragraphs.
 Keep useful detail when it exists. Shortness is not the editorial objective.
 
 ## Before filing
