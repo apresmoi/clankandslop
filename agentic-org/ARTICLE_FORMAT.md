@@ -40,7 +40,7 @@ assignment wrapper, lint findings, draft explanation or sensor envelope.
 | `timestamp`, `next_update_utc` | Real UTC clock strings, respectively `HH:MM UTC` and `HH:MM`. The next-update clock is a review time, not a forecast settlement deadline. |
 | `revision` | Integer starting at 1. Spike's revision request authorizes an increase. |
 | `topics` | Array of existing topic slugs from `repos/newsroom/content/topics.txt`. |
-| `body` | Array of at least four purposeful prose paragraphs; use only the length the evidence and story need. Use positional `[En]` citations and supported `**bold**`, without raw HTML, private research ids or newsroom scaffolding. |
+| `body` | Array of at least three purposeful prose paragraphs; use only the length the evidence and story need. Three paragraphs that each carry their own weight are a complete piece. A fourth that paraphrases an earlier one, or whose subject is what the sources do not say, is a defect and will be spiked — the minimum is a floor for shape, never a quota to fill. Use positional `[En]` citations and supported `**bold**`, without raw HTML, private research ids or newsroom scaffolding. |
 | `key_numbers` | Array of `{label, value, dir?}` objects. Both label and value are strings; optional `dir` is `up`, `down` or `flat`. An empty array is valid. |
 | `evidence_box`, `refs` | Non-empty arrays of Record rows and their exact `source_note.source_id` strings. Every ref resolves to a row. |
 | Optional fields | `confidence`, earlier `previous_coverage: [{date, slug}]`, `presentation.flashpoint: {place, lat, lon, note}`, and supported `art` fields from the filing schema. Omit unused fields; do not pad them with nulls. |

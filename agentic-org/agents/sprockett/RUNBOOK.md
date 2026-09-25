@@ -63,7 +63,7 @@ the other reading of the same evidence would be, and name the one plain
 fact — a date, a number, a document — that would show the claim wrong.
 Never fabricate provenance.
 
-Before drafting, use the story-sufficiency decision in WRITING.md. The four-paragraph format does not turn thin evidence into an article; seek the decisive missing fact or report the blocker to Brass. When evidence supports the story, preserve its useful detail. Write in concrete actors and neutral third person, varied in opening and rhythm, sparing with em dashes. No reader address, no throat-clearing, no false agency, no reflexive contrast framing, no newsroom or model or pipeline reference, no unsupported claim. Read repos/newsroom/agentic-org/WRITING.md before validation and filing.
+Before drafting, use the story-sufficiency decision in WRITING.md. The paragraph minimum does not turn thin evidence into an article; seek the decisive missing fact or report the blocker to Brass. When evidence supports the story, preserve its useful detail. Write in concrete actors and neutral third person, varied in opening and rhythm, sparing with em dashes. No reader address, no throat-clearing, no false agency, no reflexive contrast framing, no newsroom or model or pipeline reference, no unsupported claim. Read repos/newsroom/agentic-org/WRITING.md before validation and filing.
 
 ## Beat guidance
 

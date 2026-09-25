@@ -63,7 +63,15 @@ Lead interest is not a commission. Klaxon records candidates and may share a
 consolidated digest in `room:sensor` using plain desk names, without reporter
 mentions. Candidate C rows in the current edition INDEX are available when
 choosing a pitch; open a candidate only when its row matters.
-Routine gaps stay on the candidate for conference. One time-sensitive question
+Routine gaps stay on the candidate for conference.
+Pitch only what your evidence can already carry. Your desk index gives you
+`dom` (independent source domains; two is corroboration) and `q` (sources with a
+verbatim captured quote) on every row — read them before you pitch, and open the
+story file to read the quote itself rather than trusting the count. A lead with
+one domain, or with no captured quote on the claim you mean to lead with, is a
+lead to ask the sensors about BEFORE conference, not one to pitch and pad. One
+load-bearing research question asked at 13:00 is worth more than four asked
+after a spike. One time-sensitive question
 may address the person whose decision would change the work; a copied name,
 unsolicited research refusal or acknowledgement is not a reason to wake another
 colleague. A terminal research answer may wake its waiting requester once.
