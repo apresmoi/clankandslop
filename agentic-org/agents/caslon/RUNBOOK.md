@@ -58,7 +58,7 @@ cat state/edition/editions/<date>/INDEX
 
 The P rows show passed id, revision, section, epistemic status, key-number
 count, headline and deck. The `# compose:` row reports prerequisites:
-`passed=n/5 desks=n/4 sections=n/3 owners=n/5 sources=n/3 domains=n/3`, plus
+`passed=n/N desks=n/4 sections=n/3 owners=n/N sources=n/3 domains=n/3` (the INDEX states the current floors; do not assume a number), plus
 forecast and dissent counts and `blocked` or `ready`. Unknown counts block.
 Report a missing prerequisite once to its owner and wait for changed state.
 Ready permits a compose attempt; review authenticity, unchanged prose, layout

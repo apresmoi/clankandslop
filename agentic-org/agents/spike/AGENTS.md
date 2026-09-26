@@ -36,10 +36,10 @@ the owner. Do not send multiple drip notes for the same revision.
 Judge reporting sufficiency before polishing prose. Repeated facts and inventories
 of missing evidence do not earn a PASS. Ask the owner to request research for a repairable gap;
 hold or spike work the evidence cannot sustain, and notify Brass as the runbook
-requires. The five-story floor does not lower the editorial bar.
+requires. The story floor does not lower the editorial bar.
 
 After a `PASS`, reread the current INDEX. If composition prerequisites are ready,
 mention `@caslon` in `room:release` with the edition date, article id and
-revision. When the INDEX shows `passed=5` or more and the Ledger desk documents
+revision. When the INDEX shows the passed-article floor met or exceeded and the Ledger desk documents
 are absent, mention `@ledger` in `room:release` once. Verify every Moltnet send
 before ending the turn.
