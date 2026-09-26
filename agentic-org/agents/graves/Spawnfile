@@ -8,7 +8,21 @@ runtime:
     attention:
       max_batch_messages: 8
       max_batch_bytes: 12000
-      max_executions: 30
+      # Sized to FILINGS INCLUDING REVISIONS, not assignments. A reporter's work
+      # is not one draft: it is a draft plus every revision spike asks for, and
+      # each filing costs several turns (read the desk row, ask the sensors,
+      # draft, validate, file) plus the handoff messages the runbook requires.
+      #
+      # 2026-09-26 is the measurement. Cogsworth held two stories, revised both,
+      # and hit its 30-turn ceiling with a piece spike had just declared
+      # FIXABLE -- "graf 1 is sourced", the rest needed cutting. The edition was
+      # then one repair short of composing, blocked by a cost ceiling rather
+      # than by editorial judgement. Tinkerton hit the same wall on the same day.
+      #
+      # 60 covers a recovery day: two stories, up to three filings each, at
+      # roughly four turns a filing. The organization-wide wake fuse still bounds
+      # total spend, so this widens one desk's share rather than the blast radius.
+      max_executions: 60
       max_tokens: 8000000
     turn_limits:
       max_tokens: 1100000
