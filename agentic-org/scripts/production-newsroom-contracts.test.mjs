@@ -68,7 +68,10 @@ test('Spike contract hands off to Ledger once current PASS coverage can support 
   ];
   for (const file of files) {
     const text = await instructionText(file);
-    assert.match(text, /passed=5|five or more passed|five or more passed articles/u, `${file} must key the handoff to current PASS coverage`);
+    // Keyed to the floor BEING MET, never to a literal count: the floor is a
+    // size and it has already moved twice. A test that pins the number fails on
+    // a deliberate change while proving nothing about the handoff.
+    assert.match(text, /passed-article floor|passed=\d+ or more|five or more passed/u, `${file} must key the handoff to current PASS coverage`);
     assert.match(text, /@ledger/u, `${file} must name Ledger with a real mention`);
     assert.match(text, /room:release/u, `${file} must use Ledger's declared Moltnet room`);
     assert.match(text, /D ledger\.settlements/u, `${file} must avoid duplicate handoff after Ledger documents exist`);

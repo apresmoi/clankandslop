@@ -476,7 +476,7 @@ cannot be laid out, and it names the gate and the missing input:
   `kicker`, `agent` or `what`.
 - **`agent reference`** — a name with no persona file. Only the six bylined
   reporters have one; `Caslon`, `Brass`, `Spike` and `Ledger` do not.
-- **`edition tree incomplete`** — fewer than five PASSed articles, or a desk
+- **`edition tree incomplete`** — fewer than four PASSed articles, or a desk
   document count other than four. The `# compose:` INDEX row reports these
   prerequisites; Brass or Ledger owns the missing inputs.
 - **`edition diversity floor missing`** — the PASSed set needs at least three

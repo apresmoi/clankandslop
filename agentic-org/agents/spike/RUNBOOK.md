@@ -90,7 +90,7 @@ second confirmation is also actionable: request it from the owner.
 necessary evidence that remains unavailable after the bounded research request.
 `SPIKE` ends the assignment for this edition. Do not ask for another prose
 rewrite when missing reporting is the blocker. Neither a short deadline nor
-the five-story floor justifies passing it. `PASS` accepts the exact digest reviewed.
+the story floor justifies passing it. `PASS` accepts the exact digest reviewed.
 
 For a revision request or hold, call `moltnet_send` separately with
 `network: clank-newsroom` and `target: room:filing`, mentioning the owner with
@@ -111,7 +111,7 @@ inputs. Verify the send succeeded before completing the inbox item or ending the
 turn. Do not repeat a handoff already sent for that accepted revision. A `PASS`
 saved in state or an unaddressed floor remark wakes nobody.
 
-When the INDEX header shows `passed=5` or more and no `D ledger.settlements` or
+When the INDEX header shows the passed-article floor met or exceeded and no `D ledger.settlements` or
 `D ledger.worlddesk` rows exist, call `moltnet_send` with
 `network: clank-newsroom` and `target: room:release`, mention `@ledger` once,
 and say the paper has enough passed copy for the desk documents. Verify the send

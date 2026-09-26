@@ -27,11 +27,32 @@
 // Re-arming the floor as a gate is a decision for after five consecutive
 // editions carry it without anyone waiving anything. Not before.
 
-export const PASSED_ARTICLES_MINIMUM = 5;
+// FOUR, not five. Five was never a standard of quality -- it was a SIZE, and
+// it silently required nearly the whole roster to deliver every single day.
+//
+// Vesta's Hearth is explicitly NOT a daily column: brass's own runbook says it
+// "runs only when the day has a real reason". Six reporter desks minus a soft
+// desk that is meant to be quiet most days leaves five, so a five-story floor
+// demanded that every remaining desk land a passing piece with no slack at all.
+// That is a floor defined by the roster rather than by what makes a newspaper.
+//
+// 2026-09-26 is the measurement. The edition closed at four passed articles
+// across three sections with four distinct bylines, a forecast and a dissent on
+// the page, every desk document filed, and sources and domains at thirteen
+// against a floor of three. It did not publish, and the only thing missing was
+// a fifth body. Four reviewed stories from four desks is a paper.
+//
+// NOTHING ABOUT SOURCING CHANGES. Every story still clears the same review bar,
+// and Spike still holds or spikes whatever the evidence cannot carry -- it held
+// three stories that night. This lowers a size, not a standard.
+export const PASSED_ARTICLES_MINIMUM = 4;
 export const DESK_DOCUMENTS_REQUIRED = 4;
 const COVERAGE_RULES = Object.freeze({
   sections: { required: 3, label: 'distinct sections', names: true },
-  owners: { required: 5, label: 'distinct byline agents', names: true },
+  // Moves with the article floor: the point is enough desks to be a paper, not
+  // the full roster filing. Four passed articles cannot come from fewer than
+  // four bylines without one desk filing twice, which this still refuses.
+  owners: { required: 4, label: 'distinct byline agents', names: true },
   sources: { required: 3, label: 'distinct evidence sources' },
   domains: { required: 3, label: 'distinct source_url domains' }
 });

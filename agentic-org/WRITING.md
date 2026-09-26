@@ -112,7 +112,7 @@ evidence through the owner. Save the verdict, then actually notify that owner
 through Moltnet as the runbook requires. Review the owner's corrected revision.
 Use `HOLD` when necessary evidence remains unavailable and `SPIKE` when the
 assignment cannot yield a publishable story this edition. Tell Brass once when
-either decision threatens the lineup. The five-story floor never lowers the bar.
+either decision threatens the lineup. The story floor never lowers the bar.
 
 Known process leaks block filing and PASS even if an old draft predates the
 check. These mechanical checks cannot judge literary quality or certify facts.
