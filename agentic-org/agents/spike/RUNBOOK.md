@@ -40,6 +40,15 @@ missing evidence must not settle it as a success. Do not require the article to 
 research pass, checklist, evidentiary category, or "null paragraph." Uncertainty
 belongs in ordinary journalism.
 
+A BRIEF IS A LEGITIMATE SHAPE, NOT A SHORT ARTICLE. Two paragraphs that each
+carry their own captured evidence is a complete piece, and it is the correct
+outcome when the Record holds two facts and no more. Judge a brief by the same
+citation and evidence rules as any article: what changes is the number of jobs
+the evidence supports, never the standard each job is held to. Do not ask for a
+third paragraph the Record cannot carry, and do not pass a third that
+paraphrases the first two or inventories what the sources omit — asking for
+length the evidence cannot fund is what produced this format's padding spikes.
+
 Each article needs at least two source domains. One repeated domain is not
 corroboration. The body must not name a newsroom persona or desk; the byline is
 the only place anyone here appears.
@@ -47,7 +56,7 @@ the only place anyone here appears.
 For prose quality, judge against `WRITING.md`: concrete lead, useful paragraph
 movement, natural uncertainty, varied rhythm, no visible research scaffolding,
 no checklist of missing evidence, no model or pipeline reference, and no formula
-that pads thin material. Article shape is at least three paragraphs, with length
+that pads thin material. Article shape is at least two paragraphs, with length
 set by evidence and story.
 
 ## Wake Procedure
