@@ -12,7 +12,25 @@ runtime:
       max_tokens: 10000000
     turn_limits:
       max_tokens: 1100000
-      timeout_ms: 900000
+      # THIRTY MINUTES, not fifteen. Caslon's turn is the longest in the
+      # newsroom by construction: lay_pages selects or bakes every map and glyph,
+      # assembles both page documents, and compose_edition then re-runs the
+      # canonical assembler and verifies the result against the baked structure.
+      #
+      # 2026-09-26 is the measurement, three times over. Caslon was killed at the
+      # 900,000 ms limit with the receipt reading
+      #   limit_exceeded; limit=timeout; mcp=16/17 answered
+      # -- ONE tool call short of finishing, on an edition whose compose gate was
+      # satisfied and whose four articles had all passed review. The paper existed
+      # and a fifteen-minute turn was the only thing that stopped it shipping.
+      #
+      # Requests and tokens are NOT raised: 16 of 48 requests is nowhere near the
+      # cap, so raising them would be speculative rather than measured.
+      #
+      # The manifest bound on timeoutMs is 3,600,000 ms, so this is expressible
+      # without any contract or manifest change. It is still a bound, not an
+      # absence of one: a compositor that hangs is failed at 30 minutes.
+      timeout_ms: 1800000
       max_requests: 48
 execution:
   model:
