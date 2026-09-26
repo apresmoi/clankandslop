@@ -173,7 +173,7 @@ finding is attributed research, not proof that you personally fetched a source.
 Missing or unverified evidence stays missing or unverified.
 
 Spike asks the article owner in `room:filing`; after the current edition has
-five or more passed articles and no `D ledger.settlements` or
+the passed-article floor met and no `D ledger.settlements` or
 `D ledger.worlddesk` rows yet, Spike mentions `@ledger` in `room:release` so
 the desk can start before its scheduled fallback. When a PASS makes the
 composition prerequisites ready, Spike sends `@caslon` in `room:release` the
