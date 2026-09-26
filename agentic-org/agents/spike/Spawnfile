@@ -8,7 +8,22 @@ runtime:
     attention:
       max_batch_messages: 8
       max_batch_bytes: 12000
-      max_executions: 40
+      # Sized to FILINGS, not assignments. Spike is the only agent whose work
+      # scales with everyone else's output: six reporters revising means every
+      # filing and every revision passes through this one reviewer, and each
+      # verdict costs a turn plus the handoff message the runbook requires.
+      #
+      # 2026-09-26 is the measurement: 6 stories produced 14 filings and 13
+      # verdicts, which consumed roughly 30 turns at about 2.1 turns per filing.
+      # With 40 as the ceiling and ~10 turns already destroyed by a Mneme ledger
+      # crash, spike hit agent_execution_ceiling with three stories still
+      # unreviewed and the edition died at passed=3/5 — not on editorial
+      # judgement, which is the only thing that should stop a paper.
+      #
+      # 100 covers a heavy revision day (~20 filings at 2.5 turns) with headroom.
+      # The organization-wide fuse still bounds total spend, so this widens one
+      # agent's share rather than the blast radius.
+      max_executions: 100
       max_tokens: 12000000
     turn_limits:
       max_tokens: 1100000
