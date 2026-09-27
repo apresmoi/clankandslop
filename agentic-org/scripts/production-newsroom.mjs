@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { validateCompositionArtifact } from './composition-contract.mjs';
-import { assertCompositionCoverage, compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
+import { PASSED_ARTICLES_MINIMUM, assertCompositionCoverage, compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
 import { articleFormatFindings } from '../../ops/article-format.mjs';
@@ -311,7 +311,7 @@ async function composeEditionAction(args){
   if(!Array.isArray(args.pages)||args.pages.length!==2)throw new Error(`pages must be an array of exactly 2 page documents, got ${Array.isArray(args.pages)?args.pages.length:typeof args.pages}`);
   if(new Set(args.pages.map(page=>page.name)).size!==2||args.pages.some(page=>!['front','tape'].includes(page.name)))throw new Error(`pages[].name must be exactly one "front" and one "tape", got ${JSON.stringify(args.pages.map(page=>page.name))}`);
   const articles=await jsonNames(args.edition,'articles'),reviews=await jsonNames(args.edition,'reviews'),desk=await jsonNames(args.edition,'desk');
-  if(articles.length<5)throw new Error(`edition tree incomplete — at least 5 PASSed articles required, found ${articles.length}`);
+  if(articles.length<PASSED_ARTICLES_MINIMUM)throw new Error(`edition tree incomplete — at least ${PASSED_ARTICLES_MINIMUM} PASSed articles required, found ${articles.length}`);
   if(reviews.length!==articles.length)throw new Error(`edition tree incomplete — reviews (${reviews.length}) must match articles (${articles.length})`);
   if(desk.length!==4)throw new Error(`edition tree incomplete — exactly 4 desk documents required (ledger.settlements, ledger.worlddesk, caslon.chrome, caslon.weather), found ${desk.length}`);
   const values=[];for(const name of articles){const article=await readJson(location(args.edition,'articles',name)),review=await readJson(location(args.edition,'reviews',name)),filing=await readJson(location(args.edition,'filings',`${name}/${article.revision}`));if(review.verdict!=='PASS'||review.article_digest!==sha(JSON.stringify(filing)))throw new Error(`composition requires selected authentic PASS articles — "${name}" carries verdict "${review.verdict}" or a stale digest`);const{assignment_ref:_,lint:__,...filedArticle}=filing,{dissent:___,...publishedArticle}=article;if(JSON.stringify(publishedArticle)!==JSON.stringify(filedArticle))throw new Error(`composition requires reporter-owned prose unchanged from the PASS filing — "${name}" differs`);values.push(article);}

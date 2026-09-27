@@ -45,8 +45,10 @@
 // NOTHING ABOUT SOURCING CHANGES. Every story still clears the same review bar,
 // and Spike still holds or spikes whatever the evidence cannot carry -- it held
 // three stories that night. This lowers a size, not a standard.
-export const PASSED_ARTICLES_MINIMUM = 4;
-export const DESK_DOCUMENTS_REQUIRED = 4;
+// Declared once in ops/edition-floor.mjs and re-exported here so every existing
+// caller of this module keeps working. Do not restate the numbers.
+export { PASSED_ARTICLES_MINIMUM, DESK_DOCUMENTS_REQUIRED } from '../../ops/edition-floor.mjs';
+import { PASSED_ARTICLES_MINIMUM, DESK_DOCUMENTS_REQUIRED } from '../../ops/edition-floor.mjs';
 const COVERAGE_RULES = Object.freeze({
   sections: { required: 3, label: 'distinct sections', names: true },
   // Moves with the article floor: the point is enough desks to be a paper, not
