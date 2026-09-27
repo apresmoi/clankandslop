@@ -19,6 +19,30 @@ test('the published August 21 fact passes unchanged, including quotes and struct
   assert.deepEqual(articleFilingSchema.properties.byline.properties.agents.items.enum, Object.values(ARTICLE_REPORTER_NAMES));
 });
 
+test('a two-paragraph brief files, because ARTICLE_FORMAT.md says it is a whole article', () => {
+  // ARTICLE_FORMAT.md: the body is an "Array of at least TWO purposeful prose
+  // paragraphs", "A BRIEF — exactly two such paragraphs — is a complete,
+  // publishable article, not a stub and not a teaser", and the minimum is "a
+  // floor for shape, never a quota to fill".
+  //
+  // The filing schema used to demand four, so file_article answered a brief with
+  // `/article/body must NOT have fewer than 4 items`. On 2026-09-27 Cogsworth and
+  // Foreman each wrote two sourced paragraphs on two captured sentences, could not
+  // file them, and Spike reported the rows dead as "filing refused under four body
+  // items" — two stories lost to a schema that contradicted the format it enforced.
+  // The reporters were right, the document was right, and the tool was wrong.
+  const lengthErrors = (article) => articleFormatFindings(article, context).errors
+    .filter((error) => error.path === 'article.body' && error.code === 'length');
+  assert.equal(articleFilingSchema.properties.body.minItems, 2);
+  assert.deepEqual(lengthErrors({ ...fact, body: fact.body.slice(0, 2) }), [],
+    'a two-paragraph brief is the shape the format blesses and must file');
+  assert.deepEqual(lengthErrors({ ...fact, body: fact.body.slice(0, 3) }), []);
+  assert.deepEqual(lengthErrors(fact), []);
+  // Two is a floor, not an invitation: one paragraph is still a stub.
+  assert.equal(lengthErrors({ ...fact, body: fact.body.slice(0, 1) }).length, 1,
+    'a single paragraph must still be refused');
+});
+
 test('an authored forecast passes without a forged dissent; published dissent uses archive context', () => {
   const { dissent, ...authored } = publishedForecast;
   assert.ok(dissent?.agent);
