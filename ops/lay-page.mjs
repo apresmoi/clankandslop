@@ -4,6 +4,7 @@ import { dirname, resolve, basename } from 'node:path';
 import { layoutArtifacts } from './layout-artifacts.mjs';
 import { mapPresentationProps } from './map-presentation.mjs';
 import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-format.mjs';
+import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -266,7 +267,7 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
     if (!isObj(desk[part])) fail('edition tree incomplete', `desk document "${part}" is missing — compose_edition requires exactly 4`);
 
   const passed = Object.keys(articles).sort();
-  if (passed.length < 5) fail('edition tree incomplete', `at least 5 PASSed articles required, found ${passed.length} — that is Brass's lineup, not a layout problem`);
+  if (passed.length < PASSED_ARTICLES_MINIMUM) fail('edition tree incomplete', `at least ${PASSED_ARTICLES_MINIMUM} PASSed articles required, found ${passed.length} — that is Brass's lineup, not a layout problem`);
   const order = decisions.order;
   if (!Array.isArray(order) || order.some((slug) => !isStr(slug))) fail('page completeness invalid', 'the decision record must carry "order": every PASSed slug, in placement order — order[0] leads');
   const placed = [...order].sort();

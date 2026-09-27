@@ -7,6 +7,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { archiveResolver, layEdition, readEditionInputs } from '../../ops/lay-page.mjs';
 import { writeEditionIndex } from './edition-index.mjs';
+import { PASSED_ARTICLES_MINIMUM } from './compose-gate.mjs';
 import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment, recordDissent, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
@@ -454,9 +455,16 @@ runtimeTest('no other compose gate went with it', async () => {
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     await rm(path.join(state, 'editions', edition, 'desk', 'caslon.weather.json'));
     await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-desk' }), /exactly 4 desk documents required.*found 3/su);
-    await rm(path.join(state, 'editions', edition, 'articles', 'story-4.json'));
-    await rm(path.join(state, 'editions', edition, 'reviews', 'story-4.json'));
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-passed' }), /at least 5 PASSed articles required, found 4/u);
+    // Strip PASSed articles down to one BELOW the floor, derived rather than
+    // typed. This assertion used to read `found 4` against a literal 5, so when
+    // #188 lowered the floor to four the test kept passing and the real
+    // enforcement in lay-page.mjs stayed at five.
+    for (let index = 4; index >= PASSED_ARTICLES_MINIMUM - 1; index -= 1) {
+      await rm(path.join(state, 'editions', edition, 'articles', `story-${index}.json`));
+      await rm(path.join(state, 'editions', edition, 'reviews', `story-${index}.json`));
+    }
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-passed' }),
+      new RegExp(`at least ${PASSED_ARTICLES_MINIMUM} PASSed articles required, found ${PASSED_ARTICLES_MINIMUM - 1}`, 'u'));
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });

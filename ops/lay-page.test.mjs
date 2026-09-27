@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { LayoutError, alternationRuns, archiveIndex, archiveResolver, layEdition, readEditionInputs } from './lay-page.mjs';
+import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
 import { collectPublicArticleReferences } from '../agentic-org/scripts/production-newsroom.mjs';
 
 import { repo, agents, readJson, EDITIONS, decisionsFromShipped, layShipped } from './lay-page.test-data.mjs';
@@ -49,6 +50,26 @@ const refuses = (mutate, gate) => {
   assert.match(error.message, gate, `expected a refusal naming ${gate}, got: ${error.message}`);
   return error;
 };
+
+test('a book at exactly the floor lays, and one below it is refused by the derived number', () => {
+  // 2026-09-27: compose-gate.mjs reported `passed=4/4 desks=4/4 sections=3/3
+  // owners=4/4 ... -> ready` while this assembler still demanded a literal 5, so
+  // Caslon refused to lay a book the gate had already cleared: "compose gate says
+  // ready, but the page assembler still wants five PASSed slugs". Both sides now
+  // read PASSED_ARTICLES_MINIMUM from ops/edition-floor.mjs.
+  const drop = (input, slug) => {
+    delete input.articles[slug];
+    delete input.decisions.art[slug];
+    input.decisions.order = input.decisions.order.filter((item) => item !== slug);
+    input.decisions.flashpoints = input.decisions.flashpoints.filter((spot) => spot.article !== slug);
+    return input;
+  };
+  const atFloor = (input) => drop(input, 'echo');
+  assert.equal(Object.keys(atFloor(synthetic()).articles).length, PASSED_ARTICLES_MINIMUM);
+  assert.ok(lay(atFloor), 'a book carrying exactly the floor must lay');
+  refuses((input) => drop(atFloor(input), 'delta'),
+    new RegExp(`at least ${PASSED_ARTICLES_MINIMUM} PASSed articles required, found ${PASSED_ARTICLES_MINIMUM - 1}`, 'u'));
+});
 
 test('the two pages carry different top-level paper values', () => {
   const { pages } = lay();
