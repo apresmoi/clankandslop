@@ -39,7 +39,7 @@ execution:
       name: grok-4.6
       auth:
         method: grok
-      reasoning_effort: low
+      reasoning_effort: high
   sandbox:
     mode: workspace
 schedule:
