@@ -21,7 +21,7 @@ execution:
       name: grok-4.6
       auth:
         method: grok
-      reasoning_effort: low
+      reasoning_effort: medium
   sandbox:
     mode: workspace
 surfaces:
@@ -45,8 +45,8 @@ environment:
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
-    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:beb200e68d9f59ca8b954b420dd42345f960ca5a6eb7d0261201182d5f1a17be, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:252441b4f7b16b97affb0a0be203415083e1442a0d015720efcaa64d627cf30f, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:f893ed6f3353a26de641cee05374f5a387a55c98915a880eaa5a0e543d7290d2, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:b1a8d453c7fa8d7ca3dd902d48195f85c46ff42f415d56cc7b39a5aeed13119d, mount: ./repos/newsroom, mode: readonly }
     - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
     - { id: private-corpus, kind: volume, name: clank-klaxon-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }
 

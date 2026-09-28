@@ -2,10 +2,10 @@
   "version": "clank.newsroom-tools-bundle.v1",
   "archive": "newsroom-tools.tar",
   "mount": "tools/newsroom",
-  "sha256": "sha256:beb200e68d9f59ca8b954b420dd42345f960ca5a6eb7d0261201182d5f1a17be",
+  "sha256": "sha256:f893ed6f3353a26de641cee05374f5a387a55c98915a880eaa5a0e543d7290d2",
   "file_count": 272,
-  "content_bytes": 42295968,
-  "source_commit": "ec902eca941a9ec738bbecd070296621d76b1766",
+  "content_bytes": 42296890,
+  "source_commit": "b66ca235f3fe0d32e3b0d7aa9b8cfee96d75f312",
   "platform": "linux",
   "arch": "x64",
   "source_files": [
@@ -23,7 +23,7 @@
     },
     {
       "path": "newsroom/art/decisions.mjs",
-      "sha256": "sha256:713ae9266acc1f9dc03740ae71dd0661793bacf33892fd543f8f4c50eed70da5"
+      "sha256": "sha256:3633e393f3decc5711417e7b89590f6afd7df1686030abb5282860a4e5004894"
     },
     {
       "path": "newsroom/art/fonts.conf",

@@ -110,7 +110,10 @@ test('Daimon engine declarations preserve their real model-auth boundary', () =>
   }
   const brass = readFileSync(resolve(import.meta.dirname, '../agents/brass/Spawnfile'), 'utf8');
   assert.throws(() => validateAgentDeclaration('brass', brass.replace('method: grok', 'method: api_key')), /Grok broker auth invalid/u);
-  assert.throws(() => validateAgentDeclaration('brass', brass.replace('reasoning_effort: low', 'reasoning_effort: xhigh')), /Grok reasoning_effort invalid/u);
+  // Derived, not typed: this line used to read `replace('reasoning_effort: low', …)`,
+  // so the moment Brass moved off `low` the replace became a no-op and the
+  // assertion tested nothing. Mutate whatever effort is actually declared.
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace(/reasoning_effort: \w+/u, 'reasoning_effort: xhigh')), /Grok reasoning_effort invalid/u);
   assert.throws(() => validateAgentDeclaration('brass', brass.replace('name: grok-4.6', 'name: grok-9')), /Grok broker model invalid/u);
 });
 test('workspace resources enforce public modes and private corpus least privilege', () => {
