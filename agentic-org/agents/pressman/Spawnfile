@@ -8,7 +8,7 @@ runtime:
     attention:
       max_batch_messages: 8
       max_batch_bytes: 12000
-      max_executions: 20
+      max_executions: 60
       max_tokens: 4000000
     turn_limits:
       max_tokens: 1100000
