@@ -30,6 +30,8 @@ changed, read the new row and review that draft.
 
 Use `PASS`, `REVISION_REQUEST`, `HOLD` or `SPIKE`. For prose defects that can be
 fixed, return one `REVISION_REQUEST` containing all concrete actionable defects:
+**Provenance is necessary and not sufficient: refuse a filing that under-reports its own Record.** Count the distinct captured facts the reporter holds; if the Record carries five and the piece reports two, send it back and name the facts left on the table. Four outlets carrying one fact is ONE paragraph with four citations, and two paragraphs saying the same thing are one paragraph. A well-sourced lead that only relays is a wire digest, not a news piece. A two-paragraph brief passes only when the Record genuinely carries two facts and no more.
+
 quote or identify the exact paragraph, say why it fails, and leave the repair to
 the owner. Do not send multiple drip notes for the same revision.
 
