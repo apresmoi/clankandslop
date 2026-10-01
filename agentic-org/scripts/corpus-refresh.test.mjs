@@ -4,8 +4,8 @@ import { chmodSync, existsSync, lstatSync, readFileSync, readdirSync, readlinkSy
 import { join, relative, sep } from 'node:path';
 import { CorpusError, REPORTERS } from './corpus-contract.mjs';
 import { SYMLINK_OPS, TREES_DIR, VOLUME_ROOT_MODE, hostExec } from './corpus-volume.mjs';
-import { LOCK_BUSY_EXIT, LOCK_ENV, corpusCurrent, corpusRefreshArgs, main, refresh } from './corpus-refresh.mjs';
-import { EDITION, OWNER, PRIOR, STORIES, UNCUT, args, cleanup, commitAll, deps, fixture, git, identityOf, ledgerOf, snapshot, writeCorpus, writeIndex, writeRaw } from './corpus-refresh.fixture.mjs';
+import { LOCK_BUSY_EXIT, LOCK_ENV, corpusRefreshArgs, main, refresh } from './corpus-refresh.mjs';
+import { EDITION, OWNER, PRIOR, STORIES, UNCUT, args, cleanup, commitAll, deps, fixture, git, identityOf, landedOf, ledgerOf, snapshot, writeCorpus, writeIndex, writeRaw } from './corpus-refresh.fixture.mjs';
 
 const liveTree = (fixture, edition = EDITION) => realpathSync(join(fixture.volume, edition));
 const treeOf = (fixture, commit) => realpathSync(join(fixture.volume, TREES_DIR, commit));
@@ -16,10 +16,21 @@ test('corpusRefreshArgs defaults to the production host and rejects anything it 
   assert.equal(options.private, '/root/work/clankandslop/clankandslop-private');
   assert.equal(options.staging, '/var/lib/clank-corpus/staging');
   assert.equal(options.trash, '/var/lib/clank-corpus/trash');
+  // The host's record lives OUTSIDE the volume, root-owned, unreachable from any
+  // container. A record inside the volume would be an agent-writable input to a
+  // root-privileged job, which is the whole defect this path closes.
+  assert.equal(options.landed, '/var/lib/clank-corpus/landed.json');
+  assert.equal(options.editionState, '/var/lib/docker/volumes/clank-edition-state/_data');
   assert.equal(options.lock, '/run/lock/clank-corpus-refresh.lock');
   assert.equal(options.owner, '2000:2000');
-  assert.deepEqual([options.keep, options.fetch, options.check, options.edition, options.ref], [3, true, false, null, null]);
+  assert.equal(options.requireBy, '09:00');
+  assert.deepEqual([options.keep, options.fetch, options.verify, options.check, options.edition, options.ref], [3, true, true, false, null, null]);
   assert.equal(corpusRefreshArgs(['--no-lock']).lock, null);
+  assert.equal(corpusRefreshArgs(['--no-verify']).verify, false);
+  assert.throws(() => corpusRefreshArgs(['--landed=/var/lib/docker/volumes/clank-newsroom-corpus/_data/landed.json']),
+    (error) => error instanceof CorpusError && /is inside the corpus volume/u.test(error.message));
+  assert.throws(() => corpusRefreshArgs(['--require-by=9:00']), CorpusError);
+  assert.throws(() => corpusRefreshArgs(['--require-by=24:00']), CorpusError);
   assert.throws(() => corpusRefreshArgs(['--edition=tomorrow']), CorpusError);
   assert.throws(() => corpusRefreshArgs(['--keep=-1']), CorpusError);
   assert.throws(() => corpusRefreshArgs(['--keep=some']), CorpusError);
@@ -54,8 +65,18 @@ test('a first refresh into an empty volume publishes the edition, its tree and a
     });
     assert.deepEqual(ledgerOf(f), [{
       v: 'clank.corpus-refresh.v1', at: '2026-09-06T06:30:12Z', edition: EDITION, ref: `edition/${EDITION}`,
-      commit: f.commit, previous_commit: null, links_moved: 2, trees_removed: 0, changed: true
+      commit: f.commit, previous_commit: null, links_moved: 2, frozen_editions: [], trees_removed: 0, changed: true
     }]);
+    // And the HOST's record, outside the volume, which is the only thing the next
+    // run reads. Every field the next decision needs is here; nothing in the
+    // volume is consulted for any of it.
+    const landed = landedOf(f);
+    assert.equal(landed.version, 'clank.corpus-landed.v1');
+    assert.deepEqual(landed.trees, [`${TREES_DIR}/${f.commit}`]);
+    assert.deepEqual(Object.keys(landed.editions).sort(), [PRIOR, EDITION].sort());
+    assert.deepEqual(landed.editions[EDITION], { commit: f.commit, tree: `${TREES_DIR}/${f.commit}`, landed_at: '2026-09-06T06:30:12Z' });
+    assert.deepEqual(landed.identity.record, identity, 'the record carries the bytes it published, so a forged CORPUS.json can be told apart from the real one');
+    assert.match(landed.identity.sha256, /^sha256:[0-9a-f]{64}$/u);
     // Nothing transient is left anywhere, and staging/trash are empty again.
     assert.deepEqual(readdirSync(f.volume).sort(), ['CORPUS.json', PRIOR, EDITION, TREES_DIR].sort());
     assert.deepEqual(readdirSync(f.staging), []);
@@ -128,26 +149,22 @@ test('a new commit on the edition branch moves the link and advances the identit
   } finally { cleanup(f); }
 });
 
-test('an identity record that disagrees with the commit on the links is not current', () => {
+test('the host record, not the volume, decides whether a refresh is needed', () => {
   const f = fixture();
   try {
     const first = refresh(args(f), deps(f));
     writeCorpus(f.priv, EDITION, 'A LATER PRODUCER RUN');
     const second = commitAll(f.priv, 'research: later');
-    refresh(args(f), deps(f));
 
-    // A record that is internally perfect, points at a tree that exists, and
-    // sits over links that resolve — for the commit before last. Only comparing
-    // the record's commit to the resolved one catches it, and leaving it stale
-    // is what makes an edition receipt cite research the reporters did not read.
-    const stale = { ...identityOf(f), commit: first.commit, tree: `${TREES_DIR}/${first.commit}` };
-    chmodSync(join(f.volume, 'CORPUS.json'), 0o644);
-    writeFileSync(join(f.volume, 'CORPUS.json'), `${JSON.stringify(stale, null, 2)}\n`);
-    const state = corpusCurrent(f.volume, { commit: second, edition: EDITION });
-    assert.equal(state.current, false);
-    assert.match(state.reason, /volume carries/u);
-    assert.ok(state.reason.includes(first.commit.slice(0, 7)) && state.reason.includes(second.slice(0, 7)), 'the reason must name both commits');
-    assert.equal(refresh(args(f), deps(f)).changed, true, 'the record must be republished rather than trusted');
+    // The reason names BOTH commits: "stale corpus" read in a journal at 04:00 is
+    // useless without which research is mounted and which was wanted.
+    const stale = refresh(args(f, ['--check']), deps(f));
+    assert.equal(stale.current, false);
+    assert.ok(stale.reason.includes(first.commit.slice(0, 7)) && stale.reason.includes(second.slice(0, 7)), `the reason must name both commits: ${stale.reason}`);
+    assert.match(stale.reason, /the host landed/u);
+
+    assert.equal(refresh(args(f), deps(f)).changed, true);
+    assert.equal(landedOf(f).editions[EDITION].commit, second);
     assert.equal(identityOf(f).commit, second);
   } finally { cleanup(f); }
 });
@@ -355,8 +372,12 @@ test('a tree already extracted for this commit is reused rather than re-extracte
     refresh(args(f), deps(f));
     const tree = treeOf(f, f.commit);
     const before = statSync(tree).mtimeMs;
-    // Drop the identity record: the no-op check fails, but the content is there.
-    rmSync(join(f.volume, 'CORPUS.json'));
+    // Forget that this edition was ever landed — the host record is what the
+    // no-op check reads — while the extracted content and its manifest stay put.
+    const landed = landedOf(f);
+    delete landed.editions[EDITION];
+    delete landed.editions[PRIOR];
+    writeFileSync(f.landed, `${JSON.stringify(landed, null, 2)}\n`);
     const commands = [];
     const exec = (command, commandArgs, options) => { commands.push(commandArgs.includes('archive') ? 'archive' : command); return hostExec(command, commandArgs, options); };
     const result = refresh(args(f), deps(f, { exec }));
@@ -365,6 +386,7 @@ test('a tree already extracted for this commit is reused rather than re-extracte
     assert.equal(result.linksMoved, 0, 'the links already point at this tree');
     assert.equal(statSync(tree).mtimeMs, before, 'the tree must not be rewritten');
     assert.equal(identityOf(f).commit, f.commit);
+    assert.equal(landedOf(f).editions[EDITION].commit, f.commit);
     assert.deepEqual(readdirSync(f.staging), []);
   } finally { cleanup(f); }
 });

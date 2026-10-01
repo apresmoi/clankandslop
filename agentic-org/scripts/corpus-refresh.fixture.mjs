@@ -89,9 +89,15 @@ export const fixture = () => {
   chmodSync(volume, VOLUME_ROOT_MODE);
   const work = join(root, 'work');
   mkdirSync(work, { recursive: true });
+  // The host-side record and the edition-state root both live OUTSIDE the volume,
+  // exactly as they must on the box: landed.json is the only thing the refresher
+  // believes, and a volume-resident copy would be agent-writable.
+  const editionState = join(root, 'edition-state');
+  mkdirSync(editionState, { recursive: true });
   return {
-    root, priv, commit, volume: realpathSync(volume), work: realpathSync(work),
-    staging: join(realpathSync(work), 'staging'), trash: join(realpathSync(work), 'trash'), ledger: join(realpathSync(work), 'refresh.jsonl')
+    root, priv, commit, volume: realpathSync(volume), work: realpathSync(work), editionState: realpathSync(editionState),
+    staging: join(realpathSync(work), 'staging'), trash: join(realpathSync(work), 'trash'),
+    ledger: join(realpathSync(work), 'refresh.jsonl'), landed: join(realpathSync(work), 'landed.json')
   };
 };
 
@@ -104,10 +110,29 @@ export const cleanup = (fixture) => {
 
 export const args = (fixture, extra = []) => [
   '--no-fetch', '--no-lock', `--edition=${EDITION}`, `--volume=${fixture.volume}`, `--private=${fixture.priv}`,
-  `--staging=${fixture.staging}`, `--trash=${fixture.trash}`, `--owner=${OWNER}`, ...extra
+  `--staging=${fixture.staging}`, `--trash=${fixture.trash}`, `--landed=${fixture.landed}`,
+  `--edition-state=${fixture.editionState}`, `--owner=${OWNER}`, ...extra
 ];
-export const deps = (fixture, extra = {}) => ({ log: () => {}, ledger: fixture.ledger, ...extra });
+// `alarm` defaults to a no-op so a test that does not care about alarms cannot
+// page a real host through raiseDetached; tests that DO care pass their own.
+export const deps = (fixture, extra = {}) => ({ log: () => {}, alarm: () => {}, ledger: fixture.ledger, ...extra });
 export const identityOf = (fixture) => JSON.parse(readFileSync(join(fixture.volume, 'CORPUS.json'), 'utf8'));
+/** The host's authoritative record — the only thing the refresher is allowed to believe. */
+export const landedOf = (fixture) => JSON.parse(readFileSync(fixture.landed, 'utf8'));
+
+// One assignment record for `edition`, which is what makes an edition
+// COMMISSIONED: Brass has bound this corpus commit into receipts the reporters
+// are already drafting against, so the date's link must stop following the branch.
+export const commission = (fixture, edition, commit) => {
+  const directory = join(fixture.editionState, 'editions', edition, 'assignments');
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(join(directory, 'aaaaaaaa.json'), `${JSON.stringify({
+    version: 'clank.assignments.v1', edition, event_key: `schedule:assignment-${edition}`,
+    assignments: [{ id: 'story-0', owner: 'cogsworth', brief: 'Report the verified mechanism.', evidence_refs: [] }],
+    corpus: { commit, edition }
+  }, null, 2)}\n`);
+  return commit;
+};
 export const ledgerOf = (fixture) => readFileSync(fixture.ledger, 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
 
 /** Every path in the volume with its kind, mtime and contents — the evidence that a no-op wrote nothing. */

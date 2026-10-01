@@ -31,13 +31,27 @@
 //         |  rename(2)
 //     <trash>/<commit>-<stamp>/    deleted out here, never inside the volume
 //
-// READ-ONLY IS THE HOST'S JOB
-// ---------------------------
-// Nothing in the container makes the corpus read-only: the entrypoint runs as
-// uid 2000 with no capabilities, so a `chmod -R` from inside cannot touch the
-// root-owned sentinel and aborts the start. `applyOwner` + `freeze` on the
-// staging tree, before it is reachable, is the only thing standing between the
-// agents and a writable corpus.
+// WHAT THE HOST CAN AND CANNOT MAKE READ-ONLY
+// -------------------------------------------
+// `applyOwner` + `freeze` on the staging tree, before it is reachable, make the
+// CONTENT read-only: every file 0444 and every directory 0555, so an agent
+// cannot rewrite a story file or unlink it from inside a frozen directory.
+//
+// They do NOT make the volume ROOT read-only, and nothing can. The volume is
+// `mode: mutable` because `readonly` kills the container, and the compiler's
+// ownership guard chowns the whole volume to uid 2000 on every start and then
+// requires a uid-owned 0755 root. uid 2000 therefore owns the volume root and
+// the `trees/` directory, and an owner can always restore its own write bit --
+// reproduced in the live container on 2026-10-01: an agent created CORPUS.json,
+// replaced `trees` with a symlink to /etc, and `chmod u+w`'d an a-w file it
+// owned. See corpus-landed.mjs for the whole mechanism.
+//
+// Hence the second shape every function here enforces: the host NEVER takes a
+// decision from a name inside the volume. It reads its own record, and every
+// path it is about to touch is lstat'd and refused unless it is the real
+// directory the host itself created. A root-run `rmSync` aimed through an
+// agent-planted symlink is a root-privileged delete an agent chose the target
+// of; `assertRealDirectory` is the only thing between that and /etc.
 
 import { execFileSync } from 'node:child_process';
 import { chmodSync, lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
@@ -47,6 +61,8 @@ import { CORPUS_IDENTITY_FILE, CORPUS_IDENTITY_VERSION, CorpusError, EDITION_PAT
 export const TREES_DIR = 'trees';
 export const VOLUME_IDENTITY_SENTINEL = '.spawnfile-resource-identity';
 export const VOLUME_ROOT_MODE = 0o755;
+/** Every name the host itself ever writes at the volume root, besides a `<date>` symlink. */
+export const VOLUME_ROOT_NAMES = Object.freeze([VOLUME_IDENTITY_SENTINEL, CORPUS_IDENTITY_FILE, TREES_DIR]);
 
 const fail = (message) => { throw new CorpusError(message); };
 
@@ -86,6 +102,52 @@ export function assertVolumeRoot(volume) {
   }
   return stat;
 }
+
+// THE LSTAT THAT HAS TO HAPPEN BEFORE EVERY PATH OPERATION
+// --------------------------------------------------------
+// `statSync` follows symlinks, so it answers "is there a directory at the far
+// end of this name", which is the wrong question entirely when uid 2000 owns the
+// name. Fable's repro: point `<volume>/trees` at an absolute host path and the
+// root-run refresher renames entries OUT of that path and rmSync's them. One
+// lstat is the difference.
+//
+// A refusal, never a repair: an unexpected `trees` means something that is not
+// this host wrote to the volume, and silently replacing it would destroy the
+// only evidence of that. Absent is not an error -- a volume with no `trees/` yet
+// is the first run -- so this returns null and the caller creates it.
+export function assertRealDirectory(target, label) {
+  let stat;
+  try { stat = lstatSync(target); } catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+  if (stat.isSymbolicLink()) {
+    fail(`${label} ${target} is a symlink to ${JSON.stringify(readlinkOrNull(target))}, not a directory -- refusing to operate through it.\n`
+      + '  Nothing on this host ever creates that symlink, so the volume has been written by something else.\n'
+      + '  Every path operation here runs as root; following this one would aim a recursive delete at a target an agent chose.');
+  }
+  if (!stat.isDirectory()) fail(`${label} ${target} is a ${stat.isFile() ? 'file' : 'special file'}, not a directory -- refusing to operate on it`);
+  return stat;
+}
+
+/** The one directory inside the volume the host writes into. Absent is the first run; anything but a real directory is a refusal. */
+export const assertTreesDirectory = (volume) => assertRealDirectory(path.join(volume, TREES_DIR), `the corpus volume's ${TREES_DIR}/ directory`);
+
+// Reported, never repaired, and never deleted. The host knows exactly which
+// names it writes; anything else at the volume root came from one of the twelve
+// agents, and the useful response is to say so loudly -- deleting it would
+// destroy the evidence and could destroy the identity sentinel with it.
+export function auditVolumeRoot(volume) {
+  const findings = [];
+  for (const entry of readdirSync(volume, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (VOLUME_ROOT_NAMES.includes(entry.name)) continue;
+    if (EDITION_PATTERN.test(entry.name)) {
+      if (!entry.isSymbolicLink()) findings.push(`${entry.name} is a real ${entry.isDirectory() ? 'directory' : 'file'} where a corpus symlink belongs`);
+      continue;
+    }
+    findings.push(`${entry.name} is a name this host never writes (${entry.isSymbolicLink() ? 'symlink' : entry.isDirectory() ? 'directory' : 'file'})`);
+  }
+  return findings;
+}
+
+const readlinkOrNull = (target) => { try { return readlinkSync(target); } catch { return null; } };
 
 // Atomicity here is not a style preference, it is the only reason agents can
 // keep reading while the corpus is replaced -- and rename(2) is atomic only
@@ -152,9 +214,18 @@ export function landFrozenTree(stagingDir, treePath) {
 // unlinked until write is restored. Root ignores that; the owner does not, and
 // a cleanup that silently failed would fill the disk the daily image build used
 // to. Only ever called on a path OUTSIDE the volume.
+//
+// `chmod -R u+w` follows a symlinked target and would restore write across
+// whatever it points at, and `rmSync(recursive)` would then delete it, so the
+// target is lstat'd first: the thaw and the delete must both be aimed at a real
+// directory this host put there.
 export function removeTree(target, { volume, exec = hostExec } = {}) {
   if (volume) assertScoped(target, volume);
-  try { exec('chmod', ['-R', 'u+w', target]); } catch { /* already writable, or already gone */ }
+  let stat;
+  try { stat = lstatSync(target); } catch { return; }
+  if (stat.isSymbolicLink()) fail(`refusing to thaw and delete through the symlink ${target} -> ${JSON.stringify(readlinkOrNull(target))}: a recursive delete must only ever be aimed at a real directory`);
+  if (!stat.isDirectory()) { rmSync(target, { force: true }); return; }
+  try { exec('chmod', ['-R', 'u+w', target]); } catch { /* already writable */ }
   rmSync(target, { recursive: true, force: true });
 }
 
@@ -188,6 +259,14 @@ export function pointAtTree(volume, name, target, { ops = SYMLINK_OPS, tmpDir = 
   return true;
 }
 
+// CORPUS.json IS AN OUTPUT, NOT AN INPUT
+// --------------------------------------
+// uid 2000 owns the volume root and can replace this name (`echo forged >
+// CORPUS.json` succeeded in the live container), so the host takes NO decision
+// from it. It is written for the newsroom tools to read, and read back here only
+// to compare against the bytes the host recorded in landed.json -- which is a
+// tamper check, not trust. Nothing in the refresh path may use this to decide
+// whether a corpus is current.
 export function readIdentity(volume) {
   try { return JSON.parse(readFileSync(path.join(volume, CORPUS_IDENTITY_FILE), 'utf8')); } catch { return null; }
 }
@@ -213,13 +292,16 @@ export function corpusIdentity({ commit, ref, edition, fetchedAt, editionsPresen
 // record is worse than an old one. The bytes are validated AFTER they are on
 // disk and BEFORE they are visible -- reparsing what the filesystem actually
 // holds is what catches a truncated write, which validating the object cannot.
+/** The exact bytes `writeIdentity` publishes, so the host can record their digest and notice a forged replacement. */
+export const identityBytes = (record) => `${JSON.stringify(record, null, 2)}\n`;
+
 export function writeIdentity(volume, record, { edition, owner, tmpDir, exec = hostExec } = {}) {
   const planned = corpusIdentityFindings(record, { edition });
   if (planned.length) fail(`refusing to publish an invalid ${CORPUS_IDENTITY_FILE}: ${planned.join('; ')}`);
   const live = path.join(volume, CORPUS_IDENTITY_FILE);
   const tmp = path.join(tmpDir ?? volume, `.${CORPUS_IDENTITY_FILE}.${process.pid}.tmp`);
   rmSync(tmp, { force: true });
-  writeFileSync(tmp, `${JSON.stringify(record, null, 2)}\n`, { mode: 0o444 });
+  writeFileSync(tmp, identityBytes(record), { mode: 0o444 });
   let written = null;
   try { written = JSON.parse(readFileSync(tmp, 'utf8')); } catch { /* reported as a finding below */ }
   const findings = written === null ? [`${CORPUS_IDENTITY_FILE} did not survive the write as parseable JSON`] : corpusIdentityFindings(written, { edition });
@@ -231,31 +313,42 @@ export function writeIdentity(volume, record, { edition, owner, tmpDir, exec = h
   return record;
 }
 
-// Trees are cheap to keep and catastrophic to lose mid-read, so nothing a
-// symlink resolves into is ever a candidate -- not even a stale date nobody
-// will read again. `protect` carries the commit CORPUS.json names, which is
-// never deleted even if the links have since moved on.
+// WHAT MAY BE DELETED IS DECIDED OUTSIDE THE VOLUME
+// -------------------------------------------------
+// This used to `readdir` `trees/` for candidates and `readdir` the volume root
+// for the `<date>` symlinks that spared them -- both agent-writable, both
+// steering a root-run rename and rmSync. An agent could add a name to be
+// deleted, or remove the link that protected a tree twelve reporters were
+// reading.
 //
-// The doomed tree leaves the volume with ONE rename -- one directory entry
-// removed -- and is deleted outside it. A recursive delete in place would
-// unlink thousands of entries under the container's startup walk.
-export function collectGarbage(volume, { keep, protect = [], trash, now = new Date(), exec = hostExec, remove = removeTree } = {}) {
+// Now `known` is the host's own list (corpus-landed.mjs) and `live` the trees it
+// records as serving a date or frozen against a commissioned edition. A
+// candidate must appear in BOTH that list and the volume as a real directory.
+// Anything present under `trees/` that the host does not know is returned as
+// `unknown` and left exactly where it is: it is a finding about who else is
+// writing the volume, not a thing to delete.
+//
+// Trees are cheap to keep and catastrophic to lose mid-read, so the doomed tree
+// still leaves the volume with ONE rename -- one directory entry removed -- and
+// is deleted outside it. A recursive delete in place would unlink thousands of
+// entries under the container's startup walk.
+export function collectGarbage(volume, { known, live = [], keep, trash, now = new Date(), exec = hostExec, remove = removeTree } = {}) {
   // No default: an absent `keep` would slice from 0 and sweep every spare tree,
   // which is the one mistake here that cannot be undone.
   if (!Number.isInteger(keep) || keep < 0) fail(`collectGarbage needs how many unreferenced trees to keep, got ${JSON.stringify(keep)}`);
+  // Nor a default for `known`: an empty list is "the host landed nothing", which
+  // deletes nothing, but an ABSENT one would mean the caller never consulted the
+  // record at all and must not be allowed to fall through to a sweep.
+  if (!Array.isArray(known)) fail(`collectGarbage needs the host's list of landed tree names, got ${JSON.stringify(known)}`);
   const treesDir = path.join(volume, TREES_DIR);
-  let names;
-  try { names = readdirSync(treesDir).sort(); } catch { return []; }
-  const live = new Set(protect);
-  for (const name of readdirSync(volume)) {
-    if (!EDITION_PATTERN.test(name)) continue;
-    let target;
-    try { target = readlinkSync(path.join(volume, name)); } catch { continue; }
-    const relative = path.relative(treesDir, path.resolve(volume, target));
-    const [first] = relative.split(path.sep);
-    if (first && first !== '..' && !path.isAbsolute(relative)) live.add(first);
-  }
-  const doomed = names.filter((name) => !live.has(name))
+  if (!assertTreesDirectory(volume)) return { removed: [], unknown: [] };
+  const present = readdirSync(treesDir, { withFileTypes: true });
+  // isDirectory() on a Dirent is lstat-shaped, so a symlink named like a commit
+  // is never a real directory here and never a candidate.
+  const real = new Set(present.filter((entry) => entry.isDirectory()).map((entry) => entry.name));
+  const unknown = present.map((entry) => entry.name).filter((name) => !known.includes(name)).sort();
+  const spared = new Set(live);
+  const doomed = known.filter((name) => real.has(name) && !spared.has(name))
     .map((name) => ({ name, mtime: statSync(path.join(treesDir, name)).mtimeMs }))
     .sort((a, b) => b.mtime - a.mtime)
     .slice(keep);
@@ -263,13 +356,14 @@ export function collectGarbage(volume, { keep, protect = [], trash, now = new Da
   for (const entry of doomed) {
     const parked = path.join(trash, `${entry.name}-${stamp}`);
     const tree = path.join(treesDir, entry.name);
+    assertRealDirectory(tree, `the retiring corpus tree ${TREES_DIR}/${entry.name.slice(0, 7)}`);
     // Same reason as landFrozenTree: a frozen directory cannot be renamed into
     // another parent until its own write bit is back.
     try { chmodSync(tree, 0o755); } catch { /* already writable */ }
     renameSync(tree, parked);
     remove(parked, { volume, exec });
   }
-  return doomed.map((entry) => entry.name);
+  return { removed: doomed.map((entry) => entry.name), unknown };
 }
 
 /** Where a dated corpus link points, read the way an agent would read it -- null when it is absent, dangling, or not a symlink at all. */

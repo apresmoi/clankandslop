@@ -5,8 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CORPUS_IDENTITY_VERSION, CorpusError } from './corpus-contract.mjs';
 import {
-  TREES_DIR, VOLUME_ROOT_MODE, applyOwner, assertSameDevice, assertVolumeRoot, collectGarbage,
-  corpusIdentity, freeze, pointAtTree, readIdentity, resolveCorpusLink, SYMLINK_OPS, writeIdentity
+  TREES_DIR, VOLUME_ROOT_MODE, applyOwner, assertRealDirectory, assertSameDevice, assertTreesDirectory,
+  assertVolumeRoot, auditVolumeRoot, collectGarbage, corpusIdentity, freeze, pointAtTree, readIdentity,
+  removeTree, resolveCorpusLink, SYMLINK_OPS, writeIdentity
 } from './corpus-volume.mjs';
 
 const EDITION = '2026-09-06';
@@ -155,8 +156,9 @@ test('a retired tree leaves the volume by one rename and is deleted outside it',
     const removed = [];
     // Standing in for the recursive delete so the parked directory survives for
     // inspection: the point of the test is WHERE it was deleted from.
-    const removedNames = collectGarbage(fixture.volume, { keep: 0, protect: [commitOf('b')], trash, remove: (target) => removed.push(target) });
-    assert.deepEqual(removedNames, [commitOf('a')]);
+    const swept = collectGarbage(fixture.volume, { keep: 0, known: [commitOf('a'), commitOf('b')], live: [commitOf('b')], trash, remove: (target) => removed.push(target) });
+    assert.deepEqual(swept.removed, [commitOf('a')]);
+    assert.deepEqual(swept.unknown, []);
     assert.equal(existsSync(join(fixture.volume, TREES_DIR, commitOf('a'))), false, 'the entry must be gone from the volume');
     assert.equal(removed.length, 1);
     assert.ok(removed[0].startsWith(`${trash}${'/'}`), `the doomed tree must be deleted from the trash root, not from inside the volume: ${removed[0]}`);
@@ -178,8 +180,8 @@ test('garbage collection protects every tree a dated link resolves into, and kee
       utimesSync(join(fixture.volume, TREES_DIR, commitOf(seed)), when, when);
     }
     symlinkSync(`${TREES_DIR}/${commitOf('d')}/${EDITION}`, join(fixture.volume, EDITION));
-    const removed = collectGarbage(fixture.volume, { keep: 1, protect: [commitOf('d')], trash });
-    assert.deepEqual([...removed].sort(), [commitOf('a'), commitOf('b')], 'the newest unreferenced tree is kept, the rest go');
+    const swept = collectGarbage(fixture.volume, { keep: 1, known: ['a', 'b', 'c', 'd'].map(commitOf), live: [commitOf('d')], trash });
+    assert.deepEqual([...swept.removed].sort(), [commitOf('a'), commitOf('b')], 'the newest unreferenced tree is kept, the rest go');
     assert.deepEqual(readdirSync(join(fixture.volume, TREES_DIR)).sort(), [commitOf('c'), commitOf('d')].sort());
     assert.deepEqual(readdirSync(trash), [], 'nothing is left behind in the trash root');
   } finally { fixture.cleanup(); }
@@ -199,5 +201,78 @@ test('resolveCorpusLink reads a dated corpus path the way an agent would', () =>
     mkdirSync(join(fixture.volume, EDITION));
     assert.equal(resolveCorpusLink(fixture.volume, EDITION), null);
     assert.equal(lstatSync(join(fixture.volume, EDITION)).isSymbolicLink(), false);
+  } finally { fixture.cleanup(); }
+});
+
+// FABLE'S REPRO, AS A TEST. `collectGarbage` never lstat'd `trees/`, so an agent
+// -- which owns the volume root -- could point that name at any absolute host
+// path and the ROOT-RUN refresher would rename entries out of it and rmSync them.
+// A root-privileged delete whose target an agent chose.
+test('a trees symlink makes every volume operation refuse, and deletes nothing', () => {
+  const fixture = volumeFixture({ commits: [] });
+  try {
+    const bait = join(fixture.work, 'etc');
+    mkdirSync(join(bait, 'nested'), { recursive: true });
+    for (const name of ['passwd', 'shadow', 'nested/hosts']) writeFileSync(join(bait, name), `do not delete ${name}\n`);
+    symlinkSync(bait, join(fixture.volume, TREES_DIR));
+
+    const refusal = (error) => error instanceof CorpusError && /is a symlink/u.test(error.message);
+    assert.throws(() => assertTreesDirectory(fixture.volume), refusal);
+    assert.throws(() => collectGarbage(fixture.volume, { keep: 0, known: ['passwd'], live: [], trash: fixture.work }), refusal);
+    // And the thaw-then-delete is refused on its own, not only through the sweep:
+    // `chmod -R u+w` follows a symlink and would restore write across the target.
+    assert.throws(() => removeTree(join(fixture.volume, TREES_DIR), { volume: fixture.volume }), (error) => error instanceof CorpusError && /refusing to thaw and delete through the symlink/u.test(error.message));
+
+    for (const name of ['passwd', 'shadow', 'nested/hosts']) assert.ok(existsSync(join(bait, name)), `${name} was deleted through the symlink`);
+    assert.deepEqual(readdirSync(bait).sort(), ['nested', 'passwd', 'shadow']);
+  } finally { fixture.cleanup(); }
+});
+
+test('an entry under trees/ the host did not land is reported and left exactly where it is', () => {
+  const fixture = volumeFixture({ commits: ['a', 'b'] });
+  try {
+    const trash = join(fixture.work, 'trash');
+    mkdirSync(trash, { recursive: true });
+    // `b` is a tree the host knows nothing about: either somebody else wrote it,
+    // or this host lost its record. Deleting it would destroy the evidence of the
+    // first case and twelve readers' corpus in the second.
+    const swept = collectGarbage(fixture.volume, { keep: 0, known: [commitOf('a')], live: [], trash });
+    assert.deepEqual(swept.removed, [commitOf('a')]);
+    assert.deepEqual(swept.unknown, [commitOf('b')]);
+    assert.ok(existsSync(join(fixture.volume, TREES_DIR, commitOf('b'), EDITION, 'desks', 'foreman.index')));
+    // An absent `known` is never a sweep: it would mean the caller never consulted
+    // the host record, and falling through to a readdir is the defect itself.
+    assert.throws(() => collectGarbage(fixture.volume, { keep: 0, live: [], trash }), (error) => error instanceof CorpusError && /list of landed tree names/u.test(error.message));
+  } finally { fixture.cleanup(); }
+});
+
+test('the volume root is audited against the only names this host writes, and nothing is deleted', () => {
+  const fixture = volumeFixture();
+  try {
+    assert.deepEqual(auditVolumeRoot(fixture.volume), []);
+    writeFileSync(join(fixture.volume, '.spawnfile-resource-identity'), '{}\n');
+    writeFileSync(join(fixture.volume, 'CORPUS.json'), '{}\n');
+    symlinkSync(`${TREES_DIR}/${commitOf('a')}/${EDITION}`, join(fixture.volume, EDITION));
+    assert.deepEqual(auditVolumeRoot(fixture.volume), [], 'the sentinel, the identity record, trees/ and a dated symlink are all expected');
+
+    writeFileSync(join(fixture.volume, 'notes.txt'), 'an agent was here\n');
+    mkdirSync(join(fixture.volume, '2026-09-07'));
+    const findings = auditVolumeRoot(fixture.volume);
+    assert.equal(findings.length, 2);
+    assert.ok(findings.some((text) => /^2026-09-07 is a real directory where a corpus symlink belongs$/u.test(text)), findings.join('; '));
+    assert.ok(findings.some((text) => /^notes\.txt is a name this host never writes \(file\)$/u.test(text)), findings.join('; '));
+    // Reported, never repaired: a `chmod`/`rm` sweep here is what would take the
+    // root-owned identity sentinel with it and brick every container.
+    assert.ok(existsSync(join(fixture.volume, 'notes.txt')) && existsSync(join(fixture.volume, '2026-09-07')));
+  } finally { fixture.cleanup(); }
+});
+
+test('assertRealDirectory accepts the directory the host made, refuses anything else, and tolerates absence', () => {
+  const fixture = volumeFixture();
+  try {
+    assert.equal(assertRealDirectory(join(fixture.volume, TREES_DIR), 'trees').isDirectory(), true);
+    assert.equal(assertRealDirectory(join(fixture.volume, 'nowhere'), 'a tree'), null, 'absent is the first run, not a refusal');
+    writeFileSync(join(fixture.volume, 'afile'), 'x');
+    assert.throws(() => assertRealDirectory(join(fixture.volume, 'afile'), 'a tree'), (error) => error instanceof CorpusError && /is a file, not a directory/u.test(error.message));
   } finally { fixture.cleanup(); }
 });
