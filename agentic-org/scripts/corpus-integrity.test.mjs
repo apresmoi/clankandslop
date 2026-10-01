@@ -260,6 +260,33 @@ test('a real directory planted at the dated name pages with the command that cle
     assert.equal(readFileSync(join(dated, 'desks', 'cogsworth.index'), 'utf8'), 'planted\n');
     assert.equal(exit, 1, 'an edition only an operator can make reachable again is not a success');
 
+    // TWO CHANNELS, and this is the half that was missing. The exit code feeds
+    // systemd's OnFailure=, so a wedge only an operator can clear must announce
+    // itself ONCE and then stop: exiting non-zero every two minutes is ~700 pages a
+    // day about one unchanged condition. Serviceability is answered separately and
+    // on every run by `current` / `--check`, which stay false throughout.
+    // The second poll is NOT a repeat: the first one republished the forged
+    // CORPUS.json, so the finding set shrank and a changed picture pages again by
+    // design. The third poll is the real repeat, and it is the one that must be
+    // silent -- that is the ~700-pages-a-day case.
+    const second = [];
+    main(args(f), deps(f, { log: () => {}, alarm: (reason, detail) => second.push([reason, detail]) }));
+    const quiet = [];
+    const again = main(args(f), deps(f, { log: () => {}, alarm: (reason, detail) => quiet.push([reason, detail]) }));
+    assert.equal(again, 0, 'an UNCHANGED operator-only wedge must not page again every poll');
+    assert.deepEqual(quiet, [], `a poll over an identical wedge must raise nothing: ${JSON.stringify(quiet)}`);
+    assert.equal(refresh(args(f), deps(f)).current, false, 'and it must still report the corpus as not serviceable');
+
+    // A CHANGED picture is a new event and pages again. Note what does NOT count:
+    // writing another file INSIDE the planted directory changes nothing, because the
+    // finding is about the shape of the dated name, not its contents. A second,
+    // different tamper does.
+    chmodSync(join(f.volume, CORPUS), 0o644);
+    writeFileSync(join(f.volume, CORPUS), 'forged again\n', { mode: 0o644 });
+    const third = [];
+    assert.equal(main(args(f), deps(f, { log: () => {}, alarm: (reason, detail) => third.push([reason, detail]) })), 1, 'a wedge plus a NEW tamper is a new event');
+    assert.ok(third.length >= 1, 'and it pages again');
+
     // Classified, and NOT queued as a link repair: an impossible rename is not a
     // repair, and retrying it every two minutes is what the wedge was made of.
     const sweep = integritySweep({ volume: f.volume, landed: landedOf(f), landedFile: f.landed, edition: EDITION, privateRepo: f.priv, exec: hostExec });

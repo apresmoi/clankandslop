@@ -294,12 +294,25 @@ function sweepAndHeal(options, { commit, edition, ref, now, log, alarm, ledger, 
   // once auto-repair has stood down, where "every time" is ~700 pages a day about a
   // state only an operator can clear. There the stand-down pages once, and a
   // CHANGED finding set pages again.
-  if (suspended ? !healed.suspended || landed.noted !== digest : sweep.tampered || landed.noted !== digest) {
+  // OPERATOR-ONLY STATES PAGE ONCE, NOT ~700 TIMES A DAY.
+  // A real directory where a dated link belongs, a non-directory where the serving
+  // tree belongs, or a sweep that could not finish are all states nothing this job
+  // does will clear -- the refusals are correct and deliberately delete nothing.
+  // Paging about an UNCHANGED one every two minutes is the cadence that teaches
+  // whoever carries the pager to ignore the word, which is the same mistake the
+  // suspension branch below already avoids. The first page is what matters, and a
+  // CHANGED picture is what matters next. Anything the host is about to REPAIR
+  // still pages every occurrence: each repair is a real event, and a driven loop is
+  // bounded by --heal-limit rather than by silence.
+  const repairing = Boolean(sweep.drift) || sweep.links.length > 0 || Boolean(sweep.identity);
+  const unheard = landed.noted !== digest;
+  const announced = suspended ? !healed.suspended || unheard : repairing || unheard;
+  if (announced) {
     alarm(TAMPER_REASON, suspended
       ? { edition, message: `corpus auto-repair suspended: ${tree.slice(0, 13)} has been rewritten and re-landed ${healed.cycles} times`, detail: suspensionDetail(options, { tree, healed, sweep }) }
       : { edition, message: `corpus volume tampered: ${sweep.findings[0]}`, detail: sweep.findings.join('\n') });
   }
-  const result = { ...outcome, findings: sweep.findings, tampered: sweep.tampered, suspended };
+  const result = { ...outcome, findings: sweep.findings, tampered: sweep.tampered, suspended, blocked: unrepairable(sweep), announced };
   if (options.check) return { ...result, current: !sweep.tampered };
   if (suspended) {
     log(`auto-repair suspended for ${tree.slice(0, 13)}: ${healed.cycles} drift-and-reland cycles since ${healed.since}, limit ${options.healLimit}. The last good tree is left exactly where it is.`);
@@ -330,19 +343,30 @@ function sweepAndHeal(options, { commit, edition, ref, now, log, alarm, ledger, 
   // One bounded re-check: a repair that did not take must not be reported as a
   // heal, and must not quietly become next poll's "already current".
   const after = integritySweep({ volume: options.volume, landed: next, landedFile: options.landed, edition, privateRepo: options.private, exec });
-  if (after.tampered) {
+  // Only the states this poll SET OUT to repair may fail it. A blocked dated name
+  // or a planted serving tree survives on purpose, so counting it as "still
+  // tampered after repair" turned every one of them into a throw -- and an alarm --
+  // on every poll, for a condition already paged once above.
+  if (after.drift || after.links.length > 0 || after.identity) {
     const error = new CorpusError(`the corpus volume is still tampered after repair: ${after.findings.join('; ')}`);
     error.alarm = true;
     error.edition = edition;
     throw error;
   }
-  return { ...result, current: true, changed: Boolean(sweep.links.length || sweep.identity) };
+  // `current` must mean "a desk can read today's research", so an unreachable dated
+  // name is not current however much else was repaired. --check already answered
+  // this way; this path used to say `true` regardless, which disagreed with it.
+  return { ...result, current: !result.blocked, changed: Boolean(sweep.links.length || sweep.identity) };
 }
 
 // A sweep that finds NOTHING is the only evidence that whatever was rewriting the
 // mount has stopped, so it is what clears the acknowledged-finding digest and the
 // heal counters. It writes only when there is something to clear: this path runs
 // ~700 times a day, and `--check` writes nothing at all.
+// The three states only an operator can clear. Named once so the paging gate, the
+// post-repair re-check and `current` cannot drift apart about which they are.
+const unrepairable = (sweep) => Boolean(sweep.blocked?.length) || sweep.tree === 'planted' || Boolean(sweep.failed);
+
 function acknowledgeClean(options, { landed, outcome }) {
   if (options.check || (!landed.noted && !Object.keys(landed.heals ?? {}).length)) return outcome;
   writeLanded(options.landed, { ...landed, noted: null, heals: {} });
@@ -407,6 +431,13 @@ export function main(argv = [], { log = console.log, alarm = raiseDetached, env 
     // every two minutes on top -- which is how the word stops meaning anything.
     // `--check` is excluded: an operator asking "is the corpus right?" about a
     // suspended tree must still be told no.
+    // TWO CHANNELS, deliberately. The exit code is what systemd turns into a page
+    // through OnFailure=, so it must mean "something NEW is wrong" -- an unchanged
+    // operator-only wedge exiting non-zero every two minutes is ~700 pages a day
+    // about one condition, which is how the word stops meaning anything. Whether
+    // the corpus is SERVICEABLE is a different question, and `--check` plus
+    // `current` answer it on every run regardless of this number.
+    if (result.blocked) return result.announced ? 1 : 0;
     return result.waiting || result.changed || result.current || (result.suspended && !options.check) ? 0 : 1;
   } catch (error) {
     process.stderr.write(`${error instanceof CorpusError ? error.message : error.stack}\n`);
