@@ -103,10 +103,15 @@ test('a trees symlink stops the refresher dead and deletes nothing it points at'
     writeCorpus(f.priv, EDITION, 'A LATER PRODUCER RUN');
     commitAll(f.priv, 'research: later');
     const alarms = [];
-    assert.equal(main(args(f), deps(f, { alarm: (reason, detail) => alarms.push([reason, detail]) })), 1, 'a volume written by something else is a refusal, not a repair');
-    assert.throws(() => refresh(args(f), deps(f)), (error) => error instanceof CorpusError && /is a symlink/u.test(error.message));
+    const exit = main(args(f), deps(f, { alarm: (reason, detail) => alarms.push([reason, detail]) }));
+    let refusal = null;
+    try { refresh(args(f), deps(f)); } catch (error) { refusal = error; }
 
+    // Checked BEFORE the refusal itself: if this guard is ever removed, the test
+    // must fail on the root-privileged delete, not on a missing error message.
     for (const name of ['passwd', 'shadow', 'nested/hosts']) assert.ok(existsSync(join(bait, name)), `${name} was deleted through the symlink an agent planted`);
+    assert.equal(exit, 1, 'a volume written by something else is a refusal, not a repair');
+    assert.ok(refusal instanceof CorpusError && /is a symlink/u.test(refusal.message), `${refusal}`);
     assert.equal(lstatSync(trees).isSymbolicLink(), true, 'and the symlink itself is left as evidence, not silently repaired');
     assert.ok(existsSync(join(parked, landedOf(f).editions[EDITION].commit, EDITION)), 'the real trees directory is untouched');
   } finally { try { unlinkSync(join(f.volume, TREES_DIR)); } catch { /* the symlink was never created */ } cleanup(f); }

@@ -13,7 +13,7 @@
 // Read corpus-volume.mjs before changing anything here: it owns every rule about
 // what may touch the volume and why one careless `chmod -R` bricks the org.
 
-import { chmodSync, appendFileSync, mkdirSync, readdirSync, renameSync } from 'node:fs';
+import { appendFileSync, chmodSync, mkdirSync, readdirSync, renameSync } from 'node:fs';
 import path from 'node:path';
 import { CORPUS_IDENTITY_FILE, CorpusError, verifyCorpusFreshness, verifyCorpusTree } from './corpus-contract.mjs';
 import {

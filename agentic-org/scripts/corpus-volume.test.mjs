@@ -211,20 +211,34 @@ test('resolveCorpusLink reads a dated corpus path the way an agent would', () =>
 test('a trees symlink makes every volume operation refuse, and deletes nothing', () => {
   const fixture = volumeFixture({ commits: [] });
   try {
+    // Shaped like the host path an agent would actually aim at: read-only files it
+    // must not be able to chmod, and a DIRECTORY whose name the sweep would accept
+    // as a retiring tree, which is what makes the rename-and-rmSync reachable.
     const bait = join(fixture.work, 'etc');
-    mkdirSync(join(bait, 'nested'), { recursive: true });
-    for (const name of ['passwd', 'shadow', 'nested/hosts']) writeFileSync(join(bait, name), `do not delete ${name}\n`);
+    mkdirSync(join(bait, commitOf('a')), { recursive: true });
+    for (const name of ['passwd', 'shadow', `${commitOf('a')}/hosts`]) writeFileSync(join(bait, name), `do not delete ${name}\n`, { mode: 0o444 });
     symlinkSync(bait, join(fixture.volume, TREES_DIR));
 
-    const refusal = (error) => error instanceof CorpusError && /is a symlink/u.test(error.message);
-    assert.throws(() => assertTreesDirectory(fixture.volume), refusal);
-    assert.throws(() => collectGarbage(fixture.volume, { keep: 0, known: ['passwd'], live: [], trash: fixture.work }), refusal);
-    // And the thaw-then-delete is refused on its own, not only through the sweep:
-    // `chmod -R u+w` follows a symlink and would restore write across the target.
-    assert.throws(() => removeTree(join(fixture.volume, TREES_DIR), { volume: fixture.volume }), (error) => error instanceof CorpusError && /refusing to thaw and delete through the symlink/u.test(error.message));
+    // Every operation is attempted for real and its outcome recorded, because the
+    // assertion that matters is that the BAIT SURVIVED -- asserting the refusal
+    // first would let a regression abort the test before the harm is checked.
+    const errors = [];
+    const attempt = (label, run) => { try { run(); errors.push([label, null]); } catch (error) { errors.push([label, error]); } };
+    attempt('assertTreesDirectory', () => assertTreesDirectory(fixture.volume));
+    attempt('collectGarbage', () => collectGarbage(fixture.volume, { keep: 0, known: [commitOf('a')], live: [], trash: fixture.work }));
+    // `chmod -R u+w` follows a symlink and would restore write across the target,
+    // so the thaw-then-delete has to refuse on its own and not only via the sweep.
+    attempt('removeTree', () => removeTree(join(fixture.volume, TREES_DIR), { volume: fixture.volume }));
 
-    for (const name of ['passwd', 'shadow', 'nested/hosts']) assert.ok(existsSync(join(bait, name)), `${name} was deleted through the symlink`);
-    assert.deepEqual(readdirSync(bait).sort(), ['nested', 'passwd', 'shadow']);
+    for (const name of ['passwd', 'shadow', `${commitOf('a')}/hosts`]) assert.ok(existsSync(join(bait, name)), `${name} was deleted through the symlink an agent planted`);
+    assert.deepEqual(readdirSync(bait).sort(), [commitOf('a'), 'passwd', 'shadow'].sort());
+    // `chmod -R u+w` follows a symlinked target, so the thaw is harm on its own.
+    for (const name of ['passwd', `${commitOf('a')}/hosts`]) assert.equal(statSync(join(bait, name)).mode & 0o222, 0, `${name} was chmodded through the symlink`);
+    assert.deepEqual(readdirSync(fixture.work).filter((name) => name.startsWith(commitOf('a'))), [], 'nothing may have been parked in the trash root either');
+    for (const [label, error] of errors) {
+      assert.ok(error instanceof CorpusError, `${label} must refuse, not proceed: ${error ?? 'it returned normally'}`);
+      assert.match(error.message, /symlink/u, label);
+    }
   } finally { fixture.cleanup(); }
 });
 
