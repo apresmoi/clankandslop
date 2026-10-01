@@ -42,10 +42,23 @@
 //
 // WHAT IT WILL NOT DO
 // -------------------
-// It never builds and it never chooses an image. The tag comes from the image
-// the running container already reports, and a tag it cannot resolve is a
-// REFUSAL: a unit whose job is one env line must not be able to roll the
-// newsroom onto a different build.
+// It never builds and it never chooses an image. The identity comes from the
+// running container itself, and anything it cannot resolve is a REFUSAL: a unit
+// whose job is one env line must not be able to roll the newsroom onto a
+// different build.
+//
+// WHICH FIELD IS AUTHORITATIVE, AND WHY IT IS NOT THE TAG
+// ------------------------------------------------------
+// `.Image` -- the container's immutable `sha256:` image ID -- is the authority on
+// what is running. `.Config.Image` is only the TAG it was created from, and a tag
+// is a mutable pointer: rebuild anything as `clank-and-slop:local7` and every
+// container created from that name still reports it while running completely
+// different bytes. This unit used to read the tag alone and then merely check
+// that the tag existed locally, which a review proved by injection on 2026-10-01
+// -- a tag remapped to another image was accepted, and the recreate would have
+// rolled the newsroom onto a build nobody deployed. So the ID is read too, and a
+// tag that no longer resolves to it is a refusal rather than a recreate:
+// somebody rebuilt underneath the deployment and a person has to look.
 //
 // USAGE
 //   node agentic-org/scripts/epoch-roll-run.mjs
@@ -72,6 +85,9 @@ export const DEPLOYMENT_RECORDS = '/home/clank/.spawnfile/deployments';
 // is still a newsroom image and still gets its budget rolled. Anything outside
 // the repository is not.
 export const IMAGE_PREFIX = 'clank-and-slop:';
+// A docker image ID. The tag is what `up --image` takes; this is what that tag
+// has to still resolve to.
+export const IMAGE_ID = /^sha256:[0-9a-f]{64}$/u;
 
 export function parseArgs(argv) {
   const options = {
@@ -98,16 +114,29 @@ export function parseArgs(argv) {
   return options;
 }
 
-// One read of the running container: the image it was created from and the
-// epoch it was created WITH. Both answers come from the same inspect because
-// they are the same question — what is actually running right now — and taking
-// them from two places is how the two could disagree.
+// One read of the running container: the image ID it IS, the tag it was created
+// from, and the epoch it was created WITH. All three answers come from the same
+// inspect because they are the same question — what is actually running right now
+// — and taking them from two places is how they could disagree.
+//
+// `{{.Image}} {{json .Config}}`, separated by one space: an image ID contains no
+// space and the JSON object that follows cannot begin with one, so both answers
+// are separable without asking docker twice.
 export function inspectContainer(options, { log = console.log, exec = execFileSync } = {}) {
-  let config;
-  try { config = JSON.parse(exec('docker', ['inspect', options.container, '--format', '{{json .Config}}'], { stdio: ['ignore', 'pipe', 'pipe'] }).toString()); }
+  let raw;
+  try { raw = exec('docker', ['inspect', options.container, '--format', '{{.Image}} {{json .Config}}'], { stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim(); }
   catch (error) { log(`  (could not inspect ${options.container}: ${String(error.message).trim().slice(0, 160)})`); return null; }
+  const split = raw.indexOf(' ');
+  let config = null;
+  try { config = JSON.parse(raw.slice(split + 1)); }
+  catch (error) { log(`  (could not read the config of ${options.container}: ${String(error.message).trim().slice(0, 160)})`); }
   const epochLine = (config?.Env ?? []).find((entry) => typeof entry === 'string' && entry.startsWith(`${EPOCH_KEY}=`));
-  return { image: typeof config?.Image === 'string' && config.Image ? config.Image : null, epoch: epochLine ? epochLine.slice(EPOCH_KEY.length + 1) : null };
+  const id = split > 0 ? raw.slice(0, split) : '';
+  return {
+    imageId: IMAGE_ID.test(id) ? id : null,
+    image: typeof config?.Image === 'string' && config.Image ? config.Image : null,
+    epoch: epochLine ? epochLine.slice(EPOCH_KEY.length + 1) : null
+  };
 }
 
 // The deployment record is the fallback, not the first answer: it says what was
@@ -135,11 +164,28 @@ export function resolveImage(options, { log = console.log, exec = execFileSync, 
     `cannot resolve the image ${options.container} is running, from the container or from ${path.join(DEPLOYMENT_RECORDS, options.deployment, 'record.json')}`
     + ' — refusing to recreate the newsroom without knowing which build it is already on', 'epoch-roll-failed');
   if (!tag.startsWith(IMAGE_PREFIX)) throw new SeamError(`${source} reports image ${tag}, which is not a ${IMAGE_PREFIX}* newsroom image — refusing to deploy it`, 'epoch-roll-failed');
+  // A container that could name its tag but not its image ID is half an answer,
+  // and half an answer is exactly what this unit may not act on: without the
+  // immutable identity there is nothing to check the tag against.
+  if (fromContainer && !observed.imageId) throw new SeamError(
+    `${options.container} reports tag ${tag} but no immutable image id — refusing to recreate the newsroom without knowing which build it is on`, 'epoch-roll-failed');
   // Present LOCALLY, before anything is touched: `up --image` against a tag
-  // docker cannot find fails after the running container is already gone.
-  try { exec('docker', ['image', 'inspect', tag], { stdio: ['ignore', 'pipe', 'pipe'] }); }
+  // docker cannot find fails after the running container is already gone. The
+  // same inspect answers the question that matters more — what the tag resolves
+  // to NOW.
+  let resolved;
+  try { resolved = exec('docker', ['image', 'inspect', tag, '--format', '{{.Id}}'], { stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim(); }
   catch (error) { throw new SeamError(`${source} reports image ${tag} but docker cannot find it locally (${String(error.message).trim().slice(0, 160)}) — refusing a recreate that would have nothing to start`, 'epoch-roll-failed'); }
-  return { tag, source, epoch: observed?.epoch ?? null };
+  if (!IMAGE_ID.test(resolved)) throw new SeamError(`docker resolved ${tag} to ${JSON.stringify(resolved.slice(0, 120))}, which is not an image id — refusing to recreate on an identity this unit cannot read`, 'epoch-roll-failed');
+  // THE TAG MOVED. `up --image <tag>` would start different bytes than the ones
+  // serving the newsroom right now, which is the one thing this unit exists not
+  // to do. Not repairable here and not worth guessing at: somebody rebuilt
+  // underneath the deployment, and whether that build should be running is a
+  // person's call, not a budget roll's.
+  if (observed?.imageId && observed.imageId !== resolved) throw new SeamError(
+    `${options.container} is running image ${observed.imageId.slice(7, 19)} but the tag ${tag} now resolves to ${resolved.slice(7, 19)}`
+    + ' — the tag has been remapped since the deployment, so a recreate would roll the newsroom onto a different build. REFUSING: somebody rebuilt underneath the deployment and a person has to look.', 'epoch-roll-failed');
+  return { tag, imageId: observed?.imageId ?? resolved, source, epoch: observed?.epoch ?? null };
 }
 
 // Reused, never copied: these are seam-run's own stages, so the gate that
@@ -159,7 +205,7 @@ export function epochRoll(argv = [], { now = new Date(), log = console.log, alar
     log(`epoch-roll ${options.check ? '(check) ' : ''}edition ${options.edition} container ${options.container} repo ${options.repo}`);
     const image = resolve(options, { log });
     options.tag = image.tag;
-    log(`image: ${image.tag} (from ${image.source}); this unit never builds and never chooses an image`);
+    log(`image: ${image.tag} = ${image.imageId.slice(7, 19)} (from ${image.source}); this unit never builds and never chooses an image`);
     // Before the roll, because a recreate kills in-flight wakes exactly as a
     // release does — the budget is not worth a turn.
     stageImpl.gate(options, { now, log }); stages.push('gate');
