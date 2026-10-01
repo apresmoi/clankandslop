@@ -21,6 +21,8 @@
 // the one piece of it a second unit has to read on its own.
 
 import { execFileSync } from 'node:child_process';
+import { constants, accessSync, statSync } from 'node:fs';
+import path from 'node:path';
 
 // Carries its own reason word, so seam-run's fixed alarm vocabulary survives
 // being split across modules. It is NOT a SeamError subclass on purpose:
@@ -30,7 +32,9 @@ import { execFileSync } from 'node:child_process';
 // which is where the rest of the pipeline already knows it from.
 export class ReleaseError extends Error { constructor(message, reason) { super(message); this.reason = reason; } }
 
-export const git = (repo, args, exec) => exec('git', ['-C', repo, ...args], { encoding: 'utf8', maxBuffer: 1 << 24, stdio: ['ignore', 'pipe', 'pipe'] }).toString();
+// `extra` is how the one invocation that talks to the network gets its identity
+// and its closed environment; every other call inherits this process's.
+export const git = (repo, args, exec, extra = {}) => exec('git', ['-C', repo, ...args], { encoding: 'utf8', maxBuffer: 1 << 24, stdio: ['ignore', 'pipe', 'pipe'], ...extra }).toString();
 
 export function headCommit(repo, { exec = execFileSync } = {}) {
   let head;
@@ -56,6 +60,77 @@ export function headCommit(repo, { exec = execFileSync } = {}) {
 // somewhere else and building there.
 export const DEFAULT_TRACK_REF = 'origin/main';
 
+// --- the identity the fetch goes out with ------------------------------------
+// VERIFIED ON THE BOX, and it did not work before this: the public remote is
+// `git@github.com:apresmoi/clankandslop.git` with no SSH host alias, while
+// root's ~/.ssh/config only supplies a key for the aliases
+// `github-clank-public` and `github-clank-private`. So a bare `git fetch origin`
+// as root has no identity at all and dies on "Could not read from remote
+// repository" — which means the release gate below could fetch nothing, forever.
+// (The PRIVATE repo's remote IS an alias, which is why corpus-refresh.mjs's bare
+// fetch works and needed no change. Only this path was affected.)
+//
+// Same shape as publish-edition-branch.mjs's `prepareSshIdentity`, deliberately:
+// the identity is decided HERE and not by ssh's agent or its default key search
+// (`IdentitiesOnly yes`, `IdentityAgent none`), nothing interactive can happen in
+// a systemd unit (`BatchMode=yes`, `PasswordAuthentication no`, and git's own
+// prompt and askpass disabled), and an unexpected server fails loudly rather than
+// being trusted (`StrictHostKeyChecking yes`). The key material is read by ssh and
+// by nothing else: this job never reads it, never copies it, and never logs
+// anything out of it.
+//
+// It does NOT write a scratch ssh config and known_hosts the way the publisher
+// does, and that difference is the reason rather than laziness: the publisher runs
+// git in a disposable HOME that has no known_hosts to pin against, while this runs
+// as the operator whose known_hosts already holds github.com — the entry the
+// private-repo fetch uses every hour. Writing two files per run would also break
+// the property the stage below is built on, that an hourly no-op writes nothing.
+export const DEFAULT_FETCH_KEY = '/root/.ssh/clank_public';
+// A path that needs quoting inside GIT_SSH_COMMAND, which git parses as a shell
+// command. Refused rather than escaped: the one key this job uses lives at a path
+// nobody has to be clever about.
+const PLAIN_PATH = /^[A-Za-z0-9._\/-]+$/u;
+
+export function fetchSshCommand(keyFile, { stat = statSync, access = accessSync } = {}) {
+  const named = String(keyFile ?? '');
+  if (!path.isAbsolute(named) || !PLAIN_PATH.test(named))
+    throw new ReleaseError(`the fetch key path ${JSON.stringify(named)} must be absolute and free of characters a shell would read — refusing to build a GIT_SSH_COMMAND around it`, 'seam-blocked');
+  // A MISSING KEY MUST NOT LOOK LIKE AN OUTAGE. Falling back to an
+  // unauthenticated fetch would fail the way a brief GitHub outage fails, and the
+  // deferral below would then wait a day before telling anybody — so the key is
+  // checked before the fetch and its absence is said in its own words.
+  let info;
+  try { info = stat(named); }
+  catch (error) { throw new ReleaseError(`the fetch key ${named} cannot be read (${String(error.message).trim().slice(0, 160)}) — refusing an unauthenticated fetch, which would fail like an outage and be deferred for a day instead of naming the real fault`, 'seam-blocked'); }
+  if (!info.isFile()) throw new ReleaseError(`the fetch key ${named} is not a file — refusing an unauthenticated fetch`, 'seam-blocked');
+  try { access(named, constants.R_OK); }
+  catch (error) { throw new ReleaseError(`the fetch key ${named} is not readable by this job (${String(error.message).trim().slice(0, 160)}) — refusing an unauthenticated fetch`, 'seam-blocked'); }
+  return ['ssh', '-i', named, '-o IdentitiesOnly=yes', '-o IdentityAgent=none',
+    '-o PasswordAuthentication=no', '-o StrictHostKeyChecking=yes', '-o BatchMode=yes'].join(' ');
+}
+
+// WHY THE CAUSE IS CLASSIFIED AND NOT JUST REPORTED.
+//
+// The deferral below exists for one cause only: a remote this run could not
+// reach. An authentication or configuration fault is not that — it is a state
+// that will still be there in an hour, in a day, and in a week, so deferring it
+// quietly is the same mistake as deferring a missing key. Different fault,
+// different human response, so they are told apart here and the log says which.
+//
+// git's own epilogue ("Could not read from remote repository") is identical for
+// both, so the classification reads the ssh-level lines underneath it and treats
+// anything it cannot place as an outage — conservative about paging, and still
+// escalated by the pending record if it persists.
+const AUTH_EVIDENCE = /permission denied|publickey|host key verification|no such identity|load key|invalid format|authentication failed|access denied|repository not found|too many authentication failures/iu;
+const UNREACHABLE_EVIDENCE = /could not resolve|name or service not known|temporary failure in name resolution|connection (timed out|refused|reset)|network is unreachable|operation timed out|no route to host|unexpected eof/iu;
+
+export function classifyFetchFailure(output) {
+  const text = String(output ?? '');
+  if (AUTH_EVIDENCE.test(text)) return 'auth';
+  if (UNREACHABLE_EVIDENCE.test(text)) return 'unreachable';
+  return 'unclear';
+}
+
 // `origin/main` -> { remote: 'origin', branch: 'main' }. The branch half is what
 // the checkout has to be ON, so a ref this cannot split is a refusal rather than
 // a guess.
@@ -75,16 +150,34 @@ export function trackedRef(ref) {
 // fails loudly, like any other refusal.
 export function fetchTracked(options, { exec = execFileSync, log = console.log } = {}) {
   const { remote } = trackedRef(options.track);
-  try { git(options.repo, ['fetch', '--prune', remote], exec); }
+  const key = options.key ?? DEFAULT_FETCH_KEY;
+  // Built before the fetch, so a key fault is a refusal in its own words rather
+  // than an ssh failure that reads like weather.
+  const env = {
+    ...process.env, GIT_SSH_COMMAND: fetchSshCommand(key),
+    // git's own interactive paths, closed: a unit that hangs on a prompt is worse
+    // than one that fails, because nothing ever tells anybody.
+    GIT_TERMINAL_PROMPT: '0', GIT_ASKPASS: '', GIT_ADVICE: '0'
+  };
+  try { git(options.repo, ['fetch', '--prune', remote], exec, { env }); }
   catch (error) {
+    const detail = `${String(error.message ?? '')}\n${String(error.stderr ?? '')}`;
+    const kind = classifyFetchFailure(detail);
     const failure = new ReleaseError(
-      `cannot fetch ${remote} in ${options.repo}: ${String(error.message).trim().slice(0, 200)}`
-      + ` — refusing to decide there is nothing to release from a ${remote} this run could not reach`, 'seam-blocked');
-    failure.unreachable = true;
+      `cannot fetch ${remote} in ${options.repo} with the identity at ${key}: ${String(error.message).trim().slice(0, 200)}\n`
+      + (kind === 'auth'
+        ? `  AUTHENTICATION OR CONFIGURATION was refused, not the network. This will not clear on its own: nothing can be released until ${key} is the key ${remote} accepts, so it is being raised now rather than deferred.`
+        : kind === 'unreachable'
+          ? `  ${remote} COULD NOT BE REACHED. Refusing to decide there is nothing to release from a remote this run could not see; retrying on the next timer.`
+          : `  the cause could not be classified as either authentication or reachability, so it is being treated as an outage and retried; the pending record still escalates it if it persists.`),
+      'seam-blocked');
+    // Only a remote this run could not reach is a "not yet". See seam-run.mjs.
+    failure.unreachable = kind !== 'auth';
+    failure.fetchFailure = kind;
     throw failure;
   }
-  log(`release: fetched ${remote} in ${options.repo}`);
-  return { remote };
+  log(`release: fetched ${remote} in ${options.repo} (ssh identity ${key})`);
+  return { remote, key };
 }
 
 // ONE git invocation for both commits, because the no-op path runs every hour:

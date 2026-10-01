@@ -84,6 +84,7 @@
 //   node agentic-org/scripts/seam-run.mjs --no-deploy      # bundle + build, no `up`
 //   node agentic-org/scripts/seam-run.mjs --track=origin/release   # compare against another tracked ref
 //   node agentic-org/scripts/seam-run.mjs --no-fetch       # decide against the tracked ref already on disk
+//   node agentic-org/scripts/seam-run.mjs --key=/root/.ssh/clank_public   # the identity the fetch uses
 //   node agentic-org/scripts/seam-run.mjs --edition=2026-09-06 --repo=/tmp/clone
 //
 // Every stage that fails raises the alarm (alarm.mjs) before exiting non-zero.
@@ -94,7 +95,7 @@ import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, compiledArtifacts, compiledEngineFindings, grokBrokerFindings } from './engine-policy.mjs';
-import { DEFAULT_RELEASE_LEDGER, DEFAULT_TRACK_REF, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
+import { DEFAULT_FETCH_KEY, DEFAULT_RELEASE_LEDGER, DEFAULT_TRACK_REF, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
 export const DEFAULT_REPO = '/root/work/clankandslop';
 export const DEFAULT_CONTAINER = 'spawnfile-clank-and-slop';
@@ -151,6 +152,10 @@ export function parseArgs(argv) {
     // `--no-fetch` is for tests and for a deliberate release of a tree somebody
     // has already positioned; it is never how the timer runs.
     track: DEFAULT_TRACK_REF, fetch: true,
+    // The ssh identity the fetch goes out with. The public remote carries no host
+    // alias, so root's ~/.ssh/config supplies no key for it and a bare fetch has
+    // no identity at all — verified on the box. See release-git.mjs.
+    key: process.env.CLANK_RELEASE_FETCH_KEY ?? DEFAULT_FETCH_KEY,
     compiledOutput: null,
     deployUser: DEFAULT_DEPLOY_USER, tag: null, check: false, deploy: true, skipContainer: false, leadMinutes: 30, tailMinutes: 120
   };
@@ -167,6 +172,7 @@ export function parseArgs(argv) {
     else if (key === 'if-changed') options.ifChanged = true;
     else if (key === 'track' && value) options.track = value;
     else if (key === 'no-fetch') options.fetch = false;
+    else if (key === 'key' && value) options.key = path.resolve(value);
     else if (key === 'deploy-user' && value) options.deployUser = value;
     else if (key === 'tag' && value) options.tag = value;
     else if (key === 'lead-minutes' && value) options.leadMinutes = Number(value);

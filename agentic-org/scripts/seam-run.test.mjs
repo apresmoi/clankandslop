@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
-import { DEFAULT_TRACK_REF, DEFER_ALARM_AFTER_MS, RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
+import { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, DEFER_ALARM_AFTER_MS, classifyFetchFailure, fetchSshCommand, fetchTracked, RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -567,8 +567,14 @@ function releaseWorld() {
   git('remote', 'add', 'origin', origin);
   git('push', '-q', '-u', 'origin', 'main');
   const at = (ref) => execFileSync('git', ['-C', repo, 'rev-parse', ref], { encoding: 'utf8' }).trim();
+  // A readable key file, because an unauthenticated fetch is a refusal now: the
+  // public remote carries no ssh host alias, so without an identity the real box
+  // fetched nothing at all. These tests fetch a local path where ssh is never
+  // invoked, so the file only has to exist and be readable.
+  const key = path.join(root, 'fetch-key');
+  writeFileSync(key, 'not a real key, and nothing in this job ever reads it\n', { mode: 0o600 });
   return {
-    root, repo, origin, git, at, released: path.join(root, 'released.json'),
+    root, repo, origin, git, at, key, released: path.join(root, 'released.json'),
     head: at('HEAD'),
     // A merged pull request, as the box sees it: origin/main has advanced and the
     // build root has not moved an inch.
@@ -601,7 +607,7 @@ test('the release gate releases what origin/main has merged, and brings the buil
   // origin/main advanced on merge, the local HEAD did not, and the hourly timer
   // no-opped forever on an unchanged commit.
   const world = releaseWorld();
-  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`];
   try {
     // Nothing merged: the ledger names the tip, so the hourly run does nothing.
     world.write(ledgerOf(world.head));
@@ -633,7 +639,7 @@ test('a build root the tracked tip cannot fast-forward is refused, never merged 
   // something nobody reviewed out of the one checkout the newsroom's durable
   // volumes hang off, so each of these is a state a person has to resolve.
   const world = releaseWorld();
-  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`];
   const run = () => {
     const { calls, impl } = withRealGate();
     const { raised, alarm } = alarms();
@@ -679,7 +685,7 @@ test('a remote this run cannot reach defers under the timer instead of reporting
   // exit 0, no page, and the pending record still escalates an outage that has
   // stopped being brief.
   const world = releaseWorld();
-  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`];
   try {
     world.write(ledgerOf('0'.repeat(40)));
     rmSync(world.origin, { recursive: true, force: true });
@@ -700,10 +706,101 @@ test('a remote this run cannot reach defers under the timer instead of reporting
     assert.equal(stale.deferred, true);
     assert.deepEqual(late.raised.map((entry) => entry.reason), ['release-deferred']);
 
-    // The gate itself refuses rather than returning anything, and marks the one
-    // refusal the timer is allowed to defer. Every other refusal stays a failure.
-    const options = parseArgs([`--repo=${world.repo}`, `--released=${world.released}`]);
-    assert.throws(() => releaseGate(options, { log: noop }), (error) => error.reason === 'seam-blocked' && error.unreachable === true && /could not reach/u.test(error.message));
+    // The gate itself refuses rather than returning anything, and marks the
+    // refusals the timer is allowed to defer. A remote that is simply not there
+    // any more is a fault this job will not pretend to have classified, so it
+    // says so and still defers — conservative about paging, still escalated.
+    const options = parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`]);
+    assert.throws(() => releaseGate(options, { log: noop }), (error) => error.reason === 'seam-blocked'
+      && error.unreachable === true && error.fetchFailure === 'unclear' && /could not be classified/u.test(error.message));
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('the fetch goes out with a configured ssh identity, and refuses rather than going out without one', () => {
+  // VERIFIED ON THE BOX FIRST, which is the only reason this exists: the public
+  // remote is `git@github.com:apresmoi/clankandslop.git` with no ssh host alias,
+  // and root's ~/.ssh/config only keys the aliases — so the bare fetch this gate
+  // was written with had no identity and could never see a merge. The private
+  // repo's remote IS an alias, which is why corpus-refresh.mjs needed nothing.
+  assert.equal(DEFAULT_FETCH_KEY, '/root/.ssh/clank_public', 'a silent change of the identity is a release job that stops fetching');
+  assert.equal(parseArgs([]).key, '/root/.ssh/clank_public');
+  assert.equal(parseArgs(['--key=/root/.ssh/other']).key, '/root/.ssh/other');
+
+  const world = releaseWorld();
+  try {
+    // The identity reaches git as GIT_SSH_COMMAND, and it is the one the config
+    // decides rather than whatever ssh's agent or default key search would offer.
+    const calls = [];
+    const exec = (command, args, options) => { calls.push({ args, options }); return ''; };
+    fetchTracked({ repo: world.repo, track: 'origin/main', key: world.key }, { exec, log: noop });
+    assert.deepEqual(calls[0].args, ['-C', world.repo, 'fetch', '--prune', 'origin']);
+    const ssh = calls[0].options.env.GIT_SSH_COMMAND;
+    assert.ok(ssh.includes(`-i ${world.key}`), ssh);
+    for (const option of ['-o IdentitiesOnly=yes', '-o IdentityAgent=none', '-o BatchMode=yes', '-o PasswordAuthentication=no', '-o StrictHostKeyChecking=yes'])
+      assert.ok(ssh.includes(option), `${option} missing from ${ssh}`);
+    // Nothing interactive, because a unit that hangs on a prompt tells nobody.
+    assert.equal(calls[0].options.env.GIT_TERMINAL_PROMPT, '0');
+    assert.equal(calls[0].options.env.GIT_ASKPASS, '');
+
+    // A key that is not there is a refusal that NAMES it, and nothing is fetched.
+    // An unauthenticated fetch would fail the way a brief outage fails, and the
+    // deferral would then wait a day before saying anything at all.
+    const missing = [];
+    assert.throws(() => fetchTracked({ repo: world.repo, track: 'origin/main', key: '/root/.ssh/not-there' },
+      { exec: (...args) => { missing.push(args); return ''; }, log: noop }),
+    (error) => error.reason === 'seam-blocked' && error.unreachable === undefined && /\/root\/\.ssh\/not-there cannot be read/u.test(error.message));
+    assert.deepEqual(missing, [], 'the key is checked before the fetch, not after it fails');
+
+    // A directory, and a path a shell would read, are refused the same way.
+    assert.throws(() => fetchSshCommand(world.root), /is not a file/u);
+    assert.throws(() => fetchSshCommand('/root/.ssh/key$(id)'), /free of characters a shell would read/u);
+    assert.throws(() => fetchSshCommand('relative/key'), /must be absolute/u);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('an authentication fault is raised now; only an unreachable remote is deferred', () => {
+  // The deferral exists for ONE cause: a remote this run could not see. A key the
+  // remote does not accept will still not be accepted in an hour or in a week, so
+  // deferring it quietly is the same mistake as a missing key file — and git's own
+  // epilogue is identical for both, which is why the ssh lines underneath it are
+  // what gets read.
+  assert.equal(classifyFetchFailure('git@github.com: Permission denied (publickey).\nfatal: Could not read from remote repository.'), 'auth');
+  assert.equal(classifyFetchFailure('ssh: Could not resolve hostname github.com\nfatal: Could not read from remote repository.'), 'unreachable');
+  assert.equal(classifyFetchFailure('fatal: Could not read from remote repository.'), 'unclear');
+
+  const world = releaseWorld();
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`];
+  const failing = (text) => (command, commandArgs, options) => {
+    if (commandArgs.includes('fetch')) { const error = new Error(text); error.stderr = text; throw error; }
+    return execFileSync(command, commandArgs, options);
+  };
+  try {
+    world.write(ledgerOf('0'.repeat(40)));
+
+    // Authentication: a page on this run, exit non-zero, no deferral to wait out.
+    const auth = withRealGate();
+    const { raised, alarm } = alarms();
+    const result = seam(args, { now, log: noop, alarm, stageImpl: Object.assign(auth.impl, {
+      releaseGate: (options, context) => releaseGate(options, { ...context, exec: failing('git@github.com: Permission denied (publickey).') })
+    }) });
+    assert.equal(result.ok, false);
+    assert.equal(result.deferred, undefined, 'a wrong key is not a quiet "not yet"');
+    assert.deepEqual(raised.map((entry) => entry.reason), ['seam-blocked']);
+    assert.match(raised[0].detail, /AUTHENTICATION OR CONFIGURATION was refused/u);
+    assert.deepEqual(auth.calls, []);
+
+    // Unreachable: deferred, silent on the first run, and the log says which.
+    const down = withRealGate();
+    const quiet = alarms();
+    const lines = [];
+    const deferred = seam(args, { now, log: (line) => lines.push(String(line)), alarm: quiet.alarm, stageImpl: Object.assign(down.impl, {
+      releaseGate: (options, context) => releaseGate(options, { ...context, exec: failing('ssh: connect to host github.com port 22: Connection timed out') })
+    }) });
+    assert.equal(deferred.ok, true);
+    assert.equal(deferred.deferred, true);
+    assert.deepEqual(quiet.raised, []);
+    assert.match(lines.join('\n'), /COULD NOT BE REACHED/u);
+    assert.ok(!lines.join('\n').includes('AUTHENTICATION'), 'the two faults must not read the same on a lock screen');
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 
@@ -720,16 +817,16 @@ test('--track names the ref the ledger is compared against, and --no-fetch keeps
     const fetch = () => { fetched += 1; };
     // --no-fetch still compares against the tracked ref and still fast-forwards;
     // it only declines to go and look for a newer one.
-    const offline = parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, '--no-fetch']);
+    const offline = parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`, '--no-fetch']);
     const verdict = releaseGate(offline, { log: noop, fetch });
     assert.equal(fetched, 0);
     assert.equal(verdict.tip, tip);
     assert.equal(world.at('HEAD'), tip);
     // And the default does fetch, exactly once.
-    releaseGate(parseArgs([`--repo=${world.repo}`, `--released=${world.released}`]), { log: noop, fetch });
+    releaseGate(parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`]), { log: noop, fetch });
     assert.equal(fetched, 1);
     // A ref that is not <remote>/<branch> is refused rather than guessed at.
-    assert.throws(() => releaseGate(parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, '--track=main', '--no-fetch']), { log: noop }),
+    assert.throws(() => releaseGate(parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`, '--track=main', '--no-fetch']), { log: noop }),
       (error) => error.reason === 'seam-blocked' && /<remote>\/<branch>/u.test(error.message));
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
@@ -740,7 +837,7 @@ test('--if-changed on an already-released commit runs zero stages and writes not
   const before = readdirSync(world.root).sort();
   try {
     const { calls, impl } = withRealGate();
-    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm: noop });
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: impl, alarm: noop });
     assert.equal(result.ok, true);
     assert.equal(result.noop, true);
     assert.deepEqual(result.stages, []);
@@ -757,7 +854,7 @@ test('--if-changed on a commit the ledger does not name runs the whole pipeline,
   world.write(ledgerOf('0'.repeat(40), 'clank-and-slop:seam-2026-09-01-010101'));
   try {
     const { calls, impl } = withRealGate();
-    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm: noop });
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: impl, alarm: noop });
     assert.equal(result.ok, true);
     assert.equal(result.noop, undefined);
     assert.deepEqual(calls, FULL_ORDER);
@@ -771,7 +868,7 @@ test('a missing ledger releases; a ledger that cannot be read refuses and runs n
   try {
     // Nothing recorded as running yet is the first release on a fresh box.
     const fresh = withRealGate();
-    assert.equal(seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: fresh.impl, alarm: noop }).ok, true);
+    assert.equal(seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: fresh.impl, alarm: noop }).ok, true);
     assert.deepEqual(fresh.calls, FULL_ORDER);
 
     // Unparseable is NOT assumed-stale, because that assumption deploys. A job
@@ -781,7 +878,7 @@ test('a missing ledger releases; a ledger that cannot be read refuses and runs n
       world.write(broken);
       const { calls, impl } = withRealGate();
       const { raised, alarm } = alarms();
-      const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm });
+      const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: impl, alarm });
       assert.equal(result.ok, false, broken);
       assert.equal(result.reason, 'seam-blocked', broken);
       assert.deepEqual(calls, [], broken);
@@ -816,7 +913,7 @@ test('a dirty tree is refused unless the change is a digest rewrite, in the file
   const run = () => {
     const { calls, impl } = withRealGate();
     const { raised, alarm } = alarms();
-    return { calls, raised, result: seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm }) };
+    return { calls, raised, result: seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: impl, alarm }) };
   };
   try {
     mkdirSync(path.dirname(spawnfile), { recursive: true });
@@ -915,7 +1012,7 @@ test('the digest rewrites the last bundle left behind do not block the fast-forw
 
     const { calls, impl } = withRealGate();
     const { raised, alarm } = alarms();
-    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm });
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: impl, alarm });
     assert.deepEqual(raised, [], JSON.stringify(raised));
     assert.equal(result.ok, true);
     assert.deepEqual(calls, FULL_ORDER);
@@ -929,7 +1026,7 @@ test('the digest rewrites the last bundle left behind do not block the fast-forw
 test('the ledger advances only after settle and runtimeBootstrap have both passed', () => {
   const world = releaseWorld();
   const stale = ledgerOf('0'.repeat(40), 'clank-and-slop:seam-2026-09-01-010101');
-  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`];
   try {
     for (const failAt of ['settle', 'runtimeBootstrap']) {
       world.write(stale);
@@ -966,7 +1063,7 @@ test('under --if-changed a closed wake window defers instead of paging', () => {
   // nobody.
   const world = releaseWorld();
   world.write(ledgerOf('0'.repeat(40)));
-  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`];
   const blocked = () => {
     const { calls, impl } = recorder('gate', new SeamError('refusing to touch the deployment — cogsworth wakes in 4 min', 'seam-blocked'));
     return { calls, impl: Object.assign(impl, { releaseGate }) };
@@ -1080,7 +1177,7 @@ test('the real seam raises when the pending record is unwritable, and still exit
     const { impl } = recorder('gate', new SeamError('cogsworth wakes in 4 min', 'seam-blocked'));
     Object.assign(impl, { releaseGate });
     const { raised, alarm } = alarms();
-    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm });
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: impl, alarm });
     assert.equal(result.ok, true, 'a bookkeeping fault must not fail the deployment path');
     assert.equal(result.deferred, true);
     assert.deepEqual(raised.map((entry) => entry.reason), ['release-deferred']);

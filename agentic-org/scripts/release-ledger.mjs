@@ -32,9 +32,9 @@ import { bundleRewriteFindings } from './bundle-rewrite-shape.mjs';
 // The git side of a release decision, including the error type that carries the
 // alarm reason word. Re-exported, because "the release ledger's ReleaseError" is
 // how the rest of the pipeline already knows it.
-import { DEFAULT_TRACK_REF, ReleaseError, fastForwardToTip, fetchTracked, git, headCommit, trackedRef, trackedTip } from './release-git.mjs';
+import { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, ReleaseError, classifyFetchFailure, fastForwardToTip, fetchSshCommand, fetchTracked, git, headCommit, trackedRef, trackedTip } from './release-git.mjs';
 
-export { DEFAULT_TRACK_REF, ReleaseError, fastForwardToTip, fetchTracked, headCommit, trackedRef, trackedTip };
+export { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, ReleaseError, classifyFetchFailure, fastForwardToTip, fetchSshCommand, fetchTracked, headCommit, trackedRef, trackedTip };
 
 export const DEFAULT_RELEASE_LEDGER = '/home/clank/deploy-work/released.json';
 export const RELEASE_LEDGER_VERSION = 'clank.release.v1';
