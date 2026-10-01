@@ -450,6 +450,32 @@ test('a file left writable, a file added and a file removed inside the corpus ar
   }
 });
 
+// The two fixes meet here: the delete is deferred until after the links are
+// repointed, and a planted dated name makes repointing them refuse. Deferred plus
+// refused must not mean ~5 MiB of parked tree left in the trash root on every
+// two-minute poll, which fills the production disk inside a day.
+test('a re-land that refuses on a planted dated name still deletes the tree it parked', () => {
+  const f = fixture();
+  try {
+    refresh(args(f), deps(f));
+    const story = storyFile(f);
+    dirty(f);
+    const dated = join(f.volume, EDITION);
+    unlinkSync(dated);
+    mkdirSync(dated);
+
+    const alarms = [];
+    const exit = main(args(f), deps(f, { alarm: (reason, detail) => alarms.push([reason, detail]) }));
+    assert.equal(exit, 1, 'a corpus whose links cannot be repointed is not a success');
+    assert.deepEqual(readdirSync(f.trash), [], 'the parked tree has to be deleted even when the swap that parked it refuses');
+    // Nothing was lost either: the replacement is landed and the drift is healed,
+    // and only the planted name stands between it and the reporters.
+    assert.equal(readFileSync(story, 'utf8'), '# s-11111111\n');
+    assert.ok(alarms.some(([reason, detail]) => reason === REFUSAL_REASON && `${detail.message}${detail.detail}`.includes(`mv -- ${dated}`)),
+      `the refusal must page with the command that clears it: ${JSON.stringify(alarms)}`);
+  } finally { cleanup(f); }
+});
+
 // AUTO-REPAIR CAN BE DRIVEN, SO IT HAS TO BE BOUNDED
 // -------------------------------------------------
 // An agent can `chmod u+w` a directory it owns inside the frozen tree, dirty one

@@ -173,41 +173,53 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
   const dates = datedDirectories(treePath);
   const editions = { ...landed.editions };
   const frozen = [], moved = [];
-  for (const date of dates) {
-    const known = editions[date];
-    // THE FREEZE, DECIDED FROM THE HOST RECORD AND THE HOST CLOCK AND NOTHING
-    // ELSE. A date is settled once this host has landed a corpus for it and that
-    // date's own cutoff -- the same `--require-by` instant the missing-branch wait
-    // uses, so there is one idea of when a day is done -- has passed. Before the
-    // cutoff a newer commit still moves the link, which is how research that
-    // arrives through the early morning reaches the reporters. An already recorded
-    // freeze is kept rather than recomputed, so the record says when the host
-    // FIRST froze the date and a later `--require-by` cannot thaw it.
-    //
-    // With no record there is nothing to hold the date at, so a first land always
-    // links: no corpus at all is worse than a stale one.
-    if (known && known.commit !== commit && (known.frozen || editionSettled(date, { now, requireBy: options.requireBy }))) {
-      const frozenAt = known.frozen ?? { at: isoSeconds(now), cutoff: isoSeconds(editionCutoff(date, options.requireBy)), require_by: options.requireBy };
-      log(`edition ${date} is frozen at ${known.commit.slice(0, 7)}: its ${frozenAt.require_by} Europe/Berlin cutoff passed at ${frozenAt.cutoff} with a corpus already landed`);
-      editions[date] = { ...known, frozen: frozenAt };
-      frozen.push(date);
-      continue;
+  // `try`, because the parked tree has to go whether or not the links all move: a
+  // dated name an agent has planted makes `pointAtTree` refuse (corpus-volume.mjs),
+  // and a refusal that also leaked ~5 MiB into the trash root on every two-minute
+  // poll would fill the production disk inside a day.
+  try {
+    for (const date of dates) {
+      const known = editions[date];
+      // THE FREEZE, DECIDED FROM THE HOST RECORD AND THE HOST CLOCK AND NOTHING
+      // ELSE. A date is settled once this host has landed a corpus for it and that
+      // date's own cutoff -- the same `--require-by` instant the missing-branch wait
+      // uses, so there is one idea of when a day is done -- has passed. Before the
+      // cutoff a newer commit still moves the link, which is how research that
+      // arrives through the early morning reaches the reporters. An already recorded
+      // freeze is kept rather than recomputed, so the record says when the host
+      // FIRST froze the date and a later `--require-by` cannot thaw it.
+      //
+      // With no record there is nothing to hold the date at, so a first land always
+      // links: no corpus at all is worse than a stale one.
+      if (known && known.commit !== commit && (known.frozen || editionSettled(date, { now, requireBy: options.requireBy }))) {
+        const frozenAt = known.frozen ?? { at: isoSeconds(now), cutoff: isoSeconds(editionCutoff(date, options.requireBy)), require_by: options.requireBy };
+        log(`edition ${date} is frozen at ${known.commit.slice(0, 7)}: its ${frozenAt.require_by} Europe/Berlin cutoff passed at ${frozenAt.cutoff} with a corpus already landed`);
+        editions[date] = { ...known, frozen: frozenAt };
+        frozen.push(date);
+        continue;
+      }
+      if (pointAtTree(volume, date, treeLinkTarget(commit, date), { ops, tmpDir: options.staging })) moved.push(date);
+      // A forced re-land of the commit a frozen date already serves keeps the freeze
+      // stamp: the date did not thaw, the same tree was rebuilt under it, and the
+      // record must keep saying when the host first settled it.
+      editions[date] = { commit, tree: corpusTreePath(commit), landed_at: isoSeconds(now), ...(known?.commit === commit && known.frozen ? { frozen: known.frozen } : {}) };
     }
-    if (pointAtTree(volume, date, treeLinkTarget(commit, date), { ops, tmpDir: options.staging })) moved.push(date);
-    // A forced re-land of the commit a frozen date already serves keeps the freeze
-    // stamp: the date did not thaw, the same tree was rebuilt under it, and the
-    // record must keep saying when the host first settled it.
-    editions[date] = { commit, tree: corpusTreePath(commit), landed_at: isoSeconds(now), ...(known?.commit === commit && known.frozen ? { frozen: known.frozen } : {}) };
-  }
-  log(`links moved: ${moved.length} of ${dates.length} dated director${dates.length === 1 ? 'y' : 'ies'}${moved.length ? ` (${moved.slice(-5).join(', ')}${moved.length > 5 ? ', ...' : ''})` : ''}${frozen.length ? `; ${frozen.length} frozen (${frozen.join(', ')})` : ''}`);
-
-  // THE DELETE, LAST, AND THAT ORDER IS THE WHOLE POINT. The replacement is landed
-  // under the same name and every dated link has been repointed, so nothing points
-  // into the parked tree: the recursive delete can take the 245 ms it takes without
-  // one reader seeing ENOENT. Outside the volume, as every delete here is.
-  if (parked) {
-    removeTree(parked, { volume, exec });
-    log(`deleted the replaced ${TREES_DIR}/${commit.slice(0, 7)} in ${options.trash}, after the links already pointed at its replacement`);
+    log(`links moved: ${moved.length} of ${dates.length} dated director${dates.length === 1 ? 'y' : 'ies'}${moved.length ? ` (${moved.slice(-5).join(', ')}${moved.length > 5 ? ', ...' : ''})` : ''}${frozen.length ? `; ${frozen.length} frozen (${frozen.join(', ')})` : ''}`);
+  } finally {
+    // THE DELETE, LAST, AND THAT ORDER IS THE WHOLE POINT. The replacement is landed
+    // under the same name and every dated link has been repointed at it, so nothing
+    // points into the parked copy -- its own path is in the trash root and no link
+    // target is absolute. The recursive delete can therefore take the 245 ms it takes
+    // without one reader seeing ENOENT. Outside the volume, as every delete here is.
+    //
+    // Its own try/catch: a delete that fails must not replace the reason the swap
+    // failed with a message about the trash root.
+    if (parked) {
+      try {
+        removeTree(parked, { volume, exec });
+        log(`deleted the replaced ${TREES_DIR}/${commit.slice(0, 7)} in ${options.trash}, after the links already pointed at its replacement`);
+      } catch (error) { process.stderr.write(`could not delete the replaced tree parked at ${parked}: ${error.message}\n`); }
+    }
   }
 
   // CORPUS.json describes what the dated links actually serve. When the asked-for
