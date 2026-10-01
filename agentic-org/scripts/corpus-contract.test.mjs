@@ -216,7 +216,10 @@ test('the commit and tree shape are exported from the contract, and refuse every
 test('no corpus module re-spells the commit or tree-path rule privately', () => {
   // Every module that is allowed to know the shape. corpus-contract.mjs is the
   // home and is expected to hold exactly one declaration of the pattern.
-  const owned = ['corpus-contract.mjs', 'corpus-verify.mjs', 'corpus-volume.mjs', 'corpus-swap.mjs'];
+  // Every module that speaks about a commit or a tree path, not just the four the
+  // original author owned: the rule was re-spelled in two of the files this list
+  // used to omit, which is exactly how four private copies of it accumulated.
+  const owned = ['corpus-contract.mjs', 'corpus-verify.mjs', 'corpus-volume.mjs', 'corpus-swap.mjs', 'corpus-landed.mjs', 'corpus-refresh.mjs', 'edition-provenance.mjs'];
   const forbidden = [
     // The anchored 40-hex commit rule, in any of the spellings it has appeared in.
     [/\^\[0-9a-f\]\{40\}\$/gu, 'the commit pattern: import isCorpusCommit from corpus-contract.mjs'],

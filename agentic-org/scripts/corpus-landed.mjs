@@ -58,7 +58,7 @@
 import { createHash } from 'node:crypto';
 import { lstatSync, mkdirSync, readFileSync, readdirSync, readlinkSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { CorpusError, EDITION_PATTERN } from './corpus-contract.mjs';
+import { CorpusError, EDITION_PATTERN, corpusTreePath, isCorpusCommit, isCorpusTreePath } from './corpus-contract.mjs';
 
 export const LANDED_VERSION = 'clank.corpus-landed.v1';
 export const MANIFEST_VERSION = 'clank.corpus-manifest.v1';
@@ -67,8 +67,6 @@ export const MANIFEST_DIR = 'manifests';
 // stands down and asks for a human. See `bumpHeal`.
 export const HEAL_SUSPEND_AFTER = 3;
 
-const COMMIT_PATTERN = /^[0-9a-f]{40}$/;
-const TREE_PATTERN = /^trees\/[0-9a-f]{40}$/;
 const CLOCK_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const fail = (message) => { throw new CorpusError(message); };
 
@@ -158,15 +156,19 @@ export function landedFindings(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return [`must be a JSON object, got ${Array.isArray(value) ? 'an array' : typeof value}`];
   const findings = [];
   if (value.version !== LANDED_VERSION) findings.push(`version must be ${LANDED_VERSION}, got ${JSON.stringify(value.version)}`);
-  if (!Array.isArray(value.trees) || value.trees.some((tree) => typeof tree !== 'string' || !TREE_PATTERN.test(tree))) findings.push(`trees must be an array of trees/<40hex>, got ${JSON.stringify(value.trees)}`);
+  if (!Array.isArray(value.trees) || value.trees.some((tree) => typeof tree !== 'string' || !isCorpusTreePath(tree))) findings.push(`trees must be an array of trees/<40hex>, got ${JSON.stringify(value.trees)}`);
   findings.push(...healsFindings(value.heals));
   if (!value.editions || typeof value.editions !== 'object' || Array.isArray(value.editions)) return [...findings, `editions must be an object keyed by YYYY-MM-DD, got ${JSON.stringify(value.editions)}`];
   const trees = new Set(Array.isArray(value.trees) ? value.trees : []);
   for (const [date, entry] of Object.entries(value.editions)) {
     if (!EDITION_PATTERN.test(date)) { findings.push(`editions key ${JSON.stringify(date)} is not YYYY-MM-DD`); continue; }
     if (!entry || typeof entry !== 'object') { findings.push(`editions[${date}] must be an object`); continue; }
-    if (typeof entry.commit !== 'string' || !COMMIT_PATTERN.test(entry.commit)) findings.push(`editions[${date}].commit must be a 40-character lowercase hex sha, got ${JSON.stringify(entry.commit)}`);
-    if (entry.tree !== `trees/${entry.commit}`) findings.push(`editions[${date}].tree must be trees/<commit>, got ${JSON.stringify(entry.tree)}`);
+    if (typeof entry.commit !== 'string' || !isCorpusCommit(entry.commit)) findings.push(`editions[${date}].commit must be a 40-character lowercase hex sha, got ${JSON.stringify(entry.commit)}`);
+    // `corpusTreePath` refuses to build a path out of a non-commit, which is right
+    // everywhere except here: this validator exists to BE handed garbage, and the
+    // malformed commit is already its own finding above. So ask only once the commit
+    // is known good, and otherwise compare against the shape.
+    if (!isCorpusCommit(entry.commit ?? '') ? !isCorpusTreePath(entry.tree ?? '') : entry.tree !== corpusTreePath(entry.commit)) findings.push(`editions[${date}].tree must be trees/<commit>, got ${JSON.stringify(entry.tree)}`);
     // The cross-check that makes the record usable as the GC's whole input: a
     // tree an edition is serving and the tree list disagree, and the sweep is
     // taking aim at something still mounted.
@@ -195,7 +197,7 @@ function healsFindings(heals) {
   if (typeof heals !== 'object' || Array.isArray(heals)) return [`heals must be an object keyed by trees/<40hex>, got ${JSON.stringify(heals)}`];
   const findings = [];
   for (const [tree, entry] of Object.entries(heals)) {
-    if (!TREE_PATTERN.test(tree)) { findings.push(`heals key ${JSON.stringify(tree)} is not trees/<40hex>`); continue; }
+    if (!isCorpusTreePath(tree)) { findings.push(`heals key ${JSON.stringify(tree)} is not trees/<40hex>`); continue; }
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) { findings.push(`heals[${tree}] must be an object`); continue; }
     if (!Number.isInteger(entry.cycles) || entry.cycles < 1) findings.push(`heals[${tree}].cycles must be a positive integer, got ${JSON.stringify(entry.cycles)}`);
     if (typeof entry.since !== 'string' || !entry.since) findings.push(`heals[${tree}].since must be the instant the first reland happened`);
@@ -239,7 +241,7 @@ export function corpusLanded(record, { commit, edition }) {
   const entry = record.editions?.[edition] ?? null;
   if (!entry) return { current: false, reason: `the host has never landed a corpus for ${edition}`, entry: null, frozen: null };
   const frozen = entry.frozen ?? null;
-  if (frozen && record.trees.includes(`trees/${commit}`)) return { current: true, reason: null, entry, frozen };
+  if (frozen && record.trees.includes(corpusTreePath(commit))) return { current: true, reason: null, entry, frozen };
   if (entry.commit !== commit) {
     return { current: false, entry, frozen, reason: frozen
       ? `${edition} is frozen at ${entry.commit.slice(0, 7)} and ${commit.slice(0, 7)} is not landed yet`

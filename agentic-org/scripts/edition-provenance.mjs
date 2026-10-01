@@ -32,6 +32,7 @@ import path from 'node:path';
 // the POLICY on top: the refresher may degrade a bad record to "nothing landed"
 // and re-earn it next run, and the publisher may not.
 import { readLanded } from './corpus-landed.mjs';
+import { corpusTreePath, isCorpusCommit } from './corpus-contract.mjs';
 
 export { LANDED_VERSION } from './corpus-landed.mjs';
 // The same path corpus-refresh.mjs writes (its `DEFAULT_LANDED`), spelled out
@@ -42,7 +43,6 @@ export { LANDED_VERSION } from './corpus-landed.mjs';
 export const DEFAULT_LANDED_RECORD = '/var/lib/clank-corpus/landed.json';
 export const CORPUS_PROVENANCE_FILE = 'corpus-provenance.json';
 export const CORPUS_PROVENANCE_VERSION = 'clank.edition-corpus-provenance.v1';
-const CORPUS_COMMIT = /^[0-9a-f]{40}$/u;
 const readJson = async (file) => JSON.parse(await readFile(file, 'utf8'));
 
 // The container's claim, read out of the composition receipt the staged receipt
@@ -60,7 +60,7 @@ export async function editionCorpusClaim(stateRoot, edition, compositionDigest) 
   if (value?.kind !== 'composed' || value.edition !== edition || value.digest !== compositionDigest) throw new Error(`${file} is not the composed receipt for ${edition} at ${compositionDigest} — the edition's records disagree about which composition was staged, and nothing was pushed`);
   const corpus = value.composition?.corpus;
   if (corpus === undefined || corpus === null) return { file, claim: null, reason: `${file} carries no composition.corpus` };
-  if (typeof corpus !== 'object' || !CORPUS_COMMIT.test(corpus.commit ?? '') || corpus.edition !== edition || corpus.tree !== `trees/${corpus.commit}`) throw new Error(`${file} carries a malformed research-corpus identity (commit ${JSON.stringify(corpus.commit ?? null)}, edition ${JSON.stringify(corpus.edition ?? null)}, tree ${JSON.stringify(corpus.tree ?? null)}) — nothing was pushed`);
+  if (typeof corpus !== 'object' || !isCorpusCommit(corpus.commit ?? '') || corpus.edition !== edition || corpus.tree !== corpusTreePath(corpus.commit)) throw new Error(`${file} carries a malformed research-corpus identity (commit ${JSON.stringify(corpus.commit ?? null)}, edition ${JSON.stringify(corpus.edition ?? null)}, tree ${JSON.stringify(corpus.tree ?? null)}) — nothing was pushed`);
   return { file, claim: { commit: corpus.commit, ref: typeof corpus.ref === 'string' ? corpus.ref : null, tree: corpus.tree }, reason: null };
 }
 
