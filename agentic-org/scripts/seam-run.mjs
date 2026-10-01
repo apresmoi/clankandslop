@@ -26,7 +26,7 @@
 // when Brass commissions. So an org image is DAY-AGNOSTIC: nothing about
 // tomorrow obliges a rebuild, and the pipeline below exists to ship CODE AND
 // PROMPTS, not research. `--if-changed` is what makes that literal — the job
-// can sit on a timer and no-op until the org repo's HEAD moves.
+// can sit on a timer and no-op until the tracked tip (`origin/main`) moves.
 //
 // Two things the corpus used to carry with it moved rather than disappeared:
 // the per-edition wake budget turnover, which now has its own unit
@@ -36,8 +36,13 @@
 //
 // THE ORDER IS NOT A STYLE CHOICE
 // -------------------------------
-//   1. releaseGate  — cheapest first: two git reads and one file read, so the
-//      almost-always "nothing changed" path never touches docker or the tree.
+//   1. releaseGate  — cheapest first: one fetch, one `rev-parse` and one file
+//      read, so the almost-always "nothing changed" path never touches docker
+//      and writes nothing. It is also the only stage that MOVES the tree: when
+//      the tracked tip has advanced it fast-forwards the build root onto that
+//      exact commit, or refuses. See release-ledger.mjs — a gate that compared
+//      the ledger against a local HEAD nothing ever fetched could not discover a
+//      merge at all, which is a release job that never releases.
 //   2. gate         — before anything writes, because a redeploy kills wakes.
 //   3. bundle       — three commands whose order is its own lesson; see below.
 //   4. build, runtimePolicy — nothing reaches `up` unconfined.
@@ -69,13 +74,16 @@
 // Building the same tree from a different directory mints different volume
 // names and silently detaches every agent's memory. `--repo` therefore defaults
 // to the one path the live deployment was built from and is asserted, not
-// assumed.
+// assumed — and it is why discovering a merge means fast-forwarding THIS
+// checkout rather than cloning the tip somewhere with more room to build.
 //
 // USAGE
 //   node agentic-org/scripts/seam-run.mjs                  # release this commit now
-//   node agentic-org/scripts/seam-run.mjs --if-changed     # the timer: no-op unless HEAD moved
+//   node agentic-org/scripts/seam-run.mjs --if-changed     # the timer: no-op unless origin/main moved
 //   node agentic-org/scripts/seam-run.mjs --check          # verify only, writes nothing
 //   node agentic-org/scripts/seam-run.mjs --no-deploy      # bundle + build, no `up`
+//   node agentic-org/scripts/seam-run.mjs --track=origin/release   # compare against another tracked ref
+//   node agentic-org/scripts/seam-run.mjs --no-fetch       # decide against the tracked ref already on disk
 //   node agentic-org/scripts/seam-run.mjs --edition=2026-09-06 --repo=/tmp/clone
 //
 // Every stage that fails raises the alarm (alarm.mjs) before exiting non-zero.
@@ -86,7 +94,7 @@ import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, compiledArtifacts, compiledEngineFindings, grokBrokerFindings } from './engine-policy.mjs';
-import { DEFAULT_RELEASE_LEDGER, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
+import { DEFAULT_RELEASE_LEDGER, DEFAULT_TRACK_REF, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
 export const DEFAULT_REPO = '/root/work/clankandslop';
 export const DEFAULT_CONTAINER = 'spawnfile-clank-and-slop';
@@ -139,6 +147,10 @@ export function parseArgs(argv) {
     edition: null, repo: DEFAULT_REPO, container: DEFAULT_CONTAINER, deployment: DEFAULT_DEPLOYMENT,
     cli: process.env.SPAWNFILE_CLI ?? DEFAULT_SPAWNFILE_CLI, envFile: process.env.CLANK_DEPLOY_ENV_FILE ?? DEFAULT_ENV_FILE,
     released: process.env.CLANK_RELEASE_LEDGER ?? DEFAULT_RELEASE_LEDGER, ifChanged: false, releaseCommit: null,
+    // What "changed" is measured against, and whether this run may go and look.
+    // `--no-fetch` is for tests and for a deliberate release of a tree somebody
+    // has already positioned; it is never how the timer runs.
+    track: DEFAULT_TRACK_REF, fetch: true,
     compiledOutput: null,
     deployUser: DEFAULT_DEPLOY_USER, tag: null, check: false, deploy: true, skipContainer: false, leadMinutes: 30, tailMinutes: 120
   };
@@ -153,6 +165,8 @@ export function parseArgs(argv) {
     else if (key === 'env-file' && value) options.envFile = path.resolve(value);
     else if (key === 'released' && value) options.released = path.resolve(value);
     else if (key === 'if-changed') options.ifChanged = true;
+    else if (key === 'track' && value) options.track = value;
+    else if (key === 'no-fetch') options.fetch = false;
     else if (key === 'deploy-user' && value) options.deployUser = value;
     else if (key === 'tag' && value) options.tag = value;
     else if (key === 'lead-minutes' && value) options.leadMinutes = Number(value);
@@ -585,11 +599,30 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
   log(`seam ${options.check ? '(check)' : options.deploy ? '' : '(no-deploy)'}${options.ifChanged ? ' (if-changed)' : ''} edition ${options.edition} repo ${options.repo}`);
   const stages = [];
   try {
-    // Nothing above this line touches the tree, the deployment or docker. An
-    // hourly timer spends almost every run here and exits having read three
-    // things.
-    if (options.ifChanged && stageImpl.releaseGate(options, { log }).upToDate) return { ...options, stages, ok: true, noop: true };
-    if (options.ifChanged) stages.push('releaseGate');
+    // Nothing above this line touches the deployment or docker, and on the no-op
+    // path nothing touches the tree either: an hourly timer spends almost every
+    // run here and exits having fetched and read two things. When there IS
+    // something to release the gate fast-forwards the build root onto the tracked
+    // tip first, so every stage below compiles the commit that was reviewed.
+    if (options.ifChanged) {
+      let verdict;
+      try { verdict = stageImpl.releaseGate(options, { log }); }
+      catch (error) {
+        // ONE refusal from this gate is a "not yet" rather than a "broken": a
+        // remote this run could not reach. That is the same shape of event as a
+        // closed wake window — nothing is wrong with the newsroom, this run just
+        // cannot know whether anything was merged — so it defers with the fetch
+        // failure as its finding, and the pending record's 24h escalation still
+        // catches an outage that has stopped being brief. Every other refusal
+        // stays a failure under the timer too: an unreadable ledger, a tree that
+        // is not its commit, or a tip this checkout cannot fast-forward onto are
+        // states a person has to resolve.
+        if (!error?.unreachable) throw error;
+        return { ...options, stages, ok: true, ...defer(options, error.message, { now, log, alarm }) };
+      }
+      if (verdict.upToDate) return { ...options, stages, ok: true, noop: true };
+      stages.push('releaseGate');
+    }
     try { stageImpl.gate(options, { now, log }); }
     catch (error) {
       // A closed wake window under the timer is "not yet", not "broken": see
