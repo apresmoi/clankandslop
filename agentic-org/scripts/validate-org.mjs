@@ -73,14 +73,35 @@ export const engineByAgent = Object.freeze({
 });
 
 const corpusAgents = new Set(['klaxon']);
-// The newsroom tools that read the research-corpus volume at CALL time, which is
-// where its four refusals live now that the corpus is a host-populated volume
-// rather than a digest-pinned bundle: record_assignment binds the mounted
-// identity into the edition, compose_edition carries it to the published paper,
-// and file_desk reads the Ledger worlddesk input out of the same mount. Each of
-// those MCP servers must be told where the mount is, or the tool refuses every
-// call it is declared for.
-const researchCorpusReaders = new Set(['brass', 'caslon', 'ledger']);
+// The agents whose tools actually READ the research-corpus mount at call time,
+// which is where its refusals live now that the corpus is a host-populated
+// volume rather than a digest-pinned bundle. Exactly three, and each one is a
+// read in code, not a claim in prose:
+//
+//   brass    record_assignment -> corpusIdentity() reads CORPUS.json, verifies
+//            the tree and the dated link, and binds the identity into the
+//            edition's assignment records.
+//   ledger   file_desk ledger.worlddesk -> authenticateWorldDeskFiling() reads
+//            the prepared document and its trace out of the same mount. Note
+//            that this read has no refusal of its own: worlddesk-filing.mjs
+//            falls back to a cwd-relative repos/newsroom-private when the mount
+//            is undeclared, so what the declaration below buys is that the
+//            fallback is never exercised, not a refusal. Do not upgrade that
+//            into a promise here until the tool makes it.
+//   pressman prepare_release / stage_release -> the release adapter stages the
+//            current World Desk trace from the mount and refuses without it.
+//
+// CASLON IS NOT ONE OF THEM, and this list used to say otherwise.
+// compose_edition takes the corpus identity from the edition's own assignment
+// records and never from the volume — deliberately, because the volume can have
+// been swapped under the org since the lineup was commissioned — and Caslon's
+// other tool, file_desk, carries only caslon.chrome and caslon.weather, which
+// read nothing from the mount. So the mount was declared on Caslon's newsroom
+// server while no Caslon tool would ever refuse without it: a line that read as
+// an enforced guarantee and enforced nothing, which is this newsroom's most
+// expensive defect family. The assertion below now runs in BOTH directions, so
+// the next decorative mount declaration is a validation failure.
+export const researchCorpusReaders = new Set(['brass', 'ledger', 'pressman']);
 const publicWriters = new Set(['pressman']);
 // klaxon is here because it declares `allowed_wake_senders: [research-sensor]`
 // on its DM surface, i.e. the org expects the sensor to be able to reach it.
@@ -181,9 +202,12 @@ export function validateAgentDeclaration(agent, bytes) {
     assert(server?.env?.CLANK_PUBLIC_SOURCE_ROOT === `${workspacePath}/repos/newsroom`, 'ledger newsroom public source root invalid');
     assert(server?.env?.CLANK_PRIVATE_SOURCE_ROOT === `${workspacePath}/repos/newsroom-private`, 'ledger newsroom private source root invalid');
   }
+  const mountServers = (parseManifest(bytes).environment?.mcp_servers ?? []).filter((item) => item.env?.CLANK_PRIVATE_SOURCE_ROOT !== undefined);
   if (researchCorpusReaders.has(agent)) {
     const server = (parseManifest(bytes).environment?.mcp_servers ?? []).find((item) => item.name === 'newsroom');
     assert(server?.env?.CLANK_PRIVATE_SOURCE_ROOT === `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-private`, `${agent} newsroom private source root invalid`);
+  } else {
+    assert(mountServers.length === 0, `${agent} declares the research corpus mount on MCP server(s) [${mountServers.map((item) => item.name).join(', ')}] but none of its tools reads it — a mount nothing reads is a declaration this validator cannot stand behind, so either drop CLANK_PRIVATE_SOURCE_ROOT or make the tool read it and add ${agent} to researchCorpusReaders`);
   }
   const toolErrors = runtimeToolFindings(agent, parseManifest(bytes));
   assert(toolErrors.length === 0, `${agent} runtime tools invalid: ${toolErrors.join('; ')}`);

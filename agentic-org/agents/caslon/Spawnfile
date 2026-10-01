@@ -68,7 +68,16 @@ environment:
         CLANK_NEWSROOM_AGENT: caslon
         CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
         CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/state/transaction.mjs
-        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-private
+        # No CLANK_PRIVATE_SOURCE_ROOT, deliberately. Neither of Caslon's two
+        # newsroom tools reads the research corpus volume: compose_edition takes
+        # the corpus identity from the edition's own assignment records, which is
+        # the whole point — the volume can have been swapped under the org since
+        # the lineup was commissioned, so re-reading the mount at 16:00 would
+        # publish a provenance claim the stories do not rest on. file_desk here
+        # only carries caslon.chrome and caslon.weather, which read nothing from
+        # the mount either (ledger.worlddesk is Ledger's, and Ledger declares it).
+        # A mount declared for an agent no tool refuses without reads as an
+        # enforced guarantee and is not one, so validate-org.mjs refuses it.
         CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
         CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
         CLANK_DAIMON_AGENT_ID: "agent:caslon"

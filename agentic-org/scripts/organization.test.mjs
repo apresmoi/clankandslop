@@ -12,7 +12,7 @@ import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
 import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
 import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
-import { PUBLISHER_TOOLS, engineByAgent, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
+import { PUBLISHER_TOOLS, engineByAgent, researchCorpusReaders, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
 
 const messages = () => JSON.parse(readFileSync(new URL('../fixtures/daily-cycle.json', import.meta.url), 'utf8')).messages;
 const validate = (items) => { const prior = []; for (const item of items) { validateMessage(item, prior); prior.push(item); } };
@@ -173,16 +173,21 @@ test('Ledger declares mounted source roots for desk filing from runtime MCP cwd'
 
 // The research corpus is a host-populated volume now, so no image digest proves
 // an agent can read it: the declaration IS the whole claim, and an undeclared
-// mount means record_assignment and compose_edition refuse every call. Removing
-// the line must therefore fail validation rather than deploy an agent whose
-// tools cannot run.
+// mount means the tools that read it refuse every call. Removing the line must
+// therefore fail validation rather than deploy an agent whose tools cannot run.
+//
+// The roster is READ from validate-org.mjs rather than restated here, because
+// this test used to spell `caslon` into it and caslon reads nothing from the
+// mount: compose_edition takes the corpus identity from the edition's own
+// assignment records, deliberately, so a copied list is how a test ends up
+// demanding a declaration that guarantees nothing.
 test('the newsroom tools that read the research corpus declare its mount', () => {
-  for (const agent of ['brass', 'caslon', 'ledger']) {
+  for (const agent of researchCorpusReaders) {
     const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
     assert.doesNotThrow(() => validateAgentDeclaration(agent, source), agent);
     const line = `CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-private`;
     assert.ok(source.includes(line), `${agent} must declare the research corpus mount for its newsroom MCP server`);
-    const changed = source.includes(`${line}, `) ? source.replace(`${line}, `, '') : source.replace(`${line}\n        `, '');
+    const changed = source.includes(`${line}, `) ? source.replace(`${line}, `, '') : source.replace(`        ${line}\n`, '');
     assert.notEqual(changed, source, `${agent} declaration shape changed`);
     assert.throws(() => validateAgentDeclaration(agent, changed), /newsroom private source root invalid/u, agent);
   }
