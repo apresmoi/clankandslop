@@ -14,7 +14,9 @@ was:  research lands on edition/<date>   →  a person repins, rebuilds, redeplo
                                          →  a person opens and merges the PR
       something breaks                   →  systemd says Failed into a void
 
-now:  clank-seam.timer         (Hetzner)      12:00 clean public main snapshot → corpus/archive refresh → bundle → build → deploy
+now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unless public main's HEAD moved
+      the epoch-roll timer     (Hetzner)      early: today's wake budget onto the running image, nothing else
+      the corpus refresher     (Hetzner)      `clank-newsroom-corpus` volume ← the day's research, outside the org
       clank-publish.timer      (Hetzner)      17:00 staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
       clank-alarm@.service     (both boxes)   ntfy → a phone
@@ -24,8 +26,10 @@ now:  clank-seam.timer         (Hetzner)      12:00 clean public main snapshot �
 
 | File | Runs | Does |
 |---|---|---|
-| `scripts/seam-run.mjs` | Hetzner, 12:00 Berlin | clean public main snapshot → repin → `org:bundle` → build → `up` → settle |
-| `scripts/wake-window.mjs` | inside the seam | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
+| `scripts/seam-run.mjs` | Hetzner, on a timer with `--if-changed` | clean public main snapshot → `org:bundle` → build → `up` → settle → record the release |
+| `scripts/release-ledger.mjs` | inside the seam | `/home/clank/deploy-work/released.json`: which commit is actually running, so a timer can do nothing cheaply |
+| `scripts/epoch-roll-run.mjs` | Hetzner, once a day | rolls `DAIMON_WAKE_FUSE_EPOCH` and recreates the container **on the image it is already running** |
+| `scripts/wake-window.mjs` | inside both | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
 | `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |
 | `scripts/alarm.mjs` | both boxes | one HTTPS POST that reaches a person |
@@ -47,18 +51,49 @@ A redeploy kills every in-flight wake. `wake-window.mjs` therefore answers
   the steady-state set). A container that cannot be read is not quiet: every
   unreadable signal is a finding, and findings block.
 
+## The seam is a release job, not a daily one
+
+The corpus used to be `newsroom-private.tar`, a checksum-pinned bundle whose
+digest sat in all twelve agent Spawnfiles and was repinned here every morning —
+so a new day's research meant a new ~5GB image, a daily build, and a daily
+chance to lose the day to something that had nothing to do with journalism. It
+happened twice in two days (2026-09-30 at the candidate health probe, 2026-10-01
+at the deploy gate). `agentic-org/Spawnfile` now mounts the corpus as the
+team-shared `clank-newsroom-corpus` volume, populated by the host refresher
+outside the agent boundary.
+
+So: **an org image is day-agnostic, and there is no `repin` stage.** What the
+seam ships is code and prompts, and `--if-changed` makes that literal — it
+compares `git rev-parse HEAD` against the release ledger and exits 0 having
+touched nothing when they match. Under `--if-changed` a closed wake window is a
+*deferral* (logged, exit 0, with the pending commit and its age written beside
+the ledger, and one `release-deferred` alarm once it passes a day), because an
+hourly job that paged on every busy hour would train you to ignore the pager.
+Run by hand, a refused gate still alarms and still exits non-zero.
+
+Two things the daily deploy was doing for free had to be given their own homes:
+
+- **the wake budget.** `DAIMON_WAKE_FUSE_EPOCH` names one counting window, and
+  rolling it needs a container *recreate*: Daimon's `WakeFuse.open()` loads
+  `admissions` into an in-memory Set that nothing re-reads while the process
+  lives, and `--env-file` is applied at container creation only. That is
+  `scripts/epoch-roll-run.mjs`, which never builds and never chooses an image —
+  it resolves the tag from the container it is about to replace and refuses if
+  it cannot. A Daimon fix that re-evaluates the window where it is *consulted*
+  (the `snapshot()` gate in `AttentionDispatcher.drain()`, not only `admitNow`)
+  retires that unit.
+- **corpus provenance.** It travels with the data now, as `CORPUS.json` beside
+  the tree, checked by `scripts/corpus-contract.mjs` when Brass commissions.
+
 ## Order is not a style choice
 
 ```
-repin-private-source.mjs  →  check-bundle-descriptor --repin-source  →  org:bundle  →  check-bundle-descriptor
-   private tar,                  descriptor.source                        six tars,        the proof
-   private pins,                 + 12 Spawnfile source pins               descriptor
-   descriptor.private                                                     (no Spawnfile)
+check-bundle-descriptor --repin-source  →  org:bundle  →  check-bundle-descriptor
+   descriptor.source                         five tars,        the proof
+   + 12 Spawnfile source pins                descriptor
+                                             (no Spawnfile)
 ```
 
-- **repin before `--repin-source`**: repinning rewrites
-  `policies/private-source.json`, a *tracked* file and therefore part of the
-  source archive, so the source digest is only measurable once the pin is in.
 - **`--repin-source` before `org:bundle`**: `--repin-source` finds the twelve
   Spawnfile pins by searching for the descriptor's *current* source digest.
   `org:bundle` advances the descriptor and writes into no Spawnfile at all, so
@@ -291,7 +326,10 @@ is not a checksum is refused and left for a person.
 
 | Reason | Raised by |
 |---|---|
-| `repin-failed` | the edition branch is missing, a desk index is absent, a digest survived the rewrite |
+| `repin-failed` | the edition branch is missing, a desk index is absent, a digest survived the rewrite (corpus refresher only; the seam no longer repins) |
+| `release-deferred` | a commit has been waiting more than a day for a quiet deploy window — the newsroom is up, it is simply not shipping code |
+| `epoch-roll-blocked` | the window was busy, so today shares yesterday's wake budget — the newsroom is RUNNING and degraded, not dead |
+| `epoch-roll-failed` | the recreate itself failed; the organization may be down |
 | `bundle-mismatch` | `org:bundle` failed, or the descriptor still disagrees with the tree afterwards |
 | `deploy-failed` | the image build failed, `up` failed, or the container never settled |
 | `no-edition` | the cycle audit found no edition, or one that stopped below `composed` |
