@@ -69,6 +69,19 @@ export const REASONS = Object.freeze({
   // day's corpus stays mounted — so nothing crashes and nobody notices unless
   // this word reaches a person: the paper would come out on stale research.
   'corpus-refresh-failed': { title: 'Newsroom: corpus refresh failed', priority: 'urgent', tags: 'rotating_light' },
+  // DIFFERENT FROM A FAILED REFRESH, and the distinction is the whole point: a
+  // refresh that failed left the last good corpus alone, while this word means
+  // the mounted corpus stopped matching the commit the host landed. The mount is
+  // shared by twelve agents and durable, and uid 2000 owns its root -- verified
+  // on the box 2026-10-01, where a container-side `echo forged > CORPUS.json`
+  // and `ln -s /etc trees` both succeeded. So drift is reachable without anyone
+  // being hostile: one confused agent writing where it should not is enough, and
+  // it would otherwise persist until the next commit landed. The refresher
+  // re-lands from git by itself, so by the time this arrives the newsroom is
+  // already repaired -- it is a report that something wrote to the corpus, not a
+  // request to go fix the corpus. Urgent anyway: an agent reaching outside its
+  // own state is the kind of thing you want to know about the same day.
+  'corpus-tampered': { title: 'Newsroom: corpus was modified outside the host', priority: 'urgent', tags: 'rotating_light' },
   'seam-blocked': { title: 'Newsroom: seam could not run', priority: 'high', tags: 'warning' },
   // The seam is a release job on a timer now, and under `--if-changed` a closed
   // wake window is a deferral rather than a failure -- otherwise an hourly unit
