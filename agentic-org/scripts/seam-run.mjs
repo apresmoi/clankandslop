@@ -600,7 +600,7 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     }
     stages.push('gate');
     stageImpl.bundle(options, { log }); stages.push('bundle');
-    if (options.check) { log('\ncheck PASSED: the pin, the descriptor and the deploy window are all current.'); return { ...options, stages, ok: true }; }
+    if (options.check) { log('\ncheck PASSED: the descriptor, every Spawnfile bundle pin and the deploy window are all current.'); return { ...options, stages, ok: true }; }
     stageImpl.reclaimBuildSpace(options, { log }); stages.push('reclaimBuildSpace');
     stageImpl.build(options, { log }); stages.push('build');
     stageImpl.runtimePolicy(options, { log }); stages.push('runtimePolicy');
@@ -615,12 +615,13 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     // nowhere earlier. A failure is loud: a ledger that did not advance makes
     // every later timer run rebuild and redeploy this same commit forever.
     stageImpl.recordRelease(options, { log, now }); stages.push('recordRelease');
-    // The container is up and healthy, so the image it replaced is no longer
-    // the thing a rollback would want (see KEEP_IMAGES) and the cache this
-    // build filled is spent. Reclaiming here rather than only before the next
-    // build is what keeps the box from sitting at 98% all day, which is how the
-    // 2026-09-23 run found itself with 2.1GB and a container that could not
-    // start.
+    // The container is up and healthy, so the cache this build filled is spent
+    // and anything older than the image it replaced is dead weight — the one it
+    // replaced stays, because an org image is day-agnostic now and rolling back
+    // to it is a real recovery (see KEEP_IMAGES_AFTER_SETTLE). Reclaiming here
+    // rather than only before the next build is what keeps the box from sitting
+    // at 98% all day, which is how the 2026-09-23 run found itself with 2.1GB
+    // and a container that could not start.
     stageImpl.sweepImages(options, { log, keep: KEEP_IMAGES_AFTER_SETTLE });
     pruneBuildCache({ log });
     log(`\nseam complete: ${String(options.releaseCommit ?? 'HEAD').slice(0, 12)} bundled, built as ${options.tag}, deployed and settled.`);
