@@ -163,6 +163,11 @@ export function recordRelease(options, { log = console.log, now = new Date() } =
 export function deferRelease(options, finding, { now = new Date(), log = console.log, alarm = () => {} } = {}) {
   const file = releasePendingPath(options.released);
   const commit = options.releaseCommit;
+  // releaseGate is what learns the commit, and it only runs under
+  // `--if-changed`. Reaching a deferral without one would mean a deliberate run
+  // had quietly become a deferral, which is the one thing this path must not do:
+  // a person who asked for a release now has to be told it was refused.
+  if (!/^[0-9a-f]{40}$/u.test(commit ?? '')) throw new ReleaseError('a release was deferred without a release commit — only --if-changed defers, and only after the release gate has read HEAD', 'seam-blocked');
   let pending = null;
   try { pending = JSON.parse(readFileSync(file, 'utf8')); } catch { /* first deferral of this commit, or a file this job is about to replace */ }
   if (pending?.version !== RELEASE_PENDING_VERSION || pending.commit !== commit)
@@ -201,7 +206,7 @@ export function releaseGate(options, { log = console.log, read = readFileSync, e
   const ledger = readReleaseLedger(options.released, { read });
   if (ledger && ledger.commit === head) {
     log(`release: org commit ${head.slice(0, 12)} already released as ${ledger.tag}; nothing to do`);
-    return { head, ledger, released: true };
+    return { head, ledger, upToDate: true };
   }
   // Only once there is something to release: a dirty tree with nothing to ship
   // is somebody working, not a failure, and it must not page.
@@ -212,5 +217,5 @@ export function releaseGate(options, { log = console.log, read = readFileSync, e
   log(ledger
     ? `release: org commit ${head.slice(0, 12)} differs from the released ${ledger.commit.slice(0, 12)} (${ledger.tag}, ${ledger.at}) — releasing`
     : `release: no release ledger at ${options.released} yet, so nothing is recorded as running — releasing ${head.slice(0, 12)}`);
-  return { head, ledger, released: false };
+  return { head, ledger, upToDate: false };
 }

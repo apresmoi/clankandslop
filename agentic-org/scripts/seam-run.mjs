@@ -588,7 +588,7 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     // Nothing above this line touches the tree, the deployment or docker. An
     // hourly timer spends almost every run here and exits having read three
     // things.
-    if (options.ifChanged && stageImpl.releaseGate(options, { log }).released) return { ...options, stages, ok: true, noop: true };
+    if (options.ifChanged && stageImpl.releaseGate(options, { log }).upToDate) return { ...options, stages, ok: true, noop: true };
     if (options.ifChanged) stages.push('releaseGate');
     try { stageImpl.gate(options, { now, log }); }
     catch (error) {

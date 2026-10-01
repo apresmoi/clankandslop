@@ -4,8 +4,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, SeamError, TAG_PREFIX, assertCorpusPin, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
+import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
+import { RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, recordRelease, releaseGate } from './release-ledger.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -16,20 +17,24 @@ const repoRoot = path.resolve(import.meta.dirname, '..', '..');
 function recorder(failAt, error = new SeamError('boom', 'deploy-failed')) {
   const calls = [];
   const stage = (name) => (options) => { calls.push(name); if (name === failAt) throw error; return options; };
-  return { calls, impl: Object.fromEntries(['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages'].map((name) => [name, stage(name)])) };
+  return { calls, impl: Object.fromEntries(STAGE_NAMES.map((name) => [name, stage(name)])) };
 }
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
+const STAGE_NAMES = ['releaseGate', 'gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
+const FULL_ORDER = ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
 
-test('the repin runs BEFORE the bundle, always', () => {
-  // check-bundle-descriptor --repin-source locates Spawnfile pins by searching
-  // for the descriptor's current digest, so a bundle build that ran first would
-  // advance the descriptor and leave the repin nothing to match. And repinning
-  // rewrites a tracked file, so the source tar must be rebuilt after it.
+test('the pipeline has no repin stage, and STAGES has no repin key', () => {
+  // THE test that stops a daily corpus repin being reinstated by habit. The
+  // corpus is a host-populated volume now (agentic-org/Spawnfile): a new day's
+  // research no longer needs a new image, and a stage that pinned research into
+  // one is how the daily ~5GB rebuild comes back.
   const { calls, impl } = recorder(null);
   const result = seam([], { now, log: noop, stageImpl: impl, alarm: noop });
   assert.equal(result.ok, true);
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'sweepImages']);
-  assert.ok(calls.indexOf('repin') < calls.indexOf('bundle'));
+  assert.deepEqual(calls, FULL_ORDER);
+  assert.ok(!calls.includes('repin'), calls.join(' -> '));
+  assert.ok(!('repin' in STAGES), 'STAGES must not carry a repin stage');
+  assert.deepEqual(Object.keys(STAGES), STAGE_NAMES);
 });
 
 test('the gate runs first, and a blocked gate stops before anything is written', () => {
@@ -44,7 +49,7 @@ test('the gate runs first, and a blocked gate stops before anything is written',
 test('check mode stops after the bundle check and never builds or deploys', () => {
   const { calls, impl } = recorder(null);
   const result = seam(['--check'], { now, log: noop, stageImpl: impl, alarm: noop });
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle']);
+  assert.deepEqual(calls, ['gate', 'bundle']);
   assert.equal(result.ok, true);
   assert.equal(result.deploy, false);
 });
@@ -52,7 +57,7 @@ test('check mode stops after the bundle check and never builds or deploys', () =
 test('no-deploy builds the image and stops before `up`', () => {
   const { calls, impl } = recorder(null);
   seam(['--no-deploy'], { now, log: noop, stageImpl: impl, alarm: noop });
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
+  assert.deepEqual(calls, ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
 });
 
 test('compiled Codex policy admission runs after build and before deploy', () => {
@@ -67,7 +72,7 @@ test('compiled policy admission rejection stops before provider spawn', () => {
   const { alarm } = alarms();
   const result = seam([], { now, log: noop, stageImpl: impl, alarm });
   assert.equal(result.ok, false);
-  assert.deepEqual(calls, ['gate', 'repin', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
+  assert.deepEqual(calls, ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
   assert.ok(!calls.includes('deploy'));
 });
 
@@ -146,7 +151,7 @@ test('an engine the job has no policy for stops the deploy instead of being skip
 });
 
 test('each stage raises its own alarm reason, so the message says what broke', () => {
-  const expected = { repin: 'repin-failed', bundle: 'bundle-mismatch', build: 'deploy-failed', runtimePolicy: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed', runtimeBootstrap: 'deploy-failed' };
+  const expected = { bundle: 'bundle-mismatch', build: 'deploy-failed', runtimePolicy: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed', runtimeBootstrap: 'deploy-failed', recordRelease: 'deploy-failed' };
   for (const [stage, reason] of Object.entries(expected)) {
     const { impl } = recorder(stage, new SeamError(`${stage} exploded`, reason));
     const { raised, alarm } = alarms();
@@ -174,12 +179,15 @@ test('the defaults name the one build root the live deployment was built from', 
   assert.equal(options.deploy, true);
 });
 
-test('the edition and ref default to today in Berlin, and the ref is the edition branch', () => {
+test('the edition defaults to today in Berlin and names the tag; nothing names an edition branch any more', () => {
   const { impl } = recorder(null);
   const result = seam([], { now, log: noop, stageImpl: impl, alarm: noop });
   assert.equal(result.edition, '2026-09-06');
-  assert.equal(result.ref, 'edition/2026-09-06');
   assert.ok(result.tag.startsWith(`${TAG_PREFIX}2026-09-06-`));
+  // `--ref` named the corpus branch the repin pinned. There is no repin, so
+  // there is no ref: an option that implies this job still chooses research is
+  // worse than no option.
+  assert.throws(() => parseArgs(['--ref=edition/2026-09-06']), SeamError);
 });
 
 test('an unparseable edition or an unknown flag is refused before anything runs', () => {
@@ -237,9 +245,10 @@ function pinWorld(spawnfilePins, descriptor, sidecars = []) {
   return repo;
 }
 const line = (id, archive, sha) => `    - { id: ${id}, kind: bundle, source: ../../${archive}, sha256: ${sha}, mount: ./x, mode: readonly }`;
+// No `private` block: the research corpus is a volume now, so the descriptor
+// describes no archive for it and no Spawnfile pins one.
 const descriptorOf = (source, dependency) => ({
   source: { archive: 'newsroom-runtime.tar', sha256: source },
-  private: { archive: 'newsroom-private.tar', sha256: A },
   dependencies: [{ archive: 'newsroom-dependencies-a.tar', sha256: dependency }],
   assets: []
 });
@@ -254,7 +263,10 @@ test('the checked-in descriptors cover every checksum-pinned bundle across the a
   const result = pinFindings(repoRoot);
   assert.deepEqual(result.findings, []);
   assert.equal(result.checked, bundlePinCount());
-  assert.equal(result.checked, 47);
+  // 47 before the corpus left the image: twelve of those pins were
+  // newsroom-private.tar, one per agent.
+  assert.equal(result.checked, 35);
+  assert.ok(!result.archives.includes('newsroom-private.tar'), 'the descriptor must not describe a corpus archive any more');
   assert.ok(result.archives.includes('newsroom-tools.tar'));
   assert.ok(result.archives.includes('article-validation-runtime.tar'));
 });
@@ -294,10 +306,15 @@ test('an archive the descriptor does not describe is a finding unless it is the 
   assert.deepEqual(KNOWN_UNDESCRIBED, ['etopo-relief.tar']);
   const known = pinWorld([line('etopo-relief', 'etopo-relief.tar', A)], descriptorOf(A, B));
   const unknown = pinWorld([line('mystery', 'somebody-elses.tar', A)], descriptorOf(A, B));
+  // And the corpus archive is now one of those: nothing describes
+  // newsroom-private.tar any more, so a Spawnfile that still pins one is drift
+  // rather than an exemption. It must never join KNOWN_UNDESCRIBED.
+  const corpus = pinWorld([line('private-archive', 'newsroom-private.tar', A)], descriptorOf(A, B));
   try {
     assert.deepEqual(pinFindings(known).findings, []);
     assert.match(pinFindings(unknown).findings[0], /the descriptor does not describe/u);
-  } finally { rmSync(known, { recursive: true, force: true }); rmSync(unknown, { recursive: true, force: true }); }
+    assert.match(pinFindings(corpus).findings[0], /newsroom-private\.tar.*the descriptor does not describe/u);
+  } finally { for (const repo of [known, unknown, corpus]) rmSync(repo, { recursive: true, force: true }); }
 });
 
 test('a pin check that matched nothing is a finding, not a pass', () => {
@@ -404,12 +421,13 @@ test('the whole build cache is dropped on every run, not a 24h slice', () => {
   }), (error) => error.reason === 'seam-blocked' && /below the 20\.0GiB floor/u.test(error.message));
 });
 
-test('once the container is healthy only the running image is kept', () => {
-  // Image-level rollback is worth ~nothing here: every org image is pinned to
-  // one day's corpus, so rolling back restores yesterday's research under
-  // today's date. Rebuilding is the recovery path, so the image it replaced is
-  // just 5GB of disk.
-  assert.equal(KEEP_IMAGES_AFTER_SETTLE, 1);
+test('once the container is healthy the previous image survives for rollback', () => {
+  // This kept ONE for as long as every org image was pinned to one day's
+  // corpus, because rolling back then restored yesterday's research under
+  // today's date. The corpus is a host volume now, so the image that was
+  // running an hour ago is a complete newsroom and `up <previous tag> --image`
+  // is a one-minute recovery. Affordable because builds are rare.
+  assert.equal(KEEP_IMAGES_AFTER_SETTLE, 2);
   const removed = [];
   const exec = (_docker, args) => {
     if (args[0] === 'images') return { toString: () => [
@@ -421,7 +439,7 @@ test('once the container is healthy only the running image is kept', () => {
     return { toString: () => '' };
   };
   sweepImages({ tag: 'clank-and-slop:seam-2026-09-23-090007' }, { log: noop, exec, keep: KEEP_IMAGES_AFTER_SETTLE });
-  assert.deepEqual(removed, ['clank-and-slop:seam-2026-09-22-090008', 'clank-and-slop:seam-2026-09-21-090022']);
+  assert.deepEqual(removed, ['clank-and-slop:seam-2026-09-21-090022']);
 
   // During the run, before the new image exists, two are kept: the running one
   // cannot be removed and the new one is not built yet.
@@ -437,34 +455,24 @@ test('once the container is healthy only the running image is kept', () => {
   assert.deepEqual(during, ['clank-and-slop:seam-2026-09-21-090022']);
 });
 
-test('the build refuses a corpus pin from another edition', () => {
-  // 2026-09-22: the checkout was reset to `main` several times, and `main`'s
-  // committed pin reads `edition/2026-09-09-prepared`. A build that skipped
-  // repin would have mounted two-week-old research into that night's paper
-  // with no diagnostic at all, because a stale pin is a perfectly valid pin.
-  const pin = (edition) => () => JSON.stringify({ version: 'v1', repo: 'clankandslop-private', commit: 'a'.repeat(40), ref: `edition/${edition}`, edition });
-
-  assert.equal(assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: pin('2026-09-23') }).edition, '2026-09-23');
-
-  assert.throws(() => assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: pin('2026-09-09') }),
-    (error) => error.reason === 'deploy-failed' && /names edition 2026-09-09 but this build is for 2026-09-23/u.test(error.message));
-
-  // An unreadable or shapeless pin is a refusal too, never an assumed pass.
-  assert.throws(() => assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: () => { throw new Error('ENOENT'); } }),
-    (error) => error.reason === 'deploy-failed' && /cannot read the private corpus pin/u.test(error.message));
-  assert.throws(() => assertCorpusPin({ repo: '/r', edition: '2026-09-23' }, { read: () => '{}' }),
-    (error) => /names edition \(none\)/u.test(error.message));
-
-  // And `build` must actually consult it — the assertion is worth nothing if
-  // the stage does not run it. A real repo tree with a foreign pin, and the
-  // refusal must happen BEFORE the compiler is spawned.
+test('the build no longer has an opinion about which edition the corpus is from', () => {
+  // It used to refuse unless policies/private-source.json named the edition
+  // being built, because the corpus was an archive inside the image. It is a
+  // host-populated volume now, so an image is day-agnostic and that assertion
+  // would refuse every release on every day the committed pin is not today's —
+  // which is every day, and is how the daily rebuild gets reinvented.
+  //
+  // The guard did not weaken, its subject moved: corpus-contract.mjs checks the
+  // tree the host fetched, and the newsroom tools refuse a corpus that is not
+  // this edition's at call time.
   const repo = mkdtempSync(path.join(tmpdir(), 'clank-pin-build-'));
   try {
     mkdirSync(path.join(repo, 'agentic-org', 'policies'), { recursive: true });
     writeFileSync(path.join(repo, 'agentic-org/policies/private-source.json'),
       JSON.stringify({ version: 'v1', commit: 'b'.repeat(40), ref: 'edition/2026-09-09-prepared', edition: '2026-09-09' }));
+    // Reaches the compiler and fails there — on the missing CLI, not on a pin.
     assert.throws(() => build({ repo, edition: '2026-09-23', tag: 'clank-and-slop:seam-t', cli: '/nonexistent/cli.js' }, { log: () => undefined }),
-      (error) => error.reason === 'deploy-failed' && /refusing to mount research from another day/u.test(error.message));
+      (error) => error.reason === 'deploy-failed' && /build FAILED|could not run/u.test(error.message) && !/another day|corpus pin/u.test(error.message));
   } finally { rmSync(repo, { recursive: true, force: true }); }
 });
 
@@ -529,14 +537,230 @@ test('reclaiming disk sweeps the compiled-output scratch as well as the image ta
 test('the seam reclaims before it builds, never after', () => {
   const order = [];
   const stub = (name, result) => (...args) => { order.push(name); return result ?? args[0]; };
-  const stageImpl = {
-    gate: stub('gate'), repin: stub('repin'), bundle: stub('bundle'),
-    reclaimBuildSpace: stub('reclaimBuildSpace'), build: stub('build'),
-    runtimePolicy: stub('runtimePolicy'), rollEpoch: stub('rollEpoch'), deploy: stub('deploy'), settle: stub('settle'),
-    runtimeBootstrap: stub('runtimeBootstrap'), sweepImages: stub('sweepImages')
-  };
-  const result = seam(['--edition=2026-09-19', '--ref=edition/2026-09-19'], { log: () => undefined, alarm: () => undefined, stageImpl });
+  const stageImpl = Object.fromEntries(STAGE_NAMES.map((name) => [name, stub(name)]));
+  const result = seam(['--edition=2026-09-19'], { log: () => undefined, alarm: () => undefined, stageImpl });
   assert.equal(result.ok, true);
   assert.ok(order.indexOf('reclaimBuildSpace') < order.indexOf('build'), order.join(' -> '));
   assert.ok(order.indexOf('bundle') < order.indexOf('reclaimBuildSpace'), order.join(' -> '));
+});
+
+// --- stage 0: is there anything to release at all ----------------------------
+// The seam runs on a timer and is expected to do NOTHING most of the time: the
+// corpus moved to a host volume, so a new day is not a reason to build. These
+// are the tests that keep the no-op path a no-op, and the ledger honest about
+// what is actually running.
+function releaseWorld() {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-release-'));
+  const repo = path.join(root, 'repo');
+  mkdirSync(path.join(repo, 'agentic-org'), { recursive: true });
+  writeFileSync(path.join(repo, 'agentic-org', 'Spawnfile'), 'team: clank-and-slop\n');
+  const git = (...args) => execFileSync('git', ['-C', repo, '-c', 'commit.gpgsign=false', '-c', 'user.email=t@example.invalid', '-c', 'user.name=t', ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
+  execFileSync('git', ['init', '-q', '-b', 'main', repo], { stdio: ['ignore', 'pipe', 'pipe'] });
+  git('add', '-A');
+  git('commit', '-qm', 'first');
+  return {
+    root, repo, git, released: path.join(root, 'released.json'),
+    head: execFileSync('git', ['-C', repo, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+    ledger: () => JSON.parse(readFileSync(path.join(root, 'released.json'), 'utf8')),
+    write: (value) => writeFileSync(path.join(root, 'released.json'), typeof value === 'string' ? value : `${JSON.stringify(value, null, 2)}\n`)
+  };
+}
+const ledgerOf = (commit, tag = 'clank-and-slop:seam-2026-09-05-090000') => ({ version: RELEASE_LEDGER_VERSION, commit, tag, at: '2026-09-05T07:00:00.000Z' });
+// The real release gate over the recorder's stages: everything that touches the
+// tree, docker or the deployment stays a stub, and the decision is real.
+const withRealGate = (overrides = {}) => {
+  const { calls, impl } = recorder(null);
+  return { calls, impl: Object.assign(impl, { releaseGate }, overrides) };
+};
+
+test('--if-changed on an already-released commit runs zero stages and writes nothing', () => {
+  const world = releaseWorld();
+  world.write(ledgerOf(world.head));
+  const before = readdirSync(world.root).sort();
+  try {
+    const { calls, impl } = withRealGate();
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm: noop });
+    assert.equal(result.ok, true);
+    assert.equal(result.noop, true);
+    assert.deepEqual(result.stages, []);
+    // Nothing ran: every docker call, every Spawnfile rewrite and every deploy
+    // in this pipeline lives inside a stage, and no stage was reached.
+    assert.deepEqual(calls, []);
+    assert.deepEqual(readdirSync(world.root).sort(), before, 'the no-op path must not write a byte');
+    assert.deepEqual(world.ledger(), ledgerOf(world.head));
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('--if-changed on a commit the ledger does not name runs the whole pipeline, in order', () => {
+  const world = releaseWorld();
+  world.write(ledgerOf('0'.repeat(40), 'clank-and-slop:seam-2026-09-01-010101'));
+  try {
+    const { calls, impl } = withRealGate();
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm: noop });
+    assert.equal(result.ok, true);
+    assert.equal(result.noop, undefined);
+    assert.deepEqual(calls, FULL_ORDER);
+    assert.deepEqual(result.stages, ['releaseGate', ...FULL_ORDER.filter((name) => name !== 'sweepImages')]);
+    assert.equal(result.releaseCommit, world.head);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('a missing ledger releases; a ledger that cannot be read refuses and runs nothing', () => {
+  const world = releaseWorld();
+  try {
+    // Nothing recorded as running yet is the first release on a fresh box.
+    const fresh = withRealGate();
+    assert.equal(seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: fresh.impl, alarm: noop }).ok, true);
+    assert.deepEqual(fresh.calls, FULL_ORDER);
+
+    // Unparseable is NOT assumed-stale, because that assumption deploys. A job
+    // that cannot read its own ledger also cannot write the one the next run
+    // depends on, so it must not deploy at all.
+    for (const broken of ['{', '{"version":"clank.release.v1"}', JSON.stringify({ version: 'something.else.v1', commit: '0'.repeat(40) })]) {
+      world.write(broken);
+      const { calls, impl } = withRealGate();
+      const { raised, alarm } = alarms();
+      const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm });
+      assert.equal(result.ok, false, broken);
+      assert.equal(result.reason, 'seam-blocked', broken);
+      assert.deepEqual(calls, [], broken);
+      assert.deepEqual(raised.map((entry) => entry.reason), ['seam-blocked'], broken);
+    }
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('a working tree that does not match its commit is refused, except for what bundle rewrites', () => {
+  const world = releaseWorld();
+  world.write(ledgerOf('0'.repeat(40)));
+  const run = () => {
+    const { calls, impl } = withRealGate();
+    return { calls, result: seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm: noop }) };
+  };
+  try {
+    // The descriptor and the agent Spawnfiles are what `bundle` is expected to
+    // rewrite mid-run, so finding them dirty is not a finding.
+    mkdirSync(path.join(world.repo, 'agentic-org', 'agents', 'brass'), { recursive: true });
+    writeFileSync(path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json'), '{}\n');
+    writeFileSync(path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile'), 'agent: brass\n');
+    world.git('add', '-A');
+    world.git('commit', '-qm', 'descriptor and a declaration');
+    world.write(ledgerOf('0'.repeat(40)));
+    writeFileSync(path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json'), '{"source":{}}\n');
+    writeFileSync(path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile'), 'agent: brass\nchanged: true\n');
+    assert.equal(run().result.ok, true, 'a dirty descriptor and Spawnfile are what bundle rewrites');
+
+    // Anything else is a release that is not reproducible from a commit.
+    writeFileSync(path.join(world.repo, 'agentic-org', 'Spawnfile'), 'team: clank-and-slop\nedited: true\n');
+    const dirty = run();
+    assert.equal(dirty.result.ok, false);
+    assert.equal(dirty.result.reason, 'seam-blocked');
+    assert.deepEqual(dirty.calls, []);
+    assert.match(dirty.result.stages.join(','), /^$/u);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('the ledger advances only after settle and runtimeBootstrap have both passed', () => {
+  const world = releaseWorld();
+  const stale = ledgerOf('0'.repeat(40), 'clank-and-slop:seam-2026-09-01-010101');
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  try {
+    for (const failAt of ['settle', 'runtimeBootstrap']) {
+      world.write(stale);
+      const { calls, impl } = recorder(failAt, new SeamError(`${failAt} exploded`, 'deploy-failed'));
+      Object.assign(impl, { releaseGate, recordRelease });
+      const result = seam(args, { now, log: noop, stageImpl: impl, alarm: noop });
+      assert.equal(result.ok, false, failAt);
+      assert.ok(!calls.includes('recordRelease'), failAt);
+      // The claim the ledger makes is "this commit is RUNNING". A container that
+      // never settled is not running it, and a ledger that advanced anyway would
+      // make the next timer run see nothing to do.
+      assert.deepEqual(world.ledger(), stale, failAt);
+      assert.equal(existsSync(path.join(world.root, RELEASE_LOG_NAME)), false, failAt);
+    }
+
+    world.write(stale);
+    const { calls, impl } = recorder(null);
+    Object.assign(impl, { releaseGate, recordRelease });
+    const result = seam(args, { now, log: noop, stageImpl: impl, alarm: noop });
+    assert.equal(result.ok, true);
+    assert.deepEqual(world.ledger(), { version: RELEASE_LEDGER_VERSION, commit: world.head, tag: result.tag, at: now.toISOString() });
+    assert.equal(statSync(world.released).mode & 0o777, 0o644);
+    const log = readFileSync(path.join(world.root, RELEASE_LOG_NAME), 'utf8').trim().split('\n');
+    assert.equal(log.length, 1);
+    assert.equal(JSON.parse(log[0]).commit, world.head);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('under --if-changed a closed wake window defers instead of paging', () => {
+  // The release unit is on an hourly timer and the gate refuses whenever an
+  // agent is awake or the container is not quiet, which is most of the day. A
+  // job that paged on every busy hour would page ~20 times a day and train the
+  // operator to ignore the pager — which is how the 2026-09-23 failure reached
+  // nobody.
+  const world = releaseWorld();
+  world.write(ledgerOf('0'.repeat(40)));
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  const blocked = () => {
+    const { calls, impl } = recorder('gate', new SeamError('refusing to touch the deployment — cogsworth wakes in 4 min', 'seam-blocked'));
+    return { calls, impl: Object.assign(impl, { releaseGate }) };
+  };
+  try {
+    const first = blocked();
+    const quiet = alarms();
+    const result = seam(args, { now, log: noop, stageImpl: first.impl, alarm: quiet.alarm });
+    assert.equal(result.ok, true);
+    assert.equal(result.deferred, true);
+    assert.deepEqual(result.stages, ['releaseGate']);
+    assert.deepEqual(quiet.raised, [], 'a closed window must not page');
+    assert.deepEqual(first.calls, ['gate'], 'nothing past the gate runs');
+    // Observable without reading the journal: how long this commit has been
+    // waiting lives in a file beside the ledger.
+    const pending = JSON.parse(readFileSync(path.join(world.root, RELEASE_PENDING_NAME), 'utf8'));
+    assert.equal(pending.commit, world.head);
+    assert.equal(pending.since, now.toISOString());
+    assert.equal(pending.alarmed_at, null);
+
+    // Still inside the day: still silent.
+    const soon = alarms();
+    seam(args, { now: new Date(now.getTime() + 23 * 3600000), log: noop, stageImpl: blocked().impl, alarm: soon.alarm });
+    assert.deepEqual(soon.raised, []);
+
+    // Past a day it is not a quiet system any more, it is one that has stopped
+    // shipping — said once, then not again for this commit.
+    const late = alarms();
+    const stale = seam(args, { now: new Date(now.getTime() + 25 * 3600000), log: noop, stageImpl: blocked().impl, alarm: late.alarm });
+    assert.equal(stale.ok, true);
+    assert.equal(stale.deferred, true);
+    assert.deepEqual(late.raised.map((entry) => entry.reason), ['release-deferred']);
+    assert.match(late.raised[0].message, /deferred for 25h00m/u);
+    const again = alarms();
+    const repeat = blocked();
+    seam(args, { now: new Date(now.getTime() + 26 * 3600000), log: noop, stageImpl: repeat.impl, alarm: again.alarm });
+    assert.deepEqual(again.raised, [], 'the staleness alarm is raised once per pending commit');
+    assert.ok(!repeat.calls.includes('bundle') && !repeat.calls.includes('build'));
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('without --if-changed a refused gate still alarms and still fails', () => {
+  // A person who asked for a release now deserves to be told it was refused.
+  const { calls, impl } = recorder('gate', new SeamError('an agent is awake', 'seam-blocked'));
+  const { raised, alarm } = alarms();
+  const result = seam([], { now, log: noop, stageImpl: impl, alarm });
+  assert.equal(result.ok, false);
+  assert.equal(result.deferred, undefined);
+  assert.deepEqual(raised.map((entry) => entry.reason), ['seam-blocked']);
+  // The gate's own words reach the page, not a deferral's: a run that quietly
+  // became a deferral would report something else entirely.
+  assert.match(raised[0].detail, /an agent is awake/u);
+  assert.deepEqual(calls, ['gate']);
+});
+
+test('the release gate runs before the wake gate, and only under --if-changed', () => {
+  const { calls, impl } = recorder(null);
+  seam(['--if-changed'], { now, log: noop, stageImpl: impl, alarm: noop });
+  assert.equal(calls[0], 'releaseGate', calls.join(' -> '));
+  assert.ok(calls.indexOf('releaseGate') < calls.indexOf('gate'));
+  const manual = recorder(null);
+  seam([], { now, log: noop, stageImpl: manual.impl, alarm: noop });
+  assert.ok(!manual.calls.includes('releaseGate'), 'a deliberate run does not consult the ledger');
 });
