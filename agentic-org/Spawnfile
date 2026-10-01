@@ -55,11 +55,42 @@ shared:
       # It would also leave the volume root 0555, and the root ownership guard
       # refuses to start against a volume root that is not exactly 0755.
       #
-      # Read-only is therefore enforced where it CAN be: the host refresher
-      # writes the tree 0444/0555 owned 2000:2000 and never grants a write bit,
-      # which is the identical guarantee the readonly BUNDLE gave -- that was
-      # also a uid-2000-owned `a-w` tree, never a `:ro` mount. The refusal is
-      # proved by a test, not by this comment.
+      # THIS MOUNT IS WRITABLE BY THE AGENTS. SAY IT PLAINLY.
+      # An earlier version of this comment claimed the guarantee here was
+      # "identical to the bundle". That was false, and a four-seat review plus a
+      # reproduction in the live container on 2026-10-01 is what it cost to find
+      # out. The truth:
+      #
+      #   * the mount is SHARED by twelve agents and DURABLE, so anything written
+      #     to it spreads and persists -- unlike the bundle, which was a per-agent
+      #     copy re-extracted from the image on every container start and
+      #     therefore reset constantly;
+      #   * `mode: mutable` plus the compiler's recursive startup chown means uid
+      #     2000 OWNS the volume root and `trees/`, and an owner can always
+      #     restore its own write bit, so `chmod -R a-w` is advisory against it:
+      #
+      #       $ docker exec --user 2000:2000 ... sh -c 'echo forged > <vol>/CORPUS.json'
+      #       $ docker exec --user 2000:2000 ... sh -c 'ln -s /etc <vol>/trees'
+      #       $ docker exec --user 2000:2000 ... sh -c 'chmod u+w f && echo x > f'
+      #
+      #     all three succeeded;
+      #   * bytes inside an already-frozen 0555 tree ARE immutable -- a story file
+      #     cannot be rewritten or unlinked from inside a frozen directory -- but
+      #     CORPUS.json and the `<date>` symlinks are NAMES at a 0755 root and are
+      #     not protected at all.
+      #
+      # So integrity is not asserted by permissions, it is MAINTAINED. The host
+      # refresher (corpus-refresh.mjs) keeps its own record outside the volume at
+      # /var/lib/clank-corpus/landed.json, root-owned 0600, unreachable from any
+      # container, and takes every decision from it -- never from a name inside
+      # the mount. Every two minutes it re-verifies the mounted tree against a
+      # land-time manifest and against `git ls-tree`, alarms with the drifted
+      # paths, and re-lands the tree from git so the newsroom heals itself. The
+      # bundle, by contrast, was never verified once after extraction.
+      #
+      # And provenance is asserted by the HOST at publish time, from that record
+      # and from git -- not by the file sitting in this volume, which the host
+      # treats as an output it wrote and a thing to re-check, never as truth.
       #
       # FROZEN FIELDS. `mode`, `sharing` and `name` are hashed into the volume's
       # identity sentinel and/or its backing path. Changing any one of them
@@ -68,12 +99,17 @@ shared:
       # must stay in THIS file: declared on an agent it would mint twelve
       # volumes and then fail compile on the duplicate host volume name.
       #
-      # Provenance did not disappear with the image digest, it MOVED: the volume
-      # carries CORPUS.json {commit, ref, edition, fetched_at}, the newsroom
-      # tools read it when Brass commissions and refuse a corpus that is
-      # missing, empty, unreadable or not this edition's, and the identity is
-      # bound into the assignment receipt and carried into the composition. That
-      # is what proves which evidence backed a published paper now.
+      # Provenance did not disappear with the image digest, it MOVED -- to the
+      # HOST. CORPUS.json {commit, ref, edition, fetched_at} is published into
+      # this volume so the newsroom tools can read it and refuse a corpus that is
+      # missing, empty, unreadable or not this edition's, and the identity it
+      # names is bound into the assignment receipt and carried into the
+      # composition. But that file is a convenience for the reader, not the proof:
+      # it sits in a directory uid 2000 owns. The proof is the host's own record
+      # outside this volume, which the refresher re-verifies against git every two
+      # minutes, and once an edition is commissioned its corpus is FROZEN -- the
+      # date's link stops following the branch, so a receipt can never end up
+      # citing research the reporters did not read.
       - id: research-corpus
         kind: volume
         name: clank-newsroom-corpus
