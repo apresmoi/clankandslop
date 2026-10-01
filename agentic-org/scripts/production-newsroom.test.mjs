@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
-import { chmod, lstat, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
+import { chmod, cp, lstat, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -19,6 +19,8 @@ const gateLine = ({ sections = 3, dissent = 0, state = 'ready' } = {}) => `# com
 import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
 import { REPORTERS } from './corpus-contract.mjs';
 import { corpusDeskIndex, corpusIdentityFile, corpusPreparedFile, installCorpusFixture } from './corpus-fixture.mjs';
+import { agents, orgRoot } from './lib.mjs';
+import { researchCorpusReaders, validateAgentDeclaration } from './validate-org.mjs';
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
 const reviewArticle = async args => { const filing = JSON.parse(await readFile(path.join(process.env.CLANK_EDITION_STATE_ROOT, 'editions', args.edition, 'filings', args.article_id, `${args.revision}.json`), 'utf8')); return reviewArticleWithDigest({ ...args, filing_digest: `sha256:${createHash('sha256').update(JSON.stringify(filing)).digest('hex')}` }); };
@@ -1247,6 +1249,48 @@ runtimeTest('record_assignment binds the mounted corpus into the edition, and re
   }
 });
 
+// A valid identity record is a CLAIM about a commit; the reporters read a
+// symlink. Until the two are bound, every other check in the corpus contract can
+// pass while the assignment, the receipt and the composition record commit A and
+// the desks cat commit B. The host refresher's own no-op check resolved the link
+// from the first day; the read side did not, which made the read side strictly
+// weaker than the write side.
+runtimeTest('record_assignment refuses a corpus whose dated link does not resolve into the commit its identity record names', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-corpus-link-'));
+  const state = path.join(temporary, 'state'), edition = '2026-10-09', assignments = lineup(edition);
+  const named = 'a'.repeat(40), read = 'b'.repeat(40);
+  process.env.CLANK_EDITION_STATE_ROOT = state;
+  process.env.CLANK_NEWSROOM_AGENT = 'brass';
+  const declared = process.env.CLANK_PRIVATE_SOURCE_ROOT;
+  try {
+    const { root } = useCorpus(edition, { commit: named });
+    // The state a crashed refresh leaves behind — the dated links move before
+    // CORPUS.json is written — and the state an agent can produce by itself,
+    // because the volume root is owned by the uid the agents run as. Both trees
+    // are complete, valid corpora for this edition: the defect is only that the
+    // record names one and every desk reads the other.
+    await cp(path.join(root, 'trees', named), path.join(root, 'trees', read), { recursive: true });
+    await rm(path.join(root, edition));
+    await symlink(path.join('trees', read, edition), path.join(root, edition));
+    await assert.rejects(recordAssignmentAgainstMount({ edition, event_key: 'schedule:corpus-unbound', assignments }), (error) => {
+      assert.match(error.message, /does not bind edition 2026-10-09 to the commit it claims/u);
+      assert.match(error.message, new RegExp(named, 'u'), 'the refusal must name the commit the record claims');
+      assert.match(error.message, new RegExp(read, 'u'), 'the refusal must say where the link actually goes');
+      return true;
+    });
+    assert.equal((await assignmentRecords(state, edition)).length, 0, 'nothing may be bound to a corpus the desks are not reading');
+    // Point the link back and the same lineup is accepted: the gate is the
+    // binding, not a latch the volume can never leave.
+    await rm(path.join(root, edition));
+    await symlink(path.join('trees', named, edition), path.join(root, edition));
+    assert.equal((await recordAssignmentAgainstMount({ edition, event_key: 'schedule:corpus-rebound', assignments })).corpus.commit, named);
+  } finally {
+    if (declared === undefined) delete process.env.CLANK_PRIVATE_SOURCE_ROOT; else process.env.CLANK_PRIVATE_SOURCE_ROOT = declared;
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
 runtimeTest('the composition carries the corpus its stories were commissioned against, or it does not compose', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-corpus-compose-'));
   const state = path.join(temporary, 'state'), edition = '2026-10-06';
@@ -1262,7 +1306,24 @@ runtimeTest('the composition carries the corpus its stories were commissioned ag
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
-runtimeTest('an edition commissioned before corpus provenance existed must be recommissioned, not published', async () => {
+// WHAT A REFUSAL MAY PRESCRIBE. Both refusals below used to end with "record the
+// lineup again with record_assignment", and that is an instruction Brass cannot
+// carry out: re-recording under the same event_key is an event_key conflict, and
+// a new event_key only ADDS a record beside the one that is already wrong. The
+// edition could never compose again, and the message kept sending the editor
+// back into the loop. A refusal that names an act its reader cannot perform is
+// worse than a bare refusal, so these two assert the remedy is the operator's
+// and that recommissioning is explicitly ruled out.
+const refusedRemedy = (message, both) => {
+  assert.match(message, /Recommissioning cannot clear this/u, 'the refusal must say plainly that recommissioning cannot clear it');
+  assert.match(message, /Only an operator on the host can clear it/u, 'the refusal must prescribe an act that exists');
+  assert.match(message, /clank-edition-state/u, 'the operator needs to be told where the record lives');
+  for (const loop of [/It must be recommissioned/u, /records the lineup again with record_assignment/u, /recommission the lineup/u])
+    assert.doesNotMatch(message, loop, 'the refusal must not send Brass back into a loop it cannot escape');
+  for (const commit of both ?? []) assert.match(message, new RegExp(commit, 'u'), `the refusal must name ${commit}`);
+};
+
+runtimeTest('an edition commissioned before corpus provenance existed refuses with a remedy that exists', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-corpus-legacy-'));
   const state = path.join(temporary, 'state'), edition = '2026-10-07';
   try {
@@ -1274,30 +1335,125 @@ runtimeTest('an edition commissioned before corpus provenance existed must be re
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-legacy-assignment' }), (error) => {
       assert.match(error.message, /was commissioned before corpus provenance existed/u);
-      assert.match(error.message, /recommissioned/u, 'the refusal must say what clears it');
+      refusedRemedy(error.message);
       return true;
     });
     assert.equal((await readdir(path.join(state, 'editions', edition, 'receipts'))).filter((name) => name.startsWith('composed-')).length, 0, 'nothing may publish without provenance');
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
-runtimeTest('an edition commissioned against two different corpora does not compose', async () => {
+runtimeTest('a corpus that moved under a commissioned edition is a deadlock, and the refusal says who can clear it', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-corpus-split-'));
-  const state = path.join(temporary, 'state'), edition = '2026-10-08';
+  const state = path.join(temporary, 'state'), edition = '2026-10-08', first = 'a'.repeat(40), later = 'e'.repeat(40);
   try {
     const composeArgs = await driveToCompose(state, edition, article);
     // The host swapped the volume between two commissioning wakes — which is
     // exactly what a volume that can change without a rebuild makes possible.
-    const second = useCorpus(edition, { commit: 'e'.repeat(40) });
+    const second = useCorpus(edition, { commit: later });
     process.env.CLANK_NEWSROOM_AGENT = 'brass';
     await recordAssignmentAgainstMount({ edition, event_key: 'schedule:second-corpus', assignments: lineup(edition) });
-    assert.equal(second.record.commit, 'e'.repeat(40));
+    assert.equal(second.record.commit, later);
+    assert.equal((await assignmentRecords(state, edition)).length, 2);
+    const refusal = async (eventKey) => {
+      process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+      const error = await composeEdition({ ...composeArgs, event_key: eventKey }).then(() => undefined, (failure) => failure);
+      assert.ok(error, 'two corpora under one edition must not compose');
+      return error.message;
+    };
+    const message = await refusal('compose-two-corpora');
+    assert.match(message, /the research corpus moved underneath a commissioned edition/u);
+    refusedRemedy(message, [first, later]);
+
+    // THE DEADLOCK, demonstrated rather than asserted in prose. Brass has no way
+    // to take a record back: the same event_key with a corrected lineup is a
+    // conflict, and a fresh wake only adds a third record while the second stays
+    // exactly where it was, so the edition is still refused afterwards.
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    const corrected = lineup(edition).map((item) => ({ ...item, brief: `${item.brief} Corrected after the corpus moved under the edition.` }));
+    await assert.rejects(recordAssignmentAgainstMount({ edition, event_key: 'schedule:second-corpus', assignments: corrected }), /event_key conflict/u);
+    await recordAssignmentAgainstMount({ edition, event_key: 'schedule:third-corpus', assignments: corrected });
+    assert.equal((await assignmentRecords(state, edition)).length, 3, 'a new event_key adds a record; nothing replaces or removes one');
+    assert.match(await refusal('compose-after-recommissioning'), /the research corpus moved underneath a commissioned edition/u, 'recommissioning must not be able to clear it');
+
+    // WHICH RECORD THE EDITION BINDS is the record's own ordering — ascending
+    // corpus.fetched_at — and never the order the files happen to be read in. So
+    // the record the host stamped FIRST is deliberately put LAST in the directory
+    // listing: anything that binds whatever it reads first now names the other
+    // commit as the lineup's, and these two assertions say which.
+    const records = await assignmentRecords(state, edition);
+    const stamp = async (entry, commit, fetchedAt) => writeFile(entry.file, `${JSON.stringify({ ...entry.value, corpus: { ...entry.value.corpus, commit, tree: `trees/${commit}`, fetched_at: fetchedAt } })}\n`);
+    const earliest = 'b'.repeat(40), afterwards = 'f'.repeat(40);
+    for (const entry of records.slice(0, -1)) await stamp(entry, afterwards, `${edition}T09:00:00Z`);
+    await stamp(records.at(-1), earliest, `${edition}T03:00:00Z`);
+    const swapped = await refusal('compose-ordered-by-the-record');
+    assert.match(swapped, new RegExp(`first commissioned against commit ${earliest}`, 'u'), 'the earliest corpus the host stamped is the one the edition rests on');
+    assert.match(swapped, new RegExp(`a later assignment record names commit ${afterwards}`, 'u'));
+  } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
+});
+
+runtimeTest('a second commissioning wake against the same corpus agrees, and the edition composes against it', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-corpus-agree-'));
+  const state = path.join(temporary, 'state'), edition = '2026-10-11';
+  try {
+    const composeArgs = await driveToCompose(state, edition, article);
+    const expected = JSON.parse(await readFile(corpusIdentityFile(privateRootFor(edition)), 'utf8'));
+    // Brass commissions twice in one day — a hole in the lineup, a reporter
+    // swapped — against the corpus that is still mounted. Two records are not the
+    // defect; two different corpora are.
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    await recordAssignmentAgainstMount({ edition, event_key: 'schedule:same-corpus-again', assignments: lineup(edition) });
     assert.equal((await assignmentRecords(state, edition)).length, 2);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-two-corpora' }), (error) => {
-      assert.match(error.message, /this edition was commissioned against more than one corpus/u);
-      assert.match(error.message, /e{40}/u, 'the refusal must name the corpora it cannot choose between');
-      return true;
-    });
+    assert.equal((await composeEdition({ ...composeArgs, event_key: 'compose-agreeing-records' })).corpus.commit, expected.commit);
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
+});
+
+// ---------------------------------------------------------------------------
+// FIX 3: the validator may only promise what a tool enforces.
+//
+// agentic-org/scripts/validate-org.mjs asserted that every corpus reader "must
+// be told where the mount is, or the tool refuses every call" — and listed
+// caslon, whose only corpus-touching tool is compose_edition, which never reads
+// the mount. It reads the edition's assignment records, deliberately: the volume
+// can have been swapped since the lineup was commissioned, so a composition that
+// re-read the mount would publish a provenance claim its stories do not rest on.
+//
+// These two tests are the mechanical link between the enforcement and the
+// declaration, and they live here, beside the enforcement, because that is the
+// half that decides the answer.
+// ---------------------------------------------------------------------------
+runtimeTest('compose_edition composes with no corpus mount at all, because the paper rests on what it was commissioned against', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-corpus-unmounted-'));
+  const state = path.join(temporary, 'state'), edition = '2026-10-12';
+  const declared = process.env.CLANK_PRIVATE_SOURCE_ROOT;
+  try {
+    const composeArgs = await driveToCompose(state, edition, article);
+    const expected = JSON.parse(await readFile(corpusIdentityFile(privateRootFor(edition)), 'utf8'));
+    // Nothing of the mount is left: no declaration and no volume.
+    await rm(privateRootFor(edition), { recursive: true, force: true });
+    delete process.env.CLANK_PRIVATE_SOURCE_ROOT;
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-no-mount' });
+    assert.equal(composed.corpus.commit, expected.commit, 'the composition carries the commissioned corpus, read from the edition and not from the volume');
+    assert.deepEqual((await readComposedReceipt(state, edition)).composition.corpus, composed.corpus);
+  } finally {
+    if (declared === undefined) delete process.env.CLANK_PRIVATE_SOURCE_ROOT; else process.env.CLANK_PRIVATE_SOURCE_ROOT = declared;
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+test('the research corpus mount is declared for exactly the agents whose tools read it', () => {
+  const bytesOf = (agent) => readFileSync(path.join(orgRoot, 'agents', agent, 'Spawnfile'), 'utf8');
+  assert.deepEqual([...researchCorpusReaders].sort(), ['brass', 'ledger', 'pressman'], 'brass binds it at record_assignment, ledger reads the World Desk input, pressman stages its trace');
+  assert.ok(!researchCorpusReaders.has('caslon'), 'compose_edition reads the assignment records, never the mount');
+  for (const agent of agents) {
+    const declares = bytesOf(agent).split('\n').some((line) => line.includes('CLANK_PRIVATE_SOURCE_ROOT:'));
+    assert.equal(declares, researchCorpusReaders.has(agent), `${agent} ${declares ? 'declares the corpus mount but no tool of its reads it' : 'reads the corpus mount but is never told where it is'}`);
+    validateAgentDeclaration(agent, bytesOf(agent));
+  }
+  // The mutation the validator now catches, in the exact shape this PR shipped
+  // it: a mount declared on Caslon's newsroom server, which reads nothing from it.
+  const decorated = bytesOf('caslon').replace('        CLANK_DAIMON_CONTROL_URL', `        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-private\n        CLANK_DAIMON_CONTROL_URL`);
+  assert.throws(() => validateAgentDeclaration('caslon', decorated), /declares the research corpus mount/u);
 });
