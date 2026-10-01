@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { CORPUS_IDENTITY_VERSION, CorpusError, REPORTERS, corpusIdentityFindings, corpusLinkFindings, verifyCorpusTree } from './corpus-contract.mjs';
+import {
+  CORPUS_IDENTITY_VERSION, CORPUS_TREES_DIR, CorpusError, REPORTERS, corpusIdentityFindings, corpusLinkFindings,
+  corpusTreePath, isCorpusCommit, isCorpusTreePath, verifyCorpusTree
+} from './corpus-contract.mjs';
 // The corpus writers live in the refresher's fixture module; a third copy of
 // "how a desk index is spelled" is exactly how two checks drift apart.
 import { EDITION, STORIES, writeCorpus, writeIndex } from './corpus-refresh.fixture.mjs';
@@ -182,4 +185,53 @@ test('every way a link can fail to bind fails closed', () => {
     for (const edition of [undefined, '', '..', '2026-9-6', `${EDITION}/../..`])
       assert.match(corpusLinkFindings(fixture.root, edition, COMMIT)[0], /edition must be YYYY-MM-DD/u, `edition ${JSON.stringify(edition)} was accepted`);
   } finally { fixture.cleanup(); }
+});
+
+// ONE RULE, ONE SPELLING
+// ---------------------
+// `trees/<40 hex>` was restated privately in this contract, in the host's record,
+// in the host-side volume writer and in the edition publisher -- four copies of
+// one rule, because this module documented itself as the home for shared corpus
+// rules and exported none of them. These two tests are what stops the fifth.
+test('the commit and tree shape are exported from the contract, and refuse everything that is not one', () => {
+  const commit = 'a'.repeat(40);
+  assert.equal(CORPUS_TREES_DIR, 'trees');
+  assert.equal(corpusTreePath(commit), `trees/${commit}`);
+  assert.equal(isCorpusCommit(commit), true);
+  assert.equal(isCorpusTreePath(corpusTreePath(commit)), true);
+  // Every shape a record, a flag or a planted name can carry instead of a commit.
+  for (const value of [undefined, null, '', 42, {}, commit.toUpperCase(), commit.slice(0, 39), `${commit}a`, `${commit}\n`, '../../etc', ' '.repeat(40)]) {
+    assert.equal(isCorpusCommit(value), false, `isCorpusCommit accepted ${JSON.stringify(value)}`);
+    assert.throws(() => corpusTreePath(value), CorpusError, `corpusTreePath built a path from ${JSON.stringify(value)}`);
+  }
+  // And the tree path validator is anchored on both ends, so nothing that merely
+  // CONTAINS a tree path passes for one.
+  for (const value of [undefined, null, '', commit, `trees/${commit}/`, `trees/${commit}/${EDITION}`, `/trees/${commit}`, `trees//${commit}`, `TREES/${commit}`, `trees/${commit.toUpperCase()}`, `trees/../${commit}`])
+    assert.equal(isCorpusTreePath(value), false, `isCorpusTreePath accepted ${JSON.stringify(value)}`);
+});
+
+// The scan. A private copy of the rule is a correctness defect that no behavioural
+// test can see -- both copies agree on the day they are written -- so the defect
+// has to be caught as what it is: a second spelling in the source text.
+test('no corpus module re-spells the commit or tree-path rule privately', () => {
+  // Every module that is allowed to know the shape. corpus-contract.mjs is the
+  // home and is expected to hold exactly one declaration of the pattern.
+  const owned = ['corpus-contract.mjs', 'corpus-verify.mjs', 'corpus-volume.mjs', 'corpus-swap.mjs'];
+  const forbidden = [
+    // The anchored 40-hex commit rule, in any of the spellings it has appeared in.
+    [/\^\[0-9a-f\]\{40\}\$/gu, 'the commit pattern: import isCorpusCommit from corpus-contract.mjs'],
+    // The tree path as a regex, and the tree path built by hand from the directory
+    // name and a commit. `${TREES_DIR}/${commit.slice(0, 7)}` in a log line is a
+    // MESSAGE about a tree, not the rule, and is deliberately not matched.
+    [/trees\\\/\[0-9a-f\]\{40\}/gu, 'the tree-path pattern: import isCorpusTreePath from corpus-contract.mjs'],
+    [/\$\{TREES_DIR\}\/\$\{commit\}/gu, 'a hand-built tree path: call corpusTreePath(commit)'],
+    [/`trees\/\$\{/gu, 'a hand-built tree path: call corpusTreePath(commit)']
+  ];
+  const home = readFileSync(join(import.meta.dirname, 'corpus-contract.mjs'), 'utf8');
+  assert.equal(home.match(forbidden[0][0]).length, 1, 'the contract must declare the commit pattern exactly once; a second copy here is a copy too');
+  for (const file of owned.filter((name) => name !== 'corpus-contract.mjs')) {
+    const source = readFileSync(join(import.meta.dirname, file), 'utf8');
+    for (const [pattern, remedy] of forbidden)
+      assert.equal(source.match(pattern), null, `${file} re-spells ${remedy}`);
+  }
 });

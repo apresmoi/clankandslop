@@ -56,9 +56,15 @@
 import { execFileSync } from 'node:child_process';
 import { chmodSync, lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { CORPUS_IDENTITY_FILE, CORPUS_IDENTITY_VERSION, CorpusError, EDITION_PATTERN, corpusIdentityFindings } from './corpus-contract.mjs';
+import {
+  CORPUS_IDENTITY_FILE, CORPUS_IDENTITY_VERSION, CORPUS_TREES_DIR, CorpusError, EDITION_PATTERN,
+  corpusIdentityFindings, corpusTreePath
+} from './corpus-contract.mjs';
 
-export const TREES_DIR = 'trees';
+// Re-exported, not re-spelled: `trees/<commit>` is one rule and corpus-contract.mjs
+// owns it (see its ONE SPELLING note). Host-side callers keep importing TREES_DIR
+// from here because this is the module that may touch the volume.
+export const TREES_DIR = CORPUS_TREES_DIR;
 export const VOLUME_IDENTITY_SENTINEL = '.spawnfile-resource-identity';
 export const VOLUME_ROOT_MODE = 0o755;
 /** Every name the host itself ever writes at the volume root, besides a `<date>` symlink. */
@@ -79,7 +85,7 @@ export const hostExec = (command, args, options = {}) => execFileSync(command, a
 /** Seconds, not milliseconds: these timestamps are read by people in a ledger, and a corpus is never written twice in one second. */
 export const isoSeconds = (date) => `${date.toISOString().slice(0, 19)}Z`;
 
-export const treeLinkTarget = (commit, date) => `${TREES_DIR}/${commit}/${date}`;
+export const treeLinkTarget = (commit, date) => `${corpusTreePath(commit)}/${date}`;
 
 /** Every dated corpus directory in `root`. One commit carries EVERY day's corpus, not just its own. */
 export function datedDirectories(root) {
@@ -281,7 +287,7 @@ export function corpusIdentity({ commit, ref, edition, fetchedAt, editionsPresen
     ref,
     edition,
     fetched_at: fetchedAt,
-    tree: `${TREES_DIR}/${commit}`,
+    tree: corpusTreePath(commit),
     editions_present: [...editionsPresent].sort(),
     source_count: sourceCount
   };

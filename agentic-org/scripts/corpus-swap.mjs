@@ -26,7 +26,7 @@
 
 import { appendFileSync, chmodSync, mkdirSync, readdirSync, renameSync } from 'node:fs';
 import path from 'node:path';
-import { CORPUS_IDENTITY_FILE, CorpusError, verifyCorpusFreshness, verifyCorpusTree } from './corpus-contract.mjs';
+import { CORPUS_IDENTITY_FILE, CorpusError, corpusTreePath, verifyCorpusFreshness, verifyCorpusTree } from './corpus-contract.mjs';
 import {
   LANDED_VERSION, buildManifest, compareManifest, editionCutoff, editionSettled, readManifest, removeManifest,
   sha256, treeName, writeLanded, writeManifest
@@ -165,7 +165,7 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
     // A forced re-land of the commit a frozen date already serves keeps the freeze
     // stamp: the date did not thaw, the same tree was rebuilt under it, and the
     // record must keep saying when the host first settled it.
-    editions[date] = { commit, tree: `${TREES_DIR}/${commit}`, landed_at: isoSeconds(now), ...(known?.commit === commit && known.frozen ? { frozen: known.frozen } : {}) };
+    editions[date] = { commit, tree: corpusTreePath(commit), landed_at: isoSeconds(now), ...(known?.commit === commit && known.frozen ? { frozen: known.frozen } : {}) };
   }
   log(`links moved: ${moved.length} of ${dates.length} dated director${dates.length === 1 ? 'y' : 'ies'}${moved.length ? ` (${moved.slice(-5).join(', ')}${moved.length > 5 ? ', ...' : ''})` : ''}${frozen.length ? `; ${frozen.length} frozen (${frozen.join(', ')})` : ''}`);
 
@@ -185,7 +185,7 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
   // container can reach it.
   writeManifest(options.landed, buildManifest(treePath, commit));
 
-  const trees = [...new Set([...landed.trees, `${TREES_DIR}/${commit}`, ...Object.values(editions).map((entry) => entry.tree)])].sort();
+  const trees = [...new Set([...landed.trees, corpusTreePath(commit), ...Object.values(editions).map((entry) => entry.tree)])].sort();
   // Written only now: every volume mutation it describes has already succeeded.
   // `heals` is `{}` unless the caller is the drift repair itself: a genuinely new
   // commit is a fresh corpus, so whatever was being rewritten under the old tree

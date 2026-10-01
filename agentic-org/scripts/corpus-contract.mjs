@@ -39,12 +39,6 @@ export const CORPUS_PREP_VERSION = 'clank.research-corpus.prepared.v1';
 export const CORPUS_IDENTITY_VERSION = 'clank.research-corpus.identity.v1';
 export const CORPUS_IDENTITY_FILE = 'CORPUS.json';
 
-const COMMIT_PATTERN = /^[0-9a-f]{40}$/;
-// Duplicated from corpus-volume.mjs rather than imported: the contract is the
-// READ side and must not depend on the host-side writer, which the container
-// never has.
-const TREE_DIR = 'trees';
-const TREE_PATTERN = /^trees\/[0-9a-f]{40}$/;
 // Shape first, then Date.parse: Date.parse alone accepts 'Jan 1 2020' and
 // other locale-ish strings, which no reader on the far side should have to
 // guess at, and the shape alone accepts 2026-13-45T99:99:99Z.
@@ -57,6 +51,41 @@ export function berlinToday(now = new Date()) { return berlinDate.format(now); }
 
 export class CorpusError extends Error {}
 const fail = (message) => { throw new CorpusError(message); };
+
+// ONE SPELLING OF `trees/<commit>`, AND THIS IS IT
+// -----------------------------------------------
+// The commit shape and the tree path are a single rule with four readers -- this
+// contract, the host's record (corpus-landed.mjs), the host-side volume writer
+// and the edition publisher -- and every one of them had its own private copy,
+// because this module was documented as the home for shared corpus rules while
+// exporting none of them. Four copies of a validation rule are three that can
+// drift in silence, and a corpus check that has drifted is indistinguishable
+// from no corpus check at all.
+//
+// So the predicate, the builder and the validator live here and are imported,
+// never re-spelled: corpus-contract.test.mjs scans the corpus modules for a
+// private copy of either pattern and fails on a hit, so the fifth copy cannot
+// land quietly either.
+//
+// This is still the READ side: a path, not a filesystem. The host-side writer
+// re-exports the directory name (corpus-volume.mjs's TREES_DIR) so the container
+// never has to import a volume mutator to know what the path looks like.
+export const CORPUS_TREES_DIR = 'trees';
+const COMMIT_PATTERN = /^[0-9a-f]{40}$/u;
+
+/** A corpus commit id: 40 lowercase hex characters, which is what git prints and what every corpus record must carry. */
+export const isCorpusCommit = (value) => typeof value === 'string' && COMMIT_PATTERN.test(value);
+
+/** The one spelling of a corpus tree path, relative to the volume root. Refuses to build one from anything that is not a commit. */
+export const corpusTreePath = (commit) => {
+  if (!isCorpusCommit(commit)) fail(`a corpus tree path needs a 40-character lowercase hex commit, got ${JSON.stringify(commit)}`);
+  return `${CORPUS_TREES_DIR}/${commit}`;
+};
+
+/** True for exactly the strings `corpusTreePath` builds, so a record's `tree` field is validated without restating the shape. */
+export const isCorpusTreePath = (value) => typeof value === 'string'
+  && value.startsWith(`${CORPUS_TREES_DIR}/`)
+  && isCorpusCommit(value.slice(CORPUS_TREES_DIR.length + 1));
 
 // stderr is captured rather than inherited so a probe that is *expected* to
 // miss (rev-parse on a ref that does not exist yet) does not print raw git
@@ -180,14 +209,14 @@ export function corpusIdentityFindings(value, { edition } = {}) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return [`${CORPUS_IDENTITY_FILE} must be a JSON object, got ${Array.isArray(value) ? 'an array' : typeof value}`];
   const findings = [];
   if (value.version !== CORPUS_IDENTITY_VERSION) findings.push(`version must be ${CORPUS_IDENTITY_VERSION}, got ${JSON.stringify(value.version)}`);
-  if (typeof value.commit !== 'string' || !COMMIT_PATTERN.test(value.commit)) findings.push(`commit must be a 40-character lowercase hex sha, got ${JSON.stringify(value.commit)}`);
+  if (!isCorpusCommit(value.commit)) findings.push(`commit must be a 40-character lowercase hex sha, got ${JSON.stringify(value.commit)}`);
   if (typeof value.ref !== 'string' || !value.ref.trim()) findings.push(`ref must name the branch the corpus was cut from, got ${JSON.stringify(value.ref)}`);
   if (typeof value.edition !== 'string' || !EDITION_PATTERN.test(value.edition)) findings.push(`edition must be YYYY-MM-DD, got ${JSON.stringify(value.edition)}`);
   if (typeof value.fetched_at !== 'string' || !ISO_INSTANT_PATTERN.test(value.fetched_at) || Number.isNaN(Date.parse(value.fetched_at))) findings.push(`fetched_at must be an ISO instant, got ${JSON.stringify(value.fetched_at)}`);
   // Cross-checked against `commit`, not merely shaped: a record naming one
   // commit and a tree holding another is how a reader ends up proving the
   // provenance of research it did not read.
-  if (typeof value.tree !== 'string' || !TREE_PATTERN.test(value.tree) || value.tree !== `${TREE_DIR}/${value.commit}`) findings.push(`tree must be ${TREE_DIR}/<commit>, got ${JSON.stringify(value.tree)}`);
+  if (!isCorpusTreePath(value.tree) || !isCorpusCommit(value.commit) || value.tree !== corpusTreePath(value.commit)) findings.push(`tree must be ${CORPUS_TREES_DIR}/<commit>, got ${JSON.stringify(value.tree)}`);
   if (!Array.isArray(value.editions_present) || !value.editions_present.includes(value.edition)) findings.push(`editions_present must list the edition the record names, got ${JSON.stringify(value.editions_present)}`);
   if (!Number.isSafeInteger(value.source_count) || value.source_count < 1) findings.push(`source_count must be a positive integer, got ${JSON.stringify(value.source_count)}`);
   // Named with BOTH dates on purpose: "wrong edition" read on a lock screen or
@@ -221,15 +250,15 @@ const realpathOrNull = (target) => { try { return realpathSync(target); } catch 
 // bound to the commit it claims", never "probably fine".
 export function corpusLinkFindings(root, edition, commit) {
   if (typeof edition !== 'string' || !EDITION_PATTERN.test(edition)) return [`edition must be YYYY-MM-DD to resolve a corpus link, got ${JSON.stringify(edition)}`];
-  if (typeof commit !== 'string' || !COMMIT_PATTERN.test(commit)) return [`commit must be a 40-character lowercase hex sha to resolve a corpus link, got ${JSON.stringify(commit)}`];
+  if (!isCorpusCommit(commit)) return [`commit must be a 40-character lowercase hex sha to resolve a corpus link, got ${JSON.stringify(commit)}`];
   const link = path.join(root, edition);
   let stat;
   try { stat = lstatSync(link); } catch (error) { return [`${edition} is not on the corpus mount at all (${error.code ?? error.message})`]; }
-  if (!stat.isSymbolicLink()) return [`${edition} is a real ${stat.isDirectory() ? 'directory' : 'file'} on the mount, not a symlink into ${TREE_DIR}/${commit}/`];
+  if (!stat.isSymbolicLink()) return [`${edition} is a real ${stat.isDirectory() ? 'directory' : 'file'} on the mount, not a symlink into ${corpusTreePath(commit)}/`];
   const resolved = realpathOrNull(link);
   if (resolved === null) return [`${edition} is a dangling symlink, so nothing it names can be read`];
-  const tree = realpathOrNull(path.join(root, TREE_DIR, commit));
-  if (tree === null) return [`${TREE_DIR}/${commit} is absent from the mount, so the commit the record names holds no tree`];
-  if (!resolved.startsWith(`${tree}${path.sep}`)) return [`${edition} resolves to ${resolved}, which is outside ${TREE_DIR}/${commit}/`];
+  const tree = realpathOrNull(path.join(root, corpusTreePath(commit)));
+  if (tree === null) return [`${corpusTreePath(commit)} is absent from the mount, so the commit the record names holds no tree`];
+  if (!resolved.startsWith(`${tree}${path.sep}`)) return [`${edition} resolves to ${resolved}, which is outside ${corpusTreePath(commit)}/`];
   return [];
 }
