@@ -1,0 +1,39 @@
+# Make the day's research visible to the newsroom WITHOUT building an image.
+#
+# WHAT IT REPLACES
+# ----------------
+# The seam's `repin` stage. The corpus used to be a checksum-pinned tar inside
+# the org image, so a new day's research meant a new ~5GB image, a daily build,
+# and a daily chance to lose the day to something that is not journalism. It
+# did: 2026-09-30 died at the candidate health probe, 2026-10-01 died at the
+# deploy gate. This unit is the corpus arriving as DATA instead.
+#
+# WHY IT RUNS ON THE HOST AND NOT IN THE CONTAINER
+# ------------------------------------------------
+# Because the private repo needs a credential and the agents must never hold
+# one. `kind: git` would clone INSIDE the agent container, which needs egress
+# and a deploy key; that is the isolation model this newsroom is built on and
+# it is not negotiable. The credential stays here; what crosses the boundary is
+# a directory of files.
+#
+# IT IS NOT ALLOWED TO PUBLISH A BAD CORPUS
+# -----------------------------------------
+# The script validates the staged tree before anything becomes visible — the
+# same four refusals `repin` made at build time (missing, unparseable,
+# incomplete, not this edition's), now made at refresh time — and on any
+# finding it drops the staging tree, alarms, and leaves the previous corpus
+# exactly where it was. The newsroom's own read-time check then refuses to
+# commission against a corpus that is not today's, so a silent stale day is not
+# reachable from here.
+[Unit]
+Description=Refresh the newsroom research corpus volume from the private repo
+After=network-online.target docker.service
+Wants=network-online.target
+OnFailure=clank-alarm@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/work/clankandslop
+Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/home/clank/deploy-work/node24/bin/node /root/work/clankandslop/agentic-org/scripts/corpus-refresh.mjs
+TimeoutStartSec=600

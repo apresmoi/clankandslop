@@ -1,0 +1,34 @@
+# The seam, as a RELEASE job instead of a cron job.
+#
+# It builds and deploys when the organization's code or prompts change, and
+# no-ops when they have not. The daily rebuild it replaces existed only because
+# the corpus was pinned into the image; with the corpus on a volume, an image is
+# day-agnostic and there is nothing for a clock to trigger.
+#
+# WHY A HOST TIMER AND NOT CI
+# ---------------------------
+# CI-dispatch on merge is more precise, but it puts deploy authority in GitHub
+# and needs a runner credential on this box — a new trust edge, against the
+# standing rule that deploy keys stay off anything the agents can reach — and it
+# cannot run when GitHub is down. A timer that reads the local checkout keeps all
+# authority here, adds no credential, degrades safely, and its no-op case is one
+# `git rev-parse` and one JSON read. The cost is up to an hour between merge and
+# release, which for this system is nothing.
+[Unit]
+Description=Release the newsroom organization when its tree has changed
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+OnFailure=clank-alarm@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/work/clankandslop
+EnvironmentFile=-/etc/clank-alarm/alarm.env
+Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
+Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
+Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/home/clank/deploy-work/grok-runtime-identity-20260922.json
+Environment=SPAWNFILE_CLI=/home/clank/deploy-work/spawnfile-main/dist/cli/index.js
+ExecStart=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --if-changed
+TimeoutStartSec=3600

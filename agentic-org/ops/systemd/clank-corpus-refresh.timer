@@ -1,0 +1,25 @@
+# Every two minutes, all day.
+#
+# The corpus-design brief asked for a signal from the sensors with a 60s timer
+# as the safety net. This is the safety net on its own, which is the honest
+# order to build it in: the timer is what makes the signal an OPTIMISATION
+# rather than a single point of failure, and a signal added later cannot make
+# this unit wrong.
+#
+# Two minutes rather than one because the no-op path is a `git fetch` plus one
+# JSON read, and the corpus lands around 05:00Z against a 11:00 Berlin wake —
+# there is no deadline this interval can miss. The cost of being wrong in the
+# other direction is a research-sensor push that reaches the reporters late,
+# which the 13:00 conference would not notice.
+[Unit]
+Description=Keep the newsroom research corpus current
+
+[Timer]
+OnBootSec=90s
+OnUnitActiveSec=2min
+AccuracySec=15s
+Persistent=false
+Unit=clank-corpus-refresh.service
+
+[Install]
+WantedBy=timers.target
