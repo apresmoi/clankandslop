@@ -122,6 +122,109 @@ test('a trees symlink stops the refresher dead and deletes nothing it points at'
   } finally { try { unlinkSync(join(f.volume, TREES_DIR)); } catch { /* the symlink was never created */ } cleanup(f); }
 });
 
+// THE PATH WITH NO GUARD ON IT, AND IT SILENCED THE ALARM
+// ------------------------------------------------------
+// `assertTreesDirectory` checks `trees/`, never `trees/<commit>`. So one rename
+// inside a directory uid 2000 owns threw ENOENT out of `buildManifest`, straight
+// out of the sweep, past a top-level handler that only alarms on errors it
+// recognizes: exit 1, NO page at all, the dated links left dangling, and the
+// re-land this whole design rests on never running. A sweep that exits silently
+// is strictly worse than no sweep, because the newsroom believes it ran.
+test('a corpus tree renamed out from under the dated links pages and re-lands, instead of exiting on a silent ENOENT', () => {
+  const f = fixture();
+  try {
+    const first = refresh(args(f), deps(f));
+    const trees = join(f.volume, TREES_DIR);
+    renameSync(join(trees, first.commit), join(trees, 'zzz'));
+    assert.equal(existsSync(join(f.volume, EDITION, 'desks')), false, 'the dated link has to be dangling, or this test is not the reported state');
+
+    const alarms = [], lines = [];
+    assert.equal(main(args(f), deps(f, { log: (line) => lines.push(line), alarm: (reason, detail) => alarms.push([reason, detail]) })), 0,
+      'a corpus that healed itself is a success');
+    assert.ok(alarms.length >= 1, 'a tree that vanished without a page is the silent failure this sweep exists to remove');
+    assert.deepEqual([...new Set(alarms.map(([reason]) => reason))], [TAMPER_REASON]);
+    const said = alarms.map(([, detail]) => `${detail.message}\n${detail.detail}`).join('\n');
+    assert.match(said, /is gone from the volume/u, said);
+    assert.ok(lines.some((line) => /^re-landing /u.test(line)), lines.join(' | '));
+
+    // The self-heal, which is the whole point: the desk index a reporter reads is
+    // reachable again, from git, under the same commit the record names.
+    assert.match(readFileSync(join(f.volume, EDITION, 'desks', 'cogsworth.index'), 'utf8'), /s-11111111/u);
+    assert.equal(landedOf(f).editions[EDITION].commit, first.commit);
+    assert.equal(readlinkSync(join(f.volume, EDITION)), `${TREES_DIR}/${first.commit}/${EDITION}`);
+    // And the renamed tree is evidence: reported, never deleted.
+    assert.equal(existsSync(join(trees, 'zzz')), true, 'the name an agent chose is the only record of who else writes this mount');
+    // What is left to say is the planted NAME, which is reported and never deleted,
+    // so it is said once more and then acknowledged -- not re-landed again.
+    const second = [];
+    assert.equal(main(args(f), deps(f, { log: (line) => lines.push(line), alarm: (reason, detail) => second.push(detail.message) })), 0);
+    assert.ok(second.every((message) => /did not land/u.test(message)), `the drift must be healed by now: ${second.join(' | ')}`);
+    const third = [];
+    assert.equal(main(args(f), deps(f, { alarm: (reason) => third.push(reason) })), 0);
+    assert.deepEqual(third, [], 'and an acknowledged planted name stops paging');
+  } finally { cleanup(f); }
+});
+
+// The other half of the same missing guard: `compareManifest` recursively
+// readdir'd and lstat'd whatever `trees/<commit>` pointed at, as root, every two
+// minutes. 34 entries outside the volume were measured in the repro; aimed at `/`
+// it is a whole-filesystem walk. `stage`'s refusal came far too late to matter.
+test('a symlink planted at trees/<commit> is never walked and pages with the one command that clears it', () => {
+  const f = fixture();
+  const tree = (commit) => join(f.volume, TREES_DIR, commit);
+  let planted = null;
+  try {
+    const first = refresh(args(f), deps(f));
+    const bait = join(f.root, 'bait');
+    mkdirSync(join(bait, 'nested'), { recursive: true });
+    for (const name of ['passwd', 'shadow', 'nested/hosts']) writeFileSync(join(bait, name), `do not read ${name}\n`);
+    // uid 2000 owns the tree directory, so it can restore its own write bit and
+    // rename it -- which is what makes this reachable at all.
+    chmodSync(tree(first.commit), 0o755);
+    renameSync(tree(first.commit), join(f.root, 'parked-tree'));
+    planted = tree(first.commit);
+    symlinkSync(bait, planted);
+
+    const alarms = [], lines = [];
+    const exit = main(args(f), deps(f, { log: (line) => lines.push(line), alarm: (reason, detail) => alarms.push([reason, detail]) }));
+    const said = [...alarms.map(([reason, detail]) => `${reason} ${detail.message} ${detail.detail}`), ...lines].join('\n');
+
+    // Checked FIRST: if the guard is ever removed, this test must fail on the walk
+    // outside the volume, not on a missing word in a message. Every one of these
+    // names would be reported as an extra file by `compareManifest`.
+    for (const name of ['passwd', 'shadow', 'hosts']) assert.equal(said.includes(name), false, `the sweep walked outside the volume: ${said}`);
+    assert.ok(alarms.length >= 1, 'a planted tree with no page is a corpus nobody is verifying');
+    assert.match(said, /is a symlink where the corpus tree this host landed belongs/u, said);
+    assert.match(said, /mv -- /u, 'a state only an operator can clear must page with the command that clears it');
+    assert.equal(lines.some((line) => /^re-landing /u.test(line)), false, 'nothing may be re-landed through a name an agent chose');
+    assert.equal(lstatSync(planted).isSymbolicLink(), true, 'the symlink is the evidence and is left exactly where it is');
+    for (const name of ['passwd', 'shadow', 'nested/hosts']) assert.ok(existsSync(join(bait, name)), `${name} was deleted through the planted symlink`);
+    assert.equal(exit, 1, 'and a corpus that can be neither verified nor repaired is not a success');
+  } finally { try { unlinkSync(planted); } catch { /* the symlink was never created */ } cleanup(f); }
+});
+
+// The class, not the case: a refusal raised because the volume was written by
+// something else used to escape the sweep unrecognized, which is the same silent
+// exit by a different route.
+test('a refusal that escapes the sweep still pages, because an exception nobody sees is the failure this sweep removes', () => {
+  const f = fixture();
+  try {
+    refresh(args(f), deps(f));
+    const trees = join(f.volume, TREES_DIR);
+    renameSync(trees, join(f.root, 'parked-trees'));
+    symlinkSync(join(f.root, 'parked-trees'), trees);
+
+    const alarms = [];
+    // No new commit, so this is the ~700-times-a-day sweep path, not the swap path.
+    const exit = main(args(f), deps(f, { alarm: (reason, detail) => alarms.push([reason, detail]) }));
+    assert.ok(alarms.length >= 1, 'the sweep threw and nobody was told');
+    const said = alarms.map(([reason, detail]) => `${reason} ${detail.message} ${detail.detail}`).join('\n');
+    assert.match(said, /could not complete/u, said);
+    assert.match(said, /is a symlink/u, said);
+    assert.equal(exit, 1);
+  } finally { try { unlinkSync(join(f.volume, TREES_DIR)); } catch { /* never created */ } cleanup(f); }
+});
+
 // ONCE A DATE IS SETTLED ITS CORPUS IS FROZEN, AND THE HOST DECIDES WHEN
 // ---------------------------------------------------------------------
 // Brass binds a corpus commit into every assignment receipt. Move the link

@@ -37,7 +37,7 @@
 import { lstatSync, readFileSync, readdirSync, readlinkSync } from 'node:fs';
 import path from 'node:path';
 import { CORPUS_IDENTITY_FILE } from './corpus-contract.mjs';
-import { TREES_DIR, assertTreesDirectory, auditVolumeRoot } from './corpus-volume.mjs';
+import { TREES_DIR, assertTreesDirectory, auditVolumeRoot, moveAsideCommand } from './corpus-volume.mjs';
 import { compareManifest, readManifest, sha256, treeName } from './corpus-landed.mjs';
 
 // EVERY WORD THESE MODULES CAN PAGE A HUMAN WITH
@@ -103,10 +103,22 @@ export function unknownTrees(volume, known) {
   return readdirSync(path.join(volume, TREES_DIR)).filter((name) => !known.includes(name)).sort();
 }
 
-// What the names this host did not land are costing it, walked with lstat only so
-// a planted symlink is counted as one link and never followed -- following it
-// would measure /etc and, worse, teach this sweep to read through a name an agent
-// chose. Normally there are no unknown names at all and this walks nothing.
+// THE ONE RULE EVERY WALK IN THIS FILE OBEYS
+// -----------------------------------------
+// LSTAT, AND NEVER DESCEND A NAME AN AGENT CHOSE. uid 2000 owns `trees/` and can
+// replace any name under it with a symlink, so a walk that resolves names with
+// `stat` is a walk whose target an agent picked: following one measures /etc, and
+// aimed at `/` it is a whole-filesystem readdir every two minutes.
+//
+// This file used to state the rule here and break it twenty lines below, where
+// `compareManifest` walked `trees/<commit>` without ever asking what that name
+// was. Both halves now obey it:
+//
+//   * `unknownFootprint` counts a planted symlink as one entry and stops there;
+//   * the serving tree is lstat'd by `treeShape` and refused unless it is a real
+//     directory, BEFORE `compareManifest` reads one name under it.
+//
+// Normally there are no unknown names at all and the first of those walks nothing.
 export function unknownFootprint(volume, names) {
   let entries = 0, bytes = 0;
   const walk = (target) => {
@@ -123,6 +135,30 @@ export function unknownFootprint(volume, names) {
   return { entries, bytes };
 }
 
+// WHAT `trees/<commit>` ACTUALLY IS, ASKED WITH ONE LSTAT
+// ------------------------------------------------------
+// `assertTreesDirectory` checks `trees/`. It says nothing about `trees/<commit>`,
+// and that was the one path into this sweep with no guard on it at all:
+//
+//   * `mv trees/<commit> trees/zzz` inside the container made `buildManifest`'s
+//     readdir throw ENOENT straight out of the sweep -- exit 1, no alarm, dated
+//     links left dangling, and the re-land this design rests on never ran;
+//   * a symlink at `trees/<commit>` was recursively readdir'd and lstat'd by
+//     `compareManifest` -- 34 measured entries outside the volume -- long before
+//     `stage`'s `assertRealDirectory` got the chance to refuse it.
+//
+// So the shape of that name is established first, with one lstat, and the walk
+// only ever runs on a real directory. Returned rather than thrown: the caller
+// classifies this into a finding, and a refusal that escapes the sweep is the
+// silent exit described under `integritySweep`.
+export function treeShape(treeRoot) {
+  let stat;
+  try { stat = lstatSync(treeRoot); } catch (error) { return error.code === 'ENOENT' ? 'missing' : `unreadable (${error.code})`; }
+  if (stat.isSymbolicLink()) return 'symlink';
+  if (stat.isDirectory()) return 'directory';
+  return stat.isFile() ? 'file' : 'special file';
+}
+
 // ONE SWEEP, FIVE QUESTIONS, EACH ANSWERED FROM OUTSIDE THE VOLUME
 // ---------------------------------------------------------------
 //   1. does the volume root hold a name this host never writes?
@@ -136,7 +172,7 @@ export function unknownFootprint(volume, names) {
 // reading something the host did not land, and all three are repairable. An
 // unexpected NAME is not repairable without deleting evidence, so it alarms and
 // stays.
-export function integritySweep({ volume, landed, landedFile, edition, privateRepo, exec, unknownMib = DEFAULT_UNKNOWN_MIB }) {
+function sweepVolume({ volume, landed, landedFile, edition, privateRepo, exec, unknownMib = DEFAULT_UNKNOWN_MIB }) {
   const findings = [], links = [];
   const strangers = unknownTrees(volume, landed.trees.map(treeName));
   const unknown = [
@@ -170,13 +206,36 @@ export function integritySweep({ volume, landed, landedFile, edition, privateRep
     if (got !== want) { links.push({ date, want, got }); findings.push(`${date} points at ${got === null ? 'no symlink at all' : JSON.stringify(got)}, not ${want}`); }
   }
 
-  let drift = null, touched = [];
+  let drift = null, touched = [], tree = null;
   const serving = landed.editions[edition];
   if (serving) {
     const manifest = readManifest(landedFile, serving.commit);
     const treeRoot = path.join(volume, serving.tree);
-    if (!manifest) findings.push(`no land-time manifest for ${serving.tree.slice(0, 13)}, so its content cannot be verified`);
-    else if (!assertTreesDirectory(volume)) findings.push(`${TREES_DIR}/ is gone, so nothing can be verified`);
+    // `trees/` first, so a volume with no `trees/` at all is reported as what it
+    // is rather than as one missing tree; then the tree itself, before anything
+    // walks it.
+    const shape = assertTreesDirectory(volume) ? treeShape(treeRoot) : 'missing';
+    if (shape === 'missing') {
+      // GONE IS REPAIRABLE, AND IT HAS TO SAY SO. This is the finding the sweep
+      // never produced: the tree the newsroom reads was renamed or deleted, the
+      // dated links dangle, and git still has every byte of it -- so it is handed
+      // back in the same `drift` shape a rewritten file produces and the caller
+      // re-lands it. Unclassified, it was an ENOENT that escaped with no page.
+      tree = 'missing';
+      drift = { tree: serving.tree, commit: serving.commit, paths: [] };
+      findings.push(`${serving.tree} is gone from the volume, so every ${edition} link into it dangles and the corpus must be re-landed from git`);
+    } else if (shape !== 'directory') {
+      // AND PLANTED IS NOT. Re-landing would mean renaming or deleting a name this
+      // host did not write, which it never does -- `stage`'s `assertRealDirectory`
+      // refuses it too, by design. There is exactly one thing to do with this
+      // state, so the finding says it, with the path and the command.
+      tree = 'planted';
+      // One line, deliberately: the caller passes findings[0] as the alarm's
+      // headline, and a page whose first line wraps into three loses the command
+      // at the end of it.
+      findings.push(`${serving.tree} is a ${shape} where the corpus tree this host landed belongs, so the ${edition} corpus can be neither verified nor re-landed;`
+        + ` nothing here deletes or moves a name this host did not write, so an operator has to run \`${moveAsideCommand(volume, treeRoot)}\` and the next poll re-lands the tree from git on its own`);
+    } else if (!manifest) findings.push(`no land-time manifest for ${serving.tree.slice(0, 13)}, so its content cannot be verified`);
     else {
       const compared = compareManifest(treeRoot, manifest);
       const suspects = contentDrift(treeRoot, compared.touched, { privateRepo, commit: serving.commit, exec });
@@ -191,5 +250,27 @@ export function integritySweep({ volume, landed, landedFile, edition, privateRep
       } else if (touched.length) findings.push(`${touched.length} file(s) in ${serving.tree.slice(0, 13)} were touched without changing their content`);
     }
   }
-  return { findings, unknown, footprint, overflow, identity, links, drift, touched, tampered: Boolean(identity || links.length || drift) };
+  return { findings, unknown, footprint, overflow, identity, links, drift, touched, tree, failed: null, tampered: Boolean(identity || links.length || drift || tree) };
+}
+
+// NO EXCEPTION LEAVES THIS SWEEP WITHOUT A PAGE
+// --------------------------------------------
+// The refresher's top-level handler alarms only on an error it recognizes
+// (`error.alarm`), so every other throw out of here was exit 1 with no page: the
+// shape that let `mv trees/<commit> trees/zzz` silence the alarm completely. The
+// guards above remove the known cases; this removes the class. Anything that
+// escapes -- a refusal from corpus-volume.mjs because the volume was written by
+// something else, an unreadable record, a bug in this file -- comes back as a
+// finding with `tampered` set, so the caller pages and `--check` answers "not
+// current" instead of reporting a volume nothing managed to verify as fine.
+export function integritySweep(options) {
+  try { return sweepVolume(options); }
+  catch (error) {
+    const message = String(error?.message ?? error);
+    return {
+      findings: [`the corpus integrity sweep could not complete, so nothing in this volume is verified: ${message.split('\n')[0]}`],
+      unknown: [], footprint: { entries: 0, bytes: 0 }, overflow: false, identity: null, links: [], drift: null,
+      touched: [], tree: null, failed: { message, code: error?.code ?? null }, tampered: true
+    };
+  }
 }

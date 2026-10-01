@@ -155,6 +155,20 @@ export function auditVolumeRoot(volume) {
 
 const readlinkOrNull = (target) => { try { return readlinkSync(target); } catch { return null; } };
 
+// THE ONE-LINE COMMAND A PAGE HAS TO CARRY
+// ---------------------------------------
+// Nothing on this host deletes a name it did not write -- that guard is correct,
+// and it is also a dead end unless the page that fires says exactly what clears
+// it. A state only an operator can clear, reported without the command that
+// clears it, is a thing the newsroom retries every two minutes forever.
+//
+// Moved, never deleted, and moved OUTSIDE the volume: the planted name is the only
+// evidence of who else writes this mount, and the container's startup walk trips
+// over any extra entry at the volume root. The destination is a sibling of the
+// volume's data root, which is root-owned and outside the walk.
+export const asidePath = (volume, target) => path.join(path.dirname(volume), `${path.basename(target)}.planted`);
+export const moveAsideCommand = (volume, target) => `mv -- ${target} ${asidePath(volume, target)}`;
+
 // Atomicity here is not a style preference, it is the only reason agents can
 // keep reading while the corpus is replaced -- and rename(2) is atomic only
 // within one filesystem. Checked instead of assumed because the staging and
