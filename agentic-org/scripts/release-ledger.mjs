@@ -160,7 +160,23 @@ export function recordRelease(options, { log = console.log, now = new Date() } =
 // instant it FIRST deferred are written beside the ledger, so "nothing has
 // shipped since Tuesday" is readable from a file rather than reconstructible
 // from the journal, and once it passes a day a person hears it exactly once.
-export function deferRelease(options, finding, { now = new Date(), log = console.log, alarm = () => {} } = {}) {
+//
+// AND THE ESCALATION IS THE ONLY THING STOPPING "FOREVER".
+//
+// Which makes that one record load-bearing: it holds the instant this commit
+// FIRST deferred, and the flag saying the alarm already went out. If it cannot
+// be written, or exists and cannot be read, the 24h clock restarts on every run
+// and the deferral can repeat indefinitely with nothing ever paging — the one
+// mechanism that would have escalated is the thing that failed, and it failed
+// quietly. So a broken record is ITSELF an alarm, raised on that run rather than
+// deferred into a silence nobody can tell from a healthy quiet system. It still
+// does not fail the deployment path; it just never fails silently.
+//
+// That pages on every run for as long as the record stays broken, and that is
+// the deliberate half of the trade: a busy wake window is the normal state for
+// twenty hours a day, while a deploy directory this job cannot write is not a
+// state the box is ever supposed to be in.
+export function deferRelease(options, finding, { now = new Date(), log = console.log, alarm = () => {}, read = readFileSync, write = writeJsonAtomic } = {}) {
   const file = releasePendingPath(options.released);
   const commit = options.releaseCommit;
   // releaseGate is what learns the commit, and it only runs under
@@ -168,31 +184,37 @@ export function deferRelease(options, finding, { now = new Date(), log = console
   // had quietly become a deferral, which is the one thing this path must not do:
   // a person who asked for a release now has to be told it was refused.
   if (!/^[0-9a-f]{40}$/u.test(commit ?? '')) throw new ReleaseError('a release was deferred without a release commit — only --if-changed defers, and only after the release gate has read HEAD', 'seam-blocked');
-  let pending = null;
-  try { pending = JSON.parse(readFileSync(file, 'utf8')); } catch { /* first deferral of this commit, or a file this job is about to replace */ }
+  let pending = null, broken = null;
+  // ENOENT is the ordinary first deferral of this commit. Anything else — a
+  // truncated file, unreadable bytes, a path that is not a file — means the
+  // instant this commit started waiting is gone, so the age below is wrong and
+  // the escalation it drives cannot be trusted.
+  try { pending = JSON.parse(read(file, 'utf8')); }
+  catch (error) { if (error?.code !== 'ENOENT') broken = `the pending-release record ${file} cannot be read (${String(error?.message ?? error).trim().slice(0, 160)})`; }
   if (pending?.version !== RELEASE_PENDING_VERSION || pending.commit !== commit)
     pending = { version: RELEASE_PENDING_VERSION, commit, since: now.toISOString(), alarmed_at: null };
   const since = Date.parse(pending.since);
   const ageMs = Number.isFinite(since) ? Math.max(0, now.getTime() - since) : 0;
   const stale = ageMs >= DEFER_ALARM_AFTER_MS;
-  const raising = stale && !pending.alarmed_at;
-  if (raising) pending.alarmed_at = now.toISOString();
-  try { writeJsonAtomic(file, pending); }
-  catch (error) {
-    log(`release: could not record the pending release at ${file} (${String(error.message).trim().slice(0, 160)})`
-      + ' — until it can be written, the 24h staleness alarm cannot fire');
-  }
+  const escalating = stale && !pending.alarmed_at;
+  if (escalating) pending.alarmed_at = now.toISOString();
+  try { write(file, pending); }
+  catch (error) { broken = `the pending-release record ${file} could not be written (${String(error?.message ?? error).trim().slice(0, 160)})`; }
   const age = `${Math.floor(ageMs / 3600000)}h${String(Math.floor((ageMs % 3600000) / 60000)).padStart(2, '0')}m`;
   log(`release deferred: ${finding}; retrying on the next timer (commit ${commit.slice(0, 12)} pending ${age})`);
+  const raising = escalating || broken !== null;
+  if (broken) log(`release: ${broken} — the 24h staleness escalation cannot be relied on, so this deferral is being raised now instead of waited out`);
+  if (escalating) log(`release: ${commit.slice(0, 12)} has been waiting ${age} for a quiet window — raising release-deferred once`);
   if (raising) {
-    log(`release: ${commit.slice(0, 12)} has been waiting ${age} for a quiet window — raising release-deferred once`);
     alarm('release-deferred', {
       edition: options.edition,
-      message: `release ${commit.slice(0, 12)} deferred for ${age}: the deploy window has not been quiet`,
+      message: broken
+        ? `release ${commit.slice(0, 12)} deferred and the staleness tracking is broken: ${broken} — the 24h escalation cannot be relied on, so this deferral is raised immediately`
+        : `release ${commit.slice(0, 12)} deferred for ${age}: the deploy window has not been quiet`,
       detail: finding
     });
   }
-  return { deferred: true, pending, ageMs, alarmed: raising };
+  return { deferred: true, pending, ageMs, alarmed: raising, tracking_broken: broken };
 }
 
 // --- the stage ---------------------------------------------------------------

@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
-import { RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, recordRelease, releaseGate } from './release-ledger.mjs';
+import { DEFER_ALARM_AFTER_MS, RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -738,6 +738,87 @@ test('under --if-changed a closed wake window defers instead of paging', () => {
     seam(args, { now: new Date(now.getTime() + 26 * 3600000), log: noop, stageImpl: repeat.impl, alarm: again.alarm });
     assert.deepEqual(again.raised, [], 'the staleness alarm is raised once per pending commit');
     assert.ok(!repeat.calls.includes('bundle') && !repeat.calls.includes('build'));
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+// A DEFERRAL THAT CANNOT BE TRACKED MUST NOT BE QUIET.
+//
+// The pending record is the only thing that knows when this commit first
+// deferred, so it is the only thing that can escalate. If it cannot be written
+// or read, the 24h clock restarts every hour and the release can defer forever
+// with nothing ever paging -- the mechanism that would have escalated is the
+// thing that failed, and it failed silently. These are the tests that keep that
+// failure loud.
+test('a deferral whose staleness record cannot be written raises immediately', () => {
+  const world = releaseWorld();
+  try {
+    const options = { released: world.released, releaseCommit: world.head, edition: '2026-09-06' };
+    const { raised, alarm } = alarms();
+    const lines = [];
+    const result = deferRelease(options, 'cogsworth wakes in 4 min', {
+      now, alarm, log: (line) => lines.push(line),
+      write: () => { throw new Error('EROFS: read-only file system'); }
+    });
+    // Still a deferral: the deployment path is not failed by a bookkeeping fault.
+    assert.equal(result.deferred, true);
+    assert.equal(result.ageMs, 0, 'the first deferral of this commit is not stale');
+    // But not a silent one. The alarm fires on THIS run rather than waiting for
+    // an escalation that can no longer happen.
+    assert.equal(result.alarmed, true);
+    assert.match(result.tracking_broken, /could not be written/u);
+    assert.deepEqual(raised.map((entry) => entry.reason), ['release-deferred']);
+    assert.match(raised[0].message, /staleness tracking is broken/u);
+    assert.match(raised[0].message, /24h escalation cannot be relied on/u);
+    assert.equal(raised[0].detail, 'cogsworth wakes in 4 min');
+    assert.match(lines.join('\n'), /cannot be relied on/u);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('a deferral whose staleness record cannot be read raises immediately', () => {
+  const world = releaseWorld();
+  try {
+    const options = { released: world.released, releaseCommit: world.head, edition: '2026-09-06' };
+    // A truncated or corrupt record: the instant this commit started waiting is
+    // gone, so the age is wrong and the escalation it drives cannot be trusted.
+    writeFileSync(path.join(world.root, RELEASE_PENDING_NAME), '{ "version": "clank.release-pending');
+    const { raised, alarm } = alarms();
+    const result = deferRelease(options, 'the container is not quiet', { now, alarm, log: noop });
+    assert.equal(result.deferred, true);
+    assert.equal(result.alarmed, true);
+    assert.match(result.tracking_broken, /cannot be read/u);
+    assert.deepEqual(raised.map((entry) => entry.reason), ['release-deferred']);
+    assert.match(raised[0].message, /staleness tracking is broken/u);
+    // The record is rewritten, so the next run is tracked again and silent.
+    const quiet = alarms();
+    const next = deferRelease(options, 'the container is not quiet', { now, alarm: quiet.alarm, log: noop });
+    assert.deepEqual(quiet.raised, [], 'a repaired record is tracked, so it waits the day out again');
+    assert.equal(next.tracking_broken, null);
+    // A MISSING record is the ordinary first deferral and must stay silent, or
+    // every first deferral of every new commit pages.
+    rmSync(path.join(world.root, RELEASE_PENDING_NAME));
+    const first = alarms();
+    assert.equal(deferRelease(options, 'the container is not quiet', { now, alarm: first.alarm, log: noop }).alarmed, false);
+    assert.deepEqual(first.raised, []);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('the real seam raises when the pending record is unwritable, and still exits ok', () => {
+  // End to end through `seam`, with nothing injected into deferRelease: the
+  // pending path is a directory, so both the read and the write fail for real.
+  const world = releaseWorld();
+  world.write(ledgerOf('0'.repeat(40)));
+  mkdirSync(path.join(world.root, RELEASE_PENDING_NAME));
+  writeFileSync(path.join(world.root, RELEASE_PENDING_NAME, 'occupied'), 'x');
+  try {
+    const { impl } = recorder('gate', new SeamError('cogsworth wakes in 4 min', 'seam-blocked'));
+    Object.assign(impl, { releaseGate });
+    const { raised, alarm } = alarms();
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm });
+    assert.equal(result.ok, true, 'a bookkeeping fault must not fail the deployment path');
+    assert.equal(result.deferred, true);
+    assert.deepEqual(raised.map((entry) => entry.reason), ['release-deferred']);
+    assert.match(raised[0].message, /staleness tracking is broken/u);
+    assert.ok(DEFER_ALARM_AFTER_MS > 0);
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 
