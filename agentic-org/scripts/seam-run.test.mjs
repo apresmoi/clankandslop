@@ -875,6 +875,50 @@ test('a dirty tree is refused unless the change is a digest rewrite, in the file
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 
+test('the digest rewrites the last bundle left behind do not block the fast-forward', () => {
+  // THE WAY FIX ONE WOULD HAVE STALLED ONE LAYER DOWN. `bundle` rewrites digest
+  // pins into the working tree and nothing commits them, so after every release
+  // the tree is dirty in exactly the files a repin commit touches — and
+  // `git merge --ff-only` refuses to overwrite a locally modified file
+  // ("Your local changes to the following files would be overwritten by merge").
+  // The job would then discover the merge and refuse it, hourly, forever.
+  //
+  // Those rewrites are discarded before the fast-forward, and ONLY the ones the
+  // shape check has just proven to be digest rewrites: `bundle` runs two stages
+  // later and writes them again from the new descriptor, so they are reproducible
+  // by construction rather than work somebody would lose.
+  const world = releaseWorld();
+  const descriptor = path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json');
+  const spawnfile = path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile');
+  try {
+    mkdirSync(path.dirname(spawnfile), { recursive: true });
+    writeFileSync(descriptor, descriptorAt(DIGEST_A, 1644, 12065500));
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_A));
+    world.commit('the descriptor and a declaration');
+
+    // A reviewed repin lands on origin/main, touching the very lines the previous
+    // run left dirty...
+    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999));
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_B));
+    const tip = world.merge('agentic-org/notes.md', 'why the digests moved\n', 'repin');
+    // ...and the last bundle's output is still sitting in the checkout.
+    writeFileSync(descriptor, descriptorAt(`sha256:${'c'.repeat(64)}`, 1800, 12100000));
+    writeFileSync(spawnfile, spawnfileAt(`sha256:${'c'.repeat(64)}`));
+    world.write(ledgerOf('0'.repeat(40)));
+
+    const { calls, impl } = withRealGate();
+    const { raised, alarm } = alarms();
+    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm });
+    assert.deepEqual(raised, [], JSON.stringify(raised));
+    assert.equal(result.ok, true);
+    assert.deepEqual(calls, FULL_ORDER);
+    assert.equal(world.at('HEAD'), tip);
+    // The tree the build will compile is the reviewed commit's, not a mixture.
+    assert.equal(readFileSync(spawnfile, 'utf8'), spawnfileAt(DIGEST_B));
+    assert.equal(execFileSync('git', ['-C', world.repo, 'status', '--porcelain'], { encoding: 'utf8' }).trim(), '');
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
 test('the ledger advances only after settle and runtimeBootstrap have both passed', () => {
   const world = releaseWorld();
   const stale = ledgerOf('0'.repeat(40), 'clank-and-slop:seam-2026-09-01-010101');
