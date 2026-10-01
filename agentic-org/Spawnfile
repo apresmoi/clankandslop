@@ -23,36 +23,62 @@ shared:
         mount: ./state/edition
         mode: mutable
         sharing: team
-      # The day's research corpus, mounted read-only into every member at the
-      # SAME path the private-archive bundle used, so no prompt, RUNBOOK or
-      # desk path changes with this move.
+      # The day's research corpus, mounted into every member at the SAME path the
+      # private-archive bundle used, so no prompt, RUNBOOK or desk path changes.
       #
-      # WHY A VOLUME AND NOT A BUNDLE. A checksum-pinned bundle makes the
-      # corpus part of the image: a new day's research meant a new ~5GB image,
-      # which meant a daily build, which meant the day could be lost to a disk
-      # floor, a build error or a health probe that times out. It was, on
-      # 2026-09-30 and 2026-10-01. The corpus is DATA with a daily cadence and
-      # the code is not; binding them to one digest made the slow thing
-      # hostage to the fast one.
+      # WHY A VOLUME AND NOT A BUNDLE. A checksum-pinned bundle made the corpus
+      # part of the image: a new day's research meant a new ~5GB image, so a
+      # daily build, so a daily chance to lose the day. It has: 2026-09-30 died
+      # at the candidate health probe, 2026-10-01 died at the deploy gate, and
+      # neither had anything to do with journalism. The corpus is DATA on a
+      # daily cadence and the code is not; one digest binding them made the slow
+      # thing hostage to the fast one.
       #
-      # `name` is used verbatim as the host volume name so the host can
-      # populate it: clank-corpus-refresh.service fetches the private repo
-      # OUTSIDE this boundary and swaps a symlink inside the volume. No
-      # network and no credentials ever enter the container, and `readonly`
-      # is enforced by the entrypoint's `chmod -R a-w`, verified on the host:
-      # uid 2000 cannot write a byte of it.
+      # `name` is used verbatim as the host volume name, which is the whole
+      # point: clank-corpus-refresh.service fetches the private repo OUTSIDE
+      # this boundary and swaps a symlink inside `clank-newsroom-corpus`. No
+      # network and no credentials ever enter the container.
       #
-      # Provenance did not disappear with the digest, it MOVED: the volume
+      # WHY `mode: mutable` WHEN THE CORPUS IS READ-ONLY -- read this before
+      # "fixing" it. `mode: readonly` BRICKS THE ORG, verified on the box on
+      # 2026-10-01. The compiler's `mark_readonly_resource` runs
+      # `chmod -R a-w` from /opt/spawnfile/entrypoint.sh, which runs as uid 2000
+      # with an empty capability bounding set; the volume's
+      # `.spawnfile-resource-identity` sentinel is root-owned 0644 and is
+      # deliberately excluded from the startup chown, so that chmod returns
+      # EPERM, and the entrypoint runs under `set -euo pipefail`:
+      #
+      #   $ docker exec --user 2000:2000 ... chmod -R a-w <volume>
+      #   chmod: changing permissions of '.../.spawnfile-resource-identity':
+      #          Operation not permitted            # exit 1 -> container dies
+      #
+      # It would also leave the volume root 0555, and the root ownership guard
+      # refuses to start against a volume root that is not exactly 0755.
+      #
+      # Read-only is therefore enforced where it CAN be: the host refresher
+      # writes the tree 0444/0555 owned 2000:2000 and never grants a write bit,
+      # which is the identical guarantee the readonly BUNDLE gave -- that was
+      # also a uid-2000-owned `a-w` tree, never a `:ro` mount. The refusal is
+      # proved by a test, not by this comment.
+      #
+      # FROZEN FIELDS. `mode`, `sharing` and `name` are hashed into the volume's
+      # identity sentinel and/or its backing path. Changing any one of them
+      # makes a populated volume refuse to start, or silently mints a new empty
+      # volume and strands this one. `mount` is safe to change. `sharing: team`
+      # must stay in THIS file: declared on an agent it would mint twelve
+      # volumes and then fail compile on the duplicate host volume name.
+      #
+      # Provenance did not disappear with the image digest, it MOVED: the volume
       # carries CORPUS.json {commit, ref, edition, fetched_at}, the newsroom
-      # tools read it at call time and refuse a corpus that is missing, empty,
-      # unreadable or not this edition's, and record_assignment binds it into
-      # the edition receipt. That is what proves which evidence backed a
-      # published paper now.
+      # tools read it when Brass commissions and refuse a corpus that is
+      # missing, empty, unreadable or not this edition's, and the identity is
+      # bound into the assignment receipt and carried into the composition. That
+      # is what proves which evidence backed a published paper now.
       - id: research-corpus
         kind: volume
         name: clank-newsroom-corpus
         mount: ./repos/newsroom-private
-        mode: readonly
+        mode: mutable
         sharing: team
 members:
   - { id: klaxon, ref: agents/klaxon }
