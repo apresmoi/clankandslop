@@ -1,14 +1,25 @@
 // The mutating half of the corpus refresh: extract, validate, freeze, land, point
 // the dated links, publish the record, collect the garbage.
 //
-// WHY IT IS ITS OWN MODULE
-// ------------------------
-// corpus-refresh.mjs decides, this file acts, and the split is the point: every
-// decision that reaches here was taken from the host's own record outside the
-// volume (corpus-landed.mjs) or from git, never from a name inside an
-// agent-writable mount. Nothing in this file reads the volume to find out what to
-// do -- it reads it only to assert that what it is about to touch is the real
-// directory the host itself created.
+// WHAT THIS FILE IS ALLOWED TO READ, EXHAUSTIVELY
+// -----------------------------------------------
+// Four things, and this list is the contract:
+//
+//   1. the host's own record outside the volume (`landed`, corpus-landed.mjs);
+//   2. git, through `exec`, in the host's private checkout;
+//   3. the host's clock, as the `now` its caller passes;
+//   4. the volume itself -- ONLY to assert that what it is about to touch is the
+//      real directory the host created, and to list the dated directories inside
+//      a tree it has just extracted from git and not yet made reachable.
+//
+// It reads NOTHING inside the edition-state volume, and nothing at all inside a
+// mount an agent can write to find out what to DO. An earlier version of this
+// comment claimed that while the freeze below counted assignment files in the
+// edition-state docker volume, which the agents can write and delete. A comment
+// that describes a property the code does not have is the most expensive defect
+// this repository produces, because every later reader trusts it instead of the
+// code; the list above is checked by a test that plants and deletes those files
+// and requires the decision to come out identical.
 //
 // Read corpus-volume.mjs before changing anything here: it owns every rule about
 // what may touch the volume and why one careless `chmod -R` bricks the org.
@@ -17,7 +28,7 @@ import { appendFileSync, chmodSync, mkdirSync, readdirSync, renameSync } from 'n
 import path from 'node:path';
 import { CORPUS_IDENTITY_FILE, CorpusError, verifyCorpusFreshness, verifyCorpusTree } from './corpus-contract.mjs';
 import {
-  LANDED_VERSION, buildManifest, commissionedEdition, compareManifest, readManifest, removeManifest,
+  LANDED_VERSION, buildManifest, compareManifest, editionCutoff, editionSettled, readManifest, removeManifest,
   sha256, treeName, writeLanded, writeManifest
 } from './corpus-landed.mjs';
 import { TAMPER_REASON } from './corpus-verify.mjs';
@@ -116,7 +127,7 @@ export function appendRefreshLedger(ledger, entry) {
 }
 
 
-export function swap(options, { commit, edition, ref, now, log, alarm, ledger, ops, exec, landed, previousCommit, outcome, force = false }) {
+export function swap(options, { commit, edition, ref, now, log, alarm, ledger, ops, exec, landed, previousCommit, outcome, heals = {}, force = false }) {
   const volume = options.volume;
   assertTreesDirectory(volume);
   const unexpected = auditVolumeRoot(volume);
@@ -131,20 +142,30 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
   const editions = { ...landed.editions };
   const frozen = [], moved = [];
   for (const date of dates) {
-    const commissioned = commissionedEdition(options.editionState, date);
     const known = editions[date];
-    // Frozen only when the host knows what the newsroom was commissioned
-    // against. With no record there is nothing to hold the date at, and leaving
-    // it unlinked would be no corpus at all rather than a consistent one.
-    if (commissioned.count > 0 && known && known.commit !== commit) {
-      log(`edition ${date} is commissioned against ${(commissioned.commits[0] ?? known.commit).slice(0, 7)}; its corpus is frozen`);
-      editions[date] = { ...known, frozen: { at: isoSeconds(now), assignments: commissioned.count, commits: commissioned.commits } };
+    // THE FREEZE, DECIDED FROM THE HOST RECORD AND THE HOST CLOCK AND NOTHING
+    // ELSE. A date is settled once this host has landed a corpus for it and that
+    // date's own cutoff -- the same `--require-by` instant the missing-branch wait
+    // uses, so there is one idea of when a day is done -- has passed. Before the
+    // cutoff a newer commit still moves the link, which is how research that
+    // arrives through the early morning reaches the reporters. An already recorded
+    // freeze is kept rather than recomputed, so the record says when the host
+    // FIRST froze the date and a later `--require-by` cannot thaw it.
+    //
+    // With no record there is nothing to hold the date at, so a first land always
+    // links: no corpus at all is worse than a stale one.
+    if (known && known.commit !== commit && (known.frozen || editionSettled(date, { now, requireBy: options.requireBy }))) {
+      const frozenAt = known.frozen ?? { at: isoSeconds(now), cutoff: isoSeconds(editionCutoff(date, options.requireBy)), require_by: options.requireBy };
+      log(`edition ${date} is frozen at ${known.commit.slice(0, 7)}: its ${frozenAt.require_by} Europe/Berlin cutoff passed at ${frozenAt.cutoff} with a corpus already landed`);
+      editions[date] = { ...known, frozen: frozenAt };
       frozen.push(date);
       continue;
     }
-    if (commissioned.count > 0 && !known) log(`edition ${date} is commissioned but this host has no record of its corpus; landing ${commit.slice(0, 7)} for it`);
     if (pointAtTree(volume, date, treeLinkTarget(commit, date), { ops, tmpDir: options.staging })) moved.push(date);
-    editions[date] = { commit, tree: `${TREES_DIR}/${commit}`, landed_at: isoSeconds(now) };
+    // A forced re-land of the commit a frozen date already serves keeps the freeze
+    // stamp: the date did not thaw, the same tree was rebuilt under it, and the
+    // record must keep saying when the host first settled it.
+    editions[date] = { commit, tree: `${TREES_DIR}/${commit}`, landed_at: isoSeconds(now), ...(known?.commit === commit && known.frozen ? { frozen: known.frozen } : {}) };
   }
   log(`links moved: ${moved.length} of ${dates.length} dated director${dates.length === 1 ? 'y' : 'ies'}${moved.length ? ` (${moved.slice(-5).join(', ')}${moved.length > 5 ? ', ...' : ''})` : ''}${frozen.length ? `; ${frozen.length} frozen (${frozen.join(', ')})` : ''}`);
 
@@ -166,7 +187,10 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
 
   const trees = [...new Set([...landed.trees, `${TREES_DIR}/${commit}`, ...Object.values(editions).map((entry) => entry.tree)])].sort();
   // Written only now: every volume mutation it describes has already succeeded.
-  writeLanded(options.landed, { version: LANDED_VERSION, editions, trees, identity, noted: null });
+  // `heals` is `{}` unless the caller is the drift repair itself: a genuinely new
+  // commit is a fresh corpus, so whatever was being rewritten under the old tree
+  // stops being this host's problem and auto-repair resumes.
+  writeLanded(options.landed, { version: LANDED_VERSION, editions, trees, identity, noted: null, heals });
 
   // The newly landed tree is spared even when no date references it yet -- a
   // commit whose every date is frozen is still what `corpusLanded` reads as
@@ -179,7 +203,11 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
     alarm(TAMPER_REASON, { edition, message: `${gc.unknown.length} unknown entr(y/ies) under ${TREES_DIR}/`, detail: gc.unknown.join('\n') });
   }
   for (const name of gc.removed) removeManifest(options.landed, name);
-  if (gc.removed.length) writeLanded(options.landed, { version: LANDED_VERSION, editions, trees: trees.filter((tree) => !gc.removed.includes(treeName(tree))), identity, noted: null });
+  if (gc.removed.length) writeLanded(options.landed, {
+    version: LANDED_VERSION, editions, trees: trees.filter((tree) => !gc.removed.includes(treeName(tree))), identity, noted: null,
+    // A collected tree cannot drift any more, so its heal count goes with it.
+    heals: Object.fromEntries(Object.entries(heals).filter(([tree]) => !gc.removed.includes(treeName(tree))))
+  });
 
   appendRefreshLedger(ledger, {
     v: REFRESH_LEDGER_VERSION, at: isoSeconds(now), edition, ref, commit,

@@ -15,6 +15,13 @@ export const EDITION = '2026-09-06';
 export const PRIOR = '2026-09-05';
 export const UNCUT = '2026-09-07';
 export const OWNER = `${process.getuid()}:${process.getgid()}`;
+// A dated corpus freezes once its --require-by cutoff has passed with a corpus
+// already landed, so every test now has to say WHEN it is running. The default
+// clock is before the earliest cutoff in this fixture (09:00 Europe/Berlin on
+// PRIOR), so nothing is frozen unless a test asks for it by passing AFTER_CUTOFF
+// -- 10:00 Berlin on edition day, which is when the newsroom wakes.
+export const BEFORE_CUTOFF = new Date('2026-09-05T05:00:00Z');
+export const AFTER_CUTOFF = new Date('2026-09-06T08:00:00Z');
 // tinkerton sits out, because that is what a real edition looks like: the row
 // counts fall to single digits and a beat with nothing routed to it files
 // nothing. Every test in this suite therefore runs against a corpus with a
@@ -108,23 +115,33 @@ export const cleanup = (fixture) => {
   rmSync(fixture.root, { recursive: true, force: true });
 };
 
+// No `--edition-state`: the refresher does not take the flag any more, because it
+// does not read that volume any more. See `commission` below.
 export const args = (fixture, extra = []) => [
   '--no-fetch', '--no-lock', `--edition=${EDITION}`, `--volume=${fixture.volume}`, `--private=${fixture.priv}`,
-  `--staging=${fixture.staging}`, `--trash=${fixture.trash}`, `--landed=${fixture.landed}`,
-  `--edition-state=${fixture.editionState}`, `--owner=${OWNER}`, ...extra
+  `--staging=${fixture.staging}`, `--trash=${fixture.trash}`, `--landed=${fixture.landed}`, `--owner=${OWNER}`, ...extra
 ];
 // `alarm` defaults to a no-op so a test that does not care about alarms cannot
 // page a real host through raiseDetached; tests that DO care pass their own.
-export const deps = (fixture, extra = {}) => ({ log: () => {}, alarm: () => {}, ledger: fixture.ledger, ...extra });
+export const deps = (fixture, extra = {}) => ({ log: () => {}, alarm: () => {}, now: BEFORE_CUTOFF, ledger: fixture.ledger, ...extra });
 export const identityOf = (fixture) => JSON.parse(readFileSync(join(fixture.volume, 'CORPUS.json'), 'utf8'));
 /** The host's authoritative record — the only thing the refresher is allowed to believe. */
 export const landedOf = (fixture) => JSON.parse(readFileSync(fixture.landed, 'utf8'));
 
-// One assignment record for `edition`, which is what makes an edition
-// COMMISSIONED: Brass has bound this corpus commit into receipts the reporters
-// are already drafting against, so the date's link must stop following the branch.
+// ASSIGNMENT RECORDS, AS THE AGENTS CAN LEAVE THEM
+// ------------------------------------------------
+// These write into the edition-state volume, which is mounted WRITABLE into all
+// twelve agents. The refresher used to count these files to decide whether a date
+// was frozen, which made the freeze agent-answerable in both directions: one
+// planted file froze a date nobody commissioned, and one `rm` thawed a date the
+// reporters were drafting against.
+//
+// They are kept here for exactly one purpose now: proving the freeze decision does
+// not change when they appear, when they are garbage, or when they are deleted.
+const assignmentsDir = (fixture, edition) => join(fixture.editionState, 'editions', edition, 'assignments');
+
 export const commission = (fixture, edition, commit) => {
-  const directory = join(fixture.editionState, 'editions', edition, 'assignments');
+  const directory = assignmentsDir(fixture, edition);
   mkdirSync(directory, { recursive: true });
   writeFileSync(join(directory, 'aaaaaaaa.json'), `${JSON.stringify({
     version: 'clank.assignments.v1', edition, event_key: `schedule:assignment-${edition}`,
@@ -133,6 +150,17 @@ export const commission = (fixture, edition, commit) => {
   }, null, 2)}\n`);
   return commit;
 };
+
+/** The planted file the old count accepted as a commission: not JSON, not a receipt, not from Brass. */
+export const plantAssignment = (fixture, edition) => {
+  const directory = assignmentsDir(fixture, edition);
+  mkdirSync(join(directory, 'bbbbbbbb'), { recursive: true });
+  writeFileSync(join(directory, 'cccccccc.json'), '{not json');
+  writeFileSync(join(directory, 'bbbbbbbb', '1.json'), `${JSON.stringify({ corpus: { commit: 'f'.repeat(40), edition } })}\n`);
+};
+
+/** Everything an agent can delete to make a commissioned edition look uncommissioned. */
+export const uncommission = (fixture, edition) => rmSync(assignmentsDir(fixture, edition), { recursive: true, force: true });
 export const ledgerOf = (fixture) => readFileSync(fixture.ledger, 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
 
 /** Every path in the volume with its kind, mtime and contents — the evidence that a no-op wrote nothing. */

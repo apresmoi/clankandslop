@@ -13,7 +13,10 @@ import { CorpusError } from './corpus-contract.mjs';
 import { TREES_DIR, hostExec } from './corpus-volume.mjs';
 import { CORPUS_ALARM_REASONS, REFUSAL_REASON, TAMPER_REASON } from './corpus-verify.mjs';
 import { main, refresh } from './corpus-refresh.mjs';
-import { EDITION, PRIOR, UNCUT, args, cleanup, commission, commitAll, deps, fixture, identityOf, landedOf, ledgerOf, snapshot, writeCorpus } from './corpus-refresh.fixture.mjs';
+import {
+  AFTER_CUTOFF, BEFORE_CUTOFF, EDITION, PRIOR, UNCUT, args, cleanup, commission, commitAll, deps, fixture,
+  identityOf, landedOf, ledgerOf, plantAssignment, snapshot, uncommission, writeCorpus
+} from './corpus-refresh.fixture.mjs';
 
 const CORPUS = 'CORPUS.json';
 const storyFile = (f, edition = EDITION) => join(f.volume, TREES_DIR, landedOf(f).editions[edition].commit, edition, 'stories', 's-11111111.md');
@@ -119,64 +122,130 @@ test('a trees symlink stops the refresher dead and deletes nothing it points at'
   } finally { try { unlinkSync(join(f.volume, TREES_DIR)); } catch { /* the symlink was never created */ } cleanup(f); }
 });
 
-// FIX 3. Brass binds a corpus commit into every assignment receipt. Move the link
+// ONCE A DATE IS SETTLED ITS CORPUS IS FROZEN, AND THE HOST DECIDES WHEN
+// ---------------------------------------------------------------------
+// Brass binds a corpus commit into every assignment receipt. Move the link
 // afterwards and the receipt cites research nobody read, and one reporter can
 // resolve a desk index from one commit and a story file from another.
-test('a commissioned edition keeps its corpus; an uncommissioned one follows the branch', () => {
+//
+// The gate used to be "does this edition have assignment records", counted in the
+// edition-state docker volume. The next test is why it is a clock now. This one is
+// the behaviour that has to survive the change: the new tree still lands, dates
+// whose cutoff has not passed still move, a frozen tree is never collected, and the
+// steady state is a no-op rather than a re-land every two minutes.
+test('a settled date keeps its corpus; a date whose cutoff has not passed follows the branch', () => {
   const f = fixture();
   try {
+    // UNCUT is tomorrow from AFTER_CUTOFF's point of view, so it is the date that
+    // must still move while today's and yesterday's are frozen.
+    writeCorpus(f.priv, UNCUT, 'tomorrow, first cut');
+    commitAll(f.priv, 'research: tomorrow');
     const first = refresh(args(f), deps(f));
-    commission(f, EDITION, first.commit);
-    writeCorpus(f.priv, EDITION, 'RESEARCH THAT ARRIVED AFTER THE LINEUP WAS RECORDED');
+    writeCorpus(f.priv, EDITION, 'RESEARCH THAT ARRIVED AFTER THE DEADLINE');
     writeCorpus(f.priv, PRIOR, 'and a correction to yesterday');
-    const second = commitAll(f.priv, 'research: after commissioning');
+    writeCorpus(f.priv, UNCUT, 'tomorrow, second cut');
+    const second = commitAll(f.priv, 'research: after the cutoff');
 
     const lines = [];
-    const result = refresh(args(f), deps(f, { log: (line) => lines.push(line) }));
+    const result = refresh(args(f), deps(f, { now: AFTER_CUTOFF, log: (line) => lines.push(line) }));
     // A success, not a failure: refusing the whole run would deadlock the refresher
     // for the rest of the day, every two minutes, for a corpus that is correct.
     assert.equal(result.changed, true);
     assert.equal(result.frozen, true);
-    assert.ok(lines.some((line) => line === `edition ${EDITION} is commissioned against ${first.commit.slice(0, 7)}; its corpus is frozen`), lines.join(' | '));
+    assert.ok(lines.some((line) => line.startsWith(`edition ${EDITION} is frozen at ${first.commit.slice(0, 7)}:`) && line.includes('09:00 Europe/Berlin cutoff passed at 2026-09-06T07:00:00Z')),
+      lines.join(' | '));
 
-    assert.equal(readlinkSync(join(f.volume, EDITION)), `${TREES_DIR}/${first.commit}/${EDITION}`, "the commissioned edition's link must not move");
+    assert.equal(readlinkSync(join(f.volume, EDITION)), `${TREES_DIR}/${first.commit}/${EDITION}`, "the settled edition's link must not move");
     assert.match(readFileSync(join(f.volume, EDITION, 'grok', 'grok-rolling-0730.md'), 'utf8'), /EDITION BRANCH RESEARCH/u);
-    // The new tree still LANDS, and every other date still moves.
-    assert.ok(existsSync(join(f.volume, TREES_DIR, second)), 'the new tree must land even though one date is frozen');
-    assert.equal(readlinkSync(join(f.volume, PRIOR)), `${TREES_DIR}/${second}/${PRIOR}`, 'a date with no assignments follows the branch');
+    // The new tree still LANDS, and a date that is not settled yet still moves.
+    assert.ok(existsSync(join(f.volume, TREES_DIR, second)), 'the new tree must land even though two dates are frozen');
+    assert.equal(readlinkSync(join(f.volume, UNCUT)), `${TREES_DIR}/${second}/${UNCUT}`, "a date whose cutoff is still ahead must follow the branch");
+    assert.equal(readlinkSync(join(f.volume, PRIOR)), `${TREES_DIR}/${first.commit}/${PRIOR}`, 'yesterday is settled too, and does not move either');
     // Provenance stays truthful: CORPUS.json describes what is mounted.
     assert.equal(identityOf(f).commit, first.commit, 'CORPUS.json must not name a commit the frozen edition does not serve');
-    assert.deepEqual(ledgerOf(f).at(-1).frozen_editions, [EDITION]);
-    assert.deepEqual(landedOf(f).editions[EDITION].frozen.commits, [first.commit]);
+    assert.deepEqual(ledgerOf(f).at(-1).frozen_editions, [PRIOR, EDITION]);
+    // The record carries the host's own justification, so the freeze is auditable
+    // without re-deriving it from anything.
+    assert.deepEqual(landedOf(f).editions[EDITION].frozen, { at: '2026-09-06T08:00:00Z', cutoff: '2026-09-06T07:00:00Z', require_by: '09:00' });
 
     // And the frozen tree is never collected, whatever --keep says.
-    writeCorpus(f.priv, EDITION, 'a third producer run');
+    writeCorpus(f.priv, UNCUT, 'tomorrow, third cut');
     const third = commitAll(f.priv, 'research: third');
     // The intermediate tree nothing references goes; the FROZEN one never does,
     // whatever --keep says, because twelve reporters are reading it right now.
-    const swept = refresh(args(f, ['--keep=0']), deps(f));
+    const swept = refresh(args(f, ['--keep=0']), deps(f, { now: AFTER_CUTOFF }));
     assert.deepEqual(swept.treesRemoved, [second], 'a tree no date resolves into and nothing is frozen at is collectable');
     assert.ok(existsSync(join(f.volume, TREES_DIR, first.commit, EDITION, 'desks', 'foreman.index')), "a frozen edition's tree is never garbage");
     assert.equal(readlinkSync(join(f.volume, EDITION)), `${TREES_DIR}/${first.commit}/${EDITION}`);
-    assert.equal(readlinkSync(join(f.volume, PRIOR)), `${TREES_DIR}/${third}/${PRIOR}`);
+    assert.equal(readlinkSync(join(f.volume, UNCUT)), `${TREES_DIR}/${third}/${UNCUT}`);
 
     // The frozen state is a stable no-op, not a run that re-lands forever.
     const before = snapshot(f.volume);
-    const quiet = refresh(args(f), deps(f));
+    const quiet = refresh(args(f), deps(f, { now: AFTER_CUTOFF }));
     assert.deepEqual([quiet.current, quiet.changed, quiet.frozen], [true, false, true]);
     assert.deepEqual(snapshot(f.volume), before);
   } finally { cleanup(f); }
 });
 
-test('an edition commissioned before this host landed anything is served rather than left dark', () => {
+// THE DEFECT THAT SURVIVED TWO ROUNDS OF REVIEW
+// --------------------------------------------
+// The freeze gate counted `*.json` files under `editions/<date>/assignments/` in
+// the edition-state docker volume. That volume is mounted WRITABLE into all twelve
+// agents, so the decision was theirs in both directions, and both were reproduced:
+//
+//   * a file containing the literal `{not json` counted as a commission, which
+//     freezes a date nobody commissioned and denies the newsroom its refresh;
+//   * deleting the real records dropped the count to zero, which dropped the
+//     `frozen` field and let the corpus move under an edition that genuinely was
+//     commissioned -- the exact thing the freeze exists to prevent.
+//
+// Validating the JSON would have closed neither. So the question is not asked any
+// more, and this is the test that says so: the same scenario, run with nothing
+// planted, with real records, with garbage, and with records planted and then
+// deleted, must produce one identical decision.
+const freezeDecision = (plant, now) => {
   const f = fixture();
   try {
-    commission(f, EDITION, 'c'.repeat(40));
-    const lines = [];
-    assert.equal(refresh(args(f), deps(f, { log: (line) => lines.push(line) })).changed, true);
-    assert.ok(lines.some((line) => /is commissioned but this host has no record/u.test(line)), lines.join(' | '));
-    assert.equal(readlinkSync(join(f.volume, EDITION)), `${TREES_DIR}/${f.commit}/${EDITION}`, 'no corpus at all is worse than one whose receipt must be re-cut');
+    const first = refresh(args(f), deps(f));
+    plant(f, first.commit);
+    writeCorpus(f.priv, EDITION, 'RESEARCH THAT ARRIVED AFTER THE LINEUP WAS RECORDED');
+    const second = commitAll(f.priv, 'research: after the lineup');
+    const result = refresh(args(f), deps(f, { now }));
+    const names = { [first.commit]: 'first', [second]: 'second' };
+    const entry = landedOf(f).editions[EDITION];
+    return {
+      changed: result.changed, frozen: result.frozen,
+      link: names[readlinkSync(join(f.volume, EDITION)).slice(`${TREES_DIR}/`.length, `${TREES_DIR}/`.length + 40)] ?? 'other',
+      identity: names[identityOf(f).commit] ?? 'other', serving: names[entry.commit] ?? 'other',
+      recorded: entry.frozen ?? null, ledger: ledgerOf(f).at(-1).frozen_editions
+    };
   } finally { cleanup(f); }
+};
+
+test('the freeze decision reads nothing inside either docker volume: planting or deleting assignment records cannot move it', () => {
+  const plants = [
+    ['nothing planted at all', () => {}],
+    ['the real assignment records Brass writes', (f, commit) => commission(f, EDITION, commit)],
+    ['a planted file that is not even JSON', (f) => plantAssignment(f, EDITION)],
+    ['records planted and then deleted again', (f, commit) => { commission(f, EDITION, commit); plantAssignment(f, EDITION); uncommission(f, EDITION); }]
+  ];
+  for (const now of [BEFORE_CUTOFF, AFTER_CUTOFF]) {
+    const decisions = plants.map(([, plant]) => freezeDecision(plant, now));
+    for (const [index, [name]] of plants.entries()) {
+      assert.deepEqual(decisions[index], decisions[0], `${name} changed the freeze decision at ${now.toISOString()}`);
+    }
+  }
+
+  // VACUITY GUARD. The four runs above agreeing proves nothing unless the clock --
+  // the one input that IS the host's -- really decides. These two must disagree, and
+  // in this direction: research reaches the reporters until the cutoff, and after it
+  // the date keeps what it had.
+  const before = freezeDecision(() => {}, BEFORE_CUTOFF);
+  const after = freezeDecision(() => {}, AFTER_CUTOFF);
+  assert.deepEqual([before.frozen, before.link, before.serving, before.ledger], [false, 'second', 'second', []]);
+  assert.deepEqual([after.frozen, after.link, after.serving], [true, 'first', 'first']);
+  assert.deepEqual(after.ledger, [PRIOR, EDITION]);
+  assert.equal(after.recorded.cutoff, '2026-09-06T07:00:00Z');
 });
 
 // FIX 4. The mount is agent-writable and nothing can change that, so the only
@@ -232,6 +301,143 @@ test('a file left writable, a file added and a file removed inside the corpus ar
       assert.equal(statSync(storyFile(f)).mode & 0o222, 0, `${name}: the healed tree is writable again`);
     } finally { cleanup(f); }
   }
+});
+
+// AUTO-REPAIR CAN BE DRIVEN, SO IT HAS TO BE BOUNDED
+// -------------------------------------------------
+// An agent can `chmod u+w` a directory it owns inside the frozen tree, dirty one
+// file, and make the next two-minute poll re-extract the whole tree through `git
+// archive`. Repeated indefinitely that is a CPU and IO drain on the production
+// host, self-inflicted by the heal loop. Healing a one-off is right; absorbing a
+// driven loop in silence is not.
+const dirty = (f) => withWritable(storyFile(f), () => writeFileSync(storyFile(f), 'tampered\n'));
+
+test('a driven drift loop is healed up to the limit and then stood down, leaving the mount alone', () => {
+  const f = fixture();
+  try {
+    const first = refresh(args(f), deps(f));
+    const tree = `${TREES_DIR}/${first.commit}`;
+    const alarms = [], lines = [];
+    const run = () => main(args(f), deps(f, { log: (line) => lines.push(line), alarm: (reason, detail) => alarms.push([reason, detail]) }));
+
+    for (const cycle of [1, 2, 3]) {
+      dirty(f);
+      assert.equal(run(), 0, `cycle ${cycle} must still be a success`);
+      assert.equal(readFileSync(storyFile(f), 'utf8'), '# s-11111111\n', `cycle ${cycle} must still heal from git`);
+      assert.equal(landedOf(f).heals[tree].cycles, cycle, 'the host counts the cycles in its own record, outside every volume');
+    }
+    assert.equal(landedOf(f).heals[tree].since, landedOf(f).heals[tree].since, 'the record says when the loop started');
+    assert.equal(alarms.length, 3, 'each repair is new and pages');
+
+    // The fourth drift is the one the host refuses to chase.
+    dirty(f);
+    assert.equal(run(), 0, 'the stand-down has already paged; a non-zero exit adds the unit OnFailure page every two minutes on top');
+    assert.equal(readFileSync(storyFile(f), 'utf8'), 'tampered\n', 'auto-repair must have stood down rather than re-extracting a fourth time');
+    assert.ok(lines.some((line) => /^auto-repair suspended for /u.test(line)), lines.join(' | '));
+    assert.equal(landedOf(f).heals[tree].cycles, 3, 'and must not go on counting cycles it is no longer performing');
+    assert.match(landedOf(f).heals[tree].suspended, /^\d{4}-\d\d-\d\dT/u);
+
+    const suspension = alarms.slice(3);
+    assert.equal(suspension.length, 1, 'the stand-down reaches a person, or a corpus nobody repairs is also a corpus nobody is told about');
+    assert.equal(suspension[0][0], TAMPER_REASON);
+    assert.match(suspension[0][1].message, /auto-repair suspended/u);
+    // A page that does not say how to resume is a page that strands the newsroom.
+    assert.match(suspension[0][1].detail, /resumes by itself as soon as a new commit lands/u);
+    assert.match(suspension[0][1].detail, /"heals"/u);
+    assert.ok(suspension[0][1].detail.includes(f.landed), suspension[0][1].detail);
+
+    // And then it goes quiet: ~700 pages a day about a state only an operator can
+    // clear is how the word stops meaning anything.
+    for (const poll of [1, 2, 3]) assert.equal(run(), 0, `poll ${poll}`);
+    assert.equal(alarms.length, 4, `a suspended tree must page once, not once per poll: ${alarms.map(([, d]) => d.message).join(' | ')}`);
+
+    // A NEW commit is a fresh corpus, so the counter clears and auto-repair resumes.
+    writeCorpus(f.priv, EDITION, 'a later producer run');
+    const next = commitAll(f.priv, 'research: later');
+    assert.equal(refresh(args(f), deps(f)).commit, next);
+    assert.deepEqual(landedOf(f).heals, {}, 'a new commit must clear the counter');
+    dirty(f);
+    assert.equal(run(), 0);
+    assert.equal(readFileSync(storyFile(f), 'utf8'), '# s-11111111\n', 'and the next drift is healed again');
+  } finally { cleanup(f); }
+});
+
+test('--heal-limit sets the ceiling, and a clean sweep clears the counter', () => {
+  const f = fixture();
+  try {
+    const first = refresh(args(f), deps(f));
+    const tree = `${TREES_DIR}/${first.commit}`;
+    const once = args(f, ['--heal-limit=1']);
+
+    dirty(f);
+    assert.equal(main(once, deps(f)), 0);
+    assert.equal(readFileSync(storyFile(f), 'utf8'), '# s-11111111\n', 'the first drift is always healed');
+    assert.equal(landedOf(f).heals[tree].cycles, 1);
+
+    // A clean poll is the only evidence that whatever was rewriting the mount has
+    // stopped, so it is what clears the count -- and it must not cost the no-op path
+    // a write once there is nothing left to clear.
+    assert.equal(main(once, deps(f)), 0);
+    assert.deepEqual(landedOf(f).heals, {});
+    const settled = landedOf(f);
+    assert.equal(main(once, deps(f)), 0);
+    assert.deepEqual(landedOf(f), settled, 'a clean sweep with nothing to clear must write nothing at all');
+
+    // So the ceiling is per consecutive run of drift, not per lifetime.
+    dirty(f);
+    assert.equal(main(once, deps(f)), 0);
+    assert.equal(readFileSync(storyFile(f), 'utf8'), '# s-11111111\n');
+    dirty(f);
+    assert.equal(main(once, deps(f)), 0);
+    assert.equal(readFileSync(storyFile(f), 'utf8'), 'tampered\n', '--heal-limit=1 means one reland before standing down');
+    // An operator clearing the entry by hand resumes it immediately.
+    writeFileSync(f.landed, `${JSON.stringify({ ...landedOf(f), heals: {} }, null, 2)}\n`);
+    assert.equal(main(once, deps(f)), 0);
+    assert.equal(readFileSync(storyFile(f), 'utf8'), '# s-11111111\n', 'clearing heals by hand must be the documented resume, and must work');
+  } finally { cleanup(f); }
+});
+
+// An unknown name under trees/ is reported and never deleted, which is right -- and
+// which means a planted directory holds host disk indefinitely while the report is
+// acknowledged and goes quiet. "Reported" must not be able to mean "nobody will
+// ever look".
+test('an unknown tree is never deleted, but a footprint over the limit pages again', () => {
+  const f = fixture();
+  try {
+    refresh(args(f), deps(f));
+    const planted = join(f.volume, TREES_DIR, 'd'.repeat(40));
+    mkdirSync(planted, { recursive: true });
+    writeFileSync(join(planted, 'blob'), 'x'.repeat(3 * 1024 * 1024));
+
+    const first = [];
+    assert.equal(main(args(f), deps(f, { alarm: (reason, detail) => first.push([reason, detail]) })), 0);
+    assert.equal(first.length, 1, 'a name this host did not land is reported');
+    const quiet = [];
+    assert.equal(main(args(f), deps(f, { alarm: (reason) => quiet.push(reason) })), 0);
+    assert.deepEqual(quiet, [], 'and then acknowledged, because it is never deleted and would otherwise page forever');
+
+    // Same name, same acknowledgement -- but now it is over what this host will
+    // absorb, which is a different fact and has to page on its own.
+    const escalated = [];
+    assert.equal(main(args(f, ['--unknown-mib=2']), deps(f, { alarm: (reason, detail) => escalated.push([reason, detail]) })), 0);
+    assert.equal(escalated.length, 1);
+    assert.equal(escalated[0][0], TAMPER_REASON);
+    assert.match(escalated[0][1].detail, /occupying 3 MiB, over the 2 MiB this host will absorb/u);
+    assert.ok(existsSync(join(planted, 'blob')), 'it still must not be deleted: that would destroy the evidence of who writes this mount');
+
+    // A planted SYMLINK is counted as one entry and never followed. Measuring
+    // through a name an agent chose is how a root-run walk ends up reading /etc, so
+    // the bait here is 10 MiB: a walk that follows the link measures 13 MiB and
+    // escalates, and a walk that lstats it measures 3 MiB and does not.
+    const bait = join(f.root, 'bait');
+    mkdirSync(bait, { recursive: true });
+    writeFileSync(join(bait, 'big'), 'y'.repeat(10 * 1024 * 1024));
+    symlinkSync(bait, join(f.volume, TREES_DIR, 'e'.repeat(40)));
+    const linked = [];
+    assert.equal(main(args(f, ['--unknown-mib=4']), deps(f, { alarm: (reason, detail) => linked.push([reason, detail]) })), 0);
+    assert.deepEqual(linked.filter(([, detail]) => /MiB, over the 4 MiB/u.test(detail.detail)).map(([, detail]) => detail.detail), []);
+    assert.equal(existsSync(join(bait, 'big')), true);
+  } finally { cleanup(f); }
 });
 
 test('a forged CORPUS.json and a redirected dated link are detected and restored without re-extracting', () => {

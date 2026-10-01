@@ -43,6 +43,29 @@
 # exactly where it was. The newsroom's own read-time check then refuses to
 # commission against a corpus that is not today's, so a silent stale day is not
 # reachable from here.
+#
+# WHAT OnFailure= DOES AND DOES NOT COVER
+# ---------------------------------------
+# This unit runs every couple of minutes, so a non-zero exit is not one page, it
+# is ~700 a day -- and a pager that cries that often is a pager nobody reads. The
+# script therefore exits 0 for states that are already accounted for and that a
+# repeat exit code would only re-announce:
+#
+#   * WAITING for edition/<today> before the --require-by deadline (nothing is
+#     wrong; the producers have not pushed yet);
+#   * a FROZEN date, whose corpus is deliberately not following the branch
+#     because that date's --require-by cutoff has passed;
+#   * a SUSPENDED tree, where the mounted corpus has been rewritten and
+#     re-landed --heal-limit times, auto-repair has stood down rather than keep
+#     re-extracting it on demand, and the corpus-tampered page has already been
+#     raised once carrying the reason and the resume path.
+#
+# So OnFailure= here means "the refresh could not be done at all". Tampering,
+# drift and a stood-down repair reach a human through clank-alarm's own
+# corpus-tampered page, NOT through this unit's failure handler. `--check` is the
+# other direction: it writes nothing and exits non-zero whenever the mounted
+# corpus is not what the host landed, suspension included, so an operator asking
+# "is the corpus right?" is never told yes by this suppression.
 [Unit]
 Description=Refresh the newsroom research corpus volume from the private repo
 After=network-online.target docker.service

@@ -61,14 +61,23 @@
 // date is a bad edition; a desk index pointing at a story file that does not
 // exist is no edition at all.
 //
-// ONCE AN EDITION IS COMMISSIONED, ITS CORPUS IS FROZEN
-// ----------------------------------------------------
+// ONCE A DATE IS SETTLED, ITS CORPUS IS FROZEN -- ON THE HOST'S OWN CLOCK
+// ----------------------------------------------------------------------
 // Brass binds a corpus commit into every assignment receipt. Moving that date's
 // link afterwards makes the receipt cite research nobody read, and lets one
 // reporter resolve a desk index from one commit and a story file from another.
-// So a date with assignment records does not follow the branch: the new tree
-// still lands, other dates still move, and the run is a SUCCESS that says the
-// edition is frozen.
+// So a date this host has landed stops following the branch once that date's
+// `--require-by` cutoff has passed: the new tree still lands, other dates still
+// move, and the run is a SUCCESS that says the edition is frozen.
+//
+// The gate is deliberately NOT "has the newsroom commissioned this edition". That
+// question can only be answered by counting assignment records inside the
+// edition-state docker volume, which the twelve agents can write AND delete -- so
+// one planted file could freeze a date nobody commissioned and one `rm` could thaw
+// a date the reporters were drafting against. Both were reproduced. The cutoff is
+// a question the host answers from its own record and its own clock, and it is
+// wrong in the safe direction: a spurious freeze keeps an edition on the corpus it
+// already had, while a spurious thaw moves research under reporters mid-draft.
 //
 // RUN IT OFTEN
 // ------------
@@ -87,8 +96,6 @@
 //     --private=<path>      the private corpus checkout to extract from
 //     --landed=<path>       the host's authoritative record of what it landed;
 //                           root-owned 0600, NEVER inside the volume
-//     --edition-state=<path> host-visible root of the edition-state volume,
-//                           read to see which editions are commissioned
 //     --staging=<path>      where trees are extracted and validated; must be
 //                           OUTSIDE the volume and on the same filesystem
 //     --trash=<path>        where retired trees are deleted, same constraints
@@ -96,6 +103,12 @@
 //     --owner=<uid:gid>     owner for everything written
 //     --require-by=HH:MM    Europe/Berlin time by which edition/<today> must
 //                           exist; before it, a missing branch is a logged wait
+//                           and a landed date may still follow the branch. After
+//                           it, that date's corpus is frozen.
+//     --heal-limit=<n>      consecutive drift-and-reland cycles for one tree
+//                           before auto-repair stands down and pages
+//     --unknown-mib=<n>     how much disk unknown names under trees/ may occupy
+//                           before "reported" escalates to a page
 //     --lock=<path>         the flock(2) path this run serializes on
 //     --no-lock             skip locking (tests only)
 //     --no-fetch            resolve from refs already in the local checkout
@@ -108,10 +121,13 @@ import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { CORPUS_IDENTITY_FILE, CorpusError, EDITION_PATTERN, berlinToday, resolveRef } from './corpus-contract.mjs';
-import { buildManifest, corpusLanded, emptyLanded, readLanded, sha256, writeLanded, writeManifest } from './corpus-landed.mjs';
+import {
+  HEAL_SUSPEND_AFTER, berlinHourMinute, buildManifest, bumpHeal, corpusLanded, emptyLanded,
+  readLanded, sha256, writeLanded, writeManifest
+} from './corpus-landed.mjs';
 import { swap } from './corpus-swap.mjs';
-import { REFUSAL_REASON, TAMPER_REASON, integritySweep } from './corpus-verify.mjs';
-import { assertSameDevice, assertVolumeRoot, hostExec, pointAtTree, SYMLINK_OPS, writeIdentity } from './corpus-volume.mjs';
+import { DEFAULT_UNKNOWN_MIB, REFUSAL_REASON, TAMPER_REASON, integritySweep } from './corpus-verify.mjs';
+import { assertSameDevice, assertVolumeRoot, hostExec, isoSeconds, pointAtTree, SYMLINK_OPS, writeIdentity } from './corpus-volume.mjs';
 
 export const DEFAULT_VOLUME = '/var/lib/docker/volumes/clank-newsroom-corpus/_data';
 export const DEFAULT_PRIVATE = '/root/work/clankandslop/clankandslop-private';
@@ -122,9 +138,6 @@ export const DEFAULT_TRASH = `${DEFAULT_WORK}/trash`;
 // path is the whole of FIX 1: the host's truth cannot live where twelve agents
 // can rewrite it.
 export const DEFAULT_LANDED = `${DEFAULT_WORK}/landed.json`;
-// The edition-state volume as the HOST sees it. Read-only, and its absence means
-// "nothing commissioned" rather than an error, so a fresh box still refreshes.
-export const DEFAULT_EDITION_STATE = '/var/lib/docker/volumes/clank-edition-state/_data';
 export const DEFAULT_LOCK = '/run/lock/clank-corpus-refresh.lock';
 export const REFRESH_LEDGER = `${DEFAULT_WORK}/refresh.jsonl`;
 // The host's `clank` user is 2000:2000, the same uid the agents run as.
@@ -136,15 +149,12 @@ export const DEFAULT_REQUIRE_BY = '09:00';
 
 const fail = (message) => { throw new CorpusError(message); };
 
-const berlinClock = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-/** Wall-clock HH:MM in Europe/Berlin; zero-padded, so a plain string compare orders it. */
-export const berlinHourMinute = (now = new Date()) => berlinClock.format(now);
-
 export function corpusRefreshArgs(argv) {
   const options = {
     edition: null, ref: null, volume: DEFAULT_VOLUME, private: DEFAULT_PRIVATE, landed: DEFAULT_LANDED,
-    editionState: DEFAULT_EDITION_STATE, staging: DEFAULT_STAGING, trash: DEFAULT_TRASH, lock: DEFAULT_LOCK,
-    keep: DEFAULT_KEEP, owner: DEFAULT_OWNER, requireBy: DEFAULT_REQUIRE_BY, fetch: true, verify: true, check: false
+    staging: DEFAULT_STAGING, trash: DEFAULT_TRASH, lock: DEFAULT_LOCK, keep: DEFAULT_KEEP, owner: DEFAULT_OWNER,
+    requireBy: DEFAULT_REQUIRE_BY, healLimit: HEAL_SUSPEND_AFTER, unknownMib: DEFAULT_UNKNOWN_MIB,
+    fetch: true, verify: true, check: false
   };
   for (const arg of argv) {
     const [key, ...rest] = arg.startsWith('--') ? arg.slice(2).split('=') : [null];
@@ -154,7 +164,6 @@ export function corpusRefreshArgs(argv) {
     else if (key === 'volume' && value) options.volume = path.resolve(value);
     else if (key === 'private' && value) options.private = path.resolve(value);
     else if (key === 'landed' && value) options.landed = path.resolve(value);
-    else if (key === 'edition-state' && value) options.editionState = path.resolve(value);
     else if (key === 'staging' && value) options.staging = path.resolve(value);
     else if (key === 'trash' && value) options.trash = path.resolve(value);
     else if (key === 'lock' && value) options.lock = path.resolve(value);
@@ -162,6 +171,8 @@ export function corpusRefreshArgs(argv) {
     else if (key === 'keep' && value) options.keep = Number(value);
     else if (key === 'owner' && value) options.owner = value;
     else if (key === 'require-by' && value) options.requireBy = value;
+    else if (key === 'heal-limit' && value) options.healLimit = Number(value);
+    else if (key === 'unknown-mib' && value) options.unknownMib = Number(value);
     else if (key === 'no-fetch') options.fetch = false;
     else if (key === 'no-verify') options.verify = false;
     else if (key === 'check') options.check = true;
@@ -171,6 +182,10 @@ export function corpusRefreshArgs(argv) {
   if (!Number.isInteger(options.keep) || options.keep < 0) fail(`--keep must be a non-negative integer, got ${options.keep}`);
   if (!/^\d+:\d+$/.test(options.owner)) fail(`--owner must be <uid>:<gid>, got ${options.owner}`);
   if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(options.requireBy)) fail(`--require-by must be HH:MM in 24-hour Europe/Berlin time, got ${options.requireBy}`);
+  // A zero heal limit would suspend auto-repair before it ever repaired anything,
+  // which is a corpus that never heals dressed up as a safety feature.
+  if (!Number.isInteger(options.healLimit) || options.healLimit < 1) fail(`--heal-limit must be a positive integer, got ${options.healLimit}`);
+  if (!Number.isFinite(options.unknownMib) || options.unknownMib < 0) fail(`--unknown-mib must be a non-negative number, got ${options.unknownMib}`);
   // The record must never be reachable from inside the volume, whatever anyone
   // passes: a landed.json an agent can rewrite is the defect this file exists to
   // close, and it would be a silent one.
@@ -256,22 +271,46 @@ export function refresh(argv = [], { now = new Date(), log = console.log, alarm 
 // NAME is reported and left exactly where it is, because deleting it would
 // destroy the only evidence of who else is writing the mount.
 function sweepAndHeal(options, { commit, edition, ref, now, log, alarm, ledger, ops, exec, landed, outcome }) {
-  const sweep = integritySweep({ volume: options.volume, landed, landedFile: options.landed, edition, privateRepo: options.private, exec });
-  if (!sweep.findings.length) return outcome;
+  const sweep = integritySweep({ volume: options.volume, landed, landedFile: options.landed, edition, privateRepo: options.private, exec, unknownMib: options.unknownMib });
+  if (!sweep.findings.length) return acknowledgeClean(options, { landed, outcome });
   for (const finding of sweep.findings) log(`TAMPER: ${finding}`);
   const digest = sha256(sweep.findings.join('\n'));
+
+  // AUTO-REPAIR IS BOUNDED, BECAUSE IT CAN BE DRIVEN
+  // ------------------------------------------------
+  // An agent can `chmod u+w` a directory it owns inside the frozen tree, dirty one
+  // file, and make the next poll re-extract ~4660 files through `git archive`.
+  // Repeated every two minutes that is a CPU and IO drain on the production host,
+  // self-inflicted by this loop. Healing a one-off is right; absorbing a driven
+  // loop silently is not, so the host counts the cycles per tree in its own record
+  // and stands down after `--heal-limit` of them.
+  const tree = sweep.drift?.tree ?? null;
+  const healed = tree ? landed.heals?.[tree] ?? null : null;
+  const suspended = Boolean(healed) && healed.cycles >= options.healLimit;
+
   // Unexpected names persist by design (they are never deleted), so paging about
-  // the same set every two minutes would teach whoever carries the pager to
-  // ignore the word. Anything repairable alarms every time, because it is new.
-  if (sweep.tampered || landed.noted !== digest) {
-    alarm(TAMPER_REASON, { edition, message: `corpus volume tampered: ${sweep.findings[0]}`, detail: sweep.findings.join('\n') });
+  // the same set every two minutes would teach whoever carries the pager to ignore
+  // the word. Anything repairable alarms every time, because it is new -- except
+  // once auto-repair has stood down, where "every time" is ~700 pages a day about a
+  // state only an operator can clear. There the stand-down pages once, and a
+  // CHANGED finding set pages again.
+  if (suspended ? !healed.suspended || landed.noted !== digest : sweep.tampered || landed.noted !== digest) {
+    alarm(TAMPER_REASON, suspended
+      ? { edition, message: `corpus auto-repair suspended: ${tree.slice(0, 13)} has been rewritten and re-landed ${healed.cycles} times`, detail: suspensionDetail(options, { tree, healed, sweep }) }
+      : { edition, message: `corpus volume tampered: ${sweep.findings[0]}`, detail: sweep.findings.join('\n') });
   }
-  const result = { ...outcome, findings: sweep.findings, tampered: sweep.tampered };
+  const result = { ...outcome, findings: sweep.findings, tampered: sweep.tampered, suspended };
   if (options.check) return { ...result, current: !sweep.tampered };
+  if (suspended) {
+    log(`auto-repair suspended for ${tree.slice(0, 13)}: ${healed.cycles} drift-and-reland cycles since ${healed.since}, limit ${options.healLimit}. The last good tree is left exactly where it is.`);
+    writeLanded(options.landed, { ...landed, noted: digest, heals: { ...landed.heals, [tree]: { ...healed, suspended: healed.suspended ?? isoSeconds(now) } } });
+    return { ...result, current: false, changed: false };
+  }
   prepareWorkRoots(options);
   if (sweep.drift) {
     log(`re-landing ${sweep.drift.tree.slice(0, 13)} from git so the newsroom heals itself`);
-    return { ...swap(options, { commit: sweep.drift.commit, edition, ref, now, log, alarm, ledger, ops, exec, landed, previousCommit: outcome.previousCommit, outcome: result, force: true }), findings: sweep.findings, tampered: true };
+    const heals = bumpHeal(landed.heals, sweep.drift.tree, { at: isoSeconds(now) });
+    return { ...swap(options, { commit: sweep.drift.commit, edition, ref, now, log, alarm, ledger, ops, exec, landed, previousCommit: outcome.previousCommit, outcome: result, heals, force: true }), findings: sweep.findings, tampered: true };
   }
   let next = landed;
   if (sweep.links.length || sweep.identity) {
@@ -299,6 +338,27 @@ function sweepAndHeal(options, { commit, edition, ref, now, log, alarm, ledger, 
   }
   return { ...result, current: true, changed: Boolean(sweep.links.length || sweep.identity) };
 }
+
+// A sweep that finds NOTHING is the only evidence that whatever was rewriting the
+// mount has stopped, so it is what clears the acknowledged-finding digest and the
+// heal counters. It writes only when there is something to clear: this path runs
+// ~700 times a day, and `--check` writes nothing at all.
+function acknowledgeClean(options, { landed, outcome }) {
+  if (options.check || (!landed.noted && !Object.keys(landed.heals ?? {}).length)) return outcome;
+  writeLanded(options.landed, { ...landed, noted: null, heals: {} });
+  return outcome;
+}
+
+// The page has to say what stopped and how it starts again, or "suspended" is just
+// a word in a log nobody reads.
+const suspensionDetail = (options, { tree, healed, sweep }) => [
+  `${tree} has drifted and been re-landed ${healed.cycles} time(s) since ${healed.since}, which is the --heal-limit=${options.healLimit} ceiling.`,
+  'Something inside the container is rewriting the corpus repeatedly, and every repair costs this host a full re-extraction of the tree.',
+  'Auto-repair is now SUSPENDED for this tree: the last good tree is left mounted and is no longer being rebuilt from git, so whatever is writing it is unopposed.',
+  `It resumes by itself as soon as a new commit lands for this edition, or immediately if an operator removes the ${JSON.stringify(tree)} key from "heals" in ${options.landed}.`,
+  '',
+  ...sweep.findings
+].join('\n');
 
 
 
@@ -341,8 +401,13 @@ export function main(argv = [], { log = console.log, alarm = raiseDetached, env 
     if (options.lock && !options.check && env[LOCK_ENV] !== options.lock) return relayUnderLock(options, argv, { env, spawn, script, log });
     const result = refresh(argv, { log, alarm, ...rest });
     // A wait is a success: the producers have not pushed yet, nothing is wrong,
-    // and a non-zero exit here is ~25 OnFailure alarms a night.
-    return result.waiting || result.changed || result.current ? 0 : 1;
+    // and a non-zero exit here is ~25 OnFailure alarms a night. A SUSPENDED tree
+    // is the same shape for the same reason: it has already paged, only an operator
+    // can clear it, and a non-zero exit would add the unit's own OnFailure page
+    // every two minutes on top -- which is how the word stops meaning anything.
+    // `--check` is excluded: an operator asking "is the corpus right?" about a
+    // suspended tree must still be told no.
+    return result.waiting || result.changed || result.current || (result.suspended && !options.check) ? 0 : 1;
   } catch (error) {
     process.stderr.write(`${error instanceof CorpusError ? error.message : error.stack}\n`);
     if (error?.alarm) alarm(REFUSAL_REASON, { edition: error.edition, message: `corpus refresh refused: ${error.message.split('\n')[0]}`, detail: error.stack ?? error.message });

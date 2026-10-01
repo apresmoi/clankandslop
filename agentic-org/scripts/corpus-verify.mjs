@@ -57,6 +57,15 @@ export const TAMPER_REASON = 'corpus-tampered';
 export const REFUSAL_REASON = 'corpus-refresh-failed';
 export const CORPUS_ALARM_REASONS = Object.freeze([REFUSAL_REASON, TAMPER_REASON]);
 
+// How much disk unknown names under `trees/` may occupy before being REPORTED
+// stops being enough. They are never deleted -- that guard is correct, deleting
+// them destroys the only evidence of who else writes the mount -- but "reported"
+// must not be able to mean "nobody will ever look" while a planted directory
+// quietly fills the production host. A real corpus tree is single-digit MiB, so
+// this threshold is crossed by something that is not a corpus.
+export const DEFAULT_UNKNOWN_MIB = 256;
+const MIB = 1024 * 1024;
+
 const readOrNull = (file) => { try { return readFileSync(file, 'utf8'); } catch { return null; } };
 const linkOrNull = (file) => { try { return lstatSync(file).isSymbolicLink() ? readlinkSync(file) : null; } catch { return null; } };
 
@@ -94,24 +103,58 @@ export function unknownTrees(volume, known) {
   return readdirSync(path.join(volume, TREES_DIR)).filter((name) => !known.includes(name)).sort();
 }
 
-// ONE SWEEP, FOUR QUESTIONS, EACH ANSWERED FROM OUTSIDE THE VOLUME
+// What the names this host did not land are costing it, walked with lstat only so
+// a planted symlink is counted as one link and never followed -- following it
+// would measure /etc and, worse, teach this sweep to read through a name an agent
+// chose. Normally there are no unknown names at all and this walks nothing.
+export function unknownFootprint(volume, names) {
+  let entries = 0, bytes = 0;
+  const walk = (target) => {
+    let stat;
+    try { stat = lstatSync(target); } catch { return; }
+    entries += 1;
+    if (stat.isSymbolicLink()) return;
+    if (!stat.isDirectory()) { bytes += stat.size; return; }
+    let listing = [];
+    try { listing = readdirSync(target); } catch { return; }
+    for (const name of listing) walk(path.join(target, name));
+  };
+  for (const name of names) walk(path.join(volume, TREES_DIR, name));
+  return { entries, bytes };
+}
+
+// ONE SWEEP, FIVE QUESTIONS, EACH ANSWERED FROM OUTSIDE THE VOLUME
 // ---------------------------------------------------------------
 //   1. does the volume root hold a name this host never writes?
-//   2. is CORPUS.json still the bytes the host published?
-//   3. does every `<date>` link still point where the host pointed it?
-//   4. is the tree today's edition reads still the tree git says it is?
+//   2. how much disk do the names it never wrote occupy?
+//   3. is CORPUS.json still the bytes the host published?
+//   4. does every `<date>` link still point where the host pointed it?
+//   5. is the tree today's edition reads still the tree git says it is?
 //
 // `tampered` separates what must be healed from what can only be reported: a
 // forged record, a moved link or drifted content all mean the newsroom is
 // reading something the host did not land, and all three are repairable. An
 // unexpected NAME is not repairable without deleting evidence, so it alarms and
 // stays.
-export function integritySweep({ volume, landed, landedFile, edition, privateRepo, exec }) {
+export function integritySweep({ volume, landed, landedFile, edition, privateRepo, exec, unknownMib = DEFAULT_UNKNOWN_MIB }) {
   const findings = [], links = [];
+  const strangers = unknownTrees(volume, landed.trees.map(treeName));
   const unknown = [
     ...auditVolumeRoot(volume).map((text) => `volume root: ${text}`),
-    ...unknownTrees(volume, landed.trees.map(treeName)).map((name) => `${TREES_DIR}/${name} is a tree this host did not land`)
+    ...strangers.map((name) => `${TREES_DIR}/${name} is a tree this host did not land`)
   ];
+  // The escalation. Reported-and-never-deleted is the right call for one planted
+  // name; it is not the right call for a name that is eating the host's disk, and
+  // the difference has to be a finding rather than a judgement nobody makes. The
+  // size is rounded to whole MiB so a directory that keeps growing pages again
+  // while a static one stays quiet (the caller suppresses an unchanged finding
+  // set, which is what makes rounding the difference between once and ~700 times
+  // a day).
+  const footprint = unknownFootprint(volume, strangers);
+  const overflow = footprint.bytes > unknownMib * MIB;
+  if (overflow) unknown.push(`${TREES_DIR}/ holds ${footprint.entries} unknown entr${footprint.entries === 1 ? 'y' : 'ies'}`
+    + ` occupying ${Math.round(footprint.bytes / MIB)} MiB, over the ${unknownMib} MiB this host will absorb;`
+    + ' nothing here deletes them, so an operator has to look at what is writing this mount');
   findings.push(...unknown);
 
   let identity = null;
@@ -148,5 +191,5 @@ export function integritySweep({ volume, landed, landedFile, edition, privateRep
       } else if (touched.length) findings.push(`${touched.length} file(s) in ${serving.tree.slice(0, 13)} were touched without changing their content`);
     }
   }
-  return { findings, unknown, identity, links, drift, touched, tampered: Boolean(identity || links.length || drift) };
+  return { findings, unknown, footprint, overflow, identity, links, drift, touched, tampered: Boolean(identity || links.length || drift) };
 }

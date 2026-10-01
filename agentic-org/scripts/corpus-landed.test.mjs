@@ -8,8 +8,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CorpusError } from './corpus-contract.mjs';
 import {
-  LANDED_VERSION, buildManifest, commissionedEdition, compareManifest, corpusLanded,
-  emptyLanded, landedFindings, readLanded, readManifest, writeLanded, writeManifest
+  HEAL_SUSPEND_AFTER, LANDED_VERSION, buildManifest, bumpHeal, compareManifest, corpusLanded, editionCutoff,
+  editionSettled, emptyLanded, landedFindings, readLanded, readManifest, writeLanded, writeManifest
 } from './corpus-landed.mjs';
 
 const EDITION = '2026-09-06';
@@ -65,11 +65,11 @@ test('a frozen edition reads as current once the newer tree is landed, and as st
   assert.equal(corpusLanded(null, { commit: commitOf('a'), edition: EDITION }).current, false);
   assert.match(corpusLanded(emptyLanded(), { commit: commitOf('a'), edition: EDITION }).reason, /never landed a corpus for/u);
 
-  // FIX 3's steady state. The edition is pinned to the commit its receipts name,
-  // the branch has moved on, and the newer tree IS landed -- so there is nothing
-  // left to do. Without this the refresher would re-land the same tree every two
-  // minutes for the rest of the day.
-  const frozen = { ...landedFor('a', { frozen: { at: `${EDITION}T08:00:00Z`, assignments: 1, commits: [commitOf('a')] } }) };
+  // The frozen steady state. The date is pinned to the commit it was serving when
+  // its cutoff passed, the branch has moved on, and the newer tree IS landed -- so
+  // there is nothing left to do. Without this the refresher would re-land the same
+  // tree every two minutes for the rest of the day.
+  const frozen = { ...landedFor('a', { frozen: { at: `${EDITION}T08:00:00Z`, cutoff: `${EDITION}T07:00:00Z`, require_by: '09:00' } }) };
   frozen.trees = [`trees/${commitOf('a')}`, `trees/${commitOf('b')}`];
   const settled = corpusLanded(frozen, { commit: commitOf('b'), edition: EDITION });
   assert.deepEqual([settled.current, Boolean(settled.frozen)], [true, true]);
@@ -119,24 +119,60 @@ test('the cheap manifest sweep settles names, sizes, modes and kinds, and defers
   } finally { s.cleanup(); }
 });
 
-test('an edition is commissioned the moment one assignment record exists, and an absent state root is not an error', () => {
-  const s = scratch();
-  try {
-    assert.deepEqual(commissionedEdition(join(s.root, 'nowhere'), EDITION), { count: 0, commits: [] }, 'a fresh host has no edition state and must still refresh');
-    const directory = join(s.root, 'editions', EDITION, 'assignments');
-    mkdirSync(directory, { recursive: true });
-    assert.deepEqual(commissionedEdition(s.root, EDITION), { count: 0, commits: [] }, 'an empty assignments directory is not a commissioned edition');
+// THE FREEZE GATE IS A CLOCK, AND THE CLOCK HAS TO BE RIGHT ABOUT BERLIN
+// ---------------------------------------------------------------------
+// This replaced a gate that counted assignment files inside an agent-writable
+// docker volume. The whole value of the replacement is that the answer comes from
+// the host alone — which is only true if `editionCutoff` really lands on the Berlin
+// wall clock, on both sides of a DST boundary, rather than on a UTC time that
+// happens to look right in summer.
+test('the cutoff is Berlin wall-clock time on the edition date, on both sides of a DST boundary', () => {
+  // CEST, UTC+2: 09:00 Berlin is 07:00Z.
+  assert.equal(editionCutoff('2026-09-06', '09:00').toISOString(), '2026-09-06T07:00:00.000Z');
+  // CET, UTC+1: the same wall-clock cutoff in January is 08:00Z. A naive
+  // implementation gets one of these two wrong by an hour, which is an hour of a
+  // settled edition still following the branch.
+  assert.equal(editionCutoff('2026-01-14', '09:00').toISOString(), '2026-01-14T08:00:00.000Z');
+  // The day the clocks go forward, after the skipped hour.
+  assert.equal(editionCutoff('2026-03-29', '09:00').toISOString(), '2026-03-29T07:00:00.000Z');
+  // And the day they go back.
+  assert.equal(editionCutoff('2026-10-25', '09:00').toISOString(), '2026-10-25T08:00:00.000Z');
+  assert.equal(editionCutoff('2026-09-06', '00:00').toISOString(), '2026-09-05T22:00:00.000Z');
+  assert.throws(() => editionCutoff('yesterday', '09:00'), CorpusError);
+  assert.throws(() => editionCutoff('2026-09-06', '9:00'), CorpusError);
 
-    writeFileSync(join(directory, 'aaaaaaaa.json'), `${JSON.stringify({ edition: EDITION, corpus: { commit: commitOf('a') } })}\n`);
-    assert.deepEqual(commissionedEdition(s.root, EDITION), { count: 1, commits: [commitOf('a')] });
-    // A record that converged into <id>/<revision>.json counts too: a commissioned
-    // edition must not read as uncommissioned because of a layout detail.
-    mkdirSync(join(directory, 'bbbbbbbb'), { recursive: true });
-    writeFileSync(join(directory, 'bbbbbbbb', '1.json'), `${JSON.stringify({ edition: EDITION, corpus: { commit: commitOf('b') } })}\n`);
-    assert.deepEqual(commissionedEdition(s.root, EDITION), { count: 2, commits: [commitOf('a'), commitOf('b')].sort() });
-    // And an unreadable receipt still means the lineup was recorded.
-    writeFileSync(join(directory, 'cccccccc.json'), 'truncated\n');
-    assert.equal(commissionedEdition(s.root, EDITION).count, 3);
-    assert.deepEqual(commissionedEdition(s.root, '2026-09-07'), { count: 0, commits: [] });
-  } finally { s.cleanup(); }
+  // The decision itself: one minute either side of the instant above.
+  assert.equal(editionSettled(EDITION, { now: new Date('2026-09-06T06:59:59Z'), requireBy: '09:00' }), false);
+  assert.equal(editionSettled(EDITION, { now: new Date('2026-09-06T07:00:00Z'), requireBy: '09:00' }), true);
+  // A past date is settled whatever time it is now, and a future one never is.
+  assert.equal(editionSettled('2026-09-05', { now: new Date('2026-09-06T06:00:00Z'), requireBy: '09:00' }), true);
+  assert.equal(editionSettled('2026-09-07', { now: new Date('2026-09-06T23:00:00Z'), requireBy: '09:00' }), false);
+  // And --require-by moves it, because there is only ONE cutoff concept.
+  assert.equal(editionSettled(EDITION, { now: new Date('2026-09-06T06:00:00Z'), requireBy: '07:00' }), true);
+});
+
+test('a freeze the record cannot justify is not publishable, and the heal counter is the host’s own', () => {
+  // A `frozen` field that cannot say when it was taken and which cutoff justified it
+  // is a freeze nobody can audit — which is how the agent-answerable one survived.
+  const auditable = { at: `${EDITION}T07:00:00Z`, cutoff: `${EDITION}T07:00:00Z`, require_by: '09:00' };
+  assert.deepEqual(landedFindings(landedFor('a', { frozen: auditable })), []);
+  for (const bad of [{}, { ...auditable, at: '' }, { ...auditable, cutoff: undefined }, { ...auditable, require_by: '9:00' }, 'frozen', []]) {
+    assert.ok(landedFindings(landedFor('a', { frozen: bad })).length, `${JSON.stringify(bad)} must not be publishable as a freeze`);
+  }
+
+  const tree = `trees/${commitOf('a')}`;
+  const first = bumpHeal(undefined, tree, { at: 'T1' });
+  assert.deepEqual(first[tree], { cycles: 1, since: 'T1', last: 'T1' });
+  const third = bumpHeal(bumpHeal(first, tree, { at: 'T2' }), tree, { at: 'T3' });
+  assert.deepEqual(third[tree], { cycles: 3, since: 'T1', last: 'T3' }, 'the count is consecutive cycles and `since` is when the loop started');
+  assert.equal(third[tree].cycles >= HEAL_SUSPEND_AFTER, true, 'three relands of one tree is the shipped ceiling');
+  // A suspension stamp survives further counting, so the page is raised once.
+  const stamped = { ...third, [tree]: { ...third[tree], suspended: 'T4' } };
+  assert.equal(bumpHeal(stamped, tree, { at: 'T5' })[tree].suspended, 'T4');
+
+  assert.deepEqual(landedFindings({ ...landedFor('a'), heals: third }), []);
+  assert.deepEqual(landedFindings({ ...landedFor('a'), heals: {} }), []);
+  for (const bad of [{ 'not-a-tree': { cycles: 1, since: 'T1' } }, { [tree]: { cycles: 0, since: 'T1' } }, { [tree]: { cycles: 1 } }, { [tree]: 1 }, []]) {
+    assert.ok(landedFindings({ ...landedFor('a'), heals: bad }).length, `${JSON.stringify(bad)} must not be publishable as a heal count`);
+  }
 });

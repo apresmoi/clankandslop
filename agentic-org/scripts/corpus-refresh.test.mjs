@@ -20,17 +20,31 @@ test('corpusRefreshArgs defaults to the production host and rejects anything it 
   // container. A record inside the volume would be an agent-writable input to a
   // root-privileged job, which is the whole defect this path closes.
   assert.equal(options.landed, '/var/lib/clank-corpus/landed.json');
-  assert.equal(options.editionState, '/var/lib/docker/volumes/clank-edition-state/_data');
   assert.equal(options.lock, '/run/lock/clank-corpus-refresh.lock');
   assert.equal(options.owner, '2000:2000');
   assert.equal(options.requireBy, '09:00');
+  assert.deepEqual([options.healLimit, options.unknownMib], [3, 256]);
   assert.deepEqual([options.keep, options.fetch, options.verify, options.check, options.edition, options.ref], [3, true, true, false, null, null]);
   assert.equal(corpusRefreshArgs(['--no-lock']).lock, null);
   assert.equal(corpusRefreshArgs(['--no-verify']).verify, false);
+  assert.equal(corpusRefreshArgs(['--heal-limit=1']).healLimit, 1);
+  assert.equal(corpusRefreshArgs(['--unknown-mib=0']).unknownMib, 0);
+  // THE INPUT IS GONE, NOT MERELY UNUSED. The refresher used to count assignment
+  // files in the edition-state volume -- which the agents can write AND delete -- to
+  // decide whether a date's corpus was frozen. An option that is still accepted and
+  // quietly ignored is the shape in which that input comes back, so the flag itself
+  // has to be a refusal.
+  assert.throws(() => corpusRefreshArgs(['--edition-state=/var/lib/docker/volumes/clank-edition-state/_data']),
+    (error) => error instanceof CorpusError && /unrecognized argument/u.test(error.message));
+  assert.equal('editionState' in options, false, 'no option may carry a path into an agent-writable state volume');
   assert.throws(() => corpusRefreshArgs(['--landed=/var/lib/docker/volumes/clank-newsroom-corpus/_data/landed.json']),
     (error) => error instanceof CorpusError && /is inside the corpus volume/u.test(error.message));
   assert.throws(() => corpusRefreshArgs(['--require-by=9:00']), CorpusError);
   assert.throws(() => corpusRefreshArgs(['--require-by=24:00']), CorpusError);
+  // Zero relands is auto-repair that never repairs, dressed as a safety feature.
+  assert.throws(() => corpusRefreshArgs(['--heal-limit=0']), CorpusError);
+  assert.throws(() => corpusRefreshArgs(['--heal-limit=two']), CorpusError);
+  assert.throws(() => corpusRefreshArgs(['--unknown-mib=-1']), CorpusError);
   assert.throws(() => corpusRefreshArgs(['--edition=tomorrow']), CorpusError);
   assert.throws(() => corpusRefreshArgs(['--keep=-1']), CorpusError);
   assert.throws(() => corpusRefreshArgs(['--keep=some']), CorpusError);
