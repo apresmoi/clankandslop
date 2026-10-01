@@ -38,14 +38,6 @@
       "content_bytes": 42380061
     }
   ],
-  "private": {
-    "archive": "newsroom-private.tar",
-    "sha256": "sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d",
-    "mount": "repos/newsroom-private",
-    "file_count": 3401,
-    "content_bytes": 63213355,
-    "commit": "628e8477086678f97ee4b4f6f1760ca855e652e5"
-  },
   "lockfile": "website/package-lock.json",
   "entrypoint": "agentic-org/scripts/production-newsroom-mcp.mjs"
 }
