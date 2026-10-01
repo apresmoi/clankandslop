@@ -5,11 +5,13 @@
 // was reproduced in the live production container before it was written down.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, readlinkSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { REASONS, parseArgs, raise } from './alarm.mjs';
 import { CorpusError } from './corpus-contract.mjs';
 import { TREES_DIR, hostExec } from './corpus-volume.mjs';
-import { tamperReason } from './corpus-verify.mjs';
+import { CORPUS_ALARM_REASONS, REFUSAL_REASON, TAMPER_REASON } from './corpus-verify.mjs';
 import { main, refresh } from './corpus-refresh.mjs';
 import { EDITION, PRIOR, UNCUT, args, cleanup, commission, commitAll, deps, fixture, identityOf, landedOf, ledgerOf, snapshot, writeCorpus } from './corpus-refresh.fixture.mjs';
 
@@ -198,7 +200,7 @@ test('content rewritten inside a frozen tree is detected, alarmed and re-landed 
     assert.equal(main(args(f), deps(f, { log: (line) => lines.push(line), alarm: (reason, detail) => alarms.push([reason, detail]) })), 0,
       'a corpus that healed itself is a success, and a silent one would be the worst of both');
     assert.equal(alarms.length, 1, 'tampering that nobody is told about is tampering that works');
-    assert.equal(alarms[0][0], tamperReason());
+    assert.equal(alarms[0][0], TAMPER_REASON);
     assert.ok(alarms[0][1].detail.includes(`${EDITION}/stories/s-11111111.md`), `the alarm must name the paths: ${alarms[0][1].detail}`);
     assert.ok(lines.some((line) => /^re-landing /u.test(line)), lines.join(' | '));
 
@@ -247,7 +249,7 @@ test('a forged CORPUS.json and a redirected dated link are detected and restored
     const exec = (command, commandArgs, options) => { commands.push(commandArgs.includes('archive') ? 'archive' : command); return hostExec(command, commandArgs, options); };
     assert.equal(main(args(f), deps(f, { exec, alarm: (reason, detail) => alarms.push([reason, detail]) })), 0);
     assert.equal(alarms.length, 1);
-    assert.equal(alarms[0][0], tamperReason());
+    assert.equal(alarms[0][0], TAMPER_REASON);
     assert.equal(commands.includes('archive'), false, 'a forged name is repaired from the host record, not by re-extracting 4660 files');
     assert.equal(readFileSync(join(f.volume, CORPUS), 'utf8'), published, 'the published record must come back byte for byte');
     assert.equal(readlinkSync(join(f.volume, PRIOR)), `${TREES_DIR}/${first.commit}/${PRIOR}`);
@@ -275,7 +277,7 @@ test('an unexpected name at the volume root is reported and left in place, and s
     writeFileSync(join(f.volume, 'more.txt'), 'and again\n');
     const third = [];
     assert.equal(main(args(f), deps(f, { alarm: (reason) => third.push(reason) })), 0);
-    assert.deepEqual(third, [tamperReason()]);
+    assert.deepEqual(third, [TAMPER_REASON]);
   } finally { cleanup(f); }
 });
 
@@ -334,4 +336,55 @@ test('past the deadline the same missing branch exits non-zero exactly as it alw
     assert.equal(main(args(f, [`--ref=edition/${UNCUT}`]), deps(f, { now: new Date('2026-09-07T02:00:00Z') })), 1);
     assert.deepEqual(readdirSync(f.volume), []);
   } finally { cleanup(f); }
+});
+
+// THE WORD HAS TO BE ONE alarm.mjs ACCEPTS, AND THE ONLY PROOF IS RAISING IT
+// -------------------------------------------------------------------------
+// alarm.mjs's vocabulary is CLOSED: `parseArgs` refuses an unknown --reason and
+// exits 64, which `raiseDetached` reports as "could not be raised". So code that
+// emits a plausible-looking word that is not registered pages NOBODY, while every
+// log line and every unit test about the string still reads as a pass. That gap
+// was real in this file's own history. Asserting what a constant equals cannot
+// close it; this test asserts against the registry, forbids a bare string at any
+// call site, and then raises each word for real and requires a page on disk.
+test('every reason these modules can raise is registered, and raising it really writes a page', async () => {
+  for (const reason of CORPUS_ALARM_REASONS) {
+    assert.ok(reason in REASONS, `${reason} is not in alarm.mjs REASONS, so raiseDetached exits 64 and nobody is ever told`);
+    assert.equal(parseArgs([`--reason=${reason}`]).reason, reason);
+  }
+  assert.ok(CORPUS_ALARM_REASONS.includes(TAMPER_REASON) && CORPUS_ALARM_REASONS.includes(REFUSAL_REASON));
+
+  // Closing the CLASS, not the instance: no call site in these modules may pass a
+  // bare string or any expression this list does not name, so the next reason
+  // somebody adds cannot reach production without passing the checks above.
+  const named = { TAMPER_REASON, REFUSAL_REASON };
+  let sites = 0;
+  for (const file of ['corpus-refresh.mjs', 'corpus-swap.mjs', 'corpus-verify.mjs', 'corpus-volume.mjs', 'corpus-landed.mjs']) {
+    const source = readFileSync(new URL(file, import.meta.url), 'utf8');
+    for (const [, token] of source.matchAll(/(?<![\w$.])alarm\(\s*([A-Za-z_$][\w$]*|'[^']*')/gu)) {
+      sites += 1;
+      const reason = token.startsWith("'") ? token.slice(1, -1) : named[token];
+      assert.ok(CORPUS_ALARM_REASONS.includes(reason), `${file} raises ${token}, which CORPUS_ALARM_REASONS does not name — a word alarm.mjs has never heard of exits 64 and pages nobody`);
+    }
+  }
+  assert.ok(sites >= 4, `the scan must actually have found the raise sites, saw ${sites}`);
+
+  // And the real thing, through alarm.mjs itself: it reads REASONS for the title
+  // and priority, and spools the page to disk BEFORE any channel is touched. A
+  // rejected or unregistered word leaves no breadcrumb at all, so the file on disk
+  // is the positive signal — exit 0 and an empty spool would be the failure shape.
+  const spoolDirectory = mkdtempSync(join(tmpdir(), 'clank-alarm-spool-'));
+  try {
+    for (const reason of CORPUS_ALARM_REASONS) {
+      const page = await raise(
+        parseArgs([`--reason=${reason}`, `--edition=${EDITION}`, '--message=the mounted corpus stopped matching the host record', '--dry-run']),
+        { environment: { CLANK_ALARM_SPOOL: spoolDirectory, CLANK_ALARM_HOST: 'test-box' }, now: new Date('2026-09-06T07:00:00Z'), log: () => {} }
+      );
+      assert.equal(page.reason, reason);
+      const breadcrumbs = readdirSync(spoolDirectory).filter((name) => name.endsWith(`.${reason}.json`));
+      assert.equal(breadcrumbs.length, 1, `${reason} left no page on disk, so nothing would have reached a person`);
+      assert.equal(JSON.parse(readFileSync(join(spoolDirectory, breadcrumbs[0]), 'utf8')).reason, reason);
+      assert.equal(REASONS[reason].priority, 'urgent', `${reason} must page urgently: a corpus the reporters cannot trust is not an FYI`);
+    }
+  } finally { rmSync(spoolDirectory, { recursive: true, force: true }); }
 });

@@ -110,7 +110,7 @@ import { raiseDetached } from './alarm.mjs';
 import { CORPUS_IDENTITY_FILE, CorpusError, EDITION_PATTERN, berlinToday, resolveRef } from './corpus-contract.mjs';
 import { buildManifest, corpusLanded, emptyLanded, readLanded, sha256, writeLanded, writeManifest } from './corpus-landed.mjs';
 import { swap } from './corpus-swap.mjs';
-import { integritySweep, tamperReason } from './corpus-verify.mjs';
+import { REFUSAL_REASON, TAMPER_REASON, integritySweep } from './corpus-verify.mjs';
 import { assertSameDevice, assertVolumeRoot, hostExec, pointAtTree, SYMLINK_OPS, writeIdentity } from './corpus-volume.mjs';
 
 export const DEFAULT_VOLUME = '/var/lib/docker/volumes/clank-newsroom-corpus/_data';
@@ -264,7 +264,7 @@ function sweepAndHeal(options, { commit, edition, ref, now, log, alarm, ledger, 
   // the same set every two minutes would teach whoever carries the pager to
   // ignore the word. Anything repairable alarms every time, because it is new.
   if (sweep.tampered || landed.noted !== digest) {
-    alarm(tamperReason(), { edition, message: `corpus volume tampered: ${sweep.findings[0]}`, detail: sweep.findings.join('\n') });
+    alarm(TAMPER_REASON, { edition, message: `corpus volume tampered: ${sweep.findings[0]}`, detail: sweep.findings.join('\n') });
   }
   const result = { ...outcome, findings: sweep.findings, tampered: sweep.tampered };
   if (options.check) return { ...result, current: !sweep.tampered };
@@ -345,7 +345,7 @@ export function main(argv = [], { log = console.log, alarm = raiseDetached, env 
     return result.waiting || result.changed || result.current ? 0 : 1;
   } catch (error) {
     process.stderr.write(`${error instanceof CorpusError ? error.message : error.stack}\n`);
-    if (error?.alarm) alarm('corpus-refresh-failed', { edition: error.edition, message: `corpus refresh refused: ${error.message.split('\n')[0]}`, detail: error.stack ?? error.message });
+    if (error?.alarm) alarm(REFUSAL_REASON, { edition: error.edition, message: `corpus refresh refused: ${error.message.split('\n')[0]}`, detail: error.stack ?? error.message });
     return 1;
   }
 }

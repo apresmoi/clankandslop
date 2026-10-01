@@ -20,7 +20,7 @@ import {
   LANDED_VERSION, buildManifest, commissionedEdition, compareManifest, readManifest, removeManifest,
   sha256, treeName, writeLanded, writeManifest
 } from './corpus-landed.mjs';
-import { tamperReason } from './corpus-verify.mjs';
+import { TAMPER_REASON } from './corpus-verify.mjs';
 import {
   TREES_DIR, applyOwner, assertRealDirectory, assertTreesDirectory, auditVolumeRoot, collectGarbage,
   corpusIdentity, datedDirectories, freeze, identityBytes, isoSeconds, landFrozenTree, pointAtTree,
@@ -122,7 +122,7 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
   const unexpected = auditVolumeRoot(volume);
   if (unexpected.length) {
     for (const finding of unexpected) log(`UNEXPECTED VOLUME ENTRY: ${finding}`);
-    alarm(tamperReason(), { edition, message: `unexpected entries at the corpus volume root: ${unexpected[0]}`, detail: unexpected.join('\n') });
+    alarm(TAMPER_REASON, { edition, message: `unexpected entries at the corpus volume root: ${unexpected[0]}`, detail: unexpected.join('\n') });
   }
   mkdirSync(path.join(volume, TREES_DIR), { recursive: true });
   const { treePath, freshness } = stage(options, { commit, edition, log, exec, now, force });
@@ -176,7 +176,7 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
   log(gc.removed.length ? `removed ${gc.removed.length} unreferenced tree(s): ${gc.removed.map((name) => name.slice(0, 7)).join(', ')}` : 'no unreferenced tree to remove');
   if (gc.unknown.length) {
     for (const name of gc.unknown) log(`UNEXPECTED VOLUME ENTRY: ${TREES_DIR}/${name} is not a tree this host landed; left in place`);
-    alarm(tamperReason(), { edition, message: `${gc.unknown.length} unknown entr(y/ies) under ${TREES_DIR}/`, detail: gc.unknown.join('\n') });
+    alarm(TAMPER_REASON, { edition, message: `${gc.unknown.length} unknown entr(y/ies) under ${TREES_DIR}/`, detail: gc.unknown.join('\n') });
   }
   for (const name of gc.removed) removeManifest(options.landed, name);
   if (gc.removed.length) writeLanded(options.landed, { version: LANDED_VERSION, editions, trees: trees.filter((tree) => !gc.removed.includes(treeName(tree))), identity, noted: null });

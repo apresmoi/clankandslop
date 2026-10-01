@@ -36,19 +36,26 @@
 
 import { lstatSync, readFileSync, readdirSync, readlinkSync } from 'node:fs';
 import path from 'node:path';
-import { REASONS } from './alarm.mjs';
 import { CORPUS_IDENTITY_FILE } from './corpus-contract.mjs';
 import { TREES_DIR, assertTreesDirectory, auditVolumeRoot } from './corpus-volume.mjs';
 import { compareManifest, readManifest, sha256, treeName } from './corpus-landed.mjs';
 
+// EVERY WORD THESE MODULES CAN PAGE A HUMAN WITH
+// ----------------------------------------------
+// Declared here, as constants, because alarm.mjs's vocabulary is CLOSED: an
+// unregistered --reason exits 64, which `raiseDetached` reports as "could not be
+// raised" -- that is, no alarm at all. A typo in a reason string is therefore a
+// silent failure of exactly the kind this newsroom is worst at noticing, so no
+// call site in these modules may pass a bare string, and a test walks this list
+// against the registry and raises each word for real.
+//
+// Two words, not one, because they ask different things of the person reading
+// them at 04:00: a REFUSAL left the last good corpus mounted and untouched --
+// degraded, nothing on fire -- while TAMPER means the mounted corpus stopped
+// matching what the host landed, and the host has already re-landed it.
 export const TAMPER_REASON = 'corpus-tampered';
-
-// The alarm vocabulary in alarm.mjs is fixed and an unknown --reason exits 64,
-// which `raiseDetached` reports as "could not be raised" -- that is, no alarm at
-// all. Tampering must reach a person on the box as it is TODAY, so until
-// `corpus-tampered` is registered there it borrows the refusal word rather than
-// vanishing. The day it is registered, this starts using it with no change here.
-export const tamperReason = () => (TAMPER_REASON in REASONS ? TAMPER_REASON : 'corpus-refresh-failed');
+export const REFUSAL_REASON = 'corpus-refresh-failed';
+export const CORPUS_ALARM_REASONS = Object.freeze([REFUSAL_REASON, TAMPER_REASON]);
 
 const readOrNull = (file) => { try { return readFileSync(file, 'utf8'); } catch { return null; } };
 const linkOrNull = (file) => { try { return lstatSync(file).isSymbolicLink() ? readlinkSync(file) : null; } catch { return null; } };
