@@ -544,6 +544,38 @@ test('past the deadline the same missing branch exits non-zero exactly as it alw
   } finally { cleanup(f); }
 });
 
+// CLOSING THE CLASS, NOT THE INSTANCE
+// -----------------------------------
+// The test above proves the freeze decision does not change when assignment records
+// are planted or deleted. This one proves the question is not ASKED, anywhere in
+// these modules -- because the previous fix's own header comment claimed exactly
+// that while the code three screens below counted files in the edition-state
+// volume, and every later reader believed the comment. A comment cannot be tested;
+// the absence of the read can.
+//
+// It also closes the second half of the same defect: the removed log line named
+// `commits[0]` -- the lexicographically first commit across the receipts -- while
+// production-newsroom.mjs binds the edition to the receipt with the earliest
+// `corpus.fetched_at`. Two modules, one question, two answers. There is no shared
+// export for that ordering, so the only safe number of places that implement it is
+// one, and that place is not here.
+test('no corpus module reads the edition-state volume, so none can re-invent a freeze gate or a commit ordering out of it', () => {
+  const forbidden = /assignments|edition-state|editionState|commissioned/giu;
+  let scanned = 0;
+  for (const file of ['corpus-refresh.mjs', 'corpus-swap.mjs', 'corpus-verify.mjs', 'corpus-landed.mjs', 'corpus-volume.mjs', 'corpus-contract.mjs']) {
+    const source = readFileSync(new URL(file, import.meta.url), 'utf8');
+    // Comments are where this history is deliberately written down, so only the
+    // code is scanned -- and a line that is code AND comment is scanned as code.
+    const code = source.split('\n').filter((line) => !line.trimStart().startsWith('//')).join('\n');
+    assert.ok(code.length > 500, `${file} was not read as source, so this scan proves nothing`);
+    scanned += 1;
+    assert.deepEqual(code.match(forbidden) ?? [], [],
+      `${file} names the edition-state volume in code. That volume is mounted writable into all twelve agents: a decision taken from it is a decision the agents take, in both directions, `
+      + 'and validating what it contains closes neither (a planted file can be well-formed, and a delete still thaws). If a LOG line genuinely needs it, it must be labelled untrusted and must not reach a branch.');
+  }
+  assert.equal(scanned, 6, 'the scan must have covered every corpus module');
+});
+
 // THE WORD HAS TO BE ONE alarm.mjs ACCEPTS, AND THE ONLY PROOF IS RAISING IT
 // -------------------------------------------------------------------------
 // alarm.mjs's vocabulary is CLOSED: `parseArgs` refuses an unknown --reason and
