@@ -12,7 +12,20 @@ import { PASSED_ARTICLES_MINIMUM } from './compose-gate.mjs';
 // Floors come from the source of truth, so a deliberate change to a SIZE cannot
 // fail a test that is really about row shape or an empty index.
 const F = PASSED_ARTICLES_MINIMUM;
-import { composeEdition, fileArticle, fileDesk, recordAssignment, recordDissent, reviewArticle as reviewArticleWithDigest } from './production-newsroom.mjs';
+import { existsSync } from 'node:fs';
+import { composeEdition, fileArticle, fileDesk, recordAssignment as recordAssignmentAgainstMount, recordDissent, reviewArticle as reviewArticleWithDigest } from './production-newsroom.mjs';
+import { corpusIdentityFile, installCorpusFixture } from './corpus-fixture.mjs';
+
+// record_assignment reads the mounted research corpus and refuses one that is
+// missing, empty, unreadable or not this edition's, so each fixture day needs a
+// corpus on the mount. The refusals themselves are covered in
+// production-newsroom.test.mjs.
+const recordAssignment = async (args) => {
+  const root = process.env.CLANK_PRIVATE_SOURCE_ROOT ?? path.join(process.env.CLANK_EDITION_STATE_ROOT, 'private-source');
+  process.env.CLANK_PRIVATE_SOURCE_ROOT = root;
+  if (!existsSync(corpusIdentityFile(root))) installCorpusFixture(root, args.edition);
+  return recordAssignmentAgainstMount(args);
+};
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
 const reviewArticle = async args => { const filing = JSON.parse(await readFile(path.join(process.env.CLANK_EDITION_STATE_ROOT, 'editions', args.edition, 'filings', args.article_id, `${args.revision}.json`), 'utf8')); return reviewArticleWithDigest({ ...args, filing_digest: `sha256:${createHash('sha256').update(JSON.stringify(filing)).digest('hex')}` }); };

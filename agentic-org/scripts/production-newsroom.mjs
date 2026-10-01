@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { validateCompositionArtifact } from './composition-contract.mjs';
+import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, verifyCorpusFreshness, verifyCorpusTree } from './corpus-contract.mjs';
 import { PASSED_ARTICLES_MINIMUM, assertCompositionCoverage, compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
@@ -94,6 +95,18 @@ async function qualifySignalAction(args){
     receipt: value=>receipt(args,'qualified',value)
   });
 }
+// The research corpus is a host-populated read-only volume now, not a bundle pinned into the image, so the image digest no longer proves which research an edition could read: the four build-time refusals (missing / empty / unreadable / not this edition's) have to happen here, at read time, and the provenance has to be bound into the edition's own records.
+const CORPUS_IDENTITY_FIELDS=['version','commit','ref','edition','fetched_at','tree'];const CORPUS_TAIL='Nothing was recorded. The host populates this mount from outside the container, so there is nothing here to retry or work around: say so in room:release and end the turn';
+const corpusRecord=(value,edition,source)=>{const narrowed=Object.fromEntries(CORPUS_IDENTITY_FIELDS.map(key=>[key,value?.[key]])),absent=CORPUS_IDENTITY_FIELDS.filter(key=>typeof narrowed[key]!=='string'||narrowed[key].length===0);if(absent.length>0)throw new Error(`the research corpus identity ${source} cannot be bound into edition ${edition} — it carries no readable ${absent.join(', ')}. ${CORPUS_TAIL}`);return narrowed;};
+const corpusIdentity=async edition=>{
+  const declared=process.env.CLANK_PRIVATE_SOURCE_ROOT;if(typeof declared!=='string'||!declared.startsWith('/'))throw new Error(`the research corpus mount is not declared for this agent — CLANK_PRIVATE_SOURCE_ROOT must be the absolute path the day's research corpus is mounted at, got ${JSON.stringify(declared??null)}. ${CORPUS_TAIL}`);
+  const base=path.resolve(declared);let entries;try{entries=await readdir(base);}catch(error){throw new Error(`the research corpus mount is empty — the host has not populated it: ${base} cannot be read (${error.code??error.message}). ${CORPUS_TAIL}`);}if(entries.length===0)throw new Error(`the research corpus mount is empty — the host has not populated it: ${base} holds no entries. ${CORPUS_TAIL}`);
+  const file=within(base,CORPUS_IDENTITY_FILE);let value;try{value=JSON.parse(await readFile(file,'utf8'));}catch(error){throw new Error(`the research corpus carries no readable identity record — ${file} is missing or unparseable (${error.code??error.message}). ${CORPUS_TAIL}`);}let findings;try{findings=corpusIdentityFindings(value,{edition});}catch(error){findings=[`the identity record could not be checked: ${error.message}`];}if(!Array.isArray(findings)||findings.length>0)throw new Error(`the mounted research corpus is not this edition's — it declares edition ${JSON.stringify(value?.edition??null)} and this operation is for edition ${JSON.stringify(edition)}: ${(Array.isArray(findings)?findings:['the identity check returned no findings']).join('; ')}. ${CORPUS_TAIL}`);
+  try{verifyCorpusTree(base,edition);verifyCorpusFreshness(base,edition);}catch(error){throw new Error(`the mounted research corpus is incomplete for edition ${edition} — ${error.message}. ${CORPUS_TAIL}`);}return corpusRecord(value,edition,'record on the mount');};
+// The paper's claim is the corpus its stories were COMMISSIONED against, so this reads the edition's own assignment records and never the mount, which can have been swapped under the org since.
+async function commissionedCorpus(edition){
+  const records=await assignmentsForEdition(edition),absent=records.filter(record=>typeof record?.corpus?.commit!=='string'||record.corpus.commit.length===0);if(records.length===0||absent.length>0)throw new Error(`edition ${edition} was commissioned before corpus provenance existed — ${records.length===0?'it carries no assignment record at all':`${absent.length} of its ${records.length} assignment record(s) carry no corpus identity`}, so a published paper could not say which research its stories rest on. It must be recommissioned: Brass records the lineup again with record_assignment against the mounted corpus, and nothing publishes without that provenance`);
+  const commits=[...new Set(records.map(record=>record.corpus.commit))].sort();if(commits.length>1)throw new Error(`this edition was commissioned against more than one corpus — the assignment records for ${edition} name ${commits.join(' and ')}. One edition's stories rest on one corpus; recommission the lineup in a single wake against the mounted corpus`);return corpusRecord(records[0].corpus,edition,'the lineup was commissioned against');}
 async function recordAssignmentAction(args){
   identity(args);exact(args,['edition','event_key','assignments']);
   if(!Array.isArray(args.assignments))throw new Error('assignments must be an array of {id, owner, brief, evidence_refs} objects');
@@ -117,9 +130,10 @@ async function recordAssignmentAction(args){
   if(slotted.length>1)throw new Error(`at most one assignment may carry slot "forecast", got ${slotted.length}: ${slotted.map(item=>item.id).join(', ')}`);
   if(slotted.length!==1)throw new Error(`exactly one assignment must carry slot "forecast", got ${slotted.length}`);
   if(slotted[0].dissenter===undefined)throw new Error(`assignments[${args.assignments.indexOf(slotted[0])}].dissenter is required for the forecast slot and must name a different desk`);
-  await convergeIndexed(args.edition,location(args.edition,'assignments',sha(args.event_key).slice(7,39)),{version:'clank.assignments.v1',...args});
+  const corpus=await corpusIdentity(args.edition);
+  await convergeIndexed(args.edition,location(args.edition,'assignments',sha(args.event_key).slice(7,39)),{version:'clank.assignments.v1',...args,corpus});
   const forecast={id:slotted[0].id,owner:slotted[0].owner,dissenter:slotted[0].dissenter};
-  return{recorded:args.assignments.length,forecast,receipt:await receipt(args,'assigned',args.assignments)};
+  return{recorded:args.assignments.length,forecast,corpus,receipt:await receipt(args,'assigned',{assignments:args.assignments,corpus})};
 }
 const subdirNames=async(edition,kind)=>{try{return(await readdir(within(root(),'editions',edition,kind),{withFileTypes:true})).filter(entry=>entry.isDirectory()).map(entry=>entry.name).sort();}catch(error){if(error.code==='ENOENT')return[];throw error;}};
 const revisionNames=async(edition,kind,id)=>{try{return(await readdir(within(root(),'editions',edition,kind,id))).filter(name=>name.endsWith('.json')).map(name=>Number(name.slice(0,-5))).filter(value=>Number.isSafeInteger(value)&&value>=1).sort((left,right)=>left-right);}catch(error){if(error.code==='ENOENT')return[];throw error;}};
@@ -308,6 +322,7 @@ async function composeEditionAction(args){
   args=await(await adapter('CLANK_NEWSROOM_STATE_ADAPTER',['compositionInput'])).compositionInput(args,{publicRoot:path.resolve(import.meta.dirname,'../..')});
   identity(args);exact(args,['edition','event_key','pages'],['maps','artifacts']);
   if(process.env.CLANK_NEWSROOM_AGENT!=='caslon')throw new Error(`compose_edition may only be called by "caslon", got "${process.env.CLANK_NEWSROOM_AGENT}"`);
+  const corpus=await commissionedCorpus(args.edition);
   if(!Array.isArray(args.pages)||args.pages.length!==2)throw new Error(`pages must be an array of exactly 2 page documents, got ${Array.isArray(args.pages)?args.pages.length:typeof args.pages}`);
   if(new Set(args.pages.map(page=>page.name)).size!==2||args.pages.some(page=>!['front','tape'].includes(page.name)))throw new Error(`pages[].name must be exactly one "front" and one "tape", got ${JSON.stringify(args.pages.map(page=>page.name))}`);
   const articles=await jsonNames(args.edition,'articles'),reviews=await jsonNames(args.edition,'reviews'),desk=await jsonNames(args.edition,'desk');
@@ -345,7 +360,7 @@ async function composeEditionAction(args){
   for(const page of args.pages){await converge(location(args.edition,'history',`pages/${page.name}/${sha(JSON.stringify(page.document)).slice(7)}`),page.document);await supersedeIndexed(args.edition,location(args.edition,'pages',page.name),page.document);}
   for(const [kind,documents] of [['maps',suppliedMaps],['glyphs',selected.glyphs]]){for(const name of await jsonNames(args.edition,kind))if(!documents.has(name))await(await stateAdapter()).removeJson(location(args.edition,kind,name));for(const [name,document] of documents){await converge(location(args.edition,'history',`${kind}/${name}/${sha(JSON.stringify(document)).slice(7)}`),document);await supersede(location(args.edition,kind,name),document);}}
   const pageNames=['front','tape'],mapNames=[...suppliedMaps.keys()].sort(),glyphNames=[...selected.glyphs.keys()].sort(),tree={articles,desk,pages:pageNames,maps:mapNames,glyphs:glyphNames,article_digests:await digests(args.edition,'articles',articles),desk_digests:await digests(args.edition,'desk',desk),page_digests:await digests(args.edition,'pages',pageNames),map_digests:await digests(args.edition,'maps',mapNames),glyph_digests:await digests(args.edition,'glyphs',glyphNames)};
-  const composition={tree,tree_digest:sha(JSON.stringify(tree)),compose_gates:composeGateLine(gates),forecasts:gates.forecasts,dissents:gates.dissents};return composedResult(args,composition);
+  const composition={tree,tree_digest:sha(JSON.stringify(tree)),corpus,compose_gates:composeGateLine(gates),forecasts:gates.forecasts,dissents:gates.dissents};return composedResult(args,composition);
 }
 const jsonNames=async(edition,kind)=>(await stateAdapter()).jsonNames(within(root(),'editions',edition,kind));
 const run=async(command,args,cwd)=>{const home=path.join(cwd,'.release-home'),temporary=path.join(cwd,'.release-tmp');await mkdir(home,{recursive:true});await mkdir(temporary,{recursive:true});return new Promise((resolve,reject)=>{const child=spawn(command,args,{cwd,stdio:'pipe',env:{CI:'1',HOME:home,TMPDIR:temporary,PATH:'/usr/local/bin:/usr/bin:/bin',LANG:'C.UTF-8',TZ:'UTC'}});let stderr='';child.stderr.on('data',chunk=>{if(stderr.length<65536)stderr+=chunk;});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error(`${command} failed: ${stderr.slice(-2000)}`)));});};
