@@ -23,7 +23,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 
 export const REPORTERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta'];
@@ -195,4 +195,41 @@ export function corpusIdentityFindings(value, { edition } = {}) {
   // which day was wanted.
   if (edition && value.edition !== edition) findings.push(`corpus is edition ${JSON.stringify(value.edition)}, not ${edition}`);
   return findings;
+}
+
+const realpathOrNull = (target) => { try { return realpathSync(target); } catch { return null; } };
+
+// THE LINK IS PART OF THE IDENTITY
+// -------------------------------
+// CORPUS.json names a commit, and no reader ever opens that commit by name: the
+// reporters cat <root>/<edition>/desks/<agent>.index, and <edition> is a symlink
+// into trees/<commit>/<edition>. So a record that validates proves NOTHING about
+// the bytes a desk reads. The host moves the dated links before it writes the
+// record, so a crashed or partial refresh leaves a volume whose record names
+// commit A while every reporter reads commit B; and the volume root is owned by
+// the uid the agents run as, so an agent can replace the link itself.
+//
+// The host refresher's no-op check already resolved the link before it declared
+// a corpus current. The container's read side did not, which made the read side
+// strictly weaker than the write side -- and that drift is the defect, not the
+// missing check. So the predicate lives here, beside the record it completes,
+// rather than inside either program: any side that asks whether a dated link is
+// bound to a commit calls THIS, never a second copy of it.
+//
+// Fails closed on every error: an unreadable link, a dangling link, an absent
+// tree and a real directory where the link belongs are each "this corpus is not
+// bound to the commit it claims", never "probably fine".
+export function corpusLinkFindings(root, edition, commit) {
+  if (typeof edition !== 'string' || !EDITION_PATTERN.test(edition)) return [`edition must be YYYY-MM-DD to resolve a corpus link, got ${JSON.stringify(edition)}`];
+  if (typeof commit !== 'string' || !COMMIT_PATTERN.test(commit)) return [`commit must be a 40-character lowercase hex sha to resolve a corpus link, got ${JSON.stringify(commit)}`];
+  const link = path.join(root, edition);
+  let stat;
+  try { stat = lstatSync(link); } catch (error) { return [`${edition} is not on the corpus mount at all (${error.code ?? error.message})`]; }
+  if (!stat.isSymbolicLink()) return [`${edition} is a real ${stat.isDirectory() ? 'directory' : 'file'} on the mount, not a symlink into ${TREE_DIR}/${commit}/`];
+  const resolved = realpathOrNull(link);
+  if (resolved === null) return [`${edition} is a dangling symlink, so nothing it names can be read`];
+  const tree = realpathOrNull(path.join(root, TREE_DIR, commit));
+  if (tree === null) return [`${TREE_DIR}/${commit} is absent from the mount, so the commit the record names holds no tree`];
+  if (!resolved.startsWith(`${tree}${path.sep}`)) return [`${edition} resolves to ${resolved}, which is outside ${TREE_DIR}/${commit}/`];
+  return [];
 }

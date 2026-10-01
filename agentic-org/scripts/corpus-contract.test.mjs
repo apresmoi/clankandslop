@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { CORPUS_IDENTITY_VERSION, CorpusError, REPORTERS, corpusIdentityFindings, verifyCorpusTree } from './corpus-contract.mjs';
+import { CORPUS_IDENTITY_VERSION, CorpusError, REPORTERS, corpusIdentityFindings, corpusLinkFindings, verifyCorpusTree } from './corpus-contract.mjs';
 // The corpus writers live in the refresher's fixture module; a third copy of
 // "how a desk index is spelled" is exactly how two checks drift apart.
 import { EDITION, STORIES, writeCorpus, writeIndex } from './corpus-refresh.fixture.mjs';
@@ -125,4 +125,61 @@ test('the corpus check has ONE behaviour: no argument can soften or harden it', 
       assert.equal(verifyCorpusTree(quiet.root, EDITION, extra).length, REPORTERS.length, `a third argument changed the verdict: ${JSON.stringify(extra)}`);
   } finally { quiet.cleanup(); }
   assert.doesNotMatch(readFileSync(new URL('./corpus-contract.mjs', import.meta.url), 'utf8'), /requireRows/u, 'the two-behaviour flag must not come back, under its old name or any other');
+});
+
+// ---------------------------------------------------------------------------
+// The dated link, which is the only path any reader actually opens.
+// corpusIdentityFindings validates a CLAIM; this is what binds the claim to the
+// bytes. Both sides of the agent boundary call it: the host refresher so it
+// knows whether a refresh is needed, the newsroom tools so they never bind a
+// commit the desks are not reading.
+// ---------------------------------------------------------------------------
+const OTHER = 'd'.repeat(40);
+const linkFixture = () => {
+  const root = mkdtempSync(join(tmpdir(), 'clank-corpus-link-'));
+  for (const commit of [COMMIT, OTHER]) writeCorpus(join(root, 'trees', commit), EDITION, `research at ${commit}`);
+  const link = join(root, EDITION);
+  const pointAt = (commit) => { rmSync(link, { recursive: true, force: true }); symlinkSync(join('trees', commit, EDITION), link); };
+  pointAt(COMMIT);
+  return { root, link, pointAt, cleanup: () => rmSync(root, { recursive: true, force: true }) };
+};
+
+test('a dated link that resolves into another commit is not a bound corpus, however valid the record is', () => {
+  const fixture = linkFixture();
+  try {
+    assert.deepEqual(corpusLinkFindings(fixture.root, EDITION, COMMIT), []);
+    // The exploit, exactly: the link moves and the record does not. Both trees
+    // are complete, valid corpora for this edition, so every other check in the
+    // contract passes -- and the record would prove the provenance of research
+    // nobody read.
+    fixture.pointAt(OTHER);
+    const moved = corpusLinkFindings(fixture.root, EDITION, COMMIT);
+    assert.equal(moved.length, 1);
+    assert.match(moved[0], new RegExp(`outside trees/${COMMIT}/`, 'u'));
+    assert.ok(moved[0].includes(OTHER), 'the finding must say where the link actually goes');
+    assert.deepEqual(corpusLinkFindings(fixture.root, EDITION, OTHER), [], 'and the same volume IS bound to the commit it really points at');
+  } finally { fixture.cleanup(); }
+});
+
+test('every way a link can fail to bind fails closed', () => {
+  const fixture = linkFixture();
+  try {
+    rmSync(fixture.link);
+    mkdirSync(fixture.link, { recursive: true });
+    writeCorpus(fixture.link, EDITION, 'a corpus somebody dropped in by hand');
+    assert.match(corpusLinkFindings(fixture.root, EDITION, COMMIT)[0], /is a real directory on the mount/u, 'real corpus data in the link\'s place is not a binding');
+    rmSync(fixture.link, { recursive: true, force: true });
+    assert.match(corpusLinkFindings(fixture.root, EDITION, COMMIT)[0], /is not on the corpus mount at all/u);
+    symlinkSync(join('trees', 'e'.repeat(40), EDITION), fixture.link);
+    assert.match(corpusLinkFindings(fixture.root, EDITION, COMMIT)[0], /dangling symlink/u);
+    fixture.pointAt(COMMIT);
+    rmSync(join(fixture.root, 'trees', OTHER), { recursive: true, force: true });
+    assert.match(corpusLinkFindings(fixture.root, EDITION, OTHER)[0], /absent from the mount/u);
+    // Refused before any path is built, so no caller can walk out of the mount
+    // through the commit or the date it asks about.
+    for (const commit of [undefined, '', '../../../etc', COMMIT.toUpperCase(), COMMIT.slice(0, 12)])
+      assert.match(corpusLinkFindings(fixture.root, EDITION, commit)[0], /commit must be a 40-character lowercase hex sha/u, `commit ${JSON.stringify(commit)} was accepted`);
+    for (const edition of [undefined, '', '..', '2026-9-6', `${EDITION}/../..`])
+      assert.match(corpusLinkFindings(fixture.root, edition, COMMIT)[0], /edition must be YYYY-MM-DD/u, `edition ${JSON.stringify(edition)} was accepted`);
+  } finally { fixture.cleanup(); }
 });
