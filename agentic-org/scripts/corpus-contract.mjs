@@ -40,6 +40,10 @@ export const CORPUS_IDENTITY_VERSION = 'clank.research-corpus.identity.v1';
 export const CORPUS_IDENTITY_FILE = 'CORPUS.json';
 
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/;
+// Duplicated from corpus-volume.mjs rather than imported: the contract is the
+// READ side and must not depend on the host-side writer, which the container
+// never has.
+const TREE_DIR = 'trees';
 const TREE_PATTERN = /^trees\/[0-9a-f]{40}$/;
 // Shape first, then Date.parse: Date.parse alone accepts 'Jan 1 2020' and
 // other locale-ish strings, which no reader on the far side should have to
@@ -93,13 +97,22 @@ export function assertEditionInTree(privateRepoPath, commit, edition) {
 // The proof that matters: read the paths back out of the tree that will
 // actually be mounted, not out of git. Returns per-reporter index stats and
 // the resolved story files.
-export function verifyCorpusTree(root, edition) {
+//
+// `requireRows` is the one thing the two sides disagree about, so it is a
+// parameter rather than a copy of this function. A desk index with no rows is a
+// reporter with nothing to research: at READ time that is a refusal, because
+// commissioning an agent against an empty desk produces a story with no
+// evidence behind it. At WRITE time it is not, because a quiet desk is a real
+// corpus the producers legitimately cut, and refusing it would throw away the
+// other five reporters' research with it.
+export function verifyCorpusTree(root, edition, { requireRows = true } = {}) {
   const report = [];
   for (const agent of REPORTERS) {
     const indexPath = path.join(root, edition, 'desks', `${agent}.index`);
     let text;
     try { text = readFileSync(indexPath, 'utf8'); } catch { return fail(`extracted corpus is missing ${edition}/desks/${agent}.index`); }
     const rows = text.split('\n').filter((line) => line.trim() && !line.startsWith('#'));
+    if (requireRows && rows.length === 0) fail(`${edition}/desks/${agent}.index carries no rows -- ${agent} has no research to work from`);
     const stories = rows.map((line) => line.trim().split(/\s+/)[0]);
     const unparsable = stories.filter((id) => !STORY_ID_PATTERN.test(id));
     if (unparsable.length) fail(`${edition}/desks/${agent}.index has row(s) whose first field is not a story id: ${unparsable.join(', ')}`);
@@ -163,7 +176,12 @@ export function corpusIdentityFindings(value, { edition } = {}) {
   if (typeof value.ref !== 'string' || !value.ref.trim()) findings.push(`ref must name the branch the corpus was cut from, got ${JSON.stringify(value.ref)}`);
   if (typeof value.edition !== 'string' || !EDITION_PATTERN.test(value.edition)) findings.push(`edition must be YYYY-MM-DD, got ${JSON.stringify(value.edition)}`);
   if (typeof value.fetched_at !== 'string' || !ISO_INSTANT_PATTERN.test(value.fetched_at) || Number.isNaN(Date.parse(value.fetched_at))) findings.push(`fetched_at must be an ISO instant, got ${JSON.stringify(value.fetched_at)}`);
-  if (typeof value.tree !== 'string' || !TREE_PATTERN.test(value.tree)) findings.push(`tree must be trees/<40-hex>, got ${JSON.stringify(value.tree)}`);
+  // Cross-checked against `commit`, not merely shaped: a record naming one
+  // commit and a tree holding another is how a reader ends up proving the
+  // provenance of research it did not read.
+  if (typeof value.tree !== 'string' || !TREE_PATTERN.test(value.tree) || value.tree !== `${TREE_DIR}/${value.commit}`) findings.push(`tree must be ${TREE_DIR}/<commit>, got ${JSON.stringify(value.tree)}`);
+  if (!Array.isArray(value.editions_present) || !value.editions_present.includes(value.edition)) findings.push(`editions_present must list the edition the record names, got ${JSON.stringify(value.editions_present)}`);
+  if (!Number.isSafeInteger(value.source_count) || value.source_count < 1) findings.push(`source_count must be a positive integer, got ${JSON.stringify(value.source_count)}`);
   // Named with BOTH dates on purpose: "wrong edition" read on a lock screen or
   // in an agent's tool error is useless without which day was mounted and
   // which day was wanted.
