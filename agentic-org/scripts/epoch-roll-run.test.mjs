@@ -4,11 +4,15 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { SeamError, rollEpoch } from './seam-run.mjs';
-import { BLOCKED_MESSAGE, EPOCH_STAGES, IMAGE_PREFIX, epochRoll, inspectContainer, parseArgs, resolveImage } from './epoch-roll-run.mjs';
+import { BLOCKED_MESSAGE, EPOCH_STAGES, IMAGE_ID, IMAGE_PREFIX, epochRoll, inspectContainer, parseArgs, resolveImage } from './epoch-roll-run.mjs';
 
 const now = new Date('2026-10-02T03:30:00Z');
 const noop = () => {};
 const RUNNING = 'clank-and-slop:seam-2026-10-01-061603';
+// The tag is a name; these are the bytes. Two of them, because the whole question
+// this unit has to get right is whether the name still points at the same ones.
+const DEPLOYED_ID = `sha256:${'1'.repeat(64)}`;
+const REBUILT_ID = `sha256:${'2'.repeat(64)}`;
 
 // Every stage a no-op that writes its own name down, plus the options it was
 // handed — the tag this unit passes to `deploy` is the whole point, so it has to
@@ -26,7 +30,7 @@ function recorder(failAt, error = new SeamError('boom', 'deploy-failed'), rolled
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
 // The image is resolved from the box, so every pipeline test injects it. The
 // resolver itself is exercised directly further down.
-const resolved = (epoch = 'clank-2026-10-01') => () => ({ tag: RUNNING, source: 'running container spawnfile-clank-and-slop', epoch });
+const resolved = (epoch = 'clank-2026-10-01') => () => ({ tag: RUNNING, imageId: DEPLOYED_ID, source: 'running container spawnfile-clank-and-slop', epoch });
 
 test('this unit reuses the seam own stages rather than carrying copies of them', () => {
   // A second copy of `gate` would be a second opinion about whether a wake is in
@@ -118,24 +122,66 @@ test('an image it cannot resolve is a refusal, and deploy is never reached', () 
 
 // --- resolving the image, which is the one thing it must not guess at ---------
 const options = { container: 'spawnfile-clank-and-slop', deployment: 'clank-and-slop' };
-const dockerThat = (config, { imagePresent = true } = {}) => (command, args) => {
+// `runningId` is what the container IS; `tagResolvesTo` is what the tag points at
+// now. They are separate arguments because the failure this unit has to refuse is
+// exactly the case where they differ.
+const dockerThat = (config, { imagePresent = true, runningId = DEPLOYED_ID, tagResolvesTo = runningId } = {}) => (command, args) => {
   if (args[0] === 'inspect' && args[1] === 'spawnfile-clank-and-slop') {
     if (config === null) throw new Error('No such object');
-    return { toString: () => JSON.stringify(config) };
+    return { toString: () => `${runningId ?? ''} ${JSON.stringify(config)}` };
   }
   if (args[0] === 'image' && args[1] === 'inspect') {
     if (!imagePresent) throw new Error(`No such image: ${args[2]}`);
-    return { toString: () => '[]' };
+    return { toString: () => `${tagResolvesTo}\n` };
   }
   throw new Error(`unexpected docker ${args.join(' ')}`);
 };
 const envOf = (epoch) => [`DAIMON_WAKE_FUSE_EPOCH=${epoch}`, 'OTHER=1'];
 
-test('the image and the epoch both come from one read of the running container', () => {
+test('the image id, the tag and the epoch all come from one read of the running container', () => {
   const observed = inspectContainer(options, { log: noop, exec: dockerThat({ Image: RUNNING, Env: envOf('clank-2026-10-01') }) });
-  assert.deepEqual(observed, { image: RUNNING, epoch: 'clank-2026-10-01' });
+  // `.Image` is the immutable id, `.Config.Image` only the tag it was created
+  // from. Both are read, because the tag alone cannot say which build is running.
+  assert.deepEqual(observed, { imageId: DEPLOYED_ID, image: RUNNING, epoch: 'clank-2026-10-01' });
+  assert.ok(IMAGE_ID.test(observed.imageId));
   const resolvedImage = resolveImage(options, { log: noop, exec: dockerThat({ Image: RUNNING, Env: envOf('clank-2026-10-01') }), read: () => { throw new Error('the record must not be needed'); } });
-  assert.deepEqual(resolvedImage, { tag: RUNNING, source: 'running container spawnfile-clank-and-slop', epoch: 'clank-2026-10-01' });
+  assert.deepEqual(resolvedImage, { tag: RUNNING, imageId: DEPLOYED_ID, source: 'running container spawnfile-clank-and-slop', epoch: 'clank-2026-10-01' });
+});
+
+test('a tag that has been remapped since the deployment is refused, not recreated', () => {
+  // THE failure this unit is built to be incapable of. `.Config.Image` is a
+  // mutable pointer: `docker build -t clank-and-slop:seam-...` against other
+  // bytes leaves the running container reporting the same tag while the tag now
+  // names a different image. Resolving the tag and checking only that it exists
+  // locally accepted exactly that, proven by injection on 2026-10-01.
+  assert.throws(() => resolveImage(options, {
+    log: noop, read: () => '{}',
+    exec: dockerThat({ Image: RUNNING, Env: envOf('clank-2026-10-01') }, { runningId: DEPLOYED_ID, tagResolvesTo: REBUILT_ID })
+  }), (error) => error.reason === 'epoch-roll-failed'
+    && /remapped since the deployment/u.test(error.message)
+    && /different build/u.test(error.message)
+    && error.message.includes(DEPLOYED_ID.slice(7, 19))
+    && error.message.includes(REBUILT_ID.slice(7, 19)));
+
+  // And the same tag pointing at the same bytes is the ordinary day: no refusal,
+  // and the identity it returns is the container's own.
+  const same = resolveImage(options, { log: noop, read: () => '{}', exec: dockerThat({ Image: RUNNING, Env: envOf('clank-2026-10-01') }) });
+  assert.equal(same.imageId, DEPLOYED_ID);
+});
+
+test('a container that names a tag but no immutable id is refused rather than trusted', () => {
+  // Half an answer is what this unit may not act on: with no id there is nothing
+  // to check the tag against, and "I could not tell" must never recreate.
+  assert.throws(() => resolveImage(options, {
+    log: noop, read: () => '{}',
+    exec: dockerThat({ Image: RUNNING, Env: envOf('clank-2026-10-01') }, { runningId: 'not-an-image-id' })
+  }), (error) => error.reason === 'epoch-roll-failed' && /no immutable image id/u.test(error.message));
+
+  // Nor does a tag docker resolves to something that is not an id at all.
+  assert.throws(() => resolveImage(options, {
+    log: noop, read: () => '{}',
+    exec: dockerThat({ Image: RUNNING, Env: envOf('clank-2026-10-01') }, { tagResolvesTo: '<no value>' })
+  }), (error) => error.reason === 'epoch-roll-failed' && /not an image id/u.test(error.message));
 });
 
 test('an uninspectable container falls back to the deployment record, and refuses when that is empty too', () => {
@@ -143,6 +189,10 @@ test('an uninspectable container falls back to the deployment record, and refuse
   const fallback = resolveImage(options, { log: noop, exec: dockerThat(null), read: () => record });
   assert.equal(fallback.tag, RUNNING);
   assert.match(fallback.source, /deployment record/u);
+  // There is no container to read an id from here, so the id the recreate will
+  // start is the one the tag resolves to — recorded, so the log says which bytes
+  // went up rather than only which name.
+  assert.equal(fallback.imageId, DEPLOYED_ID);
   // Nothing readable anywhere: a unit whose job is one env line must never be
   // able to roll the newsroom onto a different build, so "I could not tell" and
   // "this image" must not produce the same recreate.
