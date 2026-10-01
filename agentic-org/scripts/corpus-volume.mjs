@@ -40,7 +40,7 @@
 // agents and a writable corpus.
 
 import { execFileSync } from 'node:child_process';
-import { lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CORPUS_IDENTITY_FILE, CORPUS_IDENTITY_VERSION, CorpusError, EDITION_PATTERN, corpusIdentityFindings } from './corpus-contract.mjs';
 
@@ -50,8 +50,15 @@ export const VOLUME_ROOT_MODE = 0o755;
 
 const fail = (message) => { throw new CorpusError(message); };
 
-/** Every external command the host writer runs, in one place, so a test can watch exactly which trees were chowned and frozen. */
-export const hostExec = (command, args, options = {}) => execFileSync(command, args, { maxBuffer: 1024 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'], ...options });
+// Every external command the host writer runs, in one place, so a test can watch
+// exactly which trees were chowned and frozen.
+//
+// stdin is 'ignore' EXCEPT when the caller pipes bytes in: `stdio[0]: 'ignore'`
+// silently wins over `input`, and `tar -x` then extracts nothing and exits 0 --
+// a staged corpus that is simply empty, with no error anywhere to say so.
+export const hostExec = (command, args, options = {}) => execFileSync(command, args, {
+  maxBuffer: 1024 * 1024 * 1024, stdio: [options.input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'], ...options
+});
 
 /** Seconds, not milliseconds: these timestamps are read by people in a ledger, and a corpus is never written twice in one second. */
 export const isoSeconds = (date) => `${date.toISOString().slice(0, 19)}Z`;
@@ -118,10 +125,27 @@ export function applyOwner(target, owner, { volume, exec = hostExec } = {}) {
   exec('chown', ['-R', owner, target]);
 }
 
-/** Read-only before it is reachable. Nothing inside the container can do this, so it happens here or not at all. */
+// Read-only before it is reachable. Nothing inside the container can do this, so
+// it happens here or not at all.
+//
+// The top directory is left writable and re-frozen by `landFrozenTree` after the
+// move, because rename(2) of a directory into a different parent needs write
+// permission on the directory being moved: freezing it first would make the one
+// rename this whole design rests on fail for any writer that is not root.
 export function freeze(target, { volume, exec = hostExec } = {}) {
   if (volume) assertScoped(target, volume);
   exec('chmod', ['-R', 'a-w', target]);
+  chmodSync(target, 0o755);
+}
+
+/** The one rename that makes a validated tree part of the volume, with its root frozen the moment it lands. */
+export function landFrozenTree(stagingDir, treePath) {
+  renameSync(stagingDir, treePath);
+  // Non-recursive, and aimed at one directory inside the volume: the recursive
+  // pass already happened outside it, and this entry is not reachable through
+  // any dated link yet.
+  chmodSync(treePath, 0o555);
+  return treePath;
 }
 
 // A frozen tree's own directories are unwritable, so its files cannot be
@@ -238,7 +262,11 @@ export function collectGarbage(volume, { keep, protect = [], trash, now = new Da
   const stamp = `${isoSeconds(now).replace(/[:-]/g, '')}.${process.pid}`;
   for (const entry of doomed) {
     const parked = path.join(trash, `${entry.name}-${stamp}`);
-    renameSync(path.join(treesDir, entry.name), parked);
+    const tree = path.join(treesDir, entry.name);
+    // Same reason as landFrozenTree: a frozen directory cannot be renamed into
+    // another parent until its own write bit is back.
+    try { chmodSync(tree, 0o755); } catch { /* already writable */ }
+    renameSync(tree, parked);
     remove(parked, { volume, exec });
   }
   return doomed.map((entry) => entry.name);

@@ -98,13 +98,13 @@ export function assertEditionInTree(privateRepoPath, commit, edition) {
 // actually be mounted, not out of git. Returns per-reporter index stats and
 // the resolved story files.
 //
-// `requireRows` is the one thing the two sides disagree about, so it is a
-// parameter rather than a copy of this function. A desk index with no rows is a
-// reporter with nothing to research: at READ time that is a refusal, because
-// commissioning an agent against an empty desk produces a story with no
-// evidence behind it. At WRITE time it is not, because a quiet desk is a real
-// corpus the producers legitimately cut, and refusing it would throw away the
-// other five reporters' research with it.
+// `requireRows` is the one thing callers disagree about, so it is a parameter
+// rather than a second copy of this function. A desk index with no rows is a
+// reporter with nothing to research, and the container's read-time gate refuses
+// the whole corpus over it -- so the host refresher refuses it too, loudly and
+// with an alarm, rather than publishing a corpus that would fail silently at
+// wake time instead. Only repin-private-source.mjs, the retired image-build
+// path, still tolerates one, because that is the behaviour its own tests pin.
 export function verifyCorpusTree(root, edition, { requireRows = true } = {}) {
   const report = [];
   for (const agent of REPORTERS) {

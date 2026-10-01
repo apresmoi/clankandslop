@@ -78,8 +78,8 @@ import { buildPrivateArchive, privateRoot } from './private-archive.mjs';
 // callers and tests already use for a refusal.
 export { CorpusError as RepinError, REPORTERS, assertEditionInTree, berlinToday, resolveRef, verifyCorpusFreshness };
 
-// A desk index with no rows is a quiet desk, not a broken corpus, so the
-// write side accepts one where the container's read-time gate refuses it.
+// This retired path tolerates a desk index with no rows, which the live corpus
+// refresher and the container's read-time gate both refuse. See verifyCorpusTree.
 export const verifyArchive = (root, edition) => verifyCorpusTree(root, edition, { requireRows: false });
 
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/;
