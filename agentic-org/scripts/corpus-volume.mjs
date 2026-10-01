@@ -72,6 +72,15 @@ export const VOLUME_ROOT_NAMES = Object.freeze([VOLUME_IDENTITY_SENTINEL, CORPUS
 
 const fail = (message) => { throw new CorpusError(message); };
 
+// A REFUSAL NOBODY IS TOLD ABOUT IS A SILENT FAILURE
+// -------------------------------------------------
+// These refusals mean one thing: the volume has been written by something that is
+// not this host. Every one of them used to leave the refresher as a plain
+// CorpusError, and the refresher's handler alarms only on an error it recognizes
+// (`error.alarm`), so each was exit 1 with no page -- a corpus nobody is
+// verifying, every two minutes, in silence. `refuse` is `fail` for that class.
+const refuse = (message) => { const error = new CorpusError(message); error.alarm = true; throw error; };
+
 // Every external command the host writer runs, in one place, so a test can watch
 // exactly which trees were chowned and frozen.
 //
@@ -125,11 +134,11 @@ export function assertRealDirectory(target, label) {
   let stat;
   try { stat = lstatSync(target); } catch (error) { if (error.code === 'ENOENT') return null; throw error; }
   if (stat.isSymbolicLink()) {
-    fail(`${label} ${target} is a symlink to ${JSON.stringify(readlinkOrNull(target))}, not a directory -- refusing to operate through it.\n`
+    refuse(`${label} ${target} is a symlink to ${JSON.stringify(readlinkOrNull(target))}, not a directory -- refusing to operate through it.\n`
       + '  Nothing on this host ever creates that symlink, so the volume has been written by something else.\n'
       + '  Every path operation here runs as root; following this one would aim a recursive delete at a target an agent chose.');
   }
-  if (!stat.isDirectory()) fail(`${label} ${target} is a ${stat.isFile() ? 'file' : 'special file'}, not a directory -- refusing to operate on it`);
+  if (!stat.isDirectory()) refuse(`${label} ${target} is a ${stat.isFile() ? 'file' : 'special file'}, not a directory -- refusing to operate on it`);
   return stat;
 }
 
@@ -243,7 +252,7 @@ export function removeTree(target, { volume, exec = hostExec } = {}) {
   if (volume) assertScoped(target, volume);
   let stat;
   try { stat = lstatSync(target); } catch { return; }
-  if (stat.isSymbolicLink()) fail(`refusing to thaw and delete through the symlink ${target} -> ${JSON.stringify(readlinkOrNull(target))}: a recursive delete must only ever be aimed at a real directory`);
+  if (stat.isSymbolicLink()) refuse(`refusing to thaw and delete through the symlink ${target} -> ${JSON.stringify(readlinkOrNull(target))}: a recursive delete must only ever be aimed at a real directory`);
   if (!stat.isDirectory()) { rmSync(target, { force: true }); return; }
   try { exec('chmod', ['-R', 'u+w', target]); } catch { /* already writable */ }
   rmSync(target, { recursive: true, force: true });
@@ -270,7 +279,22 @@ export function pointAtTree(volume, name, target, { ops = SYMLINK_OPS, tmpDir = 
   const live = path.join(volume, name);
   let existing = null;
   try { existing = ops.lstat(live); } catch { /* absent: the first corpus for this date */ }
-  if (existing && !existing.isSymbolicLink()) fail(`${live} is a real ${existing.isDirectory() ? 'directory' : 'file'}, not a symlink into ${TREES_DIR}/ -- refusing to replace corpus data this job did not write`);
+  // THE REFUSAL IS RIGHT, AND IT CANNOT CLEAR ITSELF
+  // -----------------------------------------------
+  // Refusing is correct: the host must not unlink research it did not write, and
+  // what sits here may be the only copy of something. But nothing in this newsroom
+  // can ever clear this state either -- three polls and a fresh producer commit
+  // left the desk index unreachable, because every one of them arrives back at
+  // this same rename. So the refusal carries the one command that does clear it,
+  // and it pages instead of exiting quietly. corpus-verify.mjs classifies the same
+  // state during the sweep, so the two-minute poll reports it rather than arriving
+  // here over and over.
+  if (existing && !existing.isSymbolicLink()) {
+    refuse(`${live} is a real ${existing.isDirectory() ? 'directory' : 'file'}, not a symlink into ${TREES_DIR}/ -- refusing to replace corpus data this job did not write.\n`
+      + '  Nothing on this host deletes or moves a name it did not write, so no refresh can clear this and the dated corpus stays unreachable until an operator runs:\n'
+      + `    ${moveAsideCommand(volume, live)}\n`
+      + `  The next refresh then creates ${name} again. The corpus the host landed is untouched under ${TREES_DIR}/ in the meantime.`);
+  }
   if (existing && ops.readlink(live) === target) return false;
   const tmp = path.join(tmpDir, `.${name}.${process.pid}.tmp`);
   try { ops.unlink(tmp); } catch { /* no leftover from a crashed run */ }

@@ -11,7 +11,7 @@ import { join } from 'node:path';
 import { REASONS, parseArgs, raise } from './alarm.mjs';
 import { CorpusError } from './corpus-contract.mjs';
 import { TREES_DIR, hostExec } from './corpus-volume.mjs';
-import { CORPUS_ALARM_REASONS, REFUSAL_REASON, TAMPER_REASON } from './corpus-verify.mjs';
+import { CORPUS_ALARM_REASONS, REFUSAL_REASON, TAMPER_REASON, integritySweep } from './corpus-verify.mjs';
 import { main, refresh } from './corpus-refresh.mjs';
 import {
   AFTER_CUTOFF, BEFORE_CUTOFF, EDITION, PRIOR, UNCUT, args, cleanup, commission, commitAll, deps, fixture,
@@ -223,6 +223,50 @@ test('a refusal that escapes the sweep still pages, because an exception nobody 
     assert.match(said, /is a symlink/u, said);
     assert.equal(exit, 1);
   } finally { try { unlinkSync(join(f.volume, TREES_DIR)); } catch { /* never created */ } cleanup(f); }
+});
+
+// THE REFUSAL IS RIGHT AND THE WEDGE IS NOT
+// ----------------------------------------
+// An agent owns the volume root, so it can unlink the dated symlink and put a real
+// directory of its own there. `pointAtTree` refuses to rename over it, correctly --
+// the host must not unlink research it did not write. But nothing could ever clear
+// that refusal: three polls, one of them after a fresh producer commit, and the
+// desk index was still unreachable, because every poll arrived back at the same
+// impossible rename and took the rest of the repair down with it.
+test('a real directory planted at the dated name pages with the command that clears it, and no longer wedges the rest of the repair', () => {
+  const f = fixture();
+  try {
+    refresh(args(f), deps(f));
+    const dated = join(f.volume, EDITION);
+    const published = identityOf(f);
+    unlinkSync(dated);
+    mkdirSync(join(dated, 'desks'), { recursive: true });
+    writeFileSync(join(dated, 'desks', 'cogsworth.index'), 'planted\n');
+    // Forged in the SAME poll, and this is the load-bearing half: CORPUS.json is
+    // republished after the dated links, so a throw in the link loop meant the
+    // forgery survived every poll for as long as the wedge lasted.
+    chmodSync(join(f.volume, CORPUS), 0o644);
+    writeFileSync(join(f.volume, CORPUS), 'forged\n', { mode: 0o644 });
+
+    const alarms = [], lines = [];
+    const exit = main(args(f), deps(f, { log: (line) => lines.push(line), alarm: (reason, detail) => alarms.push([reason, detail]) }));
+    const said = [...alarms.map(([reason, detail]) => `${reason} ${detail.message} ${detail.detail}`), ...lines].join('\n');
+    assert.ok(alarms.length >= 1, 'an unreachable edition with no page is an edition nobody knows is broken');
+    assert.match(said, /where this host's symlink to/u, said);
+    assert.ok(said.includes(`mv -- ${dated}`), `the page has to carry the one command that clears it: ${said}`);
+    assert.deepEqual(identityOf(f), published, 'the rest of the repair must still run: CORPUS.json was republished');
+    // And nothing was deleted: what an agent put there is the only evidence of it.
+    assert.equal(statSync(dated).isDirectory(), true);
+    assert.equal(readFileSync(join(dated, 'desks', 'cogsworth.index'), 'utf8'), 'planted\n');
+    assert.equal(exit, 1, 'an edition only an operator can make reachable again is not a success');
+
+    // Classified, and NOT queued as a link repair: an impossible rename is not a
+    // repair, and retrying it every two minutes is what the wedge was made of.
+    const sweep = integritySweep({ volume: f.volume, landed: landedOf(f), landedFile: f.landed, edition: EDITION, privateRepo: f.priv, exec: hostExec });
+    assert.deepEqual(sweep.links, [], `a rename that cannot work must never be queued: ${JSON.stringify(sweep.links)}`);
+    assert.deepEqual(sweep.blocked.map(({ date, shape }) => [date, shape]), [[EDITION, 'directory']]);
+    assert.equal(sweep.tampered, true, 'and the volume must not read as current while a desk index is unreachable');
+  } finally { cleanup(f); }
 });
 
 // ONCE A DATE IS SETTLED ITS CORPUS IS FROZEN, AND THE HOST DECIDES WHEN

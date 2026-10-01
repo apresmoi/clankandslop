@@ -151,9 +151,9 @@ export function unknownFootprint(volume, names) {
 // only ever runs on a real directory. Returned rather than thrown: the caller
 // classifies this into a finding, and a refusal that escapes the sweep is the
 // silent exit described under `integritySweep`.
-export function treeShape(treeRoot) {
+export function treeShape(target) {
   let stat;
-  try { stat = lstatSync(treeRoot); } catch (error) { return error.code === 'ENOENT' ? 'missing' : `unreadable (${error.code})`; }
+  try { stat = lstatSync(target); } catch (error) { return error.code === 'ENOENT' ? 'missing' : `unreadable (${error.code})`; }
   if (stat.isSymbolicLink()) return 'symlink';
   if (stat.isDirectory()) return 'directory';
   return stat.isFile() ? 'file' : 'special file';
@@ -168,12 +168,16 @@ export function treeShape(treeRoot) {
 //   5. is the tree today's edition reads still the tree git says it is?
 //
 // `tampered` separates what must be healed from what can only be reported: a
-// forged record, a moved link or drifted content all mean the newsroom is
-// reading something the host did not land, and all three are repairable. An
-// unexpected NAME is not repairable without deleting evidence, so it alarms and
-// stays.
+// forged record, a moved link, a vanished tree or drifted content all mean the
+// newsroom is reading something the host did not land, and all four are
+// repairable from git and the host record. The rest is not repairable without
+// deleting or moving a name this host did not write, which it never does -- an
+// unexpected NAME under `trees/`, something real where a dated symlink belongs
+// (`blocked`), something that is not a directory where the serving tree belongs
+// (`tree: 'planted'`). Those alarm, stay exactly where they are, and carry the
+// one command an operator runs to clear them.
 function sweepVolume({ volume, landed, landedFile, edition, privateRepo, exec, unknownMib = DEFAULT_UNKNOWN_MIB }) {
-  const findings = [], links = [];
+  const findings = [], links = [], blocked = [];
   const strangers = unknownTrees(volume, landed.trees.map(treeName));
   const unknown = [
     ...auditVolumeRoot(volume).map((text) => `volume root: ${text}`),
@@ -200,10 +204,33 @@ function sweepVolume({ volume, landed, landedFile, edition, privateRepo, exec, u
     else if (sha256(live) !== landed.identity.sha256) { identity = 'forged'; findings.push(`${CORPUS_IDENTITY_FILE} is not the record this host published`); }
   }
 
+  // A DATED NAME THAT IS NOT A SYMLINK IS NOT A REPAIR THIS HOST CAN MAKE
+  // --------------------------------------------------------------------
+  // `pointAtTree` refuses to rename over a real directory or file at the dated
+  // name, and that refusal is right: the host must never unlink research it did not
+  // write. But the refusal is also a dead end -- the reviewer polled three times,
+  // including once after a fresh producer commit, and the desk index never became
+  // reachable again, because every poll arrives back at the same impossible
+  // rename and takes the rest of the repair down with it.
+  //
+  // So this state gets its own classification. It is NOT queued as a link repair
+  // (nothing here can perform it), it names the exact path and the one command
+  // that clears it, and the rest of the sweep's repairs -- the other dated links,
+  // CORPUS.json -- still run.
   for (const [date, entry] of Object.entries(landed.editions)) {
     const want = `${entry.tree}/${date}`;
-    const got = linkOrNull(path.join(volume, date));
-    if (got !== want) { links.push({ date, want, got }); findings.push(`${date} points at ${got === null ? 'no symlink at all' : JSON.stringify(got)}, not ${want}`); }
+    const live = path.join(volume, date);
+    const got = linkOrNull(live);
+    if (got === want) continue;
+    const shape = treeShape(live);
+    if (shape !== 'missing' && shape !== 'symlink') {
+      blocked.push({ date, want, shape, path: live });
+      findings.push(`${date} is a ${shape} at the corpus volume root where this host's symlink to ${want} belongs, so ${date} reads research this host did not land;`
+        + ` nothing here deletes or moves a name this host did not write and no refresh can clear it, so an operator has to run \`${moveAsideCommand(volume, live)}\` and the next poll restores the link on its own`);
+      continue;
+    }
+    links.push({ date, want, got });
+    findings.push(`${date} points at ${got === null ? 'no symlink at all' : JSON.stringify(got)}, not ${want}`);
   }
 
   let drift = null, touched = [], tree = null;
@@ -250,7 +277,10 @@ function sweepVolume({ volume, landed, landedFile, edition, privateRepo, exec, u
       } else if (touched.length) findings.push(`${touched.length} file(s) in ${serving.tree.slice(0, 13)} were touched without changing their content`);
     }
   }
-  return { findings, unknown, footprint, overflow, identity, links, drift, touched, tree, failed: null, tampered: Boolean(identity || links.length || drift || tree) };
+  return {
+    findings, unknown, footprint, overflow, identity, links, blocked, drift, touched, tree, failed: null,
+    tampered: Boolean(identity || links.length || blocked.length || drift || tree)
+  };
 }
 
 // NO EXCEPTION LEAVES THIS SWEEP WITHOUT A PAGE
@@ -269,8 +299,8 @@ export function integritySweep(options) {
     const message = String(error?.message ?? error);
     return {
       findings: [`the corpus integrity sweep could not complete, so nothing in this volume is verified: ${message.split('\n')[0]}`],
-      unknown: [], footprint: { entries: 0, bytes: 0 }, overflow: false, identity: null, links: [], drift: null,
-      touched: [], tree: null, failed: { message, code: error?.code ?? null }, tampered: true
+      unknown: [], footprint: { entries: 0, bytes: 0 }, overflow: false, identity: null, links: [], blocked: [],
+      drift: null, touched: [], tree: null, failed: { message, code: error?.code ?? null }, tampered: true
     };
   }
 }
