@@ -7,8 +7,17 @@ import path from 'node:path';
 import test from 'node:test';
 import { archiveResolver, layEdition, readEditionInputs } from '../../ops/lay-page.mjs';
 import { writeEditionIndex } from './edition-index.mjs';
-import { PASSED_ARTICLES_MINIMUM } from './compose-gate.mjs';
+import { DESK_DOCUMENTS_REQUIRED, PASSED_ARTICLES_MINIMUM, compositionCoverage, composeGateStatus } from './compose-gate.mjs';
+// Every REQUIRED side of the gate line is read back out of the gate itself, so a
+// deliberate change to a floor cannot fail a test that is really about the found
+// counts and the ready/blocked word. These assertions used to pin a literal 5
+// and had been red since the passed-article floor moved to 4 — invisibly,
+// because the public CI run skips every test that needs the private state
+// adapter.
+const required = Object.fromEntries(Object.entries(composeGateStatus({ edition: '2026-01-01', passed: 0, desks: 0, forecasts: 0, dissents: 0, coverage: compositionCoverage([]) }).coverage).map(([key, gate]) => [key, gate.required]));
+const gateLine = ({ sections = 3, dissent = 0, state = 'ready' } = {}) => `# compose: passed=5/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=${sections}/${required.sections} owners=5/${required.owners} sources=5/${required.sources} domains=5/${required.domains} forecast=1 dissent=${dissent}  → ${state}`;
 import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
+import { REPORTERS } from './corpus-contract.mjs';
 import { corpusDeskIndex, corpusIdentityFile, corpusPreparedFile, installCorpusFixture } from './corpus-fixture.mjs';
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
@@ -407,9 +416,9 @@ runtimeTest('a day with the required forecast and no recorded dissent composes, 
   try {
     const composeArgs = await driveToCompose(state, edition, article);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 sections=3\/3 owners=5\/5 sources=5\/3 domains=5\/3 forecast=1 dissent=0 {2}→ ready$/mu);
+    assert.equal((await readIndexFile(state, edition)).split('\n').find((line) => line.startsWith('# compose:')), gateLine());
     const composed = await composeEdition({ ...composeArgs, event_key: 'compose-forecast-no-dissent' });
-    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 sections=3/3 owners=5/5 sources=5/3 domains=5/3 forecast=1 dissent=0  → ready');
+    assert.equal(stateOf(composed), gateLine());
     assert.equal(composed.forecasts, 1);
     assert.equal(composed.dissents, 0);
     assert.equal(composed.waiver, undefined, 'nothing was waived, because there is nothing left to waive');
@@ -452,7 +461,7 @@ runtimeTest('the waiver environment variable is inert — no value of it changes
     }
     const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-junk-env' });
     assert.equal(composed.waiver, undefined);
-    assert.equal(stateOf(composed), '# compose: passed=5/5 desks=4/4 sections=3/3 owners=5/5 sources=5/3 domains=5/3 forecast=1 dissent=0  → ready');
+    assert.equal(stateOf(composed), gateLine());
   } finally {
     if (saved === undefined) delete process.env.CLANK_EDITION_DIVERSITY_WAIVER; else process.env.CLANK_EDITION_DIVERSITY_WAIVER = saved;
     delete process.env.CLANK_NEWSROOM_AGENT;
@@ -823,11 +832,11 @@ runtimeTest('a recorded dissent is counted by compose and reported in the receip
     });
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     const composed = await composeEdition({ ...composeArgs, event_key: 'compose-with-dissent' });
-    assert.equal(composed.compose_gates, '# compose: passed=5/5 desks=4/4 sections=3/3 owners=5/5 sources=5/3 domains=5/3 forecast=1 dissent=1  → ready');
+    assert.equal(composed.compose_gates, gateLine({ dissent: 1 }));
     assert.equal(composed.forecasts, 1);
     assert.equal(composed.dissents, 1);
     assert.equal((await readComposedReceipt(state, edition)).composition.dissents, 1);
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 sections=3\/3 owners=5\/5 sources=5\/3 domains=5\/3 forecast=1 dissent=1 {2}→ ready$/mu);
+    assert.equal((await readIndexFile(state, edition)).split('\n').find((line) => line.startsWith('# compose:')), gateLine({ dissent: 1 }));
     assert.match(await readIndexFile(state, edition), /^N story-1 rev=1 by=vesta dissent p=0\.62$/mu);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
@@ -1107,7 +1116,7 @@ runtimeTest('five authentic PASS articles in two sections report blocked and com
     const sections = ['Business', 'World', 'World', 'Business', 'World'];
     const composeArgs = await driveToCompose(state, edition, (id, owner, day, index) => ({ ...article(id, owner, day, index), section: sections[index] }));
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    assert.match(await readIndexFile(state, edition), /^# compose: passed=5\/5 desks=4\/4 sections=2\/3 owners=5\/5 sources=5\/3 domains=5\/3 .*→ blocked$/mu);
+    assert.equal((await readIndexFile(state, edition)).split('\n').find((line) => line.startsWith('# compose:')), gateLine({ sections: 2, state: 'blocked' }));
     await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-two-sections' }), /at least 3 distinct sections required, found 2/);
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
@@ -1157,8 +1166,9 @@ runtimeTest('record_assignment binds the mounted corpus into the edition, and re
     // Each refusal, in the words an agent can act on. Nothing is recorded by
     // any of them: the single valid record above is still the only one.
     const refuse = async (name, key, pattern) => {
+      const before = (await assignmentRecords(state, edition)).length;
       await assert.rejects(recordAssignmentAgainstMount({ edition, event_key: `schedule:corpus-${key}`, assignments }), pattern, name);
-      assert.equal((await assignmentRecords(state, edition)).length, 1, `${name} must record nothing`);
+      assert.equal((await assignmentRecords(state, edition)).length, before, `${name} must record nothing`);
     };
 
     delete process.env.CLANK_PRIVATE_SOURCE_ROOT;
@@ -1202,13 +1212,21 @@ runtimeTest('record_assignment binds the mounted corpus into the edition, and re
       assert.match(error.message, /graves/u, 'the refusal must name the reporter whose research is absent');
       return true;
     });
+    // A desk with no rows is a real editorial state, not a broken corpus: the
+    // Hearth runs roughly one edition in seven and graves carried a single row
+    // on 2026-09-30. Refusing every commission because one desk is quiet would
+    // turn "five desks have something" into "no paper", which is the failure
+    // class this whole change exists to remove. Only a corpus that routed
+    // nothing to anybody is a corpus nobody can report from.
     await writeFile(graves, '');
-    await refuse('an empty reporter desk index', 'empty-desk-index', (error) => {
+    assert.deepEqual((await recordAssignmentAgainstMount({ edition, event_key: 'schedule:corpus-quiet-desk', assignments })).corpus, expected, 'one quiet desk must not cost the day');
+    for (const agent of REPORTERS) await writeFile(corpusDeskIndex(root, edition, agent), '');
+    await refuse('a corpus that routed nothing to any desk', 'no-rows-anywhere', (error) => {
       assert.match(error.message, /the mounted research corpus is incomplete for edition 2026-10-02/u);
-      assert.match(error.message, /graves/u);
+      assert.match(error.message, /2026-10-02/u, 'the refusal must name the edition that has no research');
       return true;
     });
-    await writeFile(graves, gravesBytes);
+    for (const agent of REPORTERS) await writeFile(corpusDeskIndex(root, edition, agent), gravesBytes);
 
     const prepared = corpusPreparedFile(root, edition), preparedBytes = await readFile(prepared, 'utf8');
     await rm(prepared);
