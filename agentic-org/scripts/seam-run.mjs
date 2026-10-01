@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// The seam: the step that was a person, every morning.
+// The seam: the step that was a person, every morning. It is a RELEASE job now,
+// and it is worth knowing why, because the shape of this file is the answer.
 //
 // WHAT IT REPLACES
 // ----------------
@@ -9,22 +10,44 @@
 // trigger, so on 2026-09-06 the pin was stale at wake time and every reporter's
 // research pull ENOENTed. This is that person, as a job.
 //
+// WHY THERE IS NO `repin` STAGE ANY MORE
+// --------------------------------------
+// Because the corpus is no longer an input to the image. It used to be
+// `newsroom-private.tar`, a checksum-pinned bundle whose digest sat in all
+// twelve agent Spawnfiles, repinned here every morning — which meant a new
+// day's research required a new ~5GB image, which meant a daily build, which
+// meant a daily chance to lose the day to something that had nothing to do with
+// journalism. It happened twice in two days: 2026-09-30 died at the candidate
+// health probe, 2026-10-01 at the deploy gate.
+//
+// agentic-org/Spawnfile now mounts the corpus as the team-shared
+// `clank-newsroom-corpus` volume, populated by a host timer outside the agent
+// boundary, and the newsroom tools refuse a corpus that is not this edition's
+// when Brass commissions. So an org image is DAY-AGNOSTIC: nothing about
+// tomorrow obliges a rebuild, and the pipeline below exists to ship CODE AND
+// PROMPTS, not research. `--if-changed` is what makes that literal — the job
+// can sit on a timer and no-op until the org repo's HEAD moves.
+//
+// Two things the corpus used to carry with it moved rather than disappeared:
+// the per-edition wake budget turnover, which now has its own unit
+// (epoch-roll-run.mjs, because a budget reset still needs a container
+// recreate), and the corpus provenance, which travels with the data as
+// CORPUS.json (see scripts/corpus-contract.mjs).
+//
 // THE ORDER IS NOT A STYLE CHOICE
 // -------------------------------
-//   1. repin-private-source.mjs            — standalone, FIRST
-//   2. check-bundle-descriptor --repin-source
-//   3. npm run org:bundle
-//   4. check-bundle-descriptor             — the proof
-//
-// (1) before (2): repinning rewrites policies/private-source.json, which is a
-// tracked file and therefore part of the source archive, so the source digest
-// is only measurable once the pin is in.
-// (2) before (3): `--repin-source` finds the twelve source archive pins by
-// searching for the descriptor's CURRENT source digest. `org:bundle` advances
-// the descriptor and refreshes generated public asset pins, so running it first
-// leaves source repin nothing to match and produces an image whose agents pin a
-// source archive that no longer exists. Confirmed on the box, 2026-09-06, by
-// doing it wrong.
+//   1. releaseGate  — cheapest first: two git reads and one file read, so the
+//      almost-always "nothing changed" path never touches docker or the tree.
+//   2. gate         — before anything writes, because a redeploy kills wakes.
+//   3. bundle       — three commands whose order is its own lesson; see below.
+//   4. build, runtimePolicy — nothing reaches `up` unconfined.
+//   5. rollEpoch    — AFTER the policy refusal and before `up`: a run that is
+//      not going to deploy must not leave the day's budget rolled behind it,
+//      and `--env-file` only applies at container CREATION.
+//   6. deploy, settle, runtimeBootstrap.
+//   7. recordRelease — LAST, because the ledger claims "this commit is
+//      RUNNING". Written before `settle` it would claim a container that never
+//      came up, and the next run would see nothing to do.
 //
 // A REDEPLOY KILLS IN-FLIGHT WAKES
 // --------------------------------
@@ -32,6 +55,12 @@
 // clear AND the running container is quiet — the second read from daimon's own
 // wake-acceptance receipts, its usage ledger and the container's process table,
 // never assumed from the hour. See that module's header.
+//
+// Under `--if-changed` a closed window is a DEFERRAL, not a failure: an hourly
+// timer that paged on every busy hour would page twenty times a day and teach
+// the operator to ignore the pager. Run by hand, a refused gate still alarms
+// and still exits non-zero — a person who asked for a release now deserves to
+// be told it was refused. See release-ledger.mjs.
 //
 // THE BUILD ROOT IS LOAD-BEARING
 // ------------------------------
@@ -43,9 +72,10 @@
 // assumed.
 //
 // USAGE
-//   node agentic-org/scripts/seam-run.mjs                  # the real thing
+//   node agentic-org/scripts/seam-run.mjs                  # release this commit now
+//   node agentic-org/scripts/seam-run.mjs --if-changed     # the timer: no-op unless HEAD moved
 //   node agentic-org/scripts/seam-run.mjs --check          # verify only, writes nothing
-//   node agentic-org/scripts/seam-run.mjs --no-deploy      # repin + bundle + build, no `up`
+//   node agentic-org/scripts/seam-run.mjs --no-deploy      # bundle + build, no `up`
 //   node agentic-org/scripts/seam-run.mjs --edition=2026-09-06 --repo=/tmp/clone
 //
 // Every stage that fails raises the alarm (alarm.mjs) before exiting non-zero.
@@ -56,6 +86,7 @@ import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, compiledArtifacts, compiledEngineFindings, grokBrokerFindings } from './engine-policy.mjs';
+import { DEFAULT_RELEASE_LEDGER, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
 export const DEFAULT_REPO = '/root/work/clankandslop';
 export const DEFAULT_CONTAINER = 'spawnfile-clank-and-slop';
@@ -66,21 +97,24 @@ export const DEFAULT_DEPLOY_USER = 'clank';
 // Seam-built images are tagged so they can be told apart from every hand-built
 // `local<n>`, and so the retention sweep below can only ever touch its own.
 export const TAG_PREFIX = 'clank-and-slop:seam-';
-// TWO during the run, ONE once the new container is healthy.
+// TWO during the run, TWO once the new container is healthy.
 //
 // Two while the build is in flight because the running image cannot be removed
-// and the new one does not exist yet. One afterwards because image-level
-// rollback is worth almost nothing here: every org image is pinned to ONE day's
-// corpus, so "rolling back" does not restore a working newsroom — it restores
-// yesterday's research under today's date, which is the exact failure this
-// pipeline spent two days removing. A broken build is fixed by fixing it and
-// rebuilding, not by running a stale image.
+// and the new one does not exist yet.
 //
-// This is a deliberate trade, not an oversight: we give up image rollback and
-// get ~5GB of permanent headroom per retired image. Do not reinstate retention
-// without a reason that survives the corpus-pinning argument.
+// Two afterwards because IMAGE ROLLBACK IS WORTH SOMETHING AGAIN. This said one
+// for as long as every org image was pinned to ONE day's corpus: "rolling back"
+// then restored yesterday's research under today's date, which is not a working
+// newsroom, so the only recovery was to fix the build and rebuild. The corpus
+// moved to a host-populated volume, so an image is day-agnostic — the image that
+// was running an hour ago is a complete, correct newsroom, and `up <previous
+// tag> --image` is a recovery that takes a minute instead of a build.
+//
+// Affordable because builds are RARE now: this is a release job, not a daily
+// one, so the second ~5GB sits there across however many days pass without a
+// code change rather than being replaced every morning.
 export const KEEP_IMAGES = 2;
-export const KEEP_IMAGES_AFTER_SETTLE = 1;
+export const KEEP_IMAGES_AFTER_SETTLE = 2;
 // `build` writes the compiler's whole output tree to
 // `.runtime/seam-compiled-<tag>/` and nothing ever removed it. Twelve of them
 // had accumulated by 2026-09-20 — 8.2GB of pure scratch on a 75GB disk, more
@@ -102,8 +136,9 @@ export class SeamError extends Error { constructor(message, reason) { super(mess
 
 export function parseArgs(argv) {
   const options = {
-    edition: null, ref: null, repo: DEFAULT_REPO, container: DEFAULT_CONTAINER, deployment: DEFAULT_DEPLOYMENT,
+    edition: null, repo: DEFAULT_REPO, container: DEFAULT_CONTAINER, deployment: DEFAULT_DEPLOYMENT,
     cli: process.env.SPAWNFILE_CLI ?? DEFAULT_SPAWNFILE_CLI, envFile: process.env.CLANK_DEPLOY_ENV_FILE ?? DEFAULT_ENV_FILE,
+    released: process.env.CLANK_RELEASE_LEDGER ?? DEFAULT_RELEASE_LEDGER, ifChanged: false, releaseCommit: null,
     compiledOutput: null,
     deployUser: DEFAULT_DEPLOY_USER, tag: null, check: false, deploy: true, skipContainer: false, leadMinutes: 30, tailMinutes: 120
   };
@@ -111,12 +146,13 @@ export function parseArgs(argv) {
     const [key, ...rest] = arg.startsWith('--') ? arg.slice(2).split('=') : [null];
     const value = rest.join('=');
     if (key === 'edition' && value) options.edition = value;
-    else if (key === 'ref' && value) options.ref = value;
     else if (key === 'repo' && value) options.repo = path.resolve(value);
     else if (key === 'container' && value) options.container = value;
     else if (key === 'deployment' && value) options.deployment = value;
     else if (key === 'cli' && value) options.cli = path.resolve(value);
     else if (key === 'env-file' && value) options.envFile = path.resolve(value);
+    else if (key === 'released' && value) options.released = path.resolve(value);
+    else if (key === 'if-changed') options.ifChanged = true;
     else if (key === 'deploy-user' && value) options.deployUser = value;
     else if (key === 'tag' && value) options.tag = value;
     else if (key === 'lead-minutes' && value) options.leadMinutes = Number(value);
@@ -156,23 +192,13 @@ export function gate(options, { now = new Date(), log = console.log } = {}) {
   return verdict;
 }
 
-// --- stage 2: the pin --------------------------------------------------------
-export function repin(options, { log = console.log } = {}) {
-  const args = [path.join(options.repo, 'agentic-org/scripts/repin-private-source.mjs'), `--edition=${options.edition}`, `--ref=${options.ref}`];
-  if (options.check) args.push('--check');
-  return run('repin', 'repin-failed', process.execPath, args, { cwd: options.repo, log });
-}
-
 // --- stage 3: the bundles ----------------------------------------------------
 // THREE commands, in one order that is the only order that works. Verified on
 // the box, 2026-09-06, by getting it wrong first:
 //
 //   a. `--repin-source` FIRST, because it finds the Spawnfile pins by searching
 //      for the descriptor's CURRENT source digest. It has to run while the
-//      descriptor still holds the digest the Spawnfiles hold. It also has to
-//      run AFTER repin-private-source.mjs, because that rewrites
-//      policies/private-source.json — a tracked file, therefore part of the
-//      source archive — so the measurement is only correct once the pin is in.
+//      descriptor still holds the digest the Spawnfiles hold.
 //   b. `org:bundle` SECOND. It writes the six tars and the descriptor, and it
 //      refreshes generated public asset pins in Spawnfiles. Running it before
 //      (a) advances the source descriptor, leaves (a) nothing to match, and
@@ -203,7 +229,12 @@ export function bundle(options, { log = console.log } = {}) {
 // covers the source archive — deliberately, because it must be able to run in
 // CI without the private checkout or node_modules. This job has both, so it
 // checks every archive described by the runtime, tools and article-validation descriptors.
-const descriptorEntries = (descriptor) => [descriptor.source, descriptor.private, ...descriptor.dependencies ?? [], ...descriptor.assets ?? []]
+// `descriptor.private` was the research corpus and is deliberately absent: the
+// corpus is a host-populated volume now, so the descriptor describes no archive
+// for it and no Spawnfile pins one. Listing a block that does not exist would
+// leave a hole in this check — every entry is `.filter`ed on `archive`, so an
+// undefined one is silently dropped rather than reported.
+const descriptorEntries = (descriptor) => [descriptor.source, ...descriptor.dependencies ?? [], ...descriptor.assets ?? []]
   .filter((entry) => entry?.archive);
 
 function describedArchives(repo) {
@@ -341,40 +372,25 @@ export function compiledOutputPath(options) {
   return path.join(options.repo, COMPILED_OUTPUT_DIR, `${COMPILED_OUTPUT_PREFIX}${String(options.tag ?? '').replace(/[^a-zA-Z0-9_.-]/gu, '_')}`);
 }
 
-// The corpus the image will mount is decided by one tracked file,
-// `policies/private-source.json`, and it is rewritten by `repin` at the top of
-// every run. Which means a run that SKIPS repin builds an image whose twelve
-// agents mount whatever corpus that file last named — silently, with no
-// diagnostic, because a stale pin is a perfectly valid pin.
+// THE BUILD NO LONGER HAS AN OPINION ABOUT WHICH DAY'S RESEARCH IT CARRIES,
+// because it does not carry any. This stage used to assert that
+// `policies/private-source.json` named the edition being built — the guard that
+// caught a `spawnfile build` from a tree reset to `main`, whose committed pin
+// read `edition/2026-09-09-prepared`, about to bake two-week-old research into
+// that night's paper.
 //
-// That is not hypothetical. On 2026-09-22 the checkout was reset to `main`
-// several times, and `main`'s committed pin is `edition/2026-09-09-prepared`:
-// a bare `spawnfile build` from that tree would have mounted two-week-old
-// research into tonight's paper and nothing would have said so. The pin cannot
-// simply be committed correctly either — it is per-edition by construction, so
-// whatever is committed is stale by the next morning.
+// That guard did not weaken, its SUBJECT left: no archive in this image holds
+// research any more. The same question is now answered where the corpus
+// actually is — the host refresher validates the tree it fetches and writes
+// CORPUS.json beside it, and the newsroom tools refuse a corpus that is
+// missing, empty, unreadable or not this edition's when Brass commissions
+// (scripts/corpus-contract.mjs). An image built from any commit, on any day, is
+// correct; what it mounts is decided at run time and checked there.
 //
-// So the build asserts the pin names the edition being built. It is the cheap
-// version of the check: a `spawnfile build` invoked outside this job entirely
-// is still unguarded from here, and that is worth knowing rather than
-// pretending otherwise.
-export function assertCorpusPin(options, { read = readFileSync } = {}) {
-  const file = path.join(options.repo, 'agentic-org/policies/private-source.json');
-  let pin;
-  try { pin = JSON.parse(read(file, 'utf8')); }
-  catch (error) { throw new SeamError(`cannot read the private corpus pin ${file}: ${error.message}`, 'deploy-failed'); }
-  if (pin?.edition !== options.edition) {
-    throw new SeamError(
-      `the private corpus pin names edition ${pin?.edition ?? '(none)'} but this build is for ${options.edition} —`
-      + ` refusing to mount research from another day. Run repin first (${file} is rewritten by repin-private-source.mjs).`,
-      'deploy-failed');
-  }
-  return pin;
-}
-
+// Reinstating a per-edition assertion here would make every release impossible
+// on any day the committed pin is not today's, which is every day, which is how
+// the daily rebuild got reinvented. seam-run.test.mjs holds that line.
 export function build(options, { log = console.log } = {}) {
-  const pin = assertCorpusPin(options);
-  log(`corpus: ${pin.ref} @ ${String(pin.commit).slice(0, 12)} (edition ${pin.edition})`);
   options.compiledOutput = compiledOutputPath(options);
   run('build', 'deploy-failed', process.execPath, [options.cli, 'build', path.join(options.repo, 'agentic-org'), '--tag', options.tag, '--out', options.compiledOutput], { cwd: options.repo, log });
   return options.tag;
@@ -556,22 +572,33 @@ export function sweepImages(options, { log = console.log, exec = execFileSync, k
   } catch (error) { log(`  (image sweep skipped: ${String(error.message).trim().slice(0, 120)})`); }
 }
 
-// The stages are injectable so the order — gate, then repin, then bundle — can
-// be asserted by a test rather than only asserted by this comment. Reversing
-// repin and bundle is the failure mode the header describes, and a test is the
-// only thing that keeps a future edit from doing it.
-export const STAGES = Object.freeze({ gate, repin, bundle, reclaimBuildSpace, build, runtimePolicy, rollEpoch, deploy, settle, runtimeBootstrap, sweepImages });
+// The stages are injectable so the ORDER can be asserted by a test rather than
+// only asserted by the header's comment. There is no `repin` key and there must
+// never be one again: a daily corpus repin is the habit this pipeline was
+// rebuilt to lose, and seam-run.test.mjs fails if the key comes back.
+export const STAGES = Object.freeze({ releaseGate, gate, bundle, reclaimBuildSpace, build, runtimePolicy, rollEpoch, deploy, settle, runtimeBootstrap, recordRelease, sweepImages });
 
-export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES } = {}) {
+export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES, defer = deferRelease } = {}) {
   const options = parseArgs(argv);
   options.edition ??= berlinToday(now);
-  options.ref ??= `edition/${options.edition}`;
   options.tag ??= `${TAG_PREFIX}${options.edition}-${now.toISOString().slice(11, 19).replace(/:/gu, '')}`;
-  log(`seam ${options.check ? '(check)' : options.deploy ? '' : '(no-deploy)'} edition ${options.edition} ref ${options.ref} repo ${options.repo}`);
+  log(`seam ${options.check ? '(check)' : options.deploy ? '' : '(no-deploy)'}${options.ifChanged ? ' (if-changed)' : ''} edition ${options.edition} repo ${options.repo}`);
   const stages = [];
   try {
-    stageImpl.gate(options, { now, log }); stages.push('gate');
-    stageImpl.repin(options, { log }); stages.push('repin');
+    // Nothing above this line touches the tree, the deployment or docker. An
+    // hourly timer spends almost every run here and exits having read three
+    // things.
+    if (options.ifChanged && stageImpl.releaseGate(options, { log }).released) return { ...options, stages, ok: true, noop: true };
+    if (options.ifChanged) stages.push('releaseGate');
+    try { stageImpl.gate(options, { now, log }); }
+    catch (error) {
+      // A closed wake window under the timer is "not yet", not "broken": see
+      // release-ledger.mjs's deferRelease. Run by hand it keeps the old
+      // behaviour and falls through to the alarm below.
+      if (!options.ifChanged) throw error;
+      return { ...options, stages, ok: true, ...defer(options, error.message, { now, log, alarm }) };
+    }
+    stages.push('gate');
     stageImpl.bundle(options, { log }); stages.push('bundle');
     if (options.check) { log('\ncheck PASSED: the pin, the descriptor and the deploy window are all current.'); return { ...options, stages, ok: true }; }
     stageImpl.reclaimBuildSpace(options, { log }); stages.push('reclaimBuildSpace');
@@ -584,6 +611,10 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     stageImpl.deploy(options, { log }); stages.push('deploy');
     stageImpl.settle(options, { log }); stages.push('settle');
     stageImpl.runtimeBootstrap(options, { log }); stages.push('runtimeBootstrap');
+    // The ledger claims "this commit is RUNNING", so it is written here and
+    // nowhere earlier. A failure is loud: a ledger that did not advance makes
+    // every later timer run rebuild and redeploy this same commit forever.
+    stageImpl.recordRelease(options, { log, now }); stages.push('recordRelease');
     // The container is up and healthy, so the image it replaced is no longer
     // the thing a rollback would want (see KEEP_IMAGES) and the cache this
     // build filled is spent. Reclaiming here rather than only before the next
@@ -592,10 +623,14 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     // start.
     stageImpl.sweepImages(options, { log, keep: KEEP_IMAGES_AFTER_SETTLE });
     pruneBuildCache({ log });
-    log(`\nseam complete: edition ${options.edition} pinned, bundled, built as ${options.tag}, deployed and settled.`);
+    log(`\nseam complete: ${String(options.releaseCommit ?? 'HEAD').slice(0, 12)} bundled, built as ${options.tag}, deployed and settled.`);
     return { ...options, stages, ok: true };
   } catch (error) {
-    const reason = error instanceof SeamError ? error.reason ?? 'seam-blocked' : 'seam-blocked';
+    // SeamError and release-ledger.mjs's ReleaseError both carry a reason word;
+    // anything else is an unexpected throw and gets the generic one. Matched on
+    // the field rather than the class so the release ledger can stay a separate
+    // module without closing an import cycle.
+    const reason = typeof error?.reason === 'string' ? error.reason : 'seam-blocked';
     process.stderr.write(`\nseam FAILED after stage(s) [${stages.join(', ') || 'none'}]: ${error.message}\n`);
     alarm(reason, { edition: options.edition, message: `${reason} after [${stages.join(', ') || 'none'}]`, detail: error.message });
     return { ...options, stages, ok: false, reason };
