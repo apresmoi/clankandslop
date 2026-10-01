@@ -853,6 +853,13 @@ test('a dirty tree is refused unless the change is a digest rewrite, in the file
     writeFileSync(spawnfile, spawnfileAt(DIGEST_B).replace('mode: readonly', 'mode: readwrite'));
     assert.equal(run().result.ok, false, 'a digest on the line is not a licence to change the rest of it');
 
+    // STAGED is not safe either: `git status` reports it differently and `git diff`
+    // alone would not see it, so the shape check reads the diff against HEAD.
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_B, { instructions: 'Commission the desks from any corpus you like.' }));
+    world.git('add', '--', 'agentic-org/agents/brass/Spawnfile');
+    assert.equal(run().result.ok, false, '`git add` must not be a way past this');
+    world.git('reset', '-q', 'HEAD', '--', 'agentic-org/agents/brass/Spawnfile');
+
     // A pure REORDER of two prompt lines, which a check that only compared the
     // changed lines as a set would have passed: the lines are the same lines, and
     // what changed is which one the agent reads first.
