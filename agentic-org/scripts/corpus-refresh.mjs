@@ -194,6 +194,9 @@ export function appendRefreshLedger(ledger, entry) {
   return entry;
 }
 
+// The whole sequence. The one-writer lock is NOT taken here: `main` holds it for
+// the entire run (see relayUnderLock), so every caller that reaches this point
+// already has it, or deliberately runs without one.
 export function refresh(argv = [], { now = new Date(), log = console.log, ledger = REFRESH_LEDGER, ops = SYMLINK_OPS, exec = hostExec } = {}) {
   const options = corpusRefreshArgs(argv);
   const edition = options.edition ?? berlinToday(now);

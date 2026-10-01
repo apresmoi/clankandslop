@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chmodSync, existsSync, lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync, rmSync, statSync } from 'node:fs';
+import { chmodSync, existsSync, lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { CorpusError, REPORTERS } from './corpus-contract.mjs';
 import { SYMLINK_OPS, TREES_DIR, VOLUME_ROOT_MODE, hostExec } from './corpus-volume.mjs';
-import { LOCK_BUSY_EXIT, LOCK_ENV, corpusRefreshArgs, main, refresh } from './corpus-refresh.mjs';
+import { LOCK_BUSY_EXIT, LOCK_ENV, corpusCurrent, corpusRefreshArgs, main, refresh } from './corpus-refresh.mjs';
 import { EDITION, OWNER, PRIOR, STORIES, UNCUT, args, cleanup, commitAll, deps, fixture, git, identityOf, ledgerOf, snapshot, writeCorpus, writeIndex, writeRaw } from './corpus-refresh.fixture.mjs';
 
 const liveTree = (fixture, edition = EDITION) => realpathSync(join(fixture.volume, edition));
@@ -124,6 +124,30 @@ test('a new commit on the edition branch moves the link and advances the identit
   } finally { cleanup(f); }
 });
 
+test('an identity record that disagrees with the commit on the links is not current', () => {
+  const f = fixture();
+  try {
+    const first = refresh(args(f), deps(f));
+    writeCorpus(f.priv, EDITION, 'A LATER PRODUCER RUN');
+    const second = commitAll(f.priv, 'research: later');
+    refresh(args(f), deps(f));
+
+    // A record that is internally perfect, points at a tree that exists, and
+    // sits over links that resolve — for the commit before last. Only comparing
+    // the record's commit to the resolved one catches it, and leaving it stale
+    // is what makes an edition receipt cite research the reporters did not read.
+    const stale = { ...identityOf(f), commit: first.commit, tree: `${TREES_DIR}/${first.commit}` };
+    chmodSync(join(f.volume, 'CORPUS.json'), 0o644);
+    writeFileSync(join(f.volume, 'CORPUS.json'), `${JSON.stringify(stale, null, 2)}\n`);
+    const state = corpusCurrent(f.volume, { commit: second, edition: EDITION });
+    assert.equal(state.current, false);
+    assert.match(state.reason, /volume carries/u);
+    assert.ok(state.reason.includes(first.commit.slice(0, 7)) && state.reason.includes(second.slice(0, 7)), 'the reason must name both commits');
+    assert.equal(refresh(args(f), deps(f)).changed, true, 'the record must be republished rather than trusted');
+    assert.equal(identityOf(f).commit, second);
+  } finally { cleanup(f); }
+});
+
 test('the live edition path is never absent or dangling: the swap is a rename over it', () => {
   const f = fixture();
   try {
@@ -238,6 +262,25 @@ test('garbage collection keeps the live tree and --keep spares, and removes the 
   } finally { cleanup(f); }
 });
 
+test('a tree still reachable through an older date survives collection', () => {
+  const f = fixture();
+  try {
+    const first = refresh(args(f, ['--keep=0']), deps(f));
+    // The producers prune yesterday off the branch. Today's tree no longer
+    // carries 2026-09-05, so its link keeps pointing into the previous tree —
+    // and an agent asked for that date still has to be able to read it.
+    rmSync(join(f.priv, PRIOR), { recursive: true, force: true });
+    const second = commitAll(f.priv, 'research: prune yesterday');
+    const result = refresh(args(f, ['--keep=0']), deps(f));
+
+    assert.equal(result.commit, second);
+    assert.deepEqual(result.treesRemoved, [], 'a tree an older date still resolves into is never a candidate');
+    assert.deepEqual(readdirSync(join(f.volume, TREES_DIR)).sort(), [first.commit, second].sort());
+    assert.equal(readlinkSync(join(f.volume, PRIOR)), `${TREES_DIR}/${first.commit}/${PRIOR}`);
+    assert.ok(existsSync(join(f.volume, PRIOR, 'desks', 'foreman.index')), 'yesterday must still be readable through its link');
+  } finally { cleanup(f); }
+});
+
 test('--check writes nothing and reports whether a refresh is needed', () => {
   const f = fixture();
   try {
@@ -305,7 +348,10 @@ test('a tree already extracted for this commit is reused rather than re-extracte
     const before = statSync(tree).mtimeMs;
     // Drop the identity record: the no-op check fails, but the content is there.
     rmSync(join(f.volume, 'CORPUS.json'));
-    const result = refresh(args(f), deps(f));
+    const commands = [];
+    const exec = (command, commandArgs, options) => { commands.push(commandArgs.includes('archive') ? 'archive' : command); return hostExec(command, commandArgs, options); };
+    const result = refresh(args(f), deps(f, { exec }));
+    assert.equal(commands.includes('archive'), false, `a tree that is already on disk must not be extracted again: ${commands.join(', ')}`);
     assert.equal(result.changed, true);
     assert.equal(result.linksMoved, 0, 'the links already point at this tree');
     assert.equal(statSync(tree).mtimeMs, before, 'the tree must not be rewritten');
