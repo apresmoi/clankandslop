@@ -81,13 +81,14 @@ const corpusAgents = new Set(['klaxon']);
 //   brass    record_assignment -> corpusIdentity() reads CORPUS.json, verifies
 //            the tree and the dated link, and binds the identity into the
 //            edition's assignment records.
-//   ledger   file_desk ledger.worlddesk -> authenticateWorldDeskFiling() reads
-//            the prepared document and its trace out of the same mount. Note
-//            that this read has no refusal of its own: worlddesk-filing.mjs
-//            falls back to a cwd-relative repos/newsroom-private when the mount
-//            is undeclared, so what the declaration below buys is that the
-//            fallback is never exercised, not a refusal. Do not upgrade that
-//            into a promise here until the tool makes it.
+//   ledger   file_desk ledger.worlddesk -> authenticateWorldDeskFiling() refuses
+//            an absent or non-absolute mount by name (there is no cwd-relative
+//            fallback left in that file), then checks the corpus over the shared
+//            contract -- corpusIdentityFindings, corpusLinkFindings and
+//            verifyCorpusFreshness -- before it reads the prepared document and
+//            its trace. It deliberately does not call verifyCorpusTree: a World
+//            Desk filing does not rest on the reporter desk indexes, so that one
+//            would refuse filings it has no business refusing.
 //   pressman prepare_release / stage_release -> the release adapter stages the
 //            current World Desk trace from the mount and refuses without it.
 //
