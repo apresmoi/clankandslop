@@ -1363,6 +1363,10 @@ runtimeTest('a corpus that moved under a commissioned edition is a deadlock, and
     const message = await refusal('compose-two-corpora');
     assert.match(message, /the research corpus moved underneath a commissioned edition/u);
     refusedRemedy(message, [first, later]);
+    // The operator is told which file to remove, by the name it really has on the
+    // volume: an instruction that cannot be followed is the defect being fixed.
+    for (const entry of await assignmentRecords(state, edition))
+      assert.ok(message.includes(path.basename(entry.file)), `the refusal must name ${path.basename(entry.file)} so the operator can find the record`);
 
     // THE DEADLOCK, demonstrated rather than asserted in prose. Brass has no way
     // to take a record back: the same event_key with a corrected lineup is a
