@@ -118,12 +118,24 @@ test('the live name is replaced by rename(2) and never unlinked', () => {
   } finally { fixture.cleanup(); }
 });
 
-test('a real directory where a corpus link belongs is a refusal, not something to overwrite', () => {
+// The refusal is right -- the host must not unlink research it did not write --
+// and on its own it is also a dead end: nothing in this newsroom can clear it, so
+// a refusal that neither pages nor says what clears it leaves the dated corpus
+// unreachable for as long as nobody happens to read a log.
+test('a real directory where a corpus link belongs is a refusal, and it pages with the one command that clears it', () => {
   const fixture = volumeFixture();
   try {
-    mkdirSync(join(fixture.volume, EDITION));
+    const planted = join(fixture.volume, EDITION);
+    mkdirSync(planted);
     assert.throws(() => pointAtTree(fixture.volume, EDITION, `${TREES_DIR}/${commitOf('a')}/${EDITION}`, { tmpDir: fixture.work }),
-      (error) => error instanceof CorpusError && /is a real directory/u.test(error.message));
+      (error) => {
+        assert.ok(error instanceof CorpusError && /is a real directory/u.test(error.message), error.message);
+        assert.equal(error.alarm, true, 'the refresher alarms only on an error it recognizes, so an unmarked refusal is exit 1 with no page');
+        assert.ok(error.message.includes(`mv -- ${planted}`), `the refusal must carry the command that clears it: ${error.message}`);
+        return true;
+      });
+    // And it is still a refusal: nothing was unlinked, replaced or moved.
+    assert.equal(statSync(planted).isDirectory(), true);
   } finally { fixture.cleanup(); }
 });
 
