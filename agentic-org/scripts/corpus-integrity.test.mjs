@@ -479,21 +479,24 @@ test('the recursive delete of a replaced tree happens with nothing pointing into
     const want = readFileSync(desk, 'utf8');
     dirty(f);
 
-    const deletes = [];
+    // RECORDED, NOT ASSERTED, INSIDE THE SPY: `removeTree` runs this very call inside
+    // a try/catch that swallows whatever it throws, so an assertion here would be
+    // swallowed with it and the test would be left proving the exit code.
+    const reads = [];
     const exec = (command, commandArgs, options) => {
       if (command === 'chmod' && commandArgs[0] === '-R' && commandArgs[1] === 'u+w') {
-        deletes.push(basename(commandArgs[2]));
-        // THE PROPERTY. Pre-fix this read is an ENOENT, because the replacement has
-        // not been landed yet and the link points into the tree being deleted.
-        assert.equal(readFileSync(desk, 'utf8'), want, `a dated link dangled across the recursive delete of ${commandArgs[2]}`);
+        let read;
+        try { read = readFileSync(desk, 'utf8'); } catch (error) { read = `the dated link dangled: ${error.code}`; }
+        reads.push([basename(commandArgs[2]).includes('-evicted-'), read]);
       }
       return hostExec(command, commandArgs, options);
     };
     const lines = [];
-    assert.equal(main(args(f), deps(f, { exec, log: (line) => lines.push(line) })), 0);
-    // The positive signal: an eviction delete really did run. Without this the
-    // assertion above proves nothing at all, because it never executed.
-    assert.equal(deletes.filter((name) => name.includes('-evicted-')).length, 1, `no replaced tree was deleted: ${deletes.join(', ')}`);
+    const exit = main(args(f), deps(f, { exec, log: (line) => lines.push(line) }));
+    // THE PROPERTY, and the positive signal that it was measured at all: exactly one
+    // eviction delete ran, and the desk index read as the corpus at that instant.
+    assert.deepEqual(reads, [[true, want]], `at the moment the replaced tree was deleted: ${JSON.stringify(reads)}`);
+    assert.equal(exit, 0);
     assert.ok(lines.some((line) => /^deleted the replaced /u.test(line)), lines.join(' | '));
     // And the end state is the healed corpus, with the parked copy gone from disk.
     assert.equal(readFileSync(desk, 'utf8'), want);
