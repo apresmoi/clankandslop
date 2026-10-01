@@ -60,23 +60,27 @@
 // stale digest surviving the rewrite.
 
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { existsSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import {
+  CorpusError, EDITION_PATTERN, REPORTERS, assertEditionInTree, berlinToday,
+  resolveRef, verifyCorpusFreshness, verifyCorpusTree
+} from './corpus-contract.mjs';
 import { buildPrivateArchive, privateRoot } from './private-archive.mjs';
 
-export const REPORTERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta'];
-const EDITION_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+// The corpus checks and the never-fall-back ref resolution are SHARED with the
+// host-side volume refresher (corpus-refresh.mjs), which runs the same
+// validation against an extracted directory instead of an extracted tar. They
+// live in corpus-contract.mjs so there is one implementation to keep correct.
+// Re-exported under this script's own vocabulary -- here the tree being
+// verified is always an archive it just cut, and `RepinError` is the word its
+// callers and tests already use for a refusal.
+export { CorpusError as RepinError, REPORTERS, assertEditionInTree, berlinToday, resolveRef, verifyCorpusFreshness, verifyCorpusTree as verifyArchive };
+
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/;
-const STORY_ID_PATTERN = /^s-[0-9a-f]{8}$/;
-const CORPUS_PREP_VERSION = 'clank.research-corpus.prepared.v1';
-const berlinDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' });
 
-export class RepinError extends Error {}
-const fail = (message) => { throw new RepinError(message); };
-
-export function berlinToday(now = new Date()) { return berlinDate.format(now); }
+const fail = (message) => { throw new CorpusError(message); };
 
 export function parseArgs(argv) {
   const options = { edition: null, ref: null, fetch: true, check: false };
@@ -92,99 +96,10 @@ export function parseArgs(argv) {
   return options;
 }
 
-// stderr is captured rather than inherited so a probe that is *expected* to
-// miss (rev-parse on a ref that does not exist yet) does not print raw git
-// noise ahead of this script's own, far more actionable, message.
+// stderr is captured rather than inherited so a failed fetch reports through
+// this script's own, far more actionable, message instead of printing raw git
+// noise ahead of it.
 const git = (repo, args) => execFileSync('git', ['-C', repo, ...args], { maxBuffer: 1024 * 1024 * 256, stdio: ['ignore', 'pipe', 'pipe'] }).toString();
-
-// Resolves `ref` to a commit WITHOUT ever falling back to another ref: a
-// missing edition branch means the producer has not cut today's corpus yet,
-// and silently pinning main in that case is exactly the failure this script
-// was written to end.
-export function resolveRef(privateRepoPath, ref) {
-  for (const candidate of [`refs/remotes/origin/${ref}`, `refs/heads/${ref}`]) {
-    try { return { commit: git(privateRepoPath, ['rev-parse', '--verify', `${candidate}^{commit}`]).trim(), ref: candidate }; } catch { /* try the next form */ }
-  }
-  let known = '';
-  try { known = git(privateRepoPath, ['for-each-ref', '--format=%(refname:short)', 'refs/remotes/origin/edition']).trim().split('\n').filter(Boolean).slice(-5).join(', '); } catch { /* listing is advisory */ }
-  return fail(`private ref '${ref}' does not exist in ${privateRepoPath} -- refusing to fall back to another ref.\n`
-    + `  The producers commit each day's corpus to edition/<date>; if that branch is missing the corpus for this edition has not been cut yet.\n`
-    + (known ? `  Most recent edition branches seen locally: ${known}\n` : '')
-    + '  Re-run once the branch exists, or pass --ref=<branch> deliberately.');
-}
-
-// Every path the reporters' prompts name, checked against the commit's tree
-// before anything is written. `git ls-tree` on the commit is authoritative and
-// costs nothing next to a 60MB archive build.
-export function assertEditionInTree(privateRepoPath, commit, edition) {
-  const present = new Set(git(privateRepoPath, ['ls-tree', '-r', '--name-only', commit, `${edition}/`]).split('\n').filter(Boolean));
-  const missing = REPORTERS.filter((agent) => !present.has(`${edition}/desks/${agent}.index`));
-  if (missing.length) {
-    const dates = [...new Set(git(privateRepoPath, ['ls-tree', '--name-only', commit]).split('\n').filter((name) => EDITION_PATTERN.test(name.replace(/\/$/, ''))))].sort();
-    fail(`commit ${commit.slice(0, 7)} has no ${edition}/desks/<agent>.index for: ${missing.join(', ')}\n`
-      + `  Dated corpus directories present at that commit: ${dates.slice(-5).join(', ') || '(none)'}\n`
-      + `  The reporters resolve <edition-date> themselves at wake time; a bundle without ${edition}/desks/ ENOENTs every reporter's research pull.`);
-  }
-  return present;
-}
-
-// The proof that matters: read the paths back out of the archive that will
-// actually be mounted, not out of git. Returns per-reporter index stats and
-// the resolved story files.
-export function verifyArchive(root, edition) {
-  const report = [];
-  for (const agent of REPORTERS) {
-    const indexPath = path.join(root, edition, 'desks', `${agent}.index`);
-    let text;
-    try { text = readFileSync(indexPath, 'utf8'); } catch { return fail(`extracted archive is missing ${edition}/desks/${agent}.index`); }
-    const rows = text.split('\n').filter((line) => line.trim() && !line.startsWith('#'));
-    const stories = rows.map((line) => line.trim().split(/\s+/)[0]);
-    const unparsable = stories.filter((id) => !STORY_ID_PATTERN.test(id));
-    if (unparsable.length) fail(`${edition}/desks/${agent}.index has row(s) whose first field is not a story id: ${unparsable.join(', ')}`);
-    const missing = stories.filter((id) => !existsSync(path.join(root, edition, 'stories', `${id}.md`)));
-    if (missing.length) fail(`DEFECT: ${edition}/desks/${agent}.index references story files that are absent from the archive: ${missing.map((id) => `${edition}/stories/${id}.md`).join(', ')}`);
-    report.push({ agent, bytes: Buffer.byteLength(text), rows: rows.length, stories });
-  }
-  return report;
-}
-
-const digestText = (text) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
-
-export function verifyCorpusFreshness(root, edition) {
-  const metadataPath = path.join(root, edition, 'desks', '_corpus.prepared.json');
-  let metadata;
-  try { metadata = JSON.parse(readFileSync(metadataPath, 'utf8')); } catch { fail(`extracted archive is missing parseable ${edition}/desks/_corpus.prepared.json`); }
-  if (metadata.version !== CORPUS_PREP_VERSION) fail(`${edition}/desks/_corpus.prepared.json has unsupported version ${JSON.stringify(metadata.version)}`);
-  if (metadata.edition !== edition) fail(`${edition}/desks/_corpus.prepared.json names edition ${JSON.stringify(metadata.edition)}`);
-  if (!Array.isArray(metadata.sources)) fail(`${edition}/desks/_corpus.prepared.json must declare sources[]`);
-
-  const rawSources = [];
-  for (const site of ['chatgpt', 'grok']) {
-    const dir = path.join(root, edition, site);
-    if (!existsSync(dir)) continue;
-    for (const name of readdirSync(dir).sort()) if (name.endsWith('.md')) rawSources.push(`${site}/${name}`);
-  }
-  if (!rawSources.length) fail(`${edition} has no raw chatgpt/grok research captures to prove freshness against`);
-
-  const declared = new Map();
-  for (const source of metadata.sources) {
-    if (!source || typeof source.path !== 'string' || typeof source.sha256 !== 'string') fail(`${edition}/desks/_corpus.prepared.json has malformed source entry`);
-    if (declared.has(source.path)) fail(`${edition}/desks/_corpus.prepared.json declares duplicate source ${source.path}`);
-    declared.set(source.path, source.sha256);
-  }
-  const missing = rawSources.filter((source) => !declared.has(source));
-  if (missing.length) fail(`${edition}/desks/_corpus.prepared.json does not cover latest raw capture(s): ${missing.join(', ')}`);
-  const stale = [];
-  for (const source of rawSources) {
-    const digest = digestText(readFileSync(path.join(root, edition, source), 'utf8'));
-    if (declared.get(source) !== digest) stale.push(source);
-  }
-  if (stale.length) fail(`${edition}/desks/_corpus.prepared.json has stale digest(s) for: ${stale.join(', ')}`);
-
-  const extra = [...declared.keys()].filter((source) => !rawSources.includes(source));
-  if (extra.length) fail(`${edition}/desks/_corpus.prepared.json declares source(s) absent from the archive: ${extra.join(', ')}`);
-  return { sources: rawSources.length };
-}
 
 export function run(argv = [], { orgRoot = path.resolve(import.meta.dirname, '..'), now = new Date(), log = console.log } = {}) {
   const options = parseArgs(argv);
@@ -216,7 +131,7 @@ export function run(argv = [], { orgRoot = path.resolve(import.meta.dirname, '..
     const extractDir = mkdtempSync(path.join(tmpdir(), 'clank-repin-verify-'));
     try {
       execFileSync('tar', ['-x', '-f', archiveTmp, '-C', extractDir], { maxBuffer: 1024 * 1024 * 1024 });
-      report = verifyArchive(extractDir, edition);
+      report = verifyCorpusTree(extractDir, edition);
       freshness = verifyCorpusFreshness(extractDir, edition);
     } finally { rmSync(extractDir, { recursive: true, force: true }); }
   } catch (error) {
