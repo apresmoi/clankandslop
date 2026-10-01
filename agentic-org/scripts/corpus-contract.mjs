@@ -205,7 +205,38 @@ export function verifyCorpusFreshness(root, edition) {
 // the container must be able to say "the corpus I was given is not today's"
 // in a sentence an agent can act on. Returning every finding at once serves
 // both, and keeps the one list of rules in one place.
-export function corpusIdentityFindings(value, { edition } = {}) {
+// WHY A `*Findings` PREDICATE NEVER THROWS
+// ---------------------------------------
+// Two programs read the same corpus mount and both decide whether to proceed from
+// these predicates. One wrapped its call in a try/catch and carried a comment
+// saying an unexpected throw fails closed; the other called it bare. So the two
+// readers did not actually agree, and the disagreement was invisible because each
+// one looked right on its own.
+//
+// The guarantee belongs HERE, where the rule is, not at each call site: every
+// `*Findings` function below answers with findings for every input it is handed, so
+// a bare call cannot be weaker than a wrapped one no matter who writes the next
+// reader. (`verifyCorpusTree` and `verifyCorpusFreshness` are the other family --
+// they throw CorpusError by contract and every caller wraps them.)
+//
+// DEFENCE IN DEPTH, NOT A REPAIR FOR AN OBSERVED FAILURE, and this comment says so
+// because overstating it is the defect family this file keeps catching: probing the
+// real shapes did not produce a throw -- `trees` as a regular file answers with a
+// dangling-link finding -- and the only throws that can be constructed come from
+// arguments no reader passes. corpus-contract.test.mjs constructs exactly those, so
+// the catch is exercised rather than merely claimed.
+const answering = (label, answer) => {
+  try {
+    const findings = answer();
+    return Array.isArray(findings) ? findings : [`${label} could not be checked: the check returned ${typeof findings}, not a list of findings`];
+  } catch (error) { return [`${label} could not be checked: ${error?.message ?? error}`]; }
+};
+
+export function corpusIdentityFindings(value, options = {}) {
+  return answering(CORPUS_IDENTITY_FILE, () => identityFindings(value, options));
+}
+
+function identityFindings(value, { edition } = {}) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return [`${CORPUS_IDENTITY_FILE} must be a JSON object, got ${Array.isArray(value) ? 'an array' : typeof value}`];
   const findings = [];
   if (value.version !== CORPUS_IDENTITY_VERSION) findings.push(`version must be ${CORPUS_IDENTITY_VERSION}, got ${JSON.stringify(value.version)}`);
@@ -249,6 +280,13 @@ const realpathOrNull = (target) => { try { return realpathSync(target); } catch 
 // tree and a real directory where the link belongs are each "this corpus is not
 // bound to the commit it claims", never "probably fine".
 export function corpusLinkFindings(root, edition, commit) {
+  return answering(`the ${edition} corpus link`, () => linkFindings(root, edition, commit));
+}
+
+function linkFindings(root, edition, commit) {
+  // Checked first, and by type: `path.join` throws on anything that is not a string,
+  // which is the one way a reader has ever been able to make this throw at all.
+  if (typeof root !== 'string' || !root) return [`the corpus mount must be a path to resolve a dated link against, got ${JSON.stringify(root)}`];
   if (typeof edition !== 'string' || !EDITION_PATTERN.test(edition)) return [`edition must be YYYY-MM-DD to resolve a corpus link, got ${JSON.stringify(edition)}`];
   if (!isCorpusCommit(commit)) return [`commit must be a 40-character lowercase hex sha to resolve a corpus link, got ${JSON.stringify(commit)}`];
   const link = path.join(root, edition);

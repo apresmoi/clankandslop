@@ -235,3 +235,28 @@ test('no corpus module re-spells the commit or tree-path rule privately', () => 
       assert.equal(source.match(pattern), null, `${file} re-spells ${remedy}`);
   }
 });
+
+// TWO READERS OF ONE MOUNT CANNOT BE ALLOWED TO DISAGREE ABOUT FAILING CLOSED
+// -------------------------------------------------------------------------
+// One reader wrapped its call to these predicates in a try/catch and said so in a
+// comment; the other called it bare. The guarantee now lives in the contract, so
+// every call site is correct by construction. DEFENCE IN DEPTH: nothing a reader
+// passes in production makes these throw -- these arguments are constructed to,
+// which is the only honest way to check that the catch exists.
+test('a shared findings predicate answers with a finding instead of throwing, whatever it is handed', () => {
+  // `path.join` throws a TypeError on a non-string, and `corpusLinkFindings` joins
+  // the mount path: this is the one way a reader has ever been able to make it throw.
+  for (const root of [undefined, null, 42, {}, []])
+    assert.match(corpusLinkFindings(root, EDITION, COMMIT)[0], /must be a path to resolve a dated link against|could not be checked/u, `root ${JSON.stringify(root)} escaped as a throw`);
+  // And the catch itself, exercised by a record that cannot come out of JSON.parse
+  // but proves the wrapper is there: every field read is inside it.
+  const hostile = { get commit() { throw new Error('a getter that throws'); } };
+  assert.match(corpusIdentityFindings(hostile)[0], /could not be checked: a getter that throws/u);
+  const hostileEdition = { version: CORPUS_IDENTITY_VERSION, get edition() { throw new Error('and so is this one'); } };
+  assert.match(corpusIdentityFindings(hostileEdition, { edition: EDITION })[0], /could not be checked: and so is this one/u);
+  // Both readers branch on a non-empty list, so the answer must always be one.
+  for (const answer of [corpusIdentityFindings(hostile), corpusLinkFindings(null, EDITION, COMMIT)]) {
+    assert.ok(Array.isArray(answer) && answer.length > 0, `${JSON.stringify(answer)} is not a refusal either reader would act on`);
+    assert.ok(answer.every((finding) => typeof finding === 'string'));
+  }
+});
