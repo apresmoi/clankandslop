@@ -8,6 +8,24 @@
 # did: 2026-09-30 died at the candidate health probe, 2026-10-01 died at the
 # deploy gate. This unit is the corpus arriving as DATA instead.
 #
+# IT NEEDS NO DEPLOY KEY OF ITS OWN, AND THAT IS NOT AN OVERSIGHT
+# --------------------------------------------------------------
+# The private remote is `git@github-clank-private:apresmoi/clankandslop-private`
+# -- an SSH host alias -- and root's ~/.ssh/config binds that alias to
+# /root/.ssh/clank_private with `IdentitiesOnly yes`. So a bare `git fetch` here
+# already carries the right identity and nothing else. Verified on this box
+# 2026-10-01: the bare fetch exits 0.
+#
+# Contrast clank-release.service, which fetches the PUBLIC repo whose remote is
+# plain `git@github.com:...` with no alias, gets no key from the config, and
+# therefore has to name one explicitly. If anyone ever rewrites this remote to a
+# bare github.com URL, this unit stops being able to fetch and the newsroom
+# quietly stops getting research -- so the alias is load-bearing, not cosmetic.
+#
+# Note also that the private remote's PUSH url is deliberately
+# `DISABLED-the-seam-never-pushes-the-private-repo`. This job reads; it must never
+# acquire the ability to write to the corpus it serves.
+#
 # WHY IT RUNS ON THE HOST AND NOT IN THE CONTAINER
 # ------------------------------------------------
 # Because the private repo needs a credential and the agents must never hold
