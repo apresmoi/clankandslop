@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
-import { DEFER_ALARM_AFTER_MS, RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
+import { DEFAULT_TRACK_REF, DEFER_ALARM_AFTER_MS, RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
 const now = new Date('2026-09-06T07:00:00Z');
 const noop = () => {};
@@ -558,9 +558,30 @@ function releaseWorld() {
   execFileSync('git', ['init', '-q', '-b', 'main', repo], { stdio: ['ignore', 'pipe', 'pipe'] });
   git('add', '-A');
   git('commit', '-qm', 'first');
+  // AN ORIGIN, because "has anything been merged" is a question about a tracked
+  // ref and not about this checkout. A world where the build root was the only
+  // thing that could move is the world the first release gate was written for,
+  // and in it a release job can never discover a release.
+  const origin = path.join(root, 'origin.git');
+  execFileSync('git', ['init', '-q', '--bare', origin], { stdio: ['ignore', 'pipe', 'pipe'] });
+  git('remote', 'add', 'origin', origin);
+  git('push', '-q', '-u', 'origin', 'main');
+  const at = (ref) => execFileSync('git', ['-C', repo, 'rev-parse', ref], { encoding: 'utf8' }).trim();
   return {
-    root, repo, git, released: path.join(root, 'released.json'),
-    head: execFileSync('git', ['-C', repo, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+    root, repo, origin, git, at, released: path.join(root, 'released.json'),
+    head: at('HEAD'),
+    // A merged pull request, as the box sees it: origin/main has advanced and the
+    // build root has not moved an inch.
+    merge: (file, content, message = 'merged') => {
+      writeFileSync(path.join(repo, file), content);
+      git('add', '-A'); git('commit', '-qm', message); git('push', '-q', 'origin', 'main');
+      const tip = at('HEAD');
+      git('reset', '-q', '--hard', 'HEAD~1');
+      return tip;
+    },
+    // A commit that is already on the tracked tip, so nothing has to move for it
+    // to be releasable.
+    commit: (message = 'committed') => { git('add', '-A'); git('commit', '-qm', message); git('push', '-q', 'origin', 'main'); return at('HEAD'); },
     ledger: () => JSON.parse(readFileSync(path.join(root, 'released.json'), 'utf8')),
     write: (value) => writeFileSync(path.join(root, 'released.json'), typeof value === 'string' ? value : `${JSON.stringify(value, null, 2)}\n`)
   };
@@ -572,6 +593,146 @@ const withRealGate = (overrides = {}) => {
   const { calls, impl } = recorder(null);
   return { calls, impl: Object.assign(impl, { releaseGate }, overrides) };
 };
+
+test('the release gate releases what origin/main has merged, and brings the build root to that commit', () => {
+  // THE test for a release job that could never release. The first version of
+  // this gate compared the ledger against `git rev-parse HEAD` and nothing in the
+  // job ever fetched, so the build root's HEAD only moved when a person moved it:
+  // origin/main advanced on merge, the local HEAD did not, and the hourly timer
+  // no-opped forever on an unchanged commit.
+  const world = releaseWorld();
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  try {
+    // Nothing merged: the ledger names the tip, so the hourly run does nothing.
+    world.write(ledgerOf(world.head));
+    const quiet = withRealGate();
+    assert.equal(seam(args, { now, log: noop, stageImpl: quiet.impl, alarm: noop }).noop, true);
+    assert.deepEqual(quiet.calls, []);
+
+    // Now a merge lands on the tracked ref and the checkout knows nothing about it.
+    const tip = world.merge('agentic-org/prompts.md', 'reviewed\n');
+    assert.notEqual(tip, world.head);
+    assert.equal(world.at('HEAD'), world.head, 'the merge is on the remote, not in the checkout');
+
+    const { calls, impl } = withRealGate();
+    const result = seam(args, { now, log: noop, stageImpl: impl, alarm: noop });
+    assert.equal(result.ok, true);
+    assert.equal(result.noop, undefined, 'a merged commit is something to release');
+    assert.deepEqual(calls, FULL_ORDER);
+    // The commit being released is the TIP, because that is what was reviewed —
+    // and the tree the stages below compiled is that same commit, fast-forwarded
+    // in the one build root whose path the durable volume names derive from.
+    assert.equal(result.releaseCommit, tip);
+    assert.equal(world.at('HEAD'), tip);
+    assert.equal(world.at('origin/main'), tip);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('a build root the tracked tip cannot fast-forward is refused, never merged or reset', () => {
+  // A release is a fast-forward onto a reviewed commit. Every alternative ships
+  // something nobody reviewed out of the one checkout the newsroom's durable
+  // volumes hang off, so each of these is a state a person has to resolve.
+  const world = releaseWorld();
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  const run = () => {
+    const { calls, impl } = withRealGate();
+    const { raised, alarm } = alarms();
+    return { calls, raised, result: seam(args, { now, log: noop, stageImpl: impl, alarm }) };
+  };
+  try {
+    world.write(ledgerOf('0'.repeat(40)));
+    const tip = world.merge('agentic-org/prompts.md', 'reviewed\n');
+
+    // Local commits the tip does not contain: fast-forwarding is impossible and
+    // the only way forward would be a merge this job invented.
+    writeFileSync(path.join(world.repo, 'agentic-org', 'local.md'), 'mine\n');
+    world.git('add', '-A'); world.git('commit', '-qm', 'local work');
+    const mine = world.at('HEAD');
+    const local = run();
+    assert.equal(local.result.ok, false);
+    assert.equal(local.result.reason, 'seam-blocked');
+    assert.deepEqual(local.calls, [], 'nothing is built from a tree that cannot be the tip');
+    assert.match(local.raised[0].detail, /carries commits the tracked tip does not/u);
+    assert.equal(world.at('HEAD'), mine, 'a refused release leaves the build root exactly where it was');
+    world.git('reset', '-q', '--hard', 'HEAD~1');
+
+    // Not on the tracked branch at all: a detached build root is one somebody was
+    // working in, and `main` is what the tip advances.
+    world.git('checkout', '-q', '--detach', 'HEAD');
+    const detached = run();
+    assert.equal(detached.result.ok, false);
+    assert.deepEqual(detached.calls, []);
+    assert.match(detached.raised[0].detail, /detached HEAD/u);
+    world.git('checkout', '-q', 'main');
+
+    // Cleared: the same tip is now a plain fast-forward and the release proceeds.
+    const clear = run();
+    assert.equal(clear.result.ok, true);
+    assert.equal(world.at('HEAD'), tip);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('a remote this run cannot reach defers under the timer instead of reporting nothing to do', () => {
+  // A fetch that failed means this run cannot tell whether anything was merged,
+  // so it must not say "nothing changed" — but GitHub being briefly unreachable
+  // is not an emergency either. Same treatment as a closed wake window: logged,
+  // exit 0, no page, and the pending record still escalates an outage that has
+  // stopped being brief.
+  const world = releaseWorld();
+  const args = ['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`];
+  try {
+    world.write(ledgerOf('0'.repeat(40)));
+    rmSync(world.origin, { recursive: true, force: true });
+    const { calls, impl } = withRealGate();
+    const { raised, alarm } = alarms();
+    const result = seam(args, { now, log: noop, stageImpl: impl, alarm });
+    assert.equal(result.ok, true);
+    assert.equal(result.deferred, true);
+    assert.equal(result.noop, undefined, 'unreachable is not up to date');
+    assert.deepEqual(calls, [], 'nothing past the gate runs');
+    assert.deepEqual(raised, [], 'an unreachable remote must not page on the first run');
+    const pending = JSON.parse(readFileSync(path.join(world.root, RELEASE_PENDING_NAME), 'utf8'));
+    assert.equal(pending.commit, world.head, 'the deferral keys its clock on the commit the build root is on');
+
+    // A day of not being able to look is not a quiet system either.
+    const late = alarms();
+    const stale = seam(args, { now: new Date(now.getTime() + 25 * 3600000), log: noop, stageImpl: withRealGate().impl, alarm: late.alarm });
+    assert.equal(stale.deferred, true);
+    assert.deepEqual(late.raised.map((entry) => entry.reason), ['release-deferred']);
+
+    // The gate itself refuses rather than returning anything, and marks the one
+    // refusal the timer is allowed to defer. Every other refusal stays a failure.
+    const options = parseArgs([`--repo=${world.repo}`, `--released=${world.released}`]);
+    assert.throws(() => releaseGate(options, { log: noop }), (error) => error.reason === 'seam-blocked' && error.unreachable === true && /could not reach/u.test(error.message));
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
+
+test('--track names the ref the ledger is compared against, and --no-fetch keeps this run off the network', () => {
+  assert.equal(DEFAULT_TRACK_REF, 'origin/main');
+  assert.equal(parseArgs([]).track, 'origin/main');
+  assert.equal(parseArgs([]).fetch, true);
+  assert.equal(parseArgs(['--track=origin/release']).track, 'origin/release');
+  assert.equal(parseArgs(['--no-fetch']).fetch, false);
+  const world = releaseWorld();
+  try {
+    const tip = world.merge('agentic-org/prompts.md', 'reviewed\n');
+    let fetched = 0;
+    const fetch = () => { fetched += 1; };
+    // --no-fetch still compares against the tracked ref and still fast-forwards;
+    // it only declines to go and look for a newer one.
+    const offline = parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, '--no-fetch']);
+    const verdict = releaseGate(offline, { log: noop, fetch });
+    assert.equal(fetched, 0);
+    assert.equal(verdict.tip, tip);
+    assert.equal(world.at('HEAD'), tip);
+    // And the default does fetch, exactly once.
+    releaseGate(parseArgs([`--repo=${world.repo}`, `--released=${world.released}`]), { log: noop, fetch });
+    assert.equal(fetched, 1);
+    // A ref that is not <remote>/<branch> is refused rather than guessed at.
+    assert.throws(() => releaseGate(parseArgs([`--repo=${world.repo}`, `--released=${world.released}`, '--track=main', '--no-fetch']), { log: noop }),
+      (error) => error.reason === 'seam-blocked' && /<remote>\/<branch>/u.test(error.message));
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});
 
 test('--if-changed on an already-released commit runs zero stages and writes nothing', () => {
   const world = releaseWorld();
@@ -629,33 +790,88 @@ test('a missing ledger releases; a ledger that cannot be read refuses and runs n
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 
-test('a working tree that does not match its commit is refused, except for what bundle rewrites', () => {
+// A PATH ALLOWLIST IS NOT A GUARD, IT IS A HOLE WITH A LIST OF NAMES ON IT.
+//
+// `bundle` legitimately rewrites digest pins in the descriptor and in the twelve
+// agent Spawnfiles mid-run, so those paths were exempted wholesale — which meant
+// ANY uncommitted edit to any of them passed the gate and shipped: a changed
+// prompt, a new tool grant, a widened Moltnet room, a raised token ceiling, in
+// the twelve most security-relevant declarations in the repository. Found by
+// review on 2026-10-01. What is allowlisted now is the SHAPE of the change.
+const DIGEST_A = `sha256:${'a'.repeat(64)}`;
+const DIGEST_B = `sha256:${'b'.repeat(64)}`;
+const descriptorAt = (sha256, fileCount, bytes) => `${JSON.stringify({
+  version: 'clank.newsroom-runtime-bundle.v2',
+  source: { archive: 'newsroom-runtime.tar', sha256, file_count: fileCount, content_bytes: bytes },
+  entrypoint: 'agentic-org/scripts/production-newsroom-mcp.mjs'
+}, null, 2)}\n`;
+const spawnfileAt = (digest, { instructions = 'Commission the desks from this edition corpus.', rule = 'Never commission from an unverified source.', extra = '' } = {}) =>
+  `agent: brass\ninstructions: |\n  ${instructions}\n  ${rule}\nresources:\n`
+  + `    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: ${digest}, mount: ./repos/newsroom, mode: readonly }\n${extra}`;
+
+test('a dirty tree is refused unless the change is a digest rewrite, in the files bundle rewrites too', () => {
   const world = releaseWorld();
-  world.write(ledgerOf('0'.repeat(40)));
+  const descriptor = path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json');
+  const spawnfile = path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile');
   const run = () => {
     const { calls, impl } = withRealGate();
-    return { calls, result: seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm: noop }) };
+    const { raised, alarm } = alarms();
+    return { calls, raised, result: seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`], { now, log: noop, stageImpl: impl, alarm }) };
   };
   try {
-    // The descriptor and the agent Spawnfiles are what `bundle` is expected to
-    // rewrite mid-run, so finding them dirty is not a finding.
-    mkdirSync(path.join(world.repo, 'agentic-org', 'agents', 'brass'), { recursive: true });
-    writeFileSync(path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json'), '{}\n');
-    writeFileSync(path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile'), 'agent: brass\n');
-    world.git('add', '-A');
-    world.git('commit', '-qm', 'descriptor and a declaration');
+    mkdirSync(path.dirname(spawnfile), { recursive: true });
+    writeFileSync(descriptor, descriptorAt(DIGEST_A, 1644, 12065500));
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_A));
+    world.commit('the descriptor and a declaration');
     world.write(ledgerOf('0'.repeat(40)));
-    writeFileSync(path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json'), '{"source":{}}\n');
-    writeFileSync(path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile'), 'agent: brass\nchanged: true\n');
-    assert.equal(run().result.ok, true, 'a dirty descriptor and Spawnfile are what bundle rewrites');
 
-    // Anything else is a release that is not reproducible from a commit.
+    // What `bundle` actually leaves behind mid-run: the digests it measured, and
+    // the two measurements that travel with them. Still releasable.
+    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999));
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_B));
+    assert.equal(run().result.ok, true, 'a digest rewrite is what bundle is expected to do to these files');
+
+    // ONE WORD OF A PROMPT, in a file the old check waved through.
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_B, { instructions: 'Commission the desks from any corpus you like.' }));
+    const prompt = run();
+    assert.equal(prompt.result.ok, false);
+    assert.equal(prompt.result.reason, 'seam-blocked');
+    assert.deepEqual(prompt.calls, [], 'nothing is built from an unreviewed prompt');
+    assert.match(prompt.raised[0].detail, /agentic-org\/agents\/brass\/Spawnfile:\d+/u, 'the refusal names the file and the line');
+
+    // A new tool grant, which adds a line rather than changing one. The refusal
+    // has to say WHICH line and why, because "something in a Spawnfile changed"
+    // sends whoever reads it to diff twelve files by hand at 04:00.
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_B, { extra: '    - { id: shell, kind: tool, command: /bin/sh }\n' }));
+    const grant = run();
+    assert.equal(grant.result.ok, false, 'an added grant is not a digest rewrite');
+    assert.match(grant.raised[0].detail, /carries no digest/u);
+    assert.match(grant.raised[0].detail, /id: shell, kind: tool/u, 'the refusal quotes the line it will not wave through');
+
+    // A widened mount ON the pinned line itself — the case a check that only
+    // asked "does this line carry a digest" would have passed.
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_B).replace('mode: readonly', 'mode: readwrite'));
+    assert.equal(run().result.ok, false, 'a digest on the line is not a licence to change the rest of it');
+
+    // A pure REORDER of two prompt lines, which a check that only compared the
+    // changed lines as a set would have passed: the lines are the same lines, and
+    // what changed is which one the agent reads first.
+    const swapped = spawnfileAt(DIGEST_B).split('\n');
+    [swapped[2], swapped[3]] = [swapped[3], swapped[2]];
+    writeFileSync(spawnfile, swapped.join('\n'));
+    assert.equal(run().result.ok, false, 'a line with no digest on it cannot be part of a digest rewrite');
+
+    // And in the descriptor, a field that is neither a digest nor a measurement.
+    writeFileSync(spawnfile, spawnfileAt(DIGEST_B));
+    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999).replace('production-newsroom-mcp.mjs', 'something-else.mjs'));
+    assert.equal(run().result.ok, false, 'the descriptor is allowlisted for its measurements, not for everything');
+
+    // Anything outside the allowlist is still refused on its path alone.
+    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999));
     writeFileSync(path.join(world.repo, 'agentic-org', 'Spawnfile'), 'team: clank-and-slop\nedited: true\n');
-    const dirty = run();
-    assert.equal(dirty.result.ok, false);
-    assert.equal(dirty.result.reason, 'seam-blocked');
-    assert.deepEqual(dirty.calls, []);
-    assert.match(dirty.result.stages.join(','), /^$/u);
+    const outside = run();
+    assert.equal(outside.result.ok, false);
+    assert.match(outside.raised[0].detail, /agentic-org\/Spawnfile is modified in the working tree/u);
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 
