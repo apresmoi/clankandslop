@@ -68,6 +68,7 @@ environment:
         CLANK_NEWSROOM_AGENT: caslon
         CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
         CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/state/transaction.mjs
+        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-private
         CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
         CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
         CLANK_DAIMON_AGENT_ID: "agent:caslon"

@@ -170,6 +170,23 @@ test('Ledger declares mounted source roots for desk filing from runtime MCP cwd'
   }
 });
 
+// The research corpus is a host-populated volume now, so no image digest proves
+// an agent can read it: the declaration IS the whole claim, and an undeclared
+// mount means record_assignment and compose_edition refuse every call. Removing
+// the line must therefore fail validation rather than deploy an agent whose
+// tools cannot run.
+test('the newsroom tools that read the research corpus declare its mount', () => {
+  for (const agent of ['brass', 'caslon', 'ledger']) {
+    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
+    assert.doesNotThrow(() => validateAgentDeclaration(agent, source), agent);
+    const line = `CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-private`;
+    assert.ok(source.includes(line), `${agent} must declare the research corpus mount for its newsroom MCP server`);
+    const changed = source.includes(`${line}, `) ? source.replace(`${line}, `, '') : source.replace(`${line}\n        `, '');
+    assert.notEqual(changed, source, `${agent} declaration shape changed`);
+    assert.throws(() => validateAgentDeclaration(agent, changed), /newsroom private source root invalid/u, agent);
+  }
+});
+
 test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
 // identical SKILL.md files at the top of every wake. Their content now
 // lives in compiled working boundaries and the linked task runbook.
@@ -182,11 +199,14 @@ test('production instructions describe natural-language handoffs, mechanical sta
   assert.doesNotMatch(team, /by path — never search for them/u);
 });
 test('production declarations consume only checksum-pinned offline newsroom bundles',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.ok(source.includes(`sha256: ${descriptor.source.sha256}`));assert.doesNotMatch(source,/kind: git|github\.com\/apresmoi\/clankandslop|branch: staging/u);}const pressman=readFileSync(resolve(import.meta.dirname,'../agents/pressman/Spawnfile'),'utf8');for(const dependency of [...descriptor.dependencies,...descriptor.assets]){assert.ok(pressman.includes(`sha256: ${dependency.sha256}`));assert.ok(pressman.includes(`mount: ./${dependency.mount}`));}assert.match(pressman,/CLANK_WEBSITE_DEPS_ROOTS: .*deps-a:.*deps-b/u);});
-// The private research archive is the one bundle whose digest changes on its
-// own cadence (a daily repin, see scripts/repin-private-source.mjs), and it
-// was the only one nothing asserted: the Spawnfiles kept a digest the
-// descriptor no longer named, and the checked-in pin went stale unnoticed.
-test('every agent pins the private research archive at the descriptor digest and commit',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));assert.match(descriptor.private.sha256,/^sha256:[a-f0-9]{64}$/u);assert.equal(descriptor.private.mount,'repos/newsroom-private');const pin=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/private-source.json'),'utf8'));assert.match(pin.commit,/^[0-9a-f]{40}$/u);assert.equal(descriptor.private.commit,pin.commit,'newsroom-runtime-bundle.json describes a different private commit than policies/private-source.json pins');for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');const line=source.split('\n').filter((row)=>row.includes('id: private-archive'));assert.equal(line.length,1,`${agent} must declare exactly one private-archive resource`);assert.ok(line[0].includes(`sha256: ${descriptor.private.sha256}`),`${agent} pins a stale private-archive digest`);assert.ok(line[0].includes('mount: ./repos/newsroom-private')&&line[0].includes('mode: readonly'),`${agent} private-archive mount or mode is wrong`);}});
+// The private research archive used to be the one bundle whose digest changed on
+// its own cadence -- a daily repin -- and the one nothing asserted, so the
+// Spawnfiles kept a digest the descriptor no longer named. It is not a bundle at
+// all now: the corpus is the host-populated `clank-newsroom-corpus` volume
+// declared in agentic-org/Spawnfile, so there is no digest to keep fresh and no
+// per-agent pin to go stale. What replaced this check is the volume's own
+// identity record and the call-time corpus refusals in scripts/corpus-contract.mjs.
+test('no declaration pins the research corpus as a bundle any more',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));assert.equal(descriptor.private,undefined,'the descriptor must not describe a corpus archive');for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.doesNotMatch(source,/newsroom-private\.tar/u,`${agent} still pins the corpus as an image bundle`);}const root=readFileSync(resolve(import.meta.dirname,'../Spawnfile'),'utf8');assert.match(root,/kind: volume\n\s+name: clank-newsroom-corpus/u,'the corpus must be declared once, team-shared, on the root');});
 test('lifecycle schema is closed and covers every autonomous terminal', () => { const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8')); assert.equal(schema.additionalProperties,false); assert.deepEqual(schema.properties.kind.enum,['readiness','blocker','finalization','released','staged']); });
 test('receipt-ref JSON Schema and runtime reject the same hostile components',()=>{const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8'));const pattern=new RegExp(schema.properties.receipt_ref.pattern);const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts;assert.equal(pattern.test('state/edition/receipts/lower-case_1.0/file.json'),true);for(const ref of ['state/edition/receipts/has space','state/edition/receipts/Upper','state/edition/receipts/back\\slash','state/edition/receipts/é','state/edition/receipts/../bad','state/edition/receipts//bad','state/edition/receipts/bad/','state/edition/receipts/./bad']){assert.equal(pattern.test(ref),false,ref);const changed=structuredClone(source);changed[1].receipt_ref=ref;assert.throws(()=>validateLifecycle(changed),/reference/);}});
 test('Vesta and DATA boundary mutations fail closed',()=>{const vesta=['AGENTS.md','RUNBOOK.md'].map(file=>readFileSync(resolve(import.meta.dirname,'../agents/vesta',file),'utf8')).join('\n');const data=readFileSync(resolve(import.meta.dirname,'../DATA.md'),'utf8');const voices=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/voice-boundaries.json'),'utf8'));assert.doesNotThrow(()=>validateEditorialContracts(vesta,data,voices));for(const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike'])assert.throws(()=>validateEditorialContracts(vesta.replaceAll(phrase,'removed'),data,voices),/Vesta constraint/);assert.throws(()=>validateEditorialContracts(vesta,data.replace('public content: read-only','public content: mutable'),voices),/DATA boundary/);const forged=structuredClone(voices);forged.vesta.bad='A fine pattern.';assert.throws(()=>validateEditorialContracts(vesta,data,forged),/Vesta voice/);});
@@ -347,22 +367,16 @@ test('the descriptor drift check has an opinion about the source archive and the
 // reporter wakes, finds no research rows, and files nothing. #111 repinned off
 // it. This branch merged #111, and the merge put the public-content digest one
 // line above the private-archive digest in all twelve Spawnfiles — a
-// take-ours resolution restores this pin consistently across the descriptor
-// and every declaration, so nothing else in the suite would notice.
+// take-ours resolution used to restore this pin consistently across the
+// descriptor and every declaration, so nothing else in the suite would notice.
+// The descriptor and the declarations no longer carry a corpus digest at all,
+// so what is left to guard is the pin file itself.
 const STARVING_PRIVATE_COMMIT = 'c65e6d375bcaebe53f63d6d2aa4569dc34d38735';
-const STARVING_PRIVATE_DIGEST = 'sha256:aea46e3296ca466bd419d3f73d54ff63f61096e854940653d609956393d04b8e';
 
 test('the private research corpus is never repinned back to the commit with no research in it', () => {
-  const descriptor = JSON.parse(readFileSync(resolve(import.meta.dirname, '../newsroom-runtime-bundle.json'), 'utf8'));
   const pin = JSON.parse(readFileSync(resolve(import.meta.dirname, '../policies/private-source.json'), 'utf8'));
+  assert.match(pin.commit, /^[0-9a-f]{40}$/u);
   assert.notEqual(pin.commit, STARVING_PRIVATE_COMMIT, 'policies/private-source.json is back on the corpus commit that has no desk index files');
-  assert.notEqual(descriptor.private.commit, STARVING_PRIVATE_COMMIT);
-  assert.notEqual(descriptor.private.sha256, STARVING_PRIVATE_DIGEST);
-  for (const agent of agents) {
-    const line = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8')
-      .split('\n').find((row) => row.includes('id: private-archive'));
-    assert.ok(!line.includes(STARVING_PRIVATE_DIGEST), `${agent} was resolved back onto the starving corpus digest`);
-  }
 });
 
 test('shared Git package is required by accepted revision history', () => {

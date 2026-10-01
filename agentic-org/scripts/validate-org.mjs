@@ -73,6 +73,14 @@ export const engineByAgent = Object.freeze({
 });
 
 const corpusAgents = new Set(['klaxon']);
+// The newsroom tools that read the research-corpus volume at CALL time, which is
+// where its four refusals live now that the corpus is a host-populated volume
+// rather than a digest-pinned bundle: record_assignment binds the mounted
+// identity into the edition, compose_edition carries it to the published paper,
+// and file_desk reads the Ledger worlddesk input out of the same mount. Each of
+// those MCP servers must be told where the mount is, or the tool refuses every
+// call it is declared for.
+const researchCorpusReaders = new Set(['brass', 'caslon', 'ledger']);
 const publicWriters = new Set(['pressman']);
 // klaxon is here because it declares `allowed_wake_senders: [research-sensor]`
 // on its DM surface, i.e. the org expects the sensor to be able to reach it.
@@ -172,6 +180,10 @@ export function validateAgentDeclaration(agent, bytes) {
     const workspacePath = `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}`;
     assert(server?.env?.CLANK_PUBLIC_SOURCE_ROOT === `${workspacePath}/repos/newsroom`, 'ledger newsroom public source root invalid');
     assert(server?.env?.CLANK_PRIVATE_SOURCE_ROOT === `${workspacePath}/repos/newsroom-private`, 'ledger newsroom private source root invalid');
+  }
+  if (researchCorpusReaders.has(agent)) {
+    const server = (parseManifest(bytes).environment?.mcp_servers ?? []).find((item) => item.name === 'newsroom');
+    assert(server?.env?.CLANK_PRIVATE_SOURCE_ROOT === `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-private`, `${agent} newsroom private source root invalid`);
   }
   const toolErrors = runtimeToolFindings(agent, parseManifest(bytes));
   assert(toolErrors.length === 0, `${agent} runtime tools invalid: ${toolErrors.join('; ')}`);
