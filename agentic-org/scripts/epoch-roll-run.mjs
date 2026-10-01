@@ -150,7 +150,9 @@ export const BLOCKED_MESSAGE = "the newsroom keeps yesterday's budget window tod
 
 export function epochRoll(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = EPOCH_STAGES, resolve = resolveImage } = {}) {
   const stages = [];
-  let options = { edition: null };
+  // Seeded before parsing, so a refusal on the arguments themselves still puts
+  // the day on the page rather than `null`.
+  let options = { edition: berlinToday(now) };
   try {
     options = parseArgs(argv);
     options.edition ??= berlinToday(now);
