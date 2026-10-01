@@ -75,10 +75,20 @@ function installWorldDeskPrivate(root, edition, document = deskDocument('ledger.
     delta: { word: document.world_desk.delta, current: document.world_desk.escalation_index, previous: document.world_desk.escalation_index },
   }, null, 2)}\n`);
 }
+// THE CORPUS FIRST, THE DOCUMENT SECOND, AND THE ORDER IS LOAD-BEARING.
+// file_desk ledger.worlddesk now reads the corpus identity off this same mount,
+// so the World Desk input needs a corpus under it — and installCorpusFixture
+// rm -rf's the root, so installing the corpus second deletes the document it was
+// meant to accompany. This helper used to install only the document and the test
+// passed anyway, on a corpus an EARLIER test in this file had left at the shared
+// root: green by accident of file order, which is the same silent signal as a
+// test that cannot fail. Run alone it failed. Every corpus-dependent test in this
+// file is now checked in isolation as well as in order.
 function preparedDeskDocument(name, edition, root = privateRootFor(edition), lead) {
   const document = deskDocument(name, edition, lead);
   if (name === 'ledger.worlddesk') {
     process.env.CLANK_PRIVATE_SOURCE_ROOT = root;
+    if (!existsSync(corpusIdentityFile(root))) installCorpusFixture(root, edition);
     installWorldDeskPrivate(root, edition, document);
   }
   return document;
