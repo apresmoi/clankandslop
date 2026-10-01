@@ -219,7 +219,15 @@ test('no corpus module re-spells the commit or tree-path rule privately', () => 
   // Every module that speaks about a commit or a tree path, not just the four the
   // original author owned: the rule was re-spelled in two of the files this list
   // used to omit, which is exactly how four private copies of it accumulated.
-  const owned = ['corpus-contract.mjs', 'corpus-verify.mjs', 'corpus-volume.mjs', 'corpus-swap.mjs', 'corpus-landed.mjs', 'corpus-refresh.mjs', 'edition-provenance.mjs'];
+  //
+  // Every module SPLIT OUT of one of these belongs here too, whether or not it
+  // mentions a commit today. A list that covers a file's old name and not the file
+  // the code moved into is the same unwatched gap as a list that was never updated.
+  const owned = [
+    'corpus-contract.mjs', 'corpus-verify.mjs', 'corpus-volume.mjs', 'corpus-volume-identity.mjs',
+    'corpus-host-exec.mjs', 'corpus-swap.mjs', 'corpus-landed.mjs', 'corpus-refresh.mjs',
+    'corpus-refresh-options.mjs', 'corpus-refresh-lock.mjs', 'edition-provenance.mjs'
+  ];
   const forbidden = [
     // The anchored 40-hex commit rule, in any of the spellings it has appeared in.
     [/\^\[0-9a-f\]\{40\}\$/gu, 'the commit pattern: import isCorpusCommit from corpus-contract.mjs'],

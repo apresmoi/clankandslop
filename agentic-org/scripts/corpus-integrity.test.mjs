@@ -807,7 +807,11 @@ test('past the deadline the same missing branch exits non-zero exactly as it alw
 test('no corpus module reads the edition-state volume, so none can re-invent a freeze gate or a commit ordering out of it', () => {
   const forbidden = /assignments|edition-state|editionState|commissioned/giu;
   let scanned = 0;
-  for (const file of ['corpus-refresh.mjs', 'corpus-swap.mjs', 'corpus-verify.mjs', 'corpus-landed.mjs', 'corpus-volume.mjs', 'corpus-contract.mjs']) {
+  // The modules split out of corpus-refresh.mjs and corpus-volume.mjs are scanned
+  // too: code that moved out of a scanned file is still code that must not ask this
+  // question. corpus-host-exec.mjs is the one exception -- it is a single
+  // execFileSync wrapper, far below the vacuity floor below, and holds no decision.
+  for (const file of ['corpus-refresh.mjs', 'corpus-refresh-options.mjs', 'corpus-refresh-lock.mjs', 'corpus-swap.mjs', 'corpus-verify.mjs', 'corpus-landed.mjs', 'corpus-volume.mjs', 'corpus-volume-identity.mjs', 'corpus-contract.mjs']) {
     const source = readFileSync(new URL(file, import.meta.url), 'utf8');
     // Comments are where this history is deliberately written down, so only the
     // code is scanned -- and a line that is code AND comment is scanned as code.
@@ -818,7 +822,7 @@ test('no corpus module reads the edition-state volume, so none can re-invent a f
       `${file} names the edition-state volume in code. That volume is mounted writable into all twelve agents: a decision taken from it is a decision the agents take, in both directions, `
       + 'and validating what it contains closes neither (a planted file can be well-formed, and a delete still thaws). If a LOG line genuinely needs it, it must be labelled untrusted and must not reach a branch.');
   }
-  assert.equal(scanned, 6, 'the scan must have covered every corpus module');
+  assert.equal(scanned, 9, 'the scan must have covered every corpus module');
 });
 
 // THE WORD HAS TO BE ONE alarm.mjs ACCEPTS, AND THE ONLY PROOF IS RAISING IT

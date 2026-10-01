@@ -53,13 +53,15 @@
 // agent-planted symlink is a root-privileged delete an agent chose the target
 // of; `assertRealDirectory` is the only thing between that and /etc.
 
-import { execFileSync } from 'node:child_process';
-import { chmodSync, lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, lstatSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
-import {
-  CORPUS_IDENTITY_FILE, CORPUS_IDENTITY_VERSION, CORPUS_TREES_DIR, CorpusError, EDITION_PATTERN,
-  corpusIdentityFindings, corpusTreePath
-} from './corpus-contract.mjs';
+import { CORPUS_IDENTITY_FILE, CORPUS_TREES_DIR, CorpusError, EDITION_PATTERN, corpusTreePath } from './corpus-contract.mjs';
+import { hostExec } from './corpus-host-exec.mjs';
+
+// Re-exported so the host writer's one exec wrapper keeps coming from the module
+// that may touch the volume. corpus-host-exec.mjs exists only so
+// corpus-volume-identity.mjs can share it without the two importing each other.
+export { hostExec };
 
 // Re-exported, not re-spelled: `trees/<commit>` is one rule and corpus-contract.mjs
 // owns it (see its ONE SPELLING note). Host-side callers keep importing TREES_DIR
@@ -80,16 +82,6 @@ const fail = (message) => { throw new CorpusError(message); };
 // (`error.alarm`), so each was exit 1 with no page -- a corpus nobody is
 // verifying, every two minutes, in silence. `refuse` is `fail` for that class.
 const refuse = (message) => { const error = new CorpusError(message); error.alarm = true; throw error; };
-
-// Every external command the host writer runs, in one place, so a test can watch
-// exactly which trees were chowned and frozen.
-//
-// stdin is 'ignore' EXCEPT when the caller pipes bytes in: `stdio[0]: 'ignore'`
-// silently wins over `input`, and `tar -x` then extracts nothing and exits 0 --
-// a staged corpus that is simply empty, with no error anywhere to say so.
-export const hostExec = (command, args, options = {}) => execFileSync(command, args, {
-  maxBuffer: 1024 * 1024 * 1024, stdio: [options.input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'], ...options
-});
 
 /** Seconds, not milliseconds: these timestamps are read by people in a ledger, and a corpus is never written twice in one second. */
 export const isoSeconds = (date) => `${date.toISOString().slice(0, 19)}Z`;
@@ -309,59 +301,11 @@ export function pointAtTree(volume, name, target, { ops = SYMLINK_OPS, tmpDir = 
   return true;
 }
 
-// CORPUS.json IS AN OUTPUT, NOT AN INPUT
-// --------------------------------------
-// uid 2000 owns the volume root and can replace this name (`echo forged >
-// CORPUS.json` succeeded in the live container), so the host takes NO decision
-// from it. It is written for the newsroom tools to read, and read back here only
-// to compare against the bytes the host recorded in landed.json -- which is a
-// tamper check, not trust. Nothing in the refresh path may use this to decide
-// whether a corpus is current.
-export function readIdentity(volume) {
-  try { return JSON.parse(readFileSync(path.join(volume, CORPUS_IDENTITY_FILE), 'utf8')); } catch { return null; }
-}
-
-/** Exactly the record the container reads. The field list IS the contract, so it is built in one place. */
-export function corpusIdentity({ commit, ref, edition, fetchedAt, editionsPresent, sourceCount }) {
-  return {
-    version: CORPUS_IDENTITY_VERSION,
-    commit,
-    // The ref NAME, not the resolved refs/remotes/... form: `edition/2026-10-02`
-    // is what a producer, a runbook and an agent all recognize.
-    ref,
-    edition,
-    fetched_at: fetchedAt,
-    tree: corpusTreePath(commit),
-    editions_present: [...editionsPresent].sort(),
-    source_count: sourceCount
-  };
-}
-
-// Refuses to publish a record that does not satisfy the contract: a reader that
-// cannot validate CORPUS.json treats the corpus as unusable, so an invalid
-// record is worse than an old one. The bytes are validated AFTER they are on
-// disk and BEFORE they are visible -- reparsing what the filesystem actually
-// holds is what catches a truncated write, which validating the object cannot.
-/** The exact bytes `writeIdentity` publishes, so the host can record their digest and notice a forged replacement. */
-export const identityBytes = (record) => `${JSON.stringify(record, null, 2)}\n`;
-
-export function writeIdentity(volume, record, { edition, owner, tmpDir, exec = hostExec } = {}) {
-  const planned = corpusIdentityFindings(record, { edition });
-  if (planned.length) fail(`refusing to publish an invalid ${CORPUS_IDENTITY_FILE}: ${planned.join('; ')}`);
-  const live = path.join(volume, CORPUS_IDENTITY_FILE);
-  const tmp = path.join(tmpDir ?? volume, `.${CORPUS_IDENTITY_FILE}.${process.pid}.tmp`);
-  rmSync(tmp, { force: true });
-  writeFileSync(tmp, identityBytes(record), { mode: 0o444 });
-  let written = null;
-  try { written = JSON.parse(readFileSync(tmp, 'utf8')); } catch { /* reported as a finding below */ }
-  const findings = written === null ? [`${CORPUS_IDENTITY_FILE} did not survive the write as parseable JSON`] : corpusIdentityFindings(written, { edition });
-  if (findings.length) { rmSync(tmp, { force: true }); fail(`${CORPUS_IDENTITY_FILE} failed validation after it was written: ${findings.join('; ')}`); }
-  // Scoped to the one file, never `-R` from the volume root.
-  if (owner) exec('chown', [owner, tmp]);
-  exec('chmod', ['0444', tmp]);
-  renameSync(tmp, live);
-  return record;
-}
+// CORPUS.json's reader, builder, validator and publisher are in
+// corpus-volume-identity.mjs -- re-exported here, so nothing that imports them
+// from this module had to change. The reason the host takes no decision from that
+// file is in its header.
+export { corpusIdentity, identityBytes, readIdentity, writeIdentity } from './corpus-volume-identity.mjs';
 
 // WHAT MAY BE DELETED IS DECIDED OUTSIDE THE VOLUME
 // -------------------------------------------------
