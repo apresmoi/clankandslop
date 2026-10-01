@@ -267,9 +267,15 @@ export const SYMLINK_OPS = Object.freeze({ lstat: lstatSync, readlink: readlinkS
 // Twelve agents read ./repos/newsroom-private/<date> on their own schedule and
 // none of them is paused for this. So the live name is NEVER unlinked: a new
 // symlink is created under a temporary name and rename(2)'d over the live one,
-// which replaces it in a single step. An agent sees the old tree or the new
-// one, never a missing or dangling path. `unlink` here only ever touches that
-// temporary name, left behind by a crashed run.
+// which replaces it in a single step. An agent resolving this NAME sees the old
+// target or the new one, never a missing name. `unlink` here only ever touches
+// that temporary name, left behind by a crashed run.
+//
+// WHAT THIS DOES NOT PROMISE: that the target exists. This function owns one
+// directory entry, not the tree at the far end of it, and a tree being replaced
+// under `trees/<commit>` is parked and re-landed by two adjacent renames -- the
+// link dangles for exactly that gap. corpus-swap.mjs's `park` states the window
+// and why it is not zero; neither file may claim readers never see ENOENT.
 //
 // `tmpDir` is OUTSIDE the volume by default at the call site, so the volume
 // root never gains a transient entry the container's startup walk could trip

@@ -24,7 +24,7 @@
 // Read corpus-volume.mjs before changing anything here: it owns every rule about
 // what may touch the volume and why one careless `chmod -R` bricks the org.
 
-import { appendFileSync, chmodSync, mkdirSync, readdirSync, renameSync } from 'node:fs';
+import { appendFileSync, chmodSync, existsSync, mkdirSync, readdirSync, renameSync } from 'node:fs';
 import path from 'node:path';
 import { CORPUS_IDENTITY_FILE, CorpusError, corpusTreePath, verifyCorpusFreshness, verifyCorpusTree } from './corpus-contract.mjs';
 import {
@@ -55,19 +55,39 @@ function validateTree(root, edition) {
   }
 }
 
-// One rename out of the volume, then deleted in the trash root -- the same path a
-// retiring tree takes. Only used when a tree already under `trees/<commit>` has
-// to be replaced by a freshly extracted one, which means it failed verification.
-// The `<date>` links dangle between this rename and the one that lands the
-// replacement: two renames, microseconds apart, and the alternative is leaving
-// tampered research mounted for twelve reporters.
-function evict(options, treePath, { now, exec, log }) {
+// ONE RENAME OUT, AND THE DELETE DEFERRED UNTIL NOTHING POINTS INTO THE TREE
+// --------------------------------------------------------------------------
+// Only reached when a tree already under `trees/<commit>` has to be replaced by a
+// freshly extracted one, which means it failed verification -- so it runs on every
+// forced re-land, which is every drift heal.
+//
+// IT USED TO DANGLE FOR THE LENGTH OF A RECURSIVE DELETE. One function renamed the
+// tree out, deleted it, and only THEN returned so the caller could land the
+// replacement, so every `<date>` link pointing into that tree dangled across a
+// full `rm -r`: 198 ENOENT reads measured over a 245 ms window on a 4000-file
+// tree. The real corpus is ~4660 files and twelve agents read it on their own
+// schedule.
+//
+// So the delete is not part of the swap any more. This does the one rename that
+// frees the name; `stage` lands the replacement immediately after it; `swap`
+// repoints the dated links; and only then is the parked tree deleted, outside the
+// volume, with nothing pointing into it.
+//
+// WHAT IS LEFT, STATED HONESTLY BECAUSE A COMMENT THAT OVERSTATES THIS IS WORSE
+// THAN NO COMMENT: the links still dangle between the rename below and the rename
+// that lands the replacement. That is two adjacent rename(2) calls on one
+// directory entry with no readdir, unlink, chmod or delete between them. It cannot
+// be zero -- `trees/<commit>` is ONE name, the replacement has to end up under it,
+// and Node exposes no renameat2(RENAME_EXCHANGE) to swap two directories in a
+// single step. Nothing in this file may claim readers never see ENOENT.
+function park(options, treePath) {
   assertRealDirectory(treePath, 'the corpus tree being replaced');
-  const parked = path.join(options.trash, `${path.basename(treePath)}-evicted-${isoSeconds(now).replace(/[:-]/gu, '')}.${process.pid}`);
+  const parked = path.join(options.trash, `${path.basename(treePath)}-evicted-${isoSeconds(options.now).replace(/[:-]/gu, '')}.${process.pid}`);
+  // Same reason as landFrozenTree: rename(2) of a directory into another parent
+  // needs write permission on the directory being moved, and a frozen tree has none.
   try { chmodSync(treePath, 0o755); } catch { /* already writable */ }
   renameSync(treePath, parked);
-  removeTree(parked, { volume: options.volume, exec });
-  log(`evicted ${TREES_DIR}/${path.basename(treePath).slice(0, 7)} from the volume before re-landing it`);
+  return parked;
 }
 
 // Extracts, validates, chowns and freezes OUTSIDE the volume, then moves the
@@ -114,10 +134,22 @@ function stage(options, { commit, edition, log, exec, now, force = false }) {
     removeTree(stagingDir, { volume: options.volume, exec });
     return { treePath, freshness, reused: true };
   }
-  if (existing) evict(options, treePath, { now, exec, log });
-  landFrozenTree(stagingDir, treePath);
+  // Park and land, back to back: the two renames are adjacent on purpose, and
+  // anything inserted between them is paid for by twelve readers.
+  const parked = existing ? park({ ...options, now }, treePath) : null;
+  try { landFrozenTree(stagingDir, treePath); }
+  catch (error) {
+    // The one failure that must not leave the name empty. If the land itself did
+    // not happen, the old tree goes back under its own name -- a second rename
+    // rather than a dangling link until somebody notices.
+    if (parked && !existsSync(treePath)) {
+      try { renameSync(parked, treePath); chmodSync(treePath, 0o555); }
+      catch (restore) { process.stderr.write(`could not put ${treePath} back after a failed land: ${restore.message}\n`); }
+    }
+    throw error;
+  }
   log(`staged ${TREES_DIR}/${commit.slice(0, 7)}, ${freshness.sources} raw capture file(s) covered`);
-  return { treePath, freshness, reused: false };
+  return { treePath, freshness, reused: false, parked };
 }
 
 export function appendRefreshLedger(ledger, entry) {
@@ -136,7 +168,7 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
     alarm(TAMPER_REASON, { edition, message: `unexpected entries at the corpus volume root: ${unexpected[0]}`, detail: unexpected.join('\n') });
   }
   mkdirSync(path.join(volume, TREES_DIR), { recursive: true });
-  const { treePath, freshness } = stage(options, { commit, edition, log, exec, now, force });
+  const { treePath, freshness, parked } = stage(options, { commit, edition, log, exec, now, force });
 
   const dates = datedDirectories(treePath);
   const editions = { ...landed.editions };
@@ -168,6 +200,15 @@ export function swap(options, { commit, edition, ref, now, log, alarm, ledger, o
     editions[date] = { commit, tree: corpusTreePath(commit), landed_at: isoSeconds(now), ...(known?.commit === commit && known.frozen ? { frozen: known.frozen } : {}) };
   }
   log(`links moved: ${moved.length} of ${dates.length} dated director${dates.length === 1 ? 'y' : 'ies'}${moved.length ? ` (${moved.slice(-5).join(', ')}${moved.length > 5 ? ', ...' : ''})` : ''}${frozen.length ? `; ${frozen.length} frozen (${frozen.join(', ')})` : ''}`);
+
+  // THE DELETE, LAST, AND THAT ORDER IS THE WHOLE POINT. The replacement is landed
+  // under the same name and every dated link has been repointed, so nothing points
+  // into the parked tree: the recursive delete can take the 245 ms it takes without
+  // one reader seeing ENOENT. Outside the volume, as every delete here is.
+  if (parked) {
+    removeTree(parked, { volume, exec });
+    log(`deleted the replaced ${TREES_DIR}/${commit.slice(0, 7)} in ${options.trash}, after the links already pointed at its replacement`);
+  }
 
   // CORPUS.json describes what the dated links actually serve. When the asked-for
   // edition is frozen, the mount still serves the commit its receipts name, so

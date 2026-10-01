@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { REASONS, parseArgs, raise } from './alarm.mjs';
 import { CorpusError } from './corpus-contract.mjs';
 import { TREES_DIR, hostExec } from './corpus-volume.mjs';
@@ -458,6 +458,48 @@ test('a file left writable, a file added and a file removed inside the corpus ar
 // host, self-inflicted by the heal loop. Healing a one-off is right; absorbing a
 // driven loop in silence is not.
 const dirty = (f) => withWritable(storyFile(f), () => writeFileSync(storyFile(f), 'tampered\n'));
+
+// "ATOMIC, NEVER ENOENT" WAS FALSE FOR THE WHOLE LENGTH OF A RECURSIVE DELETE
+// -------------------------------------------------------------------------
+// The eviction renamed the old tree out, deleted it, and only then returned so the
+// replacement could be landed -- so every dated link into that tree dangled for the
+// duration of an `rm -r`: 198 ENOENT reads over 245 ms on a 4000-file tree, on
+// every forced re-land, while a comment three lines up said readers never see one.
+//
+// The delete is now last, and this test asserts it from the one moment that can
+// tell the difference: `removeTree` thaws the parked tree with `chmod -R u+w`
+// before it unlinks anything, so the first such call IS the instant the recursive
+// delete begins. A reader reading the desk index at that instant either reads the
+// corpus or does not.
+test('the recursive delete of a replaced tree happens with nothing pointing into it', () => {
+  const f = fixture();
+  try {
+    refresh(args(f), deps(f));
+    const desk = join(f.volume, EDITION, 'desks', 'cogsworth.index');
+    const want = readFileSync(desk, 'utf8');
+    dirty(f);
+
+    const deletes = [];
+    const exec = (command, commandArgs, options) => {
+      if (command === 'chmod' && commandArgs[0] === '-R' && commandArgs[1] === 'u+w') {
+        deletes.push(basename(commandArgs[2]));
+        // THE PROPERTY. Pre-fix this read is an ENOENT, because the replacement has
+        // not been landed yet and the link points into the tree being deleted.
+        assert.equal(readFileSync(desk, 'utf8'), want, `a dated link dangled across the recursive delete of ${commandArgs[2]}`);
+      }
+      return hostExec(command, commandArgs, options);
+    };
+    const lines = [];
+    assert.equal(main(args(f), deps(f, { exec, log: (line) => lines.push(line) })), 0);
+    // The positive signal: an eviction delete really did run. Without this the
+    // assertion above proves nothing at all, because it never executed.
+    assert.equal(deletes.filter((name) => name.includes('-evicted-')).length, 1, `no replaced tree was deleted: ${deletes.join(', ')}`);
+    assert.ok(lines.some((line) => /^deleted the replaced /u.test(line)), lines.join(' | '));
+    // And the end state is the healed corpus, with the parked copy gone from disk.
+    assert.equal(readFileSync(desk, 'utf8'), want);
+    assert.deepEqual(readdirSync(f.trash), [], 'the parked tree is deleted outside the volume, not left there');
+  } finally { cleanup(f); }
+});
 
 test('a driven drift loop is healed up to the limit and then stood down, leaving the mount alone', () => {
   const f = fixture();
