@@ -10,6 +10,7 @@ import { checkRuntime } from './check-runtime.mjs';
 import { provision } from './provision.mjs';
 import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
 import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
+import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
 import { PUBLISHER_TOOLS, engineByAgent, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
 
@@ -192,9 +193,18 @@ test('production roles declare exact newsroom tools and carry the folded editori
 // lives in compiled working boundaries and the linked task runbook.
 // No agent declares a skill; ownership and source truth remain in the prefix.
 const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);assert.match(source,/transport: stdio/u);assert.match(source,/command: \/usr\/local\/bin\/node/u);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
+// The composition floor is DERIVED here, never spelled. This test asserted the
+// literal 'at least five articles' and so went red the moment 10ddd3e correctly
+// lowered the floor to four everywhere it is enforced -- the one check meant to
+// keep TEAM.md honest instead pinned the number TEAM.md had just stopped saying,
+// and failed a document that was right. Same defect as #188's literal 5 in two
+// enforcement sites, in a test's clothes: a test that restates the number it
+// guards cannot notice that number moving, only break when it moves correctly.
+const NUMBER_WORDS = Object.freeze({ 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven' });
+const spelled = (value) => NUMBER_WORDS[value] ?? String(value);
 test('production instructions describe natural-language handoffs, mechanical staging and external publication', () => {
   const team = readFileSync(resolve(import.meta.dirname, '../TEAM.md'), 'utf8');
-  for (const phrase of ['natural-language', 'at least five articles', 'never pushes Git', 'host job holds the deploy key', 'A prompt prohibition is not network isolation', 'No agent opens a page or approves an image'])
+  for (const phrase of ['natural-language', `at least ${spelled(PASSED_ARTICLES_MINIMUM)} articles`, 'never pushes Git', 'host job holds the deploy key', 'A prompt prohibition is not network isolation', 'No agent opens a page or approves an image'])
     assert.ok(team.includes(phrase), `missing workflow rule: ${phrase}`);
   assert.doesNotMatch(team, /by path — never search for them/u);
 });
