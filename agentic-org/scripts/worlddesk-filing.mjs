@@ -1,5 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, corpusLinkFindings } from './corpus-contract.mjs';
 import { canonicalJson, worldDeskCanonicalFindings } from '../../ops/worlddesk-contract.mjs';
 
 const date = /^\d{4}-\d{2}-\d{2}$/u;
@@ -20,6 +21,48 @@ const validTrace = (document, trace) => {
   if (findings.length > 0) throw new Error(`ledger.worlddesk trace does not substantiate the filed figures — ${findings.join('; ')}`);
 };
 
+// THE MOUNT IS A DECLARATION, NOT A DEFAULT
+// -----------------------------------------
+// Everything this module reads on the private side comes off the research-corpus
+// volume the host populates from outside the container. An undeclared mount used
+// to resolve to a cwd-relative repos/newsroom-private, so the only thing between
+// a World Desk filing and a read off a path nobody mounted was the env line in
+// ledger's Spawnfile — a declaration that reads as enforcement and enforces
+// nothing, which is the defect family this newsroom has lost editions to. There
+// is no fallback path in this file any more: an absent or relative
+// CLANK_PRIVATE_SOURCE_ROOT is a refusal that names the variable.
+const CORPUS_TAIL = 'Nothing was filed. The host populates this mount from outside the container, so there is nothing here to retry or work around: say so in room:release and end the turn';
+const corpusMount = env => {
+  const declared = env.CLANK_PRIVATE_SOURCE_ROOT;
+  if (typeof declared !== 'string' || !declared.startsWith('/')) throw new Error(`ledger.worlddesk cannot read the research corpus because the mount is not declared for this agent — CLANK_PRIVATE_SOURCE_ROOT must be the absolute path the day's research corpus is mounted at, got ${JSON.stringify(declared ?? null)}. ${CORPUS_TAIL}`);
+  return path.resolve(declared);
+};
+
+// THE SAME CORPUS CHECK record_assignment MAKES, OVER THE SAME PREDICATES
+// ----------------------------------------------------------------------
+// The World Desk document on this mount is derived from the day's corpus, so a
+// corpus that is missing, empty, unreadable, another edition's, or whose dated
+// link is not bound to the commit its own record names makes the filing exactly
+// as unpublishable as a lineup commissioned against one. corpusIdentityFindings
+// and corpusLinkFindings are imported rather than restated so this read can
+// never drift weaker than Brass's read of the same volume — a second copy of the
+// rules is how the two sides came apart the first time. Every check fails
+// closed, including on an unexpected throw out of a predicate.
+async function assertCorpus(base, edition) {
+  let entries;
+  try { entries = await readdir(base); } catch (error) { throw new Error(`ledger.worlddesk cannot read the research corpus mount — ${base} cannot be read (${error.code ?? error.message}), so the host has not populated it. ${CORPUS_TAIL}`); }
+  if (entries.length === 0) throw new Error(`ledger.worlddesk cannot read the research corpus mount — ${base} holds no entries, so the host has not populated it. ${CORPUS_TAIL}`);
+  const file = within(base, CORPUS_IDENTITY_FILE);
+  let value;
+  try { value = JSON.parse(await readFile(file, 'utf8')); } catch (error) { throw new Error(`ledger.worlddesk cannot trust the research corpus: it carries no readable identity record — ${file} is missing or unparseable (${error.code ?? error.message}). ${CORPUS_TAIL}`); }
+  let findings;
+  try { findings = corpusIdentityFindings(value, { edition }); } catch (error) { findings = [`the identity record could not be checked: ${error.message}`]; }
+  if (!Array.isArray(findings) || findings.length > 0) throw new Error(`ledger.worlddesk cannot trust the research corpus: it is not this edition's — it declares edition ${JSON.stringify(value?.edition ?? null)} and this filing is for edition ${JSON.stringify(edition)}: ${(Array.isArray(findings) ? findings : ['the identity check returned no findings']).join('; ')}. ${CORPUS_TAIL}`);
+  let unbound;
+  try { unbound = corpusLinkFindings(base, edition, value.commit); } catch (error) { unbound = [`the dated link could not be resolved: ${error.message}`]; }
+  if (!Array.isArray(unbound) || unbound.length > 0) throw new Error(`ledger.worlddesk cannot trust the research corpus: it does not bind edition ${edition} to the commit it claims — ${CORPUS_IDENTITY_FILE} names commit ${value.commit}, but ${(Array.isArray(unbound) ? unbound : ['the binding check returned no findings']).join('; ')}. Filing off this mount would derive the World Desk from one commit while the record names another. ${CORPUS_TAIL}`);
+}
+
 async function latestPriorDerived(publicRoot, edition) {
   const editionsRoot = within(publicRoot, 'content/editions');
   const entries = await readdir(editionsRoot, { withFileTypes: true }).catch(error => error.code === 'ENOENT' ? [] : Promise.reject(error));
@@ -39,12 +82,17 @@ async function latestPriorDerived(publicRoot, edition) {
   throw new Error(`ledger.worlddesk fallback requires a prior public derived World Desk trace before ${edition}`);
 }
 
+// Reached only once the mount is declared and its corpus has been accepted for
+// this edition, so an absent refusal.json here means the producer has written
+// neither a document nor a refusal — never that the mount is missing. The two
+// used to share one message, and an error naming a document costs a wake looking
+// for a file on a path that was never mounted.
 async function authenticateFallback({ args, privateRoot, publicRoot }) {
   const dir = within(privateRoot, args.edition, 'worlddesk');
   const refusal = await maybeJson(path.join(dir, 'refusal.json'));
-  if (refusal === undefined) throw new Error(`ledger.worlddesk requires mounted private prepared document at repos/newsroom-private/${args.edition}/worlddesk/ledger.worlddesk.json`);
+  if (refusal === undefined) throw new Error(`ledger.worlddesk has a readable research corpus for edition ${args.edition} but no World Desk document in it: neither a prepared document at ${path.join(dir, 'ledger.worlddesk.json')} nor a refusal at ${path.join(dir, 'refusal.json')} exists, so the World Desk producer has not written this edition yet`);
   if (refusal.version !== 'clank.worlddesk-trace.v1' || refusal.edition !== args.edition || refusal.refused !== true) throw new Error('ledger.worlddesk current refusal is malformed');
-  const currentTrace = await readJson(path.join(dir, 'trace.json')).catch(error => { if (error.code === 'ENOENT') throw new Error(`ledger.worlddesk requires mounted private trace at repos/newsroom-private/${args.edition}/worlddesk/trace.json`); throw error; });
+  const currentTrace = await readJson(path.join(dir, 'trace.json')).catch(error => { if (error.code === 'ENOENT') throw new Error(`ledger.worlddesk requires the private trace beside the refusal at ${path.join(dir, 'trace.json')}`); throw error; });
   if (currentTrace.version !== 'clank.worlddesk-trace.v1' || currentTrace.edition !== args.edition || currentTrace.escalation?.index !== null || !Array.isArray(currentTrace.escalation?.unresolved) || currentTrace.escalation.unresolved.length === 0) throw new Error('ledger.worlddesk current refusal trace is malformed');
   if (canonicalJson(refusal.unresolved) !== canonicalJson(currentTrace.escalation.unresolved)) throw new Error('ledger.worlddesk current refusal does not match its trace');
   const prior = await latestPriorDerived(publicRoot, args.edition);
@@ -55,13 +103,17 @@ async function authenticateFallback({ args, privateRoot, publicRoot }) {
 
 export async function authenticateWorldDeskFiling(args, { env = process.env, cwd = process.cwd() } = {}) {
   if (!date.test(args.edition)) throw new Error(`ledger.worlddesk edition ${JSON.stringify(args.edition)} must be YYYY-MM-DD`);
-  const privateRoot = path.resolve(env.CLANK_PRIVATE_SOURCE_ROOT ?? path.join(cwd, 'repos/newsroom-private'));
+  const privateRoot = corpusMount(env);
   const publicRoot = path.resolve(env.CLANK_PUBLIC_SOURCE_ROOT ?? path.join(cwd, 'repos/newsroom'));
+  // The order is the diagnostic: the mount, then the corpus on it, then the
+  // document in the corpus. Three causes, three refusals, none of them wearing
+  // another's message.
+  await assertCorpus(privateRoot, args.edition);
   const dir = within(privateRoot, args.edition, 'worlddesk');
   const preparedPath = path.join(dir, 'ledger.worlddesk.json'), traceFile = path.join(dir, 'trace.json');
   const prepared = await maybeJson(preparedPath);
   if (prepared === undefined) return authenticateFallback({ args, privateRoot, publicRoot });
-  const trace = await readJson(traceFile).catch(error => { if (error.code === 'ENOENT') throw new Error(`ledger.worlddesk requires mounted private trace at repos/newsroom-private/${args.edition}/worlddesk/trace.json`); throw error; });
+  const trace = await readJson(traceFile).catch(error => { if (error.code === 'ENOENT') throw new Error(`ledger.worlddesk requires the private trace beside the prepared document at ${traceFile}`); throw error; });
   if (canonicalJson(prepared) !== canonicalJson(args.document)) throw new Error('ledger.worlddesk document does not match the mounted private prepared document; copy the producer payload verbatim');
   if (trace.edition !== args.edition) throw new Error(`ledger.worlddesk trace edition ${JSON.stringify(trace.edition)} does not match filing edition ${args.edition}`);
   validTrace(args.document, trace);
