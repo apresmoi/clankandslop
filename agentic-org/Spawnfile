@@ -23,6 +23,37 @@ shared:
         mount: ./state/edition
         mode: mutable
         sharing: team
+      # The day's research corpus, mounted read-only into every member at the
+      # SAME path the private-archive bundle used, so no prompt, RUNBOOK or
+      # desk path changes with this move.
+      #
+      # WHY A VOLUME AND NOT A BUNDLE. A checksum-pinned bundle makes the
+      # corpus part of the image: a new day's research meant a new ~5GB image,
+      # which meant a daily build, which meant the day could be lost to a disk
+      # floor, a build error or a health probe that times out. It was, on
+      # 2026-09-30 and 2026-10-01. The corpus is DATA with a daily cadence and
+      # the code is not; binding them to one digest made the slow thing
+      # hostage to the fast one.
+      #
+      # `name` is used verbatim as the host volume name so the host can
+      # populate it: clank-corpus-refresh.service fetches the private repo
+      # OUTSIDE this boundary and swaps a symlink inside the volume. No
+      # network and no credentials ever enter the container, and `readonly`
+      # is enforced by the entrypoint's `chmod -R a-w`, verified on the host:
+      # uid 2000 cannot write a byte of it.
+      #
+      # Provenance did not disappear with the digest, it MOVED: the volume
+      # carries CORPUS.json {commit, ref, edition, fetched_at}, the newsroom
+      # tools read it at call time and refuse a corpus that is missing, empty,
+      # unreadable or not this edition's, and record_assignment binds it into
+      # the edition receipt. That is what proves which evidence backed a
+      # published paper now.
+      - id: research-corpus
+        kind: volume
+        name: clank-newsroom-corpus
+        mount: ./repos/newsroom-private
+        mode: readonly
+        sharing: team
 members:
   - { id: klaxon, ref: agents/klaxon }
   - { id: cogsworth, ref: agents/cogsworth }
