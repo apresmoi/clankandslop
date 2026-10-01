@@ -15,7 +15,11 @@ export const EDITION = '2026-09-06';
 export const PRIOR = '2026-09-05';
 export const UNCUT = '2026-09-07';
 export const OWNER = `${process.getuid()}:${process.getgid()}`;
-export const STORIES = { cogsworth: ['s-11111111', 's-22222222'], sprockett: ['s-22222222'], foreman: ['s-33333333'], graves: ['s-33333333'], tinkerton: ['s-44444444'], vesta: ['s-11111111'] };
+// tinkerton sits out, because that is what a real edition looks like: the row
+// counts fall to single digits and a beat with nothing routed to it files
+// nothing. Every test in this suite therefore runs against a corpus with a
+// quiet desk in it, which is the case an over-strict guard would lose the day on.
+export const STORIES = { cogsworth: ['s-11111111', 's-22222222'], sprockett: ['s-22222222'], foreman: ['s-33333333'], graves: ['s-33333333'], tinkerton: [], vesta: ['s-11111111'] };
 export const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
 const sha256 = (text) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
 

@@ -98,21 +98,28 @@ export function assertEditionInTree(privateRepoPath, commit, edition) {
 // actually be mounted, not out of git. Returns per-reporter index stats and
 // the resolved story files.
 //
-// `requireRows` is the one thing callers disagree about, so it is a parameter
-// rather than a second copy of this function. A desk index with no rows is a
-// reporter with nothing to research, and the container's read-time gate refuses
-// the whole corpus over it -- so the host refresher refuses it too, loudly and
-// with an alarm, rather than publishing a corpus that would fail silently at
-// wake time instead. Only repin-private-source.mjs, the retired image-build
-// path, still tolerates one, because that is the behaviour its own tests pin.
-export function verifyCorpusTree(root, edition, { requireRows = true } = {}) {
+// A QUIET DESK IS NOT A BROKEN CORPUS
+// ----------------------------------
+// Every reporter's index must exist, parse, and resolve to story files that are
+// really there -- those are the defects that ENOENT a wake. A desk with ZERO
+// rows is not one of them: it is a beat with nothing routed to it today. Vesta
+// runs roughly one edition in seven by declaration, and the real row counts fall
+// to single digits (graves filed one row on 2026-09-30), so refusing a corpus
+// over an empty desk would turn "five desks pitch, one sits out" into "no
+// paper" -- the exact class of lost edition this whole change exists to remove.
+// An over-strict guard that loses the day is as bad as a missing one.
+//
+// What a routing failure actually looks like is ALL of them empty: a split that
+// broke, or captures that produced nothing. That is the total below, and it is
+// one behaviour for every caller -- no flag, because a flag with two behaviours
+// is how the retired build path and the runtime drifted apart in the first place.
+export function verifyCorpusTree(root, edition) {
   const report = [];
   for (const agent of REPORTERS) {
     const indexPath = path.join(root, edition, 'desks', `${agent}.index`);
     let text;
     try { text = readFileSync(indexPath, 'utf8'); } catch { return fail(`extracted corpus is missing ${edition}/desks/${agent}.index`); }
     const rows = text.split('\n').filter((line) => line.trim() && !line.startsWith('#'));
-    if (requireRows && rows.length === 0) fail(`${edition}/desks/${agent}.index carries no rows -- ${agent} has no research to work from`);
     const stories = rows.map((line) => line.trim().split(/\s+/)[0]);
     const unparsable = stories.filter((id) => !STORY_ID_PATTERN.test(id));
     if (unparsable.length) fail(`${edition}/desks/${agent}.index has row(s) whose first field is not a story id: ${unparsable.join(', ')}`);
@@ -120,6 +127,7 @@ export function verifyCorpusTree(root, edition, { requireRows = true } = {}) {
     if (missing.length) fail(`DEFECT: ${edition}/desks/${agent}.index references story files that are absent from the corpus: ${missing.map((id) => `${edition}/stories/${id}.md`).join(', ')}`);
     report.push({ agent, bytes: Buffer.byteLength(text), rows: rows.length, stories });
   }
+  if (report.reduce((total, entry) => total + entry.rows, 0) === 0) fail(`corpus for ${edition} routed no stories to any desk`);
   return report;
 }
 

@@ -41,6 +41,10 @@ test('a first refresh into an empty volume publishes the edition, its tree and a
     assert.equal(liveTree(f), join(treeOf(f, f.commit), EDITION));
     assert.equal(readFileSync(join(f.volume, EDITION, 'chatgpt', 'chatgpt-rolling-0715.md'), 'utf8').includes('EDITION BRANCH RESEARCH'), true);
     for (const agent of REPORTERS) assert.ok(existsSync(join(f.volume, EDITION, 'desks', `${agent}.index`)), `${agent} cannot read its desk index through the link`);
+    // The quiet desk is PUBLISHED, not refused: tinkerton has nothing routed to
+    // it today and the other five reporters still get their research.
+    assert.deepEqual(STORIES.tinkerton, [], 'this assertion is only meaningful while a desk in the fixture is empty');
+    assert.equal(readFileSync(join(f.volume, EDITION, 'desks', 'tinkerton.index'), 'utf8').split('\n').filter((line) => line.trim() && !line.startsWith('#')).length, 0);
 
     const identity = identityOf(f);
     assert.deepEqual(Object.keys(identity), ['version', 'commit', 'ref', 'edition', 'fetched_at', 'tree', 'editions_present', 'source_count']);
@@ -214,7 +218,12 @@ failsClosed('a desk index row points at a story file nobody wrote', (f) => {
   writeIndex(f.priv, EDITION, 'graves', [...STORIES.graves, 's-deadbeef']);
 }, /DEFECT.*s-deadbeef/su);
 
-failsClosed('a reporter has a desk index with no rows', (f) => writeIndex(f.priv, EDITION, 'tinkerton', []), /tinkerton\.index carries no rows/u);
+// A routing failure, not a quiet beat: a split that broke, or captures that
+// produced nothing. One desk sitting out is published (see the first test);
+// nobody being routed anything is no corpus at all.
+failsClosed('no desk was routed a single story', (f) => {
+  for (const agent of REPORTERS) writeIndex(f.priv, EDITION, agent, []);
+}, /routed no stories to any desk/u);
 
 failsClosed('a raw capture was re-run without re-preparing the corpus', (f) => {
   writeRaw(f.priv, EDITION, 'chatgpt', '0715', '# chatgpt\n\nA LATER CAPTURE THE PREPARED CORPUS DOES NOT COVER\n');

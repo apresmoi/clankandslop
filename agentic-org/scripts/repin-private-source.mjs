@@ -76,11 +76,7 @@ import { buildPrivateArchive, privateRoot } from './private-archive.mjs';
 // Re-exported under this script's own vocabulary -- here the tree being
 // verified is always an archive it just cut, and `RepinError` is the word its
 // callers and tests already use for a refusal.
-export { CorpusError as RepinError, REPORTERS, assertEditionInTree, berlinToday, resolveRef, verifyCorpusFreshness };
-
-// This retired path tolerates a desk index with no rows, which the live corpus
-// refresher and the container's read-time gate both refuse. See verifyCorpusTree.
-export const verifyArchive = (root, edition) => verifyCorpusTree(root, edition, { requireRows: false });
+export { CorpusError as RepinError, REPORTERS, assertEditionInTree, berlinToday, resolveRef, verifyCorpusFreshness, verifyCorpusTree as verifyArchive };
 
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/;
 
@@ -135,7 +131,7 @@ export function run(argv = [], { orgRoot = path.resolve(import.meta.dirname, '..
     const extractDir = mkdtempSync(path.join(tmpdir(), 'clank-repin-verify-'));
     try {
       execFileSync('tar', ['-x', '-f', archiveTmp, '-C', extractDir], { maxBuffer: 1024 * 1024 * 1024 });
-      report = verifyArchive(extractDir, edition);
+      report = verifyCorpusTree(extractDir, edition);
       freshness = verifyCorpusFreshness(extractDir, edition);
     } finally { rmSync(extractDir, { recursive: true, force: true }); }
   } catch (error) {
