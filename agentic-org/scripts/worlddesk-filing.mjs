@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, corpusLinkFindings } from './corpus-contract.mjs';
+import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, corpusLinkFindings, verifyCorpusFreshness } from './corpus-contract.mjs';
 import { canonicalJson, worldDeskCanonicalFindings } from '../../ops/worlddesk-contract.mjs';
 
 const date = /^\d{4}-\d{2}-\d{2}$/u;
@@ -61,6 +61,22 @@ async function assertCorpus(base, edition) {
   let unbound;
   try { unbound = corpusLinkFindings(base, edition, value.commit); } catch (error) { unbound = [`the dated link could not be resolved: ${error.message}`]; }
   if (!Array.isArray(unbound) || unbound.length > 0) throw new Error(`ledger.worlddesk cannot trust the research corpus: it does not bind edition ${edition} to the commit it claims — ${CORPUS_IDENTITY_FILE} names commit ${value.commit}, but ${(Array.isArray(unbound) ? unbound : ['the binding check returned no findings']).join('; ')}. Filing off this mount would derive the World Desk from one commit while the record names another. ${CORPUS_TAIL}`);
+  // FRESHNESS IN, TREE OUT, AND THE ASYMMETRY IS DELIBERATE.
+  // verifyCorpusFreshness reads _corpus.prepared.json and checks that this really
+  // is the prepared research for this edition and that its declared sources still
+  // digest to the raw captures on the mount. That is the "not silently serving
+  // stale research" property, and a World Desk figure derived from last night's
+  // captures under today's date is exactly the thing nobody downstream can see.
+  // A dated directory with the right name and no prepared metadata at all used to
+  // be filed from without complaint.
+  //
+  // verifyCorpusTree is NOT called here, and must not be added: it requires all
+  // six reporter desk indexes and every story file they name. A World Desk filing
+  // does not rest on reporter desks -- it reads worlddesk/ and nothing else -- so
+  // requiring them would refuse a legitimate filing over research that has no
+  // bearing on it. Brass's read calls it because a LINEUP does rest on those
+  // desks. One mount, two readers, two different things to be true.
+  try { verifyCorpusFreshness(base, edition); } catch (error) { throw new Error(`ledger.worlddesk cannot trust the research corpus: it is not the prepared research for edition ${edition} — ${error.message}. ${CORPUS_TAIL}`); }
 }
 
 async function latestPriorDerived(publicRoot, edition) {

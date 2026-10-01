@@ -129,6 +129,43 @@ test('a World Desk filing refuses a corpus whose dated link is not bound to the 
   assert.match(await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: replaced }), /is a real directory on the mount, not a symlink into trees\/a{40}\//u);
 });
 
+// Freshness, which is the one corpus property a World Desk filing needs that the
+// identity record cannot carry: the record says which commit this is, and
+// _corpus.prepared.json says this really is the research prepared for this day
+// and that the captures underneath it have not moved since. Reporter desk indexes
+// are deliberately NOT required here -- see the comment in assertCorpus.
+test('a World Desk filing refuses a corpus that is not the prepared research for its edition', async () => {
+  // No prepared metadata at all: a dated directory with the right name, every
+  // path resolving, which is what an interrupted or hand-assembled corpus looks
+  // like. This was filed from without complaint.
+  const bare = mount('no-prepared');
+  unlinkSync(path.join(bare, EDITION, 'desks', '_corpus.prepared.json'));
+  const missing = await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: bare });
+  assert.match(missing, /cannot trust the research corpus: it is not the prepared research for edition 2026-09-11/u);
+  assert.match(missing, /_corpus\.prepared\.json/u);
+
+  // And the case the digests exist for: a capture re-run after the corpus was
+  // prepared. The dates all agree and every path resolves, so nothing else in the
+  // contract notices that the figures would rest on research the record does not
+  // describe.
+  const stale = mount('stale-prepared');
+  const capture = path.join(stale, EDITION, 'chatgpt', 'world.md');
+  writeFileSync(capture, `${readFileSync(capture, 'utf8')}an overnight re-run nobody re-prepared\n`);
+  const moved = await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: stale });
+  assert.match(moved, /stale digest\(s\) for: chatgpt\/world\.md/u);
+
+  // Both are the corpus cause, in the corpus cause's words: neither borrows the
+  // mount's message or the document's.
+  for (const message of [missing, moved]) assert.doesNotMatch(message, /cannot read the research corpus mount|no World Desk document in it|CLANK_PRIVATE_SOURCE_ROOT/u);
+
+  // A reporter desk index is NOT this reader's business: the World Desk rests on
+  // worlddesk/, so a corpus whose desk indexes are broken still files. Brass's
+  // read of the same mount refuses it, and that asymmetry is the point.
+  const quietDesks = mount('desks-broken');
+  unlinkSync(path.join(quietDesks, EDITION, 'desks', 'graves.index'));
+  await authenticate(filing(), { CLANK_PRIVATE_SOURCE_ROOT: quietDesks });
+});
+
 test('a missing prepared document is reported as a missing document, never as a missing mount', async () => {
   const root = mount('no-document', { prepared: null, trace: null });
   const message = await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: root, CLANK_PUBLIC_SOURCE_ROOT: path.join(root, 'public-never-reached') });
