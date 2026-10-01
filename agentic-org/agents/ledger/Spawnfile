@@ -48,7 +48,7 @@ workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:f893ed6f3353a26de641cee05374f5a387a55c98915a880eaa5a0e543d7290d2, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9408c63f9eb01b59d376610e5502e23afa658983a64ad077f5521914e3d2d3ed, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:9d5acb794338bde5f5595fc1a058483e9b3b283ac8f781af127ba8b736bc9916, mount: ./repos/newsroom, mode: readonly }
 
 memory:
   - id: self
