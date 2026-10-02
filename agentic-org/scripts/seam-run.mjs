@@ -29,9 +29,9 @@
 // can sit on a timer and no-op until the tracked tip (`origin/main`) moves.
 //
 // Two things the corpus used to carry with it moved rather than disappeared:
-// the per-edition wake budget turnover, which now has its own unit
-// (epoch-roll-run.mjs, because a budget reset still needs a container
-// recreate), and the corpus provenance, which travels with the data as
+// the per-edition wake budget turnover, which Daimon now renews in-process per
+// Europe/Berlin day (see the wakeBudget stage — nothing restarts the org
+// daily), and the corpus provenance, which travels with the data as
 // CORPUS.json (see scripts/corpus-contract.mjs).
 //
 // THE ORDER IS NOT A STYLE CHOICE
@@ -46,9 +46,9 @@
 //   2. gate         — before anything writes, because a redeploy kills wakes.
 //   3. bundle       — three commands whose order is its own lesson; see below.
 //   4. build, runtimePolicy — nothing reaches `up` unconfined.
-//   5. rollEpoch    — AFTER the policy refusal and before `up`: a run that is
-//      not going to deploy must not leave the day's budget rolled behind it,
-//      and `--env-file` only applies at container CREATION.
+//   5. wakeBudget   — before `up`, because `--env-file` only applies at
+//      container CREATION: refuses a deploy.env that pins the wake epoch or
+//      does not name the Europe/Berlin zone. Read-only.
 //   6. deploy, settle, runtimeBootstrap.
 //   7. recordRelease — LAST, because the ledger claims "this commit is
 //      RUNNING". Written before `settle` it would claim a container that never
@@ -90,7 +90,7 @@
 // Every stage that fails raises the alarm (alarm.mjs) before exiting non-zero.
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { appendFileSync, chmodSync, chownSync, existsSync, readFileSync, readdirSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { raiseDetached } from './alarm.mjs';
 import { assess } from './wake-window.mjs';
@@ -458,78 +458,44 @@ export function runtimePolicy(options, { log = console.log } = {}) {
   return { configs, checked, engines: Object.fromEntries(byEngine) };
 }
 
-// --- stage 5b: the day's wake budget ----------------------------------------
-// `DAIMON_WAKE_FUSE_EPOCH` names one counting window, and Daimon's wake fuse
-// treats it as exactly that: admissions are counted per epoch, `maxWakes` and
-// `maxTokens` apply per epoch, tokens are summed from the epoch's own
-// `epoch_start` record, and a trip marker belongs to one epoch so selecting a
-// new one deliberately clears it. The fuse volume has carried
-// `daily-quota-rollover-clank-<date>-to-clank-<date>` directories since
-// 2026-09-09, so the day-shaped name is the established convention, not an
-// invention here.
+// --- stage 5b: the wake budget contract ------------------------------------
+// The newsroom is compiled once and stays up; nothing may restart it daily.
+// Daimon's wake fuse counts admissions, wakes and tokens per epoch. When
+// `DAIMON_WAKE_FUSE_EPOCH` is UNSET, Daimon derives the epoch from the date in
+// the zone `DAIMON_WAKE_FUSE_EPOCH_ZONE` names and rolls it in-process, at
+// both the budget snapshot gate and admission — so the daily budget renews
+// with no recreate. A PINNED epoch never rolls: the org would spend its first
+// day's budget and then wedge. (This used to be a daily `rollEpoch` rewrite of
+// deploy.env plus a daily container recreate; both are gone.)
 //
-// It was still a line somebody edited by hand, and that is what makes it
-// dangerous: leave it and the second day shares the first day's budget. On
-// 2026-09-21 the edition began with 103 of 180 wakes already gone, and the
-// only reason it finished is that a person noticed and bumped the value.
-//
-// The seam's deploy is the one moment per edition day that already rewrites
-// what the container runs with, so it is where the turnover belongs.
-//
-// THREE PROPERTIES, deliberately:
-//   * DERIVABLE — the value is `clank-<edition>` and nothing else, so what the
-//     container ran with can be recomputed from the edition date alone.
-//   * RECORDED — every roll appends one line to `epoch-roll.jsonl` beside the
-//     env file, and keeps a 0600 copy of the file as it was.
-//   * REVERTIBLE — that copy is a whole `deploy.env`, so a revert is one `cp`.
-//
-// It rewrites ONE line. The key must be present exactly once or the stage
-// refuses: deploy.env also holds the runtime control token, and a file this
-// job cannot parse confidently is a file it must not rewrite at all. Nothing
-// here ever logs a value read from it.
-export const EPOCH_PREFIX = 'clank-';
-export const EPOCH_KEY = 'DAIMON_WAKE_FUSE_EPOCH';
-export const KEEP_ENV_BACKUPS = 7;
+// So before `up` this stage only CHECKS deploy.env, because `--env-file` is
+// applied at container creation and a wrong file here is a wrong newsroom for
+// as long as it runs. It refuses on: an unreadable file; any
+// `DAIMON_WAKE_FUSE_EPOCH=` line; or `DAIMON_WAKE_FUSE_EPOCH_ZONE=` not present
+// exactly once as `Europe/Berlin` (the edition day). It writes nothing, and
+// never logs a value read from the file — it also holds the control token.
+export const WAKE_EPOCH_KEY = 'DAIMON_WAKE_FUSE_EPOCH';
+export const WAKE_EPOCH_ZONE_KEY = 'DAIMON_WAKE_FUSE_EPOCH_ZONE';
+export const WAKE_EPOCH_ZONE = 'Europe/Berlin';
 
-export function rollEpoch(options, { log = console.log, now = new Date() } = {}) {
+export function wakeBudget(options, { log = console.log } = {}) {
   const envFile = options.envFile;
-  const wanted = `${EPOCH_PREFIX}${options.edition}`;
-  let original;
-  try { original = readFileSync(envFile, 'utf8'); }
-  catch (error) { throw new SeamError(`cannot read the deploy env file ${envFile}: ${error.message}`, 'deploy-failed'); }
-  const lines = original.split('\n');
-  const indexes = lines.map((line, index) => [line, index]).filter(([line]) => line.startsWith(`${EPOCH_KEY}=`)).map(([, index]) => index);
-  if (indexes.length !== 1) {
-    throw new SeamError(`${envFile} has ${indexes.length} ${EPOCH_KEY} lines; refusing to rewrite an env file this job cannot read unambiguously`, 'deploy-failed');
+  let text;
+  try { text = readFileSync(envFile, 'utf8'); }
+  catch (error) { throw new SeamError(`cannot read the deploy env file ${envFile} (${error.code ?? 'unreadable'})`, 'deploy-failed'); }
+  const lines = text.split('\n').map((line) => line.replace(/\r$/u, ''));
+  if (lines.some((line) => line.startsWith(`${WAKE_EPOCH_KEY}=`))) {
+    throw new SeamError(`${envFile} pins ${WAKE_EPOCH_KEY}; a pinned wake window never renews, so the newsroom would wedge after its first day — delete that line`, 'deploy-failed');
   }
-  const previous = lines[indexes[0]].slice(EPOCH_KEY.length + 1);
-  if (previous === wanted) { log(`epoch: already ${wanted}; nothing to roll`); return { previous, epoch: wanted, rolled: false }; }
-  if (!/^[A-Za-z0-9._-]*$/u.test(previous)) throw new SeamError(`${envFile} carries a ${EPOCH_KEY} value this job will not overwrite blind`, 'deploy-failed');
-
-  const stamp = now.toISOString().replace(/[-:.]/gu, '').replace(/\d{3}Z$/u, 'Z');
-  const backup = `${envFile}.bak-epoch-${stamp}`;
-  const { uid, gid, mode } = statSync(envFile);
-  writeFileSync(backup, original, { mode: 0o600 });
-  chownSync(backup, uid, gid);
-
-  // Write beside the original and rename, so a crash mid-write cannot leave a
-  // truncated env file where the deployment expects a whole one.
-  const scratch = `${envFile}.roll-${stamp}`;
-  lines[indexes[0]] = `${EPOCH_KEY}=${wanted}`;
-  writeFileSync(scratch, lines.join('\n'), { mode: 0o600 });
-  chownSync(scratch, uid, gid);
-  chmodSync(scratch, mode & 0o7777);
-  renameSync(scratch, envFile);
-
-  appendFileSync(path.join(path.dirname(envFile), 'epoch-roll.jsonl'),
-    `${JSON.stringify({ v: 'clank.epoch-roll.v1', at: now.toISOString(), edition: options.edition, previous, epoch: wanted, env_file: envFile, backup })}\n`, { mode: 0o600 });
-
-  const stale = readdirSync(path.dirname(envFile))
-    .filter((name) => name.startsWith(`${path.basename(envFile)}.bak-epoch-`)).sort().slice(0, -KEEP_ENV_BACKUPS);
-  for (const name of stale) { try { unlinkSync(path.join(path.dirname(envFile), name)); } catch { /* a backup that is already gone is fine */ } }
-
-  log(`epoch: ${previous} -> ${wanted} (${envFile} copied to ${backup}; revert with cp -a ${backup} ${envFile})`);
-  return { previous, epoch: wanted, rolled: true, backup };
+  const zones = lines.filter((line) => line.startsWith(`${WAKE_EPOCH_ZONE_KEY}=`));
+  if (zones.length !== 1) {
+    throw new SeamError(`${envFile} has ${zones.length} ${WAKE_EPOCH_ZONE_KEY} lines; it needs exactly one, set to ${WAKE_EPOCH_ZONE}`, 'deploy-failed');
+  }
+  if (zones[0].slice(WAKE_EPOCH_ZONE_KEY.length + 1) !== WAKE_EPOCH_ZONE) {
+    throw new SeamError(`${envFile} sets ${WAKE_EPOCH_ZONE_KEY} to something other than ${WAKE_EPOCH_ZONE}; the wake budget must renew on the edition day`, 'deploy-failed');
+  }
+  log(`wake budget: no pinned epoch, renews in-process per ${WAKE_EPOCH_ZONE} day`);
+  return { zone: WAKE_EPOCH_ZONE };
 }
 
 // --- stage 6: the deployment -------------------------------------------------
@@ -596,7 +562,7 @@ export function sweepImages(options, { log = console.log, exec = execFileSync, k
 // only asserted by the header's comment. There is no `repin` key and there must
 // never be one again: a daily corpus repin is the habit this pipeline was
 // rebuilt to lose, and seam-run.test.mjs fails if the key comes back.
-export const STAGES = Object.freeze({ releaseGate, gate, bundle, reclaimBuildSpace, build, runtimePolicy, rollEpoch, deploy, settle, runtimeBootstrap, recordRelease, sweepImages });
+export const STAGES = Object.freeze({ releaseGate, gate, bundle, reclaimBuildSpace, build, runtimePolicy, wakeBudget, deploy, settle, runtimeBootstrap, recordRelease, sweepImages });
 
 export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES, defer = deferRelease } = {}) {
   const options = parseArgs(argv);
@@ -644,9 +610,9 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     stageImpl.build(options, { log }); stages.push('build');
     stageImpl.runtimePolicy(options, { log }); stages.push('runtimePolicy');
     if (!options.deploy) { log(`\nno-deploy: built and checked ${options.tag} and stopped before \`up\`.`); return { ...options, stages, ok: true }; }
-    // After the policy refusal and before `up`: a run that is not going to
-    // deploy must not leave the day's budget rolled behind it.
-    stageImpl.rollEpoch(options, { log, now }); stages.push('rollEpoch');
+    // Before `up`: `--env-file` applies at creation, so a pinned wake epoch
+    // checked after `up` would already be the running newsroom's budget.
+    stageImpl.wakeBudget(options, { log }); stages.push('wakeBudget');
     stageImpl.deploy(options, { log }); stages.push('deploy');
     stageImpl.settle(options, { log }); stages.push('settle');
     stageImpl.runtimeBootstrap(options, { log }); stages.push('runtimeBootstrap');

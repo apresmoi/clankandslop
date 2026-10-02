@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, rollEpoch, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
+import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, wakeBudget, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 import { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, DEFER_ALARM_AFTER_MS, classifyFetchFailure, fetchSshCommand, fetchTracked, RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
@@ -20,8 +20,8 @@ function recorder(failAt, error = new SeamError('boom', 'deploy-failed')) {
   return { calls, impl: Object.fromEntries(STAGE_NAMES.map((name) => [name, stage(name)])) };
 }
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
-const STAGE_NAMES = ['releaseGate', 'gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
-const FULL_ORDER = ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'rollEpoch', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
+const STAGE_NAMES = ['releaseGate', 'gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'wakeBudget', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
+const FULL_ORDER = ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'wakeBudget', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
 
 test('the pipeline has no repin stage, and STAGES has no repin key', () => {
   // THE test that stops a daily corpus repin being reinstated by habit. The
@@ -1208,4 +1208,60 @@ test('the release gate runs before the wake gate, and only under --if-changed', 
   const manual = recorder(null);
   seam([], { now, log: noop, stageImpl: manual.impl, alarm: noop });
   assert.ok(!manual.calls.includes('releaseGate'), 'a deliberate run does not consult the ledger');
+});
+
+// --- wakeBudget: the deploy.env contract for an in-process daily budget -------
+function wakeEnv(content) {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-wake-budget-'));
+  const envFile = path.join(root, 'deploy.env');
+  writeFileSync(envFile, content);
+  return { root, envFile };
+}
+const refusesWith = (pattern) => (error) => error instanceof SeamError && error.reason === 'deploy-failed' && pattern.test(error.message);
+
+test('wakeBudget passes a deploy.env that names only the Europe/Berlin zone, and never writes it', () => {
+  const content = 'SECRET_TOKEN=s3cr3t\nDAIMON_WAKE_FUSE_EPOCH_ZONE=Europe/Berlin\n';
+  const { root, envFile } = wakeEnv(content);
+  try {
+    const before = statSync(envFile).mtimeMs;
+    const logged = [];
+    assert.deepEqual(wakeBudget({ envFile }, { log: (line) => logged.push(line) }), { zone: 'Europe/Berlin' });
+    assert.equal(readFileSync(envFile, 'utf8'), content);
+    assert.equal(statSync(envFile).mtimeMs, before);
+    assert.deepEqual(readdirSync(root), ['deploy.env']);
+    assert.ok(!logged.join('\n').includes('s3cr3t'));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('wakeBudget refuses a pinned epoch, without echoing it, and leaves the file alone', () => {
+  const content = 'DAIMON_WAKE_FUSE_EPOCH=clank-2026-10-02\nDAIMON_WAKE_FUSE_EPOCH_ZONE=Europe/Berlin\n';
+  const { root, envFile } = wakeEnv(content);
+  try {
+    assert.throws(() => wakeBudget({ envFile }, { log: noop }),
+      (error) => refusesWith(/pins DAIMON_WAKE_FUSE_EPOCH/u)(error) && !error.message.includes('clank-2026-10-02'));
+    assert.equal(readFileSync(envFile, 'utf8'), content);
+    assert.deepEqual(readdirSync(root), ['deploy.env']);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('wakeBudget refuses a missing, wrong or duplicated zone', () => {
+  const cases = [
+    ['TOKEN=x\n', /0 DAIMON_WAKE_FUSE_EPOCH_ZONE lines/u],
+    ['DAIMON_WAKE_FUSE_EPOCH_ZONE=UTC\n', /other than Europe\/Berlin/u],
+    ['DAIMON_WAKE_FUSE_EPOCH_ZONE=Europe/Berlin\nDAIMON_WAKE_FUSE_EPOCH_ZONE=Europe/Berlin\n', /2 DAIMON_WAKE_FUSE_EPOCH_ZONE lines/u]
+  ];
+  for (const [content, pattern] of cases) {
+    const { root, envFile } = wakeEnv(content);
+    try {
+      assert.throws(() => wakeBudget({ envFile }, { log: noop }), refusesWith(pattern), content);
+      assert.equal(readFileSync(envFile, 'utf8'), content);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  }
+});
+
+test('wakeBudget refuses an unreadable deploy.env', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'clank-wake-budget-'));
+  try {
+    assert.throws(() => wakeBudget({ envFile: path.join(root, 'missing.env') }, { log: noop }), refusesWith(/cannot read the deploy env file/u));
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

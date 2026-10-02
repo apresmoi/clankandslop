@@ -6,7 +6,7 @@ const unitDir = new URL('../ops/systemd/', import.meta.url);
 const unit = (name) => readFileSync(new URL(name, unitDir), 'utf8');
 // ENUMERATED, not listed. This read `['clank-publish.service',
 // 'clank-cycle-audit.service', 'clank-seam.service']`, so the three units added
-// when the corpus moved out of the image -- corpus-refresh, epoch-roll, release
+// when the corpus moved out of the image -- corpus-refresh, epoch-roll (since retired), release
 // -- were outside the one contract that is supposed to hold for every host job,
 // and nothing said so. An allowlist of names stops covering the thing you add
 // next, silently, which is the same defect as a test that restates the number it
@@ -14,8 +14,8 @@ const unit = (name) => readFileSync(new URL(name, unitDir), 'utf8');
 const serviceUnits = readdirSync(unitDir).filter((name) => name.endsWith('.service') && !name.includes('@')).sort();
 
 test('every host job unit is covered, and the list cannot fall behind the directory', () => {
-  assert.ok(serviceUnits.length >= 6, `expected at least the six known host job units, found ${serviceUnits.length}: ${serviceUnits.join(', ')}`);
-  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-seam.service', 'clank-corpus-refresh.service', 'clank-epoch-roll.service', 'clank-release.service'])
+  assert.ok(serviceUnits.length >= 5, `expected at least the five known host job units, found ${serviceUnits.length}: ${serviceUnits.join(', ')}`);
+  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-seam.service', 'clank-corpus-refresh.service', 'clank-release.service'])
     assert.ok(serviceUnits.includes(name), `${name} is missing from ops/systemd -- a host job unit must be tracked in the repository`);
 });
 

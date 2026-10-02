@@ -15,7 +15,6 @@ was:  research lands on edition/<date>   →  a person repins, rebuilds, redeplo
       something breaks                   →  systemd says Failed into a void
 
 now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unless public main's HEAD moved
-      the epoch-roll timer     (Hetzner)      early: today's wake budget onto the running image, nothing else
       the corpus refresher     (Hetzner)      `clank-newsroom-corpus` volume ← the day's research, outside the org
       clank-publish.timer      (Hetzner)      17:00 staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
@@ -28,7 +27,6 @@ now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unle
 |---|---|---|
 | `scripts/seam-run.mjs` | Hetzner, on a timer with `--if-changed` | clean public main snapshot → `org:bundle` → build → `up` → settle → record the release |
 | `scripts/release-ledger.mjs` | inside the seam | `/home/clank/deploy-work/released.json`: which commit is actually running, so a timer can do nothing cheaply |
-| `scripts/epoch-roll-run.mjs` | Hetzner, once a day | rolls `DAIMON_WAKE_FUSE_EPOCH` and recreates the container **on the image it is already running** |
 | `scripts/wake-window.mjs` | inside both | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
 | `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |
@@ -73,15 +71,16 @@ Run by hand, a refused gate still alarms and still exits non-zero.
 
 Two things the daily deploy was doing for free had to be given their own homes:
 
-- **the wake budget.** `DAIMON_WAKE_FUSE_EPOCH` names one counting window, and
-  rolling it needs a container *recreate*: Daimon's `WakeFuse.open()` loads
-  `admissions` into an in-memory Set that nothing re-reads while the process
-  lives, and `--env-file` is applied at container creation only. That is
-  `scripts/epoch-roll-run.mjs`, which never builds and never chooses an image —
-  it resolves the tag from the container it is about to replace and refuses if
-  it cannot. A Daimon fix that re-evaluates the window where it is *consulted*
-  (the `snapshot()` gate in `AttentionDispatcher.drain()`, not only `admitNow`)
-  retires that unit.
+- **the wake budget.** The org is compiled once, deployed only when `main`
+  changes (`clank-release.timer`, `--if-changed`), and **never restarted
+  daily**. Daimon renews the wake fuse's budget in-process: with
+  `DAIMON_WAKE_FUSE_EPOCH` unset it derives the epoch from the date in
+  `DAIMON_WAKE_FUSE_EPOCH_ZONE` and rolls it at both the snapshot gate and
+  admission. So `deploy.env` carries `DAIMON_WAKE_FUSE_EPOCH_ZONE=Europe/Berlin`
+  exactly once and **no** `DAIMON_WAKE_FUSE_EPOCH` line — a pinned epoch never
+  rolls, and the newsroom would wedge after its first day. The seam's
+  `wakeBudget` stage refuses to deploy against any other file and writes
+  nothing. (This retired `epoch-roll-run.mjs` and its daily recreate.)
 - **corpus provenance.** It travels with the data now, as `CORPUS.json` beside
   the tree, checked by `scripts/corpus-contract.mjs` when Brass commissions.
 
@@ -145,6 +144,8 @@ tail -5 /var/lib/clank-alarm/alarm.log
 install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/*.service \
                /root/work/clankandslop/agentic-org/ops/systemd/*.timer \
                /etc/systemd/system/
+systemctl disable --now clank-epoch-roll.timer 2>/dev/null || true   # retired: no daily recreate
+rm -f /etc/systemd/system/clank-epoch-roll.service /etc/systemd/system/clank-epoch-roll.timer
 systemctl daemon-reload
 systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer 2>/dev/null || true
 
@@ -328,10 +329,8 @@ is not a checksum is refused and left for a person.
 |---|---|
 | `repin-failed` | the edition branch is missing, a desk index is absent, a digest survived the rewrite (corpus refresher only; the seam no longer repins) |
 | `release-deferred` | a commit has been waiting more than a day for a quiet deploy window — the newsroom is up, it is simply not shipping code |
-| `epoch-roll-blocked` | the window was busy, so today shares yesterday's wake budget — the newsroom is RUNNING and degraded, not dead |
-| `epoch-roll-failed` | the recreate itself failed; the organization may be down |
 | `bundle-mismatch` | `org:bundle` failed, or the descriptor still disagrees with the tree afterwards |
-| `deploy-failed` | the image build failed, `up` failed, or the container never settled |
+| `deploy-failed` | the image build failed, `deploy.env` pins the wake epoch or lacks the Berlin zone, `up` failed, or the container never settled |
 | `no-edition` | the cycle audit found no edition, or one that stopped below `composed` |
 | `seam-blocked` | the schedule was not clear or the container was not quiet |
 | `unit-failed` | a systemd unit failed for a reason its own code never got to name — the `OnFailure=` handler |
