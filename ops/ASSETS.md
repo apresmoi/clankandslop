@@ -59,6 +59,11 @@ entry point. Adding another permitted model remains a reviewed source change.
 
 ## Maps — a large atlas already exists
 
+Paths below are repository paths. Inside the newsroom the published editions
+are not under `repos/newsroom/`: they are the content volume, at
+`repos/newsroom-content/current/editions/` (bylines beside them at
+`current/bylines/`).
+
 ```
 find content/editions -path '*/maps/*.json' | wc -l                                    # 209 files
 find content/editions -path '*/maps/*.json' -exec basename {} .json \; | sort -u       # 133 regions
