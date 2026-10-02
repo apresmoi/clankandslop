@@ -1083,6 +1083,9 @@ test('two read-only bundles merging into one directory: the second one lands', a
     // the dependency bundle, exactly as it does in the container.
     await writeReadOnly(path.join(source, 'ops', 'validate-content.mjs'), 'process.stdout.write("content OK\\n");\n');
     await writeReadOnly(path.join(source, 'website', 'package.json'), '{"name":"site"}\n');
+    // A developer checkout carries its back catalogue under content/; the
+    // candidate refuses to exist without one (public-content.mjs).
+    await writeReadOnly(path.join(source, 'content', 'editions', '2026-09-04', 'pages', 'front.json'), '{}\n');
 
     // The overlap. `.package-lock.json` exists in both halves with different
     // bytes, which is the file the real failure named.

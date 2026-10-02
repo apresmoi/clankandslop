@@ -7,7 +7,10 @@ const workflow = readFileSync(new URL('../../.github/workflows/merge-edition.yml
 const required = [
   'contents: write', 'pull-requests: write', 'actions: write',
   "grep -Eq '^refs/heads/edition/[0-9]{4}-[0-9]{2}-[0-9]{2}$'",
-  '[ "$bad" -eq 0 ] ||', '[ -n "$offending" ]',
+  // The checksum-only leash for agentic-org/ is gone, not loosened: an edition
+  // may carry published content and nothing else (public-content.mjs).
+  'ALLOWED_PATHS: "content/editions/ content/bylines/"',
+  '[ "$bad" -eq 0 ] ||',
   'gh pr create', '[ "$head" = "$SHA" ] ||',
   'node agentic-org/scripts/ci-gate.mjs --sha="$SHA"',
   'gh pr merge "$NUMBER" --merge --delete-branch=false',

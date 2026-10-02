@@ -66,7 +66,7 @@ Topic slugs `repos/newsroom/content/topics.json`; glyph catalogue
 `repos/newsroom/agentic-org/SYSTEMS.md`; ownership
 `repos/newsroom/agentic-org/DATA.md`; validator
 `repos/newsroom/ops/validate-content.mjs`; past filing
-`repos/newsroom/content/editions/<date>/articles/`.
+`repos/newsroom-content/current/editions/<date>/articles/`.
 
 
 # Vesta

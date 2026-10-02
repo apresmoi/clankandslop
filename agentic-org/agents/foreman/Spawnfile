@@ -56,13 +56,13 @@ surfaces:
         research: { wake: mentions }
 environment:
   mcp_servers:
-    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: foreman, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:foreman" }, tools: [file_article, record_dissent] }
+    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: foreman, CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/repos/newsroom-content, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:foreman" }, tools: [file_article, record_dissent] }
     - { name: validation, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/tools/article-validation/server.mjs], env: { CLANK_NEWSROOM_AGENT: foreman, CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/foreman/repos/newsroom }, tools: [validate_article] }
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
-    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:f893ed6f3353a26de641cee05374f5a387a55c98915a880eaa5a0e543d7290d2, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:290ae4a76f3704f45578899b905c65c82f5b41c8b7fe97220a35da49e9f254d3, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:484748db3a8e990462b01e82cd7f265eba5c1152d7f055fe92b4de646c797e53, mount: ./tools/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:411c61287c22fea586927a6d88d39170c29e02889f209e71be52983ddfb26fbc, mount: ./repos/newsroom, mode: readonly }
     - { id: article-validation, kind: bundle, source: ../../article-validation-runtime.tar, sha256: sha256:f989562895409311130e5d2bd01ac7a246c6acb9a946f4e21ae3c81f59880fa0, mount: ./tools/article-validation, mode: readonly }
 
 memory:

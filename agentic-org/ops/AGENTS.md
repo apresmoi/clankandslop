@@ -16,6 +16,7 @@ was:  research lands on edition/<date>   →  a person repins, rebuilds, redeplo
 
 now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unless public main's HEAD moved
       the corpus refresher     (Hetzner)      `clank-newsroom-corpus` volume ← the day's research, outside the org
+      the content refresher    (Hetzner)      `clank-newsroom-content` volume ← every published edition, from public main
       clank-publish.timer      (Hetzner)      17:00 staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
       clank-alarm@.service     (both boxes)   ntfy → a phone
@@ -29,6 +30,7 @@ now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unle
 | `scripts/release-ledger.mjs` | inside the seam | `/home/clank/deploy-work/released.json`: which commit is actually running, so a timer can do nothing cheaply |
 | `scripts/wake-window.mjs` | inside both | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
+| `scripts/content-refresh.mjs` | Hetzner, every 5 min | published editions + bylines at `origin/main` → `clank-newsroom-content` volume |
 | `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |
 | `scripts/alarm.mjs` | both boxes | one HTTPS POST that reaches a person |
 | `../../.github/workflows/merge-edition.yml` | GitHub | opens and merges the edition PR, only on green CI |
@@ -59,6 +61,30 @@ happened twice in two days (2026-09-30 at the candidate health probe, 2026-10-01
 at the deploy gate). `agentic-org/Spawnfile` now mounts the corpus as the
 team-shared `clank-newsroom-corpus` volume, populated by the host refresher
 outside the agent boundary.
+
+The published editions had the same defect one level down, and it is closed
+the same way. They rode inside `newsroom-runtime.tar`, so every edition moved
+its digest, the publisher repinned all twelve Spawnfiles, `main` moved in an
+image input every evening, and the release timer rebuilt and redeployed the
+org every night. Now `content/editions/` and `content/bylines/` are excluded
+from every archive (`scripts/public-content.mjs` is the one list), served by
+the team-shared `clank-newsroom-content` volume at `./repos/newsroom-content`
+(readers resolve `current/editions`, `current/bylines`), and landed by
+`clank-content-refresh.timer`. An edition commit touches nothing an image is
+built from, and the release gate answers it with *"already released; nothing
+to do"* — `releaseGate` diffs the released commit against the tip and treats a
+diff made only of those paths as released (`publish-edition-branch.test.mjs`
+proves it end to end). Everything else under `content/` (personas, topics,
+log, fixtures), the site code and every runtime script stay in the image and
+still ship through a release.
+
+```
+image (rebuilt only when code/prompts change)      volume (refreshed after every merge)
+  ./repos/newsroom          code, prompts, ops/,      ./repos/newsroom-content
+                            website/, content/          current -> trees/<commit>/content
+                            {agents,topics,log}           editions/<date>/...
+                                                          bylines/<agent>.tsv
+```
 
 So: **an org image is day-agnostic, and there is no `repin` stage.** What the
 seam ships is code and prompts, and `--if-changed` makes that literal — it
@@ -149,12 +175,31 @@ rm -f /etc/systemd/system/clank-epoch-roll.service /etc/systemd/system/clank-epo
 systemctl daemon-reload
 systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer 2>/dev/null || true
 
-# 5. dry-run the seam without deploying
+# 5. the published-content refresher's private work root (its record lives here,
+#    root-owned and outside every container: never inside the volume)
+install -d -m 700 /var/lib/clank-content
+
+# 6. dry-run the seam without deploying
 node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
 
-# 6. prove the deploy key opens the public repository (read-only check; it
+# 7. prove the deploy key opens the public repository (read-only check; it
 #    prints the repository the key is registered against and nothing secret)
 ssh -o BatchMode=yes -i /root/.ssh/clank_public -T git@github.com
+```
+
+**To arm the published-content refresher — only AFTER the first release that
+declares `clank-newsroom-content` has deployed.** The container creates the
+volume and writes its identity sentinel on first start, and refuses a volume
+that is non-empty without one, so the volume must not be populated before that
+start. Until the first land the newsroom's content readers refuse loudly
+(`CONTENT.json` missing) rather than read an empty back catalogue, so arm it
+straight after the deploy settles:
+
+```bash
+systemctl enable --now clank-content-refresh.timer
+systemctl start clank-content-refresh.service      # land now, not in 2 minutes
+node /root/work/clankandslop/agentic-org/scripts/content-refresh.mjs --check   # exit 0 = served tree is what the host landed
+readlink /var/lib/docker/volumes/clank-newsroom-content/_data/current
 ```
 
 **To arm the seam and the audit, one command:**
@@ -273,7 +318,7 @@ snapshot from it before building the next runtime image.
 
 When an edition branch lands with `merge-edition.yml`, `ci.yml` validates the
 content and builds the site. The merge workflow checks the exact head SHA, dated
-branch name, allowed paths and checksum-only changes, then opens or updates a
+branch name and allowed paths (published content only), then opens or updates a
 pull request. It rechecks the same head and CI immediately before merging. A
 green push CI run is mandatory; a duplicate pull-request run can be ignored only
 when it is from `github-actions[bot]` and GitHub did not execute any jobs for
@@ -296,37 +341,29 @@ workflow explicitly dispatches the website deployment for `main`.
   grow by ~6 cards a day because CI output is not committed, and buy a social
   preview image — measure a reason to want it before paying for it.
 
-## What the publisher now also commits
+## What the publisher commits, and what it no longer does
 
-`publish-edition-branch.mjs` gained one step, for the same reason it already
-regenerates `content/topics.txt` and `content/bylines/*.tsv`: those are views
-CI diff-checks that nothing else in the pipeline rebuilds. The bundle
-descriptor is the third instance, and the one that made unattended publication
-impossible rather than merely annoying.
+`publish-edition-branch.mjs` commits the edition directory and regenerates
+`content/bylines/*.tsv` (a view CI diff-checks that nothing else rebuilds) —
+and nothing else. It used to repin `newsroom-runtime-bundle.json` and the
+twelve Spawnfile source pins too, because `content/editions/**` was inside the
+source archive; that repin is exactly what made every edition a release. The
+editions are excluded from the archive now, so the descriptor still describes
+an edition branch untouched, and the publisher refuses to commit any staged
+path outside `content/editions/` and `content/bylines/` (read back from the
+index, not trusted from its own pathspecs). `content/topics.txt` is no longer
+regenerated: it is a view of `topics.json`, which an edition never changes.
 
-`content/editions/**` is **inside the source archive** — it is a tracked path
-and not on the exclusion list — so landing an edition moves
-`newsroom-runtime-bundle.json`'s source digest, and ci.yml's *"Check the
-runtime bundle descriptor describes this tree"* fails on **every** edition
-branch. Measured against `main` (green) plus one restored edition directory:
-`source.file_count 1243 -> 1256`, digest moved, check red. Without the repin no
-edition branch could ever be green, and the auto-merge would have had nothing
-to merge, ever.
-
-So the publisher now repins the descriptor and the twelve Spawnfile source pins
-from the branch's own tree — **last**, after the generated views are staged,
-because the measurement reads the git index. Nothing about what may be *pushed*
-changed: same branch pattern, same refspec, same remote, same refusal of `main`.
-
-`merge-edition.yml` admits those two paths on a shorter leash than the content
-paths: every changed line under `agentic-org/` must differ only in a
-`sha256:` value or a `file_count`/`content_bytes` field. A Spawnfile edit that
-is not a checksum is refused and left for a person.
+`merge-edition.yml` admits exactly those two prefixes — the same list as
+`PUBLIC_CONTENT_PATHS`, held equal by a test — and nothing under
+`agentic-org/` on any leash.
 
 ## What the alarm fires on
 
 | Reason | Raised by |
 |---|---|
+| `content-refresh-failed` | the published-content refresher could not land `origin/main` (refused key, unreadable checkout, content git does not vouch for); the last good editions stay mounted |
+| `content-tampered` | the served editions, `current` or `CONTENT.json` stopped matching what the host landed; re-landed from git, bounded by `--heal-limit` |
 | `repin-failed` | the edition branch is missing, a desk index is absent, a digest survived the rewrite (corpus refresher only; the seam no longer repins) |
 | `release-deferred` | a commit has been waiting more than a day for a quiet deploy window — the newsroom is up, it is simply not shipping code |
 | `bundle-mismatch` | `org:bundle` failed, or the descriptor still disagrees with the tree afterwards |

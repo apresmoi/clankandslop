@@ -462,3 +462,17 @@ test('every room member resolves to an agent-bound network member', () => {
     ['room release references unknown member nobody']
   );
 });
+
+// The published editions are DATA on a daily cadence: the host lands them in the
+// `clank-newsroom-content` volume and no archive the image is built from may carry
+// them, or every edition becomes a repin, a moved `main` and a nightly rebuild.
+test('the published editions are a team volume, never part of the image archive', async () => {
+  const { sourceArchivePlan } = await import('./source-archive.mjs');
+  const { isPublicContentPath } = await import('./public-content.mjs');
+  const { entries } = sourceArchivePlan(resolve(import.meta.dirname, '..', '..'));
+  const leaked = [...entries].filter(isPublicContentPath);
+  assert.deepEqual(leaked.slice(0, 5), [], `${leaked.length} published-content path(s) in newsroom-runtime.tar`);
+  assert.ok([...entries].includes('content/topics.txt'), 'the topic view is not day-varying and stays in the image');
+  const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
+  assert.match(root, /- id: public-content-volume\n\s+kind: volume\n\s+name: clank-newsroom-content\n\s+mount: \.\/repos\/newsroom-content\n\s+mode: mutable\n\s+sharing: team/u);
+});

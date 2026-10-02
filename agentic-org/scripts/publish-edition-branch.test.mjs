@@ -7,12 +7,15 @@ import { join } from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
 import { bundleDescriptorFindings, repinSource } from './check-bundle-descriptor.mjs';
+import { PUBLIC_CONTENT_PATHS } from './public-content.mjs';
+import { releaseGate, RELEASE_LEDGER_VERSION } from './release-ledger.mjs';
+import { measureSourceArchive } from './source-archive.mjs';
 import {
-  BASE_BRANCH, CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, DESCRIPTOR_FILE, GENERATED_INDEX_PATHS, LANDED_VERSION, REPINNED_DESCRIPTOR_PATHS, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
+  BASE_BRANCH, CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, GENERATED_INDEX_PATHS, LANDED_VERSION, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   artifactDigest, assertNoForcedPush, assertNotProtectedRef, assertPushableRef, assertRequestedEdition, berlinToday,
-  editionBranch, editionCommitMessage, editionCorpusClaim, hostAssertedProvenance, landedCorpus,
+  contentOnlyFindings, editionBranch, editionCommitMessage, editionCorpusClaim, hostAssertedProvenance, landedCorpus,
   parseArguments, prepareSshIdentity, publishEditionBranch, pushArgv, pushStagedEditionTree,
-  regenerateIndexes, repinBundleDescriptor, remoteUrl, resolveStagedEdition, sshConfig
+  regenerateIndexes, remoteUrl, resolveStagedEdition, sshConfig
 } from './publish-edition-branch.mjs';
 
 const scratch = (label) => mkdtempSync(join(tmpdir(), `clank-${label}-`));
@@ -316,10 +319,8 @@ test('the timer publishes today\'s paper or nothing, on the Berlin clock', () =>
   assert.throws(() => assertRequestedEdition('2026-09-05', 'tomorrow'), /must be "today" or YYYY-MM-DD/u);
 });
 
-test('the generated indexes are rebuilt from the branch tree, and only those paths are added', async () => {
-  assert.deepEqual(GENERATED_INDEX_PATHS, ['content/topics.txt', 'content/bylines']);
-  assert.deepEqual(REPINNED_DESCRIPTOR_PATHS, ['agentic-org/newsroom-runtime-bundle.json', 'agentic-org/agents']);
-  await assert.rejects(repinBundleDescriptor('relative/tree'), /must be an absolute path/u);
+test('the byline view is rebuilt from the branch tree, and nothing that feeds the image is', async () => {
+  assert.deepEqual(GENERATED_INDEX_PATHS, ['content/bylines']);
   await assert.rejects(regenerateIndexes('relative/tree'), /must be an absolute path/u);
 
   const tree = scratch('tree');
@@ -329,29 +330,44 @@ test('the generated indexes are rebuilt from the branch tree, and only those pat
   git(['init', '-q', '-b', BASE_BRANCH], tree);
   git(['add', '-A'], tree);
   writeFileSync(join(tree, 'content', 'editions', '2026-09-05', 'articles', 'one.json'), JSON.stringify({ id: 'one', edition_date: '2026-09-05', section: 'world', epistemic: 'fact', topics: ['oil'], headline: 'A headline', byline: { desk: 'Test Desk', agents: ['Cogsworth'] } }));
+  const spawnfile = readFileSync(join(tree, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), 'utf8');
 
   const first = await regenerateIndexes(tree);
-  git(['add', '-A'], tree);
-  first.descriptor = await repinBundleDescriptor(tree);
-  assert.equal(first.topics, 'content/topics.txt');
   assert.deepEqual(first.bylines, ['content/bylines/cogsworth.tsv']);
   assert.equal(first.articles, 1);
-  // The descriptor is repinned from the same tree, and the Spawnfile follows
-  // it. Without this the branch is red on ci.yml's descriptor check forever.
-  assert.match(first.descriptor.source, /^sha256:[a-f0-9]{64}$/u);
-  assert.notEqual(first.descriptor.source, first.descriptor.previous);
-  assert.deepEqual(first.descriptor.repinned, ['cogsworth']);
-  assert.match(readFileSync(join(tree, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), 'utf8'), new RegExp(first.descriptor.source, 'u'));
-  assert.equal(readFileSync(join(tree, 'content', 'topics.txt'), 'utf8'), 'oil\tOil\nrates\tRates\n');
   assert.match(readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8'), /^2026-09-05\tone\tworld\tfact\toil\tA headline$/mu);
+  // No repin, no topic view: the Spawnfile pins are exactly what they were.
+  assert.equal(readFileSync(join(tree, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), 'utf8'), spawnfile);
+  assert.throws(() => readFileSync(join(tree, 'content', 'topics.txt')), /ENOENT/u);
 
-  // Pure functions of the tree: a second run is byte-identical, which is what
+  // A pure function of the tree: a second run is byte-identical, which is what
   // keeps a retried push rebuilding the same commit object.
   const before = readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8');
   await regenerateIndexes(tree);
-  git(['add', '-A'], tree);
-  assert.equal((await repinBundleDescriptor(tree)).source, first.descriptor.source);
   assert.equal(readFileSync(join(tree, 'content', 'bylines', 'cogsworth.tsv'), 'utf8'), before);
+});
+
+test('an edition commit may carry published content and nothing else', () => {
+  assert.deepEqual(contentOnlyFindings(['content/editions/2026-09-05/articles/one.json', 'content/bylines/cogsworth.tsv']), []);
+  for (const name of ['agentic-org/agents/cogsworth/Spawnfile', 'agentic-org/newsroom-runtime-bundle.json', 'content/topics.txt', 'content/agents/vesta.json', 'website/src/x.ts', 'content/editions-but-not-really'])
+    assert.equal(contentOnlyFindings([name]).length, 1, name);
+  // merge-edition.yml spells the same list in YAML; the two cannot drift apart.
+  const workflow = readFileSync(join(import.meta.dirname, '..', '..', '.github', 'workflows', 'merge-edition.yml'), 'utf8');
+  const allowed = /^\s*ALLOWED_PATHS: "([^"]*)"$/mu.exec(workflow)?.[1].split(/\s+/u).filter(Boolean);
+  assert.deepEqual(allowed, [...PUBLIC_CONTENT_PATHS]);
+  assert.doesNotMatch(workflow, /CHECKSUM_ONLY/u, 'nothing under agentic-org/ is admitted on any leash any more');
+});
+
+test('a staged tree outside the published content is refused before anything is pushed', async () => {
+  const origin = remote(), before = origin.head();
+  const staged = stagedEdition('2026-09-11');
+  const work = scratch('work');
+  await assert.rejects(pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-09-11'), editionSource: staged.source, editionPath: 'agentic-org/agents/cogsworth/smuggled',
+    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-09-11')
+  }), /is not published content the content volume serves/u);
+  assert.deepEqual(origin.refs(), ['refs/heads/main']);
+  assert.equal(origin.head(), before);
 });
 
 test('a real push creates the edition branch and leaves main exactly where it was', async () => {
@@ -408,20 +424,11 @@ test('the commit carries only the edition directory, whatever else is in the tre
     workdir, home: join(work, 'home'), message: editionCommitMessage('2026-09-06')
   });
   const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
-  // The edition directory, the two generated views ci.yml diff-checks and the
-  // bundle pins ci.yml checks against the tree — and nothing else: neither the
-  // stray file nor the git home rides along.
-  assert.deepEqual(files.sort(), [
-    'agentic-org/agents/cogsworth/Spawnfile', 'agentic-org/newsroom-runtime-bundle.json',
-    'content/bylines/cogsworth.tsv', 'content/editions/2026-09-06/articles/one.json'
-  ]);
-  for (const name of files) assert.ok([...GENERATED_INDEX_PATHS, ...REPINNED_DESCRIPTOR_PATHS].some((prefix) => name.startsWith(prefix)) || name.startsWith('content/editions/2026-09-06/'), name);
-  // The only thing that changed in the Spawnfile is a checksum. That is what
-  // lets merge-edition.yml admit these paths without admitting arbitrary code.
-  const spawnfileDiff = execFileSync('git', ['-C', origin.url, 'diff', '-U0', `${result.base}..${result.commit}`, '--', 'agentic-org/agents'], { encoding: 'utf8' })
-    .split('\n').filter((line) => /^[+-][^+-]/u.test(line));
-  assert.equal(spawnfileDiff.length, 2);
-  for (const line of spawnfileDiff) assert.match(line, /sha256:[a-f0-9]{64}/u);
+  // The edition directory and the byline view ci.yml diff-checks -- and nothing
+  // else: not the stray file, not the git home, and NOT the bundle descriptor or
+  // a Spawnfile pin, which is what used to make every edition a release.
+  assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-06/articles/one.json']);
+  assert.deepEqual(contentOnlyFindings(files), []);
 });
 
 test('a retry of the same edition converges, and changed content is refused rather than forced', async () => {
@@ -471,34 +478,78 @@ test('an edition already merged into the base is a quiet success, not a nightly 
   assert.equal(second.generated, null, 'nothing is regenerated for a branch that will not be built');
 });
 
-test('a base branch that carries no bundle descriptor is committed without one', async () => {
-  // `main` today: `content/` and `website/`, no `agentic-org/` at all. Repinning
-  // a descriptor that is not there threw ENOENT on the first unattended
-  // publication, and committing a pathspec that matches nothing makes git
-  // refuse the commit. Both are the same bug: assuming the base carries the org.
-  const origin = remote({ descriptor: false });
-  const staged = stagedEdition('2026-09-10');
+test('an edition lands green on a base that carries the descriptor, without touching it', async () => {
+  // The descriptor still describes the edition branch, unrepinned, because the
+  // published editions are not in the source archive. That is what lets CI pass
+  // on an edition branch that changes no image input.
+  for (const descriptor of [true, false]) {
+    const origin = remote({ descriptor });
+    const staged = stagedEdition('2026-09-10');
+    const work = scratch('work');
+    const result = await pushStagedEditionTree({
+      url: origin.url, branch: editionBranch('2026-09-10'), editionSource: staged.source, editionPath: staged.path,
+      workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-09-10')
+    });
+    assert.equal(result.pushed, true);
+    const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
+    assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-10/articles/one.json']);
+    if (descriptor) {
+      const checkout = scratch('ci');
+      git(['clone', '-q', '--branch', result.branch, origin.url, checkout], checkout);
+      assert.deepEqual(bundleDescriptorFindings(checkout), []);
+    }
+  }
+});
+
+// THE PROPERTY THIS WHOLE CHANGE EXISTS FOR, end to end: the real publisher cuts
+// an edition branch, merge-edition.yml's merge lands it on main, and the real
+// release gate -- the one the hourly clank-release.timer runs -- reads the moved
+// origin/main and answers "already released; nothing to do". Then a real code
+// change still releases. Mutation-checked: restoring the publisher's descriptor
+// repin, dropping the content exclusion from the source archive, or removing the
+// gate's content-only answer each turns this red.
+test('an edition-only merge leaves the release gate at "already released; nothing to do"', async () => {
+  const origin = remote();
+  const buildRoot = scratch('build-root');
+  git(['clone', '-q', origin.url, buildRoot], buildRoot);
+  git(['config', 'user.email', 'seed@example.invalid'], buildRoot);
+  git(['config', 'user.name', 'seed'], buildRoot);
+  const released = origin.head();
+  const ledger = join(scratch('ledger'), 'released.json');
+  writeFileSync(ledger, `${JSON.stringify({ version: RELEASE_LEDGER_VERSION, commit: released, tag: 'clank-and-slop:seam-2026-10-01-000000', at: '2026-10-01T00:00:00.000Z' })}\n`);
+  const imageBefore = measureSourceArchive(buildRoot);
+
+  const staged = stagedEdition('2026-10-02');
   const work = scratch('work');
-  const result = await pushStagedEditionTree({
-    url: origin.url, branch: editionBranch('2026-09-10'), editionSource: staged.source, editionPath: staged.path,
-    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-09-10')
+  const edition = await pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-10-02'), editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-10-02')
   });
-  assert.equal(result.pushed, true);
-  assert.equal(result.generated.descriptor.skipped, true);
-  assert.match(result.generated.descriptor.reason, new RegExp(DESCRIPTOR_FILE.replaceAll('.', '\\.'), 'u'));
-  const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
-  assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-10/articles/one.json']);
-  for (const name of files) assert.doesNotMatch(name, /^agentic-org\//u);
-  // And a base that DOES carry one is still repinned: the skip is a fact about
-  // the branch, read from the branch, not a switch anybody can leave off.
-  const withDescriptor = remote();
-  const other = stagedEdition('2026-09-10');
-  const repinned = await pushStagedEditionTree({
-    url: withDescriptor.url, branch: editionBranch('2026-09-10'), editionSource: other.source, editionPath: other.path,
-    workdir: join(work, 'repo-descriptor'), home: join(work, 'home'), message: editionCommitMessage('2026-09-10')
-  });
-  assert.equal(repinned.generated.descriptor.skipped, false);
-  assert.deepEqual(repinned.generated.descriptor.repinned, ['cogsworth']);
+  origin.merge(edition.commit);
+  git(['fetch', '-q', 'origin'], buildRoot);
+
+  const lines = [];
+  const options = { repo: buildRoot, released: ledger, track: 'origin/main', fetch: false };
+  const verdict = releaseGate(options, { log: (line) => lines.push(line) });
+  assert.equal(verdict.tip, edition.commit, 'origin/main did move');
+  assert.equal(verdict.upToDate, true, lines.join('\n'));
+  assert.match(lines.join('\n'), /already released as clank-and-slop:seam-2026-10-01-000000; nothing to do/u);
+  assert.equal(git(['rev-parse', 'HEAD'], buildRoot), released, 'nothing is fast-forwarded for a build that will not happen');
+  // And the image really is unchanged: the same source archive, byte for byte.
+  git(['checkout', '-q', edition.commit], buildRoot);
+  assert.deepEqual(measureSourceArchive(buildRoot), imageBefore);
+  git(['checkout', '-q', BASE_BRANCH], buildRoot);
+
+  // A real code change on top still releases.
+  const coder = scratch('coder');
+  git(['clone', '-q', origin.url, coder], coder);
+  writeFileSync(join(coder, 'agentic-org', 'scripts', 'production-newsroom.mjs'), 'export const newsroom = 2;\n');
+  git(['commit', '-qam', 'fix: a reviewed code change'], coder);
+  git(['push', '-q', 'origin', `HEAD:${BASE_BRANCH}`], coder);
+  git(['fetch', '-q', 'origin'], buildRoot);
+  const code = releaseGate({ repo: buildRoot, released: ledger, track: 'origin/main', fetch: false }, { log: () => {} });
+  assert.equal(code.upToDate, false);
+  assert.equal(git(['rev-parse', 'HEAD'], buildRoot), code.tip, 'the release is built from the tip it found');
 });
 
 test('the edition path may not escape the branch', async () => {
