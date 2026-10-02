@@ -14,8 +14,8 @@ const unit = (name) => readFileSync(new URL(name, unitDir), 'utf8');
 const serviceUnits = readdirSync(unitDir).filter((name) => name.endsWith('.service') && !name.includes('@')).sort();
 
 test('every host job unit is covered, and the list cannot fall behind the directory', () => {
-  assert.ok(serviceUnits.length >= 5, `expected at least the five known host job units, found ${serviceUnits.length}: ${serviceUnits.join(', ')}`);
-  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-seam.service', 'clank-corpus-refresh.service', 'clank-release.service'])
+  assert.ok(serviceUnits.length >= 6, `expected at least the six known host job units, found ${serviceUnits.length}: ${serviceUnits.join(', ')}`);
+  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-seam.service', 'clank-corpus-refresh.service', 'clank-content-refresh.service', 'clank-release.service'])
     assert.ok(serviceUnits.includes(name), `${name} is missing from ops/systemd -- a host job unit must be tracked in the repository`);
 });
 
@@ -34,4 +34,19 @@ test('the alarm handler itself uses the local standalone recorder, not the retir
   assert.match(text, /^Environment=CLANK_ALARM_SCOPE=--system$/mu, 'system units must read systemd state through the system manager');
   assert.match(text, /^StateDirectory=clank-alarm$/mu, 'the local alarm must have a durable systemd-owned log directory');
   assert.match(text, /^ExecStart=\/usr\/local\/lib\/clank-alarm\/clank-alarm\.sh %i$/mu, 'the standalone local recorder must run');
+});
+
+// One writer across every newsroom volume and the release job: the content
+// refresher relays itself under the corpus lock, and the release unit takes that
+// same path with flock(1). Two different paths would be mutual exclusion that
+// only one side observes, which reads as protection and is none.
+test('the content refresher, the corpus refresher and the release job serialize on one lock', async () => {
+  const { DEFAULT_LOCK } = await import('./corpus-refresh-options.mjs');
+  const { contentRefreshArgs } = await import('./content-refresh-options.mjs');
+  assert.equal(contentRefreshArgs([]).lock, DEFAULT_LOCK);
+  assert.match(unit('clank-release.service'), new RegExp(`^ExecStart=/usr/bin/flock ${DEFAULT_LOCK.replaceAll('.', '\\.')} `, 'mu'));
+  const content = unit('clank-content-refresh.service');
+  assert.match(content, /^ExecStart=\S+node \/root\/work\/clankandslop\/agentic-org\/scripts\/content-refresh\.mjs$/mu, 'no --lock override and no --no-lock');
+  assert.match(content, /^Environment=CLANK_RELEASE_FETCH_KEY=\/root\/\.ssh\/clank_public$/mu, 'the fetch names the release identity');
+  assert.match(unit('clank-content-refresh.timer'), /^Unit=clank-content-refresh\.service$/mu);
 });
