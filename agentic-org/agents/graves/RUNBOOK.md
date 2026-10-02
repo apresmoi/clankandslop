@@ -93,7 +93,7 @@ assigned forecast, mention its named dissenter in that same message too.
 The filing tool only saves the article: neither its receipt nor this turn's
 final answer notifies the editor. End only after the send succeeds.
 
-`head -n 20` of `repos/newsroom/content/bylines/graves.tsv` is there if I
+`head -n 20` of `repos/newsroom-content/current/bylines/graves.tsv` is there if I
 genuinely need to know whether I've run a story before — late, and only
 when the question actually comes up, never as a warm-up. Eight calls is the
 target for a valid first filing; a refused format needs its own repair and

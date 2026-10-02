@@ -61,13 +61,13 @@ environment:
       transport: stdio
       command: /usr/local/bin/node
       args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
-      env: { CLANK_NEWSROOM_AGENT: spike, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:spike" }
+      env: { CLANK_NEWSROOM_AGENT: spike, CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/repos/newsroom-content, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:spike" }
       tools: [review_article]
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:f893ed6f3353a26de641cee05374f5a387a55c98915a880eaa5a0e543d7290d2, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:290ae4a76f3704f45578899b905c65c82f5b41c8b7fe97220a35da49e9f254d3, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:ddc25339d3a287f0ed3037ba6d0c3a5fe69bb72f0d3c0474ef53845b5e4a50e4, mount: ./repos/newsroom, mode: readonly }
 
 memory:
   - id: self

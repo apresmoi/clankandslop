@@ -5,6 +5,7 @@ import { layoutArtifacts } from './layout-artifacts.mjs';
 import { mapPresentationProps } from './map-presentation.mjs';
 import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-format.mjs';
 import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
+import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -45,7 +46,10 @@ export function readEditionInputs(stateRoot, edition) {
   return { articles: jsonDir(resolve(dir, 'articles')), desk: jsonDir(resolve(dir, 'desk')), maps: jsonDir(resolve(dir, 'maps')) };
 }
 
-export function archiveIndex(contentRoot = resolve(root, 'content')) {
+// Published editions come from the content volume in the container (and from
+// content/ in a checkout); publicContentRoot refuses a volume the host has not
+// landed rather than letting this come back silently empty.
+export function archiveIndex(contentRoot = publicContentRoot()) {
   const dir = resolve(contentRoot, 'editions');
   const index = new Map();
   if (!existsSync(dir)) return index;

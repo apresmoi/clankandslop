@@ -210,6 +210,14 @@ export function validateAgentDeclaration(agent, bytes) {
   } else {
     assert(mountServers.length === 0, `${agent} declares the research corpus mount on MCP server(s) [${mountServers.map((item) => item.name).join(', ')}] but none of its tools reads it — a mount nothing reads is a declaration this validator cannot stand behind, so either drop CLANK_PRIVATE_SOURCE_ROOT or make the tool read it and add ${agent} to researchCorpusReaders`);
   }
+  // Every server that can read a published edition is handed the content volume:
+  // the newsroom server (previous_coverage, archived maps, World Desk fallback,
+  // pressman's release candidate) and Caslon's art and Pressman's visual servers,
+  // which load ops/lay-page.mjs. Missing, a reader would fall back to the image's
+  // content/ -- which no longer carries a single edition.
+  const contentVolume = `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-content`;
+  for (const server of (parseManifest(bytes).environment?.mcp_servers ?? []).filter((item) => ['newsroom', 'art', 'visual'].includes(item.name)))
+    assert(server.env?.CLANK_PUBLIC_CONTENT_VOLUME === contentVolume, `${agent} ${server.name} server must read published content from ${contentVolume}`);
   const toolErrors = runtimeToolFindings(agent, parseManifest(bytes));
   assert(toolErrors.length === 0, `${agent} runtime tools invalid: ${toolErrors.join('; ')}`);
 }
@@ -218,6 +226,8 @@ export function validateRootDeclaration(bytes) {
   const packages = parseManifest(bytes).shared?.environment?.packages ?? [];
   assert(packages.some(item => item.id === 'newsroom-git' && item.manager === 'apt' && item.name === 'git'), 'shared Git package is required for accepted revision history');
   const shared = section(bytes, 'shared');
+  const content = /- id: public-content-volume\n((?:\s{8}[a-z]+: .*(?:\n|$))+)/u.exec(shared)?.[1] ?? '';
+  assert(['kind: volume', 'name: clank-newsroom-content', 'mount: ./repos/newsroom-content', 'mode: mutable', 'sharing: team'].every((field) => content.includes(field)), 'shared published-content volume resource invalid');
   assert(shared.includes('id: edition-state') && shared.includes('kind: volume') && shared.includes('name: clank-edition-state') && shared.includes('mount: ./state/edition') && shared.includes('mode: mutable') && shared.includes('sharing: team'), 'shared edition state resource invalid');
   assert(bytes.includes('id: clank-newsroom') && bytes.includes('provider: moltnet'), 'Moltnet network identity invalid');
   assert(bytes.includes('bind: 0.0.0.0, port: 8787'), 'Moltnet cloud listener invalid');

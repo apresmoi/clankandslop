@@ -116,6 +116,35 @@ shared:
         mount: ./repos/newsroom-private
         mode: mutable
         sharing: team
+      # Every PUBLISHED edition and the byline indexes derived from them, from
+      # origin/main, landed by the host (clank-content-refresh.service ->
+      # scripts/content-refresh.mjs) with the corpus refresher's own discipline:
+      # staged outside the volume, validated, frozen, swapped in with one
+      # rename(2) of `current`, re-verified against git on every poll.
+      #
+      # WHY IT LEFT THE IMAGE. It used to ride inside newsroom-runtime.tar, so
+      # every published edition moved that archive's digest, the publisher
+      # repinned all twelve Spawnfiles, `main` moved in an image input, and the
+      # hourly release job rebuilt and redeployed the org every night for a change
+      # that was data. Now an edition commit touches nothing an image is built
+      # from, and the release gate answers "already released; nothing to do".
+      #
+      # WHY NOT AT ./repos/newsroom/content. The compiler refuses a volume mounted
+      # inside a bundle's mount (overlapping mounts), and a link packed into the
+      # archive cannot reach a team volume, whose backing path hashes this file's
+      # absolute path on the build host. So it sits beside the code, and readers
+      # resolve `current/editions` and `current/bylines` through
+      # CLANK_PUBLIC_CONTENT_VOLUME (scripts/public-content.mjs).
+      #
+      # Same constraints as the corpus above, for the same reasons: `mutable`
+      # (readonly bricks the entrypoint), team-shared, and `name`, `mode` and
+      # `sharing` are frozen once the volume holds data.
+      - id: public-content-volume
+        kind: volume
+        name: clank-newsroom-content
+        mount: ./repos/newsroom-content
+        mode: mutable
+        sharing: team
 members:
   - { id: klaxon, ref: agents/klaxon }
   - { id: cogsworth, ref: agents/cogsworth }

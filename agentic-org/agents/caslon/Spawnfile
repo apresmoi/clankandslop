@@ -66,6 +66,7 @@ environment:
       args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
       env:
         CLANK_NEWSROOM_AGENT: caslon
+        CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-content
         CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
         CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/state/transaction.mjs
         # No CLANK_PRIVATE_SOURCE_ROOT, deliberately. Neither of Caslon's two
@@ -92,6 +93,7 @@ environment:
       args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/art/server.mjs]
       env:
         CLANK_NEWSROOM_AGENT: caslon
+        CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-content
         CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom
         CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
         CLANK_NEWSROOM_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
@@ -108,7 +110,7 @@ workspace:
   resources:
     - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:f893ed6f3353a26de641cee05374f5a387a55c98915a880eaa5a0e543d7290d2, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:290ae4a76f3704f45578899b905c65c82f5b41c8b7fe97220a35da49e9f254d3, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:ddc25339d3a287f0ed3037ba6d0c3a5fe69bb72f0d3c0474ef53845b5e4a50e4, mount: ./repos/newsroom, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to
     # alter it. Ships outside the newsroom bundle because it is ~395MB.

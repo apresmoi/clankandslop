@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, corpusLinkFindings, verifyCorpusFreshness } from './corpus-contract.mjs';
 import { canonicalJson, worldDeskCanonicalFindings } from '../../ops/worlddesk-contract.mjs';
+import { CONTENT_VOLUME_ENV, publicEditionsRoot } from './public-content.mjs';
 
 const date = /^\d{4}-\d{2}-\d{2}$/u;
 const readJson = async file => JSON.parse(await readFile(file, 'utf8'));
@@ -79,8 +80,10 @@ async function assertCorpus(base, edition) {
   try { verifyCorpusFreshness(base, edition); } catch (error) { throw new Error(`ledger.worlddesk cannot trust the research corpus: it is not the prepared research for edition ${edition} — ${error.message}. ${CORPUS_TAIL}`); }
 }
 
-async function latestPriorDerived(publicRoot, edition) {
-  const editionsRoot = within(publicRoot, 'content/editions');
+// Prior published editions are served by the content volume, the public trace
+// log (`content/log`) by the image: public-content.mjs owns which is which.
+async function latestPriorDerived(publicRoot, edition, env) {
+  const editionsRoot = env[CONTENT_VOLUME_ENV] ? publicEditionsRoot({ env }) : within(publicRoot, 'content/editions');
   const entries = await readdir(editionsRoot, { withFileTypes: true }).catch(error => error.code === 'ENOENT' ? [] : Promise.reject(error));
   for (const entry of entries.filter(item => item.isDirectory()).map(item => item.name).filter(name => date.test(name) && name < edition).sort().reverse()) {
     const document = await maybeJson(within(editionsRoot, entry, 'desk/ledger.worlddesk.json'));
@@ -103,7 +106,7 @@ async function latestPriorDerived(publicRoot, edition) {
 // neither a document nor a refusal — never that the mount is missing. The two
 // used to share one message, and an error naming a document costs a wake looking
 // for a file on a path that was never mounted.
-async function authenticateFallback({ args, privateRoot, publicRoot }) {
+async function authenticateFallback({ args, privateRoot, publicRoot, env }) {
   const dir = within(privateRoot, args.edition, 'worlddesk');
   const refusal = await maybeJson(path.join(dir, 'refusal.json'));
   if (refusal === undefined) throw new Error(`ledger.worlddesk has a readable research corpus for edition ${args.edition} but no World Desk document in it: neither a prepared document at ${path.join(dir, 'ledger.worlddesk.json')} nor a refusal at ${path.join(dir, 'refusal.json')} exists, so the World Desk producer has not written this edition yet`);
@@ -111,7 +114,7 @@ async function authenticateFallback({ args, privateRoot, publicRoot }) {
   const currentTrace = await readJson(path.join(dir, 'trace.json')).catch(error => { if (error.code === 'ENOENT') throw new Error(`ledger.worlddesk requires the private trace beside the refusal at ${path.join(dir, 'trace.json')}`); throw error; });
   if (currentTrace.version !== 'clank.worlddesk-trace.v1' || currentTrace.edition !== args.edition || currentTrace.escalation?.index !== null || !Array.isArray(currentTrace.escalation?.unresolved) || currentTrace.escalation.unresolved.length === 0) throw new Error('ledger.worlddesk current refusal trace is malformed');
   if (canonicalJson(refusal.unresolved) !== canonicalJson(currentTrace.escalation.unresolved)) throw new Error('ledger.worlddesk current refusal does not match its trace');
-  const prior = await latestPriorDerived(publicRoot, args.edition);
+  const prior = await latestPriorDerived(publicRoot, args.edition, env);
   const expected = structuredClone(prior.document);
   expected.world_desk.delta = 'stale';
   if (canonicalJson(expected) !== canonicalJson(args.document)) throw new Error(`ledger.worlddesk fallback must carry the latest prior derived public World Desk document (${prior.edition}) with only delta changed to stale`);
@@ -128,7 +131,7 @@ export async function authenticateWorldDeskFiling(args, { env = process.env, cwd
   const dir = within(privateRoot, args.edition, 'worlddesk');
   const preparedPath = path.join(dir, 'ledger.worlddesk.json'), traceFile = path.join(dir, 'trace.json');
   const prepared = await maybeJson(preparedPath);
-  if (prepared === undefined) return authenticateFallback({ args, privateRoot, publicRoot });
+  if (prepared === undefined) return authenticateFallback({ args, privateRoot, publicRoot, env });
   const trace = await readJson(traceFile).catch(error => { if (error.code === 'ENOENT') throw new Error(`ledger.worlddesk requires the private trace beside the prepared document at ${traceFile}`); throw error; });
   if (canonicalJson(prepared) !== canonicalJson(args.document)) throw new Error('ledger.worlddesk document does not match the mounted private prepared document; copy the producer payload verbatim');
   if (trace.edition !== args.edition) throw new Error(`ledger.worlddesk trace edition ${JSON.stringify(trace.edition)} does not match filing edition ${args.edition}`);

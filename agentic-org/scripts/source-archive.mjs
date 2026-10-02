@@ -14,6 +14,7 @@ import { lstatSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { buildTar, gitModeMap, normalizeMode } from './private-archive.mjs';
+import { isPublicContentPath } from './public-content.mjs';
 
 // Present in the archive whether or not `git ls-files` reaches them: the MCP
 // entrypoint and the module it loads are what makes the mount a runtime.
@@ -29,8 +30,16 @@ export const SOURCE_REQUIRED = Object.freeze([
 // checkout). It is a build-time/repo-level manifest only: no agent reads it
 // from the mounted workspace, so it is excluded here the same way Spawnfile
 // and the other non-payload paths are.
+//
+// The published editions and their byline indexes are excluded for a different
+// reason: they are DATA on a daily cadence, served to every agent from the
+// host-populated `clank-newsroom-content` volume (see public-content.mjs). Inside
+// this archive they made every published edition a new archive digest, a repin
+// of twelve Spawnfiles, a moved `main`, and a nightly rebuild and redeploy of the
+// whole organization for a change that was not code.
 const excluded = (name) =>
-  name.startsWith('clankandslop-private/')
+  isPublicContentPath(name)
+  || name.startsWith('clankandslop-private/')
   || name.startsWith('website/node_modules/')
   || name.startsWith('website/public/og/')
   || name.endsWith('/Spawnfile')

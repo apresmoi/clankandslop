@@ -15,6 +15,7 @@ import { archiveIndex } from '../../ops/lay-page.mjs';
 import { authenticateWorldDeskFiling } from './worlddesk-filing.mjs';
 import { saveSignalDisposition, signalKey } from './signal-disposition.mjs';
 import { reviewNoticeInstruction } from './review-handoff.mjs';
+import { publicEditionsRoot, stagePublicSource as stagePublicContent } from './public-content.mjs';
 
 const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
 const sha=value=>`sha256:${createHash('sha256').update(value).digest('hex')}`;const object=value=>{if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('object required');return value;};
@@ -196,7 +197,7 @@ async function fileArticleAction(args){
   const{assignment,event_key:assignmentEventKey,corrected}=await resolveAssignment(args,article,owner);
   const resolvedArticle=corrected?{...article,id:assignment.id}:article;
   const topics=await knownTopicSlugs(),previousArticles=new Set();
-  for(const prior of Array.isArray(resolvedArticle.previous_coverage)?resolvedArticle.previous_coverage:[])if(date.test(prior?.date??'')&&component.test(prior?.slug??'')&&await lstat(path.join(personaRoot,'..','editions',prior.date,'articles',`${prior.slug}.json`)).then(stat=>stat.isFile(),()=>false))previousArticles.add(`${prior.date}/${prior.slug}`);
+  for(const prior of Array.isArray(resolvedArticle.previous_coverage)?resolvedArticle.previous_coverage:[])if(date.test(prior?.date??'')&&component.test(prior?.slug??'')&&await lstat(path.join(publicEditionsRoot(),prior.date,'articles',`${prior.slug}.json`)).then(stat=>stat.isFile(),()=>false))previousArticles.add(`${prior.date}/${prior.slug}`);
   const format=articleFormatFindings(resolvedArticle,{profile:'filing',editionDate:args.edition,articleId:assignment.id,owner,topicSlugs:topics,previousArticles,forecastRequired:assignment.slot==='forecast'});
   if(format.errors.length)throw new Error(`article format rejected — nothing was recorded; fix these fields and file again: ${format.errors.map(item=>`${item.path} [${item.code}] ${item.message}`).join('; ')}`);
   const evidence=new Set(resolvedArticle.evidence_box.flatMap(item=>[item?.source_note?.source_url,item?.source_note?.source_id]).filter(Boolean));
@@ -373,10 +374,8 @@ export async function makeOwnerWritable(rootDir){
     if(next!==mode)await chmod(file,next);
   }
 }
-export async function stagePublicSource(source,temporary,filter){
-  await cp(source,temporary,{recursive:true,dereference:true,filter});
-  await makeOwnerWritable(temporary);
-}
+// Code from the image, published editions and bylines from the content volume: public-content.mjs.
+export const stagePublicSource=(source,temporary,filter)=>stagePublicContent(source,temporary,filter,{makeOwnerWritable});
 export async function mergeBundle(from,into){
   await cp(from,into,{recursive:true,force:true});
   await makeOwnerWritable(into);
