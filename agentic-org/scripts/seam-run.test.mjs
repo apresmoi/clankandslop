@@ -1265,3 +1265,22 @@ test('wakeBudget refuses an unreadable deploy.env', () => {
     assert.throws(() => wakeBudget({ envFile: path.join(root, 'missing.env') }, { log: noop }), refusesWith(/cannot read the deploy env file/u));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+// The content-only answer must fail toward releasing. A rename is reported under
+// its NEW name alone by default, so a prompt moved into content/editions/ would
+// read as an edition without `--no-renames`; a ledger naming a commit this
+// checkout has never seen cannot be diffed at all and must release.
+test('a rename into published content is still a release, and an undiffable ledger releases', async () => {
+  const { contentOnlyChange } = await import('./release-git.mjs');
+  const world = releaseWorld();
+  try {
+    mkdirSync(path.join(world.repo, 'content', 'editions', '2026-10-02'), { recursive: true });
+    writeFileSync(path.join(world.repo, 'content', 'editions', '2026-10-02', 'one.json'), '{}\n');
+    const edition = world.commit('edition');
+    assert.deepEqual(contentOnlyChange(world.repo, world.head, edition), { changed: ['content/editions/2026-10-02/one.json'], contentOnly: true });
+    world.git('mv', 'agentic-org/Spawnfile', 'content/editions/2026-10-02/Spawnfile');
+    const moved = world.commit('smuggle');
+    assert.equal(contentOnlyChange(world.repo, edition, moved).contentOnly, false);
+    assert.equal(contentOnlyChange(world.repo, '0'.repeat(40), moved), null);
+  } finally { rmSync(world.root, { recursive: true, force: true }); }
+});

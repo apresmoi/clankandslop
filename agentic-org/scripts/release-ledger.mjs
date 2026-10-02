@@ -263,7 +263,7 @@ export function releaseGate(options, { log = console.log, read = readFileSync, e
   // because nothing here is going to be built from it.
   const since = ledger ? contentOnlyChange(options.repo, ledger.commit, tip, { exec }) : null;
   if (since?.contentOnly) {
-    log(`release: ${trackedRef(options.track).ref} ${tip.slice(0, 12)} differs from ${ledger.commit.slice(0, 12)} only in ${since.changed.length} published-content path(s) the content volume serves, already released as ${ledger.tag}; nothing to do`);
+    log(`release: ${trackedRef(options.track).ref} ${tip.slice(0, 12)} differs from ${ledger.commit.slice(0, 12)} ${since.changed.length ? `only in ${since.changed.length} published-content path(s) the content volume serves` : 'in no path at all'}, already released as ${ledger.tag}; nothing to do`);
     return { head, tip, ledger, upToDate: true, contentOnly: true };
   }
   // Only once there is something to release: a dirty tree with nothing to ship
