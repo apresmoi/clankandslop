@@ -191,7 +191,7 @@ editorial choices stay with the agents.
 | `scripts/`, `ops/systemd/` | Existing public tools, validation and deployment helpers |
 | `e2e/`, `fixtures/`, `inventory/` | Rehearsal harness, synthetic inputs and historical evidence |
 | `*-bundle.json`, generated `*.tar` | Tracked descriptors and Git-ignored deployment archives |
-| `../content/editions/`, `../website/` | Published edition data and its renderer |
+| `../content/editions/`, `../website/` | Published edition data (served to agents from the `clank-newsroom-content` volume, never the image) and its renderer |
 
 The separate private repository owns `sensors/automation/`,
 `automation/host/` and the `newsroom/` tool implementations. Research is stored
