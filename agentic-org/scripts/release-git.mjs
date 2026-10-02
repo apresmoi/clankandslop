@@ -23,6 +23,7 @@
 import { execFileSync } from 'node:child_process';
 import { constants, accessSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { isPublicContentPath } from './public-content.mjs';
 
 // Carries its own reason word, so seam-run's fixed alarm vocabulary survives
 // being split across modules. It is NOT a SeamError subclass on purpose:
@@ -191,6 +192,31 @@ export function trackedTip(options, { exec = execFileSync } = {}) {
   if (lines.length !== 2 || !lines.every((line) => /^[0-9a-f]{40}$/u.test(line)))
     throw new ReleaseError(`git -C ${options.repo} rev-parse HEAD ${ref} returned ${JSON.stringify(raw.trim().slice(0, 120))}, which is not two commits`, 'seam-blocked');
   return { head: lines[0], tip: lines[1] };
+}
+
+// WHAT CHANGED SINCE THE RELEASE, AND WHETHER ANY OF IT IS AN IMAGE INPUT
+//
+// `main` moves every evening when an edition merges, and an edition is DATA: the
+// published editions and bylines are served by the host-populated content volume
+// and excluded from every archive the image is built from (public-content.mjs).
+// So "the tip is not the released commit" is not the same question as "there is
+// something to release". This answers the second one: the paths that differ
+// between the released commit and the tip, and whether every one of them is
+// volume-served content. Only then is the release still current.
+//
+// Fail toward releasing. A diff that cannot be read -- a ledger naming a commit
+// this checkout does not have, a shallow history -- returns null and the gate
+// releases, which costs one build; a wrong "nothing to do" costs a newsroom
+// running code nobody deployed. `--no-renames` because a rename is reported under
+// its NEW name only, and a prompt renamed into content/editions/ must not read as
+// an edition. `-z` because a quoted unusual path must not slip past the prefix
+// test.
+export function contentOnlyChange(repo, from, to, { exec = execFileSync } = {}) {
+  let raw;
+  try { raw = git(repo, ['-c', 'core.quotePath=false', 'diff', '--no-renames', '--name-only', '-z', from, to, '--'], exec); }
+  catch { return null; }
+  const changed = raw.split('\0').filter(Boolean);
+  return { changed, contentOnly: changed.every(isPublicContentPath) };
 }
 
 // Nothing here improvises. Each refusal below is a state a person has to resolve,

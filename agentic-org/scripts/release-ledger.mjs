@@ -32,7 +32,7 @@ import { bundleRewriteFindings } from './bundle-rewrite-shape.mjs';
 // The git side of a release decision, including the error type that carries the
 // alarm reason word. Re-exported, because "the release ledger's ReleaseError" is
 // how the rest of the pipeline already knows it.
-import { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, ReleaseError, classifyFetchFailure, fastForwardToTip, fetchSshCommand, fetchTracked, git, headCommit, trackedRef, trackedTip } from './release-git.mjs';
+import { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, ReleaseError, classifyFetchFailure, contentOnlyChange, fastForwardToTip, fetchSshCommand, fetchTracked, git, headCommit, trackedRef, trackedTip } from './release-git.mjs';
 
 export { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, ReleaseError, classifyFetchFailure, fastForwardToTip, fetchSshCommand, fetchTracked, headCommit, trackedRef, trackedTip };
 
@@ -256,6 +256,15 @@ export function releaseGate(options, { log = console.log, read = readFileSync, e
   if (ledger && ledger.commit === tip) {
     log(`release: ${trackedRef(options.track).ref} ${tip.slice(0, 12)} already released as ${ledger.tag}; nothing to do`);
     return { head, tip, ledger, upToDate: true };
+  }
+  // A published edition moves the tip every evening and changes nothing the image
+  // is built from: see release-git.mjs's contentOnlyChange. Still the read-only
+  // path -- one diff, no write, no docker -- and the build root stays where it is,
+  // because nothing here is going to be built from it.
+  const since = ledger ? contentOnlyChange(options.repo, ledger.commit, tip, { exec }) : null;
+  if (since?.contentOnly) {
+    log(`release: ${trackedRef(options.track).ref} ${tip.slice(0, 12)} differs from ${ledger.commit.slice(0, 12)} only in ${since.changed.length} published-content path(s) the content volume serves, already released as ${ledger.tag}; nothing to do`);
+    return { head, tip, ledger, upToDate: true, contentOnly: true };
   }
   // Only once there is something to release: a dirty tree with nothing to ship
   // is somebody working, not a failure, and it must not page. And before the

@@ -27,9 +27,8 @@ import { cp, mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promi
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
-import { buildTopicsTxt } from './build-topics-txt.mjs';
-import { repinSource } from './check-bundle-descriptor.mjs';
 import { CORPUS_PROVENANCE_FILE, hostAssertedProvenance } from './edition-provenance.mjs';
+import { PUBLIC_CONTENT_PATHS, isPublicContentPath } from './public-content.mjs';
 import { releaseClock } from './release-time.mjs';
 import { resolveStagedEdition } from './staged-edition.mjs';
 export { artifactDigest, resolveStagedEdition } from './staged-edition.mjs';
@@ -154,63 +153,44 @@ export async function prepareSshIdentity(directory, keyFile) {
   return { configFile, sshCommand: `ssh -F ${configFile} -o BatchMode=yes` };
 }
 
-// --- the generated views CI diff-checks --------------------------------------
-// `content/topics.txt` and `content/bylines/*.tsv` are committed views of
-// content the edition changes: the topic registry, and every article file.
-// ci.yml regenerates both and runs `git diff --exit-code`, and nothing else in
-// the pipeline invokes the generators — so an edition branch built from the
-// edition directory alone lands red and stays red until a person runs them by
-// hand. They are regenerated here, from the branch's own tree, immediately
-// before the commit.
+// --- the generated view CI diff-checks, and nothing else ---------------------
+// `content/bylines/*.tsv` is a committed view of every article file. ci.yml
+// regenerates it and runs `git diff --exit-code`, and nothing else in the
+// pipeline invokes the generator -- so an edition branch built from the edition
+// directory alone would land red. It is regenerated here, from the branch's own
+// tree, immediately before the commit. It is a pure function of that tree, so a
+// retry rebuilds byte-identical output and the commit stays the same object.
 //
-// `agentic-org/newsroom-runtime-bundle.json` and the twelve Spawnfile source
-// pins are the THIRD instance of exactly that defect, and the one that made an
-// unattended publication impossible rather than merely annoying. The source
-// archive is every tracked file bar a short exclusion list, so
-// `content/editions/<date>/**` is IN it: adding an edition changes the source
-// digest, and ci.yml's "Check the runtime bundle descriptor describes this
-// tree" therefore fails on EVERY edition branch. Verified against `main`
-// (green) plus one restored edition directory: source.file_count 1243 -> 1256,
-// digest moved, check red. Without this, no edition branch could ever be green
-// and an auto-merge would have had nothing to merge, ever.
+// WHAT THIS NO LONGER DOES, AND WHY THAT IS THE POINT
+// ---------------------------------------------------
+// It used to repin `agentic-org/newsroom-runtime-bundle.json` and the twelve
+// Spawnfile source pins too, because `content/editions/**` was inside the source
+// archive and every edition moved its digest. That repin is what made `main`
+// move in an image input every evening, and the hourly release job rebuild and
+// redeploy the organization every night for a change that was data. The
+// published editions and bylines are now served by the host-populated
+// `clank-newsroom-content` volume and excluded from every archive
+// (public-content.mjs), so an edition commit carries NOTHING an image is built
+// from -- and `assertContentOnlyCommit` below refuses to make one that does.
 //
-// This widens what the commit may contain by exactly these paths, all
-// mechanically derived from the tree being committed, and widens nothing about
-// what may be pushed: the branch, the refspec, the remote and the flags are
-// untouched, and `main` is still refused as hard as it ever was.
-export const GENERATED_INDEX_PATHS = Object.freeze(['content/topics.txt', 'content/bylines']);
-export const REPINNED_DESCRIPTOR_PATHS = Object.freeze(['agentic-org/newsroom-runtime-bundle.json', 'agentic-org/agents']);
+// `content/topics.txt` is not regenerated here any more either: it is a view of
+// `content/topics.json`, which an edition never changes, and it stays in the
+// image. An edition that needed it regenerated would be an edition that changed
+// an image input, which is exactly what this job must not do.
+export const GENERATED_INDEX_PATHS = Object.freeze(['content/bylines']);
 
-// Both generators are pure functions of the tree they are handed, so a retry
-// rebuilds byte-identical output and the commit stays the same object.
 export async function regenerateIndexes(workdir) {
   if (!path.isAbsolute(workdir)) throw new Error('index regeneration workdir must be an absolute path');
-  buildTopicsTxt(workdir);
   const { written, articleCount } = buildBylinesTsv(workdir);
-  return { topics: 'content/topics.txt', bylines: written.map((item) => `content/bylines/${item.agent}.tsv`), articles: articleCount };
+  return { bylines: written.map((item) => `content/bylines/${item.agent}.tsv`), articles: articleCount };
 }
 
-// LAST, and after the generated views are staged. `repinSource` measures the
-// git INDEX, so the digest it writes only describes the commit if every other
-// path the commit carries is already in the index — measuring before
-// `content/bylines/<agent>.tsv` is staged produces a pin that is short by
-// exactly the files the generators just wrote, and the branch lands red on the
-// same check this exists to satisfy.
-//
-// And it is skipped, loudly and in the result, when a historical base branch
-// does not carry a descriptor at all. Public main now carries `agentic-org/`,
-// so normal unattended publication repins the descriptor and Spawnfile pins
-// from that main-based tree. What is committed remains a function of what the
-// base branch actually carries, read from the branch; nothing here decides not
-// to repin a tree that has a descriptor.
-export const DESCRIPTOR_FILE = 'agentic-org/newsroom-runtime-bundle.json';
-
-export async function repinBundleDescriptor(workdir) {
-  if (!path.isAbsolute(workdir)) throw new Error('descriptor repin workdir must be an absolute path');
-  const present = await stat(path.join(workdir, DESCRIPTOR_FILE)).then((info) => info.isFile()).catch(() => false);
-  if (!present) return { skipped: true, reason: `${DESCRIPTOR_FILE} is not on the base branch — nothing to repin, and nothing on the branch checks it` };
-  const pins = repinSource(workdir);
-  return { skipped: false, source: pins.digest, previous: pins.previous, file_count: pins.file_count, content_bytes: pins.content_bytes, repinned: pins.repinned };
+// The structural half of "an edition is not a release": every path the commit is
+// about to carry is volume-served content, read back from the INDEX rather than
+// trusted from the pathspecs that put it there. merge-edition.yml refuses the
+// same thing on GitHub's side; this refuses it before anything is pushed.
+export function contentOnlyFindings(paths) {
+  return paths.filter((item) => !isPublicContentPath(item)).map((item) => `${item} is not published content the content volume serves -- an edition commit must not change an image input`);
 }
 
 // --- running it -------------------------------------------------------------
@@ -242,7 +222,7 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
   const scoped = path.normalize(editionPath);
-  for (const item of [scoped, ...GENERATED_INDEX_PATHS, ...REPINNED_DESCRIPTOR_PATHS])
+  for (const item of [scoped, ...GENERATED_INDEX_PATHS])
     if (path.isAbsolute(item) || item.split('/').includes('..')) throw new Error(`edition path ${JSON.stringify(editionPath)} must stay inside the branch`);
   const options = { home, sshCommand };
   await mkdir(path.join(home, 'tmp'), { recursive: true });
@@ -275,14 +255,17 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
     return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
   const generated = await regenerateIndexes(workdir);
   await git(['-C', workdir, 'add', '--', ...GENERATED_INDEX_PATHS], options);
-  generated.descriptor = await repinBundleDescriptor(workdir);
-  const descriptorPaths = generated.descriptor.skipped ? [] : REPINNED_DESCRIPTOR_PATHS;
-  if (descriptorPaths.length > 0) await git(['-C', workdir, 'add', '--', ...descriptorPaths], options);
+  // Asked as "what is staged OUTSIDE the content paths", so the answer that lets
+  // the commit through is an empty one: this job's git output is capped, and a
+  // truncated list of everything could hide the one path that matters.
+  const stagedPaths = (await git(['-C', workdir, '-c', 'core.quotePath=false', 'diff', '--cached', '--no-renames', '--name-only', '-z', 'HEAD', '--', '.', ...PUBLIC_CONTENT_PATHS.map((prefix) => `:(exclude)${prefix}`)], options)).split('\0').filter(Boolean);
+  const outside = contentOnlyFindings(stagedPaths);
+  if (outside.length) throw new Error(`refusing to commit edition ${branch}: ${outside.join('; ')}`);
   // Pinned to the edition's own Berlin release instant so a retry after a
   // failed push rebuilds the identical commit instead of a new one every run.
   const edition = branch.slice('edition/'.length);
   const date = `${edition}T${releaseClock(edition)}:00+02:00`;
-  const committed = [scoped, ...GENERATED_INDEX_PATHS, ...descriptorPaths];
+  const committed = [scoped, ...GENERATED_INDEX_PATHS];
   await git(['-C', workdir, '-c', `user.name=${COMMIT_NAME}`, '-c', `user.email=${COMMIT_EMAIL}`, 'commit', '-q', '-m', message, '--', ...committed], { ...options, date });
   const commit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
   if (dryRun) return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: false, already_published: false };
