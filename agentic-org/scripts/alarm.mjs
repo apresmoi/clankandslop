@@ -90,13 +90,6 @@ export const REASONS = Object.freeze({
   // commit that has been waiting more than a day for a quiet window is a
   // newsroom that has stopped shipping, said once per pending commit.
   'release-deferred': { title: 'Newsroom: release waiting on a quiet window', priority: 'high', tags: 'warning' },
-  // The daily wake-budget roll (epoch-roll-run.mjs). Two words rather than one,
-  // because the two failures demand different things of the person reading
-  // them: BLOCKED means the container is up and publishing on yesterday's
-  // budget window -- degraded, nothing to do at 04:00 -- while FAILED means a
-  // recreate was attempted and the organization may be down.
-  'epoch-roll-blocked': { title: 'Newsroom: wake budget not rolled', priority: 'high', tags: 'warning' },
-  'epoch-roll-failed': { title: 'Newsroom: wake budget roll failed', priority: 'urgent', tags: 'rotating_light' },
   // For an OnFailure= handler, which is reached by units whose own code never
   // ran or never got to say why. Reusing `deploy-failed` or `no-edition` there
   // would put the wrong words on a lock screen at 04:00 and send someone to
