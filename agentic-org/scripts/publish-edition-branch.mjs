@@ -21,6 +21,7 @@
 //     --state   /var/lib/docker/volumes/clank-edition-state/_data \
 //     --key     ~/.ssh/clank-deploy/clankandslop \
 //     --edition today            # refuse anything but today's paper
+//     --landed  /var/lib/clank-corpus/landed.json   # the host's own corpus record
 import { spawn } from 'node:child_process';
 import { cp, mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -28,9 +29,11 @@ import path from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
 import { repinSource } from './check-bundle-descriptor.mjs';
+import { CORPUS_PROVENANCE_FILE, hostAssertedProvenance } from './edition-provenance.mjs';
 import { releaseClock } from './release-time.mjs';
 import { resolveStagedEdition } from './staged-edition.mjs';
 export { artifactDigest, resolveStagedEdition } from './staged-edition.mjs';
+export { CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, LANDED_VERSION, editionCorpusClaim, hostAssertedProvenance, landedCorpus } from './edition-provenance.mjs';
 
 // One ed25519 deploy key per repository, reached through an SSH host alias so
 // the generated config — not ssh's agent or default key search — decides which
@@ -235,7 +238,7 @@ const git = (args, { home, sshCommand, date }) => new Promise((resolve, reject) 
 // directory to it, and fast-forward pushes that one ref. `add`, `commit` and
 // `status` are all path-scoped to the edition directory, so nothing else in the
 // scratch tree can ride along in the commit.
-export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, workdir, home, sshCommand, base = BASE_BRANCH, message, dryRun = false }) {
+export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false }) {
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
   const scoped = path.normalize(editionPath);
@@ -251,6 +254,11 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   await rm(path.join(workdir, scoped), { recursive: true, force: true });
   await mkdir(path.dirname(path.join(workdir, scoped)), { recursive: true });
   await cp(editionSource, path.join(workdir, scoped), { recursive: true });
+  // Inside the edition directory, so the host's assertion rides along in the one
+  // pathspec the commit already carries: nothing about what may be committed or
+  // pushed widens by a byte. Written before `add`, so it is part of the tree the
+  // already-published comparison below is made against.
+  if (provenance !== undefined) await writeFile(path.join(workdir, scoped, CORPUS_PROVENANCE_FILE), `${JSON.stringify(provenance, undefined, 2)}\n`);
   // Whether the edition is worth a branch is still decided by the edition
   // directory alone: a re-run of an edition already on the base branch is
   // refused here, exactly as before, and never on generated-index drift.
@@ -287,11 +295,16 @@ export function parseArguments(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const name = argv[index];
     if (name === '--dry-run') { options.dryRun = true; continue; }
+    // Deliberate, never the default, and never quiet: it is the one-time
+    // backfill for an edition commissioned before provenance existed.
+    if (name === '--allow-unprovenanced-edition') { options.allowUnprovenanced = true; continue; }
+    if (name.startsWith('--landed=')) { options.landed = path.resolve(name.slice('--landed='.length)); continue; }
     const value = argv[index += 1];
     if (value === undefined) throw new Error(`${name} requires a value`);
     if (name === '--staging') options.staging = path.resolve(value);
     else if (name === '--state') options.state = path.resolve(value);
     else if (name === '--key') options.key = path.resolve(value);
+    else if (name === '--landed') options.landed = path.resolve(value);
     else if (name === '--edition') {
       if (value !== 'today' && !EDITION_PATTERN.test(value)) throw new Error(`--edition must be "today" or YYYY-MM-DD, got ${JSON.stringify(value)}`);
       options.edition = value;
@@ -311,9 +324,12 @@ export function parseArguments(argv) {
 // `url` defaults to the one constant remote and is a test seam, not a knob:
 // `parseArguments` has no flag that can set it, so the command line cannot
 // redirect this job at another repository.
-export async function publishEditionBranch(options, url = remoteUrl(EDITION_PUSH_REMOTE), { now = new Date() } = {}) {
+export async function publishEditionBranch(options, url = remoteUrl(EDITION_PUSH_REMOTE), { now = new Date(), warn = console.warn } = {}) {
   const staged = await resolveStagedEdition(options.staging, { stateRoot: options.state });
   assertRequestedEdition(staged.edition, options.edition, now);
+  // Last of the pre-flight refusals and before the scratch tree exists, so a
+  // provenance this host cannot establish never reaches git at all.
+  const provenance = await hostAssertedProvenance(options, staged, { warn });
   const scratch = await mkdtemp(path.join(tmpdir(), 'clank-publish-'));
   try {
     const identity = options.key === undefined ? {} : await prepareSshIdentity(path.join(scratch, 'ssh'), options.key);
@@ -321,9 +337,10 @@ export async function publishEditionBranch(options, url = remoteUrl(EDITION_PUSH
       url, branch: editionBranch(staged.edition),
       editionSource: staged.source, editionPath: staged.editionPath,
       workdir: path.join(scratch, 'repo'), home: path.join(scratch, 'home'),
-      sshCommand: identity.sshCommand, message: editionCommitMessage(staged.edition), dryRun: options.dryRun
+      sshCommand: identity.sshCommand, message: editionCommitMessage(staged.edition),
+      provenance: provenance.record, dryRun: options.dryRun
     });
-    return { ...result, edition: staged.edition, remote: EDITION_PUSH_REMOTE, artifact: staged.artifact, published: false };
+    return { ...result, edition: staged.edition, remote: EDITION_PUSH_REMOTE, artifact: staged.artifact, published: false, provenance: provenance.record, landed_record: provenance.landed_record };
   } finally {
     await rm(scratch, { recursive: true, force: true });
   }

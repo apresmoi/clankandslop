@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileArticle, recordAssignment, reviewArticle } from './production-newsroom.mjs';
+import { installCorpusFixture } from './corpus-fixture.mjs';
 
 const stateAdapter = process.env.CLANK_NEWSROOM_STATE_ADAPTER;
 const runtimeTest = (name, action) => test(name, { skip: (!stateAdapter || !existsSync(stateAdapter)) && 'CLANK_NEWSROOM_STATE_ADAPTER is required for transaction integration' }, action);
@@ -57,12 +58,16 @@ async function fixture() {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-prose-review-'));
   const root = path.join(temporary, 'state');
   const base = path.join(root, 'editions', edition);
-  const previous = Object.fromEntries(['CLANK_EDITION_STATE_ROOT', 'CLANK_NEWSROOM_AGENT', 'CLANK_NEWSROOM_STATE_ADAPTER', 'CLANK_STATE_OFFLINE_FIXTURE', 'DAIMON_WAKE_ID'].map(key => [key, process.env[key]]));
+  const previous = Object.fromEntries(['CLANK_EDITION_STATE_ROOT', 'CLANK_NEWSROOM_AGENT', 'CLANK_NEWSROOM_STATE_ADAPTER', 'CLANK_STATE_OFFLINE_FIXTURE', 'CLANK_PRIVATE_SOURCE_ROOT', 'DAIMON_WAKE_ID'].map(key => [key, process.env[key]]));
   process.env.CLANK_EDITION_STATE_ROOT = root;
   process.env.CLANK_NEWSROOM_STATE_ADAPTER = stateAdapter;
   process.env.CLANK_STATE_OFFLINE_FIXTURE = '1';
   delete process.env.DAIMON_WAKE_ID;
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
+  // record_assignment reads the mounted research corpus; the refusals are
+  // covered in production-newsroom.test.mjs.
+  process.env.CLANK_PRIVATE_SOURCE_ROOT = path.join(temporary, 'corpus');
+  installCorpusFixture(process.env.CLANK_PRIVATE_SOURCE_ROOT, edition);
   await recordAssignment({
     edition,
     event_key: assignmentEvent,

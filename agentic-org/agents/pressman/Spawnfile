@@ -79,13 +79,12 @@ workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:f893ed6f3353a26de641cee05374f5a387a55c98915a880eaa5a0e543d7290d2, mount: ./tools/newsroom, mode: readonly }
-    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:4e3beb98d4ac10c3479de75ad83a59c9585abc6cec77d2b57eba15499f4a227a, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:4c600712beeba360ec6e901dd67f6c84d32958903cb682f643bc7e8805e602c2, mount: ./repos/newsroom, mode: readonly }
     - { id: website-deps-a, kind: bundle, source: ../../newsroom-dependencies-a.tar, sha256: sha256:3682eb4edaa1092fb08dcc2629da683b7690ff03e2a248301c56c7bfccc6de9d, mount: ./deps-a, mode: readonly }
     - { id: website-deps-b, kind: bundle, source: ../../newsroom-dependencies-b.tar, sha256: sha256:c7bb3c23e59c0e66257eeb2d5dde6bd131987f0ce228dc4b6c96f5b2b8509142, mount: ./deps-b, mode: readonly }
     - { id: public-assets-a, kind: bundle, source: ../../newsroom-assets-a.tar, sha256: sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a, mount: ./assets-a, mode: readonly }
     - { id: public-assets-b, kind: bundle, source: ../../newsroom-assets-b.tar, sha256: sha256:f55844657ff8ed2dccd234fef7a697c5d0bd529b1f0f97eccdade69f64664ca5, mount: ./assets-b, mode: readonly }
     - { id: public-content, kind: volume, name: clank-release-staging, mount: ./staging, mode: mutable, sharing: per_agent }
-    - { id: private-archive, kind: bundle, source: ../../newsroom-private.tar, sha256: sha256:87372076d7e07af5a30be8497bddfd438206b891acab4c64e5e8348835c6061d, mount: ./repos/newsroom-private, mode: readonly }
 
 memory:
   - id: self

@@ -63,7 +63,40 @@ export const REASONS = Object.freeze({
   'bundle-mismatch': { title: 'Newsroom: bundle mismatch', priority: 'urgent', tags: 'rotating_light' },
   'deploy-failed': { title: 'Newsroom: deploy failed', priority: 'urgent', tags: 'rotating_light' },
   'no-edition': { title: 'Newsroom: no edition today', priority: 'urgent', tags: 'newspaper' },
+  // The corpus volume refresher runs outside the agent boundary and is the
+  // ONLY thing that puts a day's research in front of the reporters now that
+  // the corpus is not baked into the image. It fails closed — the previous
+  // day's corpus stays mounted — so nothing crashes and nobody notices unless
+  // this word reaches a person: the paper would come out on stale research.
+  'corpus-refresh-failed': { title: 'Newsroom: corpus refresh failed', priority: 'urgent', tags: 'rotating_light' },
+  // DIFFERENT FROM A FAILED REFRESH, and the distinction is the whole point: a
+  // refresh that failed left the last good corpus alone, while this word means
+  // the mounted corpus stopped matching the commit the host landed. The mount is
+  // shared by twelve agents and durable, and uid 2000 owns its root -- verified
+  // on the box 2026-10-01, where a container-side `echo forged > CORPUS.json`
+  // and `ln -s /etc trees` both succeeded. So drift is reachable without anyone
+  // being hostile: one confused agent writing where it should not is enough, and
+  // it would otherwise persist until the next commit landed. The refresher
+  // re-lands from git by itself, so by the time this arrives the newsroom is
+  // already repaired -- it is a report that something wrote to the corpus, not a
+  // request to go fix the corpus. Urgent anyway: an agent reaching outside its
+  // own state is the kind of thing you want to know about the same day.
+  'corpus-tampered': { title: 'Newsroom: corpus was modified outside the host', priority: 'urgent', tags: 'rotating_light' },
   'seam-blocked': { title: 'Newsroom: seam could not run', priority: 'high', tags: 'warning' },
+  // The seam is a release job on a timer now, and under `--if-changed` a closed
+  // wake window is a deferral rather than a failure -- otherwise an hourly unit
+  // would page about twenty times a day and teach whoever carries the pager to
+  // ignore it. This is the word for a deferral that has stopped being one: a
+  // commit that has been waiting more than a day for a quiet window is a
+  // newsroom that has stopped shipping, said once per pending commit.
+  'release-deferred': { title: 'Newsroom: release waiting on a quiet window', priority: 'high', tags: 'warning' },
+  // The daily wake-budget roll (epoch-roll-run.mjs). Two words rather than one,
+  // because the two failures demand different things of the person reading
+  // them: BLOCKED means the container is up and publishing on yesterday's
+  // budget window -- degraded, nothing to do at 04:00 -- while FAILED means a
+  // recreate was attempted and the organization may be down.
+  'epoch-roll-blocked': { title: 'Newsroom: wake budget not rolled', priority: 'high', tags: 'warning' },
+  'epoch-roll-failed': { title: 'Newsroom: wake budget roll failed', priority: 'urgent', tags: 'rotating_light' },
   // For an OnFailure= handler, which is reached by units whose own code never
   // ran or never got to say why. Reusing `deploy-failed` or `no-edition` there
   // would put the wrong words on a lock screen at 04:00 and send someone to

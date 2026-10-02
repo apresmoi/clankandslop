@@ -1,0 +1,58 @@
+# The seam, as a RELEASE job instead of a cron job.
+#
+# It builds and deploys when the organization's code or prompts change, and
+# no-ops when they have not. The daily rebuild it replaces existed only because
+# the corpus was pinned into the image; with the corpus on a volume, an image is
+# day-agnostic and there is nothing for a clock to trigger.
+#
+# WHY A HOST TIMER AND NOT CI
+# ---------------------------
+# CI-dispatch on merge is more precise, but it puts deploy authority in GitHub
+# and needs a runner credential on this box — a new trust edge, against the
+# standing rule that deploy keys stay off anything the agents can reach — and it
+# cannot run when GitHub is down. A timer that keeps all authority here degrades
+# safely, and its no-op case is one fetch, one `rev-parse` and one JSON read. The
+# cost is up to an hour between merge and release, which for this system is
+# nothing.
+#
+# IT FETCHES, AND THAT NEEDS A KEY SAID OUT LOUD
+# ---------------------------------------------
+# An earlier draft of this comment claimed the no-op was "one `git rev-parse` and
+# one JSON read" — no fetch. That was wrong in the worst direction: comparing a
+# LOCAL HEAD that nothing advances means the job no-ops forever and never notices
+# a merge, which is the whole thing it exists to notice.
+#
+# The fetch needs an explicit identity. Verified on this box 2026-10-01:
+#
+#   $ git -C /root/work/clankandslop fetch --prune --dry-run origin
+#   fatal: Could not read from remote repository.
+#
+# because the public remote is `git@github.com:apresmoi/clankandslop.git` with no
+# SSH host alias, and root's ~/.ssh/config only supplies a key for the aliases
+# `github-clank-public` and `github-clank-private`. With the key it is exit 0. The
+# private corpus remote IS `git@github-clank-private:…`, which is why
+# clank-corpus-refresh.service needs no key of its own and this unit does.
+#
+# A missing or rejected key PAGES rather than defers, deliberately: an
+# unauthenticated fetch fails with git's same "Could not read from remote
+# repository" epilogue as a real outage, and a credential problem that deferred
+# like an outage would wait quietly forever.
+[Unit]
+Description=Release the newsroom organization when its tree has changed
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+OnFailure=clank-alarm@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/work/clankandslop
+EnvironmentFile=-/etc/clank-alarm/alarm.env
+Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
+Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
+Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/home/clank/deploy-work/grok-runtime-identity-20260922.json
+Environment=CLANK_RELEASE_FETCH_KEY=/root/.ssh/clank_public
+Environment=SPAWNFILE_CLI=/home/clank/deploy-work/spawnfile-main/dist/cli/index.js
+ExecStart=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --if-changed
+TimeoutStartSec=3600

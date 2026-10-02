@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileArticle, recordAssignment } from './production-newsroom.mjs';
+import { installCorpusFixture } from './corpus-fixture.mjs';
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);
 const published = JSON.parse(readFileSync(new URL('../../content/editions/2026-08-21/articles/deepseek-ships-flash-vision-on-the-api.json', import.meta.url), 'utf8'));
@@ -20,12 +21,19 @@ async function snapshot(dir) {
 
 runtimeTest('fileArticle cannot bypass format checks and rejected mutations write nothing', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-article-format-'));
-  const names = ['CLANK_EDITION_STATE_ROOT', 'CLANK_NEWSROOM_AGENT', 'CLANK_FILE_ARTICLE_HARD_LINT'];
+  // Outside `temporary`, which is the edition state root this test snapshots.
+  const corpus = await mkdtemp(path.join(os.tmpdir(), 'clank-article-format-corpus-'));
+  const names = ['CLANK_EDITION_STATE_ROOT', 'CLANK_NEWSROOM_AGENT', 'CLANK_FILE_ARTICLE_HARD_LINT', 'CLANK_PRIVATE_SOURCE_ROOT'];
   const saved = Object.fromEntries(names.map(name => [name, process.env[name]]));
   process.env.CLANK_EDITION_STATE_ROOT = temporary;
   process.env.CLANK_NEWSROOM_AGENT = 'brass';
   process.env.CLANK_FILE_ARTICLE_HARD_LINT = '0';
   try {
+    // record_assignment reads the mounted research corpus, so the fixture day
+    // needs one; the corpus refusals themselves are covered in
+    // production-newsroom.test.mjs.
+    process.env.CLANK_PRIVATE_SOURCE_ROOT = corpus;
+    installCorpusFixture(corpus, published.edition_date);
     await recordAssignment({ edition: published.edition_date, event_key: 'format-assignment', assignments: ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'].map((owner, i) => ({ id: i ? `other-${i}` : published.id, owner, brief: 'Report the actual sourced event and its consequences.', evidence_refs: i ? [] : ['s-0c0be037'], ...(i === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) })) });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
     const base = structuredClone(published);
@@ -60,6 +68,6 @@ runtimeTest('fileArticle cannot bypass format checks and rejected mutations writ
     assert.ok(Object.keys(await snapshot(temporary)).length > Object.keys(before).length, 'accepted filing must land');
   } finally {
     for (const name of names) if (saved[name] === undefined) delete process.env[name]; else process.env[name] = saved[name];
-    await rm(temporary, { recursive: true, force: true });
+    for (const root of [temporary, corpus]) await rm(root, { recursive: true, force: true });
   }
 });

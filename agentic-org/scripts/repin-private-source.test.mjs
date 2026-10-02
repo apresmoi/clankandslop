@@ -122,8 +122,13 @@ test('verifyArchive reports index sizes and resolves every story row', () => {
     const report = verifyArchive(root, EDITION);
     assert.deepEqual(report.map((entry) => entry.agent), REPORTERS);
     assert.deepEqual(report.find((entry) => entry.agent === 'cogsworth').stories, STORIES.cogsworth);
+    // A desk with nothing routed to it is a quiet beat, not a broken corpus.
     assert.equal(report.find((entry) => entry.agent === 'tinkerton').rows, 0);
     assert.ok(report.every((entry) => entry.bytes > 0));
+    // This path and the host refresher share one check (scripts/corpus-contract.mjs),
+    // so the corpus that routed nothing to ANYONE is refused here too.
+    for (const agent of REPORTERS) writeIndex(root, EDITION, agent, []);
+    assert.throws(() => verifyArchive(root, EDITION), (error) => error instanceof RepinError && /routed no stories to any desk/u.test(error.message));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

@@ -8,6 +8,7 @@ import test from 'node:test';
 import { reviewArticle } from './production-newsroom.mjs';
 import { buildEditionIndex } from './edition-index.mjs';
 import { reviewNoticeInstruction } from './review-handoff.mjs';
+import { PASSED_ARTICLES_MINIMUM, DESK_DOCUMENTS_REQUIRED } from '../../ops/edition-floor.mjs';
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter required' }, action);
 const edition = '2026-09-11';
@@ -55,7 +56,14 @@ runtimeTest('the PASS that supplies the third section gives Spike the exact Casl
   try {
     assert.match(await buildEditionIndex(f.root, edition), /sections=2\/3.*→ blocked/u);
     const result = await reviewArticle(f.args);
-    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'), /passed=6\/5 desks=4\/4 sections=3\/3.*→ ready/u);
+    // The REQUIRED side is derived, never spelled. This line read `passed=6/5`
+    // and went red the moment 10ddd3e lowered the floor to four, invisibly:
+    // public CI skips this whole family for want of the private state adapter,
+    // so it has been failing since then with nothing to say so. The FOUND side
+    // stays literal -- six passes and three sections are what this fixture
+    // builds, and that is the thing under test.
+    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'),
+      new RegExp(`passed=6/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=3/3.*→ ready`, 'u'));
     assert.match(result.next, /edition 2026-09-11, article story-5 revision 4/u);
     assert.match(result.next, /no Moltnet message was sent/u);
     assert.match(result.next, /moltnet_send.*clank-newsroom.*room:release.*@caslon/u);
