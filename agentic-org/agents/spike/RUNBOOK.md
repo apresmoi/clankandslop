@@ -16,14 +16,17 @@ external page alone does not prove the article false or waive evidence rules.
 
 ## Review Bar
 
-**Refuse a filing that under-reports its own Record.** Provenance is necessary and not sufficient: a piece whose every citation resolves can still fail as journalism, and that is a REVISION_REQUEST, not a pass. Judge the filing against the evidence it was given, and send it back when:
+**Refuse a filing that leaves its own Record on the table, and refuse one that pads.** Provenance is necessary and not sufficient. Send it back when:
 
-- **It is thinner than its Record supports.** Count the distinct captured facts the reporter holds. If the Record carries five and the piece reports two, it is under-reported — name the facts left on the table and ask for them.
-- **It stacks sources instead of reporting.** Four outlets carrying one fact is ONE paragraph with four citations. A paragraph whose only job is to attribute the previous paragraph's fact to another outlet is padding.
-- **It restates rather than develops.** Two paragraphs saying the same thing in different words are one paragraph. Every paragraph must do a job no other paragraph does.
-- **It does no reporter's work.** A well-sourced lead should compare its sources against each other, carry a sequence in time, draw the consequence the captured material implies, or name what would falsify the reading. A piece that only relays is a wire digest, not a news piece.
+- **It drops a captured fact.** Count the distinct captured facts; if the piece omits one a reader needs, name it.
+- **It stacks sources instead of reporting.** Four outlets carrying one fact is ONE paragraph with four citations.
+- **It restates rather than develops.** Two paragraphs saying the same thing are one paragraph.
+- **It reconciles sources on the page.** Arithmetic, rounding or date checks that tie one outlet's figure to another's, or a paragraph whose subject is how the sources differ when the difference does not change the news. A real disagreement a reader needs gets one plain sentence.
+- **It narrates evidence binding.** "Thursday is Yahoo's date", "in that sentence", "on that page", "only X carries" — provenance belongs in the citations, not the prose.
+- **It hedges against claims nobody made.** "X, not Y" constructions where no reader would assume Y.
+- **Its deck or kicker fails.** The deck must state the news and why it matters in at most 30 words with no outlet names; the kicker is a topic label.
 
-A brief — two paragraphs — passes this bar only when the Record genuinely carries two facts and no more. Filing a brief on a Record that supports a full article is under-reporting and comes back. Say plainly which of the four above a refusal is, and what evidence in hand would fix it.
+Length follows the facts: a piece that reports every captured fact once, in plain news prose, is the right length whether that is two paragraphs or six. Never ask a reporter to expand beyond the captured facts; if the story needs more, the remedy is reporting through the sensor route. Say plainly which of the above a refusal is.
 
 Every `[En]` in a filed piece must resolve to supplied Record evidence. What
 that evidence must show depends on the claim's `epistemic`, and the label must

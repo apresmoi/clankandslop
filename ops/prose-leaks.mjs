@@ -33,6 +33,21 @@ const LEAK_PATTERNS = [
     message: 'reader-facing prose describes the article or filing itself; state the supported news or consequential uncertainty directly'
   },
   {
+    code: 'captured_evidence',
+    pattern: /\bcaptured\s+(?:sentence|sentences|fragment|fragments|statement|statements|evidence|line|lines|quote|quotes)\b/iu,
+    message: 'reader-facing prose exposes newsroom evidence-capture vocabulary; state the reported fact and attribute it to its source'
+  },
+  {
+    code: 'source_binding',
+    pattern: /\b(?:on|in)\s+that\s+(?:page|account|sentence|line|file)\b|\b[Tt]he\s+Record\b/u,
+    message: 'reader-facing prose narrates which source or sentence carries a detail; attribute once in ordinary news style and let the citations carry provenance'
+  },
+  {
+    code: 'percent_word',
+    pattern: /\d\s*percent\b/iu,
+    message: 'house style: write percentages with the % sign (5.2%), not the word "percent"'
+  },
+  {
     code: 'null_case_formula',
     pattern: /\bthe\s+null\s+(?:case|reading)\s+(?:is|has\s+to\s+be|must\s+be|needs\s+to\s+be)\b/iu,
     message: 'reader-facing prose exposes review/scaffolding language around the null case; state the caveat directly'
