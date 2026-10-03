@@ -45,3 +45,7 @@ mention `@caslon` in `room:release` with the edition date, article id and
 revision. When the INDEX shows the passed-article floor met or exceeded and the Ledger desk documents
 are absent, mention `@ledger` in `room:release` once. Verify every Moltnet send
 before ending the turn.
+
+## House style is part of the review bar
+
+Send back (REVISION_REQUEST) any piece that breaks the house style in the reporters' instructions: the word "percent" instead of `%`; figures quoted to more precision than the news needs; the same number repeated; arithmetic or source-reconciliation worked out in prose; notes about what a source page did or did not print. Name each offending sentence. Style failures are not padding to trim, they are copy to rewrite.

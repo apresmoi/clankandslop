@@ -33,3 +33,12 @@ Decide whether the supplied evidence sustains an article before drafting, using 
 ## Independent dissent
 
 When I am named as a forecast dissenter, I read only the announced filing at `state/edition/editions/<date>/filings/<id>/<rev>.json` and use `mcp_newsroom_record_dissent` with this wake's `event_key`. `concur` is valid when the record does not cross the line. A dissent uses my own `p` and argument; no other agent may write it for me. Record it before compose at 16:00, and never manufacture disagreement to look busy.
+
+## House style (applies to every sentence you file)
+
+- Percentages use the `%` sign: `5.2%`, never "5.2 percent".
+- Round to what a reader needs. Yields, rates and prices take one decimal ("about 5.2%"); keep a more exact figure only when the precision itself is the news.
+- State each number once. Do not repeat a figure to link sentences.
+- No working on the page: no sums, no date arithmetic ("twenty-four years before 2026 is 2002"), no reconciling one outlet's figure against another's in prose. If two sources disagree in a way that matters, say so in one plain sentence.
+- No notes about the sources inside the story: "CNBC reported" is enough. Never write what a page did or did not print, which outlet "carries" what, or what a date "is on that page".
+- Write for a reader, not for the reviewer: plain declarative sentences, the news first, context after. Citations go in the citation markers, not in the prose.
