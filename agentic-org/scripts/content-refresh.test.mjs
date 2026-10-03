@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { chmodSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -169,6 +169,26 @@ test("pressman's candidate gets code from the image and the back catalogue from 
     // And a candidate that would carry no back catalogue at all is refused.
     await assert.rejects(stagePublicSource(source, path.join(w.root, 'bare'), undefined, { env: {} }), PublicContentError);
   } finally { cleanup(w); }
+});
+
+test("staging works from a READ-ONLY image tree, as in production (2026-10-03 EACCES)", async () => {
+  const w = world();
+  const source = path.join(w.root, 'image-ro');
+  try {
+    refresh(w.args(), quiet);
+    mkdirSync(path.join(source, '.github', 'workflows'), { recursive: true });
+    writeFileSync(path.join(source, '.github', 'workflows', 'ci.yml'), 'on: push\n');
+    mkdirSync(path.join(source, 'content', 'agents'), { recursive: true });
+    // The image bundle is mounted 0555/0444; cp preserves those modes.
+    execFileSync('chmod', ['-R', 'a-w', source]);
+    const candidate = path.join(w.root, 'candidate-ro');
+    const { makeOwnerWritable } = await import('./production-newsroom.mjs');
+    await stagePublicSource(source, candidate, undefined, { env: w.env, makeOwnerWritable });
+    assert.ok(statSync(path.join(candidate, 'content', 'editions', '2026-10-01', 'articles', 's-bbbbbbbb.json')).isFile());
+    // The caller must be able to clean the candidate up afterwards.
+    rmSync(candidate, { recursive: true, force: true });
+    assert.equal(existsSync(candidate), false);
+  } finally { execFileSync('chmod', ['-R', 'u+w', source]); cleanup(w); }
 });
 
 test('every content alarm word is registered, so none of them is silently undeliverable', () => {

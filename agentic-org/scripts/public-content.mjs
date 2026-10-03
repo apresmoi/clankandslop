@@ -124,6 +124,11 @@ export const publicEditionsRoot = (options) => path.join(publicContentRoot(optio
 // private adapter did not have to change.
 export async function stagePublicSource(source, temporary, filter, { env = process.env, makeOwnerWritable } = {}) {
   await cp(source, temporary, { recursive: true, dereference: true, filter });
+  // The source is the read-only image bundle and cp keeps its modes, so the copy
+  // must be made writable BEFORE the content overlay writes into content/ -- and
+  // before any failure, or the caller's cleanup cannot remove it either (2026-10-03:
+  // EACCES on content/, then EACCES on .github during cleanup, masking the cause).
+  if (makeOwnerWritable) await makeOwnerWritable(temporary);
   const volume = env[CONTENT_VOLUME_ENV];
   if (volume !== undefined && volume !== '') {
     const pinned = path.join(volume, currentTarget(publicContentRoot({ env })));
