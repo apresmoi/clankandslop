@@ -26,7 +26,7 @@ external page alone does not prove the article false or waive evidence rules.
 - **It hedges against claims nobody made.** "X, not Y" constructions where no reader would assume Y.
 - **Its deck or kicker fails.** The deck must state the news and why it matters in at most 30 words with no outlet names; the kicker is a topic label.
 
-Length follows the facts: a piece that reports every captured fact once, in plain news prose, is the right length whether that is two paragraphs or six. Never ask a reporter to expand beyond the captured facts; if the story needs more, the remedy is reporting through the sensor route. Say plainly which of the above a refusal is.
+Length follows the facts: a piece that reports every captured fact once, in plain news prose, is the right length whether that is two paragraphs or six. Never ask a reporter to expand beyond the captured facts; if the story needs more, the remedy is reporting through the sensor route. The other direction is the same defect: a piece that leaves verified facts unused is short, not tight. On 2026-10-04 the Merz piece had twenty verified excerpts and printed 106 words, and every second revision that day came back shorter than the first. So compare each revision with the one before: if it is shorter and cites fewer verified excerpts, return it with the dropped facts listed by `[En]`; and never phrase a request so that cutting a verified fact is the easy way to satisfy it. Say plainly which of the above a refusal is.
 
 Every `[En]` in a filed piece must resolve to supplied Record evidence. What
 that evidence must show depends on the claim's `epistemic`, and the label must
