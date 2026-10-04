@@ -57,7 +57,10 @@ export const DEFAULT_OWNER = '2000:2000';
 export const DEFAULT_KEEP = 3;
 // The producers push edition/<today> at roughly 00:50 Berlin. Before this hour a
 // missing branch is a wait, after it a failure.
-export const DEFAULT_REQUIRE_BY = '09:00';
+// Noon, not mid-morning: research runs until 12:00 Berlin and reporters wake at
+// 13:00, so a 09:00 freeze dropped every late-morning slot on the floor (the
+// 09:49 Grok slot never reached a reporter until 2026-10-04).
+export const DEFAULT_REQUIRE_BY = '12:00';
 
 const fail = (message) => { throw new CorpusError(message); };
 

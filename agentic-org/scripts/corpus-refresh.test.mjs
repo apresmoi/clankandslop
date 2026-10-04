@@ -22,7 +22,7 @@ test('corpusRefreshArgs defaults to the production host and rejects anything it 
   assert.equal(options.landed, '/var/lib/clank-corpus/landed.json');
   assert.equal(options.lock, '/run/lock/clank-corpus-refresh.lock');
   assert.equal(options.owner, '2000:2000');
-  assert.equal(options.requireBy, '09:00');
+  assert.equal(options.requireBy, '12:00');
   assert.deepEqual([options.healLimit, options.unknownMib], [3, 256]);
   assert.deepEqual([options.keep, options.fetch, options.verify, options.check, options.edition, options.ref], [3, true, true, false, null, null]);
   assert.equal(corpusRefreshArgs(['--no-lock']).lock, null);

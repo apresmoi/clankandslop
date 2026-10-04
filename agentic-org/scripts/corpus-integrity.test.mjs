@@ -326,7 +326,7 @@ test('a settled date keeps its corpus; a date whose cutoff has not passed follow
     // for the rest of the day, every two minutes, for a corpus that is correct.
     assert.equal(result.changed, true);
     assert.equal(result.frozen, true);
-    assert.ok(lines.some((line) => line.startsWith(`edition ${EDITION} is frozen at ${first.commit.slice(0, 7)}:`) && line.includes('09:00 Europe/Berlin cutoff passed at 2026-09-06T07:00:00Z')),
+    assert.ok(lines.some((line) => line.startsWith(`edition ${EDITION} is frozen at ${first.commit.slice(0, 7)}:`) && line.includes('12:00 Europe/Berlin cutoff passed at 2026-09-06T10:00:00Z')),
       lines.join(' | '));
 
     assert.equal(readlinkSync(join(f.volume, EDITION)), `${TREES_DIR}/${first.commit}/${EDITION}`, "the settled edition's link must not move");
@@ -340,7 +340,7 @@ test('a settled date keeps its corpus; a date whose cutoff has not passed follow
     assert.deepEqual(ledgerOf(f).at(-1).frozen_editions, [PRIOR, EDITION]);
     // The record carries the host's own justification, so the freeze is auditable
     // without re-deriving it from anything.
-    assert.deepEqual(landedOf(f).editions[EDITION].frozen, { at: '2026-09-06T08:00:00Z', cutoff: '2026-09-06T07:00:00Z', require_by: '09:00' });
+    assert.deepEqual(landedOf(f).editions[EDITION].frozen, { at: '2026-09-06T11:00:00Z', cutoff: '2026-09-06T10:00:00Z', require_by: '12:00' });
 
     // And the frozen tree is never collected, whatever --keep says.
     writeCorpus(f.priv, UNCUT, 'tomorrow, third cut');
@@ -419,7 +419,7 @@ test('the freeze decision reads nothing inside either docker volume: planting or
   assert.deepEqual([before.frozen, before.link, before.serving, before.ledger], [false, 'second', 'second', []]);
   assert.deepEqual([after.frozen, after.link, after.serving], [true, 'first', 'first']);
   assert.deepEqual(after.ledger, [PRIOR, EDITION]);
-  assert.equal(after.recorded.cutoff, '2026-09-06T07:00:00Z');
+  assert.equal(after.recorded.cutoff, '2026-09-06T10:00:00Z');
 });
 
 // FIX 4. The mount is agent-writable and nothing can change that, so the only
@@ -763,7 +763,7 @@ test('a missing edition branch before the deadline is a logged wait, not a failu
     const waiting = lines.filter((line) => /^waiting for edition\/2026-09-07/u.test(line));
     assert.equal(waiting.length, 1, lines.join(' | '));
     assert.match(waiting[0], /04:00 Europe\/Berlin/u);
-    assert.match(waiting[0], /due by 09:00/u);
+    assert.match(waiting[0], /due by 12:00/u);
     assert.deepEqual(readdirSync(f.volume), [], 'a wait must not leave a corpus behind');
     assert.equal(existsSync(f.landed), false);
     assert.equal(refresh(noEdition(f), deps(f, { now })).waiting, true);
@@ -775,8 +775,8 @@ test('past the deadline the same missing branch exits non-zero exactly as it alw
   const f = fixture();
   try {
     const lines = [];
-    // 10:00 Europe/Berlin: the wake has happened and there is no corpus.
-    assert.equal(main(noEdition(f), deps(f, { now: new Date('2026-09-07T08:00:00Z'), log: (line) => lines.push(line) })), 1);
+    // 13:00 Europe/Berlin: the wake has happened and there is no corpus.
+    assert.equal(main(noEdition(f), deps(f, { now: new Date('2026-09-07T11:00:00Z'), log: (line) => lines.push(line) })), 1);
     assert.deepEqual(lines.filter((line) => /^waiting/u.test(line)), []);
     // And --require-by moves the line, rather than it being a constant to edit.
     assert.equal(main(noEdition(f, ['--require-by=03:00']), deps(f, { now: new Date('2026-09-07T02:00:00Z') })), 1);
