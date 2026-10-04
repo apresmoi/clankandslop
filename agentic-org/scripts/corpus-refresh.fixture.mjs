@@ -17,11 +17,11 @@ export const UNCUT = '2026-09-07';
 export const OWNER = `${process.getuid()}:${process.getgid()}`;
 // A dated corpus freezes once its --require-by cutoff has passed with a corpus
 // already landed, so every test now has to say WHEN it is running. The default
-// clock is before the earliest cutoff in this fixture (09:00 Europe/Berlin on
+// clock is before the earliest cutoff in this fixture (12:00 Europe/Berlin on
 // PRIOR), so nothing is frozen unless a test asks for it by passing AFTER_CUTOFF
-// -- 10:00 Berlin on edition day, which is when the newsroom wakes.
+// -- 13:00 Berlin on edition day, which is when the newsroom wakes.
 export const BEFORE_CUTOFF = new Date('2026-09-05T05:00:00Z');
-export const AFTER_CUTOFF = new Date('2026-09-06T08:00:00Z');
+export const AFTER_CUTOFF = new Date('2026-09-06T11:00:00Z');
 // tinkerton sits out, because that is what a real edition looks like: the row
 // counts fall to single digits and a beat with nothing routed to it files
 // nothing. Every test in this suite therefore runs against a corpus with a
