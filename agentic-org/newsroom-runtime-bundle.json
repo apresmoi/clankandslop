@@ -2,9 +2,9 @@
   "version": "clank.newsroom-runtime-bundle.v2",
   "source": {
     "archive": "newsroom-runtime.tar",
-    "sha256": "sha256:be1aa21f110973ae576104e1d7c050d3b3a737626f5f017436c5ce2f052beb8b",
-    "file_count": 422,
-    "content_bytes": 5946800
+    "sha256": "sha256:cb6bd0a017a79f37e3693555791b1cb32f485ef1f5949e116b058d2c3e646875",
+    "file_count": 428,
+    "content_bytes": 5960057
   },
   "dependencies": [
     {
