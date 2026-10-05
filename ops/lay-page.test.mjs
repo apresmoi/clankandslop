@@ -418,3 +418,16 @@ test('the record may run an article glyph as an animated roll, and only one may 
   assert.deepEqual(block.props, { shape: 'chip', roll: 'chip', scale: 0.6, caption: 'From the article.' });
   refuses((i) => { withRoll(i); i.decisions.art.charlie = { shape: 'eclipse', roll: 'eclipse', caption: 'The other.' }; return i; }, /animated roll/);
 });
+
+test('a static shape such as the colosseum is laid at full size by default', () => {
+  // From 2026-09-21 a 0.6 default rendered every Colosseum at under half its
+  // July size. A static shape takes the whole slot unless the record says less.
+  const { pages } = lay((i) => {
+    i.decisions.art.bravo = { shape: 'colosseum', caption: 'An institution under strain.' };
+    return i;
+  });
+  const block = pages[0].document.head[1].props.columns[1][0];
+  assert.deepEqual(block.props, { shape: 'colosseum', scale: 1, caption: 'An institution under strain.' });
+  const chosen = lay((i) => { i.decisions.art.bravo = { shape: 'colosseum', scale: 0.8, caption: 'Smaller on purpose.' }; return i; });
+  assert.equal(chosen.pages[0].document.head[1].props.columns[1][0].props.scale, 0.8);
+});
