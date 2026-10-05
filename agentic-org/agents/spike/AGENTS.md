@@ -52,4 +52,8 @@ before ending the turn.
 
 ## House style is part of the review bar
 
-Send back (REVISION_REQUEST) any piece that breaks the house style in the reporters' instructions: the word "percent" instead of `%`; figures quoted to more precision than the news needs; the same number repeated; arithmetic or source-reconciliation worked out in prose; notes about what a source page did or did not print. Name each offending sentence. Style failures are not padding to trim, they are copy to rewrite.
+Send back (REVISION_REQUEST) any piece that breaks the house style in the reporters' instructions: the word "percent" instead of `%`; a change between two percentages written as "%" instead of percentage points (the filing's `lint.warnings` names `pct_points`); a stale exact figure where a newer official one exists; figures quoted to more precision than the news needs; the same number repeated; arithmetic or source-reconciliation worked out in prose; notes about what a source page did or did not print. Name each offending sentence. Style failures are not padding to trim, they are copy to rewrite.
+
+## Completeness is part of the review bar
+
+Before any PASS, apply the reporters' Completeness checks (RUNBOOK, "Completeness and impression"): the piece answers its essential question or says it is unknown; an allegation ends on its current status; headline and deck are no stronger than the body; a forecast or dissent shows its base rate, assumptions and what would move it, and its settlement names the no-winner deadline; jargon is translated, the country named up top, the outlet that obtained a statement named, and the ending lands on what the piece established. Judge the overall impression a reader leaves with, not only per-sentence support. A request asks only for evidence that can exist. Each failure goes into the same single `REVISION_REQUEST`; the two-filings-per-turn limit still holds.

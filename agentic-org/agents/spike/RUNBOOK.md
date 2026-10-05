@@ -26,6 +26,15 @@ external page alone does not prove the article false or waive evidence rules.
 - **It hedges against claims nobody made.** "X, not Y" constructions where no reader would assume Y.
 - **Its deck or kicker fails.** The deck must state the news and why it matters in at most 30 words with no outlet names; the kicker is a topic label.
 
+**Completeness and impression.** Per-sentence support is not enough; judge what a reader walks away believing. Send it back when:
+
+- **It skips the essential question.** A protest piece that never says what the protesters want, or a strike or military piece that omits a challenge to the official justification its own evidence carries (on 2026-10-05: the France schools piece never said why students protest though its source listed overcrowding, decaying buildings and staffing; the Caribbean strike piece dropped the UN rapporteur's criticism in its research). Unknown is acceptable if the piece says so.
+- **Its impression is disproportionate.** An allegation that ends before its current status (the Fairford piece ended on the Iran link, not on suspects bailed and no explosive devices found).
+- **Its headline or deck outruns the body.** "Every bomber ... on Sunday" when the source had confirmation on Sunday and at least 10 of 12 departed.
+- **Its numbers mislead.** A change between percentages written as "%" (`pct_points` in `lint.warnings`; Bosnia "down by about 8%" from about 50% to 42% is about 8 percentage points), or a stale exact figure where a newer official one exists.
+- **Its forecast or dissent is a bare number.** The body must give the base rate or comparison, the key assumptions (vote transfers, turnout) and what would move it; the settlement in `confidence` must name the deadline for the no-winner or edge case. Ask only for evidence that can exist: ballots are secret, so request runoff polls or modelled transfers, never a "transfer table".
+- **It needs translating.** Untranslated jargon ("home stations", "go-fast vessel", "security conditions went unmet"), no country named in headline or deck, an official's statement without the outlet that obtained it, command-chain detail before what happened and why it matters, or an ending that introduces a new implication instead of landing what the piece established.
+
 Length follows the facts: a piece that reports every captured fact once, in plain news prose, is the right length whether that is two paragraphs or six. Never ask a reporter to expand beyond the captured facts; if the story needs more, the remedy is reporting through the sensor route. The other direction is the same defect: a piece that leaves verified facts unused is short, not tight. On 2026-10-04 the Merz piece had twenty verified excerpts and printed 106 words, and every second revision that day came back shorter than the first. So compare each revision with the one before: if it is shorter and cites fewer verified excerpts, return it with the dropped facts listed by `[En]`; and never phrase a request so that cutting a verified fact is the easy way to satisfy it. Say plainly which of the above a refusal is.
 
 Every `[En]` in a filed piece must resolve to supplied Record evidence. What
@@ -47,7 +56,7 @@ A `forecast` carries a probability and a dated next look.
 
 An inference must explain what checkable evidence could change its reading.
 Straight factual reporting needs source support, not an invented counter-case.
-A forecast needs a clear observable settlement condition, source and deadline;
+A forecast needs its derivation in the body and a clear observable settlement condition, source and deadline, including the deadline for the no-winner case;
 missing evidence must not settle it as a success. Do not require the article to announce a
 research pass, checklist, evidentiary category, or "null paragraph." Uncertainty
 belongs in ordinary journalism.

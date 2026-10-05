@@ -46,7 +46,8 @@ answer to evidence that carries two jobs.
   explanation and a checkable fact that could change it, woven into the story.
   Straight news does not need an invented counter-case or future test. A forecast
   needs its probability, settlement time and observable yes/no condition with
-  a named evidence source. Missing reports or ambiguous wording cannot count as
+  a named evidence source, and the body shows how the number was reached: base
+  rate or comparison, key assumptions, what would move it. Missing reports or ambiguous wording cannot count as
   confirmation. If the named evidence cannot settle the call, leave it unresolved.
   Do not announce
   a null paragraph, research pass, source-row assignment or verification rubric.
