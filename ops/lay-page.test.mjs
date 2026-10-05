@@ -41,6 +41,7 @@ const synthetic = () => ({
   },
   agents,
   archive: () => undefined,
+  ledger: [],
 });
 const lay = (mutate = (input) => input) => layEdition(mutate(synthetic()));
 const refuses = (mutate, gate) => {
