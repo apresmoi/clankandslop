@@ -12,7 +12,7 @@ import { articleFormatFindings } from '../../ops/article-format.mjs';
 import { withDeskSection } from './desk-sections.mjs';import { assertKeepsVerifiedFacts } from './revision-facts.mjs';
 import { proseLeakFindings } from '../../ops/prose-leaks.mjs';
 import { glyphSelectionFindings } from '../../ops/glyph-format.mjs';
-import { archiveIndex } from '../../ops/lay-page.mjs';
+import { archiveIndex } from '../../ops/lay-page.mjs';import { assertCarriedRows } from '../../ops/ledger-archive.mjs';
 import { authenticateWorldDeskFiling } from './worlddesk-filing.mjs';
 import { saveSignalDisposition, signalKey } from './signal-disposition.mjs';
 import { reviewNoticeInstruction } from './review-handoff.mjs';
@@ -315,7 +315,7 @@ async function fileDeskAction(args){
   if(!allowed.has(args.name))throw new Error(`name ${JSON.stringify(args.name)} is not owned by "${agent}" — allowed names for "${agent}": ${allowed.size?[...allowed].join(', '):'none'}`);
   const findings=deskDocumentFindings(args.name,object(args.document),{profile:'filing'});
   if(findings.length>0)throw new Error(`desk document ${JSON.stringify(args.name)} does not match the shape the edition is assembled from — ${findings.join('; ')}`);
-  if(args.name==='ledger.worlddesk')await authenticateWorldDeskFiling(args);
+  if(args.name==='ledger.worlddesk')await authenticateWorldDeskFiling(args);else if(args.name==='ledger.settlements')assertCarriedRows(args.edition,args.document);
   await converge(location(args.edition,'history',`desk/${args.name}/${sha(JSON.stringify(args.document)).slice(7)}`),args.document);
   await supersedeIndexed(args.edition,location(args.edition,'desk',args.name),args.document);
   return{name:args.name,receipt:await receipt(args,'desk-filed',args.document)};
