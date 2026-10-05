@@ -1,0 +1,10 @@
+[Unit]
+Description=Reap leaked Daimon engine handlers every 5 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Unit=clank-handler-reaper.service
+
+[Install]
+WantedBy=timers.target

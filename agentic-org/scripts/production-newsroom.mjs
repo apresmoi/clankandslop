@@ -9,6 +9,7 @@ import { PASSED_ARTICLES_MINIMUM, assertCompositionCoverage, compositionCoverage
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
 import { deskDocumentFindings } from '../../ops/desk-contract.mjs';
 import { articleFormatFindings } from '../../ops/article-format.mjs';
+import { withDeskSection } from './desk-sections.mjs';import { assertKeepsVerifiedFacts } from './revision-facts.mjs';
 import { proseLeakFindings } from '../../ops/prose-leaks.mjs';
 import { glyphSelectionFindings } from '../../ops/glyph-format.mjs';
 import { archiveIndex } from '../../ops/lay-page.mjs';
@@ -195,7 +196,7 @@ async function fileArticleAction(args){
   if('dissent' in article)throw new Error('article.dissent is not yours to write — a dissent is recorded by the colleague who holds it, with record_dissent, under their own name, never typed into your filing. Remove article.dissent and file again.');
   const owner=process.env.CLANK_NEWSROOM_AGENT;
   const{assignment,event_key:assignmentEventKey,corrected}=await resolveAssignment(args,article,owner);
-  const resolvedArticle=corrected?{...article,id:assignment.id}:article;
+  const sectioned=withDeskSection(corrected?{...article,id:assignment.id}:article,owner),resolvedArticle=sectioned.article;
   const topics=await knownTopicSlugs(),previousArticles=new Set();
   for(const prior of Array.isArray(resolvedArticle.previous_coverage)?resolvedArticle.previous_coverage:[])if(date.test(prior?.date??'')&&component.test(prior?.slug??'')&&await lstat(path.join(publicEditionsRoot(),prior.date,'articles',`${prior.slug}.json`)).then(stat=>stat.isFile(),()=>false))previousArticles.add(`${prior.date}/${prior.slug}`);
   const format=articleFormatFindings(resolvedArticle,{profile:'filing',editionDate:args.edition,articleId:assignment.id,owner,topicSlugs:topics,previousArticles,forecastRequired:assignment.slot==='forecast'});
@@ -218,6 +219,7 @@ async function fileArticleAction(args){
         :`you have never filed revision ${revision-1} of "${assignment.id}", so there is no revision ${revision} to file. A refused filing is not a filing — nothing was recorded — so file revision ${revision-1} again with the problem fixed, rather than raising the number.`);
     }
     if(!['REVISION_REQUEST','HOLD'].includes(prior.verdict))throw new Error(`revision ${revision} requires revision ${revision-1} to carry a REVISION_REQUEST or HOLD verdict, got "${prior.verdict}"`);
+    assertKeepsVerifiedFacts(await readJson(location(args.edition,'filings',`${assignment.id}/${revision-1}`)).catch(()=>undefined),resolvedArticle,prior.notes,revision);
   }
   await checkArticleArt(args.edition,assignment.id,resolvedArticle);
   const flags=lintFiling(resolvedArticle,topics);
@@ -228,7 +230,7 @@ async function fileArticleAction(args){
   await supersedeIndexed(args.edition,filingPath,filing);
   const result={article_id:assignment.id,revision,digest:sha(JSON.stringify(filing)),warnings,receipt:await receipt(args,'filed',filing,supersede)};
   if(priorFiling)result.replaced=`this replaces your earlier revision ${revision} of "${assignment.id}", which the editor had not yet reviewed`;
-  if(corrected)result.note=`your assignment today is ${describeAssignment(assignment)} — filed under that id instead of the supplied ${JSON.stringify(article.id)}`;
+  if(sectioned.changed)result.section=`section set to "${sectioned.to}" from your desk (you filed ${JSON.stringify(sectioned.from??null)})`;if(corrected)result.note=`your assignment today is ${describeAssignment(assignment)} — filed under that id instead of the supplied ${JSON.stringify(article.id)}`;
   result.next=filingNoticeInstruction(args.edition,assignment.id,revision,assignment.slot==='forecast'?assignment.dissenter:undefined);
   if(assignment.slot==='forecast')result.forecast={dissenter:assignment.dissenter??null};
   return result;

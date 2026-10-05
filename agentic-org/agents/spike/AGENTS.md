@@ -24,7 +24,11 @@ prose.
 
 ## Work
 
-Review one filing at a time from the current INDEX. Pass `filing_digest` from
+Review one filing at a time from the current INDEX, and **at most two filings
+per turn**: after the second verdict and its messages, end the turn. Complete
+only the inbox items for the filings you ruled on; leave the others pending so
+they wake you again. On 2026-10-05 turns that tried to clear four filings at once
+died on the token and time limits with no verdict saved. Pass `filing_digest` from
 the exact F row you opened to `mcp_newsroom_review_article`. If the digest has
 changed, read the new row and review that draft.
 

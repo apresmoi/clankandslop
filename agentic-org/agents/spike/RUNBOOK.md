@@ -123,6 +123,13 @@ inputs. Verify the send succeeded before completing the inbox item or ending the
 turn. Do not repeat a handoff already sent for that accepted revision. A `PASS`
 saved in state or an unaddressed floor remark wakes nobody.
 
+A turn rules on at most two filings. After the second verdict and its messages,
+end the turn, completing only the inbox items for the filings you ruled on; the
+rest stay pending and wake you again. When you ask for a cut, name the evidence
+row (`[E6]`) whose fact must go: `file_article` refuses a revision that stops
+citing a verified excerpt the previous revision cited unless your notes named
+that row or quoted it, so an unnamed cut sends the reporter back to you empty.
+
 When the INDEX header shows the passed-article floor met or exceeded and no `D ledger.settlements` or
 `D ledger.worlddesk` rows exist, call `moltnet_send` with
 `network: clank-newsroom` and `target: room:release`, mention `@ledger` once,

@@ -33,6 +33,7 @@ now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unle
 | `scripts/content-refresh.mjs` | Hetzner, every 5 min | published editions + bylines at `origin/main` → `clank-newsroom-content` volume |
 | `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |
 | `scripts/alarm.mjs` | both boxes | one HTTPS POST that reaches a person |
+| `ops/bin/clank-handler-reaper.sh` | Hetzner, every 5 min | kills leaked Daimon engine handlers older than any possible turn; its age floor is pinned above the longest Spawnfile turn timeout by `systemd-contract.test.mjs` |
 | `../../.github/workflows/merge-edition.yml` | GitHub | opens and merges the edition PR, only on green CI |
 
 ## Why the seam refuses more often than it runs
