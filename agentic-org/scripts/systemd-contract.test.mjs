@@ -50,3 +50,20 @@ test('the content refresher, the corpus refresher and the release job serialize 
   assert.match(content, /^Environment=CLANK_RELEASE_FETCH_KEY=\/root\/\.ssh\/clank_public$/mu, 'the fetch names the release identity');
   assert.match(unit('clank-content-refresh.timer'), /^Unit=clank-content-refresh\.service$/mu);
 });
+
+// 2026-10-04: the reaper's age floor (1200s) sat under the 30-minute turn limit
+// and killed live writer turns all afternoon. The floor must clear the longest
+// turn any Spawnfile declares, with margin, whatever either number becomes.
+test('the handler reaper never reaps a handler young enough to belong to a live turn', async () => {
+  const { agents, orgRoot } = await import('./lib.mjs');
+  const { join } = await import('node:path');
+  const script = readFileSync(new URL('../ops/bin/clank-handler-reaper.sh', import.meta.url), 'utf8');
+  const floor = Number(script.match(/^MAX_AGE=\$\{MAX_AGE:-(\d+)\}$/mu)?.[1]);
+  assert.ok(Number.isFinite(floor), 'the reaper declares its default age floor');
+  const timeouts = agents.map((name) => Number(readFileSync(join(orgRoot, 'agents', name, 'Spawnfile'), 'utf8').match(/^\s*timeout_ms:\s*(\d+)/mu)?.[1] ?? 0));
+  const longest = Math.max(...timeouts) / 1000;
+  assert.ok(longest > 0, 'some Spawnfile declares a turn timeout');
+  assert.ok(floor >= longest * 1.25, `reaper floor ${floor}s must clear the longest turn ${longest}s by 25%`);
+  assert.match(unit('clank-handler-reaper.service'), /^ExecStart=\/bin\/bash \/root\/work\/clankandslop\/agentic-org\/ops\/bin\/clank-handler-reaper\.sh$/mu);
+  assert.match(unit('clank-handler-reaper.timer'), /^Unit=clank-handler-reaper\.service$/mu);
+});
