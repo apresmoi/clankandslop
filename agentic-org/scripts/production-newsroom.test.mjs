@@ -15,7 +15,9 @@ import { DESK_DOCUMENTS_REQUIRED, PASSED_ARTICLES_MINIMUM, compositionCoverage, 
 // because the public CI run skips every test that needs the private state
 // adapter.
 const required = Object.fromEntries(Object.entries(composeGateStatus({ edition: '2026-01-01', passed: 0, desks: 0, forecasts: 0, dissents: 0, coverage: compositionCoverage([]) }).coverage).map(([key, gate]) => [key, gate.required]));
-const gateLine = ({ sections = 3, dissent = 0, state = 'ready' } = {}) => `# compose: passed=5/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=${sections}/${required.sections} owners=5/${required.owners} sources=5/${required.sources} domains=5/${required.domains} forecast=1 dissent=${dissent}  → ${state}`;
+// file_article sets each piece's section from its owner's desk, so five owners
+// on five desks always make five sections, whatever the fixture typed.
+const gateLine = ({ sections = 5, dissent = 0, state = 'ready' } = {}) => `# compose: passed=5/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=${sections}/${required.sections} owners=5/${required.owners} sources=5/${required.sources} domains=5/${required.domains} forecast=1 dissent=${dissent}  → ${state}`;
 import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
 import { REPORTERS } from './corpus-contract.mjs';
 import { corpusDeskIndex, corpusIdentityFile, corpusPreparedFile, installCorpusFixture } from './corpus-fixture.mjs';
@@ -257,7 +259,9 @@ runtimeTest('a reporter may re-file an unreviewed revision, and may never raise 
     // And again over a filing that did land but that the editor has not read:
     // this is the case a file-time warning depends on, because a warning the
     // reporter cannot act on is not a warning.
-    const corrected = await fileArticle({ edition: EDITION, event_key: 'refile-unreviewed', article: cited('story-0', 'Cogsworth', { deck: 'A corrected sourced deck.' }) });
+    // Verified excerpts on both rows, so later revisions can be held to them.
+    const excerpted = (over = {}) => { const base = cited('story-0', 'Cogsworth', over); return { ...base, evidence_box: base.evidence_box.map((row, i) => ({ ...row, source_note: { ...row.source_note, raw_excerpt: ['The first page states the mechanism plainly.', 'The second page confirms the reading in full.'][i] } })) }; };
+    const corrected = await fileArticle({ edition: EDITION, event_key: 'refile-unreviewed', article: excerpted({ deck: 'A corrected sourced deck.' }) });
     assert.equal(corrected.revision, 1);
     assert.match(corrected.replaced, /replaces your earlier revision 1 of "story-0", which the editor had not yet reviewed/u);
     assert.equal((await filingOf(1)).deck, 'A corrected sourced deck.', 'the replacement is what is on disk');
@@ -284,14 +288,20 @@ runtimeTest('a reporter may re-file an unreviewed revision, and may never raise 
     );
     assert.equal((await filingOf(1)).deck, 'A corrected sourced deck.', 'the reviewed revision is unchanged on disk');
 
+    // A revision may not quietly shed a verified fact the editor never named
+    // (2026-10-05: 323 -> 164 words while one clause was asked to go).
+    await assert.rejects(
+      fileArticle({ edition: EDITION, event_key: 'refile-shed-2', article: excerpted({ revision: 2, deck: 'A revised sourced deck.', body: ['Alpha reports the mechanism [E1].', 'Gamma disputes the timing [E1].'] }) }),
+      /revision 2 drops 1 verified fact.*E2 of revision 1: "The second page confirms/su
+    );
     // With the REVISION_REQUEST on file, revision 2 is a genuine revision.
-    assert.equal((await fileArticle({ edition: EDITION, event_key: 'refile-genuine-2', article: cited('story-0', 'Cogsworth', { revision: 2, deck: 'A revised sourced deck.' }) })).revision, 2);
+    assert.equal((await fileArticle({ edition: EDITION, event_key: 'refile-genuine-2', article: excerpted({ revision: 2, deck: 'A revised sourced deck.' }) })).revision, 2);
 
     // HOLD preserves the frozen evidence request and lets only the owner file the next revision.
     process.env.CLANK_NEWSROOM_AGENT = 'spike';
     await reviewArticle({ edition: EDITION, event_key: 'verdict-hold-2', article_id: 'story-0', revision: 2, verdict: 'HOLD', notes: 'Waiting on a second confirmation.' });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
-    assert.equal((await fileArticle({ edition: EDITION, event_key: 'refile-after-hold', article: cited('story-0', 'Cogsworth', { revision: 3 }) })).revision, 3);
+    assert.equal((await fileArticle({ edition: EDITION, event_key: 'refile-after-hold', article: excerpted({ revision: 3 }) })).revision, 3);
     process.env.CLANK_NEWSROOM_AGENT = 'spike';
     assert.equal((await reviewArticle({ edition: EDITION, event_key: 'pass-after-hold', article_id: 'story-0', revision: 3, verdict: 'PASS', notes: 'The owner supplied the missing confirmation.' })).verdict, 'PASS');
     assert.equal(JSON.parse(await readFile(path.join(state, 'editions', EDITION, 'verdicts', 'story-0', '2.json'), 'utf8')).verdict, 'HOLD');
@@ -1124,15 +1134,20 @@ test('two read-only bundles merging into one directory: the second one lands', a
   }
 });
 
-runtimeTest('five authentic PASS articles in two sections report blocked and composition refuses the same floor', async () => {
+runtimeTest('reporters who all type the same section still clear the section floor, because the desk sets it', async () => {
+  // 2026-10-05: four desks all typed "World" and five passed pieces stalled the
+  // gate at sections=2/3. The section floor itself is still enforced by
+  // compose-gate.mjs (compose-gate.test.mjs); this proves reporters can no
+  // longer starve it.
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-two-sections-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-11';
   try {
     const sections = ['Business', 'World', 'World', 'Business', 'World'];
-    const composeArgs = await driveToCompose(state, edition, (id, owner, day, index) => ({ ...article(id, owner, day, index), section: sections[index] }));
+    await driveToCompose(state, edition, (id, owner, day, index) => ({ ...article(id, owner, day, index), section: sections[index] }));
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    assert.equal((await readIndexFile(state, edition)).split('\n').find((line) => line.startsWith('# compose:')), gateLine({ sections: 2, state: 'blocked' }));
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-two-sections' }), /at least 3 distinct sections required, found 2/);
+    assert.equal((await readIndexFile(state, edition)).split('\n').find((line) => line.startsWith('# compose:')), gateLine({ sections: 5 }));
+    const filed = JSON.parse(await readFile(path.join(state, 'editions', edition, 'filings', 'story-4', '1.json'), 'utf8'));
+    assert.equal(filed.section, 'Policy', "tinkerton's piece runs under the Policy desk");
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
