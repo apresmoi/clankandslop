@@ -22,6 +22,14 @@ Missing weather remains `null` under the desk contract. Missing article facts go
 back to the owner. A fitting illustration must be grounded in the local
 catalogue, prepared corpus, accepted article art, or a declared art tool output.
 
+## Summaries
+
+Every Flashpoint note, art caption, Briefly item and deadline restates its
+article and nothing else. Keep each event with its own day, date and place;
+never merge two events into one sentence; copy figures, never compute them. A
+day or number the article does not print stays out. `lay_pages` refuses a
+summary that moves an event onto another event's day.
+
 ## Work
 
 Start at `state/edition/editions/<date>/INDEX`. Compose only from accepted

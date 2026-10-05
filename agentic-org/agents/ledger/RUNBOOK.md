@@ -87,6 +87,12 @@ rows where work is owed; `review.horizon_undated` names event-driven clocks.
 Rows in neither list have a deadline that has not arrived, so `open` is already
 the answer and you leave them as they stand. A row you settle, you settle from an
 input on the record; a row you cannot settle stays `open` and says so.
+**Open calls carry until settled.** Every call still open from any earlier
+edition (since 29 September) appears in today's rows: `open`, or `hit`/`miss`
+when a record you can name settles it. The prepared file lifts only the
+previous edition's articles, so a call carried open yesterday may be missing
+from it; `mcp_newsroom_file_desk` refuses a document that drops one and prints
+the exact rows to add. Paste them and file again; never drop a row to clear it.
 `review.prior_p_missing` is a forecast that published no posterior: no row
 exists for it, and you do not invent one.
 
