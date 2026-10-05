@@ -100,6 +100,11 @@ const grid = (cols, columns, extra = {}) => ({ block: 'Grid', props: { cols, ...
 
 const mapArt = (article) => (isObj(article?.art) && article.art.kind === 'map' ? article.art : null);
 
+// Static shapes render at full size unless the decision record asks for less.
+// A 0.6 default shrank every Colosseum to under half its July size from
+// 2026-09-21 on; rolls keep their animated-strip default.
+const defaultScale = (roll) => (isStr(roll) ? 0.6 : 1);
+
 function artBlock(slug, article, choice, maps) {
   const errors = glyphSelectionFindings({ scale: choice?.scale });
   if (errors.length) fail('art selection', errors.join('; '));
@@ -119,12 +124,12 @@ function artBlock(slug, article, choice, maps) {
   }
   const shape = choice?.shape ?? art?.shape, roll = choice?.roll ?? art?.roll;
   if (art?.kind === 'ascii' && (isStr(shape) || isStr(roll))) {
-    return glyph(slug, { ...(isStr(shape) ? { shape } : {}), ...(isStr(roll) ? { roll } : {}), scale: isNum(choice?.scale) ? choice.scale : 0.6, caption: choice?.caption ?? art.caption ?? '' });
+    return glyph(slug, { ...(isStr(shape) ? { shape } : {}), ...(isStr(roll) ? { roll } : {}), scale: isNum(choice?.scale) ? choice.scale : defaultScale(roll), caption: choice?.caption ?? art.caption ?? '' });
   }
   if (!isObj(choice))
     fail('illustration rhythm invalid', `"${slug}" sits in an illustrated slot but carries no art, and the decision record has no art entry for it — add art["${slug}"] = {shape, caption} (shapes: ${[...GLYPH_SHAPES].join(', ')})`);
   if (!isStr(choice.caption)) fail('illustration rhythm invalid', `art["${slug}"].caption must be a non-empty string — one line about this story's own picture`);
-  return glyph(slug, { ...(isStr(choice.shape) ? { shape: choice.shape } : {}), ...(isStr(choice.roll) ? { roll: choice.roll } : {}), scale: isNum(choice.scale) ? choice.scale : 0.6, caption: choice.caption });
+  return glyph(slug, { ...(isStr(choice.shape) ? { shape: choice.shape } : {}), ...(isStr(choice.roll) ? { roll: choice.roll } : {}), scale: isNum(choice.scale) ? choice.scale : defaultScale(choice.roll), caption: choice.caption });
 }
 
 function glyph(slug, props) {
