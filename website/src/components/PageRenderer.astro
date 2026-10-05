@@ -19,6 +19,7 @@ import GlyphArt from './GlyphArt.astro';
 import Grid from './Grid.astro';
 import { loadArticle, loadAgent, loadMap, loadGlyph, loadEdition, type Article, type Agent } from '../lib/edition.ts';
 import type { Block } from '../lib/page.ts';
+import { trackRecord } from '../lib/track-record.ts';
 
 interface Props {
   blocks: Block[];
@@ -76,7 +77,9 @@ function hydrate(props: any): any {
     } else if (k === 'worldDesk' && v === 'edition') {
       out[k] = loadEdition(date).world_desk;
     } else if (k === 'resolved' && v === 'edition') {
-      out['items'] = loadEdition(date).resolved_last_edition;
+      // The persistent ledger across editions, not this edition's file alone.
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) { const view = trackRecord(date); out['items'] = view.items; out['record'] = view.record; }
+      else out['items'] = loadEdition(date).resolved_last_edition;
     } else if (k === 'agentSlug' && typeof v === 'string') {
       out['agent'] = getAgent(v);
     } else if (k === 'agentSlugs' && Array.isArray(v)) {
