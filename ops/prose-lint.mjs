@@ -1,4 +1,4 @@
-// The three prose warnings, in one place.
+// The prose warnings, in one place.
 //
 // They used to live only inside ops/validate-content.mjs, which runs at
 // stage_release — 16:00, two hours after Spike has already passed the piece at
@@ -56,13 +56,34 @@ export function emDashOveruse(paragraphs) {
   return dashes >= 3 && dashes * 2 > paragraphs.length ? { dashes, paragraphs: paragraphs.length } : undefined;
 }
 
+/**
+ * A change between two percentages written as "%" instead of percentage
+ * points: "turnout was 42%, down by about 8% from about 50%". Flags a sentence
+ * that carries two or more percentages and a "down/up/fell/rose... by N%"
+ * change. Heuristic and advisory: a growth rate beside a share ("revenue rose
+ * by 8%; margins held at 30%") also trips it, which is why it only warns.
+ * Returns `{ phrase }` for the first such sentence, or undefined.
+ */
+const PERCENT = /\d(?:[\d,]*\d)?(?:\.\d+)?\s*%/gu;
+const CHANGE_BY_PERCENT = /\b(?:down|up|fell|rose|dropped|declined|decreased|increased|climbed|slipped|grew|gained|lost|jumped|slid|sank|shrank)\s+by\s+(?:about\s+|around\s+|roughly\s+|nearly\s+|almost\s+|some\s+|more\s+than\s+|less\s+than\s+)?\d+(?:\.\d+)?\s*%/iu;
+export function percentagePointSlip(texts) {
+  for (const text of texts) {
+    for (const sentence of String(text).split(/(?<=[.!?;])\s+/u)) {
+      const change = sentence.match(CHANGE_BY_PERCENT);
+      if (change && (sentence.match(PERCENT) || []).length >= 2) return { phrase: change[0] };
+    }
+  }
+  return undefined;
+}
+
 // The sentence each flag prints, whether it is read by a reporter at file time,
 // by Spike at review time, or by the release validator. Written to the agent
 // who can still fix it, so it names the article field and says what to do.
 export const PROSE_LINT_MESSAGES = {
   openers_run: ({ word, run, paragraph }) => `${run} consecutive paragraphs open with "${word}" (para ${paragraph}+) — vary the openers`,
   binary_contrast: () => 'headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form',
-  em_dashes: ({ dashes, paragraphs }) => `${dashes} em dashes across ${paragraphs} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`
+  em_dashes: ({ dashes, paragraphs }) => `${dashes} em dashes across ${paragraphs} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`,
+  pct_points: ({ phrase }) => `"${phrase}" sits beside other percentages — a change between two percentages is in percentage points ("down about 8 percentage points, from about 50% to 42%"), even if the source wrote "%"`
 };
 
 /**
@@ -79,5 +100,7 @@ export function proseLintFindings(article) {
   if (hasBinaryContrastReflex(article?.headline, article?.deck)) findings.push({ flag: 'binary_contrast', detail: {}, message: PROSE_LINT_MESSAGES.binary_contrast() });
   const dashes = emDashOveruse(paragraphs);
   if (dashes) findings.push({ flag: `em_dashes:${dashes.dashes}/${dashes.paragraphs}`, detail: dashes, message: PROSE_LINT_MESSAGES.em_dashes(dashes) });
+  const slip = percentagePointSlip([article?.headline, article?.deck, ...paragraphs].filter((value) => typeof value === 'string'));
+  if (slip) findings.push({ flag: 'pct_points', detail: slip, message: PROSE_LINT_MESSAGES.pct_points(slip) });
   return findings;
 }
