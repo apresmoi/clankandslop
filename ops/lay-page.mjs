@@ -6,6 +6,9 @@ import { mapPresentationProps } from './map-presentation.mjs';
 import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-format.mjs';
 import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
 import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
+import { decisionSummaryFindings } from './summary-fidelity.mjs';
+import { carriedCalls, carryTape, followUps, ledgerHistory } from './open-clocks.mjs';
+import { archiveLedger } from './ledger-archive.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -191,29 +194,35 @@ function frontPage(edition, order, articles, decisions, maps, agents) {
   return { edition, page: 'front', paper: 'front', title: CHROME.front.title, active: CHROME.front.active, tagline: null, head, flow: [{ block: 'Briefly', props: { title: '', compact: true, desks: brieflyDesks('briefly', decisions.briefly, agents) } }] };
 }
 
-function tapePage(edition, decisions, desk, agents) {
+function tapePage(edition, decisions, desk, agents, carry) {
   const tape = isObj(decisions.tape) ? decisions.tape : fail('tape shape', 'the decision record must carry a "tape" object {briefly, markets, watch}');
-  const head = [{ block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: brieflyDesks('tape.briefly', tape.briefly, agents) } }];
+  const authoredDesks = brieflyDesks('tape.briefly', tape.briefly, agents);
 
   const rows = (tape.markets?.rows ?? []).map((row, i) => {
     for (const key of ['sym', 'value', 'spark', 'pct']) if (!isStr(row?.[key])) fail('markets shape', `tape.markets.rows[${i}].${key} must be a non-empty string`);
     if (!RAIL_DIRS.has(row.dir)) fail('markets shape', `tape.markets.rows[${i}].dir must be up|down|flat — red is only ever down and green only ever up, so "flat" is the honest choice for anything that has not moved`);
     return { sym: row.sym, value: row.value, spark: row.spark, pct: row.pct, dir: row.dir };
   });
-  const watch = (tape.watch ?? []).map((row, i) => {
+  const authoredWatch = (tape.watch ?? []).map((row, i) => {
     for (const key of ['when', 'what']) if (!isStr(row?.[key])) fail('watch shape', `tape.watch[${i}].${key} must be a non-empty string`);
     if (row.who !== undefined && !agents.has(row.who)) fail('agent reference', `tape.watch[${i}].who names agent "${row.who}", which has no persona file`);
     return { when: row.when, what: row.what, ...(row.who ? { who: row.who } : {}) };
   });
+  // Open calls and follow-up promises from earlier editions are carried here
+  // until they settle (ops/open-clocks.mjs); a decision record cannot drop one.
+  const carried = carryTape({ desks: authoredDesks, watch: authoredWatch, todayRows: desk['ledger.settlements'], carried: carry.calls, follow: carry.follow, agents });
+  if (carried.error) fail('open clocks', carried.error);
+  const watch = carried.watch;
+  const head = [{ block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: carried.desks } }];
   const rail = rows.length > 0 ? { block: 'MarketsRail', props: { title: 'The Tape', ...(isStr(tape.markets?.kicker) ? { kicker: tape.markets.kicker } : {}), rows } } : null;
   const deadlines = watch.length > 0 ? { block: 'WhatToWatch', props: { title: `The Deadlines · ${watch[0].when}${watch.length > 1 ? ` – ${watch[watch.length - 1].when}` : ''}`, items: watch } } : null;
   if (rail && deadlines) head.push(grid([1, 1], [[rail], [deadlines]]));
   else if (rail || deadlines) head.push(rail ?? deadlines);
 
-  const open = (desk['ledger.settlements']?.resolved_last_edition ?? []).filter((row) => row?.outcome === 'open');
+  const open = carried.calls;
   if (open.length > 0) {
     const meta = `${open.length} open call${open.length === 1 ? '' : 's'}${isStr(tape.forecast_meta) ? ` · ${tape.forecast_meta}` : ''}`;
-    head.push({ block: 'ForecastLedger', props: { meta, open_calls: open.map((row) => ({ question: row.call, call: row.prior_p >= 0.5 ? 'YES' : 'NO', direction: row.prior_p >= 0.5 ? 'bull' : 'bear', p: row.prior_p })) } });
+    head.push({ block: 'ForecastLedger', props: { meta, open_calls: open.map((row) => ({ question: row.call, call: row.prior_p >= 0.5 ? 'YES' : 'NO', direction: row.prior_p >= 0.5 ? 'bull' : 'bear', p: row.prior_p, ...(row.opened ? { detail: `open since ${row.opened}` } : {}) })) } });
   }
   head.push({ block: 'TrackRecord', props: { label: 'Track Record · Settlement', resolved: 'edition' } });
   return { edition, page: 'tape', paper: 'tape', title: CHROME.tape.title, active: CHROME.tape.active, tagline: null, head, flow: [] };
@@ -268,7 +277,9 @@ export function alternationRuns(head) {
   return runs;
 }
 
-export function layEdition({ edition, articles, desk, maps = {}, decisions, artifacts = [], agents = personaNames(), archive = archiveResolver() }) {
+// `ledger` is the published editions before this one ([{date, settlements,
+// articles}]); read from the archive when the caller does not supply it.
+export function layEdition({ edition, articles, desk, maps = {}, decisions, artifacts = [], agents = personaNames(), archive = archiveResolver(), ledger }) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(edition ?? '')) fail('edition identity', `edition must be an ISO date "YYYY-MM-DD", got ${JSON.stringify(edition)}`);
   if (!isObj(decisions)) fail('decision record', 'no decision record supplied — the assembler never guesses an editorial choice');
   if (decisions.edition !== undefined && decisions.edition !== edition) fail('edition identity', `the decision record names edition ${JSON.stringify(decisions.edition)} but the run is for ${edition}`);
@@ -292,8 +303,17 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
     if (resolved[name] && JSON.stringify(resolved[name]) !== JSON.stringify(document)) fail('map identity', `generated map ${name} conflicts with reporter art`);
     resolved[name] = document;
   }
+  const rows = desk['ledger.settlements'].resolved_last_edition ?? [];
+  // Reporter flashpoints inherited when the record names none are summaries too.
+  const inherited = Array.isArray(decisions.flashpoints) ? decisions.flashpoints : order.map((slug) => (isObj(articles[slug].presentation?.flashpoint) ? { ...articles[slug].presentation.flashpoint, article: slug } : null)).filter(Boolean);
+  const summaries = decisionSummaryFindings({ ...decisions, flashpoints: inherited }, articles, { edition, extra: [...rows.map((row) => `${row?.call} ${row?.prior_p}`), JSON.stringify(desk['ledger.worlddesk'])] });
+  if (summaries.length > 0)
+    fail('summary fidelity', `${summaries.length} summary line(s) say what their article does not. A summary may only restate what the article states: keep each event with its own day, date and place, never merge two events into one sentence, and copy figures rather than computing them. Rewrite: ${summaries.join(' | ')}`);
+  const prior = (ledger ?? archiveLedger(undefined, { before: edition })).filter((entry) => entry.date < edition);
+  const previous = prior.reduce((latest, entry) => (latest === undefined || entry.date > latest.date ? entry : latest), undefined);
+  const carry = { calls: carriedCalls(ledgerHistory(prior), edition, desk['ledger.settlements']), follow: followUps(previous, articles) };
   const front = frontPage(edition, order, articles, decisions, resolved, agents);
-  const tape = tapePage(edition, decisions, desk, agents);
+  const tape = tapePage(edition, decisions, desk, agents, carry);
 
   const visuals = visualCount(front);
   if (visuals < 2 || visuals > 3) fail('illustration rhythm invalid', `the front carries ${visuals} MapGlyph/GlyphArt blocks; compose_edition requires 2-3`);

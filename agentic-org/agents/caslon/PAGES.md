@@ -93,6 +93,34 @@ than accepted twice.
 }
 ```
 
+**Every summary restates its article, and only its article.** A flashpoint
+`note`, an art `caption`, a Briefly `what` and a deadline `what` are each a
+shorter telling of something an article already states. Three rules:
+
+- Keep each event with its own day, date and place. If the article has a
+  declaration on Sunday and a rally on Friday, the summary never says the
+  declaration happened at the Friday rally. 5 October shipped exactly that.
+- Never merge two events into one clause to save words. Two events, two
+  clauses, each with its own day, or drop the day.
+- Copy figures and dates from the article. Never compute, round into a new
+  number, or recall one from an earlier edition.
+
+The assembler checks this mechanically (`ops/summary-fidelity.mjs`). A note or
+caption tied to a slug must not carry a weekday, relative day, date or number
+its article does not print. Any summary, including a Briefly item, is refused
+when it puts a word on a weekday that the article only uses beside a different
+weekday. The refusal quotes the line and says what to fix: rewrite it from
+the article and call `lay_pages` again.
+
+**Carried clocks.** The assembler carries every forecast still open from an
+earlier edition onto the tape until Ledger settles it: into `ForecastLedger`,
+and into the tape desk labelled exactly `Open Clocks` when no item there
+already restates the call (so a tape with carried calls must keep a desk with
+that label). The prior edition's `next_update_utc` promises lead `The
+Deadlines` unless one of today's articles names that story in
+`previous_coverage`. I do not retype either; I may restate a carried call in
+my own words on the Open Clocks desk, and then it is not added twice.
+
 **What is not in it, because the assembler works it out:** `edition`, `page`,
 `paper`, `title`, `active`, `tagline`; every `Grid`'s `cols`, `align` and
 `rule`; the `SectionHeader` text; `Hero`'s `variant` and `withArt`; every
@@ -357,8 +385,8 @@ hand-authoring did on 5 September.
 Briefly            The Markets File, compact, three desks
 Grid [1,1]         MarketsRail left, WhatToWatch right   (either alone if
                    the other has nothing; neither, if neither does)
-ForecastLedger     only when Ledger's document carries an open row
-TrackRecord        Track Record · Settlement, resolved from the edition
+ForecastLedger     today's open rows plus every call still open from an earlier edition
+TrackRecord        Track Record · Settlement, read from the persistent ledger
 flow: []
 ```
 

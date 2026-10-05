@@ -6,6 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { archiveResolver, layEdition, readEditionInputs } from '../../ops/lay-page.mjs';
+import { archiveLedger } from '../../ops/ledger-archive.mjs';
+import { ledgerHistory, missingLedgerRows } from '../../ops/open-clocks.mjs';
 import { writeEditionIndex } from './edition-index.mjs';
 import { DESK_DOCUMENTS_REQUIRED, PASSED_ARTICLES_MINIMUM, compositionCoverage, composeGateStatus } from './compose-gate.mjs';
 // Every REQUIRED side of the gate line is read back out of the gate itself, so a
@@ -88,6 +90,10 @@ function installWorldDeskPrivate(root, edition, document = deskDocument('ledger.
 // file is now checked in isolation as well as in order.
 function preparedDeskDocument(name, edition, root = privateRootFor(edition), lead) {
   const document = deskDocument(name, edition, lead);
+  // Ledger carries every call still open from a published edition until it
+  // settles, and file_desk refuses a filing that drops one. A fixture edition
+  // dated after real published ones files those rows the way Ledger would.
+  if (name === 'ledger.settlements') document.resolved_last_edition.push(...missingLedgerRows(ledgerHistory(archiveLedger(undefined, { before: edition })), edition, document));
   if (name === 'ledger.worlddesk') {
     process.env.CLANK_PRIVATE_SOURCE_ROOT = root;
     if (!existsSync(corpusIdentityFile(root))) installCorpusFixture(root, edition);
