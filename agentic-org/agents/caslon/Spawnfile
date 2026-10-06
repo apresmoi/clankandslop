@@ -110,7 +110,7 @@ workspace:
   resources:
     - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:484748db3a8e990462b01e82cd7f265eba5c1152d7f055fe92b4de646c797e53, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:009bde483fe5a8ca34ef8215af0e8cc157aedd426067aaf32445f5477b6e420a, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:8cc8aeaa169fba2764009d4088cb6136d84755fa26c61250620519e792f80105, mount: ./repos/newsroom, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to
     # alter it. Ships outside the newsroom bundle because it is ~395MB.
