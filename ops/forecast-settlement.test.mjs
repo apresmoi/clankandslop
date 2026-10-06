@@ -26,6 +26,7 @@ test('either repair clears it: the deck names the deadline, or the label drops t
 
 test('forecast_probability: a printed probability must equal round(confidence.value * 100)', () => {
   assert.deepEqual(codes({ ...quebec, confidence: { ...quebec.confidence, value: 0.31 } }).filter((code) => code === 'forecast_probability'), ['forecast_probability', 'forecast_probability']);
+  assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 65% chance; the call is 42%.' })), [], 'quoted odds beside the house call pass');
   assert.deepEqual(codes(forecast({ confidence: { ...forecast().confidence, value: 0.424 } })), []);
   assert.deepEqual(codes(forecast({ deck: 'The call is 0.45 before the 25 October runoff.' })), ['forecast_probability']);
   assert.deepEqual(codes(forecast({ deck: 'The house gives it a 0.42 probability.' })), []);
@@ -37,6 +38,7 @@ test('forecast_event: the headline event must be one the label settles, or one t
   assert.match(forecastSettlementFindings(forecast({ headline: 'Lula is a 42% shot at a landslide' }))[0].message, /"landslide".*never settles on/u);
   assert.deepEqual(codes({ ...quebec, deck: 'The party leads in 59 seats. Probability 28% by 12 October.' }), ['forecast_event'], 'without the deck tying "majority" to 64 seats the headline event floats free');
   assert.deepEqual(codes(forecast({ headline: 'Lula wins 42% of the vote' })), [], 'a vote share is not a probability');
+  assert.deepEqual(codes(forecast({ headline: 'Lula is a 42% shot at a fourth term despite weak polling' })), [], 'context after the event is not the event');
   assert.deepEqual(codes(forecast({ headline: 'Lula fights for a fourth term' })), [], 'no printed probability, no event phrase to compare');
 });
 
@@ -44,6 +46,15 @@ test('non-forecasts and incomplete confidence are out of scope', () => {
   assert.deepEqual(codes({ ...quebec, epistemic: 'fact' }), []);
   assert.deepEqual(codes({ ...quebec, confidence: { label: quebec.confidence.label } }), []);
   assert.deepEqual(codes({ ...quebec, confidence: { value: 0.28 } }), []);
+});
+
+test('an ISO deadline in the deck counts, and a hostile label cannot stall the check', () => {
+  const label = 'Yes if Lula wins a fourth term; no if no result is posted by 1 November 2026.';
+  assert.deepEqual(codes(forecast({ deck: 'Results must be posted by 2026-11-01.', confidence: { value: 0.42, label } })), []);
+  assert.deepEqual(codes(forecast({ confidence: { value: 0.42, label } })), ['forecast_deadline']);
+  const start = performance.now();
+  forecastSettlementFindings(forecast({ confidence: { value: 0.42, label: 'if no posted '.repeat(5000) } }));
+  assert.ok(performance.now() - start < 200, 'linear in the label');
 });
 
 test('helpers read the common date and probability spellings', () => {

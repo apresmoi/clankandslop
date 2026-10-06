@@ -6,9 +6,9 @@
 // the settled event (a majority AND a table published by a date) differed, and
 // the deck never named the deadline. These checks catch that shape at filing:
 //
-//   forecast_probability  a probability printed in the headline or deck
-//                         ("a 28% shot", "Probability 28%", "a 0.82
-//                         probability") differs from round(confidence.value*100)
+//   forecast_probability  the headline or deck prints probabilities ("a 28%
+//                         shot", "Probability 28%", "a 0.82 probability") and
+//                         none is round(confidence.value*100)
 //   forecast_event        the event after the headline's probability ("shot at
 //                         a majority") names words the label never settles on,
 //                         and no deck sentence ties that word to the label's
@@ -22,7 +22,7 @@
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const MONTH = '(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\\.?';
-const DATE_PATTERNS = [new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+${MONTH}\\b`, 'giu'), new RegExp(`\\b${MONTH}\\s+(\\d{1,2})(?:st|nd|rd|th)?\\b`, 'giu')];
+const DATE_PATTERNS = [new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+${MONTH}\\b`, 'giu'), new RegExp(`\\b${MONTH}\\s+(\\d{1,2})(?:st|nd|rd|th)?\\b`, 'giu'), /\b\d{4}-(\d{2})-(\d{2})\b/gu];
 const PCT = '(\\d{1,3}(?:\\.\\d+)?)\\s?(?:%|percent\\b|per cent\\b)';
 const DEC = '(0?\\.\\d{1,3})(?!\\d|\\s*%|\\s*percent)';
 const NOUN = '(shot|chance|probability|likelihood|odds|favou?rite|bet|call)';
@@ -31,7 +31,23 @@ const CUE = '\\b(?:probability|chance|odds|likelihood|call)\\s+(?:is\\s+|of\\s+|
 const PROBABILITY = [[new RegExp(`${PCT}\\s+${NOUN}\\b`, 'giu'), 1], [new RegExp(`${CUE}${PCT}`, 'giu'), 1], [new RegExp(`\\b${DEC}\\s+(probability|chance|likelihood)\\b`, 'giu'), 100], [new RegExp(`${CUE}${DEC}`, 'giu'), 100]];
 // A NO branch that adds a condition beyond the headline event: nothing is
 // posted/published/named by a deadline. "by then" points at the label's date.
-const NO_CLAUSE = /\b(?:if\s+no\b|(?:is|are)\s+not\b)[^.;]*?\b(?:posted|published|named|declared|announced|certified|issued|released|confirmed|reported|signed|held)\b[^.;]*?\bby\b([^.;]*)/iu;
+// Matched clause by clause, each step a single linear scan, so no label can backtrack.
+const NO_OPENER = /\b(?:if\s+no|(?:is|are)\s+not)\b/iu;
+const NO_VERB = /\b(?:posted|published|named|declared|announced|certified|issued|released|confirmed|reported|signed|held)\b/iu;
+const LABEL_MAX = 1000;
+function noClause(label) {
+  for (const clause of label.slice(0, LABEL_MAX).split(/[.;]/u)) {
+    const opener = clause.match(NO_OPENER);
+    if (!opener) continue;
+    const rest = clause.slice(opener.index), verb = rest.match(NO_VERB);
+    if (!verb) continue;
+    const by = rest.slice(verb.index).search(/\bby\b/iu);
+    if (by >= 0) return { text: rest.trim(), tail: rest.slice(verb.index + by + 2) };
+  }
+  return undefined;
+}
+// Words that start context rather than the event: "a 42% shot at a fourth term despite weak polling".
+const CONTEXT = /\s(?:despite|amid|as|while|though|although|but|because|since|after|even|yet|with)\s/iu;
 const STOP = new Set(['the', 'a', 'an', 'of', 'at', 'for', 'to', 'in', 'on', 'by', 'that', 'this', 'its', 'it', 'is', 'be', 'will', 'with', 'and', 'or', 'as', 'than', 'from', 'into', 'over', 'under', 'before', 'after', 'outright', 'clear']);
 
 const fold = (text) => String(text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
@@ -45,8 +61,8 @@ const sentences = (text) => String(text ?? '').split(/(?<=[.!?;])\s+/u);
 export function datesIn(text) {
   const out = [];
   for (const [index, pattern] of DATE_PATTERNS.entries()) for (const match of String(text ?? '').matchAll(pattern)) {
-    const [day, month] = index === 0 ? [match[1], match[2]] : [match[2], match[1]];
-    out.push({ key: `${Number(day)}-${MONTHS.find((name) => fold(month).startsWith(name))}`, text: match[0] });
+    const [day, month] = index === 0 ? [match[1], match[2]] : index === 1 ? [match[2], match[1]] : [match[2], MONTHS[Number(match[1]) - 1]];
+    if (month !== undefined) out.push({ key: `${Number(day)}-${MONTHS.find((name) => fold(month).startsWith(name))}`, text: match[0] });
   }
   return out;
 }
@@ -56,7 +72,7 @@ export function printedProbabilities(text) {
   const found = [];
   for (const [pattern, scale] of PROBABILITY) for (const match of String(text ?? '').matchAll(pattern)) {
     const end = match.index + match[0].length;
-    found.push({ value: Number(match[1]) * scale, at: match[0], after: String(text).slice(end).split(/[,.;:!?—–]/u)[0] });
+    found.push({ value: Number(match[1]) * scale, at: match[0], after: String(text).slice(end).split(/[,.;:!?—–]/u)[0].split(CONTEXT)[0] });
   }
   return found;
 }
@@ -68,8 +84,11 @@ export function forecastSettlementFindings(article) {
   if (article?.epistemic !== 'forecast' || typeof value !== 'number' || !Number.isFinite(value) || typeof label !== 'string') return findings;
   const headline = typeof article.headline === 'string' ? article.headline : '', deck = typeof article.deck === 'string' ? article.deck : '';
   const percent = Math.round(value * 100);
-  for (const [field, text] of [['headline', headline], ['deck', deck]]) for (const printed of printedProbabilities(text)) {
-    if (Math.round(printed.value) !== percent) findings.push({ path: field, code: 'forecast_probability', message: `prints "${printed.at}" but confidence.value is ${value} (${percent}%) — the headline and deck state the same probability the call settles on` });
+  // A field may quote another probability (market odds) beside the house call,
+  // so it is refused only when it prints probabilities and none is the call.
+  for (const [field, text] of [['headline', headline], ['deck', deck]]) {
+    const printed = printedProbabilities(text);
+    if (printed.length > 0 && !printed.some((found) => Math.round(found.value) === percent)) findings.push({ path: field, code: 'forecast_probability', message: `prints ${printed.map((found) => `"${found.at}"`).join(', ')} but confidence.value is ${value} (${percent}%) — the headline and deck state the same probability the call settles on` });
   }
   for (const printed of printedProbabilities(headline)) {
     const words = tokens(printed.after).filter((word) => !STOP.has(word) && (word.length >= 3 || /^\d+$/u.test(word)));
@@ -78,11 +97,11 @@ export function forecastSettlementFindings(article) {
     const missing = words.filter((word) => !mentions(label, word) && !bridged(word));
     if (missing.length > 0) findings.push({ path: 'headline', code: 'forecast_event', message: `"${printed.at}${printed.after}" names ${missing.map((word) => `"${word}"`).join(', ')}, which confidence.label never settles on — state in the headline the event the label settles, or tie it in the deck to the label's own terms ("short of 64 for a majority")` });
   }
-  const clause = label.match(NO_CLAUSE);
+  const clause = noClause(label);
   if (clause) {
-    const deadline = datesIn(clause[1])[0] ?? datesIn(label)[0];
+    const deadline = datesIn(clause.tail)[0] ?? datesIn(label.slice(0, LABEL_MAX))[0];
     const named = new Set(datesIn(`${headline} ${deck}`).map((date) => date.key));
-    if (deadline && !named.has(deadline.key)) findings.push({ path: 'deck', code: 'forecast_deadline', message: `confidence.label also settles NO when "${clause[0].trim()}", a condition with a deadline (${deadline.text}) that neither headline nor deck names, so the printed call and the settled call differ — drop that condition from the label, or name the deadline in the deck ("…if the official seat table is posted by 12 October")` });
+    if (deadline && !named.has(deadline.key)) findings.push({ path: 'deck', code: 'forecast_deadline', message: `confidence.label also settles NO when "${clause.text}", a condition with a deadline (${deadline.text}) that neither headline nor deck names, so the printed call and the settled call differ — drop that condition from the label, or name the deadline in the deck ("…if the official seat table is posted by 12 October")` });
   }
   return findings;
 }
