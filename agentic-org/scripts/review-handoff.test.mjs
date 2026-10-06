@@ -34,13 +34,32 @@ test('review handoffs use the shared readiness floors and name the accepted revi
     assert.doesNotMatch(reviewNoticeInstruction(args, 'tinkerton', inputs), /@caslon/u);
   }
 });
+test('a PASS without a facts check sends the owner to check it and holds the Caslon handoff', () => {
+  const articles = owners.map((_, index) => article(index, index === 5 ? 'Policy' : index % 2 ? 'World' : 'Business'));
+  const args = { edition, article_id: 'story-5', revision: 4, verdict: 'PASS' };
+  const desks = ['caslon.chrome', 'caslon.weather', 'ledger.settlements', 'ledger.worlddesk'];
+  const pending = reviewNoticeInstruction(args, 'tinkerton', { articles, desks, problems: ['"story-5" revision 4 has no facts check'], fresh: false });
+  assert.match(pending, /room:filing.*article story-5 revision 4, mention @tinkerton.*needs its facts check now/u);
+  assert.match(pending, /waits only on facts checks \(1\).*do not mention @caslon/u);
+  assert.doesNotMatch(pending, /target room:release/u);
+  const early = reviewNoticeInstruction(args, 'tinkerton', { articles: articles.slice(0, 2), desks, problems: ['x'], fresh: false });
+  assert.match(early, /mention @tinkerton.*facts check.*@ledger/u);
+  const checked = reviewNoticeInstruction(args, 'tinkerton', { articles, desks, problems: [], fresh: true });
+  assert.match(checked, /room:release now.*@caslon/u);
+  assert.doesNotMatch(checked, /needs its facts check/u);
+});
 async function fixture({ section = 'Policy', ledger = true } = {}) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'clank-review-ready-'));
   const base = path.join(root, 'editions', edition);
   const save = async (relative, value) => { const file = path.join(base, relative); await mkdir(path.dirname(file), { recursive: true }); await writeFile(file, JSON.stringify(value)); };
-  for (let index = 0; index < 5; index++) await save(`articles/story-${index}.json`, article(index, index % 2 ? 'World' : 'Business'));
+  // Every other piece carries its owner's facts check, and story-5 revision 4
+  // is the revision that carried a recorded development, so the PASS under
+  // test is the one that completes the edition.
+  const check = (revision, outcome) => ({ version: 'clank.freshness-check.v1', revision, outcome, facts_checked_utc: '13:42' });
+  for (let index = 0; index < 5; index++) { await save(`articles/story-${index}.json`, { ...article(index, index % 2 ? 'World' : 'Business'), facts_checked_utc: '13:42' }); await save(`freshness/story-${index}/1.json`, check(1, 'unchanged')); }
+  await save('freshness/story-5/3.json', check(3, 'updated'));
   for (const name of ['caslon.chrome', 'caslon.weather', ...(ledger ? ['ledger.settlements', 'ledger.worlddesk'] : [])]) await save(`desk/${name}.json`, {});
-  const filing = { ...article(5, section), assignment_ref: { owner: 'tinkerton' } };
+  const filing = { ...article(5, section), facts_checked_utc: '13:42', assignment_ref: { owner: 'tinkerton' } };
   await save('filings/story-5/4.json', filing);
   const previous = Object.fromEntries(['CLANK_EDITION_STATE_ROOT', 'CLANK_NEWSROOM_AGENT', 'CLANK_STATE_OFFLINE_FIXTURE', 'DAIMON_WAKE_ID'].map(key => [key, process.env[key]]));
   process.env.CLANK_EDITION_STATE_ROOT = root;

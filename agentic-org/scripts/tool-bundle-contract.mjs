@@ -1,7 +1,7 @@
 export const ART_TOOLS = Object.freeze(['list_art_catalogue','bake_map','bake_glyph','inspect_artifact','inspect_catalogue_preview','lay_pages']);
 export const VISUAL_TOOLS = Object.freeze({pressman:['prepare_release']});
 const reporters=['cogsworth','sprockett','foreman','graves','tinkerton','vesta'];
-const newsroomTools={klaxon:['qualify_signal'],brass:['record_assignment'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release'],...Object.fromEntries(reporters.map(role=>[role,['file_article','record_dissent']]))};
+const newsroomTools={klaxon:['qualify_signal'],brass:['record_assignment','record_freshness_check'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release'],...Object.fromEntries(reporters.map(role=>[role,['file_article','record_dissent','record_freshness_check']]))};
 
 export function runtimeToolFindings(agent, manifest) {
   const errors=[], base=`/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}`;

@@ -163,8 +163,8 @@ runtimeTest('every converge path regenerates the edition INDEX', async () => {
   try {
     const text = await driveEdition(path.join(temporary, 'state'));
     assert.match(text, /^# clank\.edition-index\.v1 edition=2026-09-04 generated=\S+ assignments=5 filings=6 verdicts=6 passed=5$/mu);
-    assert.match(text, /^# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page$/mu);
-    assert.match(text, /^# read one: cat candidates\/<id>\.json \| cat filings\/<id>\/<rev>\.json \| cat articles\/<id>\.json \| cat verdicts\/<id>\/<rev>\.json \| cat dissents\/<id>\/<rev>\.json$/mu);
+    assert.match(text, /^# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · K facts check · D desk doc · G page$/mu);
+    assert.match(text, /^# read one: cat candidates\/<id>\.json \| cat filings\/<id>\/<rev>\.json \| cat articles\/<id>\.json \| cat verdicts\/<id>\/<rev>\.json \| cat dissents\/<id>\/<rev>\.json \| cat freshness\/<id>\/<rev>\.json$/mu);
     // The whole point of the file: it stays small enough to read every wake.
     assert.ok(Buffer.byteLength(text) < 6000, `edition INDEX grew to ${Buffer.byteLength(text)} bytes`);
   } finally {

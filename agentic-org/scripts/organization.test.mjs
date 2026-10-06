@@ -193,7 +193,7 @@ test('the newsroom tools that read the research corpus declare its mount', () =>
   }
 });
 
-test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
+test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment','record_freshness_check'],cogsworth:['file_article','record_dissent','record_freshness_check'],sprockett:['file_article','record_dissent','record_freshness_check'],foreman:['file_article','record_dissent','record_freshness_check'],graves:['file_article','record_dissent','record_freshness_check'],tinkerton:['file_article','record_dissent','record_freshness_check'],vesta:['file_article','record_dissent','record_freshness_check'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
 // identical SKILL.md files at the top of every wake. Their content now
 // lives in compiled working boundaries and the linked task runbook.
 // No agent declares a skill; ownership and source truth remain in the prefix.
