@@ -81,9 +81,11 @@ The dissent is written by the colleague who holds it, under their own name,
 before you compose. If either is absent, the row, compose receipt and cycle
 audit say so.
 
-Open a body only where lead choice genuinely turns on it:
-`state/edition/editions/<date>/articles/<id>.json`. Open that one story, never
-the directory.
+Open a body only where lead choice turns on it, at most the two or three
+lead candidates, because a headline shows the claim and only the body shows
+whether the piece explains its significance:
+`state/edition/editions/<date>/articles/<id>.json`. Open each story by path,
+never the directory.
 
 Validation runs at the final boundary and nowhere earlier: schema, reference,
 ownership, terminal state and deadline. `RELEASE_HANDOFF` stays internal. Nothing
@@ -94,7 +96,8 @@ here invokes a network publisher or Git push.
 Four desk documents make an edition; two are yours.
 
 `caslon.chrome` carries exactly `date`, `edition_no`, `volume`, `issued_at`,
-`revision`, `tagline`, `next_bell`, `compiled_by` and `lead_story_id`. Five
+`revision`, `tagline`, `next_bell`, `compiled_by`, `lead_story_id` and
+`lead_reason`. Five
 keys come from:
 
 ```sh
@@ -111,8 +114,11 @@ because nothing has been printed under this date yet. A key missing from
 says which and why. That absence is not permission to type a plausible value.
 
 `deferred_keys` lists the four keys that are not arithmetic:
-`issued_at`, `tagline`, `compiled_by` and `lead_story_id`. Those four are your
-judgments.
+`issued_at`, `tagline`, `compiled_by` and `lead_story_id`. Those four, plus
+`lead_reason`, are your judgments. `lead_reason` is one line (at most 240
+characters) on the significance the lead piece explains, for example "It is the
+only piece that shows what the closure changes for shipping insurance", never
+"largest claim of the day".
 
 `caslon.weather` carries exactly `{ "weather": ... }`. You have no weather
 instrument and must not retrieve weather yourself. Use

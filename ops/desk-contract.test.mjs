@@ -28,3 +28,16 @@ test('markets is optional on ledger.worlddesk and, when present, every number is
   assert.match(worlddesk(board(series({ group: 'crypto' }))).join(), /group must be one of/u);
   assert.match(worlddesk(board()).join(), /non-empty array/u);
 });
+
+const chrome = (over) => ({ date: '2026-10-07', edition_no: '0096', volume: 'I', issued_at: '2026-10-07T14:00:00Z', revision: 1, tagline: 't', next_bell: '16:00 UTC', compiled_by: ['Graves'], lead_story_id: 's-1', lead_reason: 'It explains why the strait closure moves insurance and freight for three continents.', ...over });
+
+test('caslon.chrome is filed with a one-line lead_reason; archived chrome without one still validates', () => {
+  assert.deepEqual(deskDocumentKeys('caslon.chrome').at(-1), 'lead_reason', 'the brief names the key');
+  assert.deepEqual(deskDocumentFindings('caslon.chrome', chrome(), { profile: 'filing' }), []);
+  assert.match(deskDocumentFindings('caslon.chrome', chrome({ lead_reason: undefined }), { profile: 'filing' }).join(), /lead_reason must be one line/u);
+  assert.match(deskDocumentFindings('caslon.chrome', chrome({ lead_reason: '' }), { profile: 'filing' }).join(), /lead_reason must be one line/u);
+  assert.match(deskDocumentFindings('caslon.chrome', chrome({ lead_reason: 'Two\nlines' }), { profile: 'filing' }).join(), /lead_reason must be one line/u);
+  assert.match(deskDocumentFindings('caslon.chrome', chrome({ lead_reason: 'x'.repeat(241) }), { profile: 'filing' }).join(), /at most 240/u);
+  assert.deepEqual(deskDocumentFindings('caslon.chrome', chrome({ lead_reason: undefined })), [], 'published editions before the rule carry none');
+  assert.deepEqual(deskDocumentFindings('caslon.chrome', chrome()), [], 'and the archive accepts one that does');
+});

@@ -29,6 +29,7 @@ export const DESK_OWNERS = Object.freeze({
 export const EDITION_PARTS = Object.freeze(Object.keys(DESK_OWNERS));
 export const EDITION_PART_FILES = Object.freeze(EDITION_PARTS.map((name) => `${name}.json`));
 
+const LEAD_REASON_MAX = 240;
 const isStr = (v) => typeof v === 'string' && v.length > 0;
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const isP = (v) => isNum(v) && v >= 0 && v <= 1;
@@ -39,7 +40,16 @@ const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const SHAPES = {
   'caslon.chrome': {
     keys: ['date', 'edition_no', 'volume', 'issued_at', 'revision', 'tagline', 'next_bell', 'compiled_by', 'lead_story_id'],
+    // Why this story leads, in one line, written when the lead is chosen. The
+    // lead is picked for the significance its piece explains, not the size of
+    // an official claim; a reason nobody wrote down is a reason nobody checked.
+    // Required from file_desk on; editions before 2026-10-07 carry none.
+    filingKeys: ['date', 'edition_no', 'volume', 'issued_at', 'revision', 'tagline', 'next_bell', 'compiled_by', 'lead_story_id', 'lead_reason'],
+    optional: ['lead_reason'],
     check(document, out) {
+      if (out.profile === 'filing' || document.lead_reason !== undefined)
+        if (!isStr(document.lead_reason) || /\n/u.test(document.lead_reason) || document.lead_reason.length > LEAD_REASON_MAX)
+          out.push(`lead_reason must be one line of at most ${LEAD_REASON_MAX} characters saying why lead_story_id leads: the significance its piece explains, not the size of an official claim`);
       if (isStr(document.date) && !/^\d{4}-\d{2}-\d{2}$/.test(document.date)) out.push('date must be an ISO date "YYYY-MM-DD"');
       for (const key of ['date', 'edition_no', 'volume', 'issued_at', 'tagline', 'next_bell', 'lead_story_id'])
         if (!isStr(document[key])) out.push(`${key} must be a non-empty string`);
@@ -124,8 +134,8 @@ function marketFindings(markets, out) {
   }
 }
 
-/** The required top-level keys of one desk document, for briefs and messages. */
-export const deskDocumentKeys = (name) => SHAPES[name]?.keys ?? null;
+/** The required top-level keys of one desk document as filed, for briefs and messages. */
+export const deskDocumentKeys = (name) => SHAPES[name]?.filingKeys ?? SHAPES[name]?.keys ?? null;
 /** Keys a desk document may carry beyond the required ones. */
 export const deskOptionalKeys = (name) => SHAPES[name]?.optional ?? [];
 

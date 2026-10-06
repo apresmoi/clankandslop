@@ -510,8 +510,9 @@ cannot be laid out, and it names the gate and the missing input:
   document count other than four. The `# compose:` INDEX row reports these
   prerequisites; Brass or Ledger owns the missing inputs.
 - **`edition diversity floor missing`** — the PASSed set needs at least three
-  sections, five distinct primary byline agents, three evidence source names
-  and three source URL domains. The same INDEX row reports each count. Brass
+  sections, the distinct primary byline agents the INDEX `owners=` floor names
+  (a floor, never a cap: one desk may place two pieces), three evidence source
+  names and three source URL domains. The same INDEX row reports each count. Brass
   owns coverage; I cannot relabel, rewrite or omit passed work to evade a floor.
 - **`markets shape` / `watch shape` / `flashpoint shape`** — a rail row whose
   `dir` is not `up`/`down`/`flat`, a watch item with no date, an index row

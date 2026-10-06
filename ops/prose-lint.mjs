@@ -95,6 +95,26 @@ export function unnamedSpeaker(texts) {
   return undefined;
 }
 
+/**
+ * A closing "decisive test": the final paragraph claims some piece of evidence
+ * "would settle which reading is true" or "would show whether …". On
+ * 2026-10-06 the Hearth piece ended "a pathogen or a second confirmed illness
+ * would settle which reading is true", and neither would. Advisory: a test that
+ * really separates the readings is good reporting, so Spike judges it; the
+ * flag only makes sure he looks. Fires on 2 of 488 archived final paragraphs.
+ * Returns `{ phrase }` or undefined.
+ */
+const DECISIVE_TEST = [
+  /\bwould\s+(?:settle|decide|resolve|determine|prove|show|tell(?:\s+us)?)\s+(?:which|whether)\b/iu,
+  /\bsettles?\s+which\s+reading\b/iu,
+  /\bwhich\s+reading\s+is\s+(?:true|right|correct)\b/iu
+];
+export function decisiveTestClaim(paragraphs) {
+  const last = paragraphs.length > 0 ? String(paragraphs[paragraphs.length - 1]) : '';
+  for (const pattern of DECISIVE_TEST) { const match = last.match(pattern); if (match) return { phrase: match[0] }; }
+  return undefined;
+}
+
 // The sentence each flag prints, whether it is read by a reporter at file time,
 // by Spike at review time, or by the release validator. Written to the agent
 // who can still fix it, so it names the article field and says what to do.
@@ -103,7 +123,8 @@ export const PROSE_LINT_MESSAGES = {
   binary_contrast: () => 'headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form',
   em_dashes: ({ dashes, paragraphs }) => `${dashes} em dashes across ${paragraphs} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`,
   pct_points: ({ phrase }) => `"${phrase}" sits beside other percentages — a change between two percentages is in percentage points ("down about 8 percentage points, from about 50% to 42%"), even if the source wrote "%"`,
-  unnamed_speaker: ({ phrase }) => `"${phrase}" attributes a statement to someone the copy does not name — name the speaker and their role as the source does ("Sahra Wagenknecht, founder of the BSW, told dpa"); keep it anonymous only when the source itself does not name them, and say so`
+  unnamed_speaker: ({ phrase }) => `"${phrase}" attributes a statement to someone the copy does not name — name the speaker and their role as the source does ("Sahra Wagenknecht, founder of the BSW, told dpa"); keep it anonymous only when the source itself does not name them, and say so`,
+  decisive_test: ({ phrase }) => `the final paragraph says "${phrase}" — name a test only if its result would differ under each reading the piece presents, and end on what the piece established rather than a test or implication it did not develop`
 };
 
 /**
@@ -124,5 +145,7 @@ export function proseLintFindings(article) {
   if (slip) findings.push({ flag: 'pct_points', detail: slip, message: PROSE_LINT_MESSAGES.pct_points(slip) });
   const speaker = unnamedSpeaker([article?.headline, article?.deck, ...paragraphs].filter((value) => typeof value === 'string'));
   if (speaker) findings.push({ flag: 'unnamed_speaker', detail: speaker, message: PROSE_LINT_MESSAGES.unnamed_speaker(speaker) });
+  const decisive = decisiveTestClaim(paragraphs);
+  if (decisive) findings.push({ flag: 'decisive_test', detail: decisive, message: PROSE_LINT_MESSAGES.decisive_test(decisive) });
   return findings;
 }
