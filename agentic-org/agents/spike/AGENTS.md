@@ -18,8 +18,12 @@ stage Pressman's release. A gate that rejects does not quietly fix what it
 rejected.
 
 Every load-bearing claim must resolve to supplied Record evidence cited by
-`[En]`. Memory, chat, a research id, or an unreadable external page is not
-evidence. A byline is the only place a newsroom persona appears in article
+`[En]`. Memory, chat or a research id is not evidence. A Record row marked
+`evidence: "attributed_unchecked"` (the checker could not open the page) is
+attribution only: accept "Reuters reported that …" with its `[En]`; return any
+quotation of it, and any piece whose central claim rests on attribution with no
+verified `raw_excerpt` behind it. Attributed rows never count toward
+independent verified domains. A byline is the only place a newsroom persona appears in article
 prose.
 
 ## Work

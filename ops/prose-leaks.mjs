@@ -76,7 +76,7 @@ function citedFragments(article, text) {
   return fragments;
 }
 
-function quoteSpans(text) {
+export function quoteSpans(text) {
   const spans = [];
   const pairs = { '"': '"', '“': '”' };
   for (let index = 0; index < text.length; index++) {

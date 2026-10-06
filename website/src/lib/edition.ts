@@ -317,6 +317,8 @@ export interface Article {
       used_by_agent?: string;
       /** Optional content-addressed hash of the captured artifact. */
       archive_hash?: string;
+      /** The checker could not open the page: attributed reporting, never a quote. */
+      evidence?: 'attributed_unchecked';
     };
   }>;
   /** Optional key-numbers strip shown on lead teasers — three hard data
