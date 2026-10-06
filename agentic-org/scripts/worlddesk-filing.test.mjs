@@ -212,6 +212,33 @@ test('the corpus gate is additive: a valid filing and the stale carry-forward ar
   assert.match(await rejection(filing(EDITION, carried), unmounted), /cannot read the research corpus mount/u);
 });
 
+// The Tape's FRED board rides in ledger.worlddesk as `markets`, copied from
+// the producer's worlddesk/markets.json and never authored: dropped, edited or
+// invented, it is refused; on a refusal day it still travels with the stale
+// carry-forward.
+test('markets must be the producer\'s markets.json, verbatim, on derived and stale days alike', async () => {
+  const markets = { source: 'FRED, Federal Reserve Bank of St. Louis', retrieved_at: '2026-09-11T05:00:00Z', series: [{ id: 'DGS10', group: 'rates', label: 'US 10-year Treasury yield', unit: 'percent', decimals: 2, basis: 'close', url: 'https://fred.stlouisfed.org/series/DGS10', value: 4.12, observed: '2026-09-10' }] };
+  const root = mount('markets', { prepared: { ...documentFor(EDITION), markets } });
+  writeJson(path.join(root, EDITION, 'worlddesk/markets.json'), markets);
+  const env = { CLANK_PRIVATE_SOURCE_ROOT: root };
+  await authenticate(filing(EDITION, { ...documentFor(EDITION), markets }), env);
+  assert.match(await rejection(filing(), env), /"markets" must be .*markets\.json copied verbatim/u, 'a dropped board is refused');
+  const edited = structuredClone(markets); edited.series[0].value = 4.2;
+  assert.match(await rejection(filing(EDITION, { ...documentFor(EDITION), markets: edited }), env), /copied verbatim/u, 'an edited number is refused');
+  assert.match(await rejection(filing(EDITION, { ...documentFor(EDITION), markets }), { CLANK_PRIVATE_SOURCE_ROOT: mount('markets-none') }), /producer wrote no .*markets\.json/u, 'an invented board is refused');
+
+  const stale = mount('markets-refusal', { prepared: null, trace: { version: 'clank.worlddesk-trace.v1', edition: EDITION, escalation: { index: null, unresolved: ['x'] } } });
+  writeJson(path.join(stale, EDITION, 'worlddesk/refusal.json'), { version: 'clank.worlddesk-trace.v1', edition: EDITION, refused: true, unresolved: ['x'] });
+  writeJson(path.join(stale, EDITION, 'worlddesk/markets.json'), markets);
+  const publicRoot = path.join(temporary('markets-public'), 'newsroom');
+  writeJson(path.join(publicRoot, 'content/editions', OTHER_EDITION, 'desk/ledger.worlddesk.json'), { ...documentFor(OTHER_EDITION), markets: { ...markets, retrieved_at: 'yesterday' } });
+  writeJson(path.join(publicRoot, 'content/log', OTHER_EDITION, 'worlddesk.json'), traceFor(OTHER_EDITION));
+  const carried = documentFor(OTHER_EDITION); carried.world_desk.delta = 'stale';
+  const staleEnv = { CLANK_PRIVATE_SOURCE_ROOT: stale, CLANK_PUBLIC_SOURCE_ROOT: publicRoot };
+  await authenticate(filing(EDITION, { ...carried, markets }), staleEnv);
+  assert.match(await rejection(filing(EDITION, carried), staleEnv), /copied verbatim/u, 'a stale World Desk still carries today\'s board');
+});
+
 test('the source carries no cwd-relative corpus fallback for anybody to reintroduce', () => {
   // Comments are stripped first: this file's own prose explains the deleted
   // fallback by name, and an assertion that a comment can satisfy is not an

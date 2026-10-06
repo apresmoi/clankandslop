@@ -1,18 +1,25 @@
 ---
+import { ledgerKey } from '../lib/tape.ts';
 interface Call {
-  horizon: string;
+  horizon?: string;
   question: string;
   call: 'YES' | 'NO' | 'FLAT';
   direction: 'bull' | 'bear' | 'flat';
   p: number;
+  /** The forecaster's own uncertainty band, when one was filed. */
   interval?: number;
-  quorum: string;
+  /** pending | due — the call's ledger state (ops/ledger-states.mjs). */
+  state?: string;
+  state_label?: string;
   detail?: string;
+  /** Ledger's note on a due call: what was checked and why it is unresolved. */
+  note?: string;
+  noted?: string;
   dissent?: { agents: string[]; p: number };
 }
 interface Resolved {
   call: string;
-  outcome: 'hit' | 'miss' | 'open';
+  outcome: 'hit' | 'miss' | 'open' | 'cancelled';
   prior_p: number;
 }
 interface Props {
@@ -21,6 +28,7 @@ interface Props {
   resolved?: Resolved[];
 }
 const { meta, open_calls, resolved } = Astro.props;
+const key = ledgerKey(open_calls);
 
 const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === 'bear' ? '▼' : '↔';
 ---
@@ -32,7 +40,7 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
 
   <div class="ledger-colhead" aria-hidden="true">
     <span>Resolves</span>
-    <span>Question · why</span>
+    <span>Question · state</span>
     <span>Call</span>
     <span>Posterior</span>
     <span>Dissent</span>
@@ -40,16 +48,22 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
 
   <div class="ledger-rows">
     {open_calls.map((c) => (
-      <div class="ledger-row">
-        <span class="ledger-horizon">{c.horizon}</span>
+      <div class={`ledger-row${c.state ? ` is-${c.state}` : ''}`}>
+        <span class="ledger-horizon">{c.horizon ?? '—'}</span>
         <div class="ledger-qcol">
           <span class="ledger-q">{c.question}</span>
-          {c.detail && <span class="ledger-why">{c.detail}</span>}
+          {(c.state_label || c.detail) && (
+            <span class="ledger-why">
+              {c.state_label && <span class={`ledger-state ${c.state}`}>{c.state_label}</span>}
+              {c.state_label && c.detail && ' · '}
+              {c.detail}
+            </span>
+          )}
+          {c.note && <span class="ledger-note">Ledger{c.noted ? `, ${c.noted}` : ''}: {c.note}</span>}
         </div>
         <span class={`ledger-call ${c.direction}`}>{c.call}<span class="arrow">{arrowFor(c.direction)}</span></span>
         <div class="ledger-pcol">
           <span class="ledger-p">{c.p.toFixed(2)}{c.interval !== undefined && <span class="ledger-int"> ±{c.interval.toFixed(2)}</span>}</span>
-          {c.quorum && <span class="ledger-quorum">{c.quorum} agree</span>}
         </div>
         <span class="ledger-dis">
           {c.dissent
@@ -61,10 +75,8 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
   </div>
 
   <p class="ledger-key">
-    <strong>Posterior</strong> is the desk's probability the call resolves YES, with a ±1σ band;
-    <strong>quorum</strong> is how many of five desk agents back it; <strong>dissent</strong> names the
-    agent arguing the other side, with their counter-probability. Every call is scored against the
-    outcome at the next bell — <a href="/about">how the paper computes its numbers</a>.
+    {key.map((k) => <><strong>{k.term}</strong>{` ${k.text} `}</>)}
+    <a href="/about">How the paper computes its numbers</a>.
   </p>
 
   {resolved && resolved.length > 0 && (
@@ -73,7 +85,7 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
       {resolved.map((r, i) => (
         <span class="ledger-resolved-item">
           {r.call} <span class={r.outcome}>
-            {r.outcome === 'hit' ? '✓' : r.outcome === 'miss' ? '✗' : '…'}
+            {r.outcome === 'hit' ? '✓' : r.outcome === 'miss' ? '✗' : r.outcome === 'cancelled' ? '⊘' : '…'}
           </span><span class="dim"> p={r.prior_p.toFixed(2)}</span>{i < resolved.length - 1 ? <span class="dim"> · </span> : ''}
         </span>
       ))}
@@ -140,12 +152,23 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
     color: var(--muted);
   }
   .ledger-pcol { display: flex; flex-direction: column; gap: 3px; }
-  .ledger-quorum {
+  .ledger-state {
     font-family: var(--font-sans);
+    font-style: normal;
     font-size: 9.5px;
+    font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
+  }
+  .ledger-state.due { color: var(--accent); }
+  .ledger-note {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--accent);
+    padding-left: 8px;
   }
   .ledger-key {
     font-family: var(--font-body);

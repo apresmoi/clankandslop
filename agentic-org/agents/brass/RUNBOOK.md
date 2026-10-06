@@ -34,6 +34,11 @@ findings, source URLs, capture time and request id in that room with
 `@<requesting-desk>`. This is a bounded sensor request, not permission to browse
 or write another desk's artifact.
 
+Ledger's due forecast calls go out as one combined request per edition:
+`request_id` `brass-<date>-ledger-due`, `story_id` `ledger-settlements`, the
+question listing each due call and its deadline, the discriminator naming the
+official record that settles each. Do not split it per call.
+
 ## Conference
 
 A lead digest informs the lineup; it is not an automatic commission. Read C rows

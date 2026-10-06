@@ -7,7 +7,7 @@ import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-forma
 import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
 import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
 import { decisionSummaryFindings } from './summary-fidelity.mjs';
-import { carriedCalls, carryTape, followUps, ledgerHistory } from './open-clocks.mjs';
+import { LEDGER_EPOCH, carriedCalls, carryTape, followUps, forecastRows, ledgerHistory } from './open-clocks.mjs';
 import { archiveLedger } from './ledger-archive.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -214,15 +214,20 @@ function tapePage(edition, decisions, desk, agents, carry) {
   if (carried.error) fail('open clocks', carried.error);
   const watch = carried.watch;
   const head = [{ block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: carried.desks } }];
+  // Ledger's copy of the producer's FRED board; the site reads it off the desk
+  // document, the way the globe reads the World Desk.
+  if (isObj(desk['ledger.worlddesk'].markets)) head.push({ block: 'MarketsBoard', props: { markets: 'edition' } });
   const rail = rows.length > 0 ? { block: 'MarketsRail', props: { title: 'The Tape', ...(isStr(tape.markets?.kicker) ? { kicker: tape.markets.kicker } : {}), rows } } : null;
   const deadlines = watch.length > 0 ? { block: 'WhatToWatch', props: { title: `The Deadlines · ${watch[0].when}${watch.length > 1 ? ` – ${watch[watch.length - 1].when}` : ''}`, items: watch } } : null;
   if (rail && deadlines) head.push(grid([1, 1], [[rail], [deadlines]]));
   else if (rail || deadlines) head.push(rail ?? deadlines);
 
-  const open = carried.calls;
+  // Every call not yet settled, today's new ones included, each in its state.
+  const open = carry.table;
   if (open.length > 0) {
-    const meta = `${open.length} open call${open.length === 1 ? '' : 's'}${isStr(tape.forecast_meta) ? ` · ${tape.forecast_meta}` : ''}`;
-    head.push({ block: 'ForecastLedger', props: { meta, open_calls: open.map((row) => ({ question: row.call, call: row.prior_p >= 0.5 ? 'YES' : 'NO', direction: row.prior_p >= 0.5 ? 'bull' : 'bear', p: row.prior_p, ...(row.opened ? { detail: `open since ${row.opened}` } : {}) })) } });
+    const due = open.filter((row) => row.state === 'due').length;
+    const meta = `${open.length} open call${open.length === 1 ? '' : 's'}${due > 0 ? ` · ${due} due, awaiting verification` : ''}${isStr(tape.forecast_meta) ? ` · ${tape.forecast_meta}` : ''}`;
+    head.push({ block: 'ForecastLedger', props: { meta, open_calls: open } });
   }
   head.push({ block: 'TrackRecord', props: { label: 'Track Record · Settlement', resolved: 'edition' } });
   return { edition, page: 'tape', paper: 'tape', title: CHROME.tape.title, active: CHROME.tape.active, tagline: null, head, flow: [] };
@@ -311,7 +316,8 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
     fail('summary fidelity', `${summaries.length} summary line(s) say what their article does not. A summary may only restate what the article states: keep each event with its own day, date and place, never merge two events into one sentence, and copy figures rather than computing them. Rewrite: ${summaries.join(' | ')}`);
   const prior = (ledger ?? archiveLedger(undefined, { before: edition })).filter((entry) => entry.date < edition);
   const previous = prior.reduce((latest, entry) => (latest === undefined || entry.date > latest.date ? entry : latest), undefined);
-  const carry = { calls: carriedCalls(ledgerHistory(prior), edition, desk['ledger.settlements']), follow: followUps(previous, articles) };
+  const today = { date: edition, settlements: desk['ledger.settlements'], articles: Object.values(articles) };
+  const carry = { calls: carriedCalls(ledgerHistory(prior), edition, desk['ledger.settlements']), follow: followUps(previous, articles), table: forecastRows(ledgerHistory([...prior, today], { epoch: edition < LEDGER_EPOCH ? edition : LEDGER_EPOCH }), edition) };
   const front = frontPage(edition, order, articles, decisions, resolved, agents);
   const tape = tapePage(edition, decisions, desk, agents, carry);
 

@@ -14,7 +14,7 @@ const contentRoot = resolve(root, 'content');
 
 const BLOCKS = new Set([
   'Hero', 'Teaser', 'DeskNote', 'Briefly', 'WhatToWatch',
-  'SplitVote', 'ForecastLedger', 'TrackRecord', 'MarketsRail',
+  'SplitVote', 'ForecastLedger', 'TrackRecord', 'MarketsRail', 'MarketsBoard',
   'AgentRoster', 'AgentCard', 'Divider', 'WorldGlyph', 'MapGlyph', 'WorldIndex', 'RankBars', 'GlyphArt', 'SectionHeader', 'Grid',
 ]);
 
@@ -135,7 +135,7 @@ for (const { date, dir: edDir, desk } of scopes) {
       err(edFile, `lead_story_id "${ed.lead_story_id}" has no article file`);
     for (const name of ed.compiled_by ?? []) checkAgentName(edFile, 'compiled_by', name);
     for (const [i, r] of (ed.resolved_last_edition ?? []).entries()) {
-      if (!OUTCOMES.has(r.outcome)) err(edFile, `resolved_last_edition[${i}].outcome must be hit|miss|open`);
+      if (!OUTCOMES.has(r.outcome)) err(edFile, `resolved_last_edition[${i}].outcome must be hit|miss|open|cancelled`);
       if (!isP(r.prior_p)) err(edFile, `resolved_last_edition[${i}].prior_p must be in [0,1]`);
     }
   }

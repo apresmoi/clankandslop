@@ -27,10 +27,13 @@ INDEX rows or by the runbook. Reconcile from durable records, not prompts or
 chat history.
 
 Read `repos/newsroom-private/<date>/desks/ledger.settlements.prepared.json`.
-Resolve calls only from recorded evidence; leave unresolved calls `open`.
+Resolve calls only from recorded evidence. Every call in its `due` list is
+settled `hit`/`miss`, `cancelled` with a reason in `note`, or stays `open` with
+a `note` saying what you checked and why it is unresolved (runbook: Ledger
+States). `file_desk` refuses a due call with neither.
 
 Read `repos/newsroom-private/<date>/worlddesk/ledger.worlddesk.json` and
-`trace.json`, then copy the world-desk document verbatim. If the producer wrote
+`trace.json`, then copy the world-desk document verbatim, `markets` included. If the producer wrote
 `refusal.json` instead, follow the stale carry-forward rule in the runbook.
 
 File both desk documents with `mcp_newsroom_file_desk` and the current wake id

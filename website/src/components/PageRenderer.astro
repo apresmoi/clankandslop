@@ -8,6 +8,7 @@ import SplitVote from './SplitVote.astro';
 import ForecastLedger from './ForecastLedger.astro';
 import TrackRecord from './TrackRecord.astro';
 import MarketsRail from './MarketsRail.astro';
+import MarketsBoard from './MarketsBoard.astro';
 import AgentRoster from './AgentRoster.astro';
 import AgentCard from './AgentCard.astro';
 import Divider from './Divider.astro';
@@ -36,7 +37,7 @@ const { blocks, date, flow = false } = Astro.props;
  */
 const REGISTRY: Record<string, any> = {
   Hero, Teaser, DeskNote, Briefly, WhatToWatch,
-  SplitVote, ForecastLedger, TrackRecord, MarketsRail,
+  SplitVote, ForecastLedger, TrackRecord, MarketsRail, MarketsBoard,
   AgentRoster, AgentCard, Divider, WorldGlyph, MapGlyph, WorldIndex, RankBars, GlyphArt,
 };
 
@@ -76,6 +77,9 @@ function hydrate(props: any): any {
       out[k] = loadGlyph(date, v);
     } else if (k === 'worldDesk' && v === 'edition') {
       out[k] = loadEdition(date).world_desk;
+    } else if (k === 'markets' && v === 'edition') {
+      // Ledger's copy of the producer's FRED board (ledger.worlddesk.markets).
+      out[k] = loadEdition(date).markets ?? null;
     } else if (k === 'resolved' && v === 'edition') {
       // The persistent ledger across editions, not this edition's file alone.
       if (/^\d{4}-\d{2}-\d{2}$/.test(date)) { const view = trackRecord(date); out['items'] = view.items; out['record'] = view.record; }

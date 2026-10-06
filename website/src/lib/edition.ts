@@ -185,6 +185,8 @@ function readdirSyncSafe(dir: string): string[] {
   try { return readdirSync(dir); } catch { return []; }
 }
 
+import type { Markets } from './tape.ts';
+
 // ============ Types — match the JSON schemas ============
 
 export interface Edition {
@@ -214,9 +216,13 @@ export interface Edition {
   lead_story_id: string;
   resolved_last_edition: Array<{
     call: string;
-    outcome: 'hit' | 'miss' | 'open';
+    outcome: 'hit' | 'miss' | 'open' | 'cancelled';
     prior_p: number;
+    /** What Ledger checked, why a due call is unresolved, or why it was cancelled. */
+    note?: string;
   }>;
+  /** The Tape's FRED board, copied by Ledger from the producer; absent before 2026-10-07. */
+  markets?: Markets;
 }
 
 export interface Article {

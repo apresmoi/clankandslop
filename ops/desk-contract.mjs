@@ -12,7 +12,10 @@
 // masthead ears, which read weather and world_desk unguarded), and
 // `website/src/components/{WorldGlyph,TrackRecord}.astro`.
 
-export const OUTCOMES = new Set(['hit', 'miss', 'open']);
+export const OUTCOMES = new Set(['hit', 'miss', 'open', 'cancelled']);
+const ROW_KEYS = new Set(['call', 'outcome', 'prior_p', 'note']);
+export const MARKET_GROUPS = Object.freeze(['rates', 'fx', 'commodities', 'equities']);
+const DAY = /^\d{4}-\d{2}-\d{2}$/u;
 
 /** Part name → owning agent. The filename IS the write permission. */
 export const DESK_OWNERS = Object.freeze({
@@ -68,15 +71,21 @@ const SHAPES = {
       for (const [i, row] of document.resolved_last_edition.entries()) {
         if (!isObj(row)) { out.push(`resolved_last_edition[${i}] must be an object {call, outcome, prior_p}`); continue; }
         if (!isStr(row.call)) out.push(`resolved_last_edition[${i}].call must be a non-empty string`);
-        if (!OUTCOMES.has(row.outcome)) out.push(`resolved_last_edition[${i}].outcome must be hit|miss|open`);
+        if (!OUTCOMES.has(row.outcome)) out.push(`resolved_last_edition[${i}].outcome must be hit|miss|open|cancelled`);
         if (!isP(row.prior_p)) out.push(`resolved_last_edition[${i}].prior_p must be a number in [0,1]`);
+        const extra = Object.keys(row).filter((key) => !ROW_KEYS.has(key));
+        if (extra.length > 0) out.push(`resolved_last_edition[${i}] carries unexpected key(s) [${extra.join(', ')}] — a row is {call, outcome, prior_p, note?}`);
+        if (row.note !== undefined && !isStr(row.note)) out.push(`resolved_last_edition[${i}].note must be a non-empty string when present`);
+        if (row.outcome === 'cancelled' && !isStr(row.note)) out.push(`resolved_last_edition[${i}] is cancelled with no note — a cancelled call carries its reason in "note"`);
       }
     },
   },
   'ledger.worlddesk': {
     keys: ['world_desk'],
     filingKeys: ['world_desk'],
+    optional: ['markets'],
     check(document, out) {
+      if (document.markets !== undefined) marketFindings(document.markets, out);
       // index.astro reads .escalation_index.toFixed(2) with no guard, so a
       // missing world_desk is not a thin page — it is a build crash.
       if (!isObj(document.world_desk)) { out.push('world_desk must be an object {escalation_index, delta, open_conflicts, watch}'); return; }
@@ -91,8 +100,34 @@ const SHAPES = {
   },
 };
 
+// The Tape's market board: the producer's FRED observations, copied verbatim
+// by Ledger with the World Desk. A series that did not fetch is `unavailable`
+// with its reason; there is no third form, so a number can only be one that
+// was observed on the date printed beside it.
+function marketFindings(markets, out) {
+  if (!isObj(markets)) { out.push('markets must be an object {source, retrieved_at, series[]}'); return; }
+  for (const key of ['source', 'retrieved_at']) if (!isStr(markets[key])) out.push(`markets.${key} must be a non-empty string`);
+  if (!Array.isArray(markets.series) || markets.series.length === 0) { out.push('markets.series must be a non-empty array'); return; }
+  for (const [i, row] of markets.series.entries()) {
+    const at = `markets.series[${i}]`;
+    if (!isObj(row)) { out.push(`${at} must be an object`); continue; }
+    for (const key of ['id', 'label', 'unit', 'basis', 'url']) if (!isStr(row[key])) out.push(`${at}.${key} must be a non-empty string`);
+    if (!MARKET_GROUPS.includes(row.group)) out.push(`${at}.group must be one of ${MARKET_GROUPS.join('|')}`);
+    if (!Number.isInteger(row.decimals) || row.decimals < 0 || row.decimals > 4) out.push(`${at}.decimals must be an integer 0-4`);
+    if (isStr(row.unavailable)) {
+      if (['value', 'observed', 'previous', 'previous_observed'].some((key) => row[key] !== undefined)) out.push(`${at} is unavailable and must carry no value or date`);
+      continue;
+    }
+    if (!isNum(row.value) || !DAY.test(row.observed ?? '')) out.push(`${at} must carry value and observed (YYYY-MM-DD), or unavailable with its reason`);
+    if ((row.previous === undefined) !== (row.previous_observed === undefined)) out.push(`${at}.previous and previous_observed come together`);
+    if (row.previous !== undefined && (!isNum(row.previous) || !DAY.test(row.previous_observed ?? '') || !(row.previous_observed < row.observed))) out.push(`${at}.previous must be a number observed on an earlier day`);
+  }
+}
+
 /** The required top-level keys of one desk document, for briefs and messages. */
 export const deskDocumentKeys = (name) => SHAPES[name]?.keys ?? null;
+/** Keys a desk document may carry beyond the required ones. */
+export const deskOptionalKeys = (name) => SHAPES[name]?.optional ?? [];
 
 /**
  * Every way `document` fails the contract for the desk part `name`, as plain
@@ -104,7 +139,7 @@ export function deskDocumentFindings(name, document, { profile = 'archive' } = {
   if (!isObj(document)) return [`${name} must be a JSON object`];
   const out = [];
   out.profile = profile;
-  const keys = profile === 'filing' && shape.filingKeys ? shape.filingKeys : shape.keys;
+  const keys = [...(profile === 'filing' && shape.filingKeys ? shape.filingKeys : shape.keys), ...(shape.optional ?? [])];
   const unexpected = Object.keys(document).filter((key) => !keys.includes(key));
   if (unexpected.length > 0) out.push(`unexpected key(s) [${unexpected.join(', ')}] — ${name} carries exactly [${keys.join(', ')}]`);
   shape.check(document, out);
