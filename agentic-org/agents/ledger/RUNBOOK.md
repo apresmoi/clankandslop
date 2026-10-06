@@ -9,7 +9,8 @@ source URLs with `curl`, `wget` or another HTTP client, or bypass sensors throug
 another CLI or agent. Use Moltnet and declared newsroom tools.
 
 You are not an ad hoc requester. Ask `@brass` in `room:release` for missing
-settlement evidence, naming the question and discriminator. Brass requests
+settlement evidence, naming the question and discriminator; for due calls, one
+message listing them all (see Ledger States). Brass requests
 sensors and relays findings, source URLs and capture time. You cannot read
 `room:research`; an unresolved input stays unresolved.
 
@@ -60,19 +61,47 @@ Copy `ledger.worlddesk.json` verbatim. Do not use
 
 `ledger.settlements` is exactly `{ "resolved_last_edition": [...] }`.
 
-Each row records one published call resolving today:
+Each row records one published call:
 
 ```json
 {
   "call": "Romania publicly identifies the 16 August Galati drone as a Russian-operated Geran-2",
   "outcome": "hit",
-  "prior_p": 0.7
+  "prior_p": 0.7,
+  "note": "Romanian defence ministry statement of 18 August names the drone a Russian Geran-2."
 }
 ```
 
-`call` is the paper's published wording. `outcome` is exactly `hit`, `miss` or
-`open`. `prior_p` is the paper's prior posterior, a number between 0 and 1. A
-clock still running remains `open`.
+`call` is the paper's published wording. `outcome` is exactly `hit`, `miss`,
+`open` or `cancelled`. `prior_p` is the paper's prior posterior, a number
+between 0 and 1. `note` is optional except where stated below.
+
+## Ledger States
+
+Every call is in one state: **not yet due** (its deadline has not passed),
+**due — awaiting verification**, **settled hit**, **settled miss**, or
+**cancelled**. The prep lists due calls in `due` and `review.due`: the
+deadline the call's wording states has passed, or it states none.
+
+Every due call must be resolved in today's filing, one of:
+
+- `hit` or `miss`, settled from a record you can name; put the record in `note`.
+- `cancelled`, with the reason in `note` (the event can no longer happen as
+  worded, or the call was withdrawn). A cancelled row without a note is refused.
+- `open`, with a `note` of at least eight words saying what you checked and why
+  it is still unresolved, e.g. "Checked today's corpus and Brass's research
+  answer; no IEA schedule page found by 16:00 UTC 6 October."
+
+`file_desk` refuses a due row that is `open` with no such note. The note prints
+on the Tape and the Track Record beside the call, dated today.
+
+To check a due call: search today's corpus (`repos/newsroom-private/<date>/desks/_all.index`
+and the story files it names) for the call's subject. If the corpus does not
+settle it, send **one** message to `@brass` in `room:release` listing every
+due call still unsettled, each with its deadline and the record that would
+settle it. Brass sends one combined research request for them. File your notes
+now ("asked Brass at 14:05 UTC; no answer yet" is a valid reason); when the
+answer arrives, file again on that wake with the settlements.
 
 On a day when nothing settled, file:
 
@@ -82,11 +111,9 @@ On a day when nothing settled, file:
 
 `ledger.settlements.prepared.json` lifts calls and priors from the previous
 edition. Rows arrive `open`; settling them requires recorded evidence. A deadline
-that has passed is not a resolution by itself. `review.horizon_elapsed` names
-rows where work is owed; `review.horizon_undated` names event-driven clocks.
-Rows in neither list have a deadline that has not arrived, so `open` is already
-the answer and you leave them as they stand. A row you settle, you settle from an
-input on the record; a row you cannot settle stays `open` and says so.
+that has passed is not a resolution by itself, but it makes the call due (see
+Ledger States). Rows not in `due` have a deadline that has not arrived, so
+`open` is already the answer and you leave them as they stand.
 **Open calls carry until settled.** Every call still open from any earlier
 edition (since 29 September) appears in today's rows: `open`, or `hit`/`miss`
 when a record you can name settles it. The prepared file lifts only the
@@ -96,8 +123,11 @@ the exact rows to add. Paste them and file again; never drop a row to clear it.
 `review.prior_p_missing` is a forecast that published no posterior: no row
 exists for it, and you do not invent one.
 
-`ledger.worlddesk` is exactly `{ "world_desk": {...} }`. You do not author or
-compute these numbers. Copy the producer's document verbatim. The trace must
+`ledger.worlddesk` is `{ "world_desk": {...} }` plus, when the producer wrote
+one, `"markets": {...}` — the Tape's FRED board. You do not author or compute
+these numbers. Copy the producer's document verbatim; it already embeds
+`markets`. `file_desk` refuses `markets` that differ from
+`repos/newsroom-private/<date>/worlddesk/markets.json`. The trace must
 show the observed values, thresholds and source URLs behind the escalation
 index, delta, open-conflict count and watch count.
 
@@ -111,7 +141,8 @@ direction against a figure that was never a measurement.
 
 If the producer refuses and writes `refusal.json` instead of
 `ledger.worlddesk.json`, carry the previous edition's figure forward and set
-`delta` to `stale`. This is the only sanctioned way a figure not derived today
+`delta` to `stale`; add `markets` copied verbatim from `worlddesk/markets.json`
+when that file exists. This is the only sanctioned way a figure not derived today
 reaches the page.
 
 ## Action

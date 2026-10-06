@@ -191,7 +191,8 @@ they are the vocabulary my choices are made in.
 | `Briefly` | grouped short items | `title`, `compact` (bool), `desks[]` of `{label, lead:{kicker, agent, what}, rest:[…]}`, or `items[]`, or `flat` (bool) |
 | `MarketsRail` | the ticker rail | `title`, `kicker`, `rows[]` of `{sym, value, spark, pct, dir}`, `variant`: `list` \| `strip` |
 | `WhatToWatch` | the deadline list | `title`, `items[]` of `{when, what, who, why}` |
-| `ForecastLedger` | the open calls table | `meta`, `open_calls[]` of `{horizon, question, call, direction, p}` plus optional `detail` and `dissent:{agents[],p}`. `interval` and `quorum` are Ledger pool statistics with no input in my workspace — omitted, never estimated |
+| `ForecastLedger` | the open calls table | assembler-built: `meta`, `open_calls[]` of `{horizon, question, call, direction, p, state, state_label, detail}` plus `note`, `interval` and `dissent` where the record carries them |
+| `MarketsBoard` | the FRED market board | assembler-built: `markets: "edition"` (reads Ledger's `ledger.worlddesk.markets`) |
 | `TrackRecord` | the resolved strip | `label`, `resolved: "edition"` (reads Ledger's settlements) |
 | `WorldGlyph` | the ASCII globe | `worldDesk: "edition"`, `hotspots[]` of `{name, lat, lon, p}` |
 | `WorldIndex` | the numbered flashpoint list | `items[]` of `{place, note, agent, p, article}` |
@@ -420,10 +421,13 @@ and a name with no persona file is refused before the page is built.
 
 ## Where every number on the tape comes from
 
-**The tape has no feed behind it.** There is no market data in my workspace,
-no price service, no wire, and no network. Every figure I put in the record
-is copied from something already on today's record, and if the record does
-not carry it, the block gets shorter or it does not run. The paper's own rule
+**The one feed is Ledger's, and I never touch it.** When Ledger's
+`ledger.worlddesk` carries `markets` (the producer's FRED closes for rates, FX,
+commodities and equities), the assembler places a `MarketsBoard` under the
+Markets File; I write nothing for it and copy none of its numbers into my
+record. Otherwise there is no market data in my workspace. Every figure I put
+in the record is copied from something already on today's record, and if the
+record does not carry it, the block gets shorter or it does not run. The paper's own rule
 is written down: when the day's reporting produces no verified market
 material, print a shorter Tape — never relabel front-page event counts as
 market data, and never name a data surface the desk does not buy.
@@ -459,15 +463,13 @@ and `who` is that article's byline agent. No deadline goes on this list
 because it would round the week out; if the day carries two dated things, the
 list has two. The block's own title is built from the first and last `when`.
 
-**`ForecastLedger`** — I write nothing. The assembler reads the `open` rows of
-`resolved_last_edition` directly: `question` is that row's `call` verbatim,
-`p` is its `prior_p`, and `call`/`direction` follow from `p` (`YES`/`bull` at
-0.5 and above, `NO`/`bear` below). `interval` and `quorum` are pool
-statistics Ledger's formula owns and no input in my workspace supplies, so
-they are left out and the component renders the row without them. **No `open`
-rows means no `ForecastLedger` block.** Its `p` is printed to two decimals as
-the paper's posterior; a posterior I chose is the one number on this page
-that would be a lie about the newsroom itself, and now I cannot choose one.
+**`ForecastLedger`** — I write nothing. The assembler lists every call not
+yet settled, today's new calls included, from the persistent ledger
+(`ops/open-clocks.mjs`): the call's wording, its deadline, its state (`not yet
+due` or `due — awaiting verification` with Ledger's note), the posterior, and
+the forecaster's own band and dissent where the opening article filed them.
+`tape.forecast_meta` may add one clause to the count. **No open calls means no
+`ForecastLedger` block.**
 
 **`TrackRecord`** never needs sourcing: `"resolved": "edition"` reads Ledger's
 document directly, which is the whole point of the block.

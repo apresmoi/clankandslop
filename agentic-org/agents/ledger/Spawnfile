@@ -29,7 +29,7 @@ schedule:
   cron: "30 15 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read repos/newsroom/agentic-org/agents/ledger/RUNBOOK.md. Read repos/newsroom-private/<edition-date>/desks/ledger.settlements.prepared.json. Resolve calls only from recorded evidence. Read the current derived document at repos/newsroom-private/<edition-date>/worlddesk/ledger.worlddesk.json and its trace.json; copy the document verbatim. If a refusal.json exists instead, follow the explicit stale carry-forward rule in your brief; never use ledger.worlddesk.prepared.json to invent current readings. File both documents with file_desk and the current wake id; both calls must succeed. Mention @caslon in room:release when ready."
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read repos/newsroom/agentic-org/agents/ledger/RUNBOOK.md. Read repos/newsroom-private/<edition-date>/desks/ledger.settlements.prepared.json. Resolve calls only from recorded evidence; settle each due call or give it a note on what you checked and why it is unresolved. Read the current derived document at repos/newsroom-private/<edition-date>/worlddesk/ledger.worlddesk.json and its trace.json; copy the document verbatim, markets included. If a refusal.json exists instead, follow the explicit stale carry-forward rule in your brief; never use ledger.worlddesk.prepared.json to invent current readings. File both documents with file_desk and the current wake id; both calls must succeed. Mention @caslon in room:release when ready."
 surfaces:
   moltnet:
     - network: clank-newsroom
