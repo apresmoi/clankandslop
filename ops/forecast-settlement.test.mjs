@@ -27,6 +27,8 @@ test('either repair clears it: the deck names the deadline, or the label drops t
 test('forecast_probability: a printed probability must equal round(confidence.value * 100)', () => {
   assert.deepEqual(codes({ ...quebec, confidence: { ...quebec.confidence, value: 0.31 } }).filter((code) => code === 'forecast_probability'), ['forecast_probability', 'forecast_probability']);
   assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 65% chance; the call is 42%.' })), [], 'quoted odds beside the house call pass');
+  assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 65% chance before the runoff.' })), [], 'attributed odds in the deck, house call in the headline');
+  assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 42% chance; the house call is 65%.' })), ['forecast_probability'], 'a matching quote cannot hide a wrong house call');
   assert.deepEqual(codes(forecast({ confidence: { ...forecast().confidence, value: 0.424 } })), []);
   assert.deepEqual(codes(forecast({ deck: 'The call is 0.45 before the 25 October runoff.' })), ['forecast_probability']);
   assert.deepEqual(codes(forecast({ deck: 'The house gives it a 0.42 probability.' })), []);
@@ -39,6 +41,7 @@ test('forecast_event: the headline event must be one the label settles, or one t
   assert.deepEqual(codes({ ...quebec, deck: 'The party leads in 59 seats. Probability 28% by 12 October.' }), ['forecast_event'], 'without the deck tying "majority" to 64 seats the headline event floats free');
   assert.deepEqual(codes(forecast({ headline: 'Lula wins 42% of the vote' })), [], 'a vote share is not a probability');
   assert.deepEqual(codes(forecast({ headline: 'Lula is a 42% shot at a fourth term despite weak polling' })), [], 'context after the event is not the event');
+  assert.deepEqual(codes(forecast({ headline: 'Lula is a 42% shot at a fourth term with a legislative majority' })), ['forecast_event'], 'an added condition is part of the event');
   assert.deepEqual(codes(forecast({ headline: 'Lula fights for a fourth term' })), [], 'no printed probability, no event phrase to compare');
 });
 
