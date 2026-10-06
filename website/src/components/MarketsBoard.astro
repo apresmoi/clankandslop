@@ -28,7 +28,7 @@ const retrieved = markets?.retrieved_at ? markets.retrieved_at.slice(0, 16).repl
                 <>
                   <span class="value">{r.value}</span>
                   <span class={`change ${r.dir ?? 'flat'}`}>{r.change ?? '—'}</span>
-                  <span class="asof">{r.asOf}{r.vs && <span class="vs"> {r.vs}</span>}</span>
+                  <span class="asof">{r.vs ? `${r.asOf} · ${r.vs}` : r.asOf}</span>
                 </>
               )}
             </div>

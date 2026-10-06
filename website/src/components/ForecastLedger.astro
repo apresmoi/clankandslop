@@ -75,7 +75,7 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
   </div>
 
   <p class="ledger-key">
-    {key.map((k) => <><strong>{k.term}</strong> {k.text} </>)}
+    {key.map((k) => <><strong>{k.term}</strong>{` ${k.text} `}</>)}
     <a href="/about">How the paper computes its numbers</a>.
   </p>
 
