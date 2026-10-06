@@ -47,7 +47,8 @@ answer to evidence that carries two jobs.
   Straight news does not need an invented counter-case or future test. A forecast
   needs its probability, settlement time and observable yes/no condition with
   a named evidence source, and the body shows how the number was reached: base
-  rate or comparison, key assumptions, what would move it. Missing reports or ambiguous wording cannot count as
+  rate or comparison, key assumptions, what would move it. The headline and deck
+  state the event and probability the settlement label settles. Missing reports or ambiguous wording cannot count as
   confirmation. If the named evidence cannot settle the call, leave it unresolved.
   Do not announce
   a null paragraph, research pass, source-row assignment or verification rubric.
@@ -91,7 +92,8 @@ answer to evidence that carries two jobs.
   Explain a consequential uncertainty once, in ordinary prose.
 - Reread the whole article aloud in your head. Vary openings and sentence length;
   remove throat-clearing, repetitive contrasts and unnecessary qualifications.
-  End where the story lands, without reciting the method or repeating its lead.
+  End where the story lands, without reciting the method or repeating its lead,
+  and without a closing implication or decisive test the reporting did not earn.
 
 Write the final article JSON yourself. Call `validate_article`, correct its
 field-specific errors, and consider its advisory warnings before `file_article`.
