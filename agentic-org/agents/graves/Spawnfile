@@ -56,13 +56,13 @@ surfaces:
         research: { wake: mentions }
 environment:
   mcp_servers:
-    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: graves, CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom-content, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:graves" }, tools: [file_article, record_dissent] }
+    - { name: newsroom, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs], env: { CLANK_NEWSROOM_AGENT: graves, CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom-content, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:graves" }, tools: [file_article, record_dissent, record_freshness_check] }
     - { name: validation, transport: stdio, command: /usr/local/bin/node, args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/tools/article-validation/server.mjs], env: { CLANK_NEWSROOM_AGENT: graves, CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/graves/repos/newsroom }, tools: [validate_article] }
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:484748db3a8e990462b01e82cd7f265eba5c1152d7f055fe92b4de646c797e53, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:773e6910bfa33c68475a553b212eb3fc2e53b8a17d44235842fec440ad6f8f4c, mount: ./repos/newsroom, mode: readonly }
+    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:6b700135c8113d44267cba20aab5a7b8b70f758eb19360429ad1ca0cb96430e2, mount: ./repos/newsroom, mode: readonly }
     - { id: article-validation, kind: bundle, source: ../../article-validation-runtime.tar, sha256: sha256:f989562895409311130e5d2bd01ac7a246c6acb9a946f4e21ae3c81f59880fa0, mount: ./tools/article-validation, mode: readonly }
 
 memory:

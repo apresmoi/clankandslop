@@ -20,7 +20,7 @@ const required = Object.fromEntries(Object.entries(composeGateStatus({ edition: 
 // file_article sets each piece's section from its owner's desk, so five owners
 // on five desks always make five sections, whatever the fixture typed.
 const gateLine = ({ sections = 5, dissent = 0, state = 'ready' } = {}) => `# compose: passed=5/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=${sections}/${required.sections} owners=5/${required.owners} sources=5/${required.sources} domains=5/${required.domains} forecast=1 dissent=${dissent}  → ${state}`;
-import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
+import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, recordFreshness, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
 import { REPORTERS } from './corpus-contract.mjs';
 import { corpusDeskIndex, corpusIdentityFile, corpusPreparedFile, installCorpusFixture } from './corpus-fixture.mjs';
 import { agents, orgRoot } from './lib.mjs';
@@ -137,6 +137,7 @@ runtimeTest('production newsroom authenticates composition content and fails clo
   process.env.CLANK_NEWSROOM_AGENT = 'spike'; await reviewArticle({ edition, event_key: 'request-0', article_id: 'story-0', revision: 1, verdict: 'REVISION_REQUEST', notes: 'Resolve the opposing reading.' });
   process.env.CLANK_NEWSROOM_AGENT = 'cogsworth'; await fileArticle({ edition, event_key: 'refile-0', assignment_event_key: assignmentEvent, article: { ...article('story-0', 'Cogsworth', edition, 0), revision: 2, deck: 'A revised sourced deck.' } });
   process.env.CLANK_NEWSROOM_AGENT = 'spike'; for (let index = 0; index < owners.length; index++) await reviewArticle({ edition, event_key: `review-${index}`, article_id: `story-${index}`, revision: index === 0 ? 2 : 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+  await checkFacts(state, edition);
   process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: name, name, document: preparedDeskDocument(name, edition) });
   process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: name, name, document: preparedDeskDocument(name, edition) });
   const ids = owners.map((_, index) => `story-${index}`), pages = [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps = [{ name: 'hormuz', document: archivedMap('hormuz') }, { name: 'hormuz-hero', document: archivedMap('hormuz-hero') }];
@@ -370,7 +371,19 @@ const withoutForecast = (id, agent, edition, index) => { const { confidence: _, 
 // not the only length a day comes in: 2026-09-05 PASSed six. `beforeReview`
 // runs after every filing and before Spike rules, which is where a dissent
 // lands on a real day.
-async function driveToCompose(state, edition, make, count = owners.length, beforeReview) {
+// Every PASSed piece gets its owner's facts check before composition; this is
+// the ordinary "nothing moved" outcome, recorded the way the owner would.
+// A fixture edition dated after today cannot carry a research answer from its
+// own afternoon yet, so it takes the "unavailable" outcome instead.
+async function checkFacts(state, edition, outcome = Date.parse(`${edition}T13:30:00Z`) > Date.now() ? 'unavailable' : 'unchanged') {
+  const root = path.join(state, 'editions', edition, 'articles');
+  for (const name of (await readdir(root)).filter((entry) => entry.endsWith('.json'))) {
+    const value = JSON.parse(await readFile(path.join(root, name), 'utf8')), owner = value.byline.agents[0].toLowerCase();
+    process.env.CLANK_NEWSROOM_AGENT = owner;
+    await recordFreshness({ edition, event_key: `facts-${edition}-${value.id}-${value.revision}`, article_id: value.id, revision: value.revision, outcome, ...(outcome === 'unavailable' ? {} : { request_id: `${owner}-${edition}-facts-${value.id}`, checked_at: `${edition}T13:30:00Z` }) });
+  }
+}
+async function driveToCompose(state, edition, make, count = owners.length, beforeReview, { facts = true } = {}) {
   process.env.CLANK_EDITION_STATE_ROOT = state;
   const day = [...owners, 'vesta'].slice(0, count);
   assert.equal(day.length, count, 'the fixture has no owner for that many stories');
@@ -381,11 +394,102 @@ async function driveToCompose(state, edition, make, count = owners.length, befor
   if (beforeReview) await beforeReview();
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
   for (const index of day.keys()) await reviewArticle({ edition, event_key: `review-${edition}-${index}`, article_id: `story-${index}`, revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+  if (facts) await checkFacts(state, edition);
   process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: preparedDeskDocument(name, edition) });
   process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: preparedDeskDocument(name, edition) });
   const ids = day.map((_, index) => `story-${index}`);
   return { edition, pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps: [{ name: 'hormuz', document: archivedMap('hormuz') }, { name: 'hormuz-hero', document: archivedMap('hormuz-hero') }] };
 }
+
+// ---------------------------------------------------------------------------
+// The facts check between PASS and composition. Research freezes at 12:00
+// Berlin and the paper publishes around 17:00; on 2026-10-06 three PASSed
+// pieces were stale by then. compose_edition refuses a piece whose owner has
+// not checked what changed since, and a material development goes back
+// through Spike as a new revision.
+// ---------------------------------------------------------------------------
+const facts = (edition, id, revision, outcome, over = {}) => ({ edition, event_key: `facts-${id}-${revision}-${outcome}`, article_id: id, revision, outcome, request_id: `owner-${edition}-facts-${id}`, checked_at: `${edition}T13:42:10Z`, ...over });
+const articleOf = async (state, edition, id) => JSON.parse(await readFile(path.join(state, 'editions', edition, 'articles', `${id}.json`), 'utf8'));
+
+runtimeTest('compose refuses a PASSed piece with no facts check, and composes once every owner has recorded one', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-facts-gate-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-15';
+  try {
+    const composeArgs = await driveToCompose(state, edition, article, owners.length, undefined, { facts: false });
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-unchecked' }), (error) => {
+      assert.match(error.message, /^facts check missing — nothing was composed: "story-0" revision 1 has no facts check recorded after its PASS/u);
+      assert.match(error.message, /mention each owner.*record_freshness_check now.*"unavailable"/u);
+      return true;
+    });
+    // One piece checked is not the edition checked.
+    process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    const saved = await recordFreshness(facts(edition, 'story-0', 1, 'unchanged'));
+    assert.equal(saved.facts_checked_utc, '13:42');
+    assert.equal((await articleOf(state, edition, 'story-0')).facts_checked_utc, '13:42');
+    assert.match(await readIndexFile(state, edition), /^K story-0 rev=1 unchanged facts=13:42 by=cogsworth$/mu);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-one-checked' }), /"story-1" revision 1 has no facts check/u);
+    for (const [index, owner] of owners.entries()) { if (index === 0) continue; process.env.CLANK_NEWSROOM_AGENT = owner; const result = await recordFreshness(facts(edition, `story-${index}`, 1, index === 4 ? 'unavailable' : 'unchanged', index === 4 ? { request_id: undefined, checked_at: undefined } : {})); if (index === 4) { assert.match(result.next, /room:release.*@caslon/u); assert.equal(result.facts_checked_utc, '04:58'); } else assert.doesNotMatch(result.next, /@caslon/u); }
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-checked' });
+    assert.ok(composed.receipt.digest);
+    process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
+    await assert.rejects(recordFreshness(facts(edition, 'story-0', 1, 'unchanged', { event_key: 'facts-after-compose' })), /is composed/u);
+  } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
+});
+
+runtimeTest('a material development goes back through Spike as a new revision, stamped, and only its PASS clears the gate', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-facts-update-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-16';
+  try {
+    const composeArgs = await driveToCompose(state, edition, article, owners.length, undefined, { facts: false });
+    for (const [index, owner] of owners.entries()) { if (index === 2) continue; process.env.CLANK_NEWSROOM_AGENT = owner; await recordFreshness(facts(edition, `story-${index}`, 1, 'unchanged')); }
+    process.env.CLANK_NEWSROOM_AGENT = 'foreman';
+    // Without an "updated" check, a PASS is final: no revision after it.
+    await assert.rejects(fileArticle({ edition, event_key: 'refile-before-check', article: { ...article('story-2', 'Foreman', edition, 2), revision: 2 } }), /REVISION_REQUEST or HOLD verdict, or a facts check recorded as "updated"/u);
+    const moved = await recordFreshness(facts(edition, 'story-2', 1, 'updated', { changes: 'The Air Force confirmed 25 dead at 07:14 UTC; this supersedes the unconfirmed casualty line.' }));
+    assert.match(moved.next, /File revision 2 of "story-2" now/u);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-update-pending' }), /"story-2": its owner recorded a material development against revision 1; revision 2 carrying it must be filed and passed/u);
+    process.env.CLANK_NEWSROOM_AGENT = 'foreman';
+    const update = { ...article('story-2', 'Foreman', edition, 2), revision: 2, body: ['The Air Force confirmed 25 dead [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'] };
+    await assert.rejects(fileArticle({ edition, event_key: 'typed-stamp', article: { ...update, facts_checked_utc: '16:59' } }), /facts_checked_utc is stamped by record_freshness_check, never typed/u);
+    await fileArticle({ edition, event_key: 'refile-update', article: update });
+    const filed = JSON.parse(await readFile(path.join(state, 'editions', edition, 'filings', 'story-2', '2.json'), 'utf8'));
+    assert.equal(filed.facts_checked_utc, '13:42', 'file_article stamps the update with the time of its check');
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-update-unreviewed' }), /revision 2 carrying it must be filed and passed/u);
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    const passed = await reviewArticle({ edition, event_key: 'pass-update', article_id: 'story-2', revision: 2, verdict: 'PASS', notes: 'The update is sourced and supersedes the casualty line.' });
+    assert.match(passed.next, /room:release.*@caslon/u);
+    assert.doesNotMatch(passed.next, /needs its facts check/u);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    await composeEdition({ ...composeArgs, event_key: 'compose-updated' });
+    const published = await articleOf(state, edition, 'story-2');
+    assert.equal(published.revision, 2);
+    assert.equal(published.facts_checked_utc, '13:42');
+  } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
+});
+
+runtimeTest('Spike tells the owner a passed piece needs its facts check, and holds the Caslon handoff for it', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-facts-handoff-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-17';
+  try {
+    let last;
+    await driveToCompose(state, edition, article, owners.length, undefined, { facts: false });
+    process.env.CLANK_NEWSROOM_AGENT = 'spike';
+    last = JSON.parse(await readFile(path.join(state, 'editions', edition, 'verdicts', 'story-4', '1.json'), 'utf8'));
+    assert.equal(last.verdict, 'PASS');
+    const index = await readIndexFile(state, edition);
+    assert.doesNotMatch(index, /^K /mu, 'no facts check is on record yet');
+    process.env.CLANK_NEWSROOM_AGENT = 'graves';
+    await assert.rejects(recordFreshness(facts(edition, 'story-0', 1, 'unchanged')), /belongs to cogsworth; only its owner/u);
+    await assert.rejects(recordFreshness(facts(edition, 'story-3', 1, 'unchanged', { checked_at: `${edition}T04:00:00Z` })), /before the research time/u);
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    assert.equal((await recordFreshness(facts(edition, 'story-3', 1, 'unavailable', { request_id: undefined, checked_at: undefined }))).outcome, 'unavailable');
+  } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
+});
 
 const readIndexFile = (state, edition) => readFile(path.join(state, 'editions', edition, 'INDEX'), 'utf8');
 async function readComposedReceipt(state, edition) {

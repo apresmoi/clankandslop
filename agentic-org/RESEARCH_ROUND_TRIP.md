@@ -109,6 +109,12 @@ mounted workspace.
 - One queue, two provider choices, browser locks shared with scheduled captures.
   Defaults: two admitted requests per requester and twelve per edition,
   including failed attempts; twenty-minute capture timeout plus an outer deadline.
+  Each passed piece also spends one request on its facts check after PASS
+  (`<me>-<date>-facts-<id>`), so production needs four per requester and
+  twenty-four per edition: `CLANK_ADHOC_MAX_PER_AGENT=4` and
+  `CLANK_ADHOC_MAX_PER_EDITION=24` in the responder's environment file on the
+  sensor host. A `research_budget_exhausted` refusal makes that check
+  `unavailable`, never a silent pass.
 - Durable identity, request limits, launch intent and exact reply bytes.
   Duplicate requests cannot relaunch research. Conflicting reuse cannot replace
   the original question. Uncertain interrupted runs are not repeated automatically.

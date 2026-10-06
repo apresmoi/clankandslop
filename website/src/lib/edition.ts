@@ -247,6 +247,8 @@ export interface Article {
   /** @deprecated computed live from `timestamp`; no longer authored. */
   last_updated_min_ago?: number;
   next_update_utc?: string;
+  /** HH:MM UTC of the owner's facts check after Spike's PASS (record_freshness_check). */
+  facts_checked_utc?: string;
   previous_coverage?: Array<{
     date: string;
     slug: string;
@@ -407,6 +409,12 @@ export function fmtDateLine(e: Edition): string {
  * Source strings are authored content; HTML escape is intentionally minimal
  * (only the markers we own). Authors should not put raw < or > in body JSON.
  */
+/** "Facts as of HH:MM UTC" for an article whose facts check is recorded; null for the archive before checks existed. */
+export function factsCheckedLabel(article: { facts_checked_utc?: string }): string | null {
+  const clock = article.facts_checked_utc;
+  return typeof clock === 'string' && /^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/u.test(clock) ? `Facts as of ${clock} UTC` : null;
+}
+
 export function renderParagraph(text: string, idPrefix?: string, seen?: Set<string>): string {
   return text
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')

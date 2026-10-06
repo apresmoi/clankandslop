@@ -286,13 +286,13 @@ const token = (value, fallback = '?') => String(value ?? '').replace(/\s+/gu, '-
 const pad = (value) => (value.length >= COLUMN ? `${value} ` : value.padEnd(COLUMN + 1));
 const row = (left, ...cells) => (cells.length === 0 ? left : `${pad(left)}| ${cells.join(' | ')}`);
 
-export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, desks, pages, compose, candidates = [] }) {
+export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, checks = [], desks, pages, compose, candidates = [] }) {
   const lines = [];
   lines.push(`# ${INDEX_VERSION} edition=${edition} generated=${generated} assignments=${assignments.length} filings=${filings.length} verdicts=${verdicts.length} passed=${articles.length}`);
   // Missing article coverage remains unknown rather than advertising readiness.
   lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length })));
-  lines.push('# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · D desk doc · G page');
-  lines.push('# read one: cat candidates/<id>.json | cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json');
+  lines.push('# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · K facts check · D desk doc · G page');
+  lines.push('# read one: cat candidates/<id>.json | cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json | cat freshness/<id>/<rev>.json');
   for (const item of candidates) lines.push(row(`C ${token(item.id)} rev=${item.revision} ${token(item.disposition)} desks=${token(item.selected_desks.join(','), '-')} refs=${item.evidence_refs.length}`, clean(item.source_id, 160), clean(item.summary, 160)));
   for (const item of assignments) lines.push(row(`A ${token(item.owner)} ${token(item.id)} refs=${item.evidence_refs.length}`, clean(item.brief, 120)));
   for (const item of filings) {
@@ -303,6 +303,7 @@ export function renderEditionIndex({ edition, generated, assignments, filings, v
   for (const item of dissents) lines.push(`N ${token(item.id)} rev=${item.revision} by=${token(item.agent)} ${item.stance === 'dissent' ? `dissent p=${item.p}` : 'concur'}${item.against === undefined ? '' : ` carried_from_rev=${item.against}`}`);
   for (const item of verdicts) lines.push(`V ${token(item.id)} rev=${item.revision} ${token(item.verdict)} by=spike${item.dissentDropped === undefined ? '' : ` dissent_dropped=${token(item.dissentDropped)}`}`);
   for (const item of articles) lines.push(row(`P ${token(item.id)} rev=${item.revision} section=${token(item.section)} epi=${token(item.epistemic)} key_numbers=${item.key_numbers}`, clean(item.headline, 120), clean(item.deck, 120)));
+  for (const item of checks) lines.push(`K ${token(item.id)} rev=${item.revision} ${token(item.outcome)} facts=${token(item.facts)} by=${token(item.agent)}`);
   for (const item of desks) lines.push(`D ${token(item.name)} keys=${item.keys}`);
   for (const item of pages) lines.push(`G ${token(item.name)} articles=${item.articles} visuals=${item.visuals} papers=${token(item.papers)} lead=${token(item.lead)}`);
   return `${lines.join('\n')}\n`;
@@ -337,6 +338,10 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     id: name, revision: value.revision ?? '?', section: value.section ?? '?', epistemic: value.epistemic ?? '?',
     key_numbers: (Array.isArray(value.key_numbers) ? value.key_numbers : []).length, headline: value.headline ?? '', deck: value.deck ?? ''
   }));
+  // freshness/<id>/<rev>.json: the owner's facts check after PASS. A P row
+  // with no K row at its revision (or an "updated" K row below it) is what
+  // compose_edition refuses.
+  const checks = (await readRevisions(base, 'freshness')).map(({ id, revision, value }) => ({ id, revision, outcome: value.outcome ?? '?', facts: value.facts_checked_utc ?? '?', agent: value.agent ?? '?' }));
   const desks = (await readKind(base, 'desk')).map(({ name, value }) => ({ name, keys: Object.keys(value ?? {}).length }));
   const pages = (await readKind(base, 'pages')).map(({ name, value }) => ({
     name, articles: collectPageArticles(value).length, visuals: countVisuals(value),
@@ -348,7 +353,7 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     forecasts: articleRecords.filter((item) => isDatedForecast(item.value)).length,
     dissents: articleRecords.filter((item) => hasNamedDissent(item.value)).length
   });
-  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, desks, pages, compose, candidates });
+  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, checks, desks, pages, compose, candidates });
 }
 
 // Same shapes production-newsroom.mjs already walks when it checks page

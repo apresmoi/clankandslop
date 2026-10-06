@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { articleOgPath, listAllArticleRefs, ogRoot } from './edition.ts';
+import { articleOgPath, factsCheckedLabel, listAllArticleRefs, ogRoot } from './edition.ts';
 
 // One date that genuinely has committed cards, and one file inside it. Read
 // from disk rather than hardcoded, so rendering more cards never turns this red.
@@ -38,4 +38,11 @@ test('no article on the site can advertise a card that is not on disk', () => {
   // and passes vacuously TODAY if the existence check is deleted, which is the
   // regression it is here to catch. Fifteen editions have no cards at all.
   assert.ok(missing > 0, 'every article has a card: this fixture can no longer prove a missing one falls back');
+});
+
+test('an article shows when its facts were last checked, and only a real clock', () => {
+  assert.equal(factsCheckedLabel({ facts_checked_utc: '14:32' }), 'Facts as of 14:32 UTC');
+  assert.equal(factsCheckedLabel({}), null);
+  assert.equal(factsCheckedLabel({ facts_checked_utc: '25:00' }), null);
+  assert.equal(factsCheckedLabel({ facts_checked_utc: '14:32 UTC' }), null);
 });

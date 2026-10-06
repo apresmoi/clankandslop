@@ -55,12 +55,22 @@ answer to evidence that carries two jobs.
   findings, not the sensor delivering them. Preserve truthful access metadata,
   literal quotations and positional `[En]` citations in the structured Record.
   A direct quotation needs support in its cited source; validation cannot prove
-  that a source really said it. Quote only rows with a `raw_excerpt`. A row
+  that a source really said it. Quote only rows with a `raw_excerpt`; it may be
+  a passage of up to five sentences, so quote only the words you need and keep the
+  speaker and time the passage carries. A row
   marked `evidence: "attributed_unchecked"` is a page the checker could not
   open: write it as attribution ("Reuters reported that …" [En]), paraphrased,
   never in quotation marks. It can add context, figures credited to that
   outlet and corroborating attribution, but the central claim needs a verified
   excerpt, and it never counts as an independently verified domain.
+  An attributed row whose fragment starts "Unchecked pointer to a passage…" is
+  paraphrased from the lead's claim, attributed to the outlet, and its pointer
+  words never print.
+- A sentence keeps the meaning of the passage it cites: the speaker named with
+  role as the source names them, the finding placed before or after the event as
+  the source places it, the source's qualifications (projected, preliminary, at
+  least, alleged) intact, and no "though", "but" or "while" relation the source
+  does not state.
 - A missing Record fragment needs captured support or a faithful paraphrase of
   what the cited source is reported to have said. A fragment is never the slate's
   commentary about why to cover a story or which sources are missing. Identify a

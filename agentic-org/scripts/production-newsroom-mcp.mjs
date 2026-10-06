@@ -1,7 +1,7 @@
 import { compositionArtifactSchema } from './composition-contract.mjs';
 import { articleFilingSchema } from '../../ops/article-format.mjs';
 import { createInterface } from 'node:readline';
-import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, reviewArticle, stageRelease } from './production-newsroom.mjs';
+import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, recordFreshness, reviewArticle, stageRelease } from './production-newsroom.mjs';
 import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
 
 // Closed sets mirrored from production-newsroom.mjs's own validation (`desks`,
@@ -91,6 +91,21 @@ const definitions = {
     },
     execute: recordDissent
   },
+  record_freshness_check: {
+    description: 'After Spike PASSes your piece, record its facts check: what changed since the research time, from ONE research.request.v1 you sent for it. unchanged: nothing material moved; the PASSed revision runs stamped "Facts as of HH:MM UTC" from checked_at. updated: something material moved; then file revision+1 with it and announce it to @spike (file_article stamps the time). unavailable: the answer was refused or has not arrived when Caslon asks; the piece runs stamped with the research corpus time. compose_edition refuses any piece without a check covering its current revision. A successful result sends no message; follow its next instruction.',
+    required: ['edition', 'event_key', 'article_id', 'revision', 'outcome'],
+    optional: ['request_id', 'checked_at', 'changes'],
+    properties: {
+      edition, event_key: eventKey,
+      article_id: componentId('Story id Spike passed.'),
+      revision: { type: 'integer', minimum: 1, description: 'The revision Spike passed.' },
+      outcome: { type: 'string', enum: ['unchanged', 'updated', 'unavailable'] },
+      request_id: { type: 'string', pattern: '^[A-Za-z0-9_.:-]{1,128}$', description: 'The request_id of your facts-check research request. Required for unchanged and updated.' },
+      checked_at: { type: 'string', description: 'The research answer\'s ran_at, an ISO UTC instant. Required for unchanged and updated; omitted for unavailable.' },
+      changes: { type: 'string', minLength: 20, maxLength: 1200, description: 'Only for updated: each material development, dated and sourced, and any [En] row it supersedes.' }
+    },
+    execute: recordFreshness
+  },
   review_article: {
     description: "Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner and @brass if a replacement is required. PASS continues from the fresh INDEX: when the result says the composition prerequisites are ready, use moltnet_send on clank-newsroom to @caslon in room:release with the edition, article id and revision; ask Caslon to read the fresh INDEX and compose. Verify the send succeeded before completing the inbox item or ending the turn; do not repeat an already delivered handoff. Otherwise review other filings one at a time, then when passed>=5 and the Ledger desk rows are missing, send @ledger in room:release.",
     required: ['edition', 'event_key', 'article_id', 'revision', 'filing_digest', 'verdict', 'notes'],
@@ -146,7 +161,7 @@ const definitions = {
 // A dissent is a reporter's act, so the six desks carry record_dissent and
 // nobody else does — the tool set is the boundary, exactly as it is for
 // review_article and compose_edition.
-const roleTools={klaxon:['qualify_signal'],brass:['record_assignment'],cogsworth:['file_article','record_dissent'],sprockett:['file_article','record_dissent'],foreman:['file_article','record_dissent'],graves:['file_article','record_dissent'],tinkerton:['file_article','record_dissent'],vesta:['file_article','record_dissent'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
+const roleTools={klaxon:['qualify_signal'],brass:['record_assignment','record_freshness_check'],cogsworth:['file_article','record_dissent','record_freshness_check'],sprockett:['file_article','record_dissent','record_freshness_check'],foreman:['file_article','record_dissent','record_freshness_check'],graves:['file_article','record_dissent','record_freshness_check'],tinkerton:['file_article','record_dissent','record_freshness_check'],vesta:['file_article','record_dissent','record_freshness_check'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
 if(process.env.CLANK_STATE_OFFLINE_FIXTURE!=='1'){const definition=definitions.compose_edition;definition.required=['edition','event_key','layout_sha256'];delete definition.oneOf;definition.properties=Object.fromEntries(definition.required.map(key=>[key,definition.properties[key]]));}
 const tools=roleTools[role]??[];
 const schema=definition=>({type:'object',additionalProperties:false,required:definition.required,properties:definition.properties,...(definition.oneOf?{oneOf:definition.oneOf}:{})});

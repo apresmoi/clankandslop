@@ -23,7 +23,7 @@ export const articleFilingSchema = object({
   epistemic: { enum: ['fact', 'inference', 'forecast'] },
   byline: object({ desk: text, agents: { ...list({ enum: Object.values(ARTICLE_REPORTER_NAMES) }, 1), maxItems: 1 } }),
   timestamp: { ...text, pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9] UTC$' },
-  revision: { type: 'integer', minimum: 1 }, next_update_utc: clock,
+  revision: { type: 'integer', minimum: 1 }, next_update_utc: clock, facts_checked_utc: { ...clock, description: 'the HH:MM UTC clock record_freshness_check stamped; never typed by the reporter' },
   topics: { ...list(text), uniqueItems: true }, body: list(text, 2),
   key_numbers: list(object({ label: text, value: text, dir: { enum: ['up', 'down', 'flat'] } }, ['label', 'value'])),
   evidence_box: list(evidence, 1), refs: { ...list(text, 1), uniqueItems: true },

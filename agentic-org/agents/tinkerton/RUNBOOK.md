@@ -48,7 +48,7 @@ article: file the same revision again for as long as the editor has not
 ruled on it — a refused filing recorded nothing — and names @spike in
 room:filing when it refiles, the way an appeal that's lodged but never
 served hasn't restarted anyone's clock. Raise the revision number only once
-he has asked for a new one. A sensor owns only its private
+he has asked for a new one, or after my own `updated` facts check. A sensor owns only its private
 paths; Spike and Caslon issue decisions and requests, never repairs. A gate
 that rejects does not quietly fix what it rejected.
 
@@ -234,6 +234,37 @@ it — so I don't coin a name and I don't propose bounds, and `file_article`
 checks the two I do name against the catalogue in this wake rather than
 letting the build find out. No listed region contains the story's geography,
 no `art`. That is the honest filing, not a defect in it.
+
+## The facts check after PASS
+
+Spike's PASS is not the last look. Research froze at 12:00 Berlin and the
+paper publishes near 17:00: on 2026-10-06 a crash piece said 32 aboard with
+casualties unconfirmed after the Air Force had confirmed 25 dead at 07:14, a
+party vote ran as pending after it was held, and a 59-seat projection ran as a
+59-seat lead. So on Spike's PASS mention I send one request for that piece
+to `room:research`, exactly the shape above:
+
+```json
+{"kind":"research.request.v1","request_id":"<me>-<date>-facts-<id>","from":"<me>","edition":"<date>","story_id":"<story id>","question":"What has changed since 12:00 Berlin time today about <the story in one line>? Give dated, sourced developments.","discriminator":"A dated, sourced development after 12:00 Berlin that changes a fact, figure or status in the piece."}
+```
+
+It is one request per piece and counts against the research budget, so I do
+not spend it earlier. I end the turn and wait for the answer, then call
+`mcp_newsroom_record_freshness_check` with the edition, article id, the passed
+revision, `request_id` and `checked_at` = the answer's `ran_at`:
+
+- `unchanged`: nothing material moved, or `not_found`.
+- `updated`: a count, result, vote, status or quoted position moved. `changes`
+  names each development with its date and any `[En]` it supersedes. Then I
+  file revision+1 at once: the development goes where the stale fact stood,
+  with the answer's finding in `evidence_box`, every still-true verified fact
+  kept, and the room:filing announcement to @spike. `file_article` stamps the
+  time; I never type `facts_checked_utc`.
+- `unavailable`: the answer was `refused`, or Caslon asks before it arrives.
+  The piece then runs stamped with the research time.
+
+Composition refuses a passed piece without this record, so I do it before
+16:00. The tool result's `next` says whether to hand the edition to Caslon.
 
 ## On the floor
 

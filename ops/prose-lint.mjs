@@ -76,6 +76,25 @@ export function percentagePointSlip(texts) {
   return undefined;
 }
 
+/**
+ * A statement attributed to someone the copy does not name: "a woman told the
+ * German press agency", "a man said", "an unnamed speaker", "a speaker". On
+ * 2026-10-06 a quote by Sahra Wagenknecht, founder of the BSW, ran as "A woman
+ * told the German press agency", and a Yemen piece quoted "an unnamed speaker"
+ * though its source named him. Advisory: an anonymous source the source itself
+ * did not name is legitimate, so the reporter keeps it and says so. Returns
+ * `{ phrase }` for the first match, or undefined.
+ */
+const UNNAMED_SPEAKER = [
+  /\b(?:[Aa]n?|[Oo]ne|[Aa]nother)\s+(?:woman|man|person|speaker|participant|attendee)\s+(?:told|said|says|added|argued|warned|wrote|stated|claimed|insisted|asked|explained)\b/u,
+  /\b(?:[Aa]n?\s+)?(?:unnamed|unidentified)\s+(?:speaker|woman|man|person)\b/u,
+  /\b[Aa]n?\s+speaker\b/u
+];
+export function unnamedSpeaker(texts) {
+  for (const text of texts) for (const pattern of UNNAMED_SPEAKER) { const match = String(text).match(pattern); if (match) return { phrase: match[0] }; }
+  return undefined;
+}
+
 // The sentence each flag prints, whether it is read by a reporter at file time,
 // by Spike at review time, or by the release validator. Written to the agent
 // who can still fix it, so it names the article field and says what to do.
@@ -83,7 +102,8 @@ export const PROSE_LINT_MESSAGES = {
   openers_run: ({ word, run, paragraph }) => `${run} consecutive paragraphs open with "${word}" (para ${paragraph}+) — vary the openers`,
   binary_contrast: () => 'headline/deck leans on the "X, not Y" binary-contrast reflex — state the point directly, vary the form',
   em_dashes: ({ dashes, paragraphs }) => `${dashes} em dashes across ${paragraphs} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`,
-  pct_points: ({ phrase }) => `"${phrase}" sits beside other percentages — a change between two percentages is in percentage points ("down about 8 percentage points, from about 50% to 42%"), even if the source wrote "%"`
+  pct_points: ({ phrase }) => `"${phrase}" sits beside other percentages — a change between two percentages is in percentage points ("down about 8 percentage points, from about 50% to 42%"), even if the source wrote "%"`,
+  unnamed_speaker: ({ phrase }) => `"${phrase}" attributes a statement to someone the copy does not name — name the speaker and their role as the source does ("Sahra Wagenknecht, founder of the BSW, told dpa"); keep it anonymous only when the source itself does not name them, and say so`
 };
 
 /**
@@ -102,5 +122,7 @@ export function proseLintFindings(article) {
   if (dashes) findings.push({ flag: `em_dashes:${dashes.dashes}/${dashes.paragraphs}`, detail: dashes, message: PROSE_LINT_MESSAGES.em_dashes(dashes) });
   const slip = percentagePointSlip([article?.headline, article?.deck, ...paragraphs].filter((value) => typeof value === 'string'));
   if (slip) findings.push({ flag: 'pct_points', detail: slip, message: PROSE_LINT_MESSAGES.pct_points(slip) });
+  const speaker = unnamedSpeaker([article?.headline, article?.deck, ...paragraphs].filter((value) => typeof value === 'string'));
+  if (speaker) findings.push({ flag: 'unnamed_speaker', detail: speaker, message: PROSE_LINT_MESSAGES.unnamed_speaker(speaker) });
   return findings;
 }
