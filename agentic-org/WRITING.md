@@ -61,6 +61,11 @@ answer to evidence that carries two jobs.
   never in quotation marks. It can add context, figures credited to that
   outlet and corroborating attribution, but the central claim needs a verified
   excerpt, and it never counts as an independently verified domain.
+- A sentence keeps the meaning of the passage it cites: the speaker named with
+  role as the source names them, the finding placed before or after the event as
+  the source places it, the source's qualifications (projected, preliminary, at
+  least, alleged) intact, and no "though", "but" or "while" relation the source
+  does not state.
 - A missing Record fragment needs captured support or a faithful paraphrase of
   what the cited source is reported to have said. A fragment is never the slate's
   commentary about why to cover a story or which sources are missing. Identify a

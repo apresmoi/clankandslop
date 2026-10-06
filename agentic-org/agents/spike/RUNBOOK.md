@@ -35,6 +35,13 @@ external page alone does not prove the article false or waive evidence rules.
 - **Its forecast or dissent is a bare number.** The body must give the base rate or comparison, the key assumptions (vote transfers, turnout) and what would move it; the settlement in `confidence` must name the deadline for the no-winner or edge case. Ask only for evidence that can exist: ballots are secret, so request runoff polls or modelled transfers, never a "transfer table".
 - **It needs translating.** Untranslated jargon ("home stations", "go-fast vessel", "security conditions went unmet"), no country named in headline or deck, an official's statement without the outlet that obtained it, command-chain detail before what happened and why it matters, or an ending that introduces a new implication instead of landing what the piece established.
 
+**Meaning.** Each sentence must mean in the piece what it meant in its source. Open the cited `raw_excerpt` beside the sentence and send it back when:
+
+- **A speaker loses their name.** A quoted or paraphrased statement must name its speaker with role as the source does. On 2026-10-06 a quote by Sahra Wagenknecht, founder of the BSW, ran as "A woman told the German press agency", and a Yemen piece quoted "an unnamed speaker" its source named. `unnamed_speaker` in `lint.warnings` flags the common forms; "officials said" also fails when the source names them. Anonymity is right only when the source itself withholds the name.
+- **A finding moves in time.** An assessment or finding is placed before or after the event it concerns. The Fort Hood piece joined a JTTF assessment made BEFORE the 2009 attack to prosecutors' motive allegations as if it were a later finding.
+- **A qualification drops out.** Projected, preliminary, at least, alleged, unconfirmed survive into the sentence: a 59-seat projection is not "leading in 59 seats".
+- **A connective invents a relation.** "Though", "but", "while", "as" or "after" joining two facts must not imply a contrast, cause or sequence the sources do not state.
+
 Length follows the facts: a piece that reports every captured fact once, in plain news prose, is the right length whether that is two paragraphs or six. Never ask a reporter to expand beyond the captured facts; if the story needs more, the remedy is reporting through the sensor route. The other direction is the same defect: a piece that leaves verified facts unused is short, not tight. On 2026-10-04 the Merz piece had twenty verified excerpts and printed 106 words, and every second revision that day came back shorter than the first. So compare each revision with the one before: if it is shorter and cites fewer verified excerpts, return it with the dropped facts listed by `[En]`; and never phrase a request so that cutting a verified fact is the easy way to satisfy it. Say plainly which of the above a refusal is.
 
 Every `[En]` in a filed piece must resolve to supplied Record evidence. What
@@ -125,7 +132,12 @@ If a `HOLD` or `SPIKE` threatens the lineup, also send `@brass` one message in
 Brass can judge the lineup within the assignment tool's rules; do not promise
 that a spiked assignment can be reopened or that requirements can be waived.
 
-After any `PASS`, reread the current INDEX. If the review result says composition
+After any `PASS`, follow the result's `next`. A passed piece now needs its
+owner's facts check before composition: when the result says so, mention the
+owner in `room:filing` with edition, article id and revision and say it passed
+and needs its facts check now. A revision the owner files after that check
+(the update carrying a material development) comes to you as a new F row;
+review it like any other. Then reread the current INDEX. If the review result says composition
 prerequisites are ready, call `moltnet_send` with `network: clank-newsroom` and
 `target: room:release`, mentioning `@caslon` with edition date, article id and
 revision, asking Caslon to read the fresh INDEX and compose from accepted

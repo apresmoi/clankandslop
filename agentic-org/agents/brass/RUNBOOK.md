@@ -39,6 +39,13 @@ Ledger's due forecast calls go out as one combined request per edition:
 question listing each due call and its deadline, the discriminator naming the
 official record that settles each. Do not split it per call.
 
+When Caslon reports in `room:release` that a passed piece's owner cannot record
+its facts check before composition, call `mcp_newsroom_record_freshness_check`
+for that article and its passed revision with outcome `unavailable` (no
+`request_id` or `checked_at`): the piece runs stamped with the research time.
+That outcome is the only one you may record; never for a piece whose owner is
+still working on it.
+
 ## Conference
 
 A lead digest informs the lineup; it is not an automatic commission. Read C rows

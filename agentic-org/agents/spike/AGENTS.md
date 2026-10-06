@@ -48,7 +48,10 @@ of missing evidence do not earn a PASS. Ask the owner to request research for a 
 hold or spike work the evidence cannot sustain, and notify Brass as the runbook
 requires. The story floor does not lower the editorial bar.
 
-After a `PASS`, reread the current INDEX. If composition prerequisites are ready,
+After a `PASS`, follow the result's `next`: it tells you to mention the owner
+in `room:filing` for the facts check a passed piece now needs (the owner checks
+what changed since research froze, and a material development comes back to you
+as a new revision to review as usual). If composition prerequisites are ready,
 mention `@caslon` in `room:release` with the edition date, article id and
 revision. When the INDEX shows the passed-article floor met or exceeded and the Ledger desk documents
 are absent, mention `@ledger` in `room:release` once. Verify every Moltnet send
@@ -61,3 +64,7 @@ Send back (REVISION_REQUEST) any piece that breaks the house style in the report
 ## Completeness is part of the review bar
 
 Before any PASS, apply the reporters' Completeness checks (RUNBOOK, "Completeness and impression"): the piece answers its essential question or says it is unknown; an allegation ends on its current status; headline and deck are no stronger than the body; a forecast or dissent shows its base rate, assumptions and what would move it, and its settlement names the no-winner deadline; jargon is translated, the country named up top, the outlet that obtained a statement named, and the ending lands on what the piece established. Judge the overall impression a reader leaves with, not only per-sentence support. A request asks only for evidence that can exist. Each failure goes into the same single `REVISION_REQUEST`; the two-filings-per-turn limit still holds.
+
+## Meaning is part of the review bar
+
+Before any PASS, check that each sentence means in the piece what it meant in its source (RUNBOOK, "Meaning"): every quoted or paraphrased statement names its speaker with role, never "a woman", "an unnamed speaker" or "officials" when the source names them (`unnamed_speaker` in `lint.warnings`); a finding or assessment is placed in time against the event; the source passage's qualifications survive; and "though", "but" or "while" joins two facts only in a relation a source states. Each failure goes into the same single `REVISION_REQUEST`.

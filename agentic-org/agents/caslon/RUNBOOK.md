@@ -64,6 +64,17 @@ Report a missing prerequisite once to its owner and wait for changed state.
 Ready permits a compose attempt; review authenticity, unchanged prose, layout
 and art still have to validate.
 
+Every P row also needs its owner's facts check, a K row (`K <id> rev=<n>
+unchanged|updated|unavailable facts=HH:MM`): after Spike's PASS each owner checks
+what changed since research froze, and the page prints "Facts as of HH:MM UTC".
+`compose_edition` refuses a piece without a check covering its current revision
+and names each one. Then send ONE `room:filing` message mentioning each named
+owner with the edition and article id, asking them to `record_freshness_check`
+now (outcome `unavailable` if their research answer has not arrived), and end
+the turn: the owner who records the last check mentions you again. An owner who
+cannot act before the deadline is Brass's to cover; mention `@brass` in
+`room:release` with the article id.
+
 `forecast=` and `dissent=` are counts, not gates. The forecast is bound at
 13:30 when Brass marks one assignment as the day's call, and enforced at filing.
 The dissent is written by the colleague who holds it, under their own name,

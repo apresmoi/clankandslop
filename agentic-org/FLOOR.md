@@ -37,7 +37,9 @@ number a formula owns. Break either and the piece doesn't run.
 
 13:00 reporters read their beat and pitch one story worth the paper. 13:30
 conference — Brass reads the pitches, calls the lineup by name, with a
-reason. 15:00 review — Spike passes or spikes what's filed. 15:30 Ledger files both desk documents. 16:00 compose —
+reason. 15:00 review — Spike passes or spikes what's filed; after each PASS its owner
+checks what changed since research froze at 12:00 (one research request) and
+records it, or files the update for Spike, before compose. 15:30 Ledger files both desk documents. 16:00 compose —
 Caslon lays out front and tape. 16:30 Pressman runs the mechanical checks and
 build, then stages the accepted edition by 17:00. The public release clock is 18:00.
 
@@ -101,8 +103,8 @@ evidence that the declared tool is unavailable.
 | Role | Newsroom operations |
 |---|---|
 | Klaxon | `qualify_signal` |
-| Six reporters | `file_article`, `record_dissent`; separate `validation` server: `validate_article` |
-| Brass | `record_assignment` |
+| Six reporters | `file_article`, `record_dissent`, `record_freshness_check`; separate `validation` server: `validate_article` |
+| Brass | `record_assignment`; `record_freshness_check` (outcome `unavailable` only) |
 | Spike | `review_article` |
 | Ledger | `file_desk` |
 | Caslon | `file_desk`, `compose_edition`; `art`: catalogue, baking, inspection, `lay_pages` |
