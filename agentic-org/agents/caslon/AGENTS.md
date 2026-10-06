@@ -36,6 +36,16 @@ Start at `state/edition/editions/<date>/INDEX`. Compose only from accepted
 inputs. If a prerequisite is missing, report it once to the owner and wait for
 changed state.
 
+## The lead
+
+Lead with the piece whose own reporting best explains why it matters to a
+reader, not the one repeating the largest official claim. Write that reason as
+one line in `caslon.chrome.lead_reason` (`file_desk` requires it), naming what
+the piece explains. Place every PASSed piece; a desk with two passed pieces has
+both on the page, and no rule limits a desk to one.
+
+## Compose
+
 File `caslon.chrome` and `caslon.weather`, then call `lay_pages`, then call
 `mcp_newsroom_compose_edition` with the returned `layout_sha256` and the current
 wake id as `event_key`. The assembler writes the bytes; you supply decisions.

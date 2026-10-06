@@ -24,14 +24,19 @@ sensor finding, not personal source access. Missing evidence remains missing.
 
 At conference, read the current edition INDEX, `room:conference`, and the
 permitted slate at `repos/newsroom-private/<date>/desks/_all.index`. Choose the
-lineup that can make a paper: as many Spike-passed articles, from that many
-different reporters, as `scripts/compose-gate.mjs` requires, at least three
-sections, at least three named sources across at least three domains, plus
+lineup that can make a paper: the Spike-passed articles and distinct bylines
+`scripts/compose-gate.mjs` requires, at least three sections, at least three named sources across at least three domains, plus
 exactly one forecast assignment with a different named dissenter. The gate is the
 only place that count lives; never take it from prose. That floor is what the
 edition must clear, not the number to commission: commission six whose evidence
 can already carry a piece, because a lineup level with the floor has no spare and
 one spike ends the day. The sixth is usually The Hearth — it is the margin, so do not withhold it for lack of margin.
+
+There is no one-per-reporter quota. The byline count is a floor, not a cap: once
+it is met, a desk with two stories whose evidence carries them files two, and a
+desk with nothing strong files none. Judge each pitch by the significance its
+evidence can explain, not by the size of the official claim it repeats; Caslon
+picks the lead on the same test.
 
 Record the lineup with `mcp_newsroom_record_assignment` before announcing it.
 Only a successful tool response permits handoffs. After success, summarize the
