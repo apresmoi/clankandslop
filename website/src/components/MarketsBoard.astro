@@ -1,0 +1,123 @@
+---
+// The Tape's market board: rates, FX, commodities and equities, each the
+// latest published FRED observation with the day it was observed. Fed by
+// Ledger's copy of the producer's board in ledger.worlddesk ("markets":
+// "edition" in the page document); nothing here is authored.
+import { marketBoard, type Markets } from '../lib/tape.ts';
+interface Props { markets?: Markets | null }
+const { markets } = Astro.props;
+const board = marketBoard(markets);
+const retrieved = markets?.retrieved_at ? markets.retrieved_at.slice(0, 16).replace('T', ' ') + ' UTC' : '';
+---
+{board.length > 0 && (
+  <section class="markets-board" aria-label="Markets">
+    <div class="board-head">
+      <span class="board-label">The Markets · last published closes</span>
+      <span class="board-meta">{markets!.source}{retrieved && ` · retrieved ${retrieved}`}</span>
+    </div>
+    <div class="board-groups">
+      {board.map((g) => (
+        <div class="board-group">
+          <div class="group-label">{g.label}</div>
+          {g.rows.map((r) => (
+            <div class="board-row">
+              <a class="series" href={r.url} rel="noopener">{r.label}</a>
+              {r.unavailable !== undefined ? (
+                <span class="unavailable" title={r.unavailable}>unavailable</span>
+              ) : (
+                <>
+                  <span class="value">{r.value}</span>
+                  <span class={`change ${r.dir ?? 'flat'}`}>{r.change ?? '—'}</span>
+                  <span class="asof">{r.asOf}{r.vs && <span class="vs"> {r.vs}</span>}</span>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+    <p class="board-key">
+      Each figure is the latest observation FRED had published when the desk fetched it, dated beside it — usually
+      the previous session's close, and older for series FRED publishes with a lag. Change is against the observation
+      before it. A series that did not fetch says so; nothing is estimated.
+    </p>
+  </section>
+)}
+
+<style>
+  .markets-board {
+    margin: 18px 0 24px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 10px;
+  }
+  .board-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+  }
+  .board-label { font-weight: 700; color: var(--ink); }
+  .board-meta { color: var(--muted); font-size: 10px; letter-spacing: 0.08em; }
+  .board-groups {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0 22px;
+  }
+  .board-group { min-width: 0; padding-top: 10px; }
+  .group-label {
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+  .board-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1px 10px;
+    padding: 7px 0;
+    border-bottom: 1px dotted var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .board-row:last-child { border-bottom: none; }
+  .series {
+    grid-column: 1 / -1;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .series:hover { text-decoration: underline; }
+  .value { font-weight: 600; color: var(--ink); }
+  .change { text-align: right; white-space: nowrap; }
+  .change.up { color: var(--green); }
+  .change.down { color: var(--red); }
+  .change.flat { color: var(--muted); }
+  .asof { grid-column: 1 / -1; font-size: 10.5px; color: var(--muted); }
+  .unavailable { grid-column: 1 / -1; font-size: 11px; color: var(--muted); font-style: italic; }
+  .board-key {
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
+    margin: 10px 0 0;
+  }
+  @media (max-width: 880px) {
+    .board-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .board-groups { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

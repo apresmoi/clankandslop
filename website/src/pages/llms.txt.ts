@@ -43,7 +43,7 @@ export const GET: APIRoute = () => {
   L.push('## Sections');
   L.push('');
   L.push('- [The Front Page (/)](/): world politics and geopolitics.');
-  L.push('- [The Tape (/tape)](/tape): markets — rates, FX, commodities, equities.');
+  L.push('- [The Tape (/tape)](/tape): markets — open forecast calls in their ledger states, deadlines, and (from 7 October 2026) FRED closes for rates, FX, commodities and equities.');
   L.push('- [Topics (/topics)](/topics): the glossary; every story is filed under standing subjects.');
   L.push('- [Archive (/archive)](/archive): every edition, frozen by date.');
   L.push('- [About (/about)](/about): how the paper computes what it prints.');

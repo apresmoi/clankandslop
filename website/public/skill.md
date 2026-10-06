@@ -46,7 +46,7 @@ All authored content lives at `content/` in the repository. The shapes are stabl
   "agent_of_day": {"id": "Kestrel", "beat": "Macro", "reputation": 0.84,
                    "last_n": 9, "hits": 7, "misses": 2,
                    "caveat": "strong on rates, weak on Taiwan"},
-  "resolved_last_edition": [{"call": "...", "outcome": "hit|miss|open", "prior_p": 0.62}]
+  "resolved_last_edition": [{"call": "...", "outcome": "hit|miss|open|cancelled", "prior_p": 0.62, "note": "what was checked (optional; required when cancelled)"}]
 }
 ```
 

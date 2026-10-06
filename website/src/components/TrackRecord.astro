@@ -1,17 +1,24 @@
 ---
-interface Resolved {
-  call: string;
-  outcome: 'hit' | 'miss' | 'open';
-  prior_p: number;
-}
+import type { TrackItem } from '../lib/track-record.ts';
+interface Legacy { call: string; outcome: 'hit' | 'miss' | 'open' | 'cancelled'; prior_p: number }
 interface Props {
   label?: string;
-  items: Resolved[];
+  /** TrackItem from the persistent ledger; a bare row on a non-dated page. */
+  items: Array<TrackItem | Legacy>;
   /** The paper's settled calls to date, across every edition. */
   record?: { hit: number; miss: number };
 }
 const { label = 'Resolved · Last Edition', items, record } = Astro.props;
 const settled = (record?.hit ?? 0) + (record?.miss ?? 0);
+const mark = (r: TrackItem | Legacy) => {
+  const state = 'state' in r ? r.state : r.outcome;
+  if (state === 'hit') return '✓ settled hit';
+  if (state === 'miss') return '✗ settled miss';
+  if (state === 'cancelled') return '⊘ cancelled';
+  if (state === 'due') return '! due — awaiting verification';
+  if (state === 'pending') return `… not yet due${'deadline' in r && r.deadline ? ` · ${r.deadline}` : ''}`;
+  return '… open';
+};
 ---
 <div class="track-record-block">
   <div class="resolved-label">{label}</div>
@@ -25,9 +32,10 @@ const settled = (record?.hit ?? 0) + (record?.miss ?? 0);
         : <span class="genesis">The ledger opens today — the desk's first calls resolve at the next bell. No record to demote yet.</span>
     ) : items.map((r) => (
       <span class="mono">
-        {r.call} <span class={r.outcome}>
-          {r.outcome === 'hit' ? '✓ hit' : r.outcome === 'miss' ? '✗ miss' : '… open'} (p={r.prior_p.toFixed(2)})
+        {r.call} <span class={'state' in r ? r.state : r.outcome}>
+          {mark(r)} (p={r.prior_p.toFixed(2)})
         </span>
+        {'note' in r && r.note && <span class="note">Ledger{r.noted ? `, ${r.noted}` : ''}: {r.note}</span>}
       </span>
     ))}
   </div>
@@ -61,7 +69,11 @@ const settled = (record?.hit ?? 0) + (record?.miss ?? 0);
   }
   .track-record .hit  { color: var(--ink-soft); }
   .track-record .miss { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--red); }
-  .track-record .open { color: var(--muted); opacity: 0.7; }
+  .track-record .open,
+  .track-record .pending { color: var(--muted); opacity: 0.7; }
+  .track-record .due { color: var(--accent); font-weight: 700; }
+  .track-record .cancelled { color: var(--muted); text-decoration: line-through; }
+  .track-record .note { display: block; margin-top: 3px; font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-soft); }
   .track-record .mono { font-family: var(--font-mono); letter-spacing: 0; text-transform: none; font-size: 10.5px; }
   .track-record .tally { color: var(--ink-soft); }
   .track-record .genesis { font-family: var(--font-serif); font-style: italic; letter-spacing: 0; text-transform: none; font-size: 12.5px; color: var(--ink-soft); }

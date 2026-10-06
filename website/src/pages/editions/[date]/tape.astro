@@ -8,6 +8,7 @@ import {
   fmtEditionLine,
   fmtDateLine,
 } from '../../../lib/edition.ts';
+import { tapeTagline } from '../../../lib/tape.ts';
 
 export async function getStaticPaths() {
   return listEditionDates().map((date) => ({ params: { date } }));
@@ -17,6 +18,7 @@ const { date } = Astro.params as { date: string };
 const edition = loadEdition(date);
 const page    = loadPage(date, 'tape');
 const base    = `/editions/${date}`;
+const tagline = tapeTagline(edition.markets);
 ---
 <Newspaper
   title={page.title}
@@ -32,7 +34,7 @@ const base    = `/editions/${date}`;
   <header class="section-mast">
     <span class="section-mast-kicker">The Markets Desk</span>
     <h1 class="section-mast-name">The Tape</h1>
-    <p class="section-mast-tag">Rates · FX · commodities · equities — read the tape, priced at the bell.</p>
+    <p class="section-mast-tag">{tagline}</p>
   </header>
   <PageRenderer blocks={page.head} date={date} />
   <PageRenderer blocks={page.flow} date={date} flow />

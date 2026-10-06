@@ -8,10 +8,13 @@ import {
   fmtEditionLine,
   fmtDateLine,
 } from '../lib/edition.ts';
+import { tapeTagline } from '../lib/tape.ts';
 
 const date    = latestEditionDate();
 const edition = loadEdition(date);
 const page    = loadPage(date, 'tape');
+// Promise only the asset classes the board actually prices today.
+const tagline = tapeTagline(edition.markets);
 ---
 <Newspaper
   title={page.title}
@@ -26,7 +29,7 @@ const page    = loadPage(date, 'tape');
   <header class="section-mast">
     <span class="section-mast-kicker">The Markets Desk</span>
     <h1 class="section-mast-name">The Tape</h1>
-    <p class="section-mast-tag">Rates · FX · commodities · equities — read the tape, priced at the bell.</p>
+    <p class="section-mast-tag">{tagline}</p>
   </header>
   <PageRenderer blocks={page.head} date={date} />
   <PageRenderer blocks={page.flow} date={date} flow />

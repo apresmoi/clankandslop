@@ -4,28 +4,43 @@ import { contentRoot } from './edition.ts';
 // One fold for the tape, Ledger's filing gate and this strip: a call stays
 // open across editions until a settlement row marks it hit or miss.
 import { ledgerHistory } from '../../../ops/open-clocks.mjs';
+import { CALL_STATES, callState, shortDay } from '../../../ops/ledger-states.mjs';
 
-export interface TrackRow { call: string; outcome: 'hit' | 'miss' | 'open'; prior_p: number }
+export type Outcome = 'hit' | 'miss' | 'open' | 'cancelled';
+export type CallState = 'pending' | 'due' | 'hit' | 'miss' | 'cancelled';
+export interface TrackRow { call: string; outcome: Outcome; prior_p: number; note?: string }
+export interface TrackItem { call: string; outcome: Outcome; prior_p: number; state: CallState; state_label: string; deadline?: string; note?: string; noted?: string }
 export interface LedgerEdition { date: string; settlements: { resolved_last_edition?: TrackRow[] }; articles: unknown[] }
-export interface TrackRecordView { items: TrackRow[]; record: { hit: number; miss: number } }
+export interface TrackRecordView { items: TrackItem[]; record: { hit: number; miss: number } }
+type Entry = TrackRow & { opened: string; settled_on?: string; deadline?: string | null; noted_on?: string };
 
 /**
  * The Track Record as of `date`, read from the persistent ledger rather than
- * from that one edition's settlement file: the calls that settled at this
- * bell, every call still open, and the paper's whole hit/miss record to date.
- * 2026-10-05 printed "the ledger opens today" while 4 October's IEA call was
- * still running; an empty strip now means the ledger really is empty.
+ * from that one edition's settlement file: the calls that settled (or were
+ * cancelled) at this bell, every call still open in its state — not yet due,
+ * or due and awaiting verification with Ledger's note on what was checked —
+ * and the paper's whole hit/miss record to date. 2026-10-05 printed "the
+ * ledger opens today" while 4 October's IEA call was still running; an empty
+ * strip now means the ledger really is empty.
  */
 export function trackRecordFrom(editions: LedgerEdition[], date: string): TrackRecordView {
   const upTo = editions.filter((e) => e.date <= date);
   // Today's articles open calls for tomorrow; only today's rows count today.
   const asOf = upTo.map((e) => (e.date === date ? { ...e, articles: [] } : e));
-  const history = ledgerHistory(asOf) as Array<TrackRow & { settled_on?: string; opened: string }>;
+  const history = ledgerHistory(asOf) as Entry[];
   const items = [
     ...history.filter((c) => c.outcome !== 'open' && c.settled_on === date),
     ...history.filter((c) => c.outcome === 'open'),
-  ].map(({ call, outcome, prior_p }) => ({ call, outcome, prior_p }));
-  const settled = (ledgerHistory(asOf, { epoch: '0000-00-00' }) as TrackRow[]).filter((c) => c.outcome !== 'open');
+  ].map((c): TrackItem => {
+    const state = callState(c, date) as CallState;
+    const shown = state !== 'pending' && typeof c.note === 'string';
+    return {
+      call: c.call, outcome: c.outcome, prior_p: c.prior_p, state, state_label: CALL_STATES[state],
+      ...(c.deadline ? { deadline: shortDay(c.deadline) } : {}),
+      ...(shown ? { note: c.note, noted: shortDay(c.noted_on) } : {}),
+    };
+  });
+  const settled = (ledgerHistory(asOf, { epoch: '0000-00-00' }) as TrackRow[]);
   return { items, record: { hit: settled.filter((c) => c.outcome === 'hit').length, miss: settled.filter((c) => c.outcome === 'miss').length } };
 }
 
