@@ -115,9 +115,27 @@ async function authenticateFallback({ args, privateRoot, publicRoot, env }) {
   if (currentTrace.version !== 'clank.worlddesk-trace.v1' || currentTrace.edition !== args.edition || currentTrace.escalation?.index !== null || !Array.isArray(currentTrace.escalation?.unresolved) || currentTrace.escalation.unresolved.length === 0) throw new Error('ledger.worlddesk current refusal trace is malformed');
   if (canonicalJson(refusal.unresolved) !== canonicalJson(currentTrace.escalation.unresolved)) throw new Error('ledger.worlddesk current refusal does not match its trace');
   const prior = await latestPriorDerived(publicRoot, args.edition, env);
-  const expected = structuredClone(prior.document);
-  expected.world_desk.delta = 'stale';
-  if (canonicalJson(expected) !== canonicalJson(args.document)) throw new Error(`ledger.worlddesk fallback must carry the latest prior derived public World Desk document (${prior.edition}) with only delta changed to stale`);
+  const expected = { world_desk: { ...structuredClone(prior.document.world_desk), delta: 'stale' } };
+  const { markets: _, ...filedDesk } = args.document;
+  if (canonicalJson(expected) !== canonicalJson(filedDesk)) throw new Error(`ledger.worlddesk fallback must carry the latest prior derived public World Desk document (${prior.edition}) with only delta changed to stale`);
+  await assertMarkets(dir, args.document);
+}
+
+// TODAY'S MARKETS, EVEN ON A STALE WORLD DESK DAY
+// -----------------------------------------------
+// The producer writes the Tape's FRED board to worlddesk/markets.json whether
+// or not the escalation index refused, and embeds it in ledger.worlddesk.json
+// on a derived day. Either way the filed `markets` must be that file, byte for
+// canonical byte: a board Ledger dropped would leave the Tape's "rates · FX ·
+// commodities · equities" promise unkept, and a board Ledger edited would put
+// a number on the page nobody observed. No file, no board.
+async function assertMarkets(dir, document) {
+  const markets = await maybeJson(path.join(dir, 'markets.json'));
+  if (markets === undefined) {
+    if (document.markets !== undefined) throw new Error(`ledger.worlddesk carries "markets" but the producer wrote no ${path.join(dir, 'markets.json')} for this edition — remove "markets"; the board is copied, never authored`);
+    return;
+  }
+  if (canonicalJson(markets) !== canonicalJson(document.markets)) throw new Error(`ledger.worlddesk "markets" must be ${path.join(dir, 'markets.json')} copied verbatim (the producer's FRED board for this edition) — copy that file's contents as the "markets" key and file again`);
 }
 
 export async function authenticateWorldDeskFiling(args, { env = process.env, cwd = process.cwd() } = {}) {
@@ -133,7 +151,9 @@ export async function authenticateWorldDeskFiling(args, { env = process.env, cwd
   const prepared = await maybeJson(preparedPath);
   if (prepared === undefined) return authenticateFallback({ args, privateRoot, publicRoot, env });
   const trace = await readJson(traceFile).catch(error => { if (error.code === 'ENOENT') throw new Error(`ledger.worlddesk requires the private trace beside the prepared document at ${traceFile}`); throw error; });
-  if (canonicalJson(prepared) !== canonicalJson(args.document)) throw new Error('ledger.worlddesk document does not match the mounted private prepared document; copy the producer payload verbatim');
+  const { markets: _, ...preparedDesk } = prepared, { markets: __, ...filedDesk } = args.document;
+  if (canonicalJson(preparedDesk) !== canonicalJson(filedDesk)) throw new Error('ledger.worlddesk document does not match the mounted private prepared document; copy the producer payload verbatim');
+  await assertMarkets(dir, args.document);
   if (trace.edition !== args.edition) throw new Error(`ledger.worlddesk trace edition ${JSON.stringify(trace.edition)} does not match filing edition ${args.edition}`);
   validTrace(args.document, trace);
 }
