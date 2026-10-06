@@ -47,6 +47,7 @@ function noClause(label) {
   }
   return undefined;
 }
+const CLAUSE = /[.!?;,]|\s(?:but|while|whereas|and)\s/iu;
 const ATTRIBUTED = /\b(?:markets?|bettors|betting|polymarket|kalshi|futures|traders|bookmakers|pollsters?|implied|priced)\b/iu;
 // Words that start context rather than the event: "a 42% shot at a fourth term despite weak polling".
 const CONTEXT = /\s(?:despite|amid|as|while|though|although|but|because|since|after|even|yet)\s/iu;
@@ -89,8 +90,8 @@ export function forecastSettlementFindings(article) {
   // Odds the copy attributes to someone else ("prediction markets give a 65%
   // chance") are a quote, not the call; every other printed probability is.
   for (const [field, text] of [['headline', headline], ['deck', deck]]) for (const printed of printedProbabilities(text)) {
-    const before = text.slice(0, printed.index).split(/[.!?;]/u).at(-1);
-    if (ATTRIBUTED.test(before) || Math.round(printed.value) === percent) continue;
+    const clause = `${text.slice(0, printed.index).split(CLAUSE).at(-1)}${text.slice(printed.index).split(CLAUSE)[0]}`;
+    if (ATTRIBUTED.test(clause) || Math.round(printed.value) === percent) continue;
     findings.push({ path: field, code: 'forecast_probability', message: `prints "${printed.at}" but confidence.value is ${value} (${percent}%) — the headline and deck state the same probability the call settles on` });
   }
   for (const printed of printedProbabilities(headline)) {

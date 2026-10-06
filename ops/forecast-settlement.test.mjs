@@ -29,6 +29,8 @@ test('forecast_probability: a printed probability must equal round(confidence.va
   assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 65% chance; the call is 42%.' })), [], 'quoted odds beside the house call pass');
   assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 65% chance before the runoff.' })), [], 'attributed odds in the deck, house call in the headline');
   assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 42% chance; the house call is 65%.' })), ['forecast_probability'], 'a matching quote cannot hide a wrong house call');
+  assert.deepEqual(codes(forecast({ deck: 'The house call is 42%; a 65% chance is implied by prediction markets.' })), [], 'attribution after the figure counts');
+  assert.deepEqual(codes(forecast({ deck: 'Prediction markets give Lula a 42% chance, but the house call is 65%.' })), ['forecast_probability'], 'attribution stays inside its clause');
   assert.deepEqual(codes(forecast({ confidence: { ...forecast().confidence, value: 0.424 } })), []);
   assert.deepEqual(codes(forecast({ deck: 'The call is 0.45 before the 25 October runoff.' })), ['forecast_probability']);
   assert.deepEqual(codes(forecast({ deck: 'The house gives it a 0.42 probability.' })), []);
