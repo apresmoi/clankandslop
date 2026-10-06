@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { percentagePointSlip, proseLintFindings, unnamedSpeaker } from './prose-lint.mjs';
+import { decisiveTestClaim, percentagePointSlip, proseLintFindings, unnamedSpeaker } from './prose-lint.mjs';
 
 const flags = (body, deck = 'Turnout fell.') => proseLintFindings({ headline: 'Bosnia votes', deck, body }).map((finding) => finding.flag);
 
@@ -33,4 +33,18 @@ test('unnamed_speaker: named speakers, the Speaker of a parliament and ordinary 
   assert.deepEqual(flags(['A woman was among the 25 dead, the Air Force said. [E1]']), []);
   assert.deepEqual(flags(['Loudspeakers carried the speech across the square. [E1]']), []);
   assert.equal(unnamedSpeaker(['The spokesman for the ministry said talks would resume. [E1]']), undefined);
+});
+
+test('decisive_test: a closing "would settle which reading" claim is flagged for Spike', () => {
+  const hearth = 'A laboratory result that names a pathogen in her samples, or a second confirmed illness among those under observation, would settle which reading is true. [E4]';
+  assert.deepEqual(flags(['The worker died last week. [E1]', hearth]), ['decisive_test']);
+  assert.deepEqual(flags(['Exports rose in August. [E1]', 'A shipment table would show whether August was a turn. [E2]']), ['decisive_test']);
+  assert.deepEqual(flags(['Two readings remain. [E1]', 'Nothing yet settles which reading holds. [E2]']), ['decisive_test']);
+  assert.match(proseLintFindings({ body: ['One. [E1]', hearth] })[0].message, /differ under each reading/u);
+});
+
+test('decisive_test: only the final paragraph counts, and plain endings pass', () => {
+  assert.deepEqual(flags(['A recount would settle whether the seat flips. [E1]', 'The count resumes on Monday. [E2]']), []);
+  assert.deepEqual(flags(['The worker died last week. [E1]', 'The people around her are still being watched. [E2]']), []);
+  assert.equal(decisiveTestClaim([]), undefined);
 });

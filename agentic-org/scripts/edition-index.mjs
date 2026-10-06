@@ -99,6 +99,7 @@ const LINT_FIELDS = {
   binary_contrast: ['article.headline/deck', 'leans on the "X, not Y" binary-contrast reflex'],
   em_dashes: ['article.body', 'uses the em dash as a default connector'],
   pct_points: ['article.body', 'writes a change between two percentages as "%" instead of percentage points'],
+  decisive_test: ['article.body', 'ends on a "would settle which / show whether" test — check that its result differs under each reading the piece presents'],
   'domains<2': ['article.evidence_box', 'spans fewer than two distinct source_url domains — one domain repeated is not corroboration'],
   persona_in_body: ['article.body', 'names a newsroom persona; the byline is the only place anyone here appears'],
   topic_unknown: ['article.topics', 'is not a slug in the topic glossary'],

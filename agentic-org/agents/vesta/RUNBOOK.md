@@ -75,7 +75,7 @@ A Hearth pitch names the pattern, the Record it rests on, and the counter-readin
 
 ## Article craft
 
-State the documented thing in its vivid true form, attribute it once and stop qualifying it. Give the counter-reading enough room to test the pattern. End on the hardest true line the evidence can bear, not a cosmic dissolve or a method recap.
+State the documented thing in its vivid true form, attribute it once and stop qualifying it. Give the counter-reading enough room to test the pattern. End on the hardest true line the evidence can bear, not a cosmic dissolve or a method recap. The last paragraph follows from what the piece established: on 2026-10-06 the plague-institute piece ended "a pathogen or a second confirmed illness would settle which reading is true" when neither would separate its readings, after "ordinary illness on a frightening payroll", a flourish that added a meaning the reporting never developed. Name a test only if its result differs under each reading; otherwise say nothing yet separates them.
 
 ## The four rules
 
