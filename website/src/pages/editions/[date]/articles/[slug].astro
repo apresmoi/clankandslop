@@ -19,6 +19,7 @@ import {
   fmtEditionLine,
   fmtDateLine,
   renderParagraph,
+  factsCheckedLabel,
 } from '../../../../lib/edition.ts';
 import { getTopic } from '../../../../lib/topics.ts';
 import { loadArticleMapArt } from '../../../../lib/composed-map.ts';
@@ -35,6 +36,7 @@ const headlineLines = article.headline.split('\n');
 const deskUpper = article.byline.desk.toUpperCase();
 const bylineDesk = deskUpper.startsWith('THE ') ? deskUpper : `THE ${deskUpper}`;
 const readTime = article.byline.read_time_min ?? 4;
+const factsChecked = factsCheckedLabel(article);
 const epistemicLabel = article.epistemic ? article.epistemic[0].toUpperCase() + article.epistemic.slice(1) : '';
 
 const editionBase = `/editions/${date}`;
@@ -106,7 +108,7 @@ const articleMeta = {
     {article.deck && <p class="deck">{article.deck}</p>}
     <div class="byline-row">
       <span>BY {bylineDesk} · {article.byline.agents.join(', ')}</span>
-      <span>~ {readTime} MIN · {article.evidence_box && article.evidence_box.length > 0 ? `RECORD E1-E${article.evidence_box.length}` : 'NO RECORD'}</span>
+      <span>~ {readTime} MIN · {article.evidence_box && article.evidence_box.length > 0 ? `RECORD E1-E${article.evidence_box.length}` : 'NO RECORD'}{factsChecked && <> · <span class="facts-checked">{factsChecked.toUpperCase()}</span></>}</span>
     </div>
 
     {previousCoverage.length > 0 && (
