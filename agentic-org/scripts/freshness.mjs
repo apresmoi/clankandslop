@@ -35,7 +35,7 @@ export function freshnessStatus(article, records = []) {
   const revision = article?.revision, id = article?.id ?? '?';
   const record = records.filter((item) => Number.isSafeInteger(item?.revision) && item.revision <= revision).sort((left, right) => right.revision - left.revision)[0];
   if (!record) return { ok: false, problem: `"${id}" revision ${revision} has no facts check recorded after its PASS — its owner sends one research request asking what changed since the research time, then calls record_freshness_check` };
-  if (record.outcome === 'updated' && record.revision === revision) return { ok: false, record, problem: `"${id}": its owner recorded a material development against revision ${revision}; revision ${revision + 1} carrying it must be filed and passed by Spike before composition` };
+  if (record.outcome === 'updated' && record.revision === revision) return { ok: false, record, problem: `"${id}": its owner recorded a material development against revision ${revision}; revision ${revision + 1} carrying it must be filed and passed by Spike before composition, or, if it cannot pass in time, its check on revision ${revision} recorded again as unchanged or unavailable` };
   if (record.outcome !== 'updated' && record.revision !== revision) return { ok: false, record, problem: `"${id}" changed to revision ${revision} after its facts check on revision ${record.revision} — the passed revision needs its own check` };
   if (article.facts_checked_utc !== record.facts_checked_utc) return { ok: false, record, problem: `"${id}" revision ${revision} carries facts_checked_utc ${JSON.stringify(article.facts_checked_utc ?? null)}, but its facts check stamped ${record.facts_checked_utc} — record the check again` };
   return { ok: true, record };
@@ -77,7 +77,7 @@ const ownerOf = (article) => ((article?.byline?.agents ?? [])[0] ?? '').toLowerC
 
 /**
  * record_freshness_check. `io` supplies the edition state: read/write records,
- * the PASSed article, whether a later filing exists, whether the edition is
+ * the PASSed article, whether the edition is
  * composed, the corpus time and the readiness of the rest of the edition.
  */
 export async function recordFreshnessCheck(args, io) {
@@ -86,7 +86,9 @@ export async function recordFreshnessCheck(args, io) {
   const owner = ownerOf(article);
   if (agent !== owner && !(agent === 'brass' && args.outcome === 'unavailable')) throw new Error(agent === 'brass' ? 'Brass may record only outcome "unavailable", for an owner who cannot act before composition' : `"${args.article_id}" belongs to ${owner || 'another desk'}; only its owner records its facts check`);
   if (await io.composed()) throw new Error(`edition ${args.edition} is composed; a facts check recorded now cannot reach the page — tell Caslon in room:release if the story moved`);
-  if (await io.filed(args.article_id, args.revision + 1)) throw new Error(`revision ${args.revision + 1} of "${args.article_id}" is already filed; its PASS gets its own check`);
+  // No refusal when revision r+1 is already filed: if Spike holds the update,
+  // the owner (or Brass) can still clear the passed revision r rather than
+  // leave the edition uncomposable; a later PASS of r+1 then needs its own check.
   const record = buildFreshnessRecord(args, { agent, article, corpusFetchedAt: await io.corpusFetchedAt(), now: io.now?.() ?? new Date() });
   await io.write(args.article_id, args.revision, record);
   if (record.outcome !== 'updated') await io.stamp(args.article_id, { ...article, facts_checked_utc: record.facts_checked_utc });

@@ -63,7 +63,7 @@ test('a check that did not happen after research froze, or names no request, is 
 
 const io = (over = {}) => {
   const writes = [], stamps = [];
-  return { writes, stamps, agent: 'sprockett', article: async () => article(), composed: async () => false, filed: async () => false, corpusFetchedAt: async () => corpusFetchedAt, now: () => now, write: async (...value) => writes.push(value), stamp: async (...value) => stamps.push(value), ready: async () => false, ...over };
+  return { writes, stamps, agent: 'sprockett', article: async () => article(), composed: async () => false, corpusFetchedAt: async () => corpusFetchedAt, now: () => now, write: async (...value) => writes.push(value), stamp: async (...value) => stamps.push(value), ready: async () => false, ...over };
 };
 
 test('only the owner records a check, Brass only "unavailable", and never before PASS or after composition', async () => {
@@ -73,7 +73,6 @@ test('only the owner records a check, Brass only "unavailable", and never before
   assert.equal((await recordFreshnessCheck(args({ outcome: 'unavailable', checked_at: undefined, request_id: undefined }), fallback)).facts_checked_utc, '10:00');
   await assert.rejects(recordFreshnessCheck(args(), io({ article: async () => undefined })), /has no PASSed revision/u);
   await assert.rejects(recordFreshnessCheck(args(), io({ composed: async () => true })), /is composed/u);
-  await assert.rejects(recordFreshnessCheck(args(), io({ filed: async () => true })), /revision 2 of "nigeria-crash" is already filed/u);
 });
 
 test('unchanged stamps the passed article; updated leaves it for the new revision; the last check hands off to Caslon', async () => {
