@@ -43,7 +43,8 @@ be honest.
 
 For a `fact`, the captured fragment must support the sentence itself — a
 paraphrase of a fragment is not a fact, and an unreadable source does not become
-one.
+one. An `attributed_unchecked` row supports only the attribution itself — "Reuters
+reported that …" — as context beside a verified central claim, never a quote.
 
 For an `inference`, the PREMISES must each be captured and cited, and the
 derivation from them must be stated in the prose and be sound: a comparison

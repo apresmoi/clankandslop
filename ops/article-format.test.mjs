@@ -324,3 +324,50 @@ test('new leak checks preserve ordinary reporting, source notes and evidenced qu
   article.body.push('The article can say the crossing closed [E1].');
   assert.deepEqual(proseLeakFindings(article).map(row => row.path), ['article.body[7]']);
 });
+
+// Attributed reporting, 2026-10-06. The quote checker cannot open Reuters (401),
+// so those rows arrive as `evidence: "attributed_unchecked"`: usable as
+// "Reuters reported that …", never quoted, never the only support.
+const REUTERS_NOTE = 'Source page could not be opened by the checker (http_401); use only as attributed reporting ("<outlet> reported that …"), paraphrased, never inside quotation marks and never as a quote or captured excerpt.';
+const attributedFiling = (body, { verified = true, marker = true } = {}) => {
+  const article = structuredClone(fact);
+  article.evidence_box = [
+    { ...article.evidence_box[0], source_note: { ...article.evidence_box[0].source_note, ...(verified ? { raw_excerpt: article.evidence_box[0].fragment } : {}) } },
+    { source: 'Reuters', fragment: 'DeepSeek priced the vision model at Flash rates, a company spokesperson told Reuters.', as_of: '2026-08-21',
+      source_note: { source_id: 'E2', source_kind: 'public_url', used_by_agent: 'Cogsworth', source_url: 'https://www.reuters.com/technology/deepseek-vision-2026-08-21/', retrieved_at: '2026-08-21T18:47:00Z', ...(marker ? { evidence: 'attributed_unchecked' } : {}), provenance_note: REUTERS_NOTE } },
+  ];
+  article.refs = ['E1', 'E2'];
+  article.body = body;
+  return article;
+};
+const attributedCodes = (article) => articleFormatFindings(article, context).errors.filter((error) => error.code.startsWith('attributed_')).map((error) => `${error.path}:${error.code}`);
+const LEAD = 'DeepSeek’s API docs dated 21 August say DeepSeek-V4-Flash-Vision-Exp is live on the DeepSeek API Platform [E1].';
+
+test('attributed reporting files as a paraphrase beside a verified excerpt', () => {
+  const article = attributedFiling([LEAD, 'Reuters reported that the company priced the vision model at Flash rates [E2].']);
+  assert.deepEqual(articleFormatFindings(article, context).errors, []);
+});
+
+test('a quotation-marked sentence citing attributed reporting is refused', () => {
+  const quoted = attributedFiling([LEAD, 'Reuters reported the model was priced “at Flash rates, a company spokesperson” said [E2].']);
+  assert.deepEqual(attributedCodes(quoted), ['article.body[1]:attributed_quote']);
+  const straight = attributedFiling([LEAD, '"DeepSeek priced the vision model at Flash rates," a spokesperson told Reuters [E2].']);
+  assert.deepEqual(attributedCodes(straight), ['article.body[1]:attributed_quote']);
+  // The provenance note alone still marks the row, so dropping the marker is no way round it.
+  const unmarked = attributedFiling([LEAD, '"DeepSeek priced the vision model at Flash rates," a spokesperson told Reuters [E2].'], { marker: false });
+  assert.deepEqual(attributedCodes(unmarked), ['article.body[1]:attributed_quote']);
+  // A verified excerpt may still be quoted in the same paragraph.
+  const verifiedQuote = attributedFiling(['The docs say “DeepSeek-V4-Flash-Vision-Exp is now live on the DeepSeek API Platform” [E1]. Reuters reported that it costs Flash rates [E2].', LEAD]);
+  assert.deepEqual(attributedCodes(verifiedQuote), []);
+});
+
+test('attributed reporting never carries a raw_excerpt', () => {
+  const article = attributedFiling([LEAD, 'Reuters reported that the company priced the vision model at Flash rates [E2].']);
+  article.evidence_box[1].source_note.raw_excerpt = article.evidence_box[1].fragment;
+  assert.deepEqual(attributedCodes(article), ['article.evidence_box[1].source_note.raw_excerpt:attributed_quote']);
+});
+
+test('attributed reporting cannot be a filing’s only support', () => {
+  const article = attributedFiling([LEAD, 'Reuters reported that the company priced the vision model at Flash rates [E2].'], { verified: false });
+  assert.deepEqual(attributedCodes(article), ['article.body:attributed_only']);
+});

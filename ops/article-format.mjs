@@ -1,6 +1,7 @@
 import { ARTICLE_FORMAT_VERSION, ARTICLE_REPORTER_NAMES, articleFilingSchema, articleArchiveSchema, schemaFindings } from './article-format-schema.mjs';
 import { proseLeakFindings } from './prose-leaks.mjs';
 import { proseLintFindings } from './prose-lint.mjs';
+import { attributedEvidenceFindings } from './attributed-evidence.mjs';
 export { ARTICLE_FORMAT_VERSION, ARTICLE_REPORTER_NAMES, articleFilingSchema, proseLeakFindings };
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -78,6 +79,7 @@ export function articleFormatFindings(article, context = {}) {
   }
   if (a.dissent && isObject(a.dissent) && !agentNames.has(a.dissent.agent)) add('dissent.agent', 'byline', 'must name a canonical agent');
   checkAssets(a, context, add);
+  if (strict) for (const finding of attributedEvidenceFindings(a)) add(finding.path, finding.code, finding.message);
   if (strict) errors.push(...proseLeakFindings(a));
   for (const finding of proseLintFindings({ ...a, body: strings(a.body), headline: typeof a.headline === 'string' ? a.headline : '', deck: typeof a.deck === 'string' ? a.deck : '' })) warnings.push({ path: 'article', code: finding.flag ?? 'prose', message: finding.message });
   return { errors, warnings };

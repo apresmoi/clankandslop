@@ -7,7 +7,7 @@ const list = (items, minItems = 0) => ({ type: 'array', items, minItems });
 const object = (properties, required = Object.keys(properties)) => ({ type: 'object', additionalProperties: false, properties, required });
 const clock = { ...text, description: 'a real UTC clock time HH:MM', pattern: '^(?:[01][0-9]|2[0-3]):[0-5][0-9]$' };
 const slug = { ...text, pattern: '^[a-z0-9][a-z0-9-]{0,127}$' };
-const note = object({ source_id: text, source_kind: text, used_by_agent: text, source_url: text, retrieved_at: text, raw_excerpt: text, provenance_note: text }, ['source_id', 'source_kind', 'used_by_agent', 'retrieved_at']);
+const note = object({ source_id: text, source_kind: text, used_by_agent: text, source_url: text, retrieved_at: text, raw_excerpt: text, provenance_note: text, evidence: { enum: ['attributed_unchecked'] } }, ['source_id', 'source_kind', 'used_by_agent', 'retrieved_at']);
 const evidence = object({ source: text, fragment: text, as_of: text, source_note: note });
 const spot = object({ name: text, lat: number, lon: number, label_side: { enum: ['left', 'right'] }, label_dy: number }, ['name', 'lat', 'lon']);
 const coordinate = { ...list(number, 2), maxItems: 2 };
