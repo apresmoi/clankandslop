@@ -15,6 +15,8 @@
 //
 // Pure: callers read the archive (ops/ledger-archive.mjs) and pass it in.
 
+import { CALL_STATES, TERMINAL, callDeadline, callState, hasNote, NOTE_MIN_WORDS, shortDay } from './ledger-states.mjs';
+
 // Calls published before this date predate the carry-forward contract. Their
 // labels were never written to settle ("medium", "High", "Likely") and none of
 // them was ever going to be scored; carrying them now would bury the tape in
@@ -23,7 +25,6 @@ export const LEDGER_EPOCH = '2026-09-29';
 
 const isStr = (v) => typeof v === 'string' && v.trim().length > 0;
 const isP = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1;
-const SETTLED = new Set(['hit', 'miss']);
 
 // A label that names no event ("high", "medium", "medium-low") is a
 // confidence word, not a call: nothing could ever settle it, so it is not
@@ -37,6 +38,11 @@ export const callKey = (call) => String(call ?? '').toLowerCase().replace(/\s+/g
 const rowsOf = (settlements) => (Array.isArray(settlements?.resolved_last_edition) ? settlements.resolved_last_edition : Array.isArray(settlements) ? settlements : []);
 const articlesOf = (articles) => (Array.isArray(articles) ? articles : Object.values(articles ?? {}));
 const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+// The opening article's own uncertainty band and named dissent, when filed.
+const pool = (article) => ({
+  ...(isP(article?.confidence?.interval) ? { interval: article.confidence.interval } : {}),
+  ...(isStr(article?.dissent?.agent) && isP(article?.dissent?.p) ? { dissent: { agents: [article.dissent.agent], p: article.dissent.p } } : {}),
+});
 
 /**
  * Every call the paper has published since `epoch`, with where it stands.
@@ -45,7 +51,9 @@ const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
  * edition's `ledger.settlements` document (or its rows) and `articles` its
  * article documents. A call enters the ledger from an article's `confidence`
  * block or from a settlement row, whichever comes first, and leaves `open` the
- * first time a row marks it `hit` or `miss`.
+ * first time a row marks it `hit`, `miss` or `cancelled`. Each entry carries
+ * the deadline its wording states, the forecaster's own band and dissent when
+ * the opening article filed them, and Ledger's latest row note with its date.
  */
 export function ledgerHistory(editions, { epoch = LEDGER_EPOCH } = {}) {
   const calls = new Map(), owners = new Map();
@@ -61,14 +69,16 @@ export function ledgerHistory(editions, { epoch = LEDGER_EPOCH } = {}) {
       const confidence = article?.confidence;
       if (!isCallLabel(confidence?.label) || !isP(confidence?.value)) continue;
       const key = callKey(confidence.label);
-      if (!calls.has(key)) calls.set(key, { call: confidence.label.trim(), prior_p: confidence.value, opened: edition.date, owner: article?.byline?.agents?.[0], article: article?.id, outcome: 'open' });
+      if (!calls.has(key)) calls.set(key, { call: confidence.label.trim(), prior_p: confidence.value, opened: edition.date, deadline: callDeadline(confidence.label, edition.date), owner: article?.byline?.agents?.[0], article: article?.id, ...pool(article), outcome: 'open' });
     }
     for (const row of rowsOf(edition.settlements)) {
       if (!isCallLabel(row?.call) || !isP(row?.prior_p)) continue;
       const key = callKey(row.call);
-      if (!calls.has(key)) calls.set(key, { call: row.call.trim(), prior_p: row.prior_p, opened: edition.date, ...(owners.has(key) ? { owner: owners.get(key) } : {}), outcome: 'open' });
+      if (!calls.has(key)) calls.set(key, { call: row.call.trim(), prior_p: row.prior_p, opened: edition.date, deadline: callDeadline(row.call, edition.date), ...(owners.has(key) ? { owner: owners.get(key) } : {}), outcome: 'open' });
       const entry = calls.get(key);
-      if (entry.outcome === 'open' && SETTLED.has(row.outcome)) Object.assign(entry, { outcome: row.outcome, settled_on: edition.date });
+      if (entry.outcome !== 'open') continue;
+      if (isStr(row.note)) Object.assign(entry, { note: row.note.trim(), noted_on: edition.date });
+      if (TERMINAL.has(row.outcome)) Object.assign(entry, { outcome: row.outcome, settled_on: edition.date });
     }
   }
   return [...calls.values()];
@@ -80,7 +90,7 @@ export function ledgerHistory(editions, { epoch = LEDGER_EPOCH } = {}) {
  * `today` is today's `ledger.settlements` document (or rows).
  */
 export function carriedCalls(history, edition, today = []) {
-  const settledToday = new Set(rowsOf(today).filter((row) => SETTLED.has(row?.outcome)).map((row) => callKey(row.call)));
+  const settledToday = new Set(rowsOf(today).filter((row) => TERMINAL.has(row?.outcome)).map((row) => callKey(row.call)));
   return history
     .filter((entry) => entry.outcome === 'open' && entry.opened < edition && !settledToday.has(callKey(entry.call)))
     .sort((a, b) => (a.opened < b.opened ? -1 : a.opened > b.opened ? 1 : 0));
@@ -96,8 +106,57 @@ export function missingLedgerRows(history, edition, filed) {
   return carriedCalls(history, edition).filter((entry) => !present.has(callKey(entry.call))).map(({ call, prior_p }) => ({ call, outcome: 'open', prior_p }));
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const shortDate = (iso) => `${Number(iso.slice(8, 10))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
+/**
+ * The due calls a `ledger.settlements` filing for `edition` leaves
+ * unexplained. A call whose deadline has passed is settled `hit`/`miss`/
+ * `cancelled`, or stays `open` with a `note` saying what Ledger checked and
+ * why it is still unresolved; an `open` row with no such note is what printed
+ * three overdue calls as plain "open" on 6 October.
+ */
+export function dueCallFindings(history, edition, filed) {
+  const rows = new Map(rowsOf(filed).map((row) => [callKey(row?.call), row]));
+  const out = [];
+  for (const entry of carriedCalls(history, edition)) {
+    if (callState(entry, edition) !== 'due') continue;
+    const row = rows.get(callKey(entry.call));
+    if (row === undefined || row.outcome === 'hit' || row.outcome === 'miss' || hasNote(row)) continue;
+    out.push({ call: entry.call, prior_p: entry.prior_p, deadline: entry.deadline ?? 'no date stated', outcome: row.outcome });
+  }
+  return out;
+}
+
+export { NOTE_MIN_WORDS };
+
+/**
+ * The tape's forecast table going into `edition`: every call not yet settled,
+ * including the ones today's articles open, each with its state, deadline,
+ * Ledger's latest note and the forecaster's own band and dissent. `history`
+ * is the fold over the prior editions AND today ({date: edition, settlements:
+ * today's document, articles: today's articles}).
+ */
+export function forecastRows(history, edition) {
+  return history
+    .filter((entry) => entry.outcome === 'open')
+    .sort((a, b) => String(a.deadline ?? '9999').localeCompare(String(b.deadline ?? '9999')) || a.opened.localeCompare(b.opened))
+    .map((entry) => {
+      const state = callState(entry, edition);
+      return {
+        horizon: entry.deadline ? shortDay(entry.deadline) : 'no date',
+        question: entry.call,
+        call: entry.prior_p >= 0.5 ? 'YES' : 'NO',
+        direction: entry.prior_p >= 0.5 ? 'bull' : 'bear',
+        p: entry.prior_p,
+        state,
+        state_label: CALL_STATES[state],
+        detail: entry.opened < edition ? `open since ${shortDay(entry.opened)}` : `new in the ${shortDay(edition)} edition`,
+        ...(state === 'due' && isStr(entry.note) ? { note: entry.note, noted: shortDay(entry.noted_on) } : {}),
+        ...(isP(entry.interval) ? { interval: entry.interval } : {}),
+        ...(entry.dissent ? { dissent: entry.dissent } : {}),
+      };
+    });
+}
+
+const shortDate = shortDay;
 
 /**
  * The prior edition's follow-up promises: every article that printed a
