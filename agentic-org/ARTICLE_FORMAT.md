@@ -97,14 +97,17 @@ what the supplied evidence establishes; an unverified quote remains
 unverified even when the JSON passes.
 
 Record rows come in three states. A row with `raw_excerpt` was verified on
-the page and may be quoted. A row with `source_note.evidence:
+the page; the excerpt may be a passage of up to five sentences, so quote only the
+words you need and keep the speaker and time the passage carries. A row with `source_note.evidence:
 "attributed_unchecked"` names a page the checker could not open (401, paywall,
 PDF, timeout): keep the marker and its note, and use it only as attributed
 paraphrase — "Reuters reported that …" [En] — never in quotation marks and
 never with a `raw_excerpt`. A sentence the checker read the page for and did
 not find never reaches the Record. `file_article` refuses a quotation-marked
 sentence citing an attributed row (`attributed_quote`) and a filing whose
-cited support is all attribution with no verified excerpt (`attributed_only`).
+cited support is all attribution with no verified excerpt (`attributed_only`). An attributed row whose fragment starts "Unchecked pointer to a passage…"
+is paraphrased from the lead's claim and attributed to the outlet; the pointer
+words never print.
 
 ## Existing examples
 
