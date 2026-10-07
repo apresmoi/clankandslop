@@ -17,10 +17,10 @@ const NON_PUBLIC_KINDS = new Set(['provided_research', 'desk', 'desk_cache', 're
 const DESK_PHRASES = ['Hardware Desk', 'Escalation Desk', 'Macro Desk', 'Commodities Desk', 'Policy Desk'];
 
 // key_numbers print on the Tape's Today's Numbers (website/src/components/
-// KeyFigures.astro): the value in a 64px column of 13px JetBrains Mono, which
-// holds eight characters before it ellipsizes, the label beside it. They are
+// KeyFigures.astro): the value in an 84px column of 13px JetBrains Mono, which
+// holds ten characters before it ellipsizes, the label beside it. They are
 // checked here, at filing, so the writer fixes the figure, not the layout.
-export const KEY_NUMBERS = Object.freeze({ min: 2, max: 6, value: 8, labelMin: 2, labelMax: 48 });
+export const KEY_NUMBERS = Object.freeze({ min: 2, max: 6, value: 10, labelMin: 2, labelMax: 48 });
 const chars = (value) => [...value.trim()].length;
 
 function keyNumberFindings(list, add) {

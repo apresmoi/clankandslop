@@ -13,8 +13,11 @@
 //               figures each, copied verbatim in the order the writer filed
 //   Deadlines   owed     the prior edition's next_update_utc promises no
 //                        story today follows up (open-clocks.mjs followUps)
-//               dated    today's own next checks, and every open call whose
-//                        deadline is today or later, by date then time
+//               dated    every open call whose deadline is today or later,
+//                        by date then time. Today's own next_update_utc
+//                        promises are not listed: they fall due as
+//                        tomorrow's owed rows, and most have passed by the
+//                        time the page is read.
 //
 // Pure: no I/O. Either block is omitted when it would be empty.
 
@@ -87,11 +90,6 @@ export function deadlinesBlock({ edition, owed = [], articles = {}, calls = [], 
   const owedFrom = owed.find((row) => isStr(row?.edition))?.edition;
 
   const dated = [];
-  for (const article of Object.values(articles ?? {})) {
-    const time = clock(article?.next_update_utc);
-    if (time === undefined || !isStr(article?.headline)) continue;
-    dated.push({ date: edition, time, what: `Next check on “${article.headline.trim()}”`, ...who(article.byline?.agents?.[0]) });
-  }
   for (const entry of calls) {
     if (entry?.outcome !== 'open' || !isStr(entry.deadline) || entry.deadline < edition) continue;
     const time = statedTime(entry.call);

@@ -4,8 +4,8 @@ import test from 'node:test';
 import { articleFormatFindings, KEY_NUMBERS } from './article-format.mjs';
 
 // key_numbers print on the Tape (KeyFigures.astro), so file_article holds them
-// to what the Tape can set: 2–6 figures, a value of at most eight characters
-// (the 64px mono column), a plain label of 2–48 characters.
+// to what the Tape can set: 2–6 figures, a value of at most ten characters
+// (the 84px mono column), a plain label of 2–48 characters.
 const read = (file) => JSON.parse(readFileSync(new URL(`../content/${file}`, import.meta.url), 'utf8'));
 const topicSlugs = Object.keys(read('topics.json').topics);
 const published = read('editions/2026-09-11/articles/s-df5507bc.json');
@@ -15,7 +15,7 @@ const figure = (value, label = 'Ten-day average', dir) => ({ label, value, ...(d
 const two = [figure('7'), figure('11', 'Prior day transits')];
 
 test('the limits are the ones the Tape renders cleanly', () => {
-  assert.deepEqual({ ...KEY_NUMBERS }, { min: 2, max: 6, value: 8, labelMin: 2, labelMax: 48 });
+  assert.deepEqual({ ...KEY_NUMBERS }, { min: 2, max: 6, value: 10, labelMin: 2, labelMax: 48 });
   assert.deepEqual(keyErrors(published.key_numbers), [], 'a filed Hormuz forecast already fits');
 });
 
@@ -30,12 +30,12 @@ test('two to six figures file; none, one or seven are refused with the reason', 
   }
 });
 
-test('a value of eight characters files and nine is refused, counted in characters not bytes', () => {
-  assert.deepEqual(keyErrors([figure('€930m'), figure('12345678'), figure('≤384')]), []);
+test('a value of ten characters files and eleven is refused, counted in characters not bytes', () => {
+  assert.deepEqual(keyErrors([figure('€930m'), figure('about 44%'), figure('1234567890'), figure('≤384')]), []);
   const errors = keyErrors([...two, figure('€930 million')]);
   assert.deepEqual(errors.map((e) => e.path), ['article.key_numbers[2].value']);
-  assert.match(errors[0].message, /"€930 million" is 12 characters; the Tape prints at most 8 — a number with its unit/u);
-  assert.equal(keyErrors([...two, figure('123456789')]).length, 1);
+  assert.match(errors[0].message, /"€930 million" is 12 characters; the Tape prints at most 10 — a number with its unit/u);
+  assert.equal(keyErrors([...two, figure('12345678901')]).length, 1);
   assert.equal(keyErrors([...two, figure('12\n34')]).length, 1, 'a value is one line');
 });
 

@@ -73,7 +73,7 @@ const IRAN = 'U.S. and Iranian negotiators hold an announced session in the week
 const SETTLED = 'Alito remains off the bench for Suncor on 5 October 2026';
 const call = (id, label, value, date, over = {}) => story(id, { headline: `Call ${id}`, byline: { agents: ['Foreman'] }, confidence: { label, value }, edition_date: date, ...over });
 
-test('dated rows: today\'s next checks and every open call due today or later, by date then time', () => {
+test('dated rows: every open call due today or later, by date then time — today\'s own next checks are not listed', () => {
   const history = ledgerHistory([
     { date: '2026-09-30', settlements: [], articles: [call('s-iran', IRAN, 0.52, '2026-09-30'), call('s-alito', SETTLED, 0.78, '2026-09-30')] },
     { date: '2026-10-05', settlements: [{ call: SETTLED, outcome: 'hit', prior_p: 0.78 }], articles: [call('s-brazil', BRAZIL, 0.58, '2026-10-05')] },
@@ -81,12 +81,10 @@ test('dated rows: today\'s next checks and every open call due today or later, b
   ]);
   const { props } = deadlinesBlock({ edition: EDITION, articles: TODAY, calls: history, agents });
   assert.deepEqual(props.dated, [
-    { date: '2026-10-06', time: '15:30', what: 'Next check on “ATR-42 down”' },
-    { date: '2026-10-06', time: '17:00', what: 'Next check on “Mokha claimed”', who: 'Graves' },
     { date: '2026-10-12', time: '16:00', what: 'Call s-quebec', who: 'Foreman' },
     { date: '2026-10-12', what: 'A row-only call with no article on 12 October' },
     { date: '2026-10-25', what: 'Call s-brazil', who: 'Foreman' },
-  ], 'the due Iran call and the settled Alito call stay off; an unknown agent is dropped; untimed rows follow timed ones');
+  ], 'today\'s next checks fall due as tomorrow\'s owed rows, not here; the due Iran call and the settled Alito call stay off; untimed rows follow timed ones');
   assert.equal(props.owed, undefined);
   assert.equal(props.owed_from, undefined);
 });

@@ -37,7 +37,6 @@ test('the tape head runs Markets File, board, numbers, deadlines, ledger, track 
   assert.deepEqual(deadlines.owed, [{ time: '15:00', headline: 'The Medical Flight Did Not Arrive', href: '/editions/2026-09-08/articles/s-owed/', who: 'Vesta' }]);
   assert.equal(deadlines.owed_from, '2026-09-08');
   assert.deepEqual(deadlines.dated, [
-    { date: '2026-09-09', time: '17:00', what: 'Next check on “H”', who: 'Cogsworth' },
     { date: '2026-09-12', time: '16:00', what: 'H', who: 'Foreman' },
   ]);
   assert.deepEqual(collectPublicArticleReferences(page), [], 'links to stories are hrefs, never featured slugs');

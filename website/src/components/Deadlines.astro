@@ -3,7 +3,7 @@
  * The tape's deadlines, in the Forecast Ledger's table pattern. Every field is
  * structured by the assembler (ops/tape-blocks.mjs): dates arrive as ISO days
  * and HH:MM times, owed follow-ups as story references, so nothing an agent
- * types can break the columns.
+ * types can break the columns. Dated rows are the open forecast calls.
  */
 interface Owed { time?: string; headline: string; href: string; who?: string }
 interface Dated { date: string; time?: string; what: string; who?: string }
@@ -31,7 +31,10 @@ const range = dates.length > 1 && dates[0] !== dates[dates.length - 1] ? `${day(
     {dated.map((d) => (
       <div class="dl-row">
         <span class="dl-when">{day(d.date)}{d.time ? ` · ${d.time}` : ''}</span>
-        <div class="dl-qcol"><span class="dl-q">{d.what}</span></div>
+        <div class="dl-qcol">
+          <span class="dl-q">{d.what}</span>
+          <span class="dl-why"><span class="dl-state">Forecast deadline</span></span>
+        </div>
         <span class="dl-who">{d.who ?? ''}</span>
       </div>
     ))}
