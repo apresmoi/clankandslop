@@ -5,22 +5,22 @@
   "checkpoints": [
     {
       "id": "pitch",
-      "time": "13:00",
+      "time": "12:00",
       "owner": "reporters"
     },
     {
       "id": "conference",
-      "time": "13:30",
+      "time": "12:30",
       "owner": "brass"
     },
     {
       "id": "review",
-      "time": "15:00",
+      "time": "13:00",
       "owner": "spike"
     },
     {
       "id": "settlement",
-      "time": "15:30",
+      "time": "14:00",
       "owner": "ledger"
     },
     {
@@ -44,16 +44,16 @@
   "spawnfile_schedule": {
     "status": "native",
     "owners": {
-      "cogsworth": "0 13 * * *",
-      "sprockett": "0 13 * * *",
-      "foreman": "0 13 * * *",
-      "graves": "0 13 * * *",
-      "tinkerton": "0 13 * * *",
-      "vesta": "0 13 * * *",
-      "brass": "30 13 * * *",
-      "spike": "0 15 * * *",
-      "ledger": "30 15 * * *",
-      "caslon": "0 16 * * *",
+      "cogsworth": "0 12 * * *",
+      "sprockett": "0 12 * * *",
+      "foreman": "0 12 * * *",
+      "graves": "0 12 * * *",
+      "tinkerton": "0 12 * * *",
+      "vesta": "0 12 * * *",
+      "brass": "30 12 * * *",
+      "spike": "0 13-16 * * *",
+      "ledger": "0 14 * * *",
+      "caslon": "0,45 16 * * *",
       "pressman": "30 16 * * *"
     }
   },
