@@ -68,7 +68,14 @@ export const statedTime = (call, deadline) => {
   return undefined;
 };
 
-const figure = (entry) => (isObj(entry) && isStr(entry.value) && isStr(entry.label)
+// A figure the Tape cannot print whole is skipped, never cut off: an article
+// filed before the key_numbers limits (2026-10-07: "$3.7 billion", "more than
+// 3,100") would otherwise show as "$3.7 billi…". Filing refuses these now.
+// Kept here, not imported: the page assembler ships without the filing modules.
+// tape-blocks.test.mjs holds it equal to article-format.mjs KEY_NUMBERS.value.
+export const FIGURE_VALUE_MAX = 10;
+const fits = (value) => [...value.trim()].length <= FIGURE_VALUE_MAX && !/\n/u.test(value);
+const figure = (entry) => (isObj(entry) && isStr(entry.value) && isStr(entry.label) && fits(entry.value)
   ? { value: entry.value, label: entry.label, ...(DIRS.has(entry.dir) ? { dir: entry.dir } : {}) }
   : null);
 
