@@ -52,7 +52,7 @@ export async function saveSignalDisposition(args, { read, write, receipt }) {
   return {
     qualified: value.disposition === 'qualified', disposition: value.disposition, selected_desks: value.selected_desks,
     source_id: value.source_id, candidate_id: id, revision: value.revision, unchanged,
-    next: 'Saved to the edition INDEX as a lead decision, not a commission. A concise room:sensor digest may use plain desk names, claims, URLs and verification gaps; do not mention reporters merely because a lead interests them. Ignore, defer and duplicate need no announcement. Only a concrete decision that cannot wait warrants one addressed request.',
+    next: 'Saved to the edition INDEX as a lead decision, not a commission. A concise room:sensor digest may use plain desk names, claims, URLs and verification gaps; do not mention reporters merely because a lead interests them. Ignore, defer and duplicate need no announcement. Only a concrete decision that cannot wait warrants one addressed request. A capture newer than the landed corpus (overnight, or for a later edition) has no story file on the mount yet; its claim_excerpt and URLs are the lead, so do not report the file as unreadable.',
     receipt: await receipt({ ...value, event_key: args.event_key })
   };
 }
