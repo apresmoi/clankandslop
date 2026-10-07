@@ -21,10 +21,11 @@
 //
 // Pure: no I/O. Either block is omitted when it would be empty.
 
+import { callKey } from './open-clocks.mjs';
+
 const isStr = (v) => typeof v === 'string' && v.trim().length > 0;
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const CLOCK = /^([01]?\d|2[0-3]):([0-5]\d)$/u;
-const STATED_TIME = /\b([01]?\d|2[0-3]):([0-5]\d)\s*UTC\b/u;
 const DIRS = new Set(['up', 'down', 'flat']);
 
 export const TODAYS_NUMBERS = Object.freeze({ title: "Today's Numbers", stories: 3, figures: 3 });
@@ -39,10 +40,32 @@ export const clock = (value) => {
   return m ? `${m[1].padStart(2, '0')}:${m[2]}` : undefined;
 };
 
-/** The clock time a call's wording states ("by 16:00 UTC on 6 October"), if any. */
-export const statedTime = (call) => {
-  const m = STATED_TIME.exec(String(call ?? ''));
-  return m ? `${m[1].padStart(2, '0')}:${m[2]}` : undefined;
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const CLOCK_UTC = /\b([01]?\d|2[0-3]):([0-5]\d)\s*UTC\b/giu;
+const NEAR_DATE = /\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\b|\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})(?!\d)/giu;
+const monthDay = (m) => (m[1] ? [MONTHS.indexOf(m[2].slice(0, 3).toLowerCase()) + 1, Number(m[1])] : [MONTHS.indexOf(m[3].slice(0, 3).toLowerCase()) + 1, Number(m[4])]);
+
+/**
+ * The clock a call states FOR its deadline ("by 16:00 UTC on 6 October",
+ * "6 October at 16:00 UTC"), if any. A call can name several clocks — "talks
+ * beginning at 09:00 UTC on 7 October … signed by 18:00 UTC on 8 October" — so
+ * a clock counts only when the date written next to it is the deadline day;
+ * none does, no clock is printed rather than a wrong one.
+ */
+export const statedTime = (call, deadline) => {
+  const text = String(call ?? '');
+  const iso = /^\d{4}-(\d{2})-(\d{2})$/u.exec(String(deadline ?? ''));
+  if (!iso) return undefined;
+  const want = [Number(iso[1]), Number(iso[2])];
+  for (const c of text.matchAll(CLOCK_UTC)) {
+    const around = [text.slice(c.index + c[0].length, c.index + c[0].length + 24), text.slice(Math.max(0, c.index - 24), c.index)];
+    for (const side of around) {
+      const dates = [...side.matchAll(NEAR_DATE)];
+      const m = side === around[0] ? dates[0] : dates[dates.length - 1];
+      if (m && monthDay(m)[0] === want[0] && monthDay(m)[1] === want[1]) return `${c[1].padStart(2, '0')}:${c[2]}`;
+    }
+  }
+  return undefined;
 };
 
 const figure = (entry) => (isObj(entry) && isStr(entry.value) && isStr(entry.label)
@@ -92,16 +115,12 @@ export function deadlinesBlock({ edition, owed = [], articles = {}, calls = [], 
   const dated = [];
   for (const entry of calls) {
     if (entry?.outcome !== 'open' || !isStr(entry.deadline) || entry.deadline < edition) continue;
-    const time = statedTime(entry.call);
-    dated.push({ date: entry.deadline, ...(time ? { time } : {}), what: isStr(entry.headline) ? entry.headline.trim() : entry.call.trim(), ...who(entry.owner) });
+    const time = statedTime(entry.call, entry.deadline);
+    dated.push({ key: callKey(entry.call), row: { date: entry.deadline, ...(time ? { time } : {}), what: isStr(entry.headline) ? entry.headline.trim() : entry.call.trim(), ...who(entry.owner) } });
   }
+  // One row per CALL: two different calls under one headline are two deadlines.
   const seen = new Set();
-  const unique = dated.sort(byWhen).filter((row) => {
-    const key = `${row.date}|${row.time ?? ''}|${row.what.toLowerCase()}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const unique = dated.filter(({ key }) => (seen.has(key) ? false : (seen.add(key), true))).map(({ row }) => row).sort(byWhen);
 
   if (owedRows.length === 0 && unique.length === 0) return null;
   return { block: 'Deadlines', props: { title: DEADLINES_TITLE, ...(owedRows.length > 0 ? { owed_from: owedFrom, owed: owedRows } : {}), ...(unique.length > 0 ? { dated: unique } : {}) } };

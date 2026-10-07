@@ -89,10 +89,10 @@ test('dated rows: every open call due today or later, by date then time — toda
   assert.equal(props.owed_from, undefined);
 });
 
-test('a call due today is a deadline today; settled calls and identical rows do not print', () => {
+test('a call due today is a deadline today; settled calls and a repeated call do not print', () => {
   const calls = [
     { call: 'IEA posts a schedule by 16:00 UTC on 6 October 2026', outcome: 'open', deadline: EDITION, owner: 'Foreman', headline: 'IEA clock' },
-    { call: 'Same headline twice by 16:00 UTC on 6 October 2026', outcome: 'open', deadline: EDITION, owner: 'Foreman', headline: 'IEA clock' },
+    { call: 'IEA  posts a schedule by 16:00 UTC on 6 October 2026', outcome: 'open', deadline: EDITION, owner: 'Foreman', headline: 'IEA clock' },
     { call: 'Yesterday by 5 October', outcome: 'open', deadline: '2026-10-05', owner: 'Foreman' },
     { call: 'No date at all', outcome: 'open', deadline: null, owner: 'Foreman' },
     { call: 'Settled early, due 9 October', outcome: 'hit', deadline: '2026-10-09', owner: 'Foreman' },
@@ -111,7 +111,25 @@ test('clocks are normalised and a call\'s stated time is read off its wording', 
   assert.equal(clock(' 17:00 '), '17:00');
   assert.equal(clock('24:00'), undefined);
   assert.equal(clock('17:00 UTC'), undefined);
-  assert.equal(statedTime('by 16:00 UTC on 12 October'), '16:00');
-  assert.equal(statedTime('by 12 October'), undefined);
+  assert.equal(statedTime('by 16:00 UTC on 12 October', '2026-10-12'), '16:00');
+  assert.equal(statedTime('by 12 October', '2026-10-12'), undefined);
+  assert.equal(statedTime('on 12 October at 9:30 UTC', '2026-10-12'), '09:30', 'a clock after its date');
   assert.equal(articleHref('2026-10-05', 's-1'), '/editions/2026-10-05/articles/s-1/');
+});
+
+test('a deadline takes the clock written beside ITS date, never the first clock in the call', () => {
+  // Review 2026-10-07: this call printed "8 Oct 09:00", the start time of the talks.
+  const call = 'Yes if talks beginning at 09:00 UTC on 7 October 2026 produce a signed agreement by 18:00 UTC on 8 October 2026; otherwise NO.';
+  assert.equal(statedTime(call, '2026-10-08'), '18:00');
+  assert.equal(statedTime(call, '2026-10-07'), '09:00');
+  assert.equal(statedTime('Talks at 09:00 UTC on 7 October produce a deal by 8 October', '2026-10-08'), undefined, 'no clock beside the deadline: none printed');
+});
+
+test('two different calls under one headline and deadline are two rows', () => {
+  // Review 2026-10-07: "Talks resume" for a ceasefire and for aid deliveries printed once.
+  const calls = [
+    { call: 'Yes if a ceasefire is signed by 18:00 UTC on 8 October 2026', outcome: 'open', deadline: '2026-10-08', owner: 'Foreman', headline: 'Talks resume' },
+    { call: 'Yes if aid deliveries resume by 18:00 UTC on 8 October 2026', outcome: 'open', deadline: '2026-10-08', owner: 'Vesta', headline: 'Talks resume' },
+  ];
+  assert.deepEqual(deadlinesBlock({ edition: EDITION, calls, agents }).props.dated.map((r) => [r.time, r.what, r.who]), [['18:00', 'Talks resume', 'Foreman'], ['18:00', 'Talks resume', 'Vesta']]);
 });
