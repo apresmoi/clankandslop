@@ -18,9 +18,10 @@
 //                credit the same named speaker ("Rumen Radev said"), or when
 //                they share a ten-word run of identical text.
 //
-// One relayed excerpt folds the whole outlet, so the count leans low. It can
-// only fold what an excerpt names: two outlets repeating an unnamed briefing
-// still count twice. /method#sources says both to readers.
+// One relayed excerpt folds the whole outlet, so the count leans low. It is
+// still a pattern match, not proof: a relay worded in a way these patterns do
+// not recognise, or an unnamed briefing, is not folded. /method#sources says
+// so to readers.
 
 export interface RecordRow {
   source?: string;
@@ -96,7 +97,7 @@ const RUN = `${NAME_WORD}(?:\\s+(?:(?:of|for|and|de|del|von|van|al|the)\\s+)?${N
 const WHEN = '(?:\\s+(?:late\\s+|early\\s+)?on\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?:\\s+(?:morning|afternoon|evening|night))?)?';
 const CUE = '(?:said|says|announced|stated|told|wrote|posted|confirmed|declared|reported)';
 const BEFORE_CUE = new RegExp(`(${RUN})${WHEN}\\s*,?\\s+(?:has\\s+|had\\s+|have\\s+)?${CUE}(?![\\p{L}])`, 'gu');
-const AFTER_CUE = new RegExp(`(?:[Aa]ccording\\s+to|[Cc]iting|[Cc]ited\\s+by|[Rr]eported\\s+by|[Qq]uoted\\s+by|(?<![\\p{L}])(?:said|says|told))\\s+(?:(?:the|a|an)\\s+)?(${RUN})`, 'gu');
+const AFTER_CUE = new RegExp(`(?:[Aa]ccording\\s+to|(?:report|reporting|statement|announcement|interview|briefing|post)s?\\s+(?:by|from|of|with|to)|[Cc]iting|[Cc]ited\\s+by|[Rr]eported\\s+by|[Qq]uoted\\s+by|(?<![\\p{L}])(?:said|says|told))\\s+(?:(?:the|a|an)\\s+)?(${RUN})`, 'gu');
 const NOT_SPEAKERS = new Set(['the', 'it', 'he', 'she', 'they', 'we', 'i', 'this', 'that', 'a', 'an', 'but', 'and', 'in', 'on', 'his', 'her', 'their', 'its',
   'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'today', 'yesterday']);
 const TITLES = new Set(['minister', 'president', 'spokesperson', 'spokesman', 'spokeswoman', 'governor', 'secretary', 'official', 'officials', 'chief', 'director', 'chairman', 'chair', 'ministry', 'office', 'department', 'agency', 'government']);

@@ -77,7 +77,7 @@ const pastNow = Math.round(wd.escalation_index * totalSeverity);
     <ol class="roles">
       <li><strong>Verbatim passages.</strong> The research capture names the sentence it relies on. A checker then re-reads the live page and files the excerpt only if the page carries those words in that order. Curly quotes, dashes and punctuation are ignored, but every word has to match. A longer passage is named by its first and last words. The checker copies the page’s own text between them, up to five sentences and 1,200 characters, and refuses anything longer instead of cutting it.</li>
       <li><strong>Speakers kept.</strong> When a quote names its speaker only as “he said”, the checker adds the page’s previous sentence, where the name usually is.</li>
-      <li><strong>Page furniture removed.</strong> Advertising slugs, “Also read” and “Related” links, newsletter prompts and image credits are stripped from captured passages. A filing whose excerpt still carries them is refused.</li>
+      <li><strong>Page furniture removed.</strong> The passage is first found on the page exactly as published. Advertising slugs and “Also read” link boxes are then cut from it. A passage that still carries anything like furniture, such as a “Related:” line, a newsletter prompt or an image credit, is refused rather than trimmed, and so is a filing whose excerpt carries one.</li>
       <li><strong>Attributed reporting.</strong> Some pages cannot be opened by the checker: paywalls, blocked requests, PDFs and timeouts. Those rows are marked as attributed reporting. They carry no excerpt and are never quoted. They can support “the outlet reported that…” with the link, and never as a story’s only support.</li>
       <li><strong>Sentences the page does not carry are dropped.</strong> If the page was read and the quoted sentence is not on it, the row does not reach the Record.</li>
     </ol>
@@ -107,13 +107,13 @@ const pastNow = Math.round(wd.escalation_index * totalSeverity);
       </dd>
     </dl>
     <p>
-      One relayed excerpt merges a whole outlet. The count can therefore
-      understate independence, but it cannot overstate it within what the
-      excerpts show. It cannot see a relay the excerpts do not mention: two
-      outlets repeating an unnamed briefing still count as two. The number
-      means distinct publishers that the Record does not show to be repeating
-      each other. It does not prove that each outlet reported the story
-      separately.
+      One relayed excerpt merges a whole outlet, so the count leans low.
+      It is still pattern matching on the excerpts, not proof. A relay worded
+      in a way the patterns miss is not merged, and neither is a briefing
+      the excerpts do not name: two outlets repeating it count as two. The
+      number means distinct publishers the Record does not show to be
+      repeating each other. It does not prove that each outlet reported the
+      story separately.
     </p>
     {today.length > 0 && (
       <div class="tbl" role="table" aria-label="Source counts for today's stories">

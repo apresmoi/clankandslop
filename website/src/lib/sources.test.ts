@@ -60,6 +60,7 @@ test('two outlets citing the same uncited agency count once', () => {
     row('https://b.example/2', 'Citing a Reuters report, the paper said a third ship turned back.'),
   ];
   assert.equal(sourceCounts(rows).independent, 1);
+  assert.equal(sourceCounts([rows[0], row('https://c.example/3', 'A third ship turned back, according to a report by Reuters.')]).independent, 1);
 });
 
 test('a ten-word run of identical text folds two outlets: a reprinted wire story', () => {
