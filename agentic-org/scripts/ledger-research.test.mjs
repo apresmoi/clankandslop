@@ -1,33 +1,41 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { LEDGER_REQUESTS_MAX, assertLedgerDeskOpen, ledgerFilingNext, ledgerRequestId, ledgerResearchRequest } from './ledger-research.mjs';
+import { LEDGER_REQUESTS_MAX, assertLedgerDeskOpen, ledgerFilingNext, ledgerRequestId, ledgerResearchRequests } from './ledger-research.mjs';
 import { openDueCalls } from '../../ops/ledger-archive.mjs';
 
 const edition = '2026-10-07';
 const calls = [{ call: 'Alito remains off the bench for Suncor when argument begins on 5 October 2026', deadline: '2026-10-05' }, { call: 'YES if the IEA posts a 100 million barrel schedule by 16:00 UTC on 6 October 2026', deadline: '2026-10-06' }];
 
-test('Ledger asks the sensor itself, one whole call per request, under an id stable across refiles', () => {
-  const value = JSON.parse(ledgerResearchRequest(edition, calls[0]));
+test('Ledger asks the sensor itself, in the request its runbook names, with every call whole', () => {
+  const { texts, left } = ledgerResearchRequests(edition, calls);
+  assert.equal(texts.length, 1);
+  assert.equal(left, 0);
+  const value = JSON.parse(texts[0]);
   assert.deepEqual(Object.keys(value), ['kind', 'request_id', 'from', 'edition', 'story_id', 'question', 'discriminator']);
   assert.equal(value.kind, 'research.request.v1');
+  assert.equal(value.request_id, 'ledger-2026-10-07-due');
+  assert.equal(value.request_id, ledgerRequestId(edition));
   assert.equal(value.from, 'ledger');
-  assert.match(value.request_id, /^ledger-2026-10-07-call-[0-9a-f]{10}$/u);
-  assert.equal(value.request_id, ledgerRequestId(edition, `  ${calls[0].call.toUpperCase()} `), 'the id survives whitespace and case');
-  assert.notEqual(value.request_id, ledgerRequestId(edition, calls[1].call));
-  assert.match(value.question, /\(deadline 2026-10-05\).*The call: Alito remains off the bench for Suncor when argument begins on 5 October 2026$/u, 'the whole call, criteria included');
-  const huge = JSON.parse(ledgerResearchRequest(edition, { call: 'x'.repeat(5000), deadline: null }));
-  assert.ok(Buffer.byteLength(huge.question) <= 1200 && Buffer.byteLength(JSON.stringify(huge)) <= 2048, 'the sensor drops anything larger');
+  assert.match(value.question, /\(1\) Alito remains off the bench for Suncor when argument begins on 5 October 2026 \[deadline 2026-10-05\] \(2\) YES if the IEA posts a 100 million barrel schedule by 16:00 UTC on 6 October 2026 \[deadline 2026-10-06\]$/u);
 });
 
-test('a filing that keeps due calls open lists one request per call, up to the cap, and says what is left', () => {
+test('a list too long for one question overflows into numbered requests, never a clipped call', () => {
+  const many = Array.from({ length: 30 }, (_, index) => ({ call: `Call ${index} settles YES if the ministry posts its dated schedule ${'with the full criteria '.repeat(8)}`, deadline: '2026-10-06' }));
+  const { texts, left } = ledgerResearchRequests(edition, many);
+  assert.equal(texts.length, LEDGER_REQUESTS_MAX);
+  assert.ok(left > 0, "past the cap, calls are counted as left, not asked");
+  assert.deepEqual(texts.map((text) => JSON.parse(text).request_id), texts.map((_, index) => ledgerRequestId(edition, index + 1)));
+  assert.equal(JSON.parse(texts[1]).request_id, 'ledger-2026-10-07-due-2');
+  const asked = texts.flatMap((text) => [...JSON.parse(text).question.matchAll(/ \(\d+\) (Call \d+ settles[^[]*)\[/gu)].map((match) => match[1].trim()));
+  assert.equal(asked.length + left, many.length, 'every call is asked about or counted as left');
+  for (const call of asked) assert.ok(many.some((entry) => entry.call.trim() === call), `a call was clipped: ${call.slice(0, 40)}`);
+  for (const text of texts) { assert.ok(Buffer.byteLength(JSON.parse(text).question) <= 1200); assert.ok(Buffer.byteLength(text) <= 2048); }
+});
+
+test('a filing that keeps due calls open says how to ask once; one with none says nothing', () => {
   assert.equal(ledgerFilingNext(edition, []), undefined);
   const next = ledgerFilingNext(edition, calls);
-  assert.match(next, /2 due call\(s\) stay open.*own moltnet_send on network clank-newsroom to room:research.*before Caslon composes/u);
-  assert.equal([...next.matchAll(/"kind":"research\.request\.v1"/gu)].length, 2);
-  const six = Array.from({ length: LEDGER_REQUESTS_MAX + 2 }, (_, index) => ({ call: `Call ${index} settles on a dated official record`, deadline: '2026-10-06' }));
-  const capped = ledgerFilingNext(edition, six);
-  assert.equal([...capped.matchAll(/"kind":"research\.request\.v1"/gu)].length, LEDGER_REQUESTS_MAX);
-  assert.match(capped, /2 more due call\(s\) are not asked today/u);
+  assert.match(next, /2 due call\(s\) stay open\. If you have not sent ledger-2026-10-07-due today, send this exact text with moltnet_send on network clank-newsroom to room:research.*before Caslon composes\. \{"kind":"research\.request\.v1"/u);
 });
 
 test('a Ledger refile after composition is refused, unless it changes nothing', () => {
