@@ -27,10 +27,43 @@ const SUBSTITUTE_GLYPHS = {
   },
 };
 
+// A five-story synthetic edition every layout test starts from.
+export const article = (id, over = {}) => ({ id, edition_date: '2026-09-09', section: 'world', kicker: 'K', headline: 'H', deck: 'D', epistemic: 'fact', byline: { desk: 'Policy Desk', agents: ['Tinkerton'] }, timestamp: 'T', revision: 1, body: ['a', 'b', 'c', 'd'], refs: [], evidence_box: [], ...over });
+export const synthetic = () => ({
+  edition: '2026-09-09',
+  articles: {
+    alpha: article('alpha', { byline: { desk: 'Escalation Desk', agents: ['Sprockett'] } }),
+    bravo: article('bravo', { byline: { desk: 'Hardware Desk', agents: ['Cogsworth'] } }),
+    charlie: article('charlie', { byline: { desk: 'Macro Desk', agents: ['Foreman'] } }),
+    delta: article('delta', { byline: { desk: 'Commodities Desk', agents: ['Graves'] } }),
+    echo: article('echo'),
+  },
+  desk: {
+    'caslon.chrome': { date: '2026-09-09', edition_no: '0075', volume: 'I', issued_at: 'x', revision: 1, tagline: 't', next_bell: '14:00 UTC', compiled_by: ['Tinkerton'], lead_story_id: 'alpha' },
+    'caslon.weather': { weather: null },
+    'ledger.settlements': { resolved_last_edition: [] },
+    'ledger.worlddesk': { world_desk: { escalation_index: 0.5, delta: 'steady', open_conflicts: 1, watch: 1 } },
+  },
+  maps: {},
+  decisions: {
+    edition: '2026-09-09',
+    order: ['alpha', 'bravo', 'charlie', 'delta', 'echo'],
+    art: { alpha: { shape: 'satellite', caption: 'Lead.' }, bravo: { shape: 'chip', caption: 'One.' }, charlie: { shape: 'drone', caption: 'Two.' } },
+    flashpoints: [{ place: 'KYIV', lat: 50.45, lon: 30.52, note: 'A note.', article: 'alpha' }],
+    briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `K${n}`, agent: 'Graves', what: `W${n}` }, rest: [] })),
+    tape: {
+      briefly: [1, 2, 3].map((n) => ({ label: `Tape ${n}`, lead: { kicker: `TK${n}`, agent: 'Foreman', what: `TW${n}` }, rest: [] })),
+    },
+  },
+  agents,
+  archive: () => undefined,
+  ledger: [],
+});
+
 /**
  * The decision record a shipped edition implies, read back off its own pages:
- * the placement order, the flashpoint list, the two Brieflys and the tape's
- * numbers. Everything the assembler derives is deliberately not read.
+ * the placement order, the flashpoint list and the two Brieflys. Everything
+ * the assembler derives is deliberately not read.
  */
 export function decisionsFromShipped(date) {
   const dir = resolve(repo, 'content/editions', date);
@@ -62,25 +95,15 @@ export function decisionsFromShipped(date) {
   const worldRow = front.head.find((b) => b.block === 'Grid' && b.props.columns?.[0]?.[0]?.block === 'WorldGlyph');
   const items = worldRow?.props.columns[1][0].props.items ?? [];
   const spots = Object.fromEntries((worldRow?.props.columns[0][0].props.hotspots ?? []).map((h) => [h.name, h]));
-  const findBlock = (name) => {
-    let hit = null;
-    const walkTape = (blocks) => { for (const b of blocks) { if (b.block === name) hit = b; if (b.block === 'Grid') for (const c of b.props.columns) walkTape(c); } };
-    walkTape(tape.head);
-    return hit;
-  };
-  const rail = findBlock('MarketsRail');
-  const watch = findBlock('WhatToWatch');
   return {
     edition: date,
     order,
     ...(Object.keys(art).length > 0 ? { art } : {}),
     flashpoints: items.map((it) => ({ place: it.place, lat: spots[it.place]?.lat ?? 0, lon: spots[it.place]?.lon ?? 0, note: it.note, ...(it.article ? { article: it.article } : { agent: it.agent }) })),
     briefly: front.flow.find((b) => b.block === 'Briefly').props.desks,
-    tape: {
-      briefly: tape.head.find((b) => b.block === 'Briefly').props.desks,
-      ...(rail ? { markets: { kicker: rail.props.kicker, rows: rail.props.rows } } : {}),
-      ...(watch ? { watch: watch.props.items } : {}),
-    },
+    // The rail and the deadlines those pages carried are the paper's to
+    // build now, not the record's: tape.markets and tape.watch are retired.
+    tape: { briefly: tape.head.find((b) => b.block === 'Briefly').props.desks },
   };
 }
 

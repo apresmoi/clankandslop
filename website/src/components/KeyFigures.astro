@@ -1,0 +1,68 @@
+---
+/**
+ * The day's figures in the Markets File's own pattern (Briefly.astro,
+ * compact): one column per story under its desk label, each figure a row.
+ * The assembler copies value and label from that article's key_numbers
+ * (ops/tape-blocks.mjs); the night editor only chooses which.
+ */
+interface Figure { value: string; label: string; dir?: 'up' | 'down' | 'flat' }
+interface Group { kicker: string; headline: string; href: string; figures: Figure[] }
+interface Props { title?: string; groups: Group[] }
+const { title = "Today's Numbers", groups } = Astro.props;
+---
+<div class="kf">
+  <div class="kf-title">{title}</div>
+  <div class="kf-desks">
+    {groups.map((g) => (
+      <div class="kf-desk">
+        <div class="kf-desk-label">{g.kicker}</div>
+        <a class="kf-story" href={g.href} title={g.headline}>{g.headline}</a>
+        {g.figures.map((f) => (
+          <div class="kf-item">
+            <span class={`kf-value ${f.dir ?? 'flat'}`}>{f.value}</span>
+            <span class="kf-label">{f.label}</span>
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* Briefly.astro's compact rules: head, desk label, lead, dotted items. */
+  .kf { margin-top: 28px; }
+  .kf-title {
+    font-family: var(--font-sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.26em;
+    text-transform: uppercase; color: var(--ink); margin-bottom: 14px;
+  }
+  .kf-desks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 32px; }
+  .kf-desk { display: flex; flex-direction: column; min-width: 0; }
+  .kf-desk-label {
+    font-family: var(--font-sans); font-size: 10px; font-weight: 700; letter-spacing: 0.32em;
+    text-transform: uppercase; color: var(--accent);
+    padding-bottom: 7px; margin-bottom: 8px; border-bottom: 2px solid var(--ink);
+  }
+  .kf-story {
+    font-family: var(--font-body); font-size: 12px; line-height: 1.36; color: var(--ink);
+    text-decoration: none; padding-bottom: 8px; border-bottom: 1px solid var(--hairline-strong);
+    /* One line, so the figure rows line up across the three columns. */
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .kf-story:hover { text-decoration: underline; }
+  .kf-item {
+    display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: baseline;
+    padding: 6px 0 7px; border-bottom: 1px dotted var(--hairline-strong);
+  }
+  .kf-item:last-child { border-bottom: none; }
+  .kf-value {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .kf-value.up { color: var(--green); }
+  .kf-value.down { color: var(--red); }
+  .kf-label { font-family: var(--font-body); font-size: 11.5px; line-height: 1.36; color: var(--ink); }
+  @media (max-width: 700px) {
+    .kf-desks { grid-template-columns: 1fr; }
+    .kf-desk { padding-bottom: 14px; margin-bottom: 14px; }
+  }
+</style>

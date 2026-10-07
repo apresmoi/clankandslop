@@ -52,29 +52,30 @@ const pool = (article) => ({
  * article documents. A call enters the ledger from an article's `confidence`
  * block or from a settlement row, whichever comes first, and leaves `open` the
  * first time a row marks it `hit`, `miss` or `cancelled`. Each entry carries
- * the deadline its wording states, the forecaster's own band and dissent when
- * the opening article filed them, and Ledger's latest row note with its date.
+ * the deadline its wording states, the opening article's owner and headline,
+ * the forecaster's own band and dissent when that article filed them, and
+ * Ledger's latest row note with its date.
  */
 export function ledgerHistory(editions, { epoch = LEDGER_EPOCH } = {}) {
-  const calls = new Map(), owners = new Map();
+  const calls = new Map(), sources = new Map();
   const ordered = [...(editions ?? [])].filter((e) => isStr(e?.date)).sort(byDate);
   // A settlement row does not name who made the call; the article that
   // published it does, in whatever edition that was.
   for (const edition of ordered)
     for (const article of articlesOf(edition.articles))
-      if (isStr(article?.confidence?.label) && isStr(article?.byline?.agents?.[0]) && !owners.has(callKey(article.confidence.label))) owners.set(callKey(article.confidence.label), article.byline.agents[0]);
+      if (isStr(article?.confidence?.label) && isStr(article?.byline?.agents?.[0]) && !sources.has(callKey(article.confidence.label))) sources.set(callKey(article.confidence.label), { owner: article.byline.agents[0], ...(isStr(article.headline) ? { headline: article.headline.trim() } : {}) });
   for (const edition of ordered) {
     if (edition.date < epoch) continue;
     for (const article of articlesOf(edition.articles)) {
       const confidence = article?.confidence;
       if (!isCallLabel(confidence?.label) || !isP(confidence?.value)) continue;
       const key = callKey(confidence.label);
-      if (!calls.has(key)) calls.set(key, { call: confidence.label.trim(), prior_p: confidence.value, opened: edition.date, deadline: callDeadline(confidence.label, edition.date), owner: article?.byline?.agents?.[0], article: article?.id, ...pool(article), outcome: 'open' });
+      if (!calls.has(key)) calls.set(key, { call: confidence.label.trim(), prior_p: confidence.value, opened: edition.date, deadline: callDeadline(confidence.label, edition.date), owner: article?.byline?.agents?.[0], article: article?.id, ...(isStr(article?.headline) ? { headline: article.headline.trim() } : {}), ...pool(article), outcome: 'open' });
     }
     for (const row of rowsOf(edition.settlements)) {
       if (!isCallLabel(row?.call) || !isP(row?.prior_p)) continue;
       const key = callKey(row.call);
-      if (!calls.has(key)) calls.set(key, { call: row.call.trim(), prior_p: row.prior_p, opened: edition.date, deadline: callDeadline(row.call, edition.date), ...(owners.has(key) ? { owner: owners.get(key) } : {}), outcome: 'open' });
+      if (!calls.has(key)) calls.set(key, { call: row.call.trim(), prior_p: row.prior_p, opened: edition.date, deadline: callDeadline(row.call, edition.date), ...sources.get(key), outcome: 'open' });
       const entry = calls.get(key);
       if (entry.outcome !== 'open') continue;
       if (isStr(row.note)) Object.assign(entry, { note: row.note.trim(), noted_on: edition.date });
@@ -161,20 +162,18 @@ const shortDate = shortDay;
 /**
  * The prior edition's follow-up promises: every article that printed a
  * `next_update_utc`, unless one of today's articles names it in
- * `previous_coverage` (the follow-up was filed). Each is a deadline row for
- * the tape: `{when, what, who}`.
+ * `previous_coverage` (the follow-up was filed). Each is an owed row for the
+ * tape's Deadlines: `{edition, time, headline, article, who}`, where
+ * `edition` is the prior edition's date, `time` the promised clock as filed
+ * and `article` that story's id.
  */
 export function followUps(previous, todayArticles = {}) {
   if (!isStr(previous?.date)) return [];
   const covered = new Set(articlesOf(todayArticles).flatMap((a) => (Array.isArray(a?.previous_coverage) ? a.previous_coverage : []).map((ref) => `${ref?.date}/${ref?.slug}`)));
   return articlesOf(previous.articles)
-    .filter((a) => isStr(a?.next_update_utc) && isStr(a?.headline) && !covered.has(`${previous.date}/${a.id}`))
+    .filter((a) => isStr(a?.next_update_utc) && isStr(a?.headline) && isStr(a?.id) && !covered.has(`${previous.date}/${a.id}`))
     .sort((a, b) => String(a.next_update_utc).localeCompare(String(b.next_update_utc)) || String(a.id).localeCompare(String(b.id)))
-    .map((a) => {
-      const time = a.next_update_utc.trim();
-      const when = /^\d{1,2}:\d{2}$/u.test(time) ? `${shortDate(previous.date)} ${time} UTC` : time;
-      return { when, what: `Update owed on “${a.headline.trim()}”, promised in the ${shortDate(previous.date)} edition.`, ...(isStr(a.byline?.agents?.[0]) ? { who: a.byline.agents[0] } : {}), article: a.id };
-    });
+    .map((a) => ({ edition: previous.date, time: a.next_update_utc.trim(), headline: a.headline.trim(), article: a.id, ...(isStr(a.byline?.agents?.[0]) ? { who: a.byline.agents[0] } : {}) }));
 }
 
 const tokens = (text) => new Set((String(text ?? '').toLowerCase().match(/[\p{L}\d][\p{L}\d.-]*/gu) ?? []).filter((t) => t.length >= 3 || /\d/u.test(t)));
@@ -200,14 +199,12 @@ export function carriedDeskItem(entry) {
 }
 
 /**
- * What the tape carries forward, given the decision record's own desks and
- * deadlines: carried calls the tape's Open Clocks desk does not already hold
- * are appended to it, the prior edition's follow-up promises lead the
- * deadlines, and the forecast ledger lists today's open rows plus every
- * carried call. Returns `{desks, watch, calls}`, or a refusal reason in
- * `error` when there are calls to carry and no Open Clocks desk to put them in.
+ * What the tape carries forward, given the decision record's own desks:
+ * carried calls the tape's Open Clocks desk does not already hold are
+ * appended to it. Returns `{desks, calls}`, or a refusal reason in `error`
+ * when there are calls to carry and no Open Clocks desk to put them in.
  */
-export function carryTape({ desks, watch, todayRows = [], carried = [], follow = [], agents = new Set() }) {
+export function carryTape({ desks, todayRows = [], carried = [], agents = new Set() }) {
   const open = rowsOf(todayRows).filter((row) => row?.outcome === 'open' && isStr(row?.call) && isP(row?.prior_p));
   const calls = [...open.map((row) => ({ call: row.call, prior_p: row.prior_p }))];
   const seen = new Set(calls.map((c) => callKey(c.call)));
@@ -220,8 +217,5 @@ export function carryTape({ desks, watch, todayRows = [], carried = [], follow =
   const items = desks.flatMap((desk) => [desk.lead, ...desk.rest]);
   const missing = owned.filter((entry) => !items.some((item) => itemCarries(item, entry.call)));
   const outDesks = index < 0 || missing.length === 0 ? desks : desks.map((desk, i) => (i === index ? { ...desk, rest: [...desk.rest, ...missing.map(carriedDeskItem)] } : desk));
-
-  // Owed follow-ups fell due before anything the record schedules, so they lead.
-  const outWatch = [...follow.map(({ when, what, who }) => ({ when, what, ...(isStr(who) && agents.has(who) ? { who } : {}) })), ...watch];
-  return { desks: outDesks, watch: outWatch, calls };
+  return { desks: outDesks, calls };
 }

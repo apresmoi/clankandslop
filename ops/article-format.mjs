@@ -16,6 +16,31 @@ const ARCHIVE_SCHEMA = articleArchiveSchema();
 const NON_PUBLIC_KINDS = new Set(['provided_research', 'desk', 'desk_cache', 'record', 'Record', 'desk record', 'research record', 'desk-research', 'computed']);
 const DESK_PHRASES = ['Hardware Desk', 'Escalation Desk', 'Macro Desk', 'Commodities Desk', 'Policy Desk'];
 
+// key_numbers print on the Tape's Today's Numbers (website/src/components/
+// KeyFigures.astro): the value in an 84px column of 13px JetBrains Mono, which
+// holds ten characters before it ellipsizes, the label beside it. They are
+// checked here, at filing, so the writer fixes the figure, not the layout.
+export const KEY_NUMBERS = Object.freeze({ min: 2, max: 6, value: 10, labelMin: 2, labelMax: 48 });
+const chars = (value) => [...value.trim()].length;
+
+function keyNumberFindings(list, add) {
+  if (!Array.isArray(list)) return;
+  if (list.length < KEY_NUMBERS.min || list.length > KEY_NUMBERS.max)
+    add('key_numbers', 'key_numbers', `must carry ${KEY_NUMBERS.min} to ${KEY_NUMBERS.max} figures, got ${list.length} — they are printed on the Tape; file the ${KEY_NUMBERS.min}–3 that matter most first`);
+  for (const [i, entry] of list.entries()) {
+    if (!isObject(entry)) continue;
+    const { value, label } = entry;
+    if (typeof value === 'string' && value.trim() && chars(value) > KEY_NUMBERS.value)
+      add(`key_numbers[${i}].value`, 'key_numbers', `${JSON.stringify(value)} is ${chars(value)} characters; the Tape prints at most ${KEY_NUMBERS.value} — a number with its unit ("34/day", "€930m", "28%"), with any qualifier moved into the label`);
+    if (typeof value === 'string' && /[\n\r]/u.test(value)) add(`key_numbers[${i}].value`, 'key_numbers', 'must be one line');
+    if (typeof label !== 'string' || !label.trim()) continue;
+    if (chars(label) < KEY_NUMBERS.labelMin || chars(label) > KEY_NUMBERS.labelMax)
+      add(`key_numbers[${i}].label`, 'key_numbers', `${JSON.stringify(label)} is ${chars(label)} characters; a label is a plain phrase of ${KEY_NUMBERS.labelMin}–${KEY_NUMBERS.labelMax} characters naming what the number counts`);
+    if (/[.;:,]\s*$/u.test(label) || /[\n\r]|\*\*|\[E\d+\]/u.test(label))
+      add(`key_numbers[${i}].label`, 'key_numbers', `${JSON.stringify(label)} must be a plain phrase: one line, no trailing punctuation, no citation or markup`);
+  }
+}
+
 /** Pure format preflight. It does not authenticate evidence or check assignment/revision lineage. */
 export function articleFormatFindings(article, context = {}) {
   const profile = context.profile ?? 'filing';
@@ -80,6 +105,7 @@ export function articleFormatFindings(article, context = {}) {
   }
   if (a.dissent && isObject(a.dissent) && !agentNames.has(a.dissent.agent)) add('dissent.agent', 'byline', 'must name a canonical agent');
   checkAssets(a, context, add);
+  if (strict) keyNumberFindings(a.key_numbers, add);
   if (strict) for (const finding of attributedEvidenceFindings(a)) add(finding.path, finding.code, finding.message);
   if (strict) for (const finding of forecastSettlementFindings(a)) add(finding.path, finding.code, finding.message);
   if (strict) errors.push(...proseLeakFindings(a));

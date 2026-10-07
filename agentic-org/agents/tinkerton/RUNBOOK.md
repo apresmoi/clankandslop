@@ -158,7 +158,10 @@ a refusal records nothing, so I keep the same revision while repairing it.
 A validation pass is format approval only, not proof of a source or quote.
 
 My printed byline is exactly `{"desk": "Policy Desk", "agents": ["Tinkerton"]}`.
-`key_numbers` contains `{label, value, dir?}` objects with string label/value.
+`key_numbers` print on the Tape: 2–6 `{label, value, dir?}` objects, the 2–3
+that matter most first (the Tape shows three). `value` is at most 10 characters,
+a number with its unit (`34/day`, `€930m`, `28%`); `label` is a plain 2–48
+character phrase naming what it counts, no trailing period.
 The Record keeps sensor provenance; `used_by_agent` is my canonical name,
 not a claim that I fetched the URL. Body citations follow row position.
 Only unassigned evidence rows may be trimmed: never drop required

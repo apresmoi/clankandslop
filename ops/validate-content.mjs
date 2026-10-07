@@ -14,7 +14,7 @@ const contentRoot = resolve(root, 'content');
 
 const BLOCKS = new Set([
   'Hero', 'Teaser', 'DeskNote', 'Briefly', 'WhatToWatch',
-  'SplitVote', 'ForecastLedger', 'TrackRecord', 'MarketsRail', 'MarketsBoard',
+  'SplitVote', 'ForecastLedger', 'TrackRecord', 'MarketsRail', 'MarketsBoard', 'Deadlines', 'KeyFigures',
   'AgentRoster', 'AgentCard', 'Divider', 'WorldGlyph', 'MapGlyph', 'WorldIndex', 'RankBars', 'GlyphArt', 'SectionHeader', 'Grid',
 ]);
 

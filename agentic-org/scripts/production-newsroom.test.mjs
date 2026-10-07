@@ -43,7 +43,7 @@ const recordAssignment = async (args) => { useCorpus(args.edition); return recor
 const archivedMap = archiveResolver();
 const owners = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'];
 const assignmentEvent = 'schedule:assignment-20260825';
-const article = (id, agent, edition, index) => ({ id, edition_date: edition, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test', headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact', byline: { desk: 'Test Desk', agents: [agent] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30', topics: ['unclos'], body: ['One [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'], key_numbers: [], evidence_box: [{ source: `Official ${index}`, fragment: 'fact', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: `https://source${index}.example/evidence`, retrieved_at: `${edition}T10:00:00Z` } }], refs: ['E1'], ...(index === 1 ? { confidence: { label: 'TEST CALL', value: 0.42 } } : {}), ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {}) });
+const article = (id, agent, edition, index) => ({ id, edition_date: edition, section: ['world', 'markets', 'technology'][index % 3], kicker: 'Test', headline: `Headline ${id}`, deck: 'A complete sourced test deck.', epistemic: index === 1 ? 'forecast' : 'fact', byline: { desk: 'Test Desk', agents: [agent] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30', topics: ['unclos'], body: ['One [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'], key_numbers: [{ label: 'Test count', value: '12' }, { label: 'Test share', value: '34%' }], evidence_box: [{ source: `Official ${index}`, fragment: 'fact', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: `https://source${index}.example/evidence`, retrieved_at: `${edition}T10:00:00Z` } }], refs: ['E1'], ...(index === 1 ? { confidence: { label: 'TEST CALL', value: 0.42 } } : {}), ...(index === 0 ? { art: { kind: 'map', map: 'hormuz', hero_map: 'hormuz-hero', caption: 'The strait.', spots: [] } } : {}) });
 // The four desk documents in the shape ops/desk-contract.mjs requires — the
 // same shape the site assembles an Edition from. file_desk refuses anything
 // else, so a test fixture cannot be a placeholder object any more.
@@ -179,7 +179,7 @@ const cited = (id, agent, over = {}) => ({
   deck: 'A complete sourced test deck.', epistemic: 'fact', byline: { desk: 'Test Desk', agents: [agent] },
   timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30', topics: ['unclos'],
   body: ['Alpha reports the mechanism [E1].', 'Beta confirms the second reading [E2].', 'Gamma disputes the timing [E1].', 'Delta closes on the operating fact [E2].'],
-  key_numbers: [],
+  key_numbers: [{ label: 'Test count', value: '12' }, { label: 'Test share', value: '34%' }],
   evidence_box: [
     { source: 'Official', fragment: 'fact', as_of: EDITION, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: agent, source_url: 'https://first.example/evidence', retrieved_at: `${EDITION}T10:00:00Z` } },
     { source: 'Second', fragment: 'fact', as_of: EDITION, source_note: { source_id: 'E2', source_kind: 'public_url', used_by_agent: agent, source_url: 'https://second.example/evidence', retrieved_at: `${EDITION}T10:00:00Z` } }
@@ -1108,8 +1108,6 @@ const decisions = (edition, ids) => ({
   briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `Kicker ${n}`, agent: 'Graves', what: `What ${n}.` }, rest: [] })),
   tape: {
     briefly: [1, 2, 3].map((n) => ({ label: `Tape ${n}`, lead: { kicker: `Tape kicker ${n}`, agent: 'Foreman', what: `Tape what ${n}.` }, rest: [] })),
-    markets: { kicker: 'A day in eight words', rows: [{ sym: 'ACP', value: '34', spark: 'slots', pct: 'from 4 Sep', dir: 'down' }] },
-    watch: [{ when: '8 Sep', what: 'The measure either enters force or the date slips.', who: 'Foreman' }],
   },
 });
 

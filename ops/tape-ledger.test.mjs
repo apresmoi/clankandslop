@@ -37,7 +37,7 @@ const input = (edition, ledger, rows, articles) => ({
     order: ['a', 'b', 'c', 'd', 'e'],
     art: { a: { shape: 'satellite', caption: 'Lead.' }, b: { shape: 'chip', caption: 'One.' }, c: { shape: 'drone', caption: 'Two.' } },
     briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `K${n}`, agent: 'Tinkerton', what: `W${n}` }, rest: [] })),
-    tape: { briefly: ['Closed Clocks', 'Open Clocks', 'Ballots'].map((label) => ({ label, lead: { kicker: 'Runoff Set', agent: 'Tinkerton', what: 'The runoff is the next print.' }, rest: [] })), watch: [] },
+    tape: { briefly: ['Closed Clocks', 'Open Clocks', 'Ballots'].map((label) => ({ label, lead: { kicker: 'Runoff Set', agent: 'Tinkerton', what: 'The runoff is the next print.' }, rest: [] })) },
   },
 });
 const table = (laid) => laid.pages.find((p) => p.name === 'tape').document.head.find((b) => b.block === 'ForecastLedger').props;

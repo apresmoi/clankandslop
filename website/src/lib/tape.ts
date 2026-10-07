@@ -77,10 +77,10 @@ export function ledgerKey(rows: LedgerKeyRow[]): Array<{ term: string; text: str
   const band = rows.some((r) => typeof r.interval === 'number');
   const dissent = rows.some((r) => r.dissent);
   return [
-    { term: 'Resolves', text: 'is the deadline the call’s own wording states.' },
-    { term: 'State', text: 'is not yet due until that deadline passes; then the call is due — awaiting verification until Ledger settles it hit or miss, and each edition Ledger notes what it checked and why the call is still unresolved.' },
-    { term: 'Posterior', text: `is the forecaster’s probability, at publication, that the call resolves YES${band ? ', with ± the forecaster’s own uncertainty band where one was filed' : ''}.` },
+    { term: 'Resolves', text: 'the deadline in the call’s own wording.' },
+    { term: 'State', text: 'not yet due, then due — awaiting verification until Ledger settles it hit or miss.' },
+    { term: 'Posterior', text: `the forecaster’s probability at publication${band ? ', with ± the forecaster’s own uncertainty band where one was filed' : ''}.` },
     ...(dissent ? [{ term: 'Dissent', text: 'names the agent who argued the other side, with their probability.' }] : []),
-    { term: 'Settled', text: 'calls leave this table for the Track Record below.' },
+    { term: 'Settled', text: 'calls move to the Track Record below.' },
   ];
 }

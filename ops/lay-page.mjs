@@ -9,6 +9,7 @@ import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
 import { decisionSummaryFindings } from './summary-fidelity.mjs';
 import { LEDGER_EPOCH, carriedCalls, carryTape, followUps, forecastRows, ledgerHistory } from './open-clocks.mjs';
 import { archiveLedger } from './ledger-archive.mjs';
+import { deadlinesBlock, keyFiguresBlock } from './tape-blocks.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -21,7 +22,9 @@ const isStr = (v) => typeof v === 'string' && v.length > 0;
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-const RAIL_DIRS = new Set(['up', 'down', 'flat']);
+// Retired 2026-10-07: the Tape's numbers and deadlines are built from the
+// articles and the ledger (ops/tape-blocks.mjs), never typed into the record.
+const RETIRED_TAPE_KEYS = ['markets', 'watch'];
 const CHROME = {
   front: { title: 'Clank & Slop - The Front Page', active: '/' },
   tape: { title: 'Clank & Slop - The Tape', active: '/tape' },
@@ -194,33 +197,23 @@ function frontPage(edition, order, articles, decisions, maps, agents) {
   return { edition, page: 'front', paper: 'front', title: CHROME.front.title, active: CHROME.front.active, tagline: null, head, flow: [{ block: 'Briefly', props: { title: '', compact: true, desks: brieflyDesks('briefly', decisions.briefly, agents) } }] };
 }
 
-function tapePage(edition, decisions, desk, agents, carry) {
-  const tape = isObj(decisions.tape) ? decisions.tape : fail('tape shape', 'the decision record must carry a "tape" object {briefly, markets, watch}');
+function tapePage(edition, order, articles, decisions, desk, agents, carry) {
+  const tape = decisions.tape;
   const authoredDesks = brieflyDesks('tape.briefly', tape.briefly, agents);
-
-  const rows = (tape.markets?.rows ?? []).map((row, i) => {
-    for (const key of ['sym', 'value', 'spark', 'pct']) if (!isStr(row?.[key])) fail('markets shape', `tape.markets.rows[${i}].${key} must be a non-empty string`);
-    if (!RAIL_DIRS.has(row.dir)) fail('markets shape', `tape.markets.rows[${i}].dir must be up|down|flat — red is only ever down and green only ever up, so "flat" is the honest choice for anything that has not moved`);
-    return { sym: row.sym, value: row.value, spark: row.spark, pct: row.pct, dir: row.dir };
-  });
-  const authoredWatch = (tape.watch ?? []).map((row, i) => {
-    for (const key of ['when', 'what']) if (!isStr(row?.[key])) fail('watch shape', `tape.watch[${i}].${key} must be a non-empty string`);
-    if (row.who !== undefined && !agents.has(row.who)) fail('agent reference', `tape.watch[${i}].who names agent "${row.who}", which has no persona file`);
-    return { when: row.when, what: row.what, ...(row.who ? { who: row.who } : {}) };
-  });
-  // Open calls and follow-up promises from earlier editions are carried here
+  // Open calls from earlier editions are carried onto the Open Clocks desk
   // until they settle (ops/open-clocks.mjs); a decision record cannot drop one.
-  const carried = carryTape({ desks: authoredDesks, watch: authoredWatch, todayRows: desk['ledger.settlements'], carried: carry.calls, follow: carry.follow, agents });
+  const carried = carryTape({ desks: authoredDesks, todayRows: desk['ledger.settlements'], carried: carry.calls, agents });
   if (carried.error) fail('open clocks', carried.error);
-  const watch = carried.watch;
   const head = [{ block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: carried.desks } }];
   // Ledger's copy of the producer's FRED board; the site reads it off the desk
   // document, the way the globe reads the World Desk.
   if (isObj(desk['ledger.worlddesk'].markets)) head.push({ block: 'MarketsBoard', props: { markets: 'edition' } });
-  const rail = rows.length > 0 ? { block: 'MarketsRail', props: { title: 'The Tape', ...(isStr(tape.markets?.kicker) ? { kicker: tape.markets.kicker } : {}), rows } } : null;
-  const deadlines = watch.length > 0 ? { block: 'WhatToWatch', props: { title: `The Deadlines · ${watch[0].when}${watch.length > 1 ? ` – ${watch[watch.length - 1].when}` : ''}`, items: watch } } : null;
-  if (rail && deadlines) head.push(grid([1, 1], [[rail], [deadlines]]));
-  else if (rail || deadlines) head.push(rail ?? deadlines);
+  // The numbers and the deadlines are the paper's, built from what the
+  // articles and the ledger already carry; nobody types them.
+  const figures = keyFiguresBlock({ edition, order, articles });
+  if (figures) head.push(figures);
+  const deadlines = deadlinesBlock({ edition, owed: carry.follow, articles, calls: carry.open, agents });
+  if (deadlines) head.push(deadlines);
 
   // Every call not yet settled, today's new ones included, each in its state.
   const open = carry.table;
@@ -288,6 +281,10 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
   if (!/^\d{4}-\d{2}-\d{2}$/.test(edition ?? '')) fail('edition identity', `edition must be an ISO date "YYYY-MM-DD", got ${JSON.stringify(edition)}`);
   if (!isObj(decisions)) fail('decision record', 'no decision record supplied — the assembler never guesses an editorial choice');
   if (decisions.edition !== undefined && decisions.edition !== edition) fail('edition identity', `the decision record names edition ${JSON.stringify(decisions.edition)} but the run is for ${edition}`);
+  if (!isObj(decisions.tape)) fail('tape shape', 'the decision record must carry a "tape" object {briefly, forecast_meta?}');
+  const retired = RETIRED_TAPE_KEYS.filter((key) => Object.hasOwn(decisions.tape, key));
+  if (retired.length > 0)
+    fail('tape shape', `the decision record carries ${retired.map((key) => `tape.${key}`).join(' and ')}, which the assembler no longer accepts — the Tape's numbers and deadlines are built by the paper from articles; remove tape.markets / tape.watch and keep tape.briefly (and tape.forecast_meta, if any)`);
   for (const part of ['caslon.chrome', 'caslon.weather', 'ledger.settlements', 'ledger.worlddesk'])
     if (!isObj(desk[part])) fail('edition tree incomplete', `desk document "${part}" is missing — compose_edition requires exactly 4`);
 
@@ -317,9 +314,10 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
   const prior = (ledger ?? archiveLedger(undefined, { before: edition })).filter((entry) => entry.date < edition);
   const previous = prior.reduce((latest, entry) => (latest === undefined || entry.date > latest.date ? entry : latest), undefined);
   const today = { date: edition, settlements: desk['ledger.settlements'], articles: Object.values(articles) };
-  const carry = { calls: carriedCalls(ledgerHistory(prior), edition, desk['ledger.settlements']), follow: followUps(previous, articles), table: forecastRows(ledgerHistory([...prior, today], { epoch: edition < LEDGER_EPOCH ? edition : LEDGER_EPOCH }), edition) };
+  const history = ledgerHistory([...prior, today], { epoch: edition < LEDGER_EPOCH ? edition : LEDGER_EPOCH });
+  const carry = { calls: carriedCalls(ledgerHistory(prior), edition, desk['ledger.settlements']), follow: followUps(previous, articles), table: forecastRows(history, edition), open: history.filter((entry) => entry.outcome === 'open') };
   const front = frontPage(edition, order, articles, decisions, resolved, agents);
-  const tape = tapePage(edition, decisions, desk, agents, carry);
+  const tape = tapePage(edition, order, articles, decisions, desk, agents, carry);
 
   const visuals = visualCount(front);
   if (visuals < 2 || visuals > 3) fail('illustration rhythm invalid', `the front carries ${visuals} MapGlyph/GlyphArt blocks; compose_edition requires 2-3`);

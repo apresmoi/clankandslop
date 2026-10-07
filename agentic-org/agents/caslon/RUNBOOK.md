@@ -164,9 +164,10 @@ non-empty labelled `spots`, `locator_context`, and any grounded `title`,
 This changes the page, not the reporter article.
 
 You make the decisions; the assembler writes the bytes. Hand it the placement
-order, lead and feature art, flashpoint rows, two `Briefly` groupings and tape
-numbers. It builds both documents on the house skeleton, sets every key the
-gates count, saves the exact layout and returns its digest. `compose_edition`
+order, lead and feature art, flashpoint rows and two `Briefly` groupings. It
+builds both documents on the house skeleton, the tape's numbers and deadlines
+from the articles and the ledger, sets every key the gates count, saves the
+exact layout and returns its digest. `compose_edition`
 reads and authenticates those bytes from shared state and re-runs the same
 assembler against the current accepted inputs. Never retype page bytes or mix
 the digest with inline page, map or artifact fields.

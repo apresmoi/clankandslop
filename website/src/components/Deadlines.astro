@@ -1,0 +1,81 @@
+---
+/**
+ * The tape's deadlines, in the Forecast Ledger's table pattern. Every field is
+ * structured by the assembler (ops/tape-blocks.mjs): dates arrive as ISO days
+ * and HH:MM times, owed follow-ups as story references, so nothing an agent
+ * types can break the columns. Dated rows are the open forecast calls.
+ */
+interface Owed { time?: string; headline: string; href: string; who?: string }
+interface Dated { date: string; time?: string; what: string; who?: string }
+interface Props { title?: string; owed_from?: string; owed?: Owed[]; dated?: Dated[] }
+const { title = 'The Deadlines', owed_from, owed = [], dated = [] } = Astro.props;
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const day = (iso: string) => `${Number(iso.slice(8, 10))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
+const dates = [...(owed.length && owed_from ? [owed_from] : []), ...dated.map((d) => d.date)].sort();
+const range = dates.length > 1 && dates[0] !== dates[dates.length - 1] ? `${day(dates[0])} – ${day(dates[dates.length - 1])}` : dates.length ? day(dates[0]) : '';
+---
+<div class="dl">
+  <div class="dl-head"><span class="dl-label">{title}</span>{range && <span class="dl-meta">{range}</span>}</div>
+  <div class="dl-colhead" aria-hidden="true"><span>Due</span><span>What · state</span><span>Desk</span></div>
+  <div class="dl-rows">
+    {owed.map((o) => (
+      <div class="dl-row">
+        <span class="dl-when">{owed_from ? day(owed_from) : ''}{o.time ? ` · ${o.time}` : ''}</span>
+        <div class="dl-qcol">
+          <a class="dl-q" href={o.href}>{o.headline}</a>
+          <span class="dl-why"><span class="dl-state">Update owed</span></span>
+        </div>
+        <span class="dl-who">{o.who ?? ''}</span>
+      </div>
+    ))}
+    {dated.map((d) => (
+      <div class="dl-row">
+        <span class="dl-when">{day(d.date)}{d.time ? ` · ${d.time}` : ''}</span>
+        <div class="dl-qcol">
+          <span class="dl-q">{d.what}</span>
+          <span class="dl-why"><span class="dl-state">Forecast deadline</span></span>
+        </div>
+        <span class="dl-who">{d.who ?? ''}</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* ForecastLedger.astro's head, column head and row rules, three columns. */
+  .dl { margin: 28px 0; padding: 14px 0 10px; border-top: 1px solid var(--hairline-strong); }
+  .dl-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--hairline); margin-bottom: 6px;
+  }
+  .dl-label { font-weight: 700; color: var(--ink); }
+  .dl-meta { color: var(--muted); font-size: 10px; }
+  .dl-colhead, .dl-row { display: grid; grid-template-columns: 110px 1fr 120px; gap: 16px; }
+  .dl-colhead {
+    padding: 6px 0; border-bottom: 1px solid var(--hairline-strong);
+    font-family: var(--font-sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .dl-rows { display: flex; flex-direction: column; }
+  .dl-row { align-items: start; padding: 12px 0; border-bottom: 1px dotted var(--hairline); }
+  .dl-row:last-child { border-bottom: none; }
+  .dl-when {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--muted);
+    text-transform: uppercase; white-space: nowrap; padding-top: 2px;
+  }
+  .dl-qcol { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .dl-q { font-family: var(--font-body); font-size: 14.5px; line-height: 1.4; color: var(--ink); text-decoration: none; }
+  a.dl-q:hover { text-decoration: underline; }
+  .dl-why { font-family: var(--font-body); font-size: 12.5px; font-style: italic; line-height: 1.4; color: var(--muted); }
+  .dl-state {
+    font-family: var(--font-sans); font-style: normal; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+  }
+  .dl-who { font-family: var(--font-mono); font-size: 12px; color: var(--ink); white-space: nowrap; padding-top: 2px; }
+  @media (max-width: 880px) {
+    .dl-colhead { display: none; }
+    .dl-row { grid-template-columns: 1fr auto; }
+    .dl-when { grid-column: 1 / -1; }
+  }
+</style>
