@@ -69,10 +69,12 @@ in `room:filing`.
 The second scheduled wake is the retry. Read the INDEX:
 
 - already composed: end the turn;
-- `ready`: compose now;
-- still `blocked`: send `@brass` one message in `room:release` listing every
-  missing item and its owner (a pending revision, a facts check, a Ledger desk
-  document), then end the turn. Brass's reply wakes you; compose then.
+- otherwise try to compose. If the INDEX says `blocked`, or `compose_edition`
+  refuses for anything you do not own (a missing facts check included), do not
+  ask the owners again: send `@brass` one message in `room:release` listing
+  every missing item and its owner (an unreviewed filing, a pending revision, a
+  facts check, a Ledger desk document), then end the turn. Brass's reply wakes
+  you; compose then.
 
 `forecast=` and `dissent=` are counts, not gates. The forecast is bound at
 conference when Brass marks one assignment as the day's call, and enforced at filing.

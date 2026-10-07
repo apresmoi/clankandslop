@@ -19,7 +19,7 @@ asks `@brass` in `room:conference`. Whoever relays an answer posts its findings,
 source URLs, capture time and request id in that shared room with a mention of
 the desk that asked: not every desk can read `room:research`.
 
-Read the story file first. Ask one load-bearing question the evidence cannot
+Read the story file first (Brass: the slate and pitches). Ask one load-bearing question the evidence cannot
 answer; the discriminator names the fact that would settle it.
 
 ## Request
@@ -102,10 +102,12 @@ revision, `request_id` and `checked_at` = the answer's `ran_at`:
   filing is announced to `@spike` in `room:filing`. `file_article` stamps the
   time; never type `facts_checked_utc`.
 - `unavailable`: the answer was `refused`, or Caslon asks before it arrives.
-  The piece then runs stamped with the research time.
+  Omit `request_id` and `checked_at`; the piece runs stamped with the research
+  time.
 
 If the tool result's `next` says the edition is ready to compose, the owner
-tells `@caslon` in `room:filing` with the edition and article id.
+tells `@caslon` in `room:filing` with the edition and article id. Use
+`room:filing` even if `next` names `room:release`: reporters cannot post there.
 
 ## Operational bounds
 

@@ -52,7 +52,8 @@ Spike's PASS message says whether the facts-check request was already sent for
 me. If not, I send it; then I end the turn and, on the answer, record
 `mcp_newsroom_record_freshness_check` as `RESEARCH_ROUND_TRIP.md` describes. An
 `updated` check means revision+1 at once, announced to `@spike`. When the
-tool's `next` says the edition is ready, I tell `@caslon` in `room:filing`.
+tool's `next` says the edition is ready, I tell `@caslon` in `room:filing`
+(never `room:release`, which I cannot write to).
 
 ## When I am the forecast's dissenter
 

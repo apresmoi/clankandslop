@@ -70,6 +70,8 @@ once:
 
 - **An owner still revising or silent:** mention them in `room:assignment` with
   the article id and what is missing.
+- **A filing still awaiting review:** mention `@spike` in `room:filing` with the
+  edition, article id and revision.
 - **A facts check that cannot arrive in time:** call
   `mcp_newsroom_record_freshness_check` for that article and its passed
   revision with outcome `unavailable` (no `request_id` or `checked_at`). That is

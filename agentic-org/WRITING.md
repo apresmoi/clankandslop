@@ -35,6 +35,10 @@ facts. File it as `epistemic: "fact"`.
 File an analysis as `epistemic: "inference"`. The lead story is always an
 analysis. An edition carries one or two; the rest are briefs.
 
+**The day's forecast** files as `epistemic: "forecast"` whichever format Brass
+names. As an analysis, the desk's reading is the probability and its derivation
+(see Forecasts) and the next test is the settlement condition.
+
 If the evidence cannot carry the commissioned proposition, write the brief and
 tell `@brass` in `room:assignment` in one line. Do not stretch a brief into an
 analysis.
@@ -70,7 +74,8 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
   `raw_excerpt` that carries a distinct fact appears in the body with its
   `[En]`. Length follows the captured facts: three verified facts make a
   three-paragraph piece. More length needs more reporting, never comparison,
-  gap or consequence paragraphs.
+  gap or consequence paragraphs. In an analysis, the desk's reading and the
+  next test are the only paragraphs not built on new facts.
 - **One fact, one paragraph.** Four outlets reporting one fact is one paragraph
   with four citations. Never restate a fact in other words.
 - **No working on the page.** No arithmetic, rounding or date checks that
@@ -145,9 +150,11 @@ the same bar.
 - Percentages use `%`: `5.2%`, never "5.2 percent". A change between two
   percentages is in percentage points ("down about 8 percentage points, from
   about 50% to 42%").
-- Round to what a reader needs: one decimal for yields, rates and prices. Use
-  the latest official figure, rounded with "about", never a stale exact one.
+- Round to what a reader needs: one decimal for yields, rates and prices,
+  unless the precision is the news (a quarter-point rate decision). Use the
+  latest official figure, rounded with "about", never a stale exact one.
 - State each number once.
+- Neutral third person, no reader address, sparing em dashes.
 - Concrete subjects and plain verbs; vary openings and sentence length; no
   throat-clearing, false agency or dramatic metaphor that invents a clock,
   motive or cause.
@@ -172,8 +179,9 @@ the same bar.
 
 ## Revisions and messages
 
-A revision fixes what Spike named and keeps every verified fact the previous
-revision carried. Never shorten a piece to answer a revision request. In
+A revision fixes what Spike named and keeps every other verified fact the
+previous revision carried. Cut a fact only when Spike's notes name its `[En]`
+row; never shorten a piece otherwise. In
 messages, cite rather than reproduce: name the article id, revision and `[En]`
 row, and quote only the words in dispute.
 
