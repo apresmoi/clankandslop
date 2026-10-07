@@ -17,6 +17,7 @@
 // Pure: no clock, no disk, no network, no I/O of any kind. That is what lets
 // the same code run inside file_article, inside the edition INDEX build, and
 // inside the release validator.
+import { repeatedFigure, unnamedOutlet, unnamedSpeakerStatement } from './attribution-lint.mjs';
 
 /**
  * Three or more consecutive paragraphs opening on the same word. The composer's
@@ -124,6 +125,8 @@ export const PROSE_LINT_MESSAGES = {
   em_dashes: ({ dashes, paragraphs }) => `${dashes} em dashes across ${paragraphs} paragraphs — the em dash as a default connector is an AI tell; prefer commas, colons or full stops`,
   pct_points: ({ phrase }) => `"${phrase}" sits beside other percentages — a change between two percentages is in percentage points ("down about 8 percentage points, from about 50% to 42%"), even if the source wrote "%"`,
   unnamed_speaker: ({ phrase }) => `"${phrase}" attributes a statement to someone the copy does not name — name the speaker and their role as the source does ("Sahra Wagenknecht, founder of the BSW, told dpa"); keep it anonymous only when the source itself does not name them, and say so`,
+  number_repeated: ({ figure, first, second }) => `"${figure}" is stated ${first === second ? `twice in paragraph ${first}` : `in paragraph ${first} and again in paragraph ${second}`} — state each figure once, where it does the work; cut the restatement or make the second mention add a new fact`,
+  outlet_unnamed: ({ outlet, row, paragraph }) => `paragraph ${paragraph} reports a statement from [E${row}], which an official gave to ${outlet}, without naming ${outlet} — attribute it as the source does ("a US official told ${outlet}")`,
   decisive_test: ({ phrase }) => `the final paragraph says "${phrase}" — name a test only if its result would differ under each reading the piece presents, and end on what the piece established rather than a test or implication it did not develop`
 };
 
@@ -143,8 +146,12 @@ export function proseLintFindings(article) {
   if (dashes) findings.push({ flag: `em_dashes:${dashes.dashes}/${dashes.paragraphs}`, detail: dashes, message: PROSE_LINT_MESSAGES.em_dashes(dashes) });
   const slip = percentagePointSlip([article?.headline, article?.deck, ...paragraphs].filter((value) => typeof value === 'string'));
   if (slip) findings.push({ flag: 'pct_points', detail: slip, message: PROSE_LINT_MESSAGES.pct_points(slip) });
-  const speaker = unnamedSpeaker([article?.headline, article?.deck, ...paragraphs].filter((value) => typeof value === 'string'));
+  const speaker = unnamedSpeaker([article?.headline, article?.deck, ...paragraphs].filter((value) => typeof value === 'string')) ?? unnamedSpeakerStatement(paragraphs);
   if (speaker) findings.push({ flag: 'unnamed_speaker', detail: speaker, message: PROSE_LINT_MESSAGES.unnamed_speaker(speaker) });
+  const repeated = repeatedFigure(paragraphs);
+  if (repeated) findings.push({ flag: 'number_repeated', detail: repeated, message: PROSE_LINT_MESSAGES.number_repeated(repeated) });
+  const outlet = unnamedOutlet({ evidence_box: article?.evidence_box, body: paragraphs });
+  if (outlet) findings.push({ flag: 'outlet_unnamed', detail: outlet, message: PROSE_LINT_MESSAGES.outlet_unnamed(outlet) });
   const decisive = decisiveTestClaim(paragraphs);
   if (decisive) findings.push({ flag: 'decisive_test', detail: decisive, message: PROSE_LINT_MESSAGES.decisive_test(decisive) });
   return findings;
