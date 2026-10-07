@@ -1,14 +1,19 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { articleFormatFindings, articleFilingSchema, ARTICLE_REPORTER_NAMES, proseLeakFindings } from './article-format.mjs';
+import { articleFormatFindings, articleFilingSchema, ARTICLE_REPORTER_NAMES, KEY_NUMBERS, proseLeakFindings } from './article-format.mjs';
 
 const read = (file) => JSON.parse(readFileSync(new URL(`../content/${file}`, import.meta.url), 'utf8'));
-const fact = read('editions/2026-08-21/articles/deepseek-ships-flash-vision-on-the-api.json');
-const publishedForecast = read('editions/2026-08-09/articles/syria-takes-the-airport-russia-keeps-the-question.json');
-const hormuzForecast = read('editions/2026-09-11/articles/s-df5507bc.json');
-const alstomOrder = read('editions/2026-09-11/articles/s-044c222e.json');
-const khasabStrike = read('editions/2026-09-11/articles/s-69b40b89.json');
+// Published articles predate the Tape's key_numbers limits (7 October), so the
+// filing fixtures keep only the figures that already fit the Tape; the
+// archive profile still accepts every published article as it stands.
+const fits = (entry) => [...entry.value].length <= KEY_NUMBERS.value;
+const filed = (article) => ({ ...article, key_numbers: article.key_numbers.filter(fits) });
+const fact = filed(read('editions/2026-08-21/articles/deepseek-ships-flash-vision-on-the-api.json'));
+const publishedForecast = filed(read('editions/2026-08-09/articles/syria-takes-the-airport-russia-keeps-the-question.json'));
+const hormuzForecast = filed(read('editions/2026-09-11/articles/s-df5507bc.json'));
+const alstomOrder = filed(read('editions/2026-09-11/articles/s-044c222e.json'));
+const khasabStrike = filed(read('editions/2026-09-11/articles/s-69b40b89.json'));
 const topicSlugs = Object.keys(read('topics.json').topics);
 const context = { owner: 'cogsworth', topicSlugs };
 

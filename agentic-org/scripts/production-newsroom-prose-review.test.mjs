@@ -38,7 +38,7 @@ function article({ revision = 1, leaky = false } = {}) {
       'The record leaves the timing open [E1].',
       'The next update depends on the published order [E1].'
     ],
-    key_numbers: [],
+    key_numbers: [{ label: 'Test count', value: '12' }, { label: 'Test share', value: '34%' }],
     evidence_box: [{
       source: 'Official record',
       fragment: 'fact',

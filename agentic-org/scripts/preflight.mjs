@@ -59,7 +59,7 @@ async function checkContractDerivability() {
       edition_date: edition, section: 'policy', kicker: 'Policy', headline: 'Court Clock Runs on TikTok Time',
       deck: 'A deck describing the court-clock TikTok mechanism and the reading that would undo it.', epistemic: 'fact',
       byline: { desk: 'Policy Desk', agents: ['Tinkerton'] }, timestamp: '12:00 UTC', revision: 1, next_update_utc: '14:30',
-      topics: ['policy'], body: ['One.', 'Two.', 'Three.', 'Four.'], key_numbers: [],
+      topics: ['policy'], body: ['One.', 'Two.', 'Three.', 'Four.'], key_numbers: [{ label: 'Test count', value: '12' }, { label: 'Test share', value: '34%' }],
       evidence_box: [{ source: 'Court filing', fragment: 'the clock', as_of: edition, source_note: { source_id: 'E1', source_kind: 'public_url', used_by_agent: 'Tinkerton', source_url: evidenceUrl, retrieved_at: `${edition}T10:00:00Z` } }],
       refs: ['E1']
     };

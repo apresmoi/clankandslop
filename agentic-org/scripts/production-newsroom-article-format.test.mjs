@@ -37,13 +37,15 @@ runtimeTest('fileArticle cannot bypass format checks and rejected mutations writ
     await recordAssignment({ edition: published.edition_date, event_key: 'format-assignment', assignments: ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton'].map((owner, i) => ({ id: i ? `other-${i}` : published.id, owner, brief: 'Report the actual sourced event and its consequences.', evidence_refs: i ? [] : ['s-0c0be037'], ...(i === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) })) });
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
     const base = structuredClone(published);
+    // The Tape's key_numbers limits postdate this article; keep the figures that fit.
+    base.key_numbers = base.key_numbers.filter((entry) => [...entry.value].length <= 8);
     base.presentation = { flashpoint: { place: 'PANAMA', lat: 9.08, lon: -79.52, note: 'The schedule changes. The booking limit remains provisional.' } };
     base.evidence_box[0].source_note.source_id = 's-0c0be037'; base.refs[0] = 's-0c0be037';
     const before = await snapshot(temporary);
     const mutations = [
       a => { delete a.headline; }, a => { a.unknown = true; },
       a => { a.byline.agents = ['cogsworth']; }, a => { a.byline.agents.push('Tinkerton'); }, a => { a.byline.agents = ['Tinkerton']; },
-      a => { a.key_numbers[0] = '384'; }, a => { a.body[0] = { text: 'Broken' }; },
+      a => { a.key_numbers[0] = '384'; }, a => { a.key_numbers[0].value = '€930 million'; }, a => { a.key_numbers = a.key_numbers.slice(0, 1); }, a => { a.body[0] = { text: 'Broken' }; },
       a => { a.evidence_box = [null]; }, a => { a.refs = {}; },
       a => { a.evidence_box[0].source_note.source_url = 'javascript:alert(1)'; },
       a => { a.evidence_box[0].source_note.used_by_agent = 'Tinkerton'; },
