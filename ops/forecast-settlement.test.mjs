@@ -47,6 +47,29 @@ test('forecast_event: the headline event must be one the label settles, or one t
   assert.deepEqual(codes(forecast({ headline: 'Lula fights for a fourth term' })), [], 'no printed probability, no event phrase to compare');
 });
 
+test('the 2026-10-07 shape is refused: a dated no-decision condition the deck never names', () => {
+  const label = 'Yes if the court rules for the state; no if it rules against, or if no decision is posted by December 4.';
+  const findings = forecastSettlementFindings(forecast({ headline: 'The state is a 42% shot at the ruling', deck: 'The court heard argument on Monday.', confidence: { value: 0.42, label } }));
+  assert.deepEqual(findings.map((finding) => finding.code), ['forecast_deadline']);
+  assert.match(findings[0].message, /December 4/u);
+  assert.deepEqual(codes(forecast({ headline: 'The state is a 42% shot at the ruling', deck: 'The call settles NO if no decision is posted by 4 December.', confidence: { value: 0.42, label } })), []);
+});
+
+test('an "if no" condition with no date at all is refused: nobody can say when the call settles', () => {
+  const label = 'Yes if the court rules for the state; no if no decision is posted.';
+  const findings = forecastSettlementFindings(forecast({ headline: 'The state is a 42% shot at the ruling', deck: 'The court heard argument on Monday.', confidence: { value: 0.42, label } }));
+  assert.deepEqual(findings.map((finding) => finding.code), ['forecast_deadline']);
+  assert.equal(findings[0].path, 'confidence.label');
+  assert.match(findings[0].message, /names no date for it/u);
+  assert.ok(articleFormatFindings(forecast({ headline: 'The state is a 42% shot at the ruling', confidence: { value: 0.42, label } }), { topicSlugs: [] }).errors.some((error) => error.code === 'forecast_deadline'), 'file_article and validate_article refuse it');
+  // The plain NO branch is not a contingency, and a dated label falls back to the existing check.
+  assert.deepEqual(codes(forecast({ headline: 'The state is a 42% shot at the ruling', confidence: { value: 0.42, label: 'Yes if the ruling is confirmed; no if it is not confirmed.' } })), []);
+  assert.deepEqual(codes(forecast({ headline: 'The state is a 42% shot at the ruling', deck: 'It must rule by 4 December.', confidence: { value: 0.42, label: 'Yes if the court rules for the state by 4 December; no if no decision is posted.' } })), []);
+  // A relative horizon is a deadline: Ledger resolves "within 48 hours" from the edition date.
+  for (const horizon of ['within 48 hours', 'within two weeks', 'in the next 7 days', 'by the end of the week', 'by end of session', 'over the next 3 days', 'within a week', 'within eight days', 'in 7 days', 'within a fortnight', 'by Friday', 'this week', 'within 30 days of the vote'])
+    assert.deepEqual(codes(forecast({ headline: 'Talks are a 50% shot at an agreement', confidence: { value: 0.5, label: `YES if an agreement is signed ${horizon}; NO if no agreement is signed ${horizon}.` } })), [], horizon);
+});
+
 test('non-forecasts and incomplete confidence are out of scope', () => {
   assert.deepEqual(codes({ ...quebec, epistemic: 'fact' }), []);
   assert.deepEqual(codes({ ...quebec, confidence: { label: quebec.confidence.label } }), []);

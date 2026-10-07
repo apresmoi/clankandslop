@@ -16,7 +16,8 @@
 //                         own numbers ("short of 64 for a majority")
 //   forecast_deadline     the label adds a no-publication / no-winner clause
 //                         with a deadline ("or if no … is posted by then") and
-//                         neither headline nor deck names that date
+//                         neither headline nor deck names that date — or adds
+//                         one ("if no decision is posted") with no date at all
 //
 // Heuristic by design and calibrated on every archived forecast: of the 33 in
 // content/editions, only the 10-06 Quebec piece trips it. Pure, no I/O.
@@ -36,7 +37,23 @@ const PROBABILITY = [[new RegExp(`${PCT}\\s+${NOUN}\\b`, 'giu'), 1], [new RegExp
 const NO_OPENER = /\b(?:if\s+no|(?:is|are)\s+not)\b/iu;
 const NO_VERB = /\b(?:posted|published|named|declared|announced|certified|issued|released|confirmed|reported|signed|held)\b/iu;
 const LABEL_MAX = 1000;
+// An undated "if no … is posted" is the same extra condition with no clock at
+// all; only the "if no" opener counts there, because "no if it is not
+// confirmed" is the plain NO branch, not a contingency.
+const IF_NO = /\bif\s+no\b/iu;
+// A relative horizon is a deadline too: "within 48 hours" resolves from the
+// edition date exactly as Ledger's callDeadline resolves it.
+const COUNT = String.raw`(?:\d{1,3}|an?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fourteen|thirty)`;
+const UNIT = String.raw`(?:hours?|days?|weeks?|fortnights?|months?|years?)`;
+const RELATIVE_HORIZON = new RegExp([
+  String.raw`\b(?:within|in|inside|over\s+the\s+next|in\s+the\s+next|during\s+the\s+next)\s+(?:the\s+next\s+)?${COUNT}[\s-]*${UNIT}\b`,
+  String.raw`\b${COUNT}[\s-]+${UNIT}\s+(?:of|from|after)\b`, String.raw`\b\d{1,3}[- ]hours?\b`, String.raw`(?<![\w$])\d{1,3}D(?!\w)`,
+  String.raw`\b(?:by|before)\s+(?:the\s+)?end\s+of\s+(?:the\s+|this\s+|next\s+)?(?:day|week|weekend|month|year|quarter|session|term)\b`,
+  String.raw`\b(?:by|before|on)\s+(?:next\s+)?(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b`,
+  String.raw`\b(?:today|tonight|tomorrow|this\s+(?:week|weekend|month|year)|next\s+(?:week|weekend|month|year))\b`
+].join('|'), 'iu');
 function noClause(label) {
+  let undated;
   for (const clause of label.slice(0, LABEL_MAX).split(/[.;]/u)) {
     const opener = clause.match(NO_OPENER);
     if (!opener) continue;
@@ -44,8 +61,9 @@ function noClause(label) {
     if (!verb) continue;
     const by = rest.slice(verb.index).search(/\bby\b/iu);
     if (by >= 0) return { text: rest.trim(), tail: rest.slice(verb.index + by + 2) };
+    if (!undated && IF_NO.test(opener[0])) undated = { text: rest.trim(), tail: '' };
   }
-  return undefined;
+  return undated;
 }
 const CLAUSE = /[.!?;,]|\s(?:but|while|whereas|and)\s/iu;
 const ATTRIBUTED = /\b(?:markets?|bettors|betting|polymarket|kalshi|futures|traders|bookmakers|pollsters?|implied|priced)\b/iu;
@@ -105,7 +123,8 @@ export function forecastSettlementFindings(article) {
   if (clause) {
     const deadline = datesIn(clause.tail)[0] ?? datesIn(label.slice(0, LABEL_MAX))[0];
     const named = new Set(datesIn(`${headline} ${deck}`).map((date) => date.key));
-    if (deadline && !named.has(deadline.key)) findings.push({ path: 'deck', code: 'forecast_deadline', message: `confidence.label also settles NO when "${clause.text}", a condition with a deadline (${deadline.text}) that neither headline nor deck names, so the printed call and the settled call differ — drop that condition from the label, or name the deadline in the deck ("…if the official seat table is posted by 12 October")` });
+    if (!deadline && !RELATIVE_HORIZON.test(label.slice(0, LABEL_MAX))) findings.push({ path: 'confidence.label', code: 'forecast_deadline', message: `confidence.label also settles NO when "${clause.text}" but names no date for it, so nobody can say when the call settles — drop that condition, or give it a deadline and name that date in the deck ("…if no decision is posted by 4 December")` });
+    else if (deadline && !named.has(deadline.key)) findings.push({ path: 'deck', code: 'forecast_deadline', message: `confidence.label also settles NO when "${clause.text}", a condition with a deadline (${deadline.text}) that neither headline nor deck names, so the printed call and the settled call differ — drop that condition from the label, or name the deadline in the deck ("…if the official seat table is posted by 12 October")` });
   }
   return findings;
 }

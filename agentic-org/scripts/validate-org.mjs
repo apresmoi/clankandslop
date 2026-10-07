@@ -109,7 +109,8 @@ const publicWriters = new Set(['pressman']);
 // It cannot: Spawnfile never emits `outbound_dm_peers`, so every DM the sensor
 // sends is denied by `resolveDM`, and the sensor posts to room:research anyway.
 // Room membership is the only path that actually delivers.
-const researchMembers = new Set(['gatherer', 'research-sensor', 'klaxon', ...reporters, 'brass']);
+// Ledger asks the sensor about due forecast calls itself (ledger-research.mjs).
+const researchMembers = new Set(['gatherer', 'research-sensor', 'klaxon', ...reporters, 'brass', 'ledger']);
 const section = (source, name) => {
   const lines = source.split('\n');
   const start = lines.findIndex((line) => line === `${name}:`);

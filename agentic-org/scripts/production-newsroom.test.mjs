@@ -380,7 +380,7 @@ async function checkFacts(state, edition, outcome = Date.parse(`${edition}T13:30
   for (const name of (await readdir(root)).filter((entry) => entry.endsWith('.json'))) {
     const value = JSON.parse(await readFile(path.join(root, name), 'utf8')), owner = value.byline.agents[0].toLowerCase();
     process.env.CLANK_NEWSROOM_AGENT = owner;
-    await recordFreshness({ edition, event_key: `facts-${edition}-${value.id}-${value.revision}`, article_id: value.id, revision: value.revision, outcome, ...(outcome === 'unavailable' ? {} : { request_id: `${owner}-${edition}-facts-${value.id}`, checked_at: `${edition}T13:30:00Z` }) });
+    await recordFreshness({ edition, event_key: `facts-${edition}-${value.id}-${value.revision}`, article_id: value.id, revision: value.revision, outcome, request_id: `${owner}-${edition}-facts-${value.id}`, ...(outcome === 'unavailable' ? {} : { checked_at: `${edition}T13:30:00Z` }) });
   }
 }
 async function driveToCompose(state, edition, make, count = owners.length, beforeReview, { facts = true } = {}) {
@@ -408,34 +408,39 @@ async function driveToCompose(state, edition, make, count = owners.length, befor
 // not checked what changed since, and a material development goes back
 // through Spike as a new revision.
 // ---------------------------------------------------------------------------
-const facts = (edition, id, revision, outcome, over = {}) => ({ edition, event_key: `facts-${id}-${revision}-${outcome}`, article_id: id, revision, outcome, request_id: `owner-${edition}-facts-${id}`, checked_at: `${edition}T13:42:10Z`, ...over });
+const OWNER_OF = { 'story-0': 'cogsworth', 'story-1': 'sprockett', 'story-2': 'foreman', 'story-3': 'graves', 'story-4': 'tinkerton', 'story-5': 'vesta' };
+const facts = (edition, id, revision, outcome, over = {}) => ({ edition, event_key: `facts-${id}-${revision}-${outcome}`, article_id: id, revision, outcome, request_id: `${OWNER_OF[id]}-${edition}-facts-${id}`, ...(outcome === 'unavailable' ? {} : { checked_at: `${edition}T13:42:10Z` }), ...over });
 const articleOf = async (state, edition, id) => JSON.parse(await readFile(path.join(state, 'editions', edition, 'articles', `${id}.json`), 'utf8'));
 
-runtimeTest('compose refuses a PASSed piece with no facts check, and composes once every owner has recorded one', async () => {
+runtimeTest('compose does not wait for a facts check: an unchecked piece runs stamped with the research time', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-facts-gate-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-15';
   try {
     const composeArgs = await driveToCompose(state, edition, article, owners.length, undefined, { facts: false });
-    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-unchecked' }), (error) => {
-      assert.match(error.message, /^facts check missing — nothing was composed: "story-0" revision 1 has no facts check recorded after its PASS/u);
-      assert.match(error.message, /mention each owner.*record_freshness_check now.*"unavailable"/u);
-      return true;
-    });
-    // One piece checked is not the edition checked.
+    // One piece checked, the rest not: the edition composes anyway.
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
     const saved = await recordFreshness(facts(edition, 'story-0', 1, 'unchanged'));
     assert.equal(saved.facts_checked_utc, '13:42');
-    assert.equal((await articleOf(state, edition, 'story-0')).facts_checked_utc, '13:42');
+    assert.doesNotMatch(saved.next, /@caslon/u, 'nothing was holding the edition, so nothing hands it back');
     assert.match(await readIndexFile(state, edition), /^K story-0 rev=1 unchanged facts=13:42 by=cogsworth$/mu);
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    await assert.rejects(recordFreshness(facts(edition, 'story-1', 1, 'unavailable', { request_id: undefined })), /outcome "unavailable" needs request_id "sprockett-2026-09-15-facts-story-1"/u);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-one-checked' }), /"story-1" revision 1 has no facts check/u);
-    for (const [index, owner] of owners.entries()) { if (index === 0) continue; process.env.CLANK_NEWSROOM_AGENT = owner; const result = await recordFreshness(facts(edition, `story-${index}`, 1, index === 4 ? 'unavailable' : 'unchanged', index === 4 ? { request_id: undefined, checked_at: undefined } : {})); if (index === 4) { assert.match(result.next, /room:release.*@caslon/u); assert.equal(result.facts_checked_utc, '04:58'); } else assert.doesNotMatch(result.next, /@caslon/u); }
-    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-checked' });
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-partly-checked' });
     assert.ok(composed.receipt.digest);
+    assert.equal((await articleOf(state, edition, 'story-0')).facts_checked_utc, '13:42', 'a recorded check keeps its own stamp');
+    const corpus = composed.receipt.composition.corpus.fetched_at;
+    for (const id of ['story-1', 'story-2', 'story-3', 'story-4']) assert.equal((await articleOf(state, edition, id)).facts_checked_utc, new Date(corpus).toISOString().slice(11, 16), `${id} prints "Facts as of" the research time`);
+    // The stamp is part of the composed article digests, so staging authenticates it.
+    assert.ok(await authenticatedCurrentComposition(edition));
     process.env.CLANK_NEWSROOM_AGENT = 'cogsworth';
-    await assert.rejects(recordFreshness(facts(edition, 'story-0', 1, 'unchanged', { event_key: 'facts-after-compose' })), /is composed/u);
+    await assert.rejects(recordFreshness(facts(edition, 'story-0', 1, 'unchanged', { event_key: 'facts-after-compose' })), /is composed.*room:filing/u);
+    // A late Ledger refile cannot change the desk the composition sealed.
+    process.env.CLANK_NEWSROOM_AGENT = 'ledger';
+    const settlements = preparedDeskDocument('ledger.settlements', edition);
+    await assert.rejects(fileDesk({ edition, event_key: 'late-ledger-answer', name: 'ledger.settlements', document: { ...settlements, resolved_last_edition: [...settlements.resolved_last_edition, { call: 'A late call settled after composition', outcome: 'hit', prior_p: 0.6 }] } }), /is composed; refiling ledger\.settlements now would change the desk the composition sealed/u);
+    await fileDesk({ edition, event_key: 'late-ledger-same', name: 'ledger.settlements', document: settlements });
+    assert.ok(await authenticatedCurrentComposition(edition), 'an unchanged refile leaves the composition authentic');
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
@@ -451,7 +456,7 @@ runtimeTest('a material development goes back through Spike as a new revision, s
     const moved = await recordFreshness(facts(edition, 'story-2', 1, 'updated', { changes: 'The Air Force confirmed 25 dead at 07:14 UTC; this supersedes the unconfirmed casualty line.' }));
     assert.match(moved.next, /File revision 2 of "story-2" now/u);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-update-pending' }), /"story-2": its owner recorded a material development against revision 1; revision 2 carrying it must be filed and passed/u);
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-update-pending' }), /facts check unresolved — nothing was composed: "story-2": its owner recorded a material development against revision 1; revision 2 carrying it must be filed and passed/u);
     process.env.CLANK_NEWSROOM_AGENT = 'foreman';
     const update = { ...article('story-2', 'Foreman', edition, 2), revision: 2, body: ['The Air Force confirmed 25 dead [E1].', 'Two [E1].', 'Three [E1].', 'Four [E1].'] };
     await assert.rejects(fileArticle({ edition, event_key: 'typed-stamp', article: { ...update, facts_checked_utc: '16:59' } }), /facts_checked_utc is stamped by record_freshness_check, never typed/u);
@@ -472,22 +477,35 @@ runtimeTest('a material development goes back through Spike as a new revision, s
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
-runtimeTest('Spike tells the owner a passed piece needs its facts check, and holds the Caslon handoff for it', async () => {
+runtimeTest('Spike hands the owner its facts request at PASS, and the records name that request', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-facts-handoff-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-17';
   try {
-    let last;
     await driveToCompose(state, edition, article, owners.length, undefined, { facts: false });
-    process.env.CLANK_NEWSROOM_AGENT = 'spike';
-    last = JSON.parse(await readFile(path.join(state, 'editions', edition, 'verdicts', 'story-4', '1.json'), 'utf8'));
+    const last = JSON.parse(await readFile(path.join(state, 'editions', edition, 'verdicts', 'story-4', '1.json'), 'utf8'));
     assert.equal(last.verdict, 'PASS');
+    const operation = (await readdir(path.join(state, 'editions', edition, 'operations'))).filter((name) => name.startsWith('review_article-'));
+    const results = await Promise.all(operation.map(async (name) => JSON.parse(await readFile(path.join(state, 'editions', edition, 'operations', name), 'utf8')).result));
+    const story4 = results.find((result) => result.article_id === 'story-4');
+    assert.match(story4.next, /mention @tinkerton.*"request_id":"tinkerton-2026-09-17-facts-story-4"/u);
     const index = await readIndexFile(state, edition);
     assert.doesNotMatch(index, /^K /mu, 'no facts check is on record yet');
     process.env.CLANK_NEWSROOM_AGENT = 'graves';
     await assert.rejects(recordFreshness(facts(edition, 'story-0', 1, 'unchanged')), /belongs to cogsworth; only its owner/u);
     await assert.rejects(recordFreshness(facts(edition, 'story-3', 1, 'unchanged', { checked_at: `${edition}T04:00:00Z` })), /before the research time/u);
     process.env.CLANK_NEWSROOM_AGENT = 'brass';
-    assert.equal((await recordFreshness(facts(edition, 'story-3', 1, 'unavailable', { request_id: undefined, checked_at: undefined }))).outcome, 'unavailable');
+    assert.equal((await recordFreshness(facts(edition, 'story-3', 1, 'unavailable'))).outcome, 'unavailable');
+  } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
+});
+
+runtimeTest('record_assignment wants the floor plus one spare, and says the spare may be short', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-assign-floor-'));
+  try {
+    process.env.CLANK_EDITION_STATE_ROOT = path.join(temporary, 'state'); process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    const items = owners.slice(0, PASSED_ARTICLES_MINIMUM).map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
+    await assert.rejects(recordAssignment({ edition: '2026-09-18', event_key: 'schedule:assignment-floor', assignments: items }), new RegExp(`at least ${PASSED_ARTICLES_MINIMUM + 1} items, got ${PASSED_ARTICLES_MINIMUM}: composition needs ${PASSED_ARTICLES_MINIMUM} passed pieces and the extra one is the spare against a spike; it may be a short piece`, 'u'));
+    const recorded = await recordAssignment({ edition: '2026-09-18', event_key: 'schedule:assignment-floor', assignments: [...items, { id: 'story-spare', owner: 'vesta', brief: 'A short spare piece on the day\'s second story.', evidence_refs: [] }] });
+    assert.equal(recorded.recorded, PASSED_ARTICLES_MINIMUM + 1);
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
@@ -890,7 +908,7 @@ runtimeTest('Spike review results distinguish saved notes from delivered Moltnet
     const spiked = await reviewArticle({ edition, event_key: 'spike-story', article_id: 'story-2', revision: 1, verdict: 'SPIKE', notes: 'Spike this item and ask Brass for a replacement if needed.' });
     assert.match(spiked.next, /SPIKE notes were saved only/u);
     assert.match(spiked.next, /@foreman/u);
-    assert.match(spiked.next, /@brass if a replacement is required/u);
+    assert.match(spiked.next, /if the lineup needs another piece, tell @brass in room:assignment/u);
 
     process.env.CLANK_NEWSROOM_AGENT = 'graves';
     const story3 = await fileArticle({ edition, event_key: 'pass-filing', article: article('story-3', 'Graves', edition, 3) });
@@ -899,7 +917,7 @@ runtimeTest('Spike review results distinguish saved notes from delivered Moltnet
     assert.match(passed.next, /PASS was saved/u);
     assert.match(passed.next, /fresh state\/edition\/editions\/2026-09-07\/INDEX/u);
     assert.match(passed.next, /review other unreviewed filings one at a time/u);
-    assert.match(passed.next, /passed>=5/u);
+    assert.match(passed.next, new RegExp(`passed>=${PASSED_ARTICLES_MINIMUM} `, 'u'));
     assert.match(passed.next, /no D ledger\.settlements or D ledger\.worlddesk rows/u);
     assert.match(passed.next, /moltnet_send/u);
     assert.match(passed.next, /room:release/u);

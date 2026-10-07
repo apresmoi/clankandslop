@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { qualifySignal } from './production-newsroom.mjs';
+import { ASSIGNMENTS_MINIMUM, PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 
 // Covers the two newest contract fixes that the end-to-end test in
 // production-newsroom.test.mjs does not exercise: binding event_key to
@@ -246,7 +247,12 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
   assert.match(reviewArticleTool.description, /REVISION_REQUEST and HOLD/u);
   assert.match(reviewArticleTool.description, /SPIKE/u);
   assert.match(reviewArticleTool.description, /PASS continues from the fresh INDEX/u);
-  assert.match(reviewArticleTool.description, /passed>=5/u);
+  // The handoff threshold is the floor, read from the one place it lives.
+  assert.match(reviewArticleTool.description, new RegExp(`passed>=${PASSED_ARTICLES_MINIMUM} `, 'u'));
+  assert.doesNotMatch(reviewArticleTool.description, /@brass if a replacement/u);
+  const recordAssignmentTool = (await mcpToolsList('brass')).find((tool) => tool.name === 'record_assignment');
+  assert.equal(recordAssignmentTool.inputSchema.properties.assignments.minItems, ASSIGNMENTS_MINIMUM);
+  assert.match(recordAssignmentTool.description, new RegExp(`needs ${PASSED_ARTICLES_MINIMUM} passed pieces.*at least ${ASSIGNMENTS_MINIMUM}.*spare`, 'u'));
   assert.match(reviewArticleTool.description, /@ledger in room:release/u);
   assert.match(reviewArticleTool.description, /composition prerequisites are ready/u);
   assert.match(reviewArticleTool.description, /@caslon in room:release with the edition, article id and revision/u);

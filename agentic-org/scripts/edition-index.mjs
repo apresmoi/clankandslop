@@ -18,7 +18,7 @@ import { compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissen
 // runs them. Both directories ship in the same tree — the runtime bundle is
 // the repo's tracked files, and CLANK_PUBLIC_SOURCE_ROOT is that same repo —
 // so one implementation reaches file_article and stage_release alike.
-import { proseLintFindings } from '../../ops/prose-lint.mjs';
+import { proseLintFindings } from '../../ops/prose-lint.mjs';import { readRefusals, refusalIndexLine } from './refusal-log.mjs';
 
 const INDEX_VERSION = 'clank.edition-index.v1';
 const EDITION_DATE = /^\d{4}-\d{2}-\d{2}$/u;
@@ -287,13 +287,13 @@ const token = (value, fallback = '?') => String(value ?? '').replace(/\s+/gu, '-
 const pad = (value) => (value.length >= COLUMN ? `${value} ` : value.padEnd(COLUMN + 1));
 const row = (left, ...cells) => (cells.length === 0 ? left : `${pad(left)}| ${cells.join(' | ')}`);
 
-export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, checks = [], desks, pages, compose, candidates = [] }) {
+export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, checks = [], desks, pages, compose, candidates = [], refusals = [] }) {
   const lines = [];
   lines.push(`# ${INDEX_VERSION} edition=${edition} generated=${generated} assignments=${assignments.length} filings=${filings.length} verdicts=${verdicts.length} passed=${articles.length}`);
   // Missing article coverage remains unknown rather than advertising readiness.
   lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length })));
   lines.push('# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · K facts check · D desk doc · G page');
-  lines.push('# read one: cat candidates/<id>.json | cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json | cat freshness/<id>/<rev>.json');
+  lines.push(...refusals, '# read one: cat candidates/<id>.json | cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json | cat freshness/<id>/<rev>.json');
   for (const item of candidates) lines.push(row(`C ${token(item.id)} rev=${item.revision} ${token(item.disposition)} desks=${token(item.selected_desks.join(','), '-')} refs=${item.evidence_refs.length}`, clean(item.source_id, 160), clean(item.summary, 160)));
   for (const item of assignments) lines.push(row(`A ${token(item.owner)} ${token(item.id)} refs=${item.evidence_refs.length}`, clean(item.brief, 120)));
   for (const item of filings) {
@@ -340,8 +340,8 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     key_numbers: (Array.isArray(value.key_numbers) ? value.key_numbers : []).length, headline: value.headline ?? '', deck: value.deck ?? ''
   }));
   // freshness/<id>/<rev>.json: the owner's facts check after PASS. A P row
-  // with no K row at its revision (or an "updated" K row below it) is what
-  // compose_edition refuses.
+  // with no K row composes stamped with the research time; an "updated" K row
+  // at its own revision is what compose_edition refuses.
   const checks = (await readRevisions(base, 'freshness')).map(({ id, revision, value }) => ({ id, revision, outcome: value.outcome ?? '?', facts: value.facts_checked_utc ?? '?', agent: value.agent ?? '?' }));
   const desks = (await readKind(base, 'desk')).map(({ name, value }) => ({ name, keys: Object.keys(value ?? {}).length }));
   const pages = (await readKind(base, 'pages')).map(({ name, value }) => ({
@@ -354,7 +354,7 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     forecasts: articleRecords.filter((item) => isDatedForecast(item.value)).length,
     dissents: articleRecords.filter((item) => hasNamedDissent(item.value)).length
   });
-  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, checks, desks, pages, compose, candidates });
+  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, checks, desks, pages, compose, candidates, refusals: refusalIndexLine(await readRefusals(base)) });
 }
 
 // Same shapes production-newsroom.mjs already walks when it checks page

@@ -4,47 +4,17 @@
 // floors. Ready means those prerequisites are met; composition still checks
 // authentic reviews, unchanged filings, layout and artifacts.
 //
-// The forecast/dissent diversity floor used to be a third refusal here, with a
-// dated waiver to excuse it. Both are gone, and the removal is the point:
-//
-//   * 16 of the 79 editions on `main` ever carried a dated forecast, 11 of
-//     those a named dissent, the last on 2026-08-09. None of the six quality-
-//     target editions (08-19 … 08-24) had either. The gate refused the paper
-//     it was modelled on.
-//   * It was structurally unclearable where it stood. A 21:00 refusal on a
-//     property only Brass at 18:30 and a reporter at 19:00 can supply is a
-//     refusal Caslon cannot act on, so the only reachable outcome was a waiver
-//     re-dated every night — a quality bar that has quietly disappeared while
-//     still looking like one.
-//
-// So the two halves moved to where an agent can still act on them. The
-// forecast *shape* is enforced at `file_article`, in the reporter's own wake,
-// for the assignment Brass marked `slot: "forecast"`. The dissent is written
-// by the dissenter through `record_dissent`, under the identity the MCP server
-// already authenticates. Here both are counted and neither refuses: a day
-// nobody dissents ships, and says so in the INDEX, the receipt and the audit.
-//
-// Re-arming the floor as a gate is a decision for after five consecutive
-// editions carry it without anyone waiving anything. Not before.
+// The forecast and the dissent are counted here, never refused: the forecast
+// shape is enforced at `file_article` for the assignment Brass marked
+// `slot: "forecast"`, and the dissent is recorded by the dissenter through
+// `record_dissent`. A day nobody dissents ships, and the INDEX, the receipt and
+// the audit say so. (A refusal here once fired at a time only Brass and a
+// reporter could act on, and was waived every night.)
 
-// FOUR, not five. Five was never a standard of quality -- it was a SIZE, and
-// it silently required nearly the whole roster to deliver every single day.
-//
-// Vesta's Hearth is explicitly NOT a daily column: brass's own runbook says it
-// "runs only when the day has a real reason". Six reporter desks minus a soft
-// desk that is meant to be quiet most days leaves five, so a five-story floor
-// demanded that every remaining desk land a passing piece with no slack at all.
-// That is a floor defined by the roster rather than by what makes a newspaper.
-//
-// 2026-09-26 is the measurement. The edition closed at four passed articles
-// across three sections with four distinct bylines, a forecast and a dissent on
-// the page, every desk document filed, and sources and domains at thirteen
-// against a floor of three. It did not publish, and the only thing missing was
-// a fifth body. Four reviewed stories from four desks is a paper.
-//
-// NOTHING ABOUT SOURCING CHANGES. Every story still clears the same review bar,
-// and Spike still holds or spikes whatever the evidence cannot carry -- it held
-// three stories that night. This lowers a size, not a standard.
+// The passed-article floor is a size, not a standard. Four reviewed stories
+// from four desks is a paper: on 2026-09-26 an edition with four passed pieces
+// across three sections, a forecast and a dissent did not publish for want of
+// a fifth body. Every story still clears the same review bar.
 // Declared once in ops/edition-floor.mjs and re-exported here so every existing
 // caller of this module keeps working. Do not restate the numbers.
 export { PASSED_ARTICLES_MINIMUM, DESK_DOCUMENTS_REQUIRED } from '../../ops/edition-floor.mjs';

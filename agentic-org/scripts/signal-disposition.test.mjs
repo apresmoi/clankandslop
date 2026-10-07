@@ -26,6 +26,8 @@ test('eight overlapping notices converge into one indexed lead, without reporter
     assert.equal(result.qualified, true);
     assert.doesNotMatch(result.next, /@[a-z]/u);
     assert.match(result.next, /not a commission/u);
+    // 11 of 20 digests on 2026-10-06/07 called a not-yet-landed story file "not readable".
+    assert.match(result.next, /no story file on the mount yet; its claim_excerpt and URLs are the lead/u);
   }
   assert.equal(state.records.size, 1);
   assert.equal(state.receipts.length, 8, 'Each source notice retains its own causal receipt.');
