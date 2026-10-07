@@ -133,3 +133,13 @@ test('two different calls under one headline and deadline are two rows', () => {
   ];
   assert.deepEqual(deadlinesBlock({ edition: EDITION, calls, agents }).props.dated.map((r) => [r.time, r.what, r.who]), [['18:00', 'Talks resume', 'Foreman'], ['18:00', 'Talks resume', 'Vesta']]);
 });
+
+test('a figure too long for the column is skipped, never cut off; a story left with none gives way to the next', () => {
+  // 2026-10-07 articles were filed before the key_numbers limits.
+  const articles = {
+    ship: story('ship', { kicker: 'Shipbuilding', key_numbers: [{ label: 'Private investment', value: '$3.7 billion' }, { label: 'Jobs expected', value: 'over 14,000' }] }),
+    vote: story('vote', { kicker: 'State parliament', key_numbers: [{ label: 'Yes votes', value: '48' }, { label: 'Turnout', value: 'about 44%' }, { label: 'Seats', value: '1234567890' }] }),
+  };
+  const { groups } = keyFiguresBlock({ edition: EDITION, order: ['ship', 'vote'], articles }).props;
+  assert.deepEqual(groups.map((g) => [g.kicker, g.figures.map((f) => f.value)]), [['State parliament', ['48', 'about 44%', '1234567890']]]);
+});
