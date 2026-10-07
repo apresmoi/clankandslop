@@ -29,6 +29,8 @@ interface Props {
 }
 const { meta, open_calls, resolved } = Astro.props;
 const key = ledgerKey(open_calls);
+// Column heads carry the key as hover text; the footer keeps the one term a reader needs.
+const hint = (term: string) => { const k = key.find((x) => x.term === term); return k ? `${k.term}: ${k.text}` : undefined; };
 
 const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === 'bear' ? '▼' : '↔';
 ---
@@ -38,12 +40,12 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
     {meta && <span class="ledger-meta">{meta}</span>}
   </div>
 
-  <div class="ledger-colhead" aria-hidden="true">
-    <span>Resolves</span>
-    <span>Question · state</span>
+  <div class="ledger-colhead">
+    <span title={hint('Resolves')}>Resolves</span>
+    <span title={hint('State')}>Question · state</span>
     <span>Call</span>
-    <span>Posterior</span>
-    <span>Dissent</span>
+    <span title={hint('Posterior')}>Posterior</span>
+    <span title={hint('Dissent')}>Dissent</span>
   </div>
 
   <div class="ledger-rows">
@@ -74,9 +76,9 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
     ))}
   </div>
 
-  <p class="ledger-key">
-    {key.map((k) => <><strong>{k.term}</strong>{` ${k.text} `}</>)}
-    <a href="/about">How the paper computes its numbers</a>.
+  <p class="ledger-foot">
+    {key.filter((k) => k.term === 'Posterior').map((k) => <span>{k.term} is {k.text}</span>)}
+    <a href="/about">How the paper computes its numbers</a>
   </p>
 
   {resolved && resolved.length > 0 && (
@@ -98,7 +100,6 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
     margin: 28px 0;
     padding: 14px 0 10px;
     border-top: 1px solid var(--hairline-strong);
-    border-bottom: 1px solid var(--hairline);
   }
   .ledger-head {
     display: flex;
@@ -170,17 +171,14 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
     border-left: 2px solid var(--accent);
     padding-left: 8px;
   }
-  .ledger-key {
-    font-family: var(--font-body);
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--muted);
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--hairline);
+  .ledger-foot {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--hairline);
+    font-family: var(--font-body); font-size: 12px; font-style: italic; color: var(--muted);
   }
-  .ledger-key strong { color: var(--ink-soft); font-weight: 700; font-style: normal; }
-  .ledger-key a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent); }
+  .ledger-foot a { font-style: normal; white-space: nowrap; }
+  .ledger-colhead span[title] { cursor: help; }
+  .ledger-foot a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent); }
 
   .ledger-horizon {
     font-family: var(--font-mono);
@@ -234,6 +232,7 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
   .ledger-resolved .dim  { color: var(--muted); }
 
   @media (max-width: 880px) {
+    .ledger-foot { flex-direction: column; gap: 4px; }
     .ledger-colhead { display: none; }
     .ledger-row {
       grid-template-columns: 1fr auto;
