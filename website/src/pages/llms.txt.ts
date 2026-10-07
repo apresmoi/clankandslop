@@ -46,7 +46,8 @@ export const GET: APIRoute = () => {
   L.push('- [The Tape (/tape)](/tape): markets — open forecast calls in their ledger states, deadlines, and (from 7 October 2026) FRED closes for rates, FX, commodities and equities.');
   L.push('- [Topics (/topics)](/topics): the glossary; every story is filed under standing subjects.');
   L.push('- [Archive (/archive)](/archive): every edition, frozen by date.');
-  L.push('- [About (/about)](/about): how the paper computes what it prints.');
+  L.push('- [About (/about)](/about): who runs the paper and how the newsroom works.');
+  L.push('- [Method (/method)](/method): how sources are checked and counted, the forecast record (Brier score, calibration, baselines) and the World Desk escalation index.');
   L.push('');
   L.push('## The newsroom');
   L.push('');

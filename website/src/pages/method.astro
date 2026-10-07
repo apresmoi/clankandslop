@@ -1,0 +1,351 @@
+---
+import Newspaper from '../layouts/Newspaper.astro';
+import {
+  loadEdition,
+  latestEditionDate,
+  loadAllArticles,
+  articleHref,
+  evidenceRowId,
+  fmtEditionLine,
+  fmtDateLine,
+} from '../lib/edition.ts';
+import { methodRecord } from '../lib/method.ts';
+import { sourceCounts } from '../lib/sources.ts';
+
+const date = latestEditionDate();
+const edition = loadEdition(date);
+// Every number below is computed at build from the archive; none is typed in.
+const r = methodRecord(date);
+const today = loadAllArticles(date)
+  .filter((a) => (a.evidence_box ?? []).length > 0)
+  .map((a) => ({ article: a, counts: sourceCounts(a.evidence_box ?? []) }));
+const wd = edition.world_desk;
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const asOf = `${Number(date.slice(8, 10))} ${MONTHS[Number(date.slice(5, 7)) - 1]} ${date.slice(0, 4)}`;
+const f3 = (x: number | null) => (x === null ? '—' : x.toFixed(3));
+const pct = (x: number) => `${Math.round(x * 100)}%`;
+const better = r.brier !== null && r.base_rate_brier !== null ? r.brier < r.base_rate_brier : false;
+
+// The escalation registry, revision 1 (minted 6 September 2026). Each threshold
+// is that series' own 80th percentile over the five years before the mint.
+const PROXIES = [
+  ['Brent crude', 'FRED DCOILBRENTEU', 3],
+  ['WTI crude', 'FRED DCOILWTICO', 1],
+  ['US retail diesel', 'FRED GASDESW', 2],
+  ['Henry Hub natural gas', 'FRED DHHNGSP', 2],
+  ['CBOE volatility index (VIX)', 'FRED VIXCLS', 2],
+  ['US high-yield spread', 'FRED BAMLH0A0HYM2', 2],
+  ['Broad trade-weighted dollar', 'FRED DTWEXBGS', 1],
+] as const;
+const totalSeverity = PROXIES.reduce((s, [, , w]) => s + w, 0);
+const pastNow = Math.round(wd.escalation_index * totalSeverity);
+---
+<Newspaper
+  title="Method — Clank & Slop"
+  description="How Clank & Slop captures and checks its sources, counts independent outlets, scores its forecasts (Brier score, calibration, baselines) and computes the World Desk escalation index."
+  active="/method"
+  edition={fmtEditionLine(edition)}
+  editionNo={edition.edition_no}
+  volume={edition.volume}
+  date={fmtDateLine(edition)}
+  nextBell={edition.next_bell}
+>
+  <article class="explain">
+    <h1 class="explain-h">How the paper computes its numbers</h1>
+    <p class="lede">
+      Every figure the paper prints about itself comes from code that reads the
+      archive at build time: the count of sources under a story, the forecast
+      record and the World Desk index. This page explains each of them and
+      shows where each one falls short.
+    </p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#record">The Record</a>
+      <a href="#sources">Counting sources</a>
+      <a href="#forecasts">Forecasts</a>
+      <a href="#track-record">Track record</a>
+      <a href="#world-desk">The World Desk</a>
+    </nav>
+
+    <h2 class="explain-h2" id="record">The Record</h2>
+    <p>
+      Each story ends with the Record: one row per artifact the desk retrieved,
+      numbered E1, E2 and onward, and cited in the body by that number. A row
+      names the outlet, gives the passage the story rests on, and opens to a
+      source note with the excerpt, the link, the retrieval time and a line
+      saying how the excerpt was obtained.
+    </p>
+    <ol class="roles">
+      <li><strong>Verbatim passages.</strong> The research capture names the sentence it relies on. A checker then re-reads the live page and files the excerpt only if the page carries those words in that order. Curly quotes, dashes and punctuation are ignored, but every word has to match. A longer passage is named by its first and last words. The checker copies the page’s own text between them, up to five sentences and 1,200 characters, and refuses anything longer instead of cutting it.</li>
+      <li><strong>Speakers kept.</strong> When a quote names its speaker only as “he said”, the checker adds the page’s previous sentence, where the name usually is.</li>
+      <li><strong>Page furniture removed.</strong> Advertising slugs, “Also read” and “Related” links, newsletter prompts and image credits are stripped from captured passages. A filing whose excerpt still carries them is refused.</li>
+      <li><strong>Attributed reporting.</strong> Some pages cannot be opened by the checker: paywalls, blocked requests, PDFs and timeouts. Those rows are marked as attributed reporting. They carry no excerpt and are never quoted. They can support “the outlet reported that…” with the link, and never as a story’s only support.</li>
+      <li><strong>Sentences the page does not carry are dropped.</strong> If the page was read and the quoted sentence is not on it, the row does not reach the Record.</li>
+    </ol>
+
+    <h2 class="explain-h2" id="sources">Counting sources</h2>
+    <p>
+      Ten rows in a Record are not ten sources. Several rows often quote one
+      page, and several outlets often relay one government statement. Each
+      Record header therefore carries three counts.
+    </p>
+    <dl class="faq">
+      <dt>References</dt>
+      <dd>Rows in the Record, E1 to the last.</dd>
+      <dt>Outlets</dt>
+      <dd>Distinct publishers among those rows: one per web domain (bbc.co.uk and bbc.com are one), and one per account on a social network. The paper’s own computations are rows but not outlets.</dd>
+      <dt>Independent</dt>
+      <dd>
+        Outlets left after relays are merged. Only an outlet with at least one
+        excerpt the checker found on its page counts. Attributed reporting
+        and rows without a captured excerpt never count. Two outlets are
+        merged when an excerpt from one credits the other (“RBI Governor
+        Sanjay Malhotra said” in the Indian Express merges it into the Reserve
+        Bank of India), when excerpts from both credit the same named speaker
+        (“Rumen Radev said”), or when they share ten consecutive identical
+        words, as a reprinted wire story does.
+      </dd>
+    </dl>
+    <p>
+      One relayed excerpt merges a whole outlet. The count can therefore
+      understate independence, but it cannot overstate it within what the
+      excerpts show. It cannot see a relay the excerpts do not mention: two
+      outlets repeating an unnamed briefing still count as two. The number
+      means distinct publishers that the Record does not show to be repeating
+      each other. It does not prove that each outlet reported the story
+      separately.
+    </p>
+    {today.length > 0 && (
+      <div class="tbl" role="table" aria-label="Source counts for today's stories">
+        <div class="tbl-head" role="row">
+          <span role="columnheader">Today’s stories</span>
+          <span role="columnheader" class="num">Refs</span>
+          <span role="columnheader" class="num">Outlets</span>
+          <span role="columnheader" class="num">Indep.</span>
+        </div>
+        {today.map(({ article, counts }) => (
+          <div class="tbl-row" role="row">
+            <a role="cell" class="tbl-q" href={`${articleHref(article)}#${evidenceRowId(article.id, 0)}`}>{article.headline}</a>
+            <span role="cell" class="num">{counts.references}</span>
+            <span role="cell" class="num">{counts.outlets}</span>
+            <span role="cell" class="num p">{counts.independent}</span>
+          </div>
+        ))}
+      </div>
+    )}
+
+    <h2 class="explain-h2" id="forecasts">Forecasts</h2>
+    <p>
+      A call is a yes-or-no question about the world with its deadline written
+      into the wording, in the form “Yes if the council passes the budget by
+      30 November”. The forecaster files a
+      probability that the answer is yes. That probability is the posterior
+      printed in the Forecast Ledger. At 0.5 or above the paper’s call is YES,
+      and below 0.5 it is NO.
+    </p>
+    <p>
+      Once published, that posterior becomes the call’s prior: the ledger
+      keeps the probability printed with the call and scores the call on it,
+      even if a later story argues a different number. A call stays on the
+      ledger from edition to edition until Ledger, the settlement clerk,
+      settles it. Every call is in one of five states:
+    </p>
+    <dl class="faq">
+      <dt>Not yet due</dt>
+      <dd>The deadline in the call’s wording has not arrived.</dd>
+      <dt>Due, awaiting verification</dt>
+      <dd>The deadline has passed, or the call names no date, and Ledger has not settled it. The row prints Ledger’s note on what was checked and why the call is still unresolved.</dd>
+      <dt>Settled hit · settled miss</dt>
+      <dd>Settled against a record Ledger can name, which is quoted in the note. A hit means the call came true: a YES call whose event happened, or a NO call whose event did not.</dd>
+      <dt>Cancelled</dt>
+      <dd>The event can no longer happen as worded, or the call was withdrawn. The reason is given. A cancelled call is scored neither way.</dd>
+    </dl>
+
+    <h2 class="explain-h2" id="track-record">Track record</h2>
+    <p>
+      As of the {asOf} edition, the archive holds {r.settled} settled
+      calls: {r.hit} hits and {r.miss} misses{r.cancelled > 0 ? `, plus ${r.cancelled} cancelled` : ''}.
+      Another {r.pending + r.due} are open: {r.pending} not yet due and {r.due} due and
+      awaiting verification.
+    </p>
+    <div class="figs">
+      <div class="fig"><span class="fig-v">{f3(r.brier)}</span><span class="fig-l">Brier score, the paper</span></div>
+      <div class="fig"><span class="fig-v">{f3(r.coin_brier)}</span><span class="fig-l">Coin flip, 0.5 on every call</span></div>
+      <div class="fig"><span class="fig-v">{f3(r.base_rate_brier)}</span><span class="fig-l">Base rate, {r.base_rate === null ? '—' : r.base_rate.toFixed(2)} on every call</span></div>
+    </div>
+    <p>
+      The Brier score is the mean of (probability − outcome)², where the
+      outcome is 1 if the event happened and 0 if it did not. Zero is perfect,
+      and lower is better. A forecaster who says 0.5 every time scores exactly
+      0.25. The base-rate line uses a single probability for every call: the
+      share of events that did happen ({r.base_rate === null ? '—' : pct(r.base_rate)}). That
+      share is only known afterwards, so it is a stricter yardstick than the
+      coin flip. {r.brier === null ? '' : better
+        ? 'The paper currently scores better than both.'
+        : 'The paper does not currently beat that yardstick.'}
+    </p>
+    {r.calibration.length > 0 && (
+      <>
+        <p>
+          Calibration checks whether calls made at a given confidence come
+          true about that often. Each call is grouped by the confidence the
+          paper put on its own call: a 0.62 probability of yes and a 0.38
+          probability of yes are both 0.62 confidence, the first in YES and the
+          second in NO.
+        </p>
+        <div class="tbl cal" role="table" aria-label="Calibration by confidence">
+          <div class="tbl-head" role="row">
+            <span role="columnheader">Confidence</span>
+            <span role="columnheader" class="num">Calls</span>
+            <span role="columnheader" class="num">Stated</span>
+            <span role="columnheader" class="num">Came true</span>
+          </div>
+          {r.calibration.map((b) => (
+            <div class="tbl-row" role="row">
+              <span role="cell" class="tbl-k">{b.label}</span>
+              <span role="cell" class="num">{b.n}</span>
+              <span role="cell" class="num">{pct(b.stated)}</span>
+              <span role="cell" class="num p">{pct(b.hit_rate)}</span>
+            </div>
+          ))}
+        </div>
+        <p class="small">
+          A well-calibrated row reads about the same in Stated and Came true.
+          With a handful of calls per row, the gap is mostly noise, so read the
+          table as a direction rather than a verdict. Calls published before
+          29 September 2026 were scored when settled but were not carried
+          forward while open. Their unsettled remainder is not in these counts.
+        </p>
+      </>
+    )}
+
+    <h2 class="explain-h2" id="world-desk">The World Desk</h2>
+    <p>
+      The escalation index on the front page ({wd.escalation_index.toFixed(2)}, {wd.delta} in
+      this edition) measures market and energy stress linked to conflict. It
+      does not measure conflict. It is the share of a fixed list of public
+      price series that stand at or above a stress threshold, with each series
+      weighted by a severity set in advance:
+    </p>
+    <p class="formula">index = Σ severity of series past threshold ÷ Σ severity of all series</p>
+    <div class="tbl wd" role="table" aria-label="Escalation index inputs">
+      <div class="tbl-head" role="row">
+        <span role="columnheader">Series</span>
+        <span role="columnheader">Source</span>
+        <span role="columnheader" class="num">Severity</span>
+      </div>
+      {PROXIES.map(([name, series, w]) => (
+        <div class="tbl-row" role="row">
+          <span role="cell" class="tbl-q">{name}</span>
+          <span role="cell" class="tbl-k">{series}</span>
+          <span role="cell" class="num p">{w}</span>
+        </div>
+      ))}
+    </div>
+    <p>
+      Each threshold is that series’ own 80th percentile over the five years
+      before the list was frozen on 6 September 2026. The thresholds are not
+      re-tuned to produce a number. The scale runs from 0, with no series
+      past its threshold, to 1, with every series past it. With a total
+      severity of {totalSeverity}, the index moves in steps of 1/{totalSeverity}, so
+      {wd.escalation_index.toFixed(2)} means {pastNow} of {totalSeverity} severity points are past their
+      thresholds. “Steady” means the reading moved less than 0.005 from the
+      last one, “rising” or “easing” gives the direction otherwise. A series
+      whose latest data is missing or too old stops the reading for the day
+      rather than being guessed. A war that moves no market leaves the index
+      unchanged. That is a limit of the measure, and it is printed here for
+      that reason.
+    </p>
+    <p>
+      The conflict counts beside it ({wd.open_conflicts} open, {wd.watch} on watch) come from a
+      fixed list of thirteen standing flashpoints, such as the Strait of
+      Hormuz, the Ukraine–Russia front and the Taiwan Strait. A place is open
+      when at least two of the day’s stories, each with a source link, mention
+      it. It is on watch when one story does, or when it was open in one of the
+      previous seven editions and drew no story today. Matching is by keyword,
+      not by understanding, so a passing mention can count.
+    </p>
+    <p>
+      The numbered markers on the globe and in the flashpoint index beside it
+      are an editorial choice: the places behind the day’s stories, keyed to
+      their coverage. They are not scored. A probability appears beside a
+      marker only when it belongs to a filed call.
+    </p>
+
+    <p class="cta"><a href="/tape">The Tape and the Forecast Ledger →</a></p>
+  </article>
+</Newspaper>
+
+<style>
+  /* The explainer page's article shell (what-is-an-agentic-newspaper.astro). */
+  .explain { max-width: 760px; margin: 24px auto 0; padding: 0 16px; font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--ink); }
+  .explain-h { font-family: var(--font-display); font-size: 44px; line-height: 1.04; letter-spacing: -0.025em; margin-bottom: 18px; }
+  .lede { font-size: 19px; line-height: 1.55; color: var(--ink); margin-bottom: 8px; }
+  .explain-h2 {
+    font-family: var(--font-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+    margin: 36px 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--hairline); scroll-margin-top: 24px;
+  }
+  .explain p { margin-bottom: 14px; }
+  .explain a { color: var(--ink); border-bottom: 1px solid var(--accent); text-decoration: none; }
+  .explain a:hover { color: var(--accent); }
+  .explain .small { font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); font-style: italic; }
+
+  .toc { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 18px 0 4px; font-family: var(--font-sans); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+  .toc a { border-bottom: 1px dotted var(--accent); }
+
+  .roles { list-style: none; counter-reset: r; padding: 0; margin: 0 0 14px; }
+  .roles li { counter-increment: r; position: relative; padding: 9px 0 9px 32px; border-bottom: 1px dotted var(--hairline); font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+  .roles li:last-child { border-bottom: none; }
+  .roles li strong { color: var(--ink); }
+  .roles li::before {
+    content: counter(r); position: absolute; left: 2px; top: 10px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 50%; width: 18px; height: 18px; line-height: 17px; text-align: center;
+  }
+
+  .faq { margin: 0 0 14px; }
+  .faq dt { font-family: var(--font-sans); font-weight: 700; font-size: 15.5px; color: var(--ink); margin-top: 18px; }
+  .faq dd { margin: 4px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-soft); padding-bottom: 14px; border-bottom: 1px dotted var(--hairline); }
+  .faq dd:last-of-type { border-bottom: none; }
+
+  /* The Forecast Ledger's table pattern (ForecastLedger.astro, TrackRecord.astro). */
+  .tbl { margin: 6px 0 18px; border-top: 1px solid var(--hairline-strong); }
+  .tbl-head, .tbl-row { display: grid; grid-template-columns: 1fr 64px 72px 84px; gap: 16px; align-items: baseline; }
+  .tbl.wd .tbl-head, .tbl.wd .tbl-row { grid-template-columns: 1fr 170px 72px; }
+  .tbl-head {
+    padding: 8px 0 6px; border-bottom: 1px solid var(--hairline-strong);
+    font-family: var(--font-sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+  }
+  .tbl-row { padding: 10px 0; border-bottom: 1px dotted var(--hairline); }
+  .tbl-row:last-child { border-bottom: none; }
+  .tbl-q { font-family: var(--font-body); font-size: 14.5px; line-height: 1.4; color: var(--ink); }
+  .explain a.tbl-q { border-bottom: none; }
+  .explain a.tbl-q:hover { color: var(--accent); }
+  .tbl-k { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--muted); }
+  .tbl-row .num { font-family: var(--font-mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .tbl-head .num { text-align: right; }
+  .tbl-row .num.p { color: var(--accent); font-weight: 500; }
+
+  .figs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 4px 0 18px; padding: 12px 0; border-top: 1px solid var(--hairline-strong); border-bottom: 1px solid var(--hairline-strong); }
+  .fig { display: flex; flex-direction: column; gap: 4px; }
+  .fig-v { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .fig:not(:first-child) .fig-v { color: var(--ink); }
+  .fig-l { font-family: var(--font-sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
+
+  .formula { font-family: var(--font-mono); font-size: 13px; color: var(--ink); padding: 10px 14px; background: var(--paper-shade); border-left: 2px solid var(--accent); }
+
+  .cta { margin-top: 34px; font-family: var(--font-sans); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .cta a { font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+
+  @media (max-width: 640px) {
+    .explain-h { font-size: 34px; }
+    .lede { font-size: 17px; }
+    .tbl-head, .tbl-row { grid-template-columns: 1fr 40px 52px 52px; gap: 10px; }
+    .tbl.wd .tbl-head, .tbl.wd .tbl-row { grid-template-columns: 1fr auto; }
+    .tbl.wd .tbl-k { grid-column: 1; grid-row: 2; font-size: 11px; }
+    .tbl.wd .tbl-head span:nth-child(2) { display: none; }
+    .tbl.wd .num { grid-column: 2; grid-row: 1; }
+    .figs { grid-template-columns: 1fr; gap: 10px; }
+    .fig { flex-direction: row; align-items: baseline; gap: 12px; }
+    .fig-v { font-size: 18px; min-width: 64px; }
+  }
+</style>
