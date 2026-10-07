@@ -42,6 +42,8 @@ test('each marker on its own, and the prose that only looks like one', () => {
     'The story continues to develop as rescuers reach the ship.',
     'Analysts recommended a pause; the minister was not persuaded.',
     'Readers can subscribe to the central bank bulletin, the RBI said.',
+    'The phishing email told recipients to click here to reset their passwords.',
+    'The campaign asked supporters to sign up for its weekly newsletter before the vote.',
   ]) assert.deepEqual(excerptFurniture(prose), [], prose);
 });
 

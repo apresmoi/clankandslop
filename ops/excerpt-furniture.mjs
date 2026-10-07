@@ -15,9 +15,11 @@ const MARKERS = [
   ['ad_slug', /\bscroll (?:down )?to continue(?: with content| reading)?\b/iu],
   ['ad_slug', /\bsubscribe to see fewer ads\b/iu],
   ['related_link', /(?:^|\s)(?:also read|read more|read also|must read|recommended(?: stories)?|related(?: stories| articles| coverage| news)?)\s*[:|>»]/iu],
-  ['related_link', /\bclick here\b/iu],
-  ['newsletter', /\b(?:sign up|subscribe)\b[^.]{0,60}\bnewsletters?\b/iu],
-  ['newsletter', /(?:^|[.!?]\s+)subscribe (?:now|today|to (?:our|the)\b)/iu],
+  // Calls to action count only where a sentence would start, as the page's own
+  // prompt does; "told recipients to click here" is reporting, not furniture.
+  ['related_link', /(?:^|[.!?]\s+)Click here\b/u],
+  ['newsletter', /(?:^|[.!?]\s+)(?:Sign up|Subscribe)\b[^."“”]{0,60}\bnewsletters?\b/u],
+  ['newsletter', /(?:^|[.!?]\s+)Subscribe (?:now|today|to (?:our|the)\b)/u],
   ['caption', /\((?:image|photo|picture|photograph|credit|file photo)s?\s*:[^)]*\)/iu],
 ];
 

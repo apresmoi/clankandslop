@@ -18,8 +18,9 @@
 //                credit the same named speaker ("Rumen Radev said"), or when
 //                they share a ten-word run of identical text.
 //
-// One relayed excerpt folds the whole outlet: the count can understate
-// independence, never overstate it. /method#sources explains it to readers.
+// One relayed excerpt folds the whole outlet, so the count leans low. It can
+// only fold what an excerpt names: two outlets repeating an unnamed briefing
+// still count twice. /method#sources says both to readers.
 
 export interface RecordRow {
   source?: string;
@@ -55,6 +56,8 @@ export function outletKey(row: RecordRow): string | null {
     try { parsed = new URL(url); } catch { return null; }
     const host = parsed.hostname.toLowerCase().replace(/^(?:www\d?|m|amp|mobile)\./u, '');
     const labels = host.split('.');
+    // One network under two names: twitter.com/Reuters is x.com/Reuters.
+    if (labels.slice(-2).join('.') === 'twitter.com') labels.splice(-2, 2, 'x', 'com');
     if (SOCIAL.has(labels.slice(-2).join('.'))) {
       const parts = parsed.pathname.split('/').filter(Boolean);
       const handle = (labels.slice(-2).join('.') === 'bsky.app' && parts[0] === 'profile' ? parts[1] : parts[0]) ?? '';
@@ -93,7 +96,7 @@ const RUN = `${NAME_WORD}(?:\\s+(?:(?:of|for|and|de|del|von|van|al|the)\\s+)?${N
 const WHEN = '(?:\\s+(?:late\\s+|early\\s+)?on\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?:\\s+(?:morning|afternoon|evening|night))?)?';
 const CUE = '(?:said|says|announced|stated|told|wrote|posted|confirmed|declared|reported)';
 const BEFORE_CUE = new RegExp(`(${RUN})${WHEN}\\s*,?\\s+(?:has\\s+|had\\s+|have\\s+)?${CUE}(?![\\p{L}])`, 'gu');
-const AFTER_CUE = new RegExp(`(?:according\\s+to|(?<![\\p{L}])(?:said|says))\\s+(?:the\\s+)?(${RUN})`, 'gu');
+const AFTER_CUE = new RegExp(`(?:[Aa]ccording\\s+to|[Cc]iting|[Cc]ited\\s+by|[Rr]eported\\s+by|[Qq]uoted\\s+by|(?<![\\p{L}])(?:said|says|told))\\s+(?:(?:the|a|an)\\s+)?(${RUN})`, 'gu');
 const NOT_SPEAKERS = new Set(['the', 'it', 'he', 'she', 'they', 'we', 'i', 'this', 'that', 'a', 'an', 'but', 'and', 'in', 'on', 'his', 'her', 'their', 'its',
   'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'today', 'yesterday']);
 const TITLES = new Set(['minister', 'president', 'spokesperson', 'spokesman', 'spokeswoman', 'governor', 'secretary', 'official', 'officials', 'chief', 'director', 'chairman', 'chair', 'ministry', 'office', 'department', 'agency', 'government']);
@@ -146,7 +149,9 @@ export function sourceCounts(rows: RecordRow[]): SourceCounts {
       if (!excerpt) continue;
       for (const speaker of creditedSpeakers(excerpt)) {
         const other = [...aliases].find(([k, patterns]) => k !== key && patterns.some((p) => p.test(speaker)));
-        if (other) { join(key, other[0]); continue; }
+        if (other) join(key, other[0]);
+        // The speaker joins too: "RBI Governor Sanjay Malhotra said" and
+        // "Sanjay Malhotra said" are one statement whatever the publisher match.
         const id = speakerKey(speaker);
         if (speakers.has(id)) join(key, speakers.get(id)!); else speakers.set(id, key);
       }

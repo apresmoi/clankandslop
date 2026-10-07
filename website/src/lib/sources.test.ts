@@ -23,6 +23,7 @@ test('one registrable domain is one outlet; a social network is one outlet per a
   assert.equal(outletKey(row('https://edition.cnn.com/a', '')), 'cnn');
   assert.equal(outletKey(row('https://x.com/SecWar/status/1', '')), 'x.com/secwar');
   assert.equal(outletKey(row('https://x.com/Bulgaria_PM/status/2', '')), 'x.com/bulgaria_pm');
+  assert.equal(outletKey(row('https://twitter.com/Reuters/status/1', '')), 'x.com/reuters');
   assert.equal(outletKey({ source: 'Ledger', source_note: { source_kind: 'computed' } }), null);
 });
 
@@ -42,6 +43,23 @@ test('outlets that credit the same named speaker count once', () => {
   ];
   assert.deepEqual(creditedSpeakers(rows[1].source_note!.raw_excerpt!), ['Bulgarian Prime Minister Rumen Radev']);
   assert.deepEqual(sourceCounts(rows), { references: 2, outlets: 2, independent: 1 });
+});
+
+test('a publisher match does not skip the speaker: three outlets, one statement', () => {
+  const rows = [
+    row('https://rbi.org.in/a', 'The MPC voted unanimously to increase the policy repo rate.', {}, 'Reserve Bank of India'),
+    row('https://indianexpress.com/b', 'RBI Governor Sanjay Malhotra said activity held its momentum.'),
+    row('https://livemint.com/c', 'Sanjay Malhotra said the stance had changed.'),
+  ];
+  assert.equal(sourceCounts(rows).independent, 1);
+});
+
+test('two outlets citing the same uncited agency count once', () => {
+  const rows = [
+    row('https://a.example/1', 'Two tankers were struck overnight, according to a Reuters report.'),
+    row('https://b.example/2', 'Citing a Reuters report, the paper said a third ship turned back.'),
+  ];
+  assert.equal(sourceCounts(rows).independent, 1);
 });
 
 test('a ten-word run of identical text folds two outlets: a reprinted wire story', () => {
