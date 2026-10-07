@@ -57,12 +57,11 @@ and art still have to validate.
 
 Every P row may carry its owner's facts check, a K row (`K <id> rev=<n>
 unchanged|updated|unavailable facts=HH:MM`); the page prints "Facts as of HH:MM
-UTC", or the research time without one. If `compose_edition` refuses because a
-facts check is missing, it names each piece: send ONE `room:filing` message
-mentioning each named owner with the edition and article id, asking them to
-`record_freshness_check` now (outcome `unavailable` if their answer has not
-arrived), and end the turn. The owner who records the last check mentions you
-in `room:filing`.
+UTC", or the research time without one. A missing check never stops compose.
+`compose_edition` refuses only when an owner recorded `updated` and that
+revision has not passed Spike yet; it names the piece: send ONE `room:filing`
+message mentioning its owner with the edition and article id, and end the
+turn. The owner, once the revision passes, mentions you in `room:filing`.
 
 ## The 16:45 wake
 
@@ -70,7 +69,7 @@ The second scheduled wake is the retry. Read the INDEX:
 
 - already composed: end the turn;
 - otherwise try to compose. If the INDEX says `blocked`, or `compose_edition`
-  refuses for anything you do not own (a missing facts check included), do not
+  refuses for anything you do not own (an `updated` revision not yet passed included), do not
   ask the owners again: send `@brass` one message in `room:release` listing
   every missing item and its owner (an unreviewed filing, a pending revision, a
   facts check, a Ledger desk document), then end the turn. Brass's reply wakes

@@ -101,20 +101,19 @@ revision, `request_id` and `checked_at` = the answer's `ran_at`:
   finding joins `evidence_box`, every still-true verified fact stays, and the
   filing is announced to `@spike` in `room:filing`. `file_article` stamps the
   time; never type `facts_checked_utc`.
-- `unavailable`: the answer was `refused`, or Caslon asks before it arrives.
-  Omit `request_id` and `checked_at`; the piece runs stamped with the research
-  time.
+- `unavailable`: the answer was `refused` or has not arrived. Give the piece's
+  own `request_id` (the tool refuses one without it) and omit `checked_at`;
+  the piece runs stamped with the research time.
 
 If the tool result's `next` says the edition is ready to compose, the owner
-tells `@caslon` in `room:filing` with the edition and article id. Use
-`room:filing` even if `next` names `room:release`: reporters cannot post there.
+tells `@caslon` in `room:filing` with the edition and article id.
 
 ## Operational bounds
 
-- One queue and shared browser locks. Production needs
-  `CLANK_ADHOC_MAX_PER_AGENT=4` and `CLANK_ADHOC_MAX_PER_EDITION=24` in the
-  responder's environment on the sensor host, because each passed piece spends
-  one request on its facts check. A `research_budget_exhausted` refusal makes
+- One queue; captures run as tabs of a shared browser, up to three at once.
+  Production allows 6 requests per agent and 30 per edition
+  (`CLANK_ADHOC_MAX_PER_AGENT`, `CLANK_ADHOC_MAX_PER_EDITION` on the sensor
+  host); each passed piece spends one on its facts check. A `research_budget_exhausted` refusal makes
   that check `unavailable`, never a silent pass.
 - Duplicate requests cannot relaunch research; conflicting reuse cannot replace
   the original question; uncertain interrupted runs are not repeated.
