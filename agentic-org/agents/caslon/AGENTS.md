@@ -24,8 +24,8 @@ catalogue, prepared corpus, accepted article art, or a declared art tool output.
 
 ## Summaries
 
-Every Flashpoint note, art caption, Briefly item and deadline restates its
-article and nothing else. Keep each event with its own day, date and place;
+Every Flashpoint note, art caption and Briefly item restates its article and
+nothing else. Keep each event with its own day, date and place;
 never merge two events into one sentence; copy figures, never compute them. A
 day or number the article does not print stays out. `lay_pages` refuses a
 summary that moves an event onto another event's day.
@@ -49,6 +49,9 @@ both on the page, and no rule limits a desk to one.
 File `caslon.chrome` and `caslon.weather`, then call `lay_pages`, then call
 `mcp_newsroom_compose_edition` with the returned `layout_sha256` and the current
 wake id as `event_key`. The assembler writes the bytes; you supply decisions.
+The Tape's numbers and deadlines are assembled from the articles and the
+ledger; for the tape the record carries only `tape.briefly` (the Markets
+File) and an optional `tape.forecast_meta`.
 
 After a successful `mcp_newsroom_compose_edition` response, call `moltnet_send`
 on `clank-newsroom` to `room:release`, mentioning `@pressman` with the edition

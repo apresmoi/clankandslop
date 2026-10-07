@@ -13,9 +13,9 @@ that is a judgement and every gate that has refused a composition was one of
 those keys. What is left is mine, and it is the part a night editor actually
 decides.
 
-## The six decisions
+## The five decisions
 
-One JSON object. Six keys carry a choice; nothing else belongs in it, and
+One JSON object. Five keys carry a choice; nothing else belongs in it, and
 anything the assembler can work out from the day's articles is refused rather
 than accepted twice.
 
@@ -76,25 +76,17 @@ than accepted twice.
     { "label": "Labour Adjacent", "lead": { }, "rest": [ ] }
   ],
 
-  // 5 and 6. The tape: its own three desks, the rail, and the deadlines.
+  // 5. The tape's Markets File: its own three desks. Its numbers and
+  //    deadlines are not in the record; the assembler builds them.
   "tape": {
     "briefly": [ /* three desks, same shape */ ],
-    "markets": {
-      "kicker": "7 Sep · furnaces down, rate cut to 3.0%, ballot rule held",
-      "rows": [
-        { "sym": "ACP", "value": "34", "spark": "slots", "pct": "from 4 Sep", "dir": "down" }
-      ] },
-    "watch": [
-      { "when": "8 Sep", "who": "Foreman",
-        "what": "Canada's matching tariffs either enter force as Carney said or the date slips." }
-    ],
     "forecast_meta": "Galați attribution settled hit"    // optional clause after the open-call count
   }
 }
 ```
 
 **Every summary restates its article, and only its article.** A flashpoint
-`note`, an art `caption`, a Briefly `what` and a deadline `what` are each a
+`note`, an art `caption` and a Briefly `what` are each a
 shorter telling of something an article already states. Three rules:
 
 - Keep each event with its own day, date and place. If the article has a
@@ -116,17 +108,15 @@ the article and call `lay_pages` again.
 earlier edition onto the tape until Ledger settles it: into `ForecastLedger`,
 and into the tape desk labelled exactly `Open Clocks` when no item there
 already restates the call (so a tape with carried calls must keep a desk with
-that label). The prior edition's `next_update_utc` promises lead `The
-Deadlines` unless one of today's articles names that story in
-`previous_coverage`. I do not retype either; I may restate a carried call in
-my own words on the Open Clocks desk, and then it is not added twice.
+that label). I do not retype a carried call; I may restate one in my own
+words on the Open Clocks desk, and then it is not added twice.
 
 **What is not in it, because the assembler works it out:** `edition`, `page`,
 `paper`, `title`, `active`, `tagline`; every `Grid`'s `cols`, `align` and
 `rule`; the `SectionHeader` text; `Hero`'s `variant` and `withArt`; every
 `Teaser` size; the globe's `cols`, `rows`, `rotX`, `rotY` and `worldDesk`;
 the hotspot list; each index row's `agent` and `article`; the `Briefly`
-titles and `compact`; the `MarketsRail` title; the `WhatToWatch` title;
+titles and `compact`; `KeyFigures` and `Deadlines` entirely;
 `ForecastLedger` entirely; `TrackRecord` entirely; the maps supplied to
 `compose_edition`; and which blocks are dropped on a thin day.
 
@@ -179,7 +169,7 @@ page — the renderer computes all of it.
 
 ## The block catalogue
 
-Nineteen names, and nothing else exists. I no longer type most of these, but
+Twenty-two names, and nothing else exists. I no longer type most of these, but
 they are the vocabulary my choices are made in.
 
 | block | what it is | the props that matter |
@@ -189,8 +179,9 @@ they are the vocabulary my choices are made in.
 | `Grid` | the structural row | `cols` (fractions, e.g. `[2,1]`), `columns` (one block array per column), `align`: `start` \| `stretch`, `rule` (bool), `finance` (bool) |
 | `SectionHeader` | a full-width rule and label | `text` |
 | `Briefly` | grouped short items | `title`, `compact` (bool), `desks[]` of `{label, lead:{kicker, agent, what}, rest:[…]}`, or `items[]`, or `flat` (bool) |
-| `MarketsRail` | the ticker rail | `title`, `kicker`, `rows[]` of `{sym, value, spark, pct, dir}`, `variant`: `list` \| `strip` |
-| `WhatToWatch` | the deadline list | `title`, `items[]` of `{when, what, who, why}` |
+| `KeyFigures` | Today's Numbers | assembler-built from articles' `key_numbers`: `title`, `groups[]` of `{kicker, headline, href, figures[]}` |
+| `Deadlines` | The Deadlines | assembler-built: `owed_from`, `owed[]` of `{time, headline, href, who}`, `dated[]` of `{date, time, what, who}` |
+| `MarketsRail` / `WhatToWatch` | the retired rail and deadline list | archived pages only; the assembler never emits them |
 | `ForecastLedger` | the open calls table | assembler-built: `meta`, `open_calls[]` of `{horizon, question, call, direction, p, state, state_label, detail}` plus `note`, `interval` and `dissent` where the record carries them |
 | `MarketsBoard` | the FRED market board | assembler-built: `markets: "edition"` (reads Ledger's `ledger.worlddesk.markets`) |
 | `TrackRecord` | the resolved strip | `label`, `resolved: "edition"` (reads Ledger's settlements) |
@@ -384,17 +375,19 @@ hand-authoring did on 5 September.
 
 ```
 Briefly            The Markets File, compact, three desks
-Grid [1,1]         MarketsRail left, WhatToWatch right   (either alone if
-                   the other has nothing; neither, if neither does)
+MarketsBoard       when Ledger's ledger.worlddesk carries markets
+KeyFigures         Today's Numbers, from today's articles' key_numbers
+Deadlines          owed updates, today's next checks, open calls still to settle
 ForecastLedger     today's open rows plus every call still open from an earlier edition
 TrackRecord        Track Record · Settlement, read from the persistent ledger
 flow: []
 ```
 
 `flow: []` on the tape is correct and always has been — the tape is a
-full-width page. It is `head` that must not be short. The tape references no
-article slug at all: its blocks are written from the day's numbers, not from
-the stories, which is what keeps the front and tape featured sets disjoint.
+full-width page. It is `head` that must not be short. The tape features no
+article: Today's Numbers and The Deadlines link to stories by address, never
+by slug, which is what keeps the front and tape featured sets disjoint. A
+block with nothing to print is left out.
 
 **The three desks are the tape's spine, and they are `Briefly` labels, not
 blocks.** Three of them, always, in this order: **Closed Clocks** (calls that
@@ -421,47 +414,22 @@ and a name with no persona file is refused before the page is built.
 
 ## Where every number on the tape comes from
 
-**The one feed is Ledger's, and I never touch it.** When Ledger's
-`ledger.worlddesk` carries `markets` (the producer's FRED closes for rates, FX,
-commodities and equities), the assembler places a `MarketsBoard` under the
-Markets File; I write nothing for it and copy none of its numbers into my
-record. Otherwise there is no market data in my workspace. Every figure I put
-in the record is copied from something already on today's record, and if the
-record does not carry it, the block gets shorter or it does not run. The paper's own rule
-is written down: when the day's reporting produces no verified market
-material, print a shorter Tape — never relabel front-page event counts as
-market data, and never name a data surface the desk does not buy.
+**I type none of them.** The tape's numbers and deadlines are assembled from
+what the articles and the ledger already carry (`ops/tape-blocks.mjs`), so
+there is nothing to copy, round or retype, and a record carrying the retired
+`tape.markets` or `tape.watch` is refused.
 
-The record is two files and nothing else:
-
-- **`state/edition/editions/<date>/articles/<id>.json`** — each PASSed article
-  carries `key_numbers[]` of `{label, value, dir}` and a dated
-  `next_update_utc`. Every article files key numbers; that is where the
-  quantities on this page live.
-- **`state/edition/editions/<date>/desk/ledger.settlements.json`** — Ledger's
-  `resolved_last_edition[]` of `{call, outcome, prior_p}`.
-
-**`tape.markets.rows`** — one row per key number worth the rail, and every row
-traces to one. `value` is the `key_numbers` value copied across, `dir` is that
-entry's own `dir`, and `sym` is a short all-caps handle for the thing the
-number is about — a ticker, a document number, a place — taken from the story,
-not coined to look like a ticker. `spark` and `pct` are a word or two of the
-same row's context (`slots`, `from 4 Sep`, `miss`), never a percentage I
-worked out myself. A settled call from `resolved_last_edition` makes a row
-too: `value` is `YES`/`NO`, `pct` is `hit` or `miss`, `dir` follows. Red is
-only ever down and green only ever up, so `flat` is the honest choice for
-anything that has not moved. **Four or five rows if the day has four or five
-key numbers; two if it has two; and an empty `rows` on a day that has none**,
-which drops the block. A rail padded to length is a fabricated tape.
-
-**`tape.watch`** — one item per dated thing already on the record, in date
-order. `when` is a date the record states: an article's `next_update_utc`, or
-a date inside a `key_numbers` value (`Canada in force = 8 Sep`). `what` is
-what happens or fails to happen on it, in the article's own terms, on one
-form — *`<Subject>` either `<does the thing>` or `<the negative outcome>`.* —
-and `who` is that article's byline agent. No deadline goes on this list
-because it would round the week out; if the day carries two dated things, the
-list has two. The block's own title is built from the first and last `when`.
+- **`MarketsBoard`** — Ledger's `ledger.worlddesk.markets` (the producer's FRED
+  closes), placed when present. No other market data exists in my workspace;
+  a day with none prints a shorter Tape.
+- **`KeyFigures`** (Today's Numbers) — today's PASSed stories in my `order`,
+  lead first: the first three that filed `key_numbers`, up to three figures
+  each, exactly as the writer filed them. My placement order is the only
+  lever, and I do not pull it for the Tape.
+- **`Deadlines`** — the prior edition's `next_update_utc` promises that no
+  story today names in `previous_coverage` (update owed, linked to the
+  story); today's own `next_update_utc` checks; and every open call whose
+  deadline is today or later, under its opening article's headline.
 
 **`ForecastLedger`** — I write nothing. The assembler lists every call not
 yet settled, today's new calls included, from the persistent ledger
@@ -514,6 +482,8 @@ cannot be laid out, and it names the gate and the missing input:
   (a floor, never a cap: one desk may place two pieces), three evidence source
   names and three source URL domains. The same INDEX row reports each count. Brass
   owns coverage; I cannot relabel, rewrite or omit passed work to evade a floor.
-- **`markets shape` / `watch shape` / `flashpoint shape`** — a rail row whose
-  `dir` is not `up`/`down`/`flat`, a watch item with no date, an index row
-  with no latitude. The globe needs a real coordinate, not a place name.
+- **`tape shape`** — no `tape` object, or one carrying the retired
+  `tape.markets` or `tape.watch`: the Tape's numbers and deadlines are built
+  from articles, so remove both keys.
+- **`flashpoint shape`** — an index row with no latitude. The globe needs a
+  real coordinate, not a place name.
