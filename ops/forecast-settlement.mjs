@@ -43,7 +43,15 @@ const LABEL_MAX = 1000;
 const IF_NO = /\bif\s+no\b/iu;
 // A relative horizon is a deadline too: "within 48 hours" resolves from the
 // edition date exactly as Ledger's callDeadline resolves it.
-const RELATIVE_HORIZON = /\b(?:within|in\s+the\s+next|over\s+the\s+next|inside)\s+(?:\d{1,3}|one|two|three|four|five|six|seven|ten)\s*(?:hours?|days?|weeks?|months?)\b|\b\d{1,3}[- ]hours?\b|(?<![\w$])\d{1,3}D(?!\w)|\b(?:by|before)\s+(?:the\s+)?end\s+of\s+(?:the\s+|this\s+|next\s+)?(?:day|week|month|year|quarter|session|term)\b|\b(?:today|tonight|tomorrow|this\s+week|next\s+week)\b/iu;
+const COUNT = String.raw`(?:\d{1,3}|an?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fourteen|thirty)`;
+const UNIT = String.raw`(?:hours?|days?|weeks?|fortnights?|months?|years?)`;
+const RELATIVE_HORIZON = new RegExp([
+  String.raw`\b(?:within|in|inside|over\s+the\s+next|in\s+the\s+next|during\s+the\s+next)\s+(?:the\s+next\s+)?${COUNT}[\s-]*${UNIT}\b`,
+  String.raw`\b${COUNT}[\s-]+${UNIT}\s+(?:of|from|after)\b`, String.raw`\b\d{1,3}[- ]hours?\b`, String.raw`(?<![\w$])\d{1,3}D(?!\w)`,
+  String.raw`\b(?:by|before)\s+(?:the\s+)?end\s+of\s+(?:the\s+|this\s+|next\s+)?(?:day|week|weekend|month|year|quarter|session|term)\b`,
+  String.raw`\b(?:by|before|on)\s+(?:next\s+)?(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b`,
+  String.raw`\b(?:today|tonight|tomorrow|this\s+(?:week|weekend|month|year)|next\s+(?:week|weekend|month|year))\b`
+].join('|'), 'iu');
 function noClause(label) {
   let undated;
   for (const clause of label.slice(0, LABEL_MAX).split(/[.;]/u)) {

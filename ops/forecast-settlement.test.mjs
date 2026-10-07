@@ -66,7 +66,7 @@ test('an "if no" condition with no date at all is refused: nobody can say when t
   assert.deepEqual(codes(forecast({ headline: 'The state is a 42% shot at the ruling', confidence: { value: 0.42, label: 'Yes if the ruling is confirmed; no if it is not confirmed.' } })), []);
   assert.deepEqual(codes(forecast({ headline: 'The state is a 42% shot at the ruling', deck: 'It must rule by 4 December.', confidence: { value: 0.42, label: 'Yes if the court rules for the state by 4 December; no if no decision is posted.' } })), []);
   // A relative horizon is a deadline: Ledger resolves "within 48 hours" from the edition date.
-  for (const horizon of ['within 48 hours', 'within two weeks', 'in the next 7 days', 'by the end of the week', 'by end of session', 'over the next 3 days'])
+  for (const horizon of ['within 48 hours', 'within two weeks', 'in the next 7 days', 'by the end of the week', 'by end of session', 'over the next 3 days', 'within a week', 'within eight days', 'in 7 days', 'within a fortnight', 'by Friday', 'this week', 'within 30 days of the vote'])
     assert.deepEqual(codes(forecast({ headline: 'Talks are a 50% shot at an agreement', confidence: { value: 0.5, label: `YES if an agreement is signed ${horizon}; NO if no agreement is signed ${horizon}.` } })), [], horizon);
 });
 
