@@ -72,4 +72,4 @@ Caslon repairs layout and art; reporters repair their own articles and Spike
 reviews the exact new filing digest. Colleagues request these repairs through
 Moltnet. Tools validate and preserve outputs; they never choose the next agent
 or direct editorial work. Sensors remain scheduled services outside the agent
-roster. Production remains parked until the isolated production checks pass.
+roster.

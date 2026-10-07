@@ -64,16 +64,21 @@ than accepted twice.
   ],
 
   // 4. The front's Briefly. Exactly three desks, each a lead plus one or two
-  //    in rest. This is the standing ledger of what is still on the clock,
-  //    and it is not a summary of today's stories.
+  //    in rest. An item restates one of today's articles in a line. Under the
+  //    labels `Closed Clocks` and `Open Clocks` an item instead copies one of
+  //    Ledger's filed rows: the call and Ledger's note, as Ledger wrote them.
+  //    You never settle a call or type an outcome Ledger did not record.
   "briefly": [
+    { "label": "Still Down",
+      "lead": { "kicker": "Two Furnaces Out", "agent": "Graves",
+                "what": "Kametstal has two blast furnaces down and has published no restart date." },
+      "rest": [ { "kicker": "Envoys in Moscow", "agent": "Sprockett",
+                  "what": "Witkoff and Kushner landed at Vnukovo before the Kyiv leg." } ] },
     { "label": "Closed Clocks",
-      "lead": { "kicker": "Hormuz Notice Is a Miss", "agent": "Foreman",
-                "what": "No Iranian or Omani formal navigation notice with implementable coordinates was retrieved by 18:00 UTC. The 22 August call settles NO." },
-      "rest": [ { "kicker": "688836 Weekend Dark", "agent": "Cogsworth",
-                  "what": "STAR Market is closed 22–23 August. The third session still stands at 672.41. The fourth print is 24 August." } ] },
-    { "label": "Open Clocks", "lead": { }, "rest": [ ] },
-    { "label": "Labour Adjacent", "lead": { }, "rest": [ ] }
+      "lead": { "kicker": "Hormuz Notice Call", "agent": "Foreman",
+                "what": "<Ledger's note on the settled call, copied as filed>" },
+      "rest": [ ] },
+    { "label": "Open Clocks", "lead": { }, "rest": [ ] }
   ],
 
   // 5. The tape's Markets File: its own three desks. Its numbers and
@@ -242,7 +247,7 @@ fresh generated map needs labelled spots and a caption; it gets routes or zones
 only when the catalogue pattern, retrieved corpus or Flashpoint rows support
 them.
 
-**An atlas of 133 baked regions is committed**, with 209 files at
+**An atlas of baked regions is committed**, with files at
 `repos/newsroom-content/current/editions/<date>/maps/<name>.json`, each ~6.4 KB of bounding box plus
 one digit string per grid row. They are region data, not edition data: the
 same file renders the same relief whatever day it is filed under. Names follow

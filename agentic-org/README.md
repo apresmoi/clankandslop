@@ -59,19 +59,17 @@ before a checkpoint. Research, dissent and desk preparation can overlap.
                 ↓
  Private GitHub research archive
                 ↓
-12:00 host loads a fresh snapshot
+12:00 research freezes; reporters pitch
                 ↓
-      13:00 reporters pitch
-                ↓
-     13:30 Brass commissions
+     12:30 Brass commissions
                 ↓
 Reporters write, validate + file
                 ↓
-Spike reviews (15:00 checkpoint)
+Spike reviews (13:00–16:00)
                 ↓
-  Ledger supplies desks (15:30)
+  Ledger supplies desks (14:00)
                 ↓
-Caslon makes art + pages (16:00)
+Caslon makes art + pages (16:00, retry 16:45)
                 ↓
 Pressman checks + stages (16:30)
                 ↓
@@ -93,14 +91,14 @@ Step IDs retain the references used by earlier workflow records.
 | 03A | Capture and preparation complete, in separate commits | Sensor archive job | Research pushed to private GitHub on `edition/YYYY-MM-DD`; a Moltnet research notice announces availability |
 | 03B | 12:00 host timer, before writers begin | Hetzner daily launch service | Fresh public source and verified private corpus pinned, bundled, deployed and checked in agent mounts; stale or incomplete inputs stop admission |
 | 04 | Sensor mention or allowed DM | Klaxon | Durable lead decisions in the edition index; optional concise sensor-room digest without waking every desk |
-| 05 | 13:00 scheduled wake | Six reporters | At most one pitch each in `conference`, based on their beat index and colleagues' pitches |
-| 06 | 13:30 conference | Brass | At least five assignments for distinct reporters; one forecast and a different named dissenter. Save assignments first, then mention each owner in `assignment` |
+| 05 | 12:00 scheduled wake | Six reporters | At most one pitch each in `conference`, based on their beat index and colleagues' pitches |
+| 06 | 12:30 conference | Brass | At least five assignments, each a BRIEF or an ANALYSIS with its proposition; one forecast and a different named dissenter. Save assignments first, then mention each owner in `assignment` |
 | 07 | Assignment or revision request | Assigned reporter | Article JSON: prose, canonical byline, epistemic label and cited Record. Forecasts carry probability and a dated next look. Call `validate_article` and repair errors |
 | 08 | Finished draft passes validation | Reporter and filing tool | `file_article` repeats checks and saves an attributed revision, Git commit and receipt. Separately announce it in `filing`, mentioning Spike and any named dissenter |
 | 09 | Forecast owner's filing mention | Assigned dissenter | Independent dissent or concurrence saved under their own identity against that revision |
-| 10 | Filing mention or 15:00 checkpoint | Spike | Digest-bound PASS, REVISION_REQUEST, HOLD or SPIKE. Send repair requests to the owner; after five PASS articles, notify Ledger if its desks are missing |
-| 11 | Review handoff or 15:30 checkpoint | Ledger | `ledger.settlements` and `ledger.worlddesk` from authorized prepared inputs and trace; mention Caslon after both are accepted |
-| 12 | Desk handoff or 16:00 checkpoint | Caslon | Chrome/weather, catalogue or freshly baked art, fixed `front` and `tape` pages, and immutable composition receipt; mention Pressman |
+| 10 | Filing mention, or hourly 13:00–16:00 | Spike | Digest-bound PASS, REVISION_REQUEST, HOLD or SPIKE. Send repair requests to the owner; once the passed-article floor is met, notify Ledger if its desks are missing |
+| 11 | Review handoff or 14:00 checkpoint | Ledger | `ledger.settlements` and `ledger.worlddesk` from authorized prepared inputs and trace; mention Caslon after both are accepted |
+| 12 | Desk handoff, 16:00 checkpoint or 16:45 retry | Caslon | Chrome/weather, catalogue or freshly baked art, fixed `front` and `tape` pages, and immutable composition receipt; mention Pressman |
 | 13A | Composition handoff or 16:30 checkpoint | Pressman | `prepare_release` starts validation of the exact composition, references, layout and dependencies |
 | 13B | During that preparation job | Private build worker | Website build and mechanical renderer checks, including glyph cameras and required map/minimap artifacts. Pressman follows bounded job polling |
 | 13C | Matching successful build; target before 17:00 | Pressman | `stage_release` saves the validated candidate and receipt to local staging; announce readiness in `release` |

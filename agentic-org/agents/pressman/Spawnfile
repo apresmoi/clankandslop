@@ -29,7 +29,7 @@ schedule:
   cron: "30 16 * * *"
   timezone: Europe/Berlin
   jitter_seconds: 900
-  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read repos/newsroom/agentic-org/agents/pressman/RUNBOOK.md. If the current composition is ready, call prepare_release using the current wake id. Follow its bounded job polling until complete, then call stage_release for that exact composition. Mechanical content, layout and build checks are the release gate. Report failures to the owning colleague; never edit content or bypass a gate. Produce only a local staging artifact and receipt. Production publishing is parked."
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read repos/newsroom/agentic-org/agents/pressman/RUNBOOK.md. If the current composition is ready, call prepare_release using the current wake id. Follow its bounded job polling until complete, then call stage_release for that exact composition. Mechanical content, layout and build checks are the release gate. Report failures to the owning colleague; never edit content or bypass a gate. Produce only a local staging artifact and receipt; the host job publishes. If nothing is composed yet, end the turn: Caslon mentions you when it composes."
 surfaces:
   moltnet:
     - network: clank-newsroom
@@ -81,7 +81,7 @@ workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:484748db3a8e990462b01e82cd7f265eba5c1152d7f055fe92b4de646c797e53, mount: ./tools/newsroom, mode: readonly }
-    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:01ef836b42dfa1555d417210d5ec36769fad6ab3a603ee69f267fdeb4f3489bc, mount: ./repos/newsroom, mode: readonly }
+    - { id: newsroom-runtime, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:3bb8b905dfc4572a16288a0b6ce62a7951077343b8a04105360a4cf82c180dba, mount: ./repos/newsroom, mode: readonly }
     - { id: website-deps-a, kind: bundle, source: ../../newsroom-dependencies-a.tar, sha256: sha256:3682eb4edaa1092fb08dcc2629da683b7690ff03e2a248301c56c7bfccc6de9d, mount: ./deps-a, mode: readonly }
     - { id: website-deps-b, kind: bundle, source: ../../newsroom-dependencies-b.tar, sha256: sha256:c7bb3c23e59c0e66257eeb2d5dde6bd131987f0ce228dc4b6c96f5b2b8509142, mount: ./deps-b, mode: readonly }
     - { id: public-assets-a, kind: bundle, source: ../../newsroom-assets-a.tar, sha256: sha256:37f4e67f9b6e226dc5edb17d7cd1d9641cf84bbcdf64f96bc47afe8877e0649a, mount: ./assets-a, mode: readonly }

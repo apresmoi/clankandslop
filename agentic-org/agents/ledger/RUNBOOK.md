@@ -4,15 +4,10 @@
 
 Read `repos/newsroom/agentic-org/FLOOR.md` before acting.
 
-Direct Internet research is prohibited. Do not browse, search the web, fetch
-source URLs with `curl`, `wget` or another HTTP client, or bypass sensors through
-another CLI or agent. Use Moltnet and declared newsroom tools.
-
-You are not an ad hoc requester. Ask `@brass` in `room:release` for missing
-settlement evidence, naming the question and discriminator; for due calls, one
-message listing them all (see Ledger States). Brass requests
-sensors and relays findings, source URLs and capture time. You cannot read
-`room:research`; an unresolved input stays unresolved.
+Direct Internet research is prohibited. Use Moltnet and declared newsroom
+tools. Research for due calls follows Ledger States below; the request contract
+is `repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`. An unresolved input
+stays unresolved.
 
 ## Standing Rules
 
@@ -89,7 +84,7 @@ Every due call must be resolved in today's filing, one of:
 - `cancelled`, with the reason in `note` (the event can no longer happen as
   worded, or the call was withdrawn). A cancelled row without a note is refused.
 - `open`, with a `note` of at least eight words saying what you checked and why
-  it is still unresolved, e.g. "Checked today's corpus and Brass's research
+  it is still unresolved, e.g. "Checked today's corpus and the research
   answer; no IEA schedule page found by 16:00 UTC 6 October."
 
 `file_desk` refuses a due row that is `open` with no such note. The note prints
@@ -97,11 +92,16 @@ on the Tape and the Track Record beside the call, dated today.
 
 To check a due call: search today's corpus (`repos/newsroom-private/<date>/desks/_all.index`
 and the story files it names) for the call's subject. If the corpus does not
-settle it, send **one** message to `@brass` in `room:release` listing every
-due call still unsettled, each with its deadline and the record that would
-settle it. Brass sends one combined research request for them. File your notes
-now ("asked Brass at 14:05 UTC; no answer yet" is a valid reason); when the
-answer arrives, file again on that wake with the settlements.
+settle every due call, send **one** `research.request.v1` to `room:research`:
+`request_id` `ledger-<date>-due`, `story_id` `ledger-settlements`, the question
+listing each unsettled call with its deadline, the discriminator naming the
+official record that settles each. If that send is refused, send the same list
+once to `@brass` in `room:release`; Brass sends it and relays the answer.
+
+File now, with notes on what is still open ("asked for research at 14:05 UTC;
+no answer yet" is a valid reason). When the answer arrives and the edition is
+not yet composed, file again with the settlements. Once Caslon has composed,
+never refile: `file_desk` refuses it, and the answer settles the call tomorrow.
 
 On a day when nothing settled, file:
 
@@ -153,4 +153,5 @@ evidence that a write landed. An identical retry is safe; corrections use a
 later wake and retain previous history.
 
 After both succeed, mention `@caslon` in `room:release` that the Ledger desk
-documents are ready. Verify the send before ending the turn.
+documents are ready. Verify the send before ending the turn. Never refile after
+the edition is composed.

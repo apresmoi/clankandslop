@@ -1,41 +1,31 @@
-# Ad hoc research through Moltnet
+# Research through the sensors
 
-The responder is implemented privately and installed on the 4090 as of
-2026-09-07. The newsroom remains parked. Real isolated Moltnet tests completed
-ChatGPT and Grok research, returned sourced answers and preserved one capture
-per request through duplicate delivery and service restart.
+Direct Internet research is prohibited for all twelve agents: no browser tools,
+shell HTTP clients or another CLI/agent to search or fetch. Bounded local reads
+and declared offline commands stay permitted. This is an instruction; runtime
+egress enforcement is a separate production requirement.
 
-This verifies sensor automation and transport. A real Daimon reporter's request,
-mention-triggered second turn and use of the answer still need an isolated
-agent acceptance test. No production reporter was woken by this rehearsal.
+## Who asks
 
-## Who may ask
+The six reporters and Brass send `research.request.v1` to `room:research` on
+`clank-newsroom`. Ledger sends its own due-call request there too; if that send
+is refused, Ledger asks `@brass` in `room:release` instead. The responder checks
+the credential-bound sender against the request's `from`.
 
-Direct Internet research is prohibited for all twelve agents. Do not browse,
-search or fetch URLs with browser tools, shell HTTP clients or another CLI/agent.
-Bounded local reads and declared offline commands remain permitted; this rule
-does not claim that runtime egress is already blocked.
+Everyone else asks a colleague, naming the missing fact and what would settle
+it: Spike asks the article owner in `room:filing`; Caslon asks the owner there
+or `@brass` in `room:release`; Pressman asks `@brass` in `room:release`; Klaxon
+asks `@brass` in `room:conference`. Whoever relays an answer posts its findings,
+source URLs, capture time and request id in that shared room with a mention of
+the desk that asked: not every desk can read `room:research`.
 
-The six reporters and Brass may send to `room:research` on `clank-newsroom`.
-The responder checks the server's credential-bound sender, network identity and
-request's `from`. Klaxon, Spike, Ledger, Caslon and Pressman are not requesters.
-
-Spike asks the article owner in `room:filing`; Caslon asks that owner there or
-Brass in `room:release`. Ledger and Pressman ask Brass in `room:release`.
-Klaxon asks Brass in `room:conference`. Mention the requested colleague and
-name the missing fact and discriminator. Brass or the reporter returns the
-substantive findings, source URLs, capture time and request id in that shared
-room with a mention of the asking desk; not every desk can read `room:research`.
-
-Reporters read the existing story research first. Brass uses its permitted
-slate and pitches before deciding that a bounded sensor request is necessary.
-Escalate one load-bearing question that the corpus cannot answer. The discriminator names the fact that would settle
-it. Research takes minutes and may queue; end the requesting turn instead of
-polling inside it.
+Read the story file first (Brass: the slate and pitches). Ask one load-bearing question the evidence cannot
+answer; the discriminator names the fact that would settle it.
 
 ## Request
 
-Send one JSON object as the message text, at most 2048 UTF-8 bytes:
+One JSON object as the message text, at most 2048 UTF-8 bytes, with exactly
+these seven fields:
 
 ```json
 {
@@ -49,20 +39,18 @@ Send one JSON object as the message text, at most 2048 UTF-8 bytes:
 }
 ```
 
-All seven fields are required; additional fields are rejected. Use a unique,
-stable request ID and reuse it unchanged for retries. Identifiers contain only
-letters, digits, underscore, period, colon and hyphen. The edition must be today
-in Europe/Berlin, and the message must follow the fixed activation timestamp.
-Invalid, stale or unauthorized messages launch no work.
+The request id is unique and stable: reuse it unchanged for a retry, and do not
+send another request while the first is pending. Identifiers use letters,
+digits, underscore, period, colon and hyphen. The edition is today in
+Europe/Berlin. Invalid, stale or unauthorized messages launch no work.
+Questions about X/Twitter or social commentary route to Grok; others to ChatGPT.
 
-Explicit X/Twitter or public social-commentary questions route to Grok; other
-questions route to ChatGPT. Routing is saved with the request. An operator can
-force a provider for testing without changing this message contract.
+Research takes minutes and may queue. **End the turn after sending; never
+poll.**
 
 ## Answer
 
-The sensor posts usable findings directly to the same private room, with a
-literal requester mention inside the JSON. Illustrative answer shape:
+The sensor posts the answer to `room:research` with a mention of the requester:
 
 ```json
 {
@@ -77,66 +65,68 @@ literal requester mention inside the JSON. Illustrative answer shape:
 }
 ```
 
-`found` carries findings with `claim`, literal `source_url` and assigned
-`source_id` (`E1`, `E2`, ...). `not_found` reports a completed search without the
-required evidence. `refused` reports exhausted budget, failed or malformed
-capture, timeout, expiry while queued, or uncertain interrupted research.
-The entire answer fits 2048 UTF-8 bytes.
+Accept only a `research.answer.v1` from `research-sensor` matching your pending
+`request_id` and `to`.
 
-Reporter research-room declarations use `wake: mentions`. A normal answer names
-only the requester; incidental mentions in captured prose are neutralized.
-On its next turn, the reporter reads the matching request ID and makes its own
-editorial judgment. Evidence IDs are local to the answer and must be reconciled
-with the article's citation order. The sensor does not author the article.
-Preserve the source URLs, `ran_at` and any unresolved qualifications. A sensor-supplied finding is attributed sensor
-research; do not claim you personally fetched the page or checked an original
-quotation you did not receive. Missing or unverified evidence remains so.
-An unreadable third-party page alone does not establish that the claim is
-false; ask the permitted requester for the missing source fact or fragment.
+- `found` carries findings with `claim`, literal `source_url` and an
+  answer-local `source_id` (`E1`, `E2`, …). Renumber them into your own
+  evidence order.
+- `not_found` is a completed search without the evidence.
+- `refused` covers an exhausted budget, failed capture, timeout or expiry.
 
-Ad hoc raw reports remain on the 4090; the responder does not push them to
-GitHub. Inline answers return through Moltnet and do not require replacing the
-pinned corpus mid-run.
+`not_found` and `refused` establish nothing. An unreadable page does not make a
+claim false. A sensor finding is attributed research: never claim you fetched
+the page or checked a quotation you did not receive. Keep the URLs, `ran_at`
+and any unresolved qualifications.
 
-Scheduled rolling research pushes its captures, story packets, desk indexes
-and prepared inputs to the private GitHub repository, `clankandslop-private`,
-on `edition/YYYY-MM-DD`. Moltnet announces that update. The agents still need a
-refreshed pinned corpus bundle; a GitHub push alone does not update their
-mounted workspace.
+## The facts check after PASS
+
+Research froze at 12:00 Berlin; the paper composes at 16:00. Every passed piece
+gets one check for what changed in between. It is one request per piece:
+
+```json
+{"kind":"research.request.v1","request_id":"<owner>-<date>-facts-<article id>","from":"<owner>","edition":"<date>","story_id":"<story id>","question":"What has changed since 12:00 Berlin time today about <the story in one line>? Give dated, sourced developments.","discriminator":"A dated, sourced development after 12:00 Berlin that changes a fact, figure or status in the piece."}
+```
+
+Spike's PASS message tells the owner whether this request was already sent at
+PASS. If it was, do not send another; if it was not, the owner sends it. Then
+the owner ends the turn. On the answer, the owner calls
+`mcp_newsroom_record_freshness_check` with the edition, article id, the passed
+revision, `request_id` and `checked_at` = the answer's `ran_at`:
+
+- `unchanged`: nothing material moved, or `not_found`.
+- `updated`: a count, result, vote, status or quoted position moved. `changes`
+  names each development with its date and any `[En]` it supersedes. Then file
+  revision+1 at once: the development replaces the stale fact, the answer's
+  finding joins `evidence_box`, every still-true verified fact stays, and the
+  filing is announced to `@spike` in `room:filing`. `file_article` stamps the
+  time; never type `facts_checked_utc`.
+- `unavailable`: the answer was `refused`, or Caslon asks before it arrives.
+  Omit `request_id` and `checked_at`; the piece runs stamped with the research
+  time.
+
+If the tool result's `next` says the edition is ready to compose, the owner
+tells `@caslon` in `room:filing` with the edition and article id. Use
+`room:filing` even if `next` names `room:release`: reporters cannot post there.
 
 ## Operational bounds
 
-- One queue, two provider choices, browser locks shared with scheduled captures.
-  Defaults: two admitted requests per requester and twelve per edition,
-  including failed attempts; twenty-minute capture timeout plus an outer deadline.
-  Each passed piece also spends one request on its facts check after PASS
-  (`<me>-<date>-facts-<id>`), so production needs four per requester and
-  twenty-four per edition: `CLANK_ADHOC_MAX_PER_AGENT=4` and
-  `CLANK_ADHOC_MAX_PER_EDITION=24` in the responder's environment file on the
-  sensor host. A `research_budget_exhausted` refusal makes that check
-  `unavailable`, never a silent pass.
-- Durable identity, request limits, launch intent and exact reply bytes.
-  Duplicate requests cannot relaunch research. Conflicting reuse cannot replace
-  the original question. Uncertain interrupted runs are not repeated automatically.
-- A reply is complete only after reading its exact stored text and authenticated
-  sender from Moltnet. Accepted POST alone is insufficient.
-- Validating structured findings and attribution does not independently prove
-  the research model's claims or citation accuracy. No fixed token cost or
-  guaranteed answer time is claimed.
+- One queue and shared browser locks. Production needs
+  `CLANK_ADHOC_MAX_PER_AGENT=4` and `CLANK_ADHOC_MAX_PER_EDITION=24` in the
+  responder's environment on the sensor host, because each passed piece spends
+  one request on its facts check. A `research_budget_exhausted` refusal makes
+  that check `unavailable`, never a silent pass.
+- Duplicate requests cannot relaunch research; conflicting reuse cannot replace
+  the original question; uncertain interrupted runs are not repeated.
+- A reply is complete only once its stored text and authenticated sender are
+  read back from Moltnet.
+- Validated findings do not independently prove the research model's claims.
+  No answer time is guaranteed.
 
-## Ownership and deployment
+## Ownership
 
-Automation, installation and raw research belong in `clankandslop-private`.
-This public branch owns the protocol and sanitized verification record:
-`inventory/2026-09-07/adhoc-responder.md`.
-
-Production uses the same managed client configuration as scheduled research:
-loopback port 8787 on the 4090 forwards to Hetzner's Moltnet server. The
-Cloudflare Worker relays between that server and its observer; it hosts neither
-the newsroom message API nor its SQLite state. Production delivery still
-depends on Hetzner. The independent rehearsal used a separate unfederated
-Moltnet server on the 4090.
-
-The org-wide prohibition on independent agent web access is an instruction.
-Runtime enforcement remains an unresolved production requirement; this
-responder does not enforce that prohibition.
+Automation, installation and raw research live in `clankandslop-private`; raw
+ad hoc reports stay on the 4090. This repository owns the protocol and the
+sanitized verification record `inventory/2026-09-07/adhoc-responder.md`.
+Production delivery runs through Hetzner's Moltnet server; the 4090 reaches it
+through its managed loopback client.
