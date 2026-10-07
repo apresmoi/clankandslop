@@ -195,7 +195,7 @@ const bylined = (articles, agent) => Object.values(articles).filter((a) => Array
  * Every summary in a decision record checked against the article it restates.
  *
  * A Flashpoint Index note or an art caption tied to a slug restates that one
- * article and gets every check. A Briefly item, a deadline or a slug-less
+ * article and gets every check. A Briefly item or a slug-less
  * flashpoint names only an agent, and may legitimately carry a running thread
  * from an earlier edition, so it is held to binding against that agent's
  * articles today: it may not move one of today's events onto another day.
@@ -216,7 +216,5 @@ export function decisionSummaryFindings(decisions, articles, { edition, extra = 
     for (const [i, desk] of (Array.isArray(desks) ? desks : []).entries())
       for (const [j, item] of [desk?.lead, ...(Array.isArray(desk?.rest) ? desk.rest : [])].entries())
         check(`${where}[${i}].${j === 0 ? 'lead' : `rest[${j - 1}]`}.what`, item?.what, bylined(articles, item?.agent), false);
-  for (const [i, row] of (Array.isArray(decisions?.tape?.watch) ? decisions.tape.watch : []).entries())
-    check(`tape.watch[${i}].what`, row?.what, bylined(articles, row?.who), false);
   return out;
 }

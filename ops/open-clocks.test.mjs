@@ -31,7 +31,7 @@ const input = (over = {}) => ({
     order: ['a', 'b', 'c', 'd', 'e'],
     art: { a: { shape: 'satellite', caption: 'Lead.' }, b: { shape: 'chip', caption: 'One.' }, c: { shape: 'drone', caption: 'Two.' } },
     briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `K${n}`, agent: 'Tinkerton', what: `W${n}` }, rest: [] })),
-    tape: { briefly: ['Closed Clocks', 'Open Clocks', 'Ballots'].map((label) => ({ label, lead: { kicker: 'Runoff Set', agent: 'Tinkerton', what: 'The runoff is the next print.' }, rest: [] })), watch: [{ when: '25 Oct', what: 'The runoff either lands or it slips.', who: 'Tinkerton' }] },
+    tape: { briefly: ['Closed Clocks', 'Open Clocks', 'Ballots'].map((label) => ({ label, lead: { kicker: 'Runoff Set', agent: 'Tinkerton', what: 'The runoff is the next print.' }, rest: [] })) },
   },
   agents,
   archive: () => undefined,
@@ -60,13 +60,16 @@ test('a call settled today leaves the ledger and the desk', () => {
   assert.deepEqual(block(tape, 'Briefly').props.desks.find((d) => d.label === 'Open Clocks').rest, []);
 });
 
-test('the prior edition\'s next_update_utc promise is surfaced as an open deadline', () => {
-  const watch = block(tapeOf(layEdition(input())), 'WhatToWatch').props.items;
-  assert.deepEqual(watch[0], { when: '4 Oct 17:00 UTC', what: 'Update owed on “The Medical Flight Did Not Arrive”, promised in the 4 Oct edition.', who: 'Vesta' });
-  assert.equal(watch.length, 2);
-  // A follow-up that names it in previous_coverage has kept the promise.
+test('the prior edition\'s next_update_utc promise is surfaced as an owed deadline', () => {
+  const deadlines = block(tapeOf(layEdition(input())), 'Deadlines').props;
+  assert.equal(deadlines.owed_from, '2026-10-04');
+  assert.deepEqual(deadlines.owed, [{ time: '17:00', headline: 'The Medical Flight Did Not Arrive', href: '/editions/2026-10-04/articles/s-nantucket/', who: 'Vesta' }]);
+  // A follow-up that names it in previous_coverage has kept the promise; the
+  // IEA call due 6 October is the one deadline left.
   const articles = { ...input().articles, e: story('e', { previous_coverage: [{ date: '2026-10-04', slug: 's-nantucket' }] }) };
-  assert.equal(block(tapeOf(layEdition(input({ articles }))), 'WhatToWatch').props.items.length, 1);
+  const kept = block(tapeOf(layEdition(input({ articles }))), 'Deadlines').props;
+  assert.equal(kept.owed, undefined);
+  assert.deepEqual(kept.dated, [{ date: '2026-10-06', time: '16:00', what: 'Headline s-iea', who: 'Foreman' }]);
 });
 
 test('a tape with calls to carry and no Open Clocks desk is refused with the fix', () => {

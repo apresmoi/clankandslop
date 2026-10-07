@@ -8,41 +8,8 @@ import { LayoutError, alternationRuns, archiveIndex, archiveResolver, layEdition
 import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
 import { collectPublicArticleReferences } from '../agentic-org/scripts/production-newsroom.mjs';
 
-import { repo, agents, readJson, EDITIONS, decisionsFromShipped, layShipped } from './lay-page.test-data.mjs';
+import { repo, readJson, EDITIONS, layShipped, article, synthetic } from './lay-page.test-data.mjs';
 
-const article = (id, over = {}) => ({ id, edition_date: '2026-09-09', section: 'world', kicker: 'K', headline: 'H', deck: 'D', epistemic: 'fact', byline: { desk: 'Policy Desk', agents: ['Tinkerton'] }, timestamp: 'T', revision: 1, body: ['a', 'b', 'c', 'd'], refs: [], evidence_box: [], ...over });
-const synthetic = () => ({
-  edition: '2026-09-09',
-  articles: {
-    alpha: article('alpha', { byline: { desk: 'Escalation Desk', agents: ['Sprockett'] } }),
-    bravo: article('bravo', { byline: { desk: 'Hardware Desk', agents: ['Cogsworth'] } }),
-    charlie: article('charlie', { byline: { desk: 'Macro Desk', agents: ['Foreman'] } }),
-    delta: article('delta', { byline: { desk: 'Commodities Desk', agents: ['Graves'] } }),
-    echo: article('echo'),
-  },
-  desk: {
-    'caslon.chrome': { date: '2026-09-09', edition_no: '0075', volume: 'I', issued_at: 'x', revision: 1, tagline: 't', next_bell: '14:00 UTC', compiled_by: ['Tinkerton'], lead_story_id: 'alpha' },
-    'caslon.weather': { weather: null },
-    'ledger.settlements': { resolved_last_edition: [] },
-    'ledger.worlddesk': { world_desk: { escalation_index: 0.5, delta: 'steady', open_conflicts: 1, watch: 1 } },
-  },
-  maps: {},
-  decisions: {
-    edition: '2026-09-09',
-    order: ['alpha', 'bravo', 'charlie', 'delta', 'echo'],
-    art: { alpha: { shape: 'satellite', caption: 'Lead.' }, bravo: { shape: 'chip', caption: 'One.' }, charlie: { shape: 'drone', caption: 'Two.' } },
-    flashpoints: [{ place: 'KYIV', lat: 50.45, lon: 30.52, note: 'A note.', article: 'alpha' }],
-    briefly: [1, 2, 3].map((n) => ({ label: `Desk ${n}`, lead: { kicker: `K${n}`, agent: 'Graves', what: `W${n}` }, rest: [] })),
-    tape: {
-      briefly: [1, 2, 3].map((n) => ({ label: `Tape ${n}`, lead: { kicker: `TK${n}`, agent: 'Foreman', what: `TW${n}` }, rest: [] })),
-      markets: { kicker: '9 Sep · one thing', rows: [{ sym: 'ACP', value: '34', spark: 'slots', pct: 'from 4 Sep', dir: 'down' }] },
-      watch: [{ when: '10 Sep', what: 'The rule either enters force or it slips.', who: 'Tinkerton' }],
-    },
-  },
-  agents,
-  archive: () => undefined,
-  ledger: [],
-});
 const lay = (mutate = (input) => input) => layEdition(mutate(synthetic()));
 const refuses = (mutate, gate) => {
   let error;
@@ -193,7 +160,7 @@ test('a Briefly that is not exactly three desks is refused', () => {
 
 test('an agent name with no persona file is refused', () => {
   refuses((i) => { i.decisions.briefly[0].lead.agent = 'Caslon'; return i; }, /agent reference/);
-  refuses((i) => { i.decisions.tape.watch[0].who = 'Brass'; return i; }, /agent reference/);
+  refuses((i) => { i.decisions.tape.briefly[0].lead.agent = 'Brass'; return i; }, /agent reference/);
 });
 
 test('an article hero_map with no baked map is refused, naming the maps gate', () => {
@@ -328,29 +295,6 @@ test('a reporter-shipped presentation.flashpoint is used when the record declare
   const row = pages[0].document.head.find((b) => b.block === 'Grid' && b.props.columns[0][0]?.block === 'WorldGlyph');
   assert.deepEqual(row.props.columns[1][0].props.items.map((i) => i.place), ['LUSAKA']);
   assert.equal(row.props.columns[1][0].props.items[0].agent, 'Graves');
-});
-
-test('the tape derives its open calls from the settlement document, and omits the block when there are none', () => {
-  assert.equal(lay().pages[1].document.head.some((b) => b.block === 'ForecastLedger'), false);
-  const { pages } = lay((i) => {
-    i.desk['ledger.settlements'].resolved_last_edition = [{ call: 'A thing happens by Friday', outcome: 'open', prior_p: 0.62 }, { call: 'Settled', outcome: 'miss', prior_p: 0.1 }];
-    return i;
-  });
-  const ledger = pages[1].document.head.find((b) => b.block === 'ForecastLedger');
-  assert.equal(ledger.props.meta, '1 open call');
-  assert.deepEqual(ledger.props.open_calls, [{ horizon: 'no date', question: 'A thing happens by Friday', call: 'YES', direction: 'bull', p: 0.62, state: 'pending', state_label: 'not yet due', detail: 'new in the 9 Sep edition' }]);
-});
-
-test('a day with no market numbers prints a shorter tape rather than a padded rail', () => {
-  const { pages } = lay((i) => { i.decisions.tape.markets = { rows: [] }; return i; });
-  assert.equal(pages[1].document.head.some((b) => b.block === 'MarketsRail'), false);
-  assert.equal(pages[1].document.head.some((b) => b.block === 'WhatToWatch'), true);
-});
-
-test('the deadline title is derived from the first and last watch item', () => {
-  const { pages } = lay((i) => { i.decisions.tape.watch.push({ when: '30 Sep', what: 'It either lands or it does not.', who: 'Foreman' }); return i; });
-  const watch = pages[1].document.head.find((b) => b.block === 'Grid').props.columns[1][0];
-  assert.equal(watch.props.title, 'The Deadlines · 10 Sep – 30 Sep');
 });
 
 test('page chrome is ceremony and is never taken from the record', () => {
