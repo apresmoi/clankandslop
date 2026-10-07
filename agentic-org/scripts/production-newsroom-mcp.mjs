@@ -3,6 +3,8 @@ import { articleFilingSchema } from '../../ops/article-format.mjs';
 import { createInterface } from 'node:readline';
 import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, recordFreshness, reviewArticle, stageRelease } from './production-newsroom.mjs';
 import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
+import { ASSIGNMENTS_MINIMUM, PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
+import { appendRefusal, withRefusalLog } from './refusal-log.mjs';
 
 // Closed sets mirrored from production-newsroom.mjs's own validation (`desks`,
 // the verdict list in reviewArticle, and the epistemic values used across
@@ -45,7 +47,7 @@ const article = articleFilingSchema;
 
 const definitions = {
   qualify_signal: {
-    description: 'Record a durable lead decision: qualified, ignore, defer or duplicate. Interested desks are tags, not recipients to mention. Read candidate rows in the edition INDEX before repeating work. A stable source_id lets overlapping notices converge; changed decisions require the current expected_revision. This tool sends no message and never commissions work.',
+    description: 'Record a durable lead decision: qualified, ignore, defer or duplicate. Interested desks are tags, not recipients to mention. Read candidate rows in the edition INDEX before repeating work. A stable source_id lets overlapping notices converge; changed decisions require the current expected_revision. This tool sends no message and never commissions work. A capture newer than the landed corpus has no story file on the mount yet: judge it from the notice\'s claim_excerpt and URLs.',
     required: ['edition', 'event_key', 'summary', 'evidence_refs'],
     optional: ['selected_desks', 'source_id', 'disposition', 'duplicate_of', 'expected_revision'],
     properties: {
@@ -61,9 +63,9 @@ const definitions = {
     execute: qualifySignal
   },
   record_assignment: {
-    description: 'Durably record the chief-approved lineup before sending natural-language assignments.',
+    description: `Durably record the chief-approved lineup before sending natural-language assignments. Composition needs ${PASSED_ARTICLES_MINIMUM} passed pieces; the lineup carries at least ${ASSIGNMENTS_MINIMUM}, the extra one a spare against a spike, and the spare may be a short piece.`,
     required: ['edition', 'event_key', 'assignments'],
-    properties: { edition, event_key: eventKey, assignments: { type: 'array', minItems: 5, items: assignmentItem, description: 'At least 5 items; ids must be unique.' } },
+    properties: { edition, event_key: eventKey, assignments: { type: 'array', minItems: ASSIGNMENTS_MINIMUM, items: assignmentItem, description: `At least ${ASSIGNMENTS_MINIMUM} items (the floor of ${PASSED_ARTICLES_MINIMUM} plus one spare); ids must be unique.` } },
     execute: recordAssignment
   },
   file_article: {
@@ -92,7 +94,7 @@ const definitions = {
     execute: recordDissent
   },
   record_freshness_check: {
-    description: 'After Spike PASSes your piece, record its facts check: what changed since the research time, from ONE research.request.v1 you sent for it. unchanged: nothing material moved; the PASSed revision runs stamped "Facts as of HH:MM UTC" from checked_at. updated: something material moved; then file revision+1 with it and announce it to @spike (file_article stamps the time). unavailable: the answer was refused or has not arrived when Caslon asks; the piece runs stamped with the research corpus time. compose_edition refuses any piece without a check covering its current revision. A successful result sends no message; follow its next instruction.',
+    description: 'After Spike PASSes your piece, record its facts check from the research.request.v1 you sent for it, request_id "<you>-<edition>-facts-<article id>" (Spike\'s PASS message carries the exact text). unchanged: nothing material moved; the PASSed revision runs stamped "Facts as of HH:MM UTC" from checked_at. updated: something material moved; then file revision+1 with it and announce it to @spike (file_article stamps the time). unavailable: the answer was refused; the piece runs stamped with the research corpus time. Composition does not wait for a check: a piece without one runs stamped with the research time, and an "updated" check holds the edition until its revision passes. A successful result sends no message; follow its next instruction.',
     required: ['edition', 'event_key', 'article_id', 'revision', 'outcome'],
     optional: ['request_id', 'checked_at', 'changes'],
     properties: {
@@ -100,14 +102,14 @@ const definitions = {
       article_id: componentId('Story id Spike passed.'),
       revision: { type: 'integer', minimum: 1, description: 'The revision Spike passed.' },
       outcome: { type: 'string', enum: ['unchanged', 'updated', 'unavailable'] },
-      request_id: { type: 'string', pattern: '^[A-Za-z0-9_.:-]{1,128}$', description: 'The request_id of your facts-check research request. Required for unchanged and updated.' },
+      request_id: { type: 'string', pattern: '^[A-Za-z0-9_.:-]{1,160}$', description: 'The request_id of the facts-check request sent for this piece, "<owner>-<edition>-facts-<article id>". Required for every outcome.' },
       checked_at: { type: 'string', description: 'The research answer\'s ran_at, an ISO UTC instant. Required for unchanged and updated; omitted for unavailable.' },
       changes: { type: 'string', minLength: 20, maxLength: 1200, description: 'Only for updated: each material development, dated and sourced, and any [En] row it supersedes.' }
     },
     execute: recordFreshness
   },
   review_article: {
-    description: "Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner and @brass if a replacement is required. PASS continues from the fresh INDEX: when the result says the composition prerequisites are ready, use moltnet_send on clank-newsroom to @caslon in room:release with the edition, article id and revision; ask Caslon to read the fresh INDEX and compose. Verify the send succeeded before completing the inbox item or ending the turn; do not repeat an already delivered handoff. Otherwise review other filings one at a time, then when passed>=5 and the Ledger desk rows are missing, send @ledger in room:release.",
+    description: `Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner, and tell @brass in room:assignment if the lineup needs another piece. PASS continues from the fresh INDEX and its next line, which carries the owner's facts-check request: when the result says the composition prerequisites are ready, use moltnet_send on clank-newsroom to @caslon in room:release with the edition, article id and revision; ask Caslon to read the fresh INDEX and compose. Verify the send succeeded before completing the inbox item or ending the turn; do not repeat an already delivered handoff. Otherwise review other filings one at a time, then when passed>=${PASSED_ARTICLES_MINIMUM} and the Ledger desk rows are missing, send @ledger in room:release.`,
     required: ['edition', 'event_key', 'article_id', 'revision', 'filing_digest', 'verdict', 'notes'],
     properties: {
       edition, event_key: eventKey,
@@ -163,6 +165,9 @@ const definitions = {
 // review_article and compose_edition.
 const roleTools={klaxon:['qualify_signal'],brass:['record_assignment','record_freshness_check'],cogsworth:['file_article','record_dissent','record_freshness_check'],sprockett:['file_article','record_dissent','record_freshness_check'],foreman:['file_article','record_dissent','record_freshness_check'],graves:['file_article','record_dissent','record_freshness_check'],tinkerton:['file_article','record_dissent','record_freshness_check'],vesta:['file_article','record_dissent','record_freshness_check'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
 if(process.env.CLANK_STATE_OFFLINE_FIXTURE!=='1'){const definition=definitions.compose_edition;definition.required=['edition','event_key','layout_sha256'];delete definition.oneOf;definition.properties=Object.fromEntries(definition.required.map(key=>[key,definition.properties[key]]));}
+// Every refusal and every filing lint warning lands in the edition's
+// refusals.jsonl (refusal-log.mjs), so a day's friction survives the container.
+for(const [name,definition] of Object.entries(definitions))definition.execute=withRefusalLog(name,definition.execute);
 const tools=roleTools[role]??[];
 const schema=definition=>({type:'object',additionalProperties:false,required:definition.required,properties:definition.properties,...(definition.oneOf?{oneOf:definition.oneOf}:{})});
 // The stdio transport, and what it means for the peer to go away.
@@ -200,4 +205,4 @@ process.stderr.on('error',()=>process.exit(70));
 // branches above are exercised against this handler rather than a copy of it.
 if(process.env.CLANK_MCP_INJECT_STREAM_ERROR)process.nextTick(()=>process.stdout.emit('error',Object.assign(new Error('injected stream error'),{code:process.env.CLANK_MCP_INJECT_STREAM_ERROR})));
 const reply=(id,result,error)=>process.stdout.write(`${JSON.stringify({jsonrpc:'2.0',id,...(error?{error:{code:-32000,message:error}}:{result})})}\n`);
-for await(const line of createInterface({input:process.stdin,crlfDelay:Infinity})){let request;try{request=JSON.parse(line);if(request.method==='initialize')reply(request.id,{protocolVersion:'2025-06-18',capabilities:{tools:{}},serverInfo:{name:`clank-newsroom-${role}`,version:'1.0.0'}});else if(request.method==='notifications/initialized'){}else if(request.method==='tools/list')reply(request.id,{tools:tools.map(name=>({name,description:definitions[name].description,inputSchema:schema(definitions[name])}))});else if(request.method==='tools/call'){const name=request.params?.name;if(!tools.includes(name))throw new Error('tool exceeds agent authority');const value=await definitions[name].execute(request.params.arguments);reply(request.id,{content:[{type:'text',text:JSON.stringify(value)}],structuredContent:value});}else if(request.id!==undefined)reply(request.id,undefined,'unsupported method');}catch(error){reply(request?.id??null,undefined,error instanceof Error?error.message:'newsroom tool failed');}}
+for await(const line of createInterface({input:process.stdin,crlfDelay:Infinity})){let request;try{request=JSON.parse(line);if(request.method==='initialize')reply(request.id,{protocolVersion:'2025-06-18',capabilities:{tools:{}},serverInfo:{name:`clank-newsroom-${role}`,version:'1.0.0'}});else if(request.method==='notifications/initialized'){}else if(request.method==='tools/list')reply(request.id,{tools:tools.map(name=>({name,description:definitions[name].description,inputSchema:schema(definitions[name])}))});else if(request.method==='tools/call'){const name=request.params?.name;if(!tools.includes(name)){await appendRefusal({edition:request.params?.arguments?.edition,tool:String(name),message:'tool exceeds agent authority'});throw new Error('tool exceeds agent authority');}const value=await definitions[name].execute(request.params.arguments);reply(request.id,{content:[{type:'text',text:JSON.stringify(value)}],structuredContent:value});}else if(request.id!==undefined)reply(request.id,undefined,'unsupported method');}catch(error){reply(request?.id??null,undefined,error instanceof Error?error.message:'newsroom tool failed');}}

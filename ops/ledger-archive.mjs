@@ -6,7 +6,8 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
-import { NOTE_MIN_WORDS, dueCallFindings, ledgerHistory, missingLedgerRows } from './open-clocks.mjs';
+import { NOTE_MIN_WORDS, callKey, carriedCalls, dueCallFindings, ledgerHistory, missingLedgerRows } from './open-clocks.mjs';
+import { callState } from './ledger-states.mjs';
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 const DATE = /^\d{4}-\d{2}-\d{2}$/u;
@@ -40,5 +41,16 @@ export function assertCarriedRows(edition, document, contentRoot = publicContent
     throw new Error(`ledger.settlements drops ${missing.length} call(s) still open from earlier editions — a call stays on the ledger until a row settles it hit, miss or cancelled. Add these rows (keep outcome "open" unless a record you can name settles it) and file again: ${JSON.stringify(missing)}`);
   const due = dueCallFindings(history, edition, document);
   if (due.length > 0)
-    throw new Error(`ledger.settlements leaves ${due.length} due call(s) unexplained — each call whose deadline has passed is settled "hit" or "miss" from a record you can name, "cancelled" with the reason in "note", or stays "open" with a "note" of at least ${NOTE_MIN_WORDS} words saying what you checked and why it is still unresolved (e.g. "Checked the day's corpus and asked Brass for the IEA release page; no schedule found by 16:00 UTC"). Fix these rows and file again: ${JSON.stringify(due)}`);
+    throw new Error(`ledger.settlements leaves ${due.length} due call(s) unexplained — each call whose deadline has passed is settled "hit" or "miss" from a record you can name, "cancelled" with the reason in "note", or stays "open" with a "note" of at least ${NOTE_MIN_WORDS} words saying what you checked and why it is still unresolved (e.g. "Checked the day's corpus and research answer ledger-<date>-calls; no IEA schedule found by 16:00 UTC"). Fix these rows and file again: ${JSON.stringify(due)}`);
+}
+
+/**
+ * The due calls a `ledger.settlements` filing for `edition` keeps "open":
+ * deadline passed, nothing on the record settles them yet. These are what
+ * Ledger asks the research sensor about. `[{call, deadline}]`.
+ */
+export function openDueCalls(edition, document, contentRoot = publicContentRoot()) {
+  const history = ledgerHistory(archiveLedger(contentRoot, { before: edition }));
+  const rows = new Map((Array.isArray(document?.resolved_last_edition) ? document.resolved_last_edition : []).map((row) => [callKey(row?.call), row]));
+  return carriedCalls(history, edition).filter((entry) => callState(entry, edition) === 'due' && (rows.get(callKey(entry.call))?.outcome ?? 'open') === 'open').map(({ call, deadline }) => ({ call, deadline: deadline ?? null }));
 }

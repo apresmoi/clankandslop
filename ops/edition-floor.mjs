@@ -19,3 +19,7 @@
 // `compose-gate.mjs` re-exports it for its existing callers.
 export const PASSED_ARTICLES_MINIMUM = 4;
 export const DESK_DOCUMENTS_REQUIRED = 4;
+// record_assignment's minimum: the floor plus one spare, because a single
+// spiked piece on a lineup level with the floor ends the day. The spare may be
+// a short piece; it is never a reason to pad the others.
+export const ASSIGNMENTS_MINIMUM = PASSED_ARTICLES_MINIMUM + 1;

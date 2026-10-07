@@ -35,6 +35,7 @@ surfaces:
     - network: clank-newsroom
       auth: { token_id: ledger }
       rooms:
+        research: { wake: mentions }
         release: { wake: mentions }
 environment:
   mcp_servers:
