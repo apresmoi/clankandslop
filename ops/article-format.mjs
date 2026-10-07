@@ -2,6 +2,7 @@ import { ARTICLE_FORMAT_VERSION, ARTICLE_REPORTER_NAMES, articleFilingSchema, ar
 import { proseLeakFindings } from './prose-leaks.mjs';
 import { proseLintFindings } from './prose-lint.mjs';
 import { attributedEvidenceFindings } from './attributed-evidence.mjs';
+import { excerptFurnitureFindings } from './excerpt-furniture.mjs';
 import { forecastSettlementFindings } from './forecast-settlement.mjs';
 export { ARTICLE_FORMAT_VERSION, ARTICLE_REPORTER_NAMES, articleFilingSchema, proseLeakFindings };
 
@@ -107,6 +108,7 @@ export function articleFormatFindings(article, context = {}) {
   checkAssets(a, context, add);
   if (strict) keyNumberFindings(a.key_numbers, add);
   if (strict) for (const finding of attributedEvidenceFindings(a)) add(finding.path, finding.code, finding.message);
+  if (strict) for (const finding of excerptFurnitureFindings(a)) add(finding.path, finding.code, finding.message);
   if (strict) for (const finding of forecastSettlementFindings(a)) add(finding.path, finding.code, finding.message);
   if (strict) errors.push(...proseLeakFindings(a));
   for (const finding of proseLintFindings({ ...a, body: strings(a.body), headline: typeof a.headline === 'string' ? a.headline : '', deck: typeof a.deck === 'string' ? a.deck : '' })) warnings.push({ path: 'article', code: finding.flag ?? 'prose', message: finding.message });

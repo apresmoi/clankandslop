@@ -1,6 +1,7 @@
 ---
 import { evidenceRowId } from '../../lib/edition.ts';
 import type { Article } from '../../lib/edition.ts';
+import { sourceCounts, sourceLine } from '../../lib/sources.ts';
 
 type Evidence = NonNullable<Article['evidence_box']>[number];
 
@@ -9,13 +10,18 @@ interface Props {
   items: Evidence[];
 }
 const { articleId, items } = Astro.props;
+// References are not sources: relays of one statement count once (lib/sources.ts).
+const counts = sourceLine(sourceCounts(items));
 
 // Tag outbound source links so each cited outlet sees clankandslop.com as the
 // referrer. Added at render only — the stored Record URL stays clean and verified.
 const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=clankandslop.com';
 ---
 <div class="evidence-box">
-  <div class="head">The Record · Provenance for this story</div>
+  <div class="head">
+    <span>The Record · Provenance for this story</span>
+    <a class="counts" href="/method#sources" title="How references, outlets and independent sources are counted">{counts}</a>
+  </div>
   {items.map((e, i) => {
     const eid = `E${i + 1}`;
     const rowId = evidenceRowId(articleId, i);
@@ -68,7 +74,20 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     text-transform: uppercase;
     color: var(--ink);
     margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
   }
+  .head .counts {
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--hairline-strong);
+  }
+  .head .counts:hover { color: var(--accent); border-bottom-color: var(--accent); }
   .evidence-row {
     display: grid;
     grid-template-columns: 42px 1.1fr 3.4fr 0.9fr 60px;

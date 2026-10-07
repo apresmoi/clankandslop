@@ -78,7 +78,7 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
 
   <p class="ledger-foot">
     {key.filter((k) => k.term === 'Posterior').map((k) => <span>{k.term} is {k.text}</span>)}
-    <a href="/about">How the paper computes its numbers</a>
+    <a href="/method">How the paper computes its numbers</a>
   </p>
 
   {resolved && resolved.length > 0 && (
