@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { articleHref, clock, deadlinesBlock, keyFiguresBlock, statedTime } from './tape-blocks.mjs';
+import { articleHref, clock, deadlinesBlock, keyFiguresBlock, statedTime, FIGURE_VALUE_MAX } from './tape-blocks.mjs';
+import { KEY_NUMBERS } from './article-format.mjs';
 import { followUps, ledgerHistory } from './open-clocks.mjs';
 
 const EDITION = '2026-10-06';
@@ -142,4 +143,8 @@ test('a figure too long for the column is skipped, never cut off; a story left w
   };
   const { groups } = keyFiguresBlock({ edition: EDITION, order: ['ship', 'vote'], articles }).props;
   assert.deepEqual(groups.map((g) => [g.kicker, g.figures.map((f) => f.value)]), [['State parliament', ['48', 'about 44%', '1234567890']]]);
+});
+
+test('the Tape skips exactly what filing refuses', () => {
+  assert.equal(FIGURE_VALUE_MAX, KEY_NUMBERS.value);
 });

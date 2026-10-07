@@ -22,7 +22,6 @@
 // Pure: no I/O. Either block is omitted when it would be empty.
 
 import { callKey } from './open-clocks.mjs';
-import { KEY_NUMBERS } from './article-format.mjs';
 
 const isStr = (v) => typeof v === 'string' && v.trim().length > 0;
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -72,7 +71,10 @@ export const statedTime = (call, deadline) => {
 // A figure the Tape cannot print whole is skipped, never cut off: an article
 // filed before the key_numbers limits (2026-10-07: "$3.7 billion", "more than
 // 3,100") would otherwise show as "$3.7 billi…". Filing refuses these now.
-const fits = (value) => [...value.trim()].length <= KEY_NUMBERS.value && !/\n/u.test(value);
+// Kept here, not imported: the page assembler ships without the filing modules.
+// tape-blocks.test.mjs holds it equal to article-format.mjs KEY_NUMBERS.value.
+export const FIGURE_VALUE_MAX = 10;
+const fits = (value) => [...value.trim()].length <= FIGURE_VALUE_MAX && !/\n/u.test(value);
 const figure = (entry) => (isObj(entry) && isStr(entry.value) && isStr(entry.label) && fits(entry.value)
   ? { value: entry.value, label: entry.label, ...(DIRS.has(entry.dir) ? { dir: entry.dir } : {}) }
   : null);
