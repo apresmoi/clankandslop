@@ -180,13 +180,14 @@ test('shared inbox guidance separates execution authority from message completio
   assert.match(text, /After saving the needed work and successfully sending any required handoff/u);
 });
 
-test('shared floor names Codex Moltnet deferred tools exactly', async () => {
-  const root = path.resolve(import.meta.dirname, '..');
-  const text = await readFile(path.join(root, 'FLOOR.md'), 'utf8');
-  assert.match(text, /mcp__daimon\.moltnet_read/u, 'FLOOR must name Codex deferred Moltnet read exactly');
-  assert.match(text, /mcp__daimon\.moltnet_send/u, 'FLOOR must name Codex deferred Moltnet send exactly');
-  assert.match(text, /shorter\s+`moltnet_read`\s+and\s+`moltnet_send`\s+names in prompts are the operations/u, 'FLOOR must distinguish operation names from advertised Codex tool names');
-  assert.match(text, /not proof that the runtime connection is absent/u, 'FLOOR must prevent false unavailable-tool conclusions');
+// The Codex deferred-tool names (`mcp__daimon.moltnet_*`) were retired from
+// FLOOR.md: every agent runs on Grok, and the passage only taught agents about
+// a runtime none of them uses. The floor still forbids the shell workarounds.
+test('shared floor forbids reaching declared tools through the shell', async () => {
+  const text = await readFile(path.join(import.meta.dirname, '../FLOOR.md'), 'utf8');
+  assert.match(text, /Do not launch an MCP server\s+through\s+shell/u);
+  assert.match(text, /a shell\s+credential denial is not evidence that a declared tool is unavailable/u);
+  assert.doesNotMatch(text, /in Codex/u, 'FLOOR must not carry runtime-specific Codex instructions');
 });
 
 test('mcp tool schemas type every property beyond edition/event_key', async () => {

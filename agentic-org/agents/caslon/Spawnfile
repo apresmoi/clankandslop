@@ -44,10 +44,10 @@ execution:
     mode: workspace
 schedule:
   kind: cron
-  cron: "0 16 * * *"
+  cron: "0,45 16 * * *"
   timezone: Europe/Berlin
-  jitter_seconds: 900
-  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX and read repos/newsroom/agentic-org/agents/caslon/RUNBOOK.md plus repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed, including decisions.art[order[0]] lead art when the lead lacks reporter art; generated lead maps need locator_context. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. Every P row needs its owner's facts check (a K row) first: if compose_edition refuses with facts check missing, send ONE room:filing message mentioning each owner it names with the edition and article id, asking them to record_freshness_check now (outcome unavailable if their research answer has not arrived), and end the turn; the owner who records the last check mentions you again. The tools enforce the baked page structure. Mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."
+  jitter_seconds: 300
+  prompt: "Start at ./state/edition/editions/<edition-date>/INDEX. This wake fires at 16:00 to compose and again at 16:45 as the retry: if the edition is already composed, end the turn. Read repos/newsroom/agentic-org/agents/caslon/RUNBOOK.md and repos/newsroom/agentic-org/agents/caslon/PAGES.md. File both prepared desk documents with file_desk using the current wake id; both must succeed. Select catalogue art or bake it as needed, including decisions.art[order[0]] lead art when the lead lacks reporter art; generated lead maps need locator_context. The lead is an analysis when one has passed. Author the decision record and call art lay_pages, then compose_edition with the returned layout_sha256. If compose_edition refuses with a facts check missing, send ONE room:filing message mentioning each owner it names with the edition and article id, asking them to record_freshness_check now (outcome unavailable if their research answer has not arrived), and end the turn. On the 16:45 wake, if the edition still cannot compose, send @brass one message in room:release listing each missing item and its owner, and end the turn. After a successful compose, mention @pressman in room:release with the composition. Correct only your own artifacts; request reporter changes from their owner."
 
 surfaces:
   moltnet:
