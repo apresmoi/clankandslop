@@ -31,8 +31,8 @@ evidence remains missing.
 - **Each assignment's `brief` opens with its format.** `ANALYSIS — <proposition>` or
   `BRIEF — <what happened>`. The proposition is one line: what the reader will
   understand that the main source does not say. No proposition means a brief.
-  The piece you expect to lead is an analysis; commission one or two analyses
-  and make the rest briefs.
+  The piece you expect to lead and the forecast are analyses; commission one
+  or two analyses and make the rest briefs.
 - **Give the angle and the evidence to carry, never a length.**
 - **Exactly one assignment must be the forecast**: `slot: "forecast"` and a
   `dissenter` from a different desk.

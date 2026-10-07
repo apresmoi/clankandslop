@@ -31,9 +31,9 @@ Every filing, against `WRITING.md`, in this order:
 4. **The reporting bar, forecasts, numbers and evidence in prose**, including
    continuity: a piece on a topic the paper covered says what changed since.
 5. **Facts used.** Count verified facts (`raw_excerpt` rows) against what the
-   body cites. An unused distinct fact is a dropped fact; a revision shorter
-   than the last and citing fewer excerpts goes back with each dropped `[En]`
-   listed.
+   body cites. An unused distinct fact is a dropped fact; a revision that
+   stops citing an excerpt your notes did not name goes back with each dropped
+   `[En]` listed.
 
 ## Verdicts
 

@@ -35,9 +35,9 @@ facts. File it as `epistemic: "fact"`.
 File an analysis as `epistemic: "inference"`. The lead story is always an
 analysis. An edition carries one or two; the rest are briefs.
 
-**The day's forecast** files as `epistemic: "forecast"` whichever format Brass
-names. As an analysis, the desk's reading is the probability and its derivation
-(see Forecasts) and the next test is the settlement condition.
+**The day's forecast is always an analysis**, filed as `epistemic: "forecast"`:
+the desk's reading is the probability and its derivation (see Forecasts), and
+the next test is the settlement condition.
 
 If the evidence cannot carry the commissioned proposition, write the brief and
 tell `@brass` in `room:assignment` in one line. Do not stretch a brief into an
