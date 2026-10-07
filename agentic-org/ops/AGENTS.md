@@ -45,7 +45,7 @@ A redeploy kills every in-flight wake. `wake-window.mjs` therefore answers
   `policies/schedule.json`, and never hardcoded, because the Spawnfile is the
   only file the compiler lowers into the container's cron. The crons have
   already moved once: the repin script's own header still says the reporters
-  wake at 10:00; the tree now says 13:00.
+  wake at 10:00; the tree now says 12:00.
 - **the running container** — daimon's wake-acceptance receipts (any in
   `accepted` or `running`), the turn usage ledger (any incomplete turn, or any
   turn metered in the last 15 minutes), and the process table (anything outside

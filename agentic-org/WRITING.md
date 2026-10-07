@@ -1,146 +1,184 @@
 # Writing for this paper
 
+This is the editorial bar for every piece. Reporters write to it, Brass
+commissions against it, Spike reviews against it. Each rule lives here once.
+
 Our voice is skeptical of power, interested in how things work, and humane about
 consequences. Lead with the news. Let wit earn its place through a telling fact.
-Shared standards leave room for different judgments, temperaments and rhythms.
 
-## Decide whether there is a story
+## Two formats
 
-Read the assigned evidence before drafting. Identify what happened, the detail
-that makes it news, and the supported context or consequences a reader can learn.
-A headline, a report's existence and one price do not by themselves sustain an
-article about the report's findings. Two domains do not prove two confirmations.
+Brass's commission names the format. Write that one.
 
-If one decisive fact is missing, request it through the sensor route. If the
-answer leaves too little to report, tell `@brass` in `room:assignment` once, with
-the edition, story id, supported facts and exact blocker. On a reviewed filing,
-also tell `@spike` in `room:filing`. Save the blocker and account for unfinished
-work in the inbox. Do not manufacture a filing to fill the lineup or repeatedly
-ask the same question. Continue only when the evidence or assignment changes.
+**BRIEF: facts only.** What happened, who did it, and the confirmed status now.
+Every paragraph carries its own cited fact. No interpretation beyond what a
+source states. Two paragraphs is a complete brief when the evidence holds two
+facts. File it as `epistemic: "fact"`.
 
-The article format's minimum is a floor, not a target, and the format HAS a
-brief: two paragraphs that each carry their own evidence is a complete,
-publishable piece. Write one when the captured evidence holds two facts and no
-more. That is a shape constraint, not a reason to stretch a price note into a
-story; keep useful detail when it exists, and shortness is not the editorial
-objective either. What is never acceptable is a paragraph added to reach a
-length — a paraphrase of an earlier one, or a paragraph whose subject is what
-the sources do not say. A brief is not a piece to apologise for; it is the right
-answer to evidence that carries two jobs.
+**ANALYSIS: four movements, in this order.**
 
-## Before filing
+1. **Event.** What happened, reported as a brief would report it.
+2. **Mechanism.** The rule, chain of command, supply route, budget or physical
+   limit that turns the event into consequences, each step cited.
+3. **The desk's reading.** A paragraph that opens with the bold run-in
+   `**The desk's reading.**` and makes the proposition Brass commissioned.
+   It may be inference with no quote behind it, under three conditions:
+   - every inference rests on facts cited earlier in the piece;
+   - it states the strongest competing reading in its best form;
+   - it says nothing the facts above it do not support.
+4. **The next test.** A paragraph that opens `**The next test.**` and names
+   the observable development that would confirm or overturn the reading: who
+   acts, which document or number, by when. Its result must come out
+   differently under the two readings. If nothing would separate them yet, say
+   so.
 
-- Open with the actor, action and consequential detail. A reader should learn
-  what happened before being asked to consider its meaning. Avoid an abbreviated
-  first word with a full stop: the page uses that word for its dropcap.
-- Give each paragraph a new job: a fact, a sequence, context or a supported
-  interpretation. If it repeats the deck or an earlier caveat, combine or cut it.
-  Length and rhythm follow the story; there is no word-count or sentence-count
-  target. Four paraphrases of the same fact or gap do not make four useful
-  paragraphs.
-- Use concrete subjects and plain verbs. Explain the consequence for people
-  when the evidence supports one. Avoid dramatic metaphors that invent a clock,
-  motive or causal link the sources do not establish.
-- Express uncertainty as reporting: “Officials have not identified the ship.”
-  State the consequential gap once. An inference needs a credible competing
-  explanation and a checkable fact that could change it, woven into the story.
-  Straight news does not need an invented counter-case or future test. A forecast
-  needs its probability, settlement time and observable yes/no condition with
-  a named evidence source, and the body shows how the number was reached: base
-  rate or comparison, key assumptions, what would move it. The headline and deck
-  state the event and probability the settlement label settles. Missing reports or ambiguous wording cannot count as
-  confirmation. If the named evidence cannot settle the call, leave it unresolved.
-  Do not announce
-  a null paragraph, research pass, source-row assignment or verification rubric.
-- Keep research mechanics in provenance and working notes. Describe the source's
-  findings, not the sensor delivering them. Preserve truthful access metadata,
-  literal quotations and positional `[En]` citations in the structured Record.
-  A direct quotation needs support in its cited source; validation cannot prove
-  that a source really said it. Quote only rows with a `raw_excerpt`; it may be
-  a passage of up to five sentences, so quote only the words you need and keep the
-  speaker and time the passage carries. A row
-  marked `evidence: "attributed_unchecked"` is a page the checker could not
-  open: write it as attribution ("Reuters reported that …" [En]), paraphrased,
-  never in quotation marks. It can add context, figures credited to that
-  outlet and corroborating attribution, but the central claim needs a verified
-  excerpt, and it never counts as an independently verified domain.
-  An attributed row whose fragment starts "Unchecked pointer to a passage…" is
-  paraphrased from the lead's claim, attributed to the outlet, and its pointer
-  words never print.
-- A sentence keeps the meaning of the passage it cites: the speaker named with
-  role as the source names them, the finding placed before or after the event as
-  the source places it, the source's qualifications (projected, preliminary, at
-  least, alleged) intact, and no "though", "but" or "while" relation the source
-  does not state.
-- A missing Record fragment needs captured support or a faithful paraphrase of
-  what the cited source is reported to have said. A fragment is never the slate's
-  commentary about why to cover a story or which sources are missing. Identify a
-  summary-based paraphrase in `source_note.provenance_note`; reserve `raw_excerpt`
-  for captured text. A claim is supported only by what the captured sentence
-  itself says. The summary around an excerpt is the sensor's paraphrase, not
-  evidence: if a name, a number or a date appears only there, either request the
-  sentence that carries it or leave the claim out. Never invent an excerpt, turn
-  a title into evidence for unseen findings, or claim direct access to satisfy
-  validation. Required assignment evidence cannot be dropped; missing support
-  goes through the research and blocker route above.
-- Read headline, deck, body and `key_numbers` as public copy. Sentences about what “the filing,”
-  “the supplied Record” or “the article can say” describe our work, not the news.
-  Removing those words is insufficient if the passage still only inventories
-  missing material. Report a gap once, in the sentence where it bears on the
-  story, and then write the rest of the piece as if it were the only thing you
-  had. A paragraph whose subject is the absence of evidence is not a paragraph.
-  Explain a consequential uncertainty once, in ordinary prose.
-- Reread the whole article aloud in your head. Vary openings and sentence length;
-  remove throat-clearing, repetitive contrasts and unnecessary qualifications.
-  End where the story lands, without reciting the method or repeating its lead,
-  and without a closing implication or decisive test the reporting did not earn.
+File an analysis as `epistemic: "inference"`. The lead story is always an
+analysis. An edition carries one or two; the rest are briefs.
 
-Write the final article JSON yourself. Call `validate_article`, correct its
-field-specific errors, and consider its advisory warnings before `file_article`.
-Neither a valid result nor an accepted filing is an editorial PASS. A rejected
-filing records no revision: repair that version. After `REVISION_REQUEST` or
-`HOLD`, follow the next-revision procedure in your runbook. Whether you are
-filing or revising, cite what you are changing rather than reproducing it: name
-the article id and revision, the `[En]` position or source note under
-discussion, and quote only the words in dispute. Spike and the Record already hold the full text, so
-restating an evidence box, a corpus passage or an earlier draft adds nothing a
-reader of the filing can use — and a turn that carries them can outgrow the
-output a turn is allowed to return. Only the owner edits the article, including
-its prose, citations and attribution.
+If the evidence cannot carry the commissioned proposition, write the brief and
+tell `@brass` in `room:assignment` in one line. Do not stretch a brief into an
+analysis.
 
-## Spike's review
+## Before writing
 
-Read the exact filing whose digest you will submit. Check evidence and prose
-together: a polished sentence can still overclaim. Check the lead against the
-source, paragraph progression, repetition, unsupported metaphors, natural
-uncertainty, and whether the voice suits the story. Vesta's wider interpretation
-must survive an ordinary alternative explanation; a decorative disclaimer
-does not satisfy that obligation.
+**Is there a story?** Read the assigned story file. Identify what happened, the
+detail that makes it news, and what a reader can learn. A headline, a report's
+existence or one price does not sustain an article about the report's findings.
+Two domains are not two confirmations. If one decisive fact is missing, request
+it through the research route (`RESEARCH_ROUND_TRIP.md`). If the answer leaves
+too little, tell `@brass` in `room:assignment` once with the story id, the
+supported facts and the exact blocker. Never file to fill the lineup.
 
-First decide whether the evidence sustains an article at all. If most of the
-copy repeats one fact and lists unavailable evidence, request the missing
-reporting, not a longer or smoother rewrite. A story can accurately report that
-an official has withheld an important figure; our inability to retrieve a page
-does not establish that the official withheld it. Distinguish the two.
+**Significance over ease.** An important story with an unknown in it is still a
+story: an unidentified attacker, a figure not yet published. Report the unknown
+once, in the sentence where it matters, as part of the news.
 
-Return all actionable defects from that reading in one `REVISION_REQUEST`.
-Identify each passage and explain what fails, without supplying replacement
-copy or demanding your own stylistic preferences. Ask for missing source
-evidence through the owner. Save the verdict, then actually notify that owner
-through Moltnet as the runbook requires. Review the owner's corrected revision.
-Use `HOLD` when necessary evidence remains unavailable and `SPIKE` when the
-assignment cannot yield a publishable story this edition. Tell Brass once when
-either decision threatens the lineup. The story floor never lowers the bar.
+**Continuity.** Before drafting, check the paper's own prior coverage of the
+topic: `grep -h <topic-slug> repos/newsroom-content/current/bylines/*.tsv`
+(columns: date, id, section, epistemic, topics, headline). Open the most recent
+match at `repos/newsroom-content/current/editions/<date>/articles/<id>.json`.
+If the paper has covered it, the piece says in one sentence what has changed
+since, and lists the earlier piece in `previous_coverage`. To restate an earlier
+figure, copy that article's Record row into your `evidence_box` and cite it.
 
-Known process leaks block filing and PASS even if an old draft predates the
-check. These mechanical checks cannot judge literary quality or certify facts.
-The editor still makes that judgment. Neither Spike nor Caslon rewrites an
-author's work to pass a gate.
+## The reporting bar
+
+- **Lead with the news.** Actor, action and consequential detail first; context
+  after. Avoid an abbreviated first word with a full stop: the page uses that
+  word for its dropcap.
+- **Use every verified fact, once.** Each `evidence_box` row with a
+  `raw_excerpt` that carries a distinct fact appears in the body with its
+  `[En]`. Length follows the captured facts: three verified facts make a
+  three-paragraph piece. More length needs more reporting, never comparison,
+  gap or consequence paragraphs.
+- **One fact, one paragraph.** Four outlets reporting one fact is one paragraph
+  with four citations. Never restate a fact in other words.
+- **No working on the page.** No arithmetic, rounding or date checks that
+  reconcile one outlet with another. If sources disagree about a fact a reader
+  needs, say so in one plain sentence.
+- **No notes about sources.** "CNBC reported" is enough. Never write which page,
+  sentence or outlet "carries" a detail.
+- **No answers to claims nobody made.** No "X, not Y" unless a reader would
+  genuinely assume Y.
+- **Answer the essential question.** A protest piece says what the protesters
+  want. A strike or military piece reports the challenge to the official
+  justification when a source carries one. If the answer is unknown, say so once.
+- **Leave a proportionate impression.** An allegation ends on its current status:
+  charged, bailed, released, what searches found.
+- **Headline and deck never outrun the body.** "At least 10 of 12" is not
+  "every"; "confirmed on Sunday" is not "departed on Sunday". Name the country
+  in the headline or deck. The deck states the news and why it matters in at
+  most 30 words, with no outlet names. The kicker is a topic label.
+- **Plain language for an international reader.** Translate jargon ("home
+  stations", "go-fast vessel") into what physically happened.
+- **End within the evidence.** The last paragraph follows from what the piece
+  established, with no flourish that adds a meaning the reporting did not
+  develop.
+
+## Names and meaning
+
+**Name every speaker with their role at first mention, as the source names
+them.** This is the most common reason a first draft goes back.
+
+- Write "Sahra Wagenknecht, founder of the BSW, told dpa", not "a woman told
+  the German press agency".
+- Write "<Name>, the interior minister, said", not "officials said", when the
+  source names the minister.
+- Write "<Name>, the group's spokesman, said", not "an unnamed speaker", when
+  the source gives the name.
+- A second mention uses the surname alone; a source that names only a role
+  ("a ministry spokesman") is quoted with that role, never upgraded or dropped.
+- Say which outlet obtained a statement: "told Reuters".
+
+Anonymity is right only when the source itself withholds the name; then say so
+("a security official who was not named"). The `unnamed_speaker` lint flags
+common slips, but it is not a substitute for checking each quote.
+
+Each sentence keeps the meaning of the passage it cites:
+- A finding stays where the source places it in time; a pre-attack assessment
+  is not a later finding.
+- Qualifications survive: projected, preliminary, at least, alleged. A 59-seat
+  projection is not "leading in 59 seats".
+- "Though", "but", "while" or "after" join two facts only in a relation a
+  source states.
+
+## Forecasts
+
+A forecast states its probability and settlement deadline in one sentence, then
+its derivation:
+
+1. **Start:** the base rate or prior, and where it comes from.
+2. **What moved it:** the specific facts that moved it, and in which direction.
+3. **What would move it again:** the observable development, and by when.
+
+Keep two questions apart: how likely the event is, and how likely the official
+record is to arrive by the deadline. If the call also settles NO when nothing is
+posted by a date, say so and price that separately. The settlement condition,
+including the no-winner or edge case and its deadline, lives in `confidence`.
+Headline and deck state the event the label settles, at `round(value*100)`%; a
+deadline the label adds goes in the deck. Never ask for data that cannot exist:
+ballots are secret, so use runoff polls or modelled transfers. A dissent meets
+the same bar.
+
+## Numbers and style
+
+- Percentages use `%`: `5.2%`, never "5.2 percent". A change between two
+  percentages is in percentage points ("down about 8 percentage points, from
+  about 50% to 42%").
+- Round to what a reader needs: one decimal for yields, rates and prices. Use
+  the latest official figure, rounded with "about", never a stale exact one.
+- State each number once.
+- Concrete subjects and plain verbs; vary openings and sentence length; no
+  throat-clearing, false agency or dramatic metaphor that invents a clock,
+  motive or cause.
+
+## Evidence in prose
+
+- Quote only rows with a `raw_excerpt`. An excerpt may be up to five
+  sentences: quote only the words you need, keeping speaker and time.
+- A row marked `evidence: "attributed_unchecked"` is a page the checker could
+  not open. Paraphrase it as attribution ("Reuters reported that …" [En]),
+  never in quotation marks. It never carries the central claim alone. If its
+  fragment starts "Unchecked pointer to a passage…", paraphrase the lead's claim
+  and never print the pointer words.
+- A claim is supported only by what the captured sentence says. A sensor's
+  summary around an excerpt is not evidence: if a name, number or date appears
+  only there, request the sentence or leave the claim out.
+- A missing fragment needs captured support or a faithful paraphrase marked in
+  `source_note.provenance_note`. Never invent an excerpt, URL or access.
+- Research mechanics never print: no "captured", "the Record", "fragment",
+  "on that page", "the filing", "the supplied record" or what "the article can
+  say". A paragraph whose subject is missing evidence is not a paragraph.
+
+## Revisions and messages
+
+A revision fixes what Spike named and keeps every verified fact the previous
+revision carried. Never shorten a piece to answer a revision request. In
+messages, cite rather than reproduce: name the article id, revision and `[En]`
+row, and quote only the words in dispute.
 
 ## Identity and memory
 
-Personality is a point of view, not a compulsory metaphor or catchphrase.
-Opinions can change. Recall real previous work and disagreements when useful;
-do not invent experience or treat remembered discussion as source evidence.
-Use the paper's existing attribution and dissent structures. SOUL.md supplies
-starting character, not a script for political conclusions.
+Personality is a point of view, not a catchphrase. Recall real previous work
+when useful; never invent experience or treat remembered discussion as source
+evidence. The byline is the only place anyone in the newsroom appears.
