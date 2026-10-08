@@ -227,20 +227,20 @@ node --test agentic-org/scripts/*.test.mjs
 npm run ops:test
 node agentic-org/scripts/validate-org.mjs
 node agentic-org/scripts/check-instruction-budget.mjs
-node agentic-org/scripts/check-bundle-descriptor.mjs
+spawnfile validate agentic-org
 npm --prefix website run test:lib
 node ops/generated-art-rendering.integration.test.mjs
 npm --prefix website run build
 node website/scripts/verify-glyph-cameras.mjs
 ```
 
-A documentation edit also changes the public bundle. After staging intended
-file additions/deletions, regenerate source pins with
-`node agentic-org/scripts/check-bundle-descriptor.mjs --repin-source`
-and include the descriptor and updated agent checksums in the same change.
-This needs no private checkout. Full `org:bundle` generation also needs private
-research, deployment-platform dependencies and generated assets; tool and
-terrain bundles have separate builders.
+Nothing is pinned by hand. `spawnfile compile`/`build` builds every image
+bundle from the Spawnfiles (the public source tree, the website dependencies in
+a pinned Node image, the og assets) and records each digest in the compile
+report; the only prebuilt archive is Caslon's ETOPO1 relief grid
+(`scripts/build-etopo-bundle.mjs`). Private code is never in the image: the
+private newsroom tools and the published editions are host-fed volumes kept
+current by `spawnfile volume refresh` (`ops/systemd/clank-feed-*.timer`).
 
 Source checks and a website build do not establish that a real-agent edition can complete. Deployment uses
 the private host launcher and its admission checks.

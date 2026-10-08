@@ -26,11 +26,12 @@ now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unle
 
 | File | Runs | Does |
 |---|---|---|
-| `scripts/seam-run.mjs` | Hetzner, on a timer with `--if-changed` | clean public main snapshot → `org:bundle` → build → `up` → settle → record the release |
+| `scripts/seam-run.mjs` | Hetzner, on a timer with `--if-changed` | clean public main snapshot → `spawnfile build --release` (builds every bundle) → `up` → settle → record the release |
 | `scripts/release-ledger.mjs` | inside the seam | `/home/clank/deploy-work/released.json`: which commit is actually running, so a timer can do nothing cheaply |
 | `scripts/wake-window.mjs` | inside both | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
-| `scripts/content-refresh.mjs` | Hetzner, every 5 min | published editions + bylines at `origin/main` → `clank-newsroom-content` volume |
+| `clank-feed-content.timer` | Hetzner, every 5 min | `spawnfile volume refresh public-content-volume`: published editions + bylines at `origin/main` → `clank-newsroom-content` fed volume |
+| `clank-feed-private-tools.timer` | Hetzner, every 2 min | `spawnfile volume refresh newsroom-private-tools`: the private newsroom tools at clankandslop-private `origin/main` → `clank-newsroom-private-tools` fed volume |
 | `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |
 | `scripts/alarm.mjs` | both boxes | one HTTPS POST that reaches a person |
 | `ops/bin/clank-handler-reaper.sh` | Hetzner, every 5 min | kills leaked Daimon engine handlers older than any possible turn; its age floor is pinned above the longest Spawnfile turn timeout by `systemd-contract.test.mjs` |
@@ -68,10 +69,16 @@ the same way. They rode inside `newsroom-runtime.tar`, so every edition moved
 its digest, the publisher repinned all twelve Spawnfiles, `main` moved in an
 image input every evening, and the release timer rebuilt and redeployed the
 org every night. Now `content/editions/` and `content/bylines/` are excluded
-from every archive (`scripts/public-content.mjs` is the one list), served by
-the team-shared `clank-newsroom-content` volume at `./repos/newsroom-content`
-(readers resolve `current/editions`, `current/bylines`), and landed by
-`clank-content-refresh.timer`. An edition commit touches nothing an image is
+from the source bundle (`scripts/public-content.mjs` is the one list), served
+by the team-shared `clank-newsroom-content` fed volume at
+`./repos/newsroom-content` (readers resolve `current/content/editions`,
+`current/content/bylines`), and landed by `clank-feed-content.timer`.
+
+Private code took the same road, for a different reason: the image is public,
+so nothing from clankandslop-private may be a layer. The state adapter, the
+art, visual and validation servers and the release adapter are the
+`clank-newsroom-private-tools` fed volume at `./tools/private`
+(`current/newsroom/...`), landed by `clank-feed-private-tools.timer`. An edition commit touches nothing an image is
 built from, and the release gate answers it with *"already released; nothing
 to do"* — `releaseGate` diffs the released commit against the tip and treats a
 diff made only of those paths as released (`publish-edition-branch.test.mjs`
@@ -82,9 +89,9 @@ still ship through a release.
 ```
 image (rebuilt only when code/prompts change)      volume (refreshed after every merge)
   ./repos/newsroom          code, prompts, ops/,      ./repos/newsroom-content
-                            website/, content/          current -> trees/<commit>/content
-                            {agents,topics,log}           editions/<date>/...
-                                                          bylines/<agent>.tsv
+                            website/, content/          current -> trees/<revision>
+                            {agents,topics,log}           content/editions/<date>/...
+                                                          content/bylines/<agent>.tsv
 ```
 
 So: **an org image is day-agnostic, and there is no `repin` stage.** What the
@@ -111,34 +118,17 @@ Two things the daily deploy was doing for free had to be given their own homes:
 - **corpus provenance.** It travels with the data now, as `CORPUS.json` beside
   the tree, checked by `scripts/corpus-contract.mjs` when Brass commissions.
 
-## Order is not a style choice
+## No bundle stage
 
-```
-check-bundle-descriptor --repin-source  →  org:bundle  →  check-bundle-descriptor
-   descriptor.source                         five tars,        the proof
-   + 12 Spawnfile source pins                descriptor
-                                             (no Spawnfile)
-```
-
-- **`--repin-source` before `org:bundle`**: `--repin-source` finds the twelve
-  Spawnfile pins by searching for the descriptor's *current* source digest.
-  `org:bundle` advances the descriptor and writes into no Spawnfile at all, so
-  running it first leaves the repin nothing to match and produces an image
-  whose agents pin an archive that no longer exists. Confirmed on the box on
-  2026-09-06 by doing it in the wrong order and watching all twelve Spawnfiles
-  fall out of agreement with the descriptor.
-
-`seam-run.test.mjs` asserts the order; it is not defended only by this section.
-
-The dependency and asset archives have **no repin at all** — their digests
-exist only in the Spawnfiles. If `npm ci` moves `website/node_modules` under
-the job, `org:bundle` advances the descriptor and the pins stay put.
-`assertPinsMatchDescriptor` catches that and **refuses**; it does not repair
-it, because rewriting a dependency pin from an unreviewed rebuild is how you
-deploy an archive nobody chose. `etopo-relief.tar` is the one archive a
-Spawnfile may pin that the descriptor does not describe (it is built
-separately from a ~395MB external download) and it is named in the code, not
-skipped silently.
+There is nothing to order any more. `spawnfile build --release` builds every
+image bundle from the Spawnfiles: the public source tree (git-tracked files of
+the build root, published content excluded), the website dependencies
+(`npm ci` in the runtime's own digest-pinned Node image) and the og assets. It
+keys each by its inputs, refuses a build root whose bundle inputs do not match
+`HEAD`, and records every digest in the compile report. Nothing is written back
+into the tree, so the release gate refuses any tracked modification. The one
+prebuilt archive is `etopo-relief.tar` (`scripts/build-etopo-bundle.mjs`, from
+a ~395MB external download), which Spawnfile hashes at compile.
 
 ## The build root is load-bearing
 
@@ -171,14 +161,15 @@ tail -5 /var/lib/clank-alarm/alarm.log
 install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/*.service \
                /root/work/clankandslop/agentic-org/ops/systemd/*.timer \
                /etc/systemd/system/
-systemctl disable --now clank-epoch-roll.timer 2>/dev/null || true   # retired: no daily recreate
-rm -f /etc/systemd/system/clank-epoch-roll.service /etc/systemd/system/clank-epoch-roll.timer
+systemctl disable --now clank-epoch-roll.timer clank-content-refresh.timer 2>/dev/null || true   # retired
+rm -f /etc/systemd/system/clank-epoch-roll.service /etc/systemd/system/clank-epoch-roll.timer \
+      /etc/systemd/system/clank-content-refresh.service /etc/systemd/system/clank-content-refresh.timer
 systemctl daemon-reload
-systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer 2>/dev/null || true
+systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer clank-feed-content.timer clank-feed-private-tools.timer 2>/dev/null || true
 
-# 5. the published-content refresher's private work root (its record lives here,
-#    root-owned and outside every container: never inside the volume)
-install -d -m 700 /var/lib/clank-content
+# 5. the retired published-content refresher's work root is not used any more
+#    (Spawnfile keeps fed-volume state beside each volume, in spawnfile-feed/)
+rm -rf /var/lib/clank-content
 
 # 6. dry-run the seam without deploying
 node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
@@ -188,19 +179,25 @@ node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
 ssh -o BatchMode=yes -i /root/.ssh/clank_public -T git@github.com
 ```
 
-**To arm the published-content refresher — only AFTER the first release that
-declares `clank-newsroom-content` has deployed.** The container creates the
-volume and writes its identity sentinel on first start, and refuses a volume
-that is non-empty without one, so the volume must not be populated before that
-start. Until the first land the newsroom's content readers refuse loudly
-(`CONTENT.json` missing) rather than read an empty back catalogue, so arm it
-straight after the deploy settles:
+**To arm the fed volumes — only AFTER the first release that declares them has
+deployed.** The container creates each volume and writes its identity sentinel
+on first start, and `spawnfile volume refresh` refuses a volume no container has
+initialized. Until the first land the readers refuse loudly (no
+`.spawnfile-feed.json`, no `current/`) rather than read nothing, so arm them
+straight after the deploy settles. The content volume still holds the retired
+refresher's layout (`CONTENT.json`, `trees/<commit>`, a `current` link into
+`trees/<commit>/content`), which Spawnfile reports and never deletes, so clear it
+first; the back catalogue is unreadable for the minute until the first land.
 
 ```bash
-systemctl enable --now clank-content-refresh.timer
-systemctl start clank-content-refresh.service      # land now, not in 2 minutes
-node /root/work/clankandslop/agentic-org/scripts/content-refresh.mjs --check   # exit 0 = served tree is what the host landed
-readlink /var/lib/docker/volumes/clank-newsroom-content/_data/current
+V=/var/lib/docker/volumes/clank-newsroom-content/_data
+rm -rf "$V/current" "$V/CONTENT.json" "$V/trees"
+systemctl enable --now clank-feed-content.timer clank-feed-private-tools.timer
+systemctl start clank-feed-content.service clank-feed-private-tools.service   # land now
+SF="/home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js"
+$SF volume verify public-content-volume /root/work/clankandslop/agentic-org     # exit 0 = served tree is what the host landed
+$SF volume verify newsroom-private-tools /root/work/clankandslop/agentic-org
+readlink "$V/current"
 ```
 
 **To arm the seam and the audit, one command:**
@@ -349,8 +346,8 @@ workflow explicitly dispatches the website deployment for `main`.
 and nothing else. It used to repin `newsroom-runtime-bundle.json` and the
 twelve Spawnfile source pins too, because `content/editions/**` was inside the
 source archive; that repin is exactly what made every edition a release. The
-editions are excluded from the archive now, so the descriptor still describes
-an edition branch untouched, and the publisher refuses to commit any staged
+editions are excluded from the source bundle now, so an edition branch changes
+no image input, and the publisher refuses to commit any staged
 path outside `content/editions/` and `content/bylines/` (read back from the
 index, not trusted from its own pathspecs). `content/topics.txt` is no longer
 regenerated: it is a view of `topics.json`, which an edition never changes.
@@ -363,11 +360,8 @@ regenerated: it is a view of `topics.json`, which an edition never changes.
 
 | Reason | Raised by |
 |---|---|
-| `content-refresh-failed` | the published-content refresher could not land `origin/main` (refused key, unreadable checkout, content git does not vouch for); the last good editions stay mounted |
-| `content-tampered` | the served editions, `current` or `CONTENT.json` stopped matching what the host landed; re-landed from git, bounded by `--heal-limit` |
 | `repin-failed` | the edition branch is missing, a desk index is absent, a digest survived the rewrite (corpus refresher only; the seam no longer repins) |
 | `release-deferred` | a commit has been waiting more than a day for a quiet deploy window — the newsroom is up, it is simply not shipping code |
-| `bundle-mismatch` | `org:bundle` failed, or the descriptor still disagrees with the tree afterwards |
 | `deploy-failed` | the image build failed, `deploy.env` pins the wake epoch or lacks the Berlin zone, `up` failed, or the container never settled |
 | `no-edition` | the cycle audit found no edition, or one that stopped below `composed` |
 | `seam-blocked` | the schedule was not clear or the container was not quiet |
