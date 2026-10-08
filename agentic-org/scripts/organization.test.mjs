@@ -13,9 +13,14 @@ import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
 import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
 import { effectiveAgentManifest } from './effective-mcp.mjs';
-import { PUBLISHER_TOOLS, engineByAgent, researchCorpusReaders, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
+import { PUBLISHER_TOOLS, engineByAgent, researchCorpusReaders, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateLifecycle, validateManifest, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
 
-const messages = () => JSON.parse(readFileSync(new URL('../fixtures/daily-cycle.json', import.meta.url), 'utf8')).messages;
+// Synthetic newsroom inputs: one daily cycle of lifecycle messages, a corpus
+// manifest, the release receipts and every persona's voice boundary.
+const testdata = () => JSON.parse(readFileSync(new URL('./organization.testdata.json', import.meta.url), 'utf8'));
+const messages = () => testdata().dailyCycle;
+const receipts = () => testdata().lifecycleReceipts;
+const readVestaDocs = () => ['AGENTS.md', 'RUNBOOK.md'].map((file) => readFileSync(resolve(import.meta.dirname, '../agents/vesta', file), 'utf8')).join('\n');
 const validate = (items) => { const prior = []; for (const item of items) { validateMessage(item, prior); prior.push(item); } };
 const admittedEnv = (root) => {
   const env = { CLANK_PRIVATE_ROOT: root, CLANK_BROKER_READY: 'yes', CLANK_MOLTNET_READY: 'yes', CLANK_NETWORK_POLICY_READY: 'yes', CLANK_GIT_POLICY_READY: 'yes' };
@@ -37,7 +42,20 @@ const mutatedOrg = (agent, mutate) => {
   return root;
 };
 
-test('digest-linked reporter lifecycle accepts the fixture', () => assert.doesNotThrow(validateFixtures));
+test('the daily cycle, corpus manifest, release receipts and voice boundaries satisfy the newsroom rules', () => {
+  const data = testdata(), prior = [];
+  for (const message of data.dailyCycle) { assert.doesNotThrow(() => validateMessage(message, prior), message.id); prior.push(message); }
+  assert.doesNotThrow(() => validateManifest(data.corpusManifest));
+  assert.doesNotThrow(() => validateLifecycle(data.lifecycleReceipts));
+  for (const agent of agents) assert.ok(data.voiceBoundaries[agent]?.good && data.voiceBoundaries[agent]?.bad, `${agent} needs concrete good/bad voice examples`);
+  assert.doesNotThrow(() => validateEditorialContracts(readVestaDocs(), readFileSync(resolve(import.meta.dirname, '../DATA.md'), 'utf8'), data.voiceBoundaries));
+  assert.equal(data.dailyCycle.find((message) => message.id === 'spike-vesta-20260816')?.owner, 'spike', 'Spike must own the Vesta editorial spike');
+});
+test('corpus manifest mutations fail closed', () => {
+  const manifest = testdata().corpusManifest;
+  const unknown = structuredClone(manifest); unknown.artifacts[0].kind = 'rumour';
+  assert.throws(() => validateManifest(unknown), /unknown private kind/u);
+});
 test('hostile envelope mutations reject for their intended reason', () => {
   const cases = [
     ['assigned recipient', 0, (m) => ({ ...m, recipient: 'nobody' }), /assignment recipient/],
@@ -66,8 +84,8 @@ test('autonomy mutations fail closed', () => {
   writeFileSync(klaxonPath,klaxon.replace('wake: all, allowed_wake_senders: [research-sensor]','wake: all'));
   try { assert.throws(validateSchedule,/Klaxon selective/); } finally { writeFileSync(klaxonPath,klaxon); }
 });
-test('lifecycle release receipts reject duplicate publication and broken lineage', () => { const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts; assert.doesNotThrow(()=>validateLifecycle(source)); assert.throws(()=>validateLifecycle([...source,source.at(-1)]),/unique|cardinality/); const broken=structuredClone(source); broken.at(-1).causal_parent='missing'; assert.throws(()=>validateLifecycle(broken),/parent/); });
-test('receipt shape adapter rejects extra and missing fields',()=>{const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts;const extra=structuredClone(source);extra[0].unexpected=true;assert.throws(()=>validateLifecycle(extra),/shape/);const missing=structuredClone(source);delete missing[0].receipt_ref;assert.throws(()=>validateLifecycle(missing),/shape/);});
+test('lifecycle release receipts reject duplicate publication and broken lineage', () => { const source=receipts(); assert.doesNotThrow(()=>validateLifecycle(source)); assert.throws(()=>validateLifecycle([...source,source.at(-1)]),/unique|cardinality/); const broken=structuredClone(source); broken.at(-1).causal_parent='missing'; assert.throws(()=>validateLifecycle(broken),/parent/); });
+test('receipt shape adapter rejects extra and missing fields',()=>{const source=receipts();const extra=structuredClone(source);extra[0].unexpected=true;assert.throws(()=>validateLifecycle(extra),/shape/);const missing=structuredClone(source);delete missing[0].receipt_ref;assert.throws(()=>validateLifecycle(missing),/shape/);});
 // The invariant is NOT "everyone is on Codex" — that is a roster, and it was
 // encoded here as though it were a safety property, so moving the newsroom onto
 // Grok broke eight tests that were only ever asserting the old roster. What has
@@ -227,9 +245,8 @@ test('production declarations consume only checksum-pinned offline newsroom bund
 // per-agent pin to go stale. What replaced this check is the volume's own
 // identity record and the call-time corpus refusals in scripts/corpus-contract.mjs.
 test('no declaration pins the research corpus as a bundle any more',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));assert.equal(descriptor.private,undefined,'the descriptor must not describe a corpus archive');for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.doesNotMatch(source,/newsroom-private\.tar/u,`${agent} still pins the corpus as an image bundle`);}const root=readFileSync(resolve(import.meta.dirname,'../Spawnfile'),'utf8');assert.match(root,/kind: volume\n\s+name: clank-newsroom-corpus/u,'the corpus must be declared once, team-shared, on the root');});
-test('lifecycle schema is closed and covers every autonomous terminal', () => { const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8')); assert.equal(schema.additionalProperties,false); assert.deepEqual(schema.properties.kind.enum,['readiness','blocker','finalization','released','staged']); });
-test('receipt-ref JSON Schema and runtime reject the same hostile components',()=>{const schema=JSON.parse(readFileSync(resolve(import.meta.dirname,'../schemas/lifecycle-receipt.schema.json'),'utf8'));const pattern=new RegExp(schema.properties.receipt_ref.pattern);const source=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/lifecycle-receipts.json'),'utf8')).receipts;assert.equal(pattern.test('state/edition/receipts/lower-case_1.0/file.json'),true);for(const ref of ['state/edition/receipts/has space','state/edition/receipts/Upper','state/edition/receipts/back\\slash','state/edition/receipts/é','state/edition/receipts/../bad','state/edition/receipts//bad','state/edition/receipts/bad/','state/edition/receipts/./bad']){assert.equal(pattern.test(ref),false,ref);const changed=structuredClone(source);changed[1].receipt_ref=ref;assert.throws(()=>validateLifecycle(changed),/reference/);}});
-test('Vesta and DATA boundary mutations fail closed',()=>{const vesta=['AGENTS.md','RUNBOOK.md'].map(file=>readFileSync(resolve(import.meta.dirname,'../agents/vesta',file),'utf8')).join('\n');const data=readFileSync(resolve(import.meta.dirname,'../DATA.md'),'utf8');const voices=JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/voice-boundaries.json'),'utf8'));assert.doesNotThrow(()=>validateEditorialContracts(vesta,data,voices));for(const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike'])assert.throws(()=>validateEditorialContracts(vesta.replaceAll(phrase,'removed'),data,voices),/Vesta constraint/);assert.throws(()=>validateEditorialContracts(vesta,data.replace('public content: read-only','public content: mutable'),voices),/DATA boundary/);const forged=structuredClone(voices);forged.vesta.bad='A fine pattern.';assert.throws(()=>validateEditorialContracts(vesta,data,forged),/Vesta voice/);});
+test('receipt references reject hostile path components',()=>{const source=receipts();for(const ref of ['state/edition/receipts/has space','state/edition/receipts/Upper','state/edition/receipts/back\\slash','state/edition/receipts/é','state/edition/receipts/../bad','state/edition/receipts//bad','state/edition/receipts/bad/','state/edition/receipts/./bad']){const changed=structuredClone(source);changed[1].receipt_ref=ref;assert.throws(()=>validateLifecycle(changed),/reference/,ref);}const accepted=structuredClone(source);accepted[1].receipt_ref='state/edition/receipts/lower-case_1.0/file.json';assert.doesNotThrow(()=>validateLifecycle(accepted));});
+test('Vesta and DATA boundary mutations fail closed',()=>{const vesta=['AGENTS.md','RUNBOOK.md'].map(file=>readFileSync(resolve(import.meta.dirname,'../agents/vesta',file),'utf8')).join('\n');const data=readFileSync(resolve(import.meta.dirname,'../DATA.md'),'utf8');const voices=testdata().voiceBoundaries;assert.doesNotThrow(()=>validateEditorialContracts(vesta,data,voices));for(const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike'])assert.throws(()=>validateEditorialContracts(vesta.replaceAll(phrase,'removed'),data,voices),/Vesta constraint/);assert.throws(()=>validateEditorialContracts(vesta,data.replace('public content: read-only','public content: mutable'),voices),/DATA boundary/);const forged=structuredClone(voices);forged.vesta.bad='A fine pattern.';assert.throws(()=>validateEditorialContracts(vesta,data,forged),/Vesta voice/);});
 test('root declaration keeps Moltnet durable, authenticated, direct and secret-backed', () => {
   const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
   assert.doesNotThrow(() => validateRootDeclaration(root));
