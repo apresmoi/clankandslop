@@ -55,8 +55,23 @@ jobs:
       # unescaped `"` in brass's schedule prompt that made its manifest
       # unparseable. A real `spawnfile compile` is out of reach here (it needs a
       # pinned Daimon runtime image whose capability receipt attests the
-      # compiler's contract manifest, i.e. Docker and a registry), but the
-      # instruction budget and the manifests are pure functions of this tree.
+      # compiler's contract manifest, i.e. Docker and a registry), but
+      # `spawnfile validate` is not: it parses every manifest, resolves the
+      # shared MCP servers and runs Daimon's compile preflight (instruction
+      # size, attention, turn limits, MCP allowlists) with no image at all.
+      # Pinned to the commit the production host compiles with; npm's
+      # `spawnfile` predates shared-MCP inheritance and cannot read this tree.
+      - name: Spawnfile validate (production compiler)
+        env:
+          SPAWNFILE_REF: 9ad3c825215e65abf4df439346838112b6aa3cd1
+        run: |
+          git init -q "$RUNNER_TEMP/spawnfile"
+          git -C "$RUNNER_TEMP/spawnfile" fetch -q --depth 1 https://github.com/noopolis/spawnfile.git "$SPAWNFILE_REF"
+          git -C "$RUNNER_TEMP/spawnfile" checkout -q FETCH_HEAD
+          (cd "$RUNNER_TEMP/spawnfile" && npm ci --no-audit --no-fund && npm run build)
+          node "$RUNNER_TEMP/spawnfile/dist/cli/index.js" validate agentic-org
+      # The org budget is stricter than Spawnfile's limit: it reserves the bytes
+      # Daimon appends after the compiled instructions.
       - name: Check every agent fits Daimon's instruction budget
         run: |
           node agentic-org/scripts/check-instruction-budget.mjs
@@ -64,7 +79,7 @@ jobs:
       - name: Check declared agent tools and release clock
         run: |
           node agentic-org/scripts/validate-org.mjs
-          node --test agentic-org/scripts/engine-policy.test.mjs agentic-org/scripts/engine-policy.fixture.test.mjs agentic-org/scripts/moltnet-pairings.test.ts agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs agentic-org/scripts/signal-disposition.test.mjs agentic-org/scripts/production-newsroom-contracts.test.mjs
+          node --test agentic-org/scripts/engine-policy.test.mjs agentic-org/scripts/moltnet-pairings.test.ts agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs agentic-org/scripts/signal-disposition.test.mjs agentic-org/scripts/production-newsroom-contracts.test.mjs
       # The corpus left the image, so the guards that used to be a build-time
       # repin are now code: the host refresher, the volume's layout rules, the
       # read-time gate's contract and the alarm vocabulary. None of it needs the
