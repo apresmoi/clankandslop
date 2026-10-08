@@ -5,6 +5,7 @@ import { validateLifecycleGraph } from './lifecycle-graph.mjs';
 import { isBerlinRelease } from './release-time.mjs';
 import { runtimeToolFindings } from './tool-bundle-contract.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
+import { effectiveAgentManifest, readRootManifest } from './effective-mcp.mjs';
 import { SUPPORTED_ENGINES, engineDeclarationFindings } from './engine-policy.mjs';
 
 const TYPES = new Set(['ASSIGNMENT', 'ACK', 'PINPOINT_REQUEST', 'PINPOINT_CLAIM', 'PINPOINT_RESULT', 'PINPOINT_NOT_FOUND', 'FILED', 'REVISION_REQUEST', 'REFILED', 'PASS', 'HOLD', 'SPIKE', 'COMPOSITION_ISSUE', 'COMPOSED', 'RELEASE_HANDOFF']);
@@ -146,8 +147,8 @@ export function declaredPairings(bytes) {
 
 const inlineField = (value, key) => new RegExp(`\\b${key}: "?([^,"}]+)"?`).exec(value ?? '')?.[1]?.trim();
 
-export function validateReporterValidationDeclaration(agent, bytes) {
-  const manifest = parseManifest(bytes);
+export function validateReporterValidationDeclaration(agent, bytes, rootManifest = readRootManifest()) {
+  const manifest = effectiveAgentManifest(agent, bytes, rootManifest);
   const servers = (manifest.environment?.mcp_servers ?? []).filter((item) => item.name === 'validation');
   const bundles = (manifest.workspace?.resources ?? []).filter((item) => item.id === 'article-validation');
   if (!reporters.has(agent)) {
@@ -167,7 +168,7 @@ export function validateReporterValidationDeclaration(agent, bytes) {
   assert(bundle.mount === './tools/article-validation' && bundle.mode === 'readonly', `${agent} article-validation bundle must be mounted read-only at its tool path`);
 }
 
-export function validateAgentDeclaration(agent, bytes) {
+export function validateAgentDeclaration(agent, bytes, rootManifest = readRootManifest()) {
   const engine = engineByAgent[agent];
   assert(engine, `${agent} runtime assignment missing`);
   const runtime = section(bytes, 'runtime');
@@ -196,17 +197,17 @@ export function validateAgentDeclaration(agent, bytes) {
   } else {
     assert(!corpus, `${agent} must not receive a private corpus resource`);
   }
-  validateReporterValidationDeclaration(agent, bytes);
+  validateReporterValidationDeclaration(agent, bytes, rootManifest);
+  const effective = effectiveAgentManifest(agent, bytes, rootManifest);
   if (agent === 'ledger') {
-    const manifest = parseManifest(bytes);
-    const server = (manifest.environment?.mcp_servers ?? []).find((item) => item.name === 'newsroom');
+    const server = (effective.environment?.mcp_servers ?? []).find((item) => item.name === 'newsroom');
     const workspacePath = `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}`;
     assert(server?.env?.CLANK_PUBLIC_SOURCE_ROOT === `${workspacePath}/repos/newsroom`, 'ledger newsroom public source root invalid');
     assert(server?.env?.CLANK_PRIVATE_SOURCE_ROOT === `${workspacePath}/repos/newsroom-private`, 'ledger newsroom private source root invalid');
   }
-  const mountServers = (parseManifest(bytes).environment?.mcp_servers ?? []).filter((item) => item.env?.CLANK_PRIVATE_SOURCE_ROOT !== undefined);
+  const mountServers = (effective.environment?.mcp_servers ?? []).filter((item) => item.env?.CLANK_PRIVATE_SOURCE_ROOT !== undefined);
   if (researchCorpusReaders.has(agent)) {
-    const server = (parseManifest(bytes).environment?.mcp_servers ?? []).find((item) => item.name === 'newsroom');
+    const server = (effective.environment?.mcp_servers ?? []).find((item) => item.name === 'newsroom');
     assert(server?.env?.CLANK_PRIVATE_SOURCE_ROOT === `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-private`, `${agent} newsroom private source root invalid`);
   } else {
     assert(mountServers.length === 0, `${agent} declares the research corpus mount on MCP server(s) [${mountServers.map((item) => item.name).join(', ')}] but none of its tools reads it — a mount nothing reads is a declaration this validator cannot stand behind, so either drop CLANK_PRIVATE_SOURCE_ROOT or make the tool read it and add ${agent} to researchCorpusReaders`);
@@ -217,9 +218,9 @@ export function validateAgentDeclaration(agent, bytes) {
   // which load ops/lay-page.mjs. Missing, a reader would fall back to the image's
   // content/ -- which no longer carries a single edition.
   const contentVolume = `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-content`;
-  for (const server of (parseManifest(bytes).environment?.mcp_servers ?? []).filter((item) => ['newsroom', 'art', 'visual'].includes(item.name)))
+  for (const server of (effective.environment?.mcp_servers ?? []).filter((item) => ['newsroom', 'art', 'visual'].includes(item.name)))
     assert(server.env?.CLANK_PUBLIC_CONTENT_VOLUME === contentVolume, `${agent} ${server.name} server must read published content from ${contentVolume}`);
-  const toolErrors = runtimeToolFindings(agent, parseManifest(bytes));
+  const toolErrors = runtimeToolFindings(agent, effective);
   assert(toolErrors.length === 0, `${agent} runtime tools invalid: ${toolErrors.join('; ')}`);
 }
 
@@ -324,9 +325,10 @@ export function validateRuntimeBindings(root = orgRoot) {
   for (const agent of agents) assert(SUPPORTED_ENGINES.includes(engineByAgent[agent]), `${agent} is assigned engine ${engineByAgent[agent] ?? 'none'}, which has no confinement contract in engine-policy.mjs`);
   assert(policy.enginePolicy?.active?.grok === 10 && policy.enginePolicy?.active?.codex === 6, 'active engine policy invalid');
   assert(policy.enginePolicy?.agy?.hostAuthCheck === true && policy.enginePolicy?.agy?.linuxPortable === false && policy.enginePolicy?.agy?.status === 'deferred-broker', 'AGY portability policy invalid');
+  const rootManifest = readRootManifest(root);
   for (const agent of agents) {
     const bytes = readFileSync(resolve(root, 'agents', agent, 'Spawnfile'), 'utf8');
-    validateAgentDeclaration(agent, bytes);
+    validateAgentDeclaration(agent, bytes, rootManifest);
     if (agent === PUBLISHER) validatePublisherSurface(bytes);
     else validateNoPublishingCredential(agent, bytes);
   }
