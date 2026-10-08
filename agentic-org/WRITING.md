@@ -32,6 +32,10 @@ facts. File it as `epistemic: "fact"`.
    differently under the two readings. If nothing would separate them yet, say
    so.
 
+Its headline states the desk's reading in plain words ("Hormuz Transit No
+Longer Means the Gulf Is Clear"); the deck carries the event. A headline that
+only names the event reads as a brief.
+
 File an analysis as `epistemic: "inference"`. The lead story is always an
 analysis. An edition carries one or two; the rest are briefs.
 
@@ -81,6 +85,11 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
 - **No working on the page.** No arithmetic, rounding or date checks that
   reconcile one outlet with another. If sources disagree about a fact a reader
   needs, say so in one plain sentence.
+- **One quantity, one figure.** A distance, count or sum appears once, in one
+  unit. The 8 October tanker piece gave the same position as 50 nautical
+  miles, 51 nautical miles and 94 kilometres; print one, attributed.
+- **A question is not evidence.** A reporter's question at a briefing shows only
+  what was asked. Cite the answer, or leave it out.
 - **No notes about sources.** "CNBC reported" is enough. Never write which page,
   sentence or outlet "carries" a detail.
 - **No answers to claims nobody made.** No "X, not Y" unless a reader would
@@ -116,7 +125,10 @@ them.** This is the most common reason a first draft goes back.
 - Say which outlet obtained a statement: "told Reuters".
 
 Anonymity is right only when the source itself withholds the name; then say so
-("a security official who was not named"). The `unnamed_speaker` lint flags
+("a security official who was not named"). When the source gives neither name
+nor role, attribute the words to the record that carries them ("the briefing
+transcript records", "the statement says"); never stack what is missing ("a
+speaker who was not named, and whose role was not given"). The `unnamed_speaker` lint flags
 common slips, but it is not a substitute for checking each quote.
 
 Each sentence keeps the meaning of the passage it cites:

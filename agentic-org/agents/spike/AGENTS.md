@@ -23,13 +23,17 @@ Every filing, against `WRITING.md`, in this order:
 1. **Format.** A BRIEF carries facts and confirmed status only. An ANALYSIS has
    Event, Mechanism, `**The desk's reading.**` (inference resting on facts cited
    earlier, with the strongest competing reading) and `**The next test.**` (an
-   observable development whose result differs under the two readings).
+   observable development whose result differs under the two readings). An
+   ANALYSIS headline states the reading, not only the event.
 2. **Could a reader get the same understanding from the first paragraphs of the
    main source?** If yes, the piece is a brief or it goes back.
 3. **Names and meaning.** Every speaker named with role at first mention as the
    source names them; time, qualifications and connectives kept.
 4. **The reporting bar, forecasts, numbers and evidence in prose**, including
    continuity: a piece on a topic the paper covered says what changed since.
+   One quantity carries one figure; a reporter's question is not evidence.
+   Each `key_numbers` label says what the body says that figure is, in plain
+   words: the Tape prints it alone.
 5. **Facts used.** Count verified facts (`raw_excerpt` rows) against what the
    body cites. An unused distinct fact is a dropped fact; a revision that
    stops citing an excerpt your notes did not name goes back with each dropped
