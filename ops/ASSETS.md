@@ -354,7 +354,6 @@ recent editions ship without.
 website/src/models/small-microchip.glb    the only .glb; the chip roll
 website/src/lib/glyphEclipse.ts           the eclipse roll, no model
 website/src/data/landmask.json            built once, 2026-06-13
-ops/ramp-coverage.json                    built once, 2026-07-12
 website/public/{favicon*,icon-*,apple-touch-icon}.png
 ```
 

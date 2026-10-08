@@ -28,7 +28,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 const scripts = new URL('./', import.meta.url);
 const workflow = readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8');
 
-// Filenames carry dots -- `engine-policy.fixture.test.mjs` -- and a pattern that
+// Filenames carry dots -- `a.fixture.test.mjs` -- and a pattern that
 // forgets that under-reports coverage. My first measurement of this gap did
 // exactly that and claimed 26 uncovered files instead of 18.
 const NAME = /[A-Za-z0-9._-]+\.test\.(?:mjs|ts)/gu;

@@ -1,5 +1,5 @@
 {
-  "messages": [
+  "dailyCycle": [
     {"version":"v1","id":"assign-20260816","type":"ASSIGNMENT","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"brass","recipient":"cogsworth","article_owner":"cogsworth","artifact_refs":[{"ref":"private:candidates/world","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],"derived_from":[],"revision":0,"correlation_id":"cycle-20260816","deadline":"2026-08-16T14:00:00+02:00","terminal_state":"OPEN","summary":"Assign hardware filing."},
     {"version":"v1","id":"ack-20260816","type":"ACK","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"cogsworth","article_owner":"cogsworth","artifact_refs":[{"ref":"private:receipts/cogsworth-ack","digest":"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}],"derived_from":[{"ref":"private:candidates/world","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],"revision":0,"causal_parent":"assign-20260816","correlation_id":"cycle-20260816","deadline":"2026-08-16T14:02:00+02:00","terminal_state":"ACKED","summary":"Assignment accepted."},
     {"version":"v1","id":"request-20260816","type":"PINPOINT_REQUEST","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"cogsworth","artifact_refs":[{"ref":"private:dossiers/cogsworth-chip","digest":"sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}],"derived_from":[],"revision":0,"correlation_id":"pinpoint-chip","deadline":"2026-08-16T14:05:00+02:00","terminal_state":"OPEN","summary":"Request primary-source verification."},
@@ -16,5 +16,93 @@
     {"version":"v1","id":"request-vesta-20260816","type":"PINPOINT_REQUEST","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"vesta","artifact_refs":[{"ref":"private:dossiers/vesta-null","digest":"sha256:8888888888888888888888888888888888888888888888888888888888888888"}],"derived_from":[],"revision":0,"correlation_id":"vesta-research","deadline":"2026-08-16T14:05:00+02:00","terminal_state":"OPEN","summary":"Request Record review."},
     {"version":"v1","id":"file-vesta-20260816","type":"FILED","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"vesta","article_owner":"vesta","artifact_refs":[{"ref":"private:articles/vesta-null","digest":"sha256:9999999999999999999999999999999999999999999999999999999999999999"}],"derived_from":[{"ref":"private:receipts/vesta-ack","digest":"sha256:7777777777777777777777777777777777777777777777777777777777777777"},{"ref":"private:dossiers/vesta-null","digest":"sha256:8888888888888888888888888888888888888888888888888888888888888888"}],"revision":0,"causal_parent":"ack-vesta-20260816","correlation_id":"vesta-cycle","deadline":"2026-08-16T15:00:00+02:00","terminal_state":"FILED","summary":"Long-view filing with no worthy fire."},
     {"version":"v1","id":"spike-vesta-20260816","type":"SPIKE","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"spike","article_owner":"vesta","artifact_refs":[{"ref":"private:decisions/vesta-null","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],"derived_from":[{"ref":"private:articles/vesta-null","digest":"sha256:9999999999999999999999999999999999999999999999999999999999999999"}],"revision":0,"causal_parent":"file-vesta-20260816","correlation_id":"vesta-cycle","deadline":"2026-08-16T15:20:00+02:00","terminal_state":"SPIKED","summary":"No worthy fire grounded in the ordinary Record."}
-  ]
+  ],
+  "corpusManifest": {
+    "version": "v1",
+    "edition": "2026-08-16",
+    "root": "/var/lib/clank-private/2026-08-16",
+    "artifacts": [
+      {
+        "kind": "sensor-ledger",
+        "path": "sensor-ledger/frontier-summary.json",
+        "owner": "klaxon",
+        "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+      },
+      {
+        "kind": "pinpoint",
+        "path": "pinpoint/chip-source.json",
+        "owner": "klaxon",
+        "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      {
+        "kind": "dossiers",
+        "path": "dossiers/cogsworth-chip.json",
+        "owner": "cogsworth",
+        "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+      },
+      {
+        "kind": "receipts",
+        "path": "receipts/release.json",
+        "owner": "pressman",
+        "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+      }
+    ]
+  },
+  "lifecycleReceipts": [
+    {"version":"v1","id":"ready-20260816","kind":"readiness","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"brass","correlation_id":"edition-20260816","causal_parent":null,"artifact_digest":"sha256:1111111111111111111111111111111111111111111111111111111111111111","receipt_ref":"state/edition/receipts/readiness.json","status":"ready"},
+    {"version":"v1","id":"blocker-20260816","kind":"blocker","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"brass","correlation_id":"edition-20260816","causal_parent":"ready-20260816","artifact_digest":"sha256:2222222222222222222222222222222222222222222222222222222222222222","receipt_ref":"state/edition/receipts/blocker-cleared.json","status":"blocked"},
+    {"version":"v1","id":"final-20260816","kind":"finalization","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"brass","correlation_id":"edition-20260816","causal_parent":"blocker-20260816","artifact_digest":"sha256:3333333333333333333333333333333333333333333333333333333333333333","receipt_ref":"state/edition/receipts/finalization.json","status":"finalized"},
+    {"version":"v1","id":"released-20260816","kind":"released","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"pressman","correlation_id":"edition-20260816","causal_parent":"final-20260816","artifact_digest":"sha256:4444444444444444444444444444444444444444444444444444444444444444","receipt_ref":"state/edition/receipts/released.json","status":"released"},
+    {"version":"v1","id":"staged-20260816","kind":"staged","edition":"2026-08-16","release":"2026-08-16T16:00:00+02:00[Europe/Berlin]","owner":"pressman","correlation_id":"edition-20260816","causal_parent":"released-20260816","artifact_digest":"sha256:4444444444444444444444444444444444444444444444444444444444444444","receipt_ref":"state/edition/receipts/staged.json","status":"staged"}
+  ],
+  "voiceBoundaries": {
+    "klaxon": {
+      "good": "Qualified signal routed as a lead pending primary-source grounding.",
+      "bad": "A viral account makes the claim publishable."
+    },
+    "cogsworth": {
+      "good": "Names a permit clock and the production number that would have shown the claim wrong.",
+      "bad": "Calls a product inevitable without a physical constraint."
+    },
+    "sprockett": {
+      "good": "Orders actions and marks disputed attribution.",
+      "bad": "Uses alarm as evidence."
+    },
+    "foreman": {
+      "good": "Reconciles units, accounting basis, and upstream constraint before calculating.",
+      "bad": "Mixes nominal and real values to sharpen the headline."
+    },
+    "graves": {
+      "good": "Separates three days of site downtime from global tonnes lost.",
+      "bad": "Turns a price move into proof of physical shortage."
+    },
+    "tinkerton": {
+      "good": "Names jurisdiction, appeal clock, and the narrow supported intervention.",
+      "bad": "Offers generic reform without legal authority."
+    },
+    "vesta": {
+      "good": "Uses the ordinary Record, strongest boring null, and observable falsifier.",
+      "bad": "Reports a new fact, hidden hand, or unsupported grand pattern."
+    },
+    "brass": {
+      "good": "Assigns one bounded question with owner, deadline, and durable parent receipt.",
+      "bad": "Writes reporter prose or launches a task runner."
+    },
+    "spike": {
+      "good": "PASS: citations resolve and the fact that would have sunk it is in the piece, with a date on it.",
+      "bad": "Silently rewrites the reporter's weak paragraph."
+    },
+    "ledger": {
+      "good": "Rejects settlement because tonnes and barrels have no recorded conversion.",
+      "bad": "Invents a conversion to complete the table."
+    },
+    "caslon": {
+      "good": "Composes only PASS artifacts in deterministic assignment order.",
+      "bad": "Repairs copy while laying out the page."
+    },
+    "pressman": {
+      "good": "Writes one digest-keyed artifact to local staging and matching receipts.",
+      "bad": "Pushes Git, calls a network publisher, or overrides a failed gate."
+    }
+  }
 }

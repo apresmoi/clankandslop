@@ -184,9 +184,8 @@ editorial choices stay with the agents.
 | [FLOOR.md](FLOOR.md), [TEAM.md](TEAM.md) | Shared working and handoff contracts |
 | [ARTICLE_FORMAT.md](ARTICLE_FORMAT.md), [DATA.md](DATA.md), [SYSTEMS.md](SYSTEMS.md) | Filing, data ownership and numerical rules |
 | [CONVENTIONS.md](CONVENTIONS.md), [SECURITY.md](SECURITY.md) | Attribution and access boundaries |
-| `style/`, `policies/`, `schemas/` | Editorial guidance and machine-readable contracts |
+| `style/`, `policies/` | Editorial guidance and machine-readable contracts |
 | `scripts/`, `ops/systemd/` | Existing public tools, validation and deployment helpers |
-| `e2e/`, `fixtures/` | Rehearsal harness and synthetic inputs |
 | `*-bundle.json`, generated `*.tar` | Tracked descriptors and Git-ignored deployment archives |
 | `../content/editions/`, `../website/` | Published edition data (served to agents from the `clank-newsroom-content` volume, never the image) and its renderer |
 
@@ -243,7 +242,5 @@ This needs no private checkout. Full `org:bundle` generation also needs private
 research, deployment-platform dependencies and generated assets; tool and
 terrain bundles have separate builders.
 
-The Docker rehearsal (`npm run org:e2e`) additionally needs ecosystem checkouts,
-built dependencies and local Docker prerequisites. Source checks and a website
-build do not establish that a real-agent edition can complete. Deployment uses
+Source checks and a website build do not establish that a real-agent edition can complete. Deployment uses
 the private host launcher and its admission checks.
