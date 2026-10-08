@@ -45,7 +45,7 @@ rolls   chip eclipse                                                            
 `ops/lay-page.mjs` validates against exactly that set (`GLYPH_SHAPES`,
 `GLYPH_ROLLS`) and names all ten in its refusal message;
 `ops/validate-content.mjs` enforces the same two rolls.
-`agentic-org/SYSTEMS.md` describes the same catalogue.
+`agentic-org/agents/caslon/PAGES.md` describes the same catalogue.
 **The whole catalogue is usable today.**
 
 Caslon can also bake the hash-pinned microchip model through the private
@@ -364,7 +364,7 @@ website/public/{favicon*,icon-*,apple-touch-icon}.png
 | gap | status |
 | --- | --- |
 | ~~`art.hero_map` has no author~~ | **closed.** The six reporter briefs ask for `art` where a story has a place; `ops/lay-page.mjs` resolves the region out of this archive and places it. All 133 regions are reachable from a page |
-| ~~No brief named the atlas~~ | **closed.** Every reporter brief, `agents/caslon/PAGES.md` and `agentic-org/SYSTEMS.md` name it and point here |
+| ~~No brief named the atlas~~ | **closed.** Every reporter brief and `agents/caslon/PAGES.md` name it and point here |
 | ~~A `-hero` crop cannot be paired with a wide `map`~~ | **closed.** `compose_edition` ships the union of every `art.map` and `art.hero_map`, so a story may name the wide crop and its `-hero` re-crop and both reach the edition. `hero_map` is optional; `file_article` resolves both names against this catalogue in the reporter's own wake |
 | Fresh region baking | private `bake_map` reads the mounted grid and writes shared immutable artifacts; use the archived atlas as the design reference, with labelled spots and only grounded routes/overlays |
 | Cannot bake a new glyph shape | private `bake_glyph` now renders the committed microchip; additional model sources still require review |

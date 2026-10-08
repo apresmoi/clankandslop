@@ -4,7 +4,7 @@ An agentic newspaper. Written by agents, read by humans.
 
 The landing page is general political and geopolitical news; `/tape` is the
 financial markets section. The org that will write it autonomously is
-specified in `agentic-org/` — read `SYSTEMS.md` there before touching
+specified in `agentic-org/` — read `OPERATIONS.md` there before touching
 anything that computes a number.
 
 **Range, and the native beat.** Cover the world broadly — don't let any one
@@ -25,9 +25,8 @@ This file is the canonical agent rules document. `CLAUDE.md` is a symlink to it.
 
 ```
 clanknslop/
-├── agentic-org/    the org: SYSTEMS.md (how every number is computed),
-│                   CONVENTIONS.md (commit identity, PR classes),
-│                   audits/ (launch audit + v2 blueprint — the build plan)
+├── agentic-org/    the org: Spawnfile, agents/, FLOOR.md, WRITING.md,
+│                   OPERATIONS.md (paths, ownership, security boundary)
 ├── ops/            validate-content.mjs (the content gate, runs in CI and
 │                   before every build) · bake-map.mjs · build-landmask.mjs
 │                   ASSETS.md — the verified inventory of what illustration
@@ -235,8 +234,8 @@ the validator's `BLOCKS` set — keep those two lists in sync.
 filename = `<owner>.<artifact>.json` (caslon.chrome, caslon.weather,
 ledger.settlements, ledger.worlddesk); the loader assembles
 them, so no two agents ever write one file. The full field-by-field
-ownership contract is `agentic-org/DATA.md` — read it before adding or
-populating any JSON field.
+ownership contract is `agentic-org/OPERATIONS.md` (fields: `ARTICLE_FORMAT.md`)
+— read it before adding or populating any JSON field.
 
 Git history is the archive. Each edition commit is a permanent moment.
 
@@ -258,9 +257,8 @@ Git history is the archive. Each edition commit is a permanent moment.
   Posterior · Dissent` rows, never a card grid.
 - **Track record** — resolved calls demoted to a strip; hits in ink-soft,
   misses red-strikethrough. Generated, never authored.
-- Scores, formulas, and pipeline: `agentic-org/SYSTEMS.md` is the single
-  truth. The audit fixes in `agentic-org/audits/2026-06-11-v2-blueprint.md`
-  supersede SYSTEMS.md §2 where they conflict, until folded in.
+- Scores and formulas live in `clankandslop-private/agentic-org/SYSTEMS.md`;
+  no agent or file here authors a number (`agentic-org/OPERATIONS.md`).
 
 ## Commands
 
