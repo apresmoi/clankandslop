@@ -12,6 +12,7 @@ import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
 import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
 import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
+import { effectiveAgentManifest } from './effective-mcp.mjs';
 import { PUBLISHER_TOOLS, engineByAgent, researchCorpusReaders, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateFixtures, validateLifecycle, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
 
 const messages = () => JSON.parse(readFileSync(new URL('../fixtures/daily-cycle.json', import.meta.url), 'utf8')).messages;
@@ -27,6 +28,7 @@ const admittedEnv = (root) => {
 // mutation can be validated without touching the real tree.
 const mutatedOrg = (agent, mutate) => {
   const root = mkdtempSync(join(tmpdir(), 'clank-org-'));
+  writeFileSync(join(root, 'Spawnfile'), readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8'));
   for (const name of agents) {
     mkdirSync(join(root, 'agents', name), { recursive: true });
     const source = readFileSync(resolve(import.meta.dirname, `../agents/${name}/Spawnfile`), 'utf8');
@@ -79,6 +81,7 @@ test('actual agent Spawnfile bytes select the assigned Daimon CLI engines', () =
     assert.match(readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8'), new RegExp(`engine: ${engineByAgent[agent]}\\b`, 'u'), agent);
   }
   const root = mkdtempSync(join(tmpdir(), 'clank-runtime-bindings-'));
+  writeFileSync(join(root, 'Spawnfile'), readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8'));
   mkdirSync(join(root, 'agents', 'klaxon'), { recursive: true });
   const source = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
   const declared = `engine: ${engineByAgent.klaxon}`;
@@ -140,8 +143,8 @@ test('all six reporter declarations reject broken validation identity, tools and
       ['duplicate server', source.replace(server, `${server}\n${server}`)],
       ['wrong transport', source.replace(server, server.replace('transport: stdio', 'transport: http'))],
       ['wrong entry point', source.replace(server, server.replace('/tools/article-validation/server.mjs', '/repos/newsroom/server.mjs'))],
-      ['another reporter identity', source.replace(server, server.replace(`CLANK_NEWSROOM_AGENT: ${agent}`, 'CLANK_NEWSROOM_AGENT: spike'))],
-      ['another source root', source.replace(server, server.replace('/repos/newsroom }', '/repos/newsroom-private }'))],
+      ['another reporter identity', source.replace(server, server.replace('CLANK_NEWSROOM_AGENT: "${agent.name}"', 'CLANK_NEWSROOM_AGENT: spike'))],
+      ['another source root', source.replace(server, server.replace('/repos/newsroom" }', '/repos/newsroom-private" }'))],
       ['missing tools', source.replace(server, server.replace('tools: [validate_article]', 'tools: []'))],
       ['write tool added', source.replace(server, server.replace('tools: [validate_article]', 'tools: [validate_article, file_article]'))],
       ['missing bundle', source.replace(bundle, '')],
@@ -163,8 +166,8 @@ test('Pressman implementation contains no network publisher, push, credential, o
 test('Ledger declares mounted source roots for desk filing from runtime MCP cwd', () => {
   const source = readFileSync(resolve(import.meta.dirname, '../agents/ledger/Spawnfile'), 'utf8');
   assert.doesNotThrow(() => validateAgentDeclaration('ledger', source));
-  const publicRoot = 'CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom, ';
-  const privateRoot = 'CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom-private, ';
+  const publicRoot = 'CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom", ';
+  const privateRoot = ', CLANK_PRIVATE_SOURCE_ROOT: "${workspace}/repos/newsroom-private"';
   for (const [name, changed] of [['missing public root', source.replace(publicRoot, '')], ['missing private root', source.replace(privateRoot, '')]]) {
     assert.notEqual(changed, source, name);
     assert.throws(() => validateAgentDeclaration('ledger', changed), /ledger newsroom .* source root invalid/u, name);
@@ -185,9 +188,11 @@ test('the newsroom tools that read the research corpus declare its mount', () =>
   for (const agent of researchCorpusReaders) {
     const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
     assert.doesNotThrow(() => validateAgentDeclaration(agent, source), agent);
-    const line = `CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}/repos/newsroom-private`;
+    const line = 'CLANK_PRIVATE_SOURCE_ROOT: "${workspace}/repos/newsroom-private"';
     assert.ok(source.includes(line), `${agent} must declare the research corpus mount for its newsroom MCP server`);
-    const changed = source.includes(`${line}, `) ? source.replace(`${line}, `, '') : source.replace(`        ${line}\n`, '');
+    // The line sits in the agent's narrowing of the shared newsroom server, in
+    // whichever shape that agent's override uses.
+    const changed = [`env: { ${line} }, `, `, ${line}`, `${line}, `, `        ${line}\n`].reduce((text, form) => text === source ? source.replace(form, '') : text, source);
     assert.notEqual(changed, source, `${agent} declaration shape changed`);
     assert.throws(() => validateAgentDeclaration(agent, changed), /newsroom private source root invalid/u, agent);
   }
@@ -197,7 +202,7 @@ test('production roles declare exact newsroom tools and carry the folded editori
 // identical SKILL.md files at the top of every wake. Their content now
 // lives in compiled working boundaries and the linked task runbook.
 // No agent declares a skill; ownership and source truth remain in the prefix.
-const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);assert.match(source,/transport: stdio/u);assert.match(source,/command: \/usr\/local\/bin\/node/u);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
+const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);const newsroom=effectiveAgentManifest(agent,source).environment.mcp_servers.find(item=>item.name==='newsroom');assert.equal(newsroom?.transport,'stdio',agent);assert.equal(newsroom?.command,'/usr/local/bin/node',agent);assert.deepEqual(newsroom?.tools,tools,agent);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
 // The composition floor is DERIVED here, never spelled. This test asserted the
 // literal 'at least five articles' and so went red the moment 10ddd3e correctly
 // lowered the floor to four everywhere it is enforced -- the one check meant to

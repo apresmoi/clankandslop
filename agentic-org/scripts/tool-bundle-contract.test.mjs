@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runtimeToolFindings } from './tool-bundle-contract.mjs';
-import { parseManifest } from './check-instruction-budget.mjs';
+import { effectiveAgentManifest } from './effective-mcp.mjs';
 
-const declaration=role=>parseManifest(readFileSync(new URL(`../agents/${role}/Spawnfile`,import.meta.url),'utf8'));
+// What compiles: the root's shared newsroom server narrowed by the agent.
+const declaration=role=>effectiveAgentManifest(role,readFileSync(new URL(`../agents/${role}/Spawnfile`,import.meta.url),'utf8'));
 test('every actual declaration carries its private tool bundle and live admission',()=>{
   for (const role of ['klaxon','cogsworth','sprockett','foreman','graves','tinkerton','vesta','brass','spike','ledger','caslon','pressman']) assert.deepEqual(runtimeToolFindings(role,declaration(role)),[],role);
 });
