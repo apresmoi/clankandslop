@@ -6,10 +6,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
-import { bundleDescriptorFindings, repinSource } from './check-bundle-descriptor.mjs';
-import { PUBLIC_CONTENT_PATHS } from './public-content.mjs';
+import { PUBLIC_CONTENT_PATHS, isPublicContentPath } from './public-content.mjs';
 import { releaseGate, RELEASE_LEDGER_VERSION } from './release-ledger.mjs';
-import { measureSourceArchive } from './source-archive.mjs';
 import {
   BASE_BRANCH, CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, GENERATED_INDEX_PATHS, LANDED_VERSION, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   artifactDigest, assertNoForcedPush, assertNotProtectedRef, assertPushableRef, assertRequestedEdition, berlinToday,
@@ -28,7 +26,7 @@ const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf8', en
 // nothing for the drift check to be wrong about.
 const TOPICS_JSON = { topics: { oil: { name: 'Oil', blurb: 'Crude and products.' }, rates: { name: 'Rates', blurb: 'Policy rates.' } } };
 
-function remote({ descriptor = true } = {}) {
+function remote({ organization = true } = {}) {
   const root = scratch('remote');
   const bare = join(root, 'origin.git'), seed = join(root, 'seed');
   mkdirSync(bare); mkdirSync(seed);
@@ -40,15 +38,8 @@ function remote({ descriptor = true } = {}) {
   buildTopicsTxt(seed);
   buildBylinesTsv(seed);
   writeFileSync(join(seed, 'content', 'bylines', '.keep'), '');
-  if (descriptor) seedDescriptor(seed);
-  git(['add', '--', 'README.md', 'content', ...(descriptor ? ['agentic-org'] : [])], seed);
-  // Repin against the staged tree so the seed is self-consistent, exactly as
-  // `main` is: descriptor digest == a fresh measurement, and every Spawnfile
-  // pins it. That is the state an edition branch is cut from.
-  if (descriptor) {
-    repinSource(seed);
-    git(['add', '--', 'agentic-org'], seed);
-  }
+  if (organization) seedOrganization(seed);
+  git(['add', '--', 'README.md', 'content', ...(organization ? ['agentic-org'] : [])], seed);
   git(['commit', '-q', '-m', 'chore: seed'], seed);
   git(['push', '-q', bare, `refs/heads/${BASE_BRANCH}:refs/heads/${BASE_BRANCH}`], seed);
   return {
@@ -60,19 +51,21 @@ function remote({ descriptor = true } = {}) {
   };
 }
 
-// The smallest tree `measureSourceArchive` will measure: the two entrypoints it
-// requires unconditionally, one Spawnfile carrying a pin, and a descriptor.
-function seedDescriptor(root) {
+// A slice of the organization tree: the newsroom entrypoints and one agent
+// Spawnfile, so an edition branch is cut from something shaped like `main`.
+function seedOrganization(root) {
   mkdirSync(join(root, 'agentic-org', 'scripts'), { recursive: true });
   mkdirSync(join(root, 'agentic-org', 'agents', 'cogsworth'), { recursive: true });
   writeFileSync(join(root, 'agentic-org', 'scripts', 'production-newsroom.mjs'), 'export const newsroom = 1;\n');
   writeFileSync(join(root, 'agentic-org', 'scripts', 'production-newsroom-mcp.mjs'), 'export const mcp = 1;\n');
-  const zero = `sha256:${'0'.repeat(64)}`;
-  writeFileSync(join(root, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'),
-    `agent: cogsworth\n    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: ${zero}, mount: ./repos/newsroom, mode: readonly }\n`);
-  writeFileSync(join(root, 'agentic-org', 'newsroom-runtime-bundle.json'),
-    `${JSON.stringify({ version: 'clank.newsroom-runtime-bundle.v2', source: { archive: 'newsroom-runtime.tar', sha256: zero, file_count: 0, content_bytes: 0 } }, null, 2)}\n`);
+  writeFileSync(join(root, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), 'agent: cogsworth\n');
 }
+
+// What the image is built from at a commit: every tracked file the
+// `newsroom-runtime` bundle archives, i.e. everything but the published content
+// (agentic-org/Spawnfile excludes exactly PUBLIC_CONTENT_PATHS), with its blob id.
+const imageInputs = (root, rev = 'HEAD') => git(['ls-tree', '-r', rev], root).split('\n').filter(Boolean)
+  .filter((line) => !isPublicContentPath(line.split('\t')[1]));
 
 function stagedEdition(edition) {
   const root = scratch('staged');
@@ -84,16 +77,12 @@ function stagedEdition(edition) {
   return { root, source: directory, path: `content/editions/${edition}` };
 }
 
-// Exactly what ci.yml does: run both generators over the checked-out tree, run
-// the bundle descriptor check, and require neither to find anything. The
-// descriptor half is the one an edition branch used to fail unconditionally —
-// `content/editions/**` is inside the source archive, so landing an edition
-// moves the digest — and it is what made an unattended merge impossible.
+// Exactly what ci.yml does: run both generators over the checked-out tree and
+// require neither to change anything.
 function ciDriftCheck(workdir) {
   buildTopicsTxt(workdir);
   buildBylinesTsv(workdir);
-  const findings = bundleDescriptorFindings(workdir);
-  return [git(['status', '--porcelain'], workdir), ...findings].filter(Boolean).join('\n');
+  return git(['status', '--porcelain'], workdir);
 }
 
 test('the edition branch is derived from the date and nothing else may be pushed', () => {
@@ -326,7 +315,7 @@ test('the byline view is rebuilt from the branch tree, and nothing that feeds th
   const tree = scratch('tree');
   mkdirSync(join(tree, 'content', 'editions', '2026-09-05', 'articles'), { recursive: true });
   writeFileSync(join(tree, 'content', 'topics.json'), JSON.stringify(TOPICS_JSON));
-  seedDescriptor(tree);
+  seedOrganization(tree);
   git(['init', '-q', '-b', BASE_BRANCH], tree);
   git(['add', '-A'], tree);
   writeFileSync(join(tree, 'content', 'editions', '2026-09-05', 'articles', 'one.json'), JSON.stringify({ id: 'one', edition_date: '2026-09-05', section: 'world', epistemic: 'fact', topics: ['oil'], headline: 'A headline', byline: { desk: 'Test Desk', agents: ['Cogsworth'] } }));
@@ -425,8 +414,8 @@ test('the commit carries only the edition directory, whatever else is in the tre
   });
   const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
   // The edition directory and the byline view ci.yml diff-checks -- and nothing
-  // else: not the stray file, not the git home, and NOT the bundle descriptor or
-  // a Spawnfile pin, which is what used to make every edition a release.
+  // else: not the stray file, not the git home, and NOT an image input,
+  // which is what used to make every edition a release.
   assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-06/articles/one.json']);
   assert.deepEqual(contentOnlyFindings(files), []);
 });
@@ -478,12 +467,11 @@ test('an edition already merged into the base is a quiet success, not a nightly 
   assert.equal(second.generated, null, 'nothing is regenerated for a branch that will not be built');
 });
 
-test('an edition lands green on a base that carries the descriptor, without touching it', async () => {
-  // The descriptor still describes the edition branch, unrepinned, because the
-  // published editions are not in the source archive. That is what lets CI pass
-  // on an edition branch that changes no image input.
-  for (const descriptor of [true, false]) {
-    const origin = remote({ descriptor });
+test('an edition lands green on an organization base without touching any image input', async () => {
+  // The published editions are not in the source bundle, so an edition branch
+  // changes no image input and needs no rebuild.
+  for (const organization of [true, false]) {
+    const origin = remote({ organization });
     const staged = stagedEdition('2026-09-10');
     const work = scratch('work');
     const result = await pushStagedEditionTree({
@@ -493,11 +481,7 @@ test('an edition lands green on a base that carries the descriptor, without touc
     assert.equal(result.pushed, true);
     const files = execFileSync('git', ['-C', origin.url, 'diff', '--name-only', `${result.base}..${result.commit}`], { encoding: 'utf8' }).trim().split('\n');
     assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-10/articles/one.json']);
-    if (descriptor) {
-      const checkout = scratch('ci');
-      git(['clone', '-q', '--branch', result.branch, origin.url, checkout], checkout);
-      assert.deepEqual(bundleDescriptorFindings(checkout), []);
-    }
+    if (organization) assert.deepEqual(imageInputs(origin.url, result.commit), imageInputs(origin.url, result.base), 'an edition commit changes nothing the image is built from');
   }
 });
 
@@ -505,9 +489,7 @@ test('an edition lands green on a base that carries the descriptor, without touc
 // an edition branch, merge-edition.yml's merge lands it on main, and the real
 // release gate -- the one the hourly clank-release.timer runs -- reads the moved
 // origin/main and answers "already released; nothing to do". Then a real code
-// change still releases. Mutation-checked: restoring the publisher's descriptor
-// repin, dropping the content exclusion from the source archive, or removing the
-// gate's content-only answer each turns this red.
+// change still releases.
 test('an edition-only merge leaves the release gate at "already released; nothing to do"', async () => {
   const origin = remote();
   const buildRoot = scratch('build-root');
@@ -517,7 +499,7 @@ test('an edition-only merge leaves the release gate at "already released; nothin
   const released = origin.head();
   const ledger = join(scratch('ledger'), 'released.json');
   writeFileSync(ledger, `${JSON.stringify({ version: RELEASE_LEDGER_VERSION, commit: released, tag: 'clank-and-slop:seam-2026-10-01-000000', at: '2026-10-01T00:00:00.000Z' })}\n`);
-  const imageBefore = measureSourceArchive(buildRoot);
+  const imageBefore = imageInputs(buildRoot);
 
   const staged = stagedEdition('2026-10-02');
   const work = scratch('work');
@@ -537,7 +519,7 @@ test('an edition-only merge leaves the release gate at "already released; nothin
   assert.equal(git(['rev-parse', 'HEAD'], buildRoot), released, 'nothing is fast-forwarded for a build that will not happen');
   // And the image really is unchanged: the same source archive, byte for byte.
   git(['checkout', '-q', edition.commit], buildRoot);
-  assert.deepEqual(measureSourceArchive(buildRoot), imageBefore);
+  assert.deepEqual(imageInputs(buildRoot), imageBefore);
   git(['checkout', '-q', BASE_BRANCH], buildRoot);
 
   // A real code change on top still releases.

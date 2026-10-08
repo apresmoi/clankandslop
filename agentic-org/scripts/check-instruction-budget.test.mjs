@@ -3,7 +3,8 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { sourceArchivePlan } from './source-archive.mjs';
+import { execFileSync } from 'node:child_process';
+import { readRootManifest } from './effective-mcp.mjs';
 import { validateAgentDeclaration } from './validate-org.mjs';
 
 import {
@@ -87,8 +88,17 @@ test('instructions are built from every declared workspace doc', () => {
   assert.equal(instructions, `# soul\n\n${soul}\n\n# system\n\n${brief}`.trim());
 });
 
+// The tracked files the shared `newsroom-runtime` bundle archives: its exclude
+// patterns are plain paths (a match on a directory excludes beneath it) and
+// `**/<name>` basenames, which is all agentic-org/Spawnfile uses.
+function sourceBundleEntries(repo) {
+  const exclude = readRootManifest().shared.workspace.resources.find((item) => item.id === 'newsroom-runtime').build.files.exclude;
+  const excluded = (name) => exclude.some((pattern) => pattern.startsWith('**/') ? name.split('/').at(-1) === pattern.slice(3) : name === pattern || name.startsWith(`${pattern}/`));
+  return new Set(execFileSync('git', ['ls-files', '-z'], { cwd: repo, encoding: 'utf8' }).split('\0').filter(Boolean).filter((name) => !excluded(name)));
+}
+
 test('every identity is declared in instructions and every task runbook ships in the mounted source', () => {
-  const { entries } = sourceArchivePlan(path.resolve(orgRoot, '..'));
+  const entries = sourceBundleEntries(path.resolve(orgRoot, '..'));
   assert.ok(entries.has('agentic-org/WRITING.md'));
   for (const agent of listAgents()) {
     const source = manifest(`agents/${agent}/Spawnfile`);

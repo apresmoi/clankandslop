@@ -4,15 +4,13 @@ import { mkdtempSync, mkdirSync, existsSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { bundleDescriptorFindings } from './check-bundle-descriptor.mjs';
-import { measureSourceArchive, sourceDescriptorFindings } from './source-archive.mjs';
 import { checkRuntime } from './check-runtime.mjs';
 import { provision } from './provision.mjs';
 import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
 import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
 import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
-import { effectiveAgentManifest } from './effective-mcp.mjs';
+import { effectiveAgentManifest, readRootManifest } from './effective-mcp.mjs';
 import { PUBLISHER_TOOLS, engineByAgent, researchCorpusReaders, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateLifecycle, validateManifest, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
 
 // Synthetic newsroom inputs: one daily cycle of lifecycle messages, a corpus
@@ -140,45 +138,55 @@ test('Daimon engine declarations preserve their real model-auth boundary', () =>
 });
 test('workspace resources enforce public modes and private corpus least privilege', () => {
   const scout = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');
-  const publicLine = scout.split('\n').find(line => line.includes('{ id: public-content,'));
-  assert.ok(publicLine?.includes('mode: readonly'));
-  assert.throws(() => validateAgentDeclaration('klaxon', scout.replace(publicLine, publicLine.replace('mode: readonly', 'mode: mutable'))), /public content resource/);
+  assert.doesNotThrow(() => validateAgentDeclaration('klaxon', scout));
+  assert.throws(() => validateAgentDeclaration('klaxon', scout.replace('  resources:', '  resources:\n    - { id: public-content, kind: volume, name: clank-klaxon-content, mount: ./content, mode: mutable, sharing: per_agent }')), /public content resource/);
+  // The shared source bundle: Spawnfile-built, published content excluded, read-only.
+  const root = readRootManifest();
+  const sourceBundle = (manifest) => manifest.shared.workspace.resources.find((item) => item.id === 'newsroom-runtime');
+  for (const [name, mutate] of [
+    ['writable', (manifest) => { sourceBundle(manifest).mode = 'mutable'; }],
+    ['hand-pinned archive', (manifest) => { Object.assign(sourceBundle(manifest), { source: '../newsroom-runtime.tar', sha256: `sha256:${'a'.repeat(64)}` }); delete sourceBundle(manifest).build; }],
+    ['published content inside', (manifest) => { sourceBundle(manifest).build.files.exclude = sourceBundle(manifest).build.files.exclude.filter((item) => item !== 'content/editions'); }],
+  ]) {
+    const changed = structuredClone(root); mutate(changed);
+    assert.throws(() => validateAgentDeclaration('klaxon', scout, changed), /newsroom runtime bundle/u, name);
+  }
   const reporter = readFileSync(resolve(import.meta.dirname, '../agents/cogsworth/Spawnfile'), 'utf8');
-  assert.throws(() => validateAgentDeclaration('cogsworth', reporter.replace('  resources:', '  resources:\n    - { id: private-corpus, kind: volume, name: clank-cogsworth-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }')), /must not receive a private corpus/);
+  assert.throws(() => validateAgentDeclaration('cogsworth', reporter.replace('  docs: { system: AGENTS.md, soul: SOUL.md }', '  docs: { system: AGENTS.md, soul: SOUL.md }\n  resources:\n    - { id: private-corpus, kind: volume, name: clank-cogsworth-corpus, mount: ./private/corpus, mode: mutable, sharing: per_agent }')), /must not receive a private corpus/);
   const pressman = readFileSync(resolve(import.meta.dirname, '../agents/pressman/Spawnfile'), 'utf8');
-  assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('mode: mutable', 'mode: readonly')), /public content resource/);
-  assert.throws(() => validateAgentDeclaration('pressman', pressman.replace('kind: volume', 'kind: git').replace('name: clank-release-staging, ', 'url: https://github.com/apresmoi/clankandslop.git, branch: staging, ')), /public content resource/);
+  const staging = pressman.split('\n').find((line) => line.includes('{ id: public-content,'));
+  assert.throws(() => validateAgentDeclaration('pressman', pressman.replace(staging, staging.replace('mode: mutable', 'mode: readonly'))), /public content resource/);
+  assert.throws(() => validateAgentDeclaration('pressman', pressman.replace(staging, staging.replace('kind: volume', 'kind: git').replace('name: clank-release-staging, ', 'url: https://github.com/apresmoi/clankandslop.git, branch: staging, '))), /public content resource/);
 });
-test('all six reporter declarations reject broken validation identity, tools and read-only bundles', () => {
+test('all six reporter declarations reject broken validation identity, tools and entry point', () => {
+  const root = readRootManifest();
+  const validation = (manifest) => manifest.shared.environment.mcp_servers.find((item) => item.name === 'validation');
   for (const agent of ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']) {
     const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
-    const server = source.split('\n').find((line) => line.includes('name: validation,'));
-    const bundle = source.split('\n').find((line) => line.includes('id: article-validation,'));
-    assert.ok(server && bundle, `${agent} must carry the validation declaration`);
+    const server = source.split('\n').find((line) => line.includes('{ name: validation }'));
+    assert.ok(server, `${agent} must select the validation server`);
     assert.doesNotThrow(() => validateAgentDeclaration(agent, source));
-    const mutations = [
-      ['missing server', source.replace(server, '')],
-      ['duplicate server', source.replace(server, `${server}\n${server}`)],
-      ['wrong transport', source.replace(server, server.replace('transport: stdio', 'transport: http'))],
-      ['wrong entry point', source.replace(server, server.replace('/tools/article-validation/server.mjs', '/repos/newsroom/server.mjs'))],
-      ['another reporter identity', source.replace(server, server.replace('CLANK_NEWSROOM_AGENT: "${agent.name}"', 'CLANK_NEWSROOM_AGENT: spike'))],
-      ['another source root', source.replace(server, server.replace('/repos/newsroom" }', '/repos/newsroom-private" }'))],
-      ['missing tools', source.replace(server, server.replace('tools: [validate_article]', 'tools: []'))],
-      ['write tool added', source.replace(server, server.replace('tools: [validate_article]', 'tools: [validate_article, file_article]'))],
-      ['missing bundle', source.replace(bundle, '')],
-      ['duplicate bundle', source.replace(bundle, `${bundle}\n${bundle}`)],
-      ['wrong source', source.replace(bundle, bundle.replace('article-validation-runtime.tar', 'newsroom-runtime.tar'))],
-      ['unpinned bundle', source.replace(bundle, bundle.replace(/sha256: sha256:[a-f0-9]{64}, /u, ''))],
-      ['wrong mount', source.replace(bundle, bundle.replace('./tools/article-validation', './tools/elsewhere'))],
-      ['writable bundle', source.replace(bundle, bundle.replace('mode: readonly', 'mode: mutable'))],
-    ];
-    for (const [name, changed] of mutations) {
+    for (const [name, changed] of [['missing server', source.replace(`${server}\n`, '')], ['duplicate server', source.replace(server, `${server}\n${server}`)]]) {
       assert.notEqual(changed, source, `${agent}: ${name} must mutate the actual declaration`);
       assert.throws(() => validateAgentDeclaration(agent, changed), /validation/u, `${agent}: ${name}`);
+    }
+    for (const [name, mutate] of [
+      ['wrong transport', (server) => { server.transport = 'sse'; }],
+      ['wrong entry point', (server) => { server.args = ['${workspace}/repos/newsroom/server.mjs']; }],
+      ['another reporter identity', (server) => { server.env.CLANK_NEWSROOM_AGENT = 'spike'; }],
+      ['another source root', (server) => { server.env.CLANK_PUBLIC_SOURCE_ROOT = '${workspace}/repos/newsroom-private'; }],
+      ['write tool added', (server) => { server.tools = ['validate_article', 'file_article']; }],
+    ]) {
+      const changed = structuredClone(root); mutate(validation(changed));
+      assert.throws(() => validateAgentDeclaration(agent, source, changed), /validation/u, `${agent}: ${name}`);
     }
     const doc = ['AGENTS.md', 'RUNBOOK.md'].map(file => readFileSync(resolve(import.meta.dirname, `../agents/${agent}/${file}`), 'utf8')).join('\n').replace(/\s+/gu, ' ');
     for (const phrase of ['ARTICLE_FORMAT.md', 'mcp_validation_validate_article', '{edition, article}', 'complete candidate', 'revalidate in the same wake', 'before any durable write', 'not proof of a source or quote', `"agents": ["${agent[0].toUpperCase()}${agent.slice(1)}"]`]) assert.ok(doc.includes(phrase), `${agent} needs ${phrase}`);
   }
+});
+test('only reporters may select the validation server', () => {
+  const spike = readFileSync(resolve(import.meta.dirname, '../agents/spike/Spawnfile'), 'utf8');
+  assert.throws(() => validateAgentDeclaration('spike', spike.replace('  mcp_servers:\n', '  mcp_servers:\n    - { name: validation }\n')), /must not receive the reporter validation surface/u);
 });
 test('Pressman implementation contains no network publisher, push, credential, or process execution path', () => { const source=readFileSync(resolve(import.meta.dirname,'newsroom.mjs'),'utf8'); assert.doesNotMatch(source,/child_process|execFile|spawn\(|fetch\(|https?:|git\s+push|credential|token/i); });
 test('Ledger declares mounted source roots for desk filing from runtime MCP cwd', () => {
@@ -236,7 +244,7 @@ test('production instructions describe natural-language handoffs, mechanical sta
     assert.ok(team.includes(phrase), `missing workflow rule: ${phrase}`);
   assert.doesNotMatch(team, /by path — never search for them/u);
 });
-test('production declarations consume only checksum-pinned offline newsroom bundles',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.ok(source.includes(`sha256: ${descriptor.source.sha256}`));assert.doesNotMatch(source,/kind: git|github\.com\/apresmoi\/clankandslop|branch: staging/u);}const pressman=readFileSync(resolve(import.meta.dirname,'../agents/pressman/Spawnfile'),'utf8');for(const dependency of [...descriptor.dependencies,...descriptor.assets]){assert.ok(pressman.includes(`sha256: ${dependency.sha256}`));assert.ok(pressman.includes(`mount: ./${dependency.mount}`));}assert.match(pressman,/CLANK_WEBSITE_DEPS_ROOTS: .*deps-a:.*deps-b/u);});
+test('production declarations build their bundles from public inputs and pin nothing by hand',()=>{for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.doesNotMatch(source,/sha256: sha256:|kind: git|github\.com\/apresmoi\/clankandslop|branch: staging|clankandslop-private/u,agent);for(const match of source.matchAll(/source: (\S+?),/gu))assert.equal(match[1],'../../etopo-relief.tar',`${agent} may only consume the prebuilt public relief grid`);}const pressman=effectiveAgentManifest('pressman',readFileSync(resolve(import.meta.dirname,'../agents/pressman/Spawnfile'),'utf8'));const deps=pressman.workspace.resources.find(item=>item.id==='website-deps'),assets=pressman.workspace.resources.find(item=>item.id==='public-assets');assert.match(deps.build.generated.image,/^node:24-bookworm-slim@sha256:[a-f0-9]{64}$/u,'the dependency install runs in a digest-pinned image');assert.ok(deps.build.generated.command.includes(deps.build.generated.image),'the provenance names the image the install ran in');assert.equal(deps.mount,'./deps');assert.equal(assets.build.files.root,'../../../website/public/og');assert.equal(assets.mount,'./assets/website/public/og');const env=pressman.environment.mcp_servers.find(item=>item.name==='newsroom').env;assert.match(env.CLANK_WEBSITE_DEPS_ROOTS,/\/deps$/u);assert.match(env.CLANK_PUBLIC_ASSET_ROOTS,/\/assets$/u);});
 // The private research archive used to be the one bundle whose digest changed on
 // its own cadence -- a daily repin -- and the one nothing asserted, so the
 // Spawnfiles kept a digest the descriptor no longer named. It is not a bundle at
@@ -244,7 +252,7 @@ test('production declarations consume only checksum-pinned offline newsroom bund
 // declared in agentic-org/Spawnfile, so there is no digest to keep fresh and no
 // per-agent pin to go stale. What replaced this check is the volume's own
 // identity record and the call-time corpus refusals in scripts/corpus-contract.mjs.
-test('no declaration pins the research corpus as a bundle any more',()=>{const descriptor=JSON.parse(readFileSync(resolve(import.meta.dirname,'../newsroom-runtime-bundle.json'),'utf8'));assert.equal(descriptor.private,undefined,'the descriptor must not describe a corpus archive');for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.doesNotMatch(source,/newsroom-private\.tar/u,`${agent} still pins the corpus as an image bundle`);}const root=readFileSync(resolve(import.meta.dirname,'../Spawnfile'),'utf8');assert.match(root,/kind: volume\n\s+name: clank-newsroom-corpus/u,'the corpus must be declared once, team-shared, on the root');});
+test('no declaration pins the research corpus as a bundle any more',()=>{for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.doesNotMatch(source,/newsroom-private\.tar/u,`${agent} still pins the corpus as an image bundle`);}const root=readFileSync(resolve(import.meta.dirname,'../Spawnfile'),'utf8');assert.match(root,/kind: volume\n\s+name: clank-newsroom-corpus/u,'the corpus must be declared once, team-shared, on the root');});
 test('receipt references reject hostile path components',()=>{const source=receipts();for(const ref of ['state/edition/receipts/has space','state/edition/receipts/Upper','state/edition/receipts/back\\slash','state/edition/receipts/é','state/edition/receipts/../bad','state/edition/receipts//bad','state/edition/receipts/bad/','state/edition/receipts/./bad']){const changed=structuredClone(source);changed[1].receipt_ref=ref;assert.throws(()=>validateLifecycle(changed),/reference/,ref);}const accepted=structuredClone(source);accepted[1].receipt_ref='state/edition/receipts/lower-case_1.0/file.json';assert.doesNotThrow(()=>validateLifecycle(accepted));});
 test('Vesta and DATA boundary mutations fail closed',()=>{const vesta=['AGENTS.md','RUNBOOK.md'].map(file=>readFileSync(resolve(import.meta.dirname,'../agents/vesta',file),'utf8')).join('\n');const data=readFileSync(resolve(import.meta.dirname,'../OPERATIONS.md'),'utf8');const voices=testdata().voiceBoundaries;assert.doesNotThrow(()=>validateEditorialContracts(vesta,data,voices));for(const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike'])assert.throws(()=>validateEditorialContracts(vesta.replaceAll(phrase,'removed'),data,voices),/Vesta constraint/);assert.throws(()=>validateEditorialContracts(vesta,data.replace('public content: read-only','public content: mutable'),voices),/DATA boundary/);const forged=structuredClone(voices);forged.vesta.bad='A fine pattern.';assert.throws(()=>validateEditorialContracts(vesta,data,forged),/Vesta voice/);});
 test('root declaration keeps Moltnet durable, authenticated, direct and secret-backed', () => {
@@ -339,83 +347,6 @@ test('removing either publishing desk schedule fails closed', () => {
   }
 });
 
-// The descriptor and the Spawnfiles have always been checked against each
-// other and never against the tree, so both could be — and three times were —
-// consistently wrong. This is the check that has an opinion about the tree.
-test('the runtime bundle descriptor describes the tree that is committed', () => {
-  assert.deepEqual(bundleDescriptorFindings(), []);
-  const tool = JSON.parse(readFileSync(resolve(import.meta.dirname, '../article-validation-runtime-bundle.json'), 'utf8'));
-  assert.equal(tool.file_count, 2);
-  assert.match(tool.source_commit, /^[a-f0-9]{40}$/u);
-  for (const agent of ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta']) {
-    const source = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
-    assert.ok(source.split('\n').find(line => line.includes('id: article-validation,')).includes(`sha256: ${tool.sha256},`));
-  }
-});
-
-test('the descriptor drift check has an opinion about the source archive and the pins', () => {
-  const repo = resolve(import.meta.dirname, '../..');
-  const scratch = mkdtempSync(join(tmpdir(), 'clank-descriptor-'));
-  try {
-    // A throwaway checkout, so the mutations below cannot touch the tree the
-    // rest of the suite is reading. The baseline is measured rather than
-    // assumed, so this stays honest whatever state that checkout is in.
-    execFileSync('git', ['worktree', 'add', '--detach', scratch, 'HEAD'], { cwd: repo, stdio: 'pipe' });
-    const measured = measureSourceArchive(scratch);
-    const baseline = { sha256: measured.digest, file_count: measured.count, content_bytes: measured.total };
-
-    // One tracked, bundled file changed without a rebuild — the exact shape of
-    // the defect: the tree moves, the pin does not.
-    const bundled = join(scratch, 'ops', 'desk-contract.mjs');
-    writeFileSync(bundled, `${readFileSync(bundled, 'utf8')}// drift\n`);
-    const drifted = measureSourceArchive(scratch);
-    assert.notEqual(drifted.digest, baseline.sha256, 'a changed bundled file must change the source digest');
-    assert.equal(drifted.total, baseline.content_bytes + '// drift\n'.length);
-    assert.deepEqual(sourceDescriptorFindings({ source: baseline }, drifted).map((finding) => finding.split(' is ')[0]), ['source.sha256', 'source.content_bytes']);
-    assert.ok(bundleDescriptorFindings(scratch).some((finding) => /^source\.sha256 is .* a fresh build of this tree is /u.test(finding)));
-
-    // A new bundled file moves the count too — the descriptor that shipped
-    // three times carried a count from before files it did not know about.
-    writeFileSync(join(scratch, 'ops', 'drift-probe.mjs'), 'export const probe = 1;\n');
-    execFileSync('git', ['-C', scratch, 'add', '--', 'ops/drift-probe.mjs'], { stdio: 'pipe' });
-    assert.equal(measureSourceArchive(scratch).count, baseline.file_count + 1);
-    assert.ok(sourceDescriptorFindings({ source: baseline }, measureSourceArchive(scratch)).some((finding) => finding.startsWith('source.file_count is')));
-
-    // And a Spawnfile that no longer carries the descriptor's digest is named.
-    execFileSync('git', ['-C', scratch, 'rm', '-q', '-f', '--', 'ops/drift-probe.mjs'], { stdio: 'pipe' });
-    execFileSync('git', ['-C', scratch, 'checkout', '--', 'ops/desk-contract.mjs'], { stdio: 'pipe' });
-    const spawnfile = join(scratch, 'agentic-org', 'agents', 'caslon', 'Spawnfile');
-    const descriptor = JSON.parse(readFileSync(join(scratch, 'agentic-org', 'newsroom-runtime-bundle.json'), 'utf8'));
-    writeFileSync(spawnfile, readFileSync(spawnfile, 'utf8').replace(descriptor.source.sha256, 'sha256:0000000000000000000000000000000000000000000000000000000000000000'));
-    assert.ok(bundleDescriptorFindings(scratch).some((finding) => /agents\/caslon\/Spawnfile does not pin/u.test(finding)));
-    const toolDescriptor = 'agentic-org/article-validation-runtime-bundle.json';
-    const tool = JSON.parse(readFileSync(join(repo, toolDescriptor), 'utf8'));
-    writeFileSync(join(scratch, toolDescriptor), JSON.stringify(tool));
-    const reporter = 'agentic-org/agents/cogsworth/Spawnfile';
-    writeFileSync(join(scratch, reporter), readFileSync(join(repo, reporter), 'utf8').replace(tool.sha256, `sha256:${'0'.repeat(64)}`));
-    assert.ok(bundleDescriptorFindings(scratch).some(finding => /cogsworth.*article-validation descriptor/u.test(finding)));
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', scratch], { cwd: repo, stdio: 'pipe' });
-    rmSync(scratch, { recursive: true, force: true });
-  }
-});
-
-// c65e6d3 is the private commit whose tree carries zero `.index` files: every
-// reporter wakes, finds no research rows, and files nothing. #111 repinned off
-// it. This branch merged #111, and the merge put the public-content digest one
-// line above the private-archive digest in all twelve Spawnfiles — a
-// take-ours resolution used to restore this pin consistently across the
-// descriptor and every declaration, so nothing else in the suite would notice.
-// The descriptor and the declarations no longer carry a corpus digest at all,
-// so what is left to guard is the pin file itself.
-const STARVING_PRIVATE_COMMIT = 'c65e6d375bcaebe53f63d6d2aa4569dc34d38735';
-
-test('the private research corpus is never repinned back to the commit with no research in it', () => {
-  const pin = JSON.parse(readFileSync(resolve(import.meta.dirname, '../policies/private-source.json'), 'utf8'));
-  assert.match(pin.commit, /^[0-9a-f]{40}$/u);
-  assert.notEqual(pin.commit, STARVING_PRIVATE_COMMIT, 'policies/private-source.json is back on the corpus commit that has no desk index files');
-});
-
 test('shared Git package is required by accepted revision history', () => {
   const source = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
   assert.doesNotThrow(() => validateRootDeclaration(source));
@@ -488,13 +419,19 @@ test('every room member resolves to an agent-bound network member', () => {
 // The published editions are DATA on a daily cadence: the host lands them in the
 // `clank-newsroom-content` volume and no archive the image is built from may carry
 // them, or every edition becomes a repin, a moved `main` and a nightly rebuild.
-test('the published editions are a team volume, never part of the image archive', async () => {
-  const { sourceArchivePlan } = await import('./source-archive.mjs');
-  const { isPublicContentPath } = await import('./public-content.mjs');
-  const { entries } = sourceArchivePlan(resolve(import.meta.dirname, '..', '..'));
-  const leaked = [...entries].filter(isPublicContentPath);
-  assert.deepEqual(leaked.slice(0, 5), [], `${leaked.length} published-content path(s) in newsroom-runtime.tar`);
-  assert.ok([...entries].includes('content/topics.txt'), 'the topic view is not day-varying and stays in the image');
+test('the published editions are a team fed volume, never part of the image archive', async () => {
+  const { PUBLIC_CONTENT_PATHS } = await import('./public-content.mjs');
+  const paths = PUBLIC_CONTENT_PATHS.map((prefix) => prefix.replace(/\/$/u, ''));
+  const resources = readRootManifest().shared.workspace.resources;
+  const source = resources.find((item) => item.id === 'newsroom-runtime');
+  for (const path of paths) assert.ok(source.build.files.exclude.includes(path), `${path} must stay out of the newsroom-runtime bundle`);
+  assert.ok(!source.build.files.exclude.includes('content'), 'the topic view and roster are not day-varying and stay in the image');
+  const volume = resources.find((item) => item.id === 'public-content-volume');
+  assert.deepEqual(volume.feed.git.paths, paths, 'the content feed lands exactly the paths the image leaves out');
+  assert.equal(volume.feed.git.repo, '..');
+  assert.deepEqual(volume.feed.validate, ['node', 'scripts/content-validate.mjs']);
+  assert.ok(volume.feed.keep >= 3);
   const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
   assert.match(root, /- id: public-content-volume\n\s+kind: volume\n\s+name: clank-newsroom-content\n\s+mount: \.\/repos\/newsroom-content\n\s+mode: mutable\n\s+sharing: team/u);
 });
+

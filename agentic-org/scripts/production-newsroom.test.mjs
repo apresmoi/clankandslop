@@ -1612,6 +1612,7 @@ test('the research corpus mount is declared for exactly the agents whose tools r
   }
   // The mutation the validator now catches, in the exact shape this PR shipped
   // it: a mount declared on Caslon's newsroom server, which reads nothing from it.
-  const decorated = bytesOf('caslon').replace('        CLANK_DAIMON_CONTROL_URL', `        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-private\n        CLANK_DAIMON_CONTROL_URL`);
+  const decorated = bytesOf('caslon').replace('        CLANK_ETOPO_GZ:', '        CLANK_PRIVATE_SOURCE_ROOT: "${workspace}/repos/newsroom-private"\n        CLANK_ETOPO_GZ:');
+  assert.notEqual(decorated, bytesOf('caslon'), 'the mutation must reach the declaration');
   assert.throws(() => validateAgentDeclaration('caslon', decorated), /declares the research corpus mount/u);
 });

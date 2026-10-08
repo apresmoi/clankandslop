@@ -10,10 +10,12 @@ test('every actual declaration carries its private tool bundle and live admissio
   for (const role of ['klaxon','cogsworth','sprockett','foreman','graves','tinkerton','vesta','brass','spike','ledger','caslon','pressman']) assert.deepEqual(runtimeToolFindings(role,declaration(role)),[],role);
 });
 
-test('missing runtime adapters, wrong roles, unpinned bundles and missing art tools fail',()=>{
+test('missing runtime adapters, wrong roles, private code in a bundle and missing art tools fail',()=>{
   for (const mutate of [
-    x=>x.workspace.resources=x.workspace.resources.filter(item=>item.id!=='newsroom-tools'),
-    x=>x.workspace.resources.find(item=>item.id==='newsroom-tools').sha256=`sha256:${'0'.repeat(64)}`,
+    x=>x.workspace.resources=x.workspace.resources.filter(item=>item.id!=='newsroom-private-tools'),
+    x=>{x.workspace.resources.find(item=>item.id==='newsroom-private-tools').feed.git.repo='../somewhere-else';},
+    x=>x.workspace.resources.push({id:'smuggled',kind:'bundle',build:{files:{root:'../../../clankandslop-private/newsroom'}},mount:'./tools/x',mode:'readonly'}),
+    x=>x.workspace.resources.push({id:'prebuilt',kind:'bundle',source:'../../newsroom-tools.tar',mount:'./tools/x',mode:'readonly'}),
     x=>delete x.environment.mcp_servers.find(item=>item.name==='newsroom').env.CLANK_NEWSROOM_STATE_ADAPTER,
     x=>x.environment.mcp_servers.find(item=>item.name==='art').env.CLANK_NEWSROOM_AGENT='pressman',
     x=>x.environment.mcp_servers.find(item=>item.name==='art').tools.pop(),

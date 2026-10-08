@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, KNOWN_UNDESCRIBED, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, pinFindings, reclaimBuildSpace, wakeBudget, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
+import { BUILD_FLOOR_BYTES, DEFAULT_REPO, KEEP_IMAGES, KEEP_IMAGES_AFTER_SETTLE, STAGES, SeamError, TAG_PREFIX, berlinToday, build, deploymentCommand, parseArgs, reclaimBuildSpace, wakeBudget, runtimeBootstrap, runtimePolicy, seam, settle, sweepCompiledOutputs, sweepImages } from './seam-run.mjs';
 import { DAIMON_RUNTIME_CONFIG, DAIMON_UID_ENTRYPOINT, GROK_BROKER } from './engine-policy.mjs';
 import { DEFAULT_FETCH_KEY, DEFAULT_TRACK_REF, DEFER_ALARM_AFTER_MS, classifyFetchFailure, fetchSshCommand, fetchTracked, RELEASE_LEDGER_VERSION, RELEASE_LOG_NAME, RELEASE_PENDING_NAME, deferRelease, recordRelease, releaseGate } from './release-ledger.mjs';
 
@@ -20,8 +20,8 @@ function recorder(failAt, error = new SeamError('boom', 'deploy-failed')) {
   return { calls, impl: Object.fromEntries(STAGE_NAMES.map((name) => [name, stage(name)])) };
 }
 const alarms = () => { const raised = []; return { raised, alarm: (reason, detail) => raised.push({ reason, ...detail }) }; };
-const STAGE_NAMES = ['releaseGate', 'gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'wakeBudget', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
-const FULL_ORDER = ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'wakeBudget', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
+const STAGE_NAMES = ['releaseGate', 'gate', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'wakeBudget', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
+const FULL_ORDER = ['gate', 'reclaimBuildSpace', 'build', 'runtimePolicy', 'wakeBudget', 'deploy', 'settle', 'runtimeBootstrap', 'recordRelease', 'sweepImages'];
 
 test('the pipeline has no repin stage, and STAGES has no repin key', () => {
   // THE test that stops a daily corpus repin being reinstated by habit. The
@@ -46,10 +46,10 @@ test('the gate runs first, and a blocked gate stops before anything is written',
   assert.deepEqual(raised.map((entry) => entry.reason), ['seam-blocked']);
 });
 
-test('check mode stops after the bundle check and never builds or deploys', () => {
+test('check mode stops after the gate and never builds or deploys', () => {
   const { calls, impl } = recorder(null);
   const result = seam(['--check'], { now, log: noop, stageImpl: impl, alarm: noop });
-  assert.deepEqual(calls, ['gate', 'bundle']);
+  assert.deepEqual(calls, ['gate']);
   assert.equal(result.ok, true);
   assert.equal(result.deploy, false);
 });
@@ -57,7 +57,7 @@ test('check mode stops after the bundle check and never builds or deploys', () =
 test('no-deploy builds the image and stops before `up`', () => {
   const { calls, impl } = recorder(null);
   seam(['--no-deploy'], { now, log: noop, stageImpl: impl, alarm: noop });
-  assert.deepEqual(calls, ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
+  assert.deepEqual(calls, ['gate', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
 });
 
 test('compiled Codex policy admission runs after build and before deploy', () => {
@@ -72,7 +72,7 @@ test('compiled policy admission rejection stops before provider spawn', () => {
   const { alarm } = alarms();
   const result = seam([], { now, log: noop, stageImpl: impl, alarm });
   assert.equal(result.ok, false);
-  assert.deepEqual(calls, ['gate', 'bundle', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
+  assert.deepEqual(calls, ['gate', 'reclaimBuildSpace', 'build', 'runtimePolicy']);
   assert.ok(!calls.includes('deploy'));
 });
 
@@ -151,7 +151,7 @@ test('an engine the job has no policy for stops the deploy instead of being skip
 });
 
 test('each stage raises its own alarm reason, so the message says what broke', () => {
-  const expected = { bundle: 'bundle-mismatch', build: 'deploy-failed', runtimePolicy: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed', runtimeBootstrap: 'deploy-failed', recordRelease: 'deploy-failed' };
+  const expected = { build: 'deploy-failed', runtimePolicy: 'deploy-failed', deploy: 'deploy-failed', settle: 'deploy-failed', runtimeBootstrap: 'deploy-failed', recordRelease: 'deploy-failed' };
   for (const [stage, reason] of Object.entries(expected)) {
     const { impl } = recorder(stage, new SeamError(`${stage} exploded`, reason));
     const { raised, alarm } = alarms();
@@ -228,102 +228,6 @@ test('the image sweep only ever touches the seam s own tags, and never the one j
   assert.ok(!removed.includes('clank-and-slop:seam-2026-09-05-090000'), 'yesterday stays: it is the rollback target');
   assert.ok(!removed.some((tag) => tag.includes('local7') || tag.includes('registry')));
 });
-
-// --- the pin check org:bundle cannot do for itself ---------------------------
-// `check-bundle-descriptor.mjs` covers the source archive. The bundle build
-// refreshes generated public asset pins, while the seam keeps dependency,
-// private, and tool archive drift fail-closed against each Spawnfile pin.
-const A = 'sha256:'.concat('a'.repeat(64));
-const B = 'sha256:'.concat('b'.repeat(64));
-
-function pinWorld(spawnfilePins, descriptor, sidecars = []) {
-  const repo = mkdtempSync(path.join(tmpdir(), 'clank-pin-test-'));
-  mkdirSync(path.join(repo, 'agentic-org', 'agents', 'cogsworth'), { recursive: true });
-  writeFileSync(path.join(repo, 'agentic-org', 'newsroom-runtime-bundle.json'), JSON.stringify(descriptor));
-  for (const [name, value] of sidecars) writeFileSync(path.join(repo, 'agentic-org', name), JSON.stringify(value));
-  writeFileSync(path.join(repo, 'agentic-org', 'agents', 'cogsworth', 'Spawnfile'), spawnfilePins.join('\n'));
-  return repo;
-}
-const line = (id, archive, sha) => `    - { id: ${id}, kind: bundle, source: ../../${archive}, sha256: ${sha}, mount: ./x, mode: readonly }`;
-// No `private` block: the research corpus is a volume now, so the descriptor
-// describes no archive for it and no Spawnfile pins one.
-const descriptorOf = (source, dependency) => ({
-  source: { archive: 'newsroom-runtime.tar', sha256: source },
-  dependencies: [{ archive: 'newsroom-dependencies-a.tar', sha256: dependency }],
-  assets: []
-});
-const toolsDescriptor = (sha256 = A) => ({ version: 'clank.newsroom-tools-bundle.v1', archive: 'newsroom-tools.tar', sha256 });
-const articleValidationDescriptor = (sha256 = A) => ({ version: 'clank.article-validation-runtime-bundle.v1', archive: 'article-validation-runtime.tar', sha256 });
-const bundlePinCount = () => readdirSync(path.join(repoRoot, 'agentic-org', 'agents'), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .reduce((sum, agent) => sum + (readFileSync(path.join(repoRoot, 'agentic-org', 'agents', agent.name, 'Spawnfile'), 'utf8').match(/kind: bundle/gu)?.length ?? 0), 0);
-
-
-test('the checked-in descriptors cover every checksum-pinned bundle across the actual agent Spawnfiles', () => {
-  const result = pinFindings(repoRoot);
-  assert.deepEqual(result.findings, []);
-  assert.equal(result.checked, bundlePinCount());
-  // 47 before the corpus left the image: twelve of those pins were
-  // newsroom-private.tar, one per agent.
-  assert.equal(result.checked, 35);
-  assert.ok(!result.archives.includes('newsroom-private.tar'), 'the descriptor must not describe a corpus archive any more');
-  assert.ok(result.archives.includes('newsroom-tools.tar'));
-  assert.ok(result.archives.includes('article-validation-runtime.tar'));
-});
-
-test('sidecar descriptor mismatches are findings for newsroom tools and article validation bundles', () => {
-  const repo = pinWorld([
-    line('newsroom-tools', 'newsroom-tools.tar', A),
-    line('article-validation', 'article-validation-runtime.tar', A),
-  ], descriptorOf(A, B), [
-    ['newsroom-tools-bundle.json', toolsDescriptor(B)],
-    ['article-validation-runtime-bundle.json', articleValidationDescriptor(B)],
-  ]);
-  try {
-    const findings = pinFindings(repo).findings;
-    assert.equal(findings.length, 2);
-    assert.match(findings.join('\n'), /newsroom-tools\.tar/u);
-    assert.match(findings.join('\n'), /article-validation-runtime\.tar/u);
-  } finally { rmSync(repo, { recursive: true, force: true }); }
-});
-
-test('a Spawnfile pin that disagrees with the descriptor is a finding, for every archive', () => {
-  const repo = pinWorld([line('public-content', 'newsroom-runtime.tar', A), line('deps-a', 'newsroom-dependencies-a.tar', A)], descriptorOf(A, B));
-  try {
-    const result = pinFindings(repo);
-    assert.equal(result.checked, 2);
-    assert.equal(result.findings.length, 1);
-    assert.match(result.findings[0], /newsroom-dependencies-a\.tar/u);
-  } finally { rmSync(repo, { recursive: true, force: true }); }
-});
-
-test('matching pins produce no findings', () => {
-  const repo = pinWorld([line('public-content', 'newsroom-runtime.tar', A), line('deps-a', 'newsroom-dependencies-a.tar', B)], descriptorOf(A, B));
-  try { assert.deepEqual(pinFindings(repo).findings, []); } finally { rmSync(repo, { recursive: true, force: true }); }
-});
-
-test('an archive the descriptor does not describe is a finding unless it is the known relief grid', () => {
-  assert.deepEqual(KNOWN_UNDESCRIBED, ['etopo-relief.tar']);
-  const known = pinWorld([line('etopo-relief', 'etopo-relief.tar', A)], descriptorOf(A, B));
-  const unknown = pinWorld([line('mystery', 'somebody-elses.tar', A)], descriptorOf(A, B));
-  // And the corpus archive is now one of those: nothing describes
-  // newsroom-private.tar any more, so a Spawnfile that still pins one is drift
-  // rather than an exemption. It must never join KNOWN_UNDESCRIBED.
-  const corpus = pinWorld([line('private-archive', 'newsroom-private.tar', A)], descriptorOf(A, B));
-  try {
-    assert.deepEqual(pinFindings(known).findings, []);
-    assert.match(pinFindings(unknown).findings[0], /the descriptor does not describe/u);
-    assert.match(pinFindings(corpus).findings[0], /newsroom-private\.tar.*the descriptor does not describe/u);
-  } finally { for (const repo of [known, unknown, corpus]) rmSync(repo, { recursive: true, force: true }); }
-});
-
-test('a pin check that matched nothing is a finding, not a pass', () => {
-  // A regex that stops matching because the Spawnfile format moved would
-  // otherwise report a clean bill of health over zero evidence.
-  const repo = pinWorld(['agent: cogsworth', 'resources: []'], descriptorOf(A, B));
-  try { assert.match(pinFindings(repo).findings[0], /matched nothing/u); } finally { rmSync(repo, { recursive: true, force: true }); }
-});
-
 
 test('deployment shell sets readable cwd and round-trips literal arguments without substitution', () => {
   const root = mkdtempSync(path.join(tmpdir(), 'clank-deploy-cwd-'));
@@ -541,7 +445,6 @@ test('the seam reclaims before it builds, never after', () => {
   const result = seam(['--edition=2026-09-19'], { log: () => undefined, alarm: () => undefined, stageImpl });
   assert.equal(result.ok, true);
   assert.ok(order.indexOf('reclaimBuildSpace') < order.indexOf('build'), order.join(' -> '));
-  assert.ok(order.indexOf('bundle') < order.indexOf('reclaimBuildSpace'), order.join(' -> '));
 });
 
 // --- stage 0: is there anything to release at all ----------------------------
@@ -887,28 +790,11 @@ test('a missing ledger releases; a ledger that cannot be read refuses and runs n
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 
-// A PATH ALLOWLIST IS NOT A GUARD, IT IS A HOLE WITH A LIST OF NAMES ON IT.
-//
-// `bundle` legitimately rewrites digest pins in the descriptor and in the twelve
-// agent Spawnfiles mid-run, so those paths were exempted wholesale — which meant
-// ANY uncommitted edit to any of them passed the gate and shipped: a changed
-// prompt, a new tool grant, a widened Moltnet room, a raised token ceiling, in
-// the twelve most security-relevant declarations in the repository. Found by
-// review on 2026-10-01. What is allowlisted now is the SHAPE of the change.
-const DIGEST_A = `sha256:${'a'.repeat(64)}`;
-const DIGEST_B = `sha256:${'b'.repeat(64)}`;
-const descriptorAt = (sha256, fileCount, bytes) => `${JSON.stringify({
-  version: 'clank.newsroom-runtime-bundle.v2',
-  source: { archive: 'newsroom-runtime.tar', sha256, file_count: fileCount, content_bytes: bytes },
-  entrypoint: 'agentic-org/scripts/production-newsroom-mcp.mjs'
-}, null, 2)}\n`;
-const spawnfileAt = (digest, { instructions = 'Commission the desks from this edition corpus.', rule = 'Never commission from an unverified source.', extra = '' } = {}) =>
-  `agent: brass\ninstructions: |\n  ${instructions}\n  ${rule}\nresources:\n`
-  + `    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: ${digest}, mount: ./repos/newsroom, mode: readonly }\n${extra}`;
-
-test('a dirty tree is refused unless the change is a digest rewrite, in the files bundle rewrites too', () => {
+// NO PATH IS EXEMPT. The `bundle` stage that used to rewrite digest pins into
+// the descriptor and the agent Spawnfiles is gone, so a tracked modification of
+// any file, a Spawnfile included, is a change that is not in the released commit.
+test('a dirty tree is refused whatever the file, Spawnfiles included', () => {
   const world = releaseWorld();
-  const descriptor = path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json');
   const spawnfile = path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile');
   const run = () => {
     const { calls, impl } = withRealGate();
@@ -917,109 +803,18 @@ test('a dirty tree is refused unless the change is a digest rewrite, in the file
   };
   try {
     mkdirSync(path.dirname(spawnfile), { recursive: true });
-    writeFileSync(descriptor, descriptorAt(DIGEST_A, 1644, 12065500));
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_A));
-    world.commit('the descriptor and a declaration');
+    writeFileSync(spawnfile, 'agent: brass\nprompt: Commission the desks from this edition corpus.\n');
+    world.commit('a declaration');
     world.write(ledgerOf('0'.repeat(40)));
-
-    // What `bundle` actually leaves behind mid-run: the digests it measured, and
-    // the two measurements that travel with them. Still releasable.
-    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999));
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_B));
-    assert.equal(run().result.ok, true, 'a digest rewrite is what bundle is expected to do to these files');
-
-    // ONE WORD OF A PROMPT, in a file the old check waved through.
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_B, { instructions: 'Commission the desks from any corpus you like.' }));
+    writeFileSync(spawnfile, 'agent: brass\nprompt: Commission the desks from any corpus you like.\n');
     const prompt = run();
     assert.equal(prompt.result.ok, false);
     assert.equal(prompt.result.reason, 'seam-blocked');
     assert.deepEqual(prompt.calls, [], 'nothing is built from an unreviewed prompt');
-    assert.match(prompt.raised[0].detail, /agentic-org\/agents\/brass\/Spawnfile:\d+/u, 'the refusal names the file and the line');
-
-    // A new tool grant, which adds a line rather than changing one. The refusal
-    // has to say WHICH line and why, because "something in a Spawnfile changed"
-    // sends whoever reads it to diff twelve files by hand at 04:00.
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_B, { extra: '    - { id: shell, kind: tool, command: /bin/sh }\n' }));
-    const grant = run();
-    assert.equal(grant.result.ok, false, 'an added grant is not a digest rewrite');
-    assert.match(grant.raised[0].detail, /carries no digest/u);
-    assert.match(grant.raised[0].detail, /id: shell, kind: tool/u, 'the refusal quotes the line it will not wave through');
-
-    // A widened mount ON the pinned line itself — the case a check that only
-    // asked "does this line carry a digest" would have passed.
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_B).replace('mode: readonly', 'mode: readwrite'));
-    assert.equal(run().result.ok, false, 'a digest on the line is not a licence to change the rest of it');
-
-    // STAGED is not safe either: `git status` reports it differently and `git diff`
-    // alone would not see it, so the shape check reads the diff against HEAD.
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_B, { instructions: 'Commission the desks from any corpus you like.' }));
+    assert.match(prompt.raised[0].detail, /agentic-org\/agents\/brass\/Spawnfile is modified in the working tree/u);
+    // STAGED is not a way past it either.
     world.git('add', '--', 'agentic-org/agents/brass/Spawnfile');
     assert.equal(run().result.ok, false, '`git add` must not be a way past this');
-    world.git('reset', '-q', 'HEAD', '--', 'agentic-org/agents/brass/Spawnfile');
-
-    // A pure REORDER of two prompt lines, which a check that only compared the
-    // changed lines as a set would have passed: the lines are the same lines, and
-    // what changed is which one the agent reads first.
-    const swapped = spawnfileAt(DIGEST_B).split('\n');
-    [swapped[2], swapped[3]] = [swapped[3], swapped[2]];
-    writeFileSync(spawnfile, swapped.join('\n'));
-    assert.equal(run().result.ok, false, 'a line with no digest on it cannot be part of a digest rewrite');
-
-    // And in the descriptor, a field that is neither a digest nor a measurement.
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_B));
-    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999).replace('production-newsroom-mcp.mjs', 'something-else.mjs'));
-    assert.equal(run().result.ok, false, 'the descriptor is allowlisted for its measurements, not for everything');
-
-    // Anything outside the allowlist is still refused on its path alone.
-    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999));
-    writeFileSync(path.join(world.repo, 'agentic-org', 'Spawnfile'), 'team: clank-and-slop\nedited: true\n');
-    const outside = run();
-    assert.equal(outside.result.ok, false);
-    assert.match(outside.raised[0].detail, /agentic-org\/Spawnfile is modified in the working tree/u);
-  } finally { rmSync(world.root, { recursive: true, force: true }); }
-});
-
-test('the digest rewrites the last bundle left behind do not block the fast-forward', () => {
-  // THE WAY FIX ONE WOULD HAVE STALLED ONE LAYER DOWN. `bundle` rewrites digest
-  // pins into the working tree and nothing commits them, so after every release
-  // the tree is dirty in exactly the files a repin commit touches — and
-  // `git merge --ff-only` refuses to overwrite a locally modified file
-  // ("Your local changes to the following files would be overwritten by merge").
-  // The job would then discover the merge and refuse it, hourly, forever.
-  //
-  // Those rewrites are discarded before the fast-forward, and ONLY the ones the
-  // shape check has just proven to be digest rewrites: `bundle` runs two stages
-  // later and writes them again from the new descriptor, so they are reproducible
-  // by construction rather than work somebody would lose.
-  const world = releaseWorld();
-  const descriptor = path.join(world.repo, 'agentic-org', 'newsroom-runtime-bundle.json');
-  const spawnfile = path.join(world.repo, 'agentic-org', 'agents', 'brass', 'Spawnfile');
-  try {
-    mkdirSync(path.dirname(spawnfile), { recursive: true });
-    writeFileSync(descriptor, descriptorAt(DIGEST_A, 1644, 12065500));
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_A));
-    world.commit('the descriptor and a declaration');
-
-    // A reviewed repin lands on origin/main, touching the very lines the previous
-    // run left dirty...
-    writeFileSync(descriptor, descriptorAt(DIGEST_B, 1700, 12099999));
-    writeFileSync(spawnfile, spawnfileAt(DIGEST_B));
-    const tip = world.merge('agentic-org/notes.md', 'why the digests moved\n', 'repin');
-    // ...and the last bundle's output is still sitting in the checkout.
-    writeFileSync(descriptor, descriptorAt(`sha256:${'c'.repeat(64)}`, 1800, 12100000));
-    writeFileSync(spawnfile, spawnfileAt(`sha256:${'c'.repeat(64)}`));
-    world.write(ledgerOf('0'.repeat(40)));
-
-    const { calls, impl } = withRealGate();
-    const { raised, alarm } = alarms();
-    const result = seam(['--if-changed', `--repo=${world.repo}`, `--released=${world.released}`, `--key=${world.key}`], { now, log: noop, stageImpl: impl, alarm });
-    assert.deepEqual(raised, [], JSON.stringify(raised));
-    assert.equal(result.ok, true);
-    assert.deepEqual(calls, FULL_ORDER);
-    assert.equal(world.at('HEAD'), tip);
-    // The tree the build will compile is the reviewed commit's, not a mixture.
-    assert.equal(readFileSync(spawnfile, 'utf8'), spawnfileAt(DIGEST_B));
-    assert.equal(execFileSync('git', ['-C', world.repo, 'status', '--porcelain'], { encoding: 'utf8' }).trim(), '');
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 
@@ -1101,7 +896,7 @@ test('under --if-changed a closed wake window defers instead of paging', () => {
     const repeat = blocked();
     seam(args, { now: new Date(now.getTime() + 26 * 3600000), log: noop, stageImpl: repeat.impl, alarm: again.alarm });
     assert.deepEqual(again.raised, [], 'the staleness alarm is raised once per pending commit');
-    assert.ok(!repeat.calls.includes('bundle') && !repeat.calls.includes('build'));
+    assert.ok(!repeat.calls.includes('build'));
   } finally { rmSync(world.root, { recursive: true, force: true }); }
 });
 

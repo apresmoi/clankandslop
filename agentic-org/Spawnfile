@@ -13,12 +13,16 @@ shared:
   environment:
     packages:
       - { id: newsroom-git, manager: apt, name: git }
-    # The newsroom MCP server, declared once for every member. Each agent
-    # narrows it in its own Spawnfile with `{ name: newsroom, tools: [...] }`
-    # (and adds any agent-specific env there). No `tools` here on purpose:
-    # an agent that forgets to select its tools fails compile instead of
-    # inheriting someone else's. Spawnfile resolves `${workspace}` to the
-    # agent's workspace path and `${agent.name}` / `${agent.id}` per member.
+    # MCP servers, declared once. `newsroom` reaches every member; each agent
+    # narrows it with `{ name: newsroom, tools: [...] }` (no `tools` here, so a
+    # member that forgets its selection fails compile instead of inheriting
+    # someone else's). `validation`, `art` and `visual` are `opt_in`: only a
+    # member that lists the name receives the server. Spawnfile resolves
+    # `${workspace}`, `${agent.name}` and `${agent.id}` per member.
+    #
+    # Private code (the state adapter, the art, visual and validation servers,
+    # the release adapter) is never in the image: it is the fed volume
+    # `newsroom-private-tools` below, read through its `current/` link.
     mcp_servers:
       - name: newsroom
         transport: stdio
@@ -28,14 +32,101 @@ shared:
           CLANK_NEWSROOM_AGENT: "${agent.name}"
           CLANK_PUBLIC_CONTENT_VOLUME: "${workspace}/repos/newsroom-content"
           CLANK_EDITION_STATE_ROOT: "${workspace}/state/edition"
-          CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/newsroom/state/transaction.mjs"
+          CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/private/current/newsroom/state/transaction.mjs"
           CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
           CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
           CLANK_DAIMON_AGENT_ID: "${agent.id}"
+      # Reporters only.
+      - name: validation
+        opt_in: true
+        transport: stdio
+        command: /usr/local/bin/node
+        args: ["${workspace}/tools/private/current/newsroom/validation/server.mjs"]
+        env:
+          CLANK_NEWSROOM_AGENT: "${agent.name}"
+          CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
+        tools: [validate_article]
+      # Caslon only.
+      - name: art
+        opt_in: true
+        transport: stdio
+        command: /usr/local/bin/node
+        args: ["${workspace}/tools/private/current/newsroom/art/server.mjs"]
+        env:
+          CLANK_NEWSROOM_AGENT: "${agent.name}"
+          CLANK_PUBLIC_CONTENT_VOLUME: "${workspace}/repos/newsroom-content"
+          CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
+          CLANK_EDITION_STATE_ROOT: "${workspace}/state/edition"
+          CLANK_NEWSROOM_STATE_ROOT: "${workspace}/state/edition"
+          CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/private/current/newsroom/state/transaction.mjs"
+          CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
+          CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
+          CLANK_DAIMON_AGENT_ID: "${agent.id}"
+          CLANK_ART_OUTPUT_ROOT: "${workspace}/state/art-cache"
+          CLANK_ETOPO_GZ: "${workspace}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
+          CLANK_ETOPO_GRD: "${workspace}/state/etopo-cache/etopo1.grd"
+        tools: [list_art_catalogue, bake_map, bake_glyph, inspect_artifact, inspect_catalogue_preview, lay_pages]
+      # Pressman only.
+      - name: visual
+        opt_in: true
+        transport: stdio
+        command: /usr/local/bin/node
+        args: ["${workspace}/tools/private/current/newsroom/visual/server.mjs"]
+        env:
+          CLANK_NEWSROOM_AGENT: "${agent.name}"
+          CLANK_PUBLIC_CONTENT_VOLUME: "${workspace}/repos/newsroom-content"
+          CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
+          CLANK_EDITION_STATE_ROOT: "${workspace}/state/edition"
+          CLANK_NEWSROOM_STATE_ROOT: "${workspace}/state/edition"
+          CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/private/current/newsroom/state/transaction.mjs"
+          CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
+          CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
+          CLANK_DAIMON_AGENT_ID: "${agent.id}"
+          CLANK_PRIVATE_SOURCE_ROOT: "${workspace}/repos/newsroom-private"
+          CLANK_NEWSROOM_RELEASE_ADAPTER: "${workspace}/tools/private/current/newsroom/build/release.mjs"
+          CLANK_RELEASE_STAGING_ROOT: "${workspace}/staging"
+          CLANK_WEBSITE_DEPS_ROOTS: "${workspace}/deps"
+          CLANK_PUBLIC_ASSET_ROOTS: "${workspace}/assets"
+        tools: [prepare_release]
   workspace:
     docs:
       system: TEAM.md
     resources:
+      # The public source tree every member mounts at ./repos/newsroom. Spawnfile
+      # archives the git-tracked files of this repository and pins the digest
+      # in the compile report; nothing is hand-built or hand-pinned. Excluded:
+      # published content (the fed volume below), the generated og images
+      # (Pressman's own bundle), the Spawnfiles, and symlinks (git-recorded
+      # CLAUDE.md/AGENTS.md links, which a bundle cannot carry).
+      - id: newsroom-runtime
+        kind: bundle
+        build:
+          files:
+            root: ..
+            exclude: [content/editions, content/bylines, website/public/og, node_modules, "**/Spawnfile", CLAUDE.md, "**/CLAUDE.md", agentic-org/agents/AGENTS.md, agentic-org/policies/AGENTS.md, agentic-org/scripts/AGENTS.md]
+        mount: ./repos/newsroom
+        mode: readonly
+      # PRIVATE CODE NEVER ENTERS THE IMAGE. The newsroom state adapter, the
+      # art, visual and validation servers and the release adapter come from
+      # the private repo's main branch as a host-fed volume: `spawnfile volume
+      # refresh newsroom-private-tools` (a host timer) fetches the private
+      # checkout beside this repo, lands the listed directories as a frozen
+      # tree and swaps `current` to it. MCP servers run
+      # ./tools/private/current/newsroom/... . A private merge reaches agents
+      # on the next refresh, without an image build.
+      - id: newsroom-private-tools
+        kind: volume
+        name: clank-newsroom-private-tools
+        mount: ./tools/private
+        mode: mutable
+        sharing: team
+        feed:
+          git:
+            repo: ../clankandslop-private
+            ref: origin/main
+            paths: [newsroom/art, newsroom/build, newsroom/history, newsroom/runtime, newsroom/state, newsroom/validation, newsroom/visual]
+            fetch: true
+          keep: 3
       - id: edition-state
         kind: volume
         name: clank-edition-state
@@ -136,10 +227,11 @@ shared:
         mode: mutable
         sharing: team
       # Every PUBLISHED edition and the byline indexes derived from them, from
-      # origin/main, landed by the host (clank-content-refresh.service ->
-      # scripts/content-refresh.mjs) with the corpus refresher's own discipline:
-      # staged outside the volume, validated, frozen, swapped in with one
-      # rename(2) of `current`, re-verified against git on every poll.
+      # this checkout's origin/main, as a Spawnfile fed volume: the host timer
+      # clank-feed-content.service runs `spawnfile volume refresh
+      # public-content-volume`, which stages outside the volume, runs the
+      # newsroom's validate hook, freezes the tree, swaps `current` with one
+      # rename(2) and re-verifies the served tree on every poll.
       #
       # WHY IT LEFT THE IMAGE. It used to ride inside newsroom-runtime.tar, so
       # every published edition moved that archive's digest, the publisher
@@ -152,8 +244,9 @@ shared:
       # inside a bundle's mount (overlapping mounts), and a link packed into the
       # archive cannot reach a team volume, whose backing path hashes this file's
       # absolute path on the build host. So it sits beside the code, and readers
-      # resolve `current/editions` and `current/bylines` through
-      # CLANK_PUBLIC_CONTENT_VOLUME (scripts/public-content.mjs).
+      # resolve `current/content/editions` and `current/content/bylines` (the
+      # feed keeps git's paths) through CLANK_PUBLIC_CONTENT_VOLUME
+      # (scripts/public-content.mjs).
       #
       # Same constraints as the corpus above, for the same reasons: `mutable`
       # (readonly bricks the entrypoint), team-shared, and `name`, `mode` and
@@ -164,6 +257,14 @@ shared:
         mount: ./repos/newsroom-content
         mode: mutable
         sharing: team
+        feed:
+          git:
+            repo: ..
+            ref: origin/main
+            paths: [content/editions, content/bylines]
+            fetch: true
+          validate: [node, scripts/content-validate.mjs]
+          keep: 3
 members:
   - { id: klaxon, ref: agents/klaxon }
   - { id: cogsworth, ref: agents/cogsworth }

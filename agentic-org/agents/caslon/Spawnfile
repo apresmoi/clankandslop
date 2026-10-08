@@ -77,34 +77,15 @@ environment:
         CLANK_ETOPO_GZ: "${workspace}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
         CLANK_ETOPO_GRD: "${workspace}/state/etopo-cache/etopo1.grd"
       tools: [file_desk, compose_edition]
-    - name: art
-      transport: stdio
-      command: /usr/local/bin/node
-      args: ["${workspace}/tools/newsroom/art/server.mjs"]
-      env:
-        CLANK_NEWSROOM_AGENT: "${agent.name}"
-        CLANK_PUBLIC_CONTENT_VOLUME: "${workspace}/repos/newsroom-content"
-        CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
-        CLANK_EDITION_STATE_ROOT: "${workspace}/state/edition"
-        CLANK_NEWSROOM_STATE_ROOT: "${workspace}/state/edition"
-        CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/newsroom/state/transaction.mjs"
-        CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
-        CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
-        CLANK_DAIMON_AGENT_ID: "${agent.id}"
-        CLANK_ART_OUTPUT_ROOT: "${workspace}/state/art-cache"
-        CLANK_ETOPO_GZ: "${workspace}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
-        CLANK_ETOPO_GRD: "${workspace}/state/etopo-cache/etopo1.grd"
-      tools: [list_art_catalogue, bake_map, bake_glyph, inspect_artifact, inspect_catalogue_preview, lay_pages]
+    - { name: art }
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
-    - { id: newsroom-tools, kind: bundle, source: ../../newsroom-tools.tar, sha256: sha256:484748db3a8e990462b01e82cd7f265eba5c1152d7f055fe92b4de646c797e53, mount: ./tools/newsroom, mode: readonly }
-    - { id: public-content, kind: bundle, source: ../../newsroom-runtime.tar, sha256: sha256:f614d96e1d39eddade31d1ed56f17ee5e6c716da0945e63b0f811d8e4885c9ff, mount: ./repos/newsroom, mode: readonly }
     # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
     # every archived map was baked from it, so an edition must not be able to
     # alter it. Ships outside the newsroom bundle because it is ~395MB.
-    - { id: etopo-relief, kind: bundle, source: ../../etopo-relief.tar, sha256: sha256:ae1177ef2885c339f227c67b4efb27907eae0274a5aa61c1038eaac56ce50eeb, mount: ./etopo, mode: readonly }
+    - { id: etopo-relief, kind: bundle, source: ../../etopo-relief.tar, mount: ./etopo, mode: readonly }
     # Regenerable decompressed cache (~890MB). Scratch, never an artifact.
     - { id: etopo-cache, kind: volume, name: clank-etopo-cache, mount: ./state/etopo-cache, mode: mutable, sharing: per_agent }
 
