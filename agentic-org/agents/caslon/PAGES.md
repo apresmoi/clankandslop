@@ -433,7 +433,7 @@ there is nothing to copy, round or retype, and a record carrying the retired
   lever, and I do not pull it for the Tape.
 - **`Deadlines`** — the prior edition's `next_update_utc` promises that no
   story today names in `previous_coverage` (update owed, linked to the
-  story); today's own `next_update_utc` checks; and every open call whose
+  story; a forecast owes its settlement instead, dated below); today's own `next_update_utc` checks; and every open call whose
   deadline is today or later, under its opening article's headline.
 
 **`ForecastLedger`** — I write nothing. The assembler lists every call not

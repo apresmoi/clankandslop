@@ -174,7 +174,9 @@ export function followUps(previous, todayArticles = {}) {
   if (!isStr(previous?.date)) return [];
   const covered = new Set(articlesOf(todayArticles).flatMap((a) => (Array.isArray(a?.previous_coverage) ? a.previous_coverage : []).map((ref) => `${ref?.date}/${ref?.slug}`)));
   return articlesOf(previous.articles)
-    .filter((a) => isStr(a?.next_update_utc) && isStr(a?.headline) && isStr(a?.id) && !covered.has(`${previous.date}/${a.id}`))
+    // A forecast's next_update_utc is its same-day facts check; what it owes
+    // later is its settlement, which the Deadlines already date.
+    .filter((a) => a?.epistemic !== 'forecast' && isStr(a?.next_update_utc) && isStr(a?.headline) && isStr(a?.id) && !covered.has(`${previous.date}/${a.id}`))
     .sort((a, b) => String(a.next_update_utc).localeCompare(String(b.next_update_utc)) || String(a.id).localeCompare(String(b.id)))
     .map((a) => ({ edition: previous.date, time: a.next_update_utc.trim(), headline: a.headline.trim(), article: a.id, ...(isStr(a.byline?.agents?.[0]) ? { who: a.byline.agents[0] } : {}) }));
 }

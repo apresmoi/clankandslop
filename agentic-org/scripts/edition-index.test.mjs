@@ -5,7 +5,7 @@ import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promis
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { CITATION_GATE_NAMES, HARD_LINT_NAMES, advisoryFilingWarnings, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
+import { CITATION_GATE_NAMES, HARD_LINT_NAMES, advisoryFilingWarnings, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, owedUpdates, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
 import { proseLintFindings } from '../../ops/prose-lint.mjs';
 import { PASSED_ARTICLES_MINIMUM } from './compose-gate.mjs';
 
@@ -402,7 +402,7 @@ test('a row is one line no matter what the headline carries', () => {
 test('an empty edition still renders a readable index', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-empty-'));
   try {
-    const text = await writeEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS });
+    const text = await writeEditionIndex(path.join(temporary, 'state'), EDITION, { knownTopics: TOPICS, contentRootFor: () => temporary });
     assert.equal(text.trim().split('\n').length, 4, 'an empty edition is four header lines and nothing else');
     assert.match(text, /assignments=0 filings=0 verdicts=0 passed=0/u);
     assert.match(text, new RegExp(`^# compose: passed=0/${F} desks=0/4 sections=0/3 owners=0/${F} sources=0/3 domains=0/3 forecast=0 dissent=0 {2}→ blocked$`, 'mu'));
@@ -423,4 +423,28 @@ test('the hard lint switch arms nothing, everything, or a named subset', () => {
   // checks apply independently of its selected flags.
   const staged = ['refs_subset', 'cite_missing', 'topic_unknown', 'persona_in_body'];
   assert.deepEqual(hardLintFlags(['domains<2', 'cite_missing:E4'], staged), ['cite_missing:E4']);
+});
+
+test('O rows: the prior edition\'s promised updates that no passed article answers yet, forecasts excluded', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-index-owed-'));
+  try {
+    const prior = path.join(temporary, 'content', 'editions', '2026-10-07', 'articles');
+    await mkdir(prior, { recursive: true });
+    const story = (id, over) => ({ id, headline: `Headline ${id}`, epistemic: 'fact', next_update_utc: '13:00', byline: { agents: ['Cogsworth'] }, ...over });
+    await writeFile(path.join(prior, 's-a.json'), JSON.stringify(story('s-a')));
+    await writeFile(path.join(prior, 's-b.json'), JSON.stringify(story('s-b', { byline: { agents: ['Graves'] }, next_update_utc: '14:00' })));
+    await writeFile(path.join(prior, 's-f.json'), JSON.stringify(story('s-f', { epistemic: 'forecast', next_update_utc: '16:00' })));
+    await writeFile(path.join(prior, 's-n.json'), JSON.stringify(story('s-n', { next_update_utc: undefined })));
+    const contentRootFor = () => path.join(temporary, 'content');
+    const text = await buildEditionIndex(path.join(temporary, 'state'), '2026-10-08', { knownTopics: TOPICS, contentRootFor });
+    const owed = text.split('\n').filter((line) => line.startsWith('O '));
+    assert.equal(owed.length, 2, 'two promised updates; the forecast owes its settlement, not an update');
+    assert.match(owed[0], /^O cogsworth s-a from=2026-10-07 promised=13:00 +\| Headline s-a$/u);
+    assert.match(owed[1], /^O graves s-b from=2026-10-07 promised=14:00 /u);
+    const followed = await owedUpdates('2026-10-08', [{ previous_coverage: [{ date: '2026-10-07', slug: 's-a' }] }], contentRootFor);
+    assert.deepEqual(followed.map((row) => row.article), ['s-b'], 'a passed follow-up naming the story in previous_coverage answers it');
+    assert.deepEqual(await owedUpdates('2026-10-08', [], () => path.join(temporary, 'missing')), [], 'no archive, no rows, no failure');
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
 });

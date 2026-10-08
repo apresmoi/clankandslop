@@ -14,6 +14,12 @@ The slate is the only research file you open; never a desk or story file.
 Keep accepted assignments unless something substantive changed. A lead digest
 informs the lineup; it is not a commission.
 
+`O` rows are yesterday's stories that promised an update and have none yet;
+the Tape prints each as "Update owed" under its desk. For each, when the slate
+carries news on it, commission the owner a follow-up BRIEF that lists the
+earlier piece in `previous_coverage`; when it carries nothing, leave it and the
+row stays on the Tape.
+
 Commission a supported development, not a subject or a report title. A price
 plus an unread report is a research question, not a slot. Pick and kill
 publicly, by name, with reasons. When two reporters pitch one story, say which

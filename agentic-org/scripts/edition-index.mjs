@@ -19,6 +19,8 @@ import { compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissen
 // the repo's tracked files, and CLANK_PUBLIC_SOURCE_ROOT is that same repo —
 // so one implementation reaches file_article and stage_release alike.
 import { proseLintFindings } from '../../ops/prose-lint.mjs';import { readRefusals, refusalIndexLine } from './refusal-log.mjs';
+import { followUps } from '../../ops/open-clocks.mjs';
+import { publicContentRoot } from './public-content.mjs';
 
 const INDEX_VERSION = 'clank.edition-index.v1';
 const EDITION_DATE = /^\d{4}-\d{2}-\d{2}$/u;
@@ -287,13 +289,16 @@ const token = (value, fallback = '?') => String(value ?? '').replace(/\s+/gu, '-
 const pad = (value) => (value.length >= COLUMN ? `${value} ` : value.padEnd(COLUMN + 1));
 const row = (left, ...cells) => (cells.length === 0 ? left : `${pad(left)}| ${cells.join(' | ')}`);
 
-export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, checks = [], desks, pages, compose, candidates = [], refusals = [] }) {
+export function renderEditionIndex({ edition, generated, assignments, filings, verdicts, dissents = [], articles, checks = [], desks, pages, compose, candidates = [], refusals = [], owed = [] }) {
   const lines = [];
   lines.push(`# ${INDEX_VERSION} edition=${edition} generated=${generated} assignments=${assignments.length} filings=${filings.length} verdicts=${verdicts.length} passed=${articles.length}`);
   // Missing article coverage remains unknown rather than advertising readiness.
   lines.push(composeGateLine(compose ?? composeGateStatus({ edition, passed: articles.length, desks: desks.length })));
-  lines.push('# rows: C candidate · A assignment · F filing · N dissent · V verdict · P passed article · K facts check · D desk doc · G page');
+  lines.push('# rows: O owed update · C candidate · A assignment · F filing · N dissent · V verdict · P passed article · K facts check · D desk doc · G page');
   lines.push(...refusals, '# read one: cat candidates/<id>.json | cat filings/<id>/<rev>.json | cat articles/<id>.json | cat verdicts/<id>/<rev>.json | cat dissents/<id>/<rev>.json | cat freshness/<id>/<rev>.json');
+  // The prior edition's stories that promised an update and have none yet;
+  // the Tape prints each as "Update owed" under its desk.
+  for (const item of owed) lines.push(row(`O ${token(item.who?.toLowerCase(), '-')} ${token(item.article)} from=${token(item.edition)} promised=${token(item.time)}`, clean(item.headline, 160)));
   for (const item of candidates) lines.push(row(`C ${token(item.id)} rev=${item.revision} ${token(item.disposition)} desks=${token(item.selected_desks.join(','), '-')} refs=${item.evidence_refs.length}`, clean(item.source_id, 160), clean(item.summary, 160)));
   for (const item of assignments) lines.push(row(`A ${token(item.owner)} ${token(item.id)} refs=${item.evidence_refs.length}`, clean(item.brief, 120)));
   for (const item of filings) {
@@ -315,7 +320,7 @@ export function renderEditionIndex({ edition, generated, assignments, filings, v
  * record on disk is unreadable or malformed — a half-true index is worse than
  * a failed tool call, because nobody re-reads an index they were handed.
  */
-export async function buildEditionIndex(root, edition, { now = new Date(), knownTopics } = {}) {
+export async function buildEditionIndex(root, edition, { now = new Date(), knownTopics, contentRootFor } = {}) {
   const base = editionRoot(root, edition);
   const topics = knownTopics === undefined ? await knownTopicSlugs() : knownTopics;
   const candidates = (await readKind(base, 'candidates')).map(({ name, value }) => ({ id: name, revision: value.revision ?? 1, disposition: value.disposition ?? 'qualified', source_id: value.source_id ?? value.event_key, summary: value.summary, selected_desks: value.selected_desks ?? [], evidence_refs: value.evidence_refs ?? [] }));
@@ -354,7 +359,26 @@ export async function buildEditionIndex(root, edition, { now = new Date(), known
     forecasts: articleRecords.filter((item) => isDatedForecast(item.value)).length,
     dissents: articleRecords.filter((item) => hasNamedDissent(item.value)).length
   });
-  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, checks, desks, pages, compose, candidates, refusals: refusalIndexLine(await readRefusals(base)) });
+  const owed = await owedUpdates(edition, articleRecords.map((item) => item.value), contentRootFor);
+  return renderEditionIndex({ edition, generated: now.toISOString(), assignments, filings, verdicts, dissents, articles, checks, desks, pages, compose, candidates, refusals: refusalIndexLine(await readRefusals(base)), owed });
+}
+
+/**
+ * The prior published edition's follow-up promises that today's passed
+ * articles do not yet answer (ops/open-clocks.mjs followUps). An unreadable
+ * archive yields no rows rather than failing the index: these rows inform
+ * commissioning, they gate nothing.
+ */
+export async function owedUpdates(edition, todayArticles, root = () => publicContentRoot()) {
+  try {
+    const dir = path.join(root(), 'editions');
+    const previous = (await readdir(dir)).filter((name) => /^\d{4}-\d{2}-\d{2}$/u.test(name) && name < edition).sort().at(-1);
+    if (previous === undefined) return [];
+    const articlesDir = path.join(dir, previous, 'articles');
+    const files = (await readdir(articlesDir)).filter((name) => name.endsWith('.json')).sort();
+    const articles = await Promise.all(files.map(async (name) => JSON.parse(await readFile(path.join(articlesDir, name), 'utf8'))));
+    return followUps({ date: previous, articles }, todayArticles);
+  } catch { return []; }
 }
 
 // Same shapes production-newsroom.mjs already walks when it checks page
