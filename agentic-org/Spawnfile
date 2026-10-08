@@ -13,6 +13,25 @@ shared:
   environment:
     packages:
       - { id: newsroom-git, manager: apt, name: git }
+    # The newsroom MCP server, declared once for every member. Each agent
+    # narrows it in its own Spawnfile with `{ name: newsroom, tools: [...] }`
+    # (and adds any agent-specific env there). No `tools` here on purpose:
+    # an agent that forgets to select its tools fails compile instead of
+    # inheriting someone else's. Spawnfile resolves `${workspace}` to the
+    # agent's workspace path and `${agent.name}` / `${agent.id}` per member.
+    mcp_servers:
+      - name: newsroom
+        transport: stdio
+        command: /usr/local/bin/node
+        args: ["${workspace}/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs"]
+        env:
+          CLANK_NEWSROOM_AGENT: "${agent.name}"
+          CLANK_PUBLIC_CONTENT_VOLUME: "${workspace}/repos/newsroom-content"
+          CLANK_EDITION_STATE_ROOT: "${workspace}/state/edition"
+          CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/newsroom/state/transaction.mjs"
+          CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
+          CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
+          CLANK_DAIMON_AGENT_ID: "${agent.id}"
   workspace:
     docs:
       system: TEAM.md

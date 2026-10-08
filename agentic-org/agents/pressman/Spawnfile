@@ -39,43 +39,33 @@ surfaces:
 environment:
   mcp_servers:
     - name: newsroom
-      transport: stdio
-      command: /usr/local/bin/node
-      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
       env:
-        CLANK_NEWSROOM_AGENT: pressman
-        CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom-content
-        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/state/edition
-        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/state/transaction.mjs
-        CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
-        CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
-        CLANK_DAIMON_AGENT_ID: "agent:pressman"
-        CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom
-        CLANK_WEBSITE_DEPS_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-b
-        CLANK_PUBLIC_ASSET_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-b
-        CLANK_RELEASE_STAGING_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/staging
-        CLANK_NEWSROOM_RELEASE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/build/release.mjs
-        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom-private
+        CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
+        CLANK_WEBSITE_DEPS_ROOTS: "${workspace}/deps-a:${workspace}/deps-b"
+        CLANK_PUBLIC_ASSET_ROOTS: "${workspace}/assets-a:${workspace}/assets-b"
+        CLANK_RELEASE_STAGING_ROOT: "${workspace}/staging"
+        CLANK_NEWSROOM_RELEASE_ADAPTER: "${workspace}/tools/newsroom/build/release.mjs"
+        CLANK_PRIVATE_SOURCE_ROOT: "${workspace}/repos/newsroom-private"
       tools: [stage_release]
     - name: visual
       transport: stdio
       command: /usr/local/bin/node
-      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/visual/server.mjs]
+      args: ["${workspace}/tools/newsroom/visual/server.mjs"]
       env:
-        CLANK_NEWSROOM_AGENT: pressman
-        CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom-content
-        CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom
-        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/state/edition
-        CLANK_NEWSROOM_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/state/edition
-        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/state/transaction.mjs
+        CLANK_NEWSROOM_AGENT: "${agent.name}"
+        CLANK_PUBLIC_CONTENT_VOLUME: "${workspace}/repos/newsroom-content"
+        CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
+        CLANK_EDITION_STATE_ROOT: "${workspace}/state/edition"
+        CLANK_NEWSROOM_STATE_ROOT: "${workspace}/state/edition"
+        CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/newsroom/state/transaction.mjs"
         CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
         CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
-        CLANK_DAIMON_AGENT_ID: "agent:pressman"
-        CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/repos/newsroom-private
-        CLANK_NEWSROOM_RELEASE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/tools/newsroom/build/release.mjs
-        CLANK_RELEASE_STAGING_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/staging
-        CLANK_WEBSITE_DEPS_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/deps-b
-        CLANK_PUBLIC_ASSET_ROOTS: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-a:/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/pressman/assets-b
+        CLANK_DAIMON_AGENT_ID: "${agent.id}"
+        CLANK_PRIVATE_SOURCE_ROOT: "${workspace}/repos/newsroom-private"
+        CLANK_NEWSROOM_RELEASE_ADAPTER: "${workspace}/tools/newsroom/build/release.mjs"
+        CLANK_RELEASE_STAGING_ROOT: "${workspace}/staging"
+        CLANK_WEBSITE_DEPS_ROOTS: "${workspace}/deps-a:${workspace}/deps-b"
+        CLANK_PUBLIC_ASSET_ROOTS: "${workspace}/assets-a:${workspace}/assets-b"
       tools: [prepare_release]
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }

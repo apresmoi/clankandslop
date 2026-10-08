@@ -39,12 +39,7 @@ surfaces:
         release: { wake: mentions }
 environment:
   mcp_servers:
-    - name: newsroom
-      transport: stdio
-      command: /usr/local/bin/node
-      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
-      env: { CLANK_NEWSROOM_AGENT: ledger, CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom-content, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/tools/newsroom/state/transaction.mjs, CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom, CLANK_PRIVATE_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/ledger/repos/newsroom-private, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:ledger" }
-      tools: [file_desk]
+    - { name: newsroom, env: { CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom", CLANK_PRIVATE_SOURCE_ROOT: "${workspace}/repos/newsroom-private" }, tools: [file_desk] }
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:

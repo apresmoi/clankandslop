@@ -61,49 +61,39 @@ surfaces:
 environment:
   mcp_servers:
     - name: newsroom
-      transport: stdio
-      command: /usr/local/bin/node
-      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
+      # No CLANK_PRIVATE_SOURCE_ROOT, deliberately. Neither of Caslon's two
+      # newsroom tools reads the research corpus volume: compose_edition takes
+      # the corpus identity from the edition's own assignment records, which is
+      # the whole point — the volume can have been swapped under the org since
+      # the lineup was commissioned, so re-reading the mount at 16:00 would
+      # publish a provenance claim the stories do not rest on. file_desk here
+      # only carries caslon.chrome and caslon.weather, which read nothing from
+      # the mount either (ledger.worlddesk is Ledger's, and Ledger declares it).
+      # A mount declared for an agent no tool refuses without reads as an
+      # enforced guarantee and is not one, so validate-org.mjs refuses it.
       env:
-        CLANK_NEWSROOM_AGENT: caslon
-        CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-content
-        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
-        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/state/transaction.mjs
-        # No CLANK_PRIVATE_SOURCE_ROOT, deliberately. Neither of Caslon's two
-        # newsroom tools reads the research corpus volume: compose_edition takes
-        # the corpus identity from the edition's own assignment records, which is
-        # the whole point — the volume can have been swapped under the org since
-        # the lineup was commissioned, so re-reading the mount at 16:00 would
-        # publish a provenance claim the stories do not rest on. file_desk here
-        # only carries caslon.chrome and caslon.weather, which read nothing from
-        # the mount either (ledger.worlddesk is Ledger's, and Ledger declares it).
-        # A mount declared for an agent no tool refuses without reads as an
-        # enforced guarantee and is not one, so validate-org.mjs refuses it.
-        CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
-        CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
-        CLANK_DAIMON_AGENT_ID: "agent:caslon"
         # Relief grid for ops/bake-map.mjs. Read-only source; the decompressed
         # cache is regenerable scratch and is never an artifact.
-        CLANK_ETOPO_GZ: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/etopo/ETOPO1_Ice_g_gmt4.grd.gz
-        CLANK_ETOPO_GRD: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/etopo-cache/etopo1.grd
+        CLANK_ETOPO_GZ: "${workspace}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
+        CLANK_ETOPO_GRD: "${workspace}/state/etopo-cache/etopo1.grd"
       tools: [file_desk, compose_edition]
     - name: art
       transport: stdio
       command: /usr/local/bin/node
-      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/art/server.mjs]
+      args: ["${workspace}/tools/newsroom/art/server.mjs"]
       env:
-        CLANK_NEWSROOM_AGENT: caslon
-        CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom-content
-        CLANK_PUBLIC_SOURCE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/repos/newsroom
-        CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
-        CLANK_NEWSROOM_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/edition
-        CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/tools/newsroom/state/transaction.mjs
+        CLANK_NEWSROOM_AGENT: "${agent.name}"
+        CLANK_PUBLIC_CONTENT_VOLUME: "${workspace}/repos/newsroom-content"
+        CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
+        CLANK_EDITION_STATE_ROOT: "${workspace}/state/edition"
+        CLANK_NEWSROOM_STATE_ROOT: "${workspace}/state/edition"
+        CLANK_NEWSROOM_STATE_ADAPTER: "${workspace}/tools/newsroom/state/transaction.mjs"
         CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
         CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
-        CLANK_DAIMON_AGENT_ID: "agent:caslon"
-        CLANK_ART_OUTPUT_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/art-cache
-        CLANK_ETOPO_GZ: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/etopo/ETOPO1_Ice_g_gmt4.grd.gz
-        CLANK_ETOPO_GRD: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/caslon/state/etopo-cache/etopo1.grd
+        CLANK_DAIMON_AGENT_ID: "${agent.id}"
+        CLANK_ART_OUTPUT_ROOT: "${workspace}/state/art-cache"
+        CLANK_ETOPO_GZ: "${workspace}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
+        CLANK_ETOPO_GRD: "${workspace}/state/etopo-cache/etopo1.grd"
       tools: [list_art_catalogue, bake_map, bake_glyph, inspect_artifact, inspect_catalogue_preview, lay_pages]
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }

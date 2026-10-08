@@ -57,12 +57,7 @@ surfaces:
         release: { wake: mentions }
 environment:
   mcp_servers:
-    - name: newsroom
-      transport: stdio
-      command: /usr/local/bin/node
-      args: [/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/repos/newsroom/agentic-org/scripts/production-newsroom-mcp.mjs]
-      env: { CLANK_NEWSROOM_AGENT: spike, CLANK_PUBLIC_CONTENT_VOLUME: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/repos/newsroom-content, CLANK_EDITION_STATE_ROOT: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/state/edition, CLANK_NEWSROOM_STATE_ADAPTER: /var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/spike/tools/newsroom/state/transaction.mjs, CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700, CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token, CLANK_DAIMON_AGENT_ID: "agent:spike" }
-      tools: [review_article]
+    - { name: newsroom, tools: [review_article] }
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
