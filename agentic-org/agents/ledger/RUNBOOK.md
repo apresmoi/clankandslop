@@ -118,6 +118,8 @@ File now, with notes on what is still open ("asked for research at 14:05 UTC;
 no answer yet" is a valid reason). When the answer arrives and the edition is
 not yet composed, file again with the settlements. Once Caslon has composed,
 never refile: `file_desk` refuses it, and the answer settles the call tomorrow.
+A pending answer holds a call open only inside the two-day grace. Past it,
+settle from what you have already searched.
 
 On a day when nothing settled, file:
 
