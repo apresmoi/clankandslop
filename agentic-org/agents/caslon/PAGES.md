@@ -248,14 +248,14 @@ only when the catalogue pattern, retrieved corpus or Flashpoint rows support
 them.
 
 **An atlas of baked regions is committed**, with files at
-`repos/newsroom-content/current/editions/<date>/maps/<name>.json`, each ~6.4 KB of bounding box plus
+`repos/newsroom-content/current/content/editions/<date>/maps/<name>.json`, each ~6.4 KB of bounding box plus
 one digit string per grid row. They are region data, not edition data: the
 same file renders the same relief whatever day it is filed under. Names follow
 the story that first needed them — `hormuz`, `taiwan-strait`, `moscow-kyiv`,
 `danube-second-reactor`, `okanagan-evacuation-orders` — with `-hero` and `-sq`
 marking narrower re-crops of the same ground, cut for the hero panel rather
 than the wide story-page frame. `ops/ASSETS.md` lists every one with its
-bounding box; `ls ./repos/newsroom-content/current/editions/*/maps/` is the live
+bounding box; `ls ./repos/newsroom-content/current/content/editions/*/maps/` is the live
 answer. A `-hero` variant is separately reachable: a story may name the wide
 crop in `art.map` and its `-hero` re-crop in `art.hero_map`, and both ship —
 the story page draws the wide one at 104 × 42, the front panel the narrow one
@@ -287,7 +287,7 @@ I do not remove one that has it.
 pointing at before I place it — the bounding box and grid, not the bands:
 
 ```
-head -c 200 ./repos/newsroom-content/current/editions/*/maps/<region>.json
+head -c 200 ./repos/newsroom-content/current/content/editions/*/maps/<region>.json
 ```
 
 Same region, same file, whatever edition directory it is filed under: a baked

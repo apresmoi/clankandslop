@@ -1,0 +1,12 @@
+[Unit]
+Description=Keep the newsroom's private tools volume current
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+AccuracySec=15s
+Persistent=false
+Unit=clank-feed-private-tools.service
+
+[Install]
+WantedBy=timers.target

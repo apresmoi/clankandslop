@@ -60,7 +60,6 @@ import path from 'node:path';
 // receiving human learns a fixed vocabulary rather than free text.
 export const REASONS = Object.freeze({
   'repin-failed': { title: 'Newsroom: repin failed', priority: 'urgent', tags: 'rotating_light' },
-  'bundle-mismatch': { title: 'Newsroom: bundle mismatch', priority: 'urgent', tags: 'rotating_light' },
   'deploy-failed': { title: 'Newsroom: deploy failed', priority: 'urgent', tags: 'rotating_light' },
   'no-edition': { title: 'Newsroom: no edition today', priority: 'urgent', tags: 'newspaper' },
   // The corpus volume refresher runs outside the agent boundary and is the
@@ -82,13 +81,6 @@ export const REASONS = Object.freeze({
   // request to go fix the corpus. Urgent anyway: an agent reaching outside its
   // own state is the kind of thing you want to know about the same day.
   'corpus-tampered': { title: 'Newsroom: corpus was modified outside the host', priority: 'urgent', tags: 'rotating_light' },
-  // The public-content twins of the two corpus words, for the volume that serves
-  // every published edition (content-refresh.mjs). A failed refresh left the last
-  // good back catalogue mounted -- yesterday's paper is missing from what the
-  // newsroom and pressman's site build can see -- while tampered means the mounted
-  // editions stopped matching what the host landed and were re-landed from git.
-  'content-refresh-failed': { title: 'Newsroom: published-content refresh failed', priority: 'urgent', tags: 'rotating_light' },
-  'content-tampered': { title: 'Newsroom: published content was modified outside the host', priority: 'urgent', tags: 'rotating_light' },
   'seam-blocked': { title: 'Newsroom: seam could not run', priority: 'high', tags: 'warning' },
   // The seam is a release job on a timer now, and under `--if-changed` a closed
   // wake window is a deferral rather than a failure -- otherwise an hourly unit

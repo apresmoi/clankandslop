@@ -107,7 +107,7 @@ The caption restates this story only.
 
 ## Examples in print
 
-Format references under `repos/newsroom-content/current/editions/`, not
+Format references under `repos/newsroom-content/current/content/editions/`, not
 evidence for today:
 
 - `2026-08-19/articles/unitree-opens-on-star-at-eleven-hundred.json`
