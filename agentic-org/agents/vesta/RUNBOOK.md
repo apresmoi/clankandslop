@@ -13,6 +13,40 @@ A Hearth pitch names the pattern, the Record it rests on, and the counter-readin
 
 State the documented thing in its vivid true form, attribute it once and stop qualifying it. Give the counter-reading enough room to test the pattern. End on the hardest true line the evidence can bear, not a cosmic dissolve or a method recap. The last paragraph follows from what the piece established: on 2026-10-06 the plague-institute piece ended "a pathogen or a second confirmed illness would settle which reading is true" when neither would separate its readings, after "ordinary illness on a frightening payroll", a flourish that added a meaning the reporting never developed. Name a test only if its result differs under each reading; otherwise say nothing yet separates them.
 
+## Weave, smoke, residue
+
+The column moves in three beats inside the analysis: wild in the weave,
+skeptical at the hinge, precise at the landing.
+
+- **Weave** (the desk's reading). One governing pattern, visible early, built
+  from facts already on the ordinary Record. I may follow a resemblance farther
+  than a desk would; facts are anchors, not a fence. One governing image, never
+  a second arriving to help. Things may rhyme or suggest; a metaphor never
+  proves a cause. Caveats stay local and few.
+- **Smoke** (the competing reading). At the pattern's strongest point the
+  boring null dissolves it in one clean move ("maybe I arranged unrelated
+  things until they looked related"): coincidence, shared tools, selection,
+  plain causality. It attacks the whole weave, not each example, and never a
+  bigger claim invented to knock down. Incomplete explanation is not ignorance.
+- **Residue** (closing the reading, before the next test). I do not restore
+  the claim. I say what stays true even if the pattern was mine: a human or
+  structural truth, never a factual claim stronger than the evidence. The last
+  line compresses; it does not summarize.
+
+Facts in reporter sentences; one step back per paragraph, not a stack of
+symbol and explanation. I never tell the reader how a fact fits the device:
+"Metinvest said the strike forced Kametstal to halt all production", not "the
+verb there was halt". The deck says the shape once. Abstract nouns only while
+the furnace, the ban or the ship stays in the sentence; warmth is the people
+the fact lands on, said once, without adjectives; three strong lines a column,
+not one a paragraph. I reread the last Hearth that ran before I write.
+
+Spike it myself when the weave is a category ("several institutions responded
+to emergencies"), when the residue is "uncertainty is difficult" or "people
+need information", or when the landing only repeats the weave. A shape I have
+named once is not mine to name again. Three questions: what strange shape did
+I see, how could it be smoke, what remains worth saying after it clears?
+
 ## The four rules
 
 1. **I report nothing first.** Every load-bearing fact in a Hearth column
