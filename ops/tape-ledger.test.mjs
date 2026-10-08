@@ -99,3 +99,29 @@ test('the market board is placed under the Markets File only when Ledger filed o
   assert.deepEqual(heads({ markets }).slice(0, 2), ['Briefly', 'MarketsBoard']);
   assert.equal(heads({}).includes('MarketsBoard'), false);
 });
+
+test('two days past its deadline a note no longer holds a call open: settle it hit, miss or cancelled', () => {
+  const history = ledgerHistory([OCT3, OCT4]);
+  const checked = 'Checked the corpus and research answer; no announced session was found for that week.';
+  // The IEA call (due 6 October) carries a note throughout, so only Iran is in question.
+  const noted = (outcome, note) => ({ resolved_last_edition: OCT6_ROWS.resolved_last_edition.map((r) => (r.call === IRAN ? { ...r, outcome, note } : { ...r, note: NOTE })) });
+  // The Iran window shut on 4 October: a noted "open" is fine on the 6th, refused from the 7th.
+  assert.deepEqual(dueCallFindings(history, '2026-10-06', noted('open', checked)), []);
+  const late = dueCallFindings(history, '2026-10-07', noted('open', checked));
+  assert.deepEqual(late.map((f) => [f.call, f.must_settle]), [[IRAN, true]]);
+  assert.deepEqual(dueCallFindings(history, '2026-10-07', noted('miss', checked)), []);
+  assert.deepEqual(dueCallFindings(history, '2026-10-07', noted('cancelled', 'No public record of the talks could ever decide this call as worded.')), []);
+  assert.equal(dueCallFindings(history, '2026-10-07', noted('cancelled', 'short')).length, 1, 'a late cancellation still needs its reason');
+
+  const root = mkdtempSync(resolve(tmpdir(), 'clank-late-'));
+  try {
+    for (const edition of [OCT3, OCT4]) {
+      mkdirSync(resolve(root, 'editions', edition.date, 'desk'), { recursive: true });
+      mkdirSync(resolve(root, 'editions', edition.date, 'articles'), { recursive: true });
+      writeFileSync(resolve(root, 'editions', edition.date, 'desk', 'ledger.settlements.json'), JSON.stringify(edition.settlements));
+      for (const article of edition.articles) writeFileSync(resolve(root, 'editions', edition.date, 'articles', `${article.id}.json`), JSON.stringify(article));
+    }
+    assert.throws(() => assertCarriedRows('2026-10-07', noted('open', checked), root), /keeps 1 call\(s\) open more than 2 days past their deadline .*U\.S\. and Iranian negotiators/u);
+    assert.doesNotThrow(() => assertCarriedRows('2026-10-07', noted('miss', checked), root));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

@@ -31,6 +31,20 @@ export const CALL_STATES = Object.freeze({
 /** Outcomes that take a call off the open ledger. */
 export const TERMINAL = new Set(['hit', 'miss', 'cancelled']);
 
+/**
+ * How long a due call may stay `open` with a note. On 8 October the tape
+ * still printed the week-ending-4-October Iran call and the 2 October
+ * 48-hour expulsion as "still open", each with a note saying nothing was
+ * found, four and five days after their windows shut. A note explains a
+ * pending check; it cannot hold a call open forever. Two days past its stated
+ * deadline (seven after it opened when it states none) a call is settled:
+ * `miss` when the record that would have made it a hit is still absent after
+ * checking, `hit` when it is there, `cancelled` when no record could ever
+ * decide it.
+ */
+export const SETTLE_GRACE_DAYS = 2;
+export const UNDATED_LIMIT_DAYS = 7;
+
 /** The shortest note that can say what was checked and why it did not settle. */
 export const NOTE_MIN_WORDS = 8;
 export const hasNote = (row) => isStr(row?.note) && row.note.trim().split(/\s+/u).length >= NOTE_MIN_WORDS;
@@ -90,6 +104,17 @@ export function callState(entry, edition) {
   if (!(String(entry?.opened ?? '') < edition)) return 'pending';
   if (!isStr(entry?.deadline)) return 'due';
   return entry.deadline < edition ? 'due' : 'pending';
+}
+
+/**
+ * Whether a call going into `edition` is past the time it may stay open:
+ * due, and more than SETTLE_GRACE_DAYS past its stated deadline (or more than
+ * UNDATED_LIMIT_DAYS past the edition that opened it, when it states none).
+ */
+export function mustSettle(entry, edition) {
+  if (callState(entry, edition) !== 'due') return false;
+  if (isStr(entry?.deadline)) return addDays(entry.deadline, SETTLE_GRACE_DAYS) < edition;
+  return ISO_DAY.test(String(entry?.opened ?? '')) && addDays(entry.opened, UNDATED_LIMIT_DAYS) < edition;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
