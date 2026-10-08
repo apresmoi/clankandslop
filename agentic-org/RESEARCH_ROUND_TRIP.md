@@ -125,7 +125,6 @@ tells `@caslon` in `room:filing` with the edition and article id.
 ## Ownership
 
 Automation, installation and raw research live in `clankandslop-private`; raw
-ad hoc reports stay on the 4090. This repository owns the protocol and the
-sanitized verification record `inventory/2026-09-07/adhoc-responder.md`.
+ad hoc reports stay on the 4090. This repository owns the protocol.
 Production delivery runs through Hetzner's Moltnet server; the 4090 reaches it
 through its managed loopback client.
