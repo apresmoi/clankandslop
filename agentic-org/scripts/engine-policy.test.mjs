@@ -127,8 +127,8 @@ const registration = (id, uid, model = 'grok-4.6', effort = 'low') => ({
 
 // The compiler embeds each worker's config.toml and sandbox.toml as JSON string
 // values, so their bytes arrive ESCAPED and only the parsed structure can be read;
-// `fixtures/compiled-grok-entrypoint.sh` is the real article, and this builder
-// mirrors its shape so the unit cases stay honest about the encoding.
+// this builder mirrors the shape `spawnfile build` emits so the unit cases
+// stay honest about the encoding.
 const worker = (id, uid, model = 'grok-4.6', effort = 'low') => ({
   agentId: id, uid, slot: uid - GROK_BROKER.firstWorkerUid, model, reasoningEffort: effort,
   config: `[model.daimon-broker-grok]\nmodel = "${model}"\nbase_url = "${GROK_BROKER.providerProxy}"\n${GROK_BROKER.backendSearch}\n${GROK_BROKER.webFetch}\n`,
