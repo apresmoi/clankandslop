@@ -90,6 +90,22 @@ Every due call must be resolved in today's filing, one of:
 `file_desk` refuses a due row that is `open` with no such note. The note prints
 on the Tape and the Track Record beside the call, dated today.
 
+**A note buys two days, not forever.** More than two days past the deadline
+the call states (seven days after it opened, when it states none), `open` is
+refused even with a note. Settle it:
+
+- `miss` when the record that would make it a hit is still absent after you
+  checked the corpus and the research answer. Name what you searched in `note`.
+  An announced session, a posted schedule or a confirmed departure that no
+  outlet reported days later did not happen as the call worded it.
+- `hit` when the record exists; name it.
+- `cancelled` only when no public record could ever decide the call as worded,
+  with that reason in `note`.
+
+On 8 October the week-ending-4-October Iran call and the 2 October 48-hour
+expulsion were still printed "open", four and five days late, each with a note
+saying nothing was found. Both were due a settlement, not another note.
+
 To check a due call: search today's corpus (`repos/newsroom-private/<date>/desks/_all.index`
 and the story files it names) for the call's subject. If the corpus does not
 settle every due call, send **one** `research.request.v1` to `room:research`:
@@ -102,6 +118,8 @@ File now, with notes on what is still open ("asked for research at 14:05 UTC;
 no answer yet" is a valid reason). When the answer arrives and the edition is
 not yet composed, file again with the settlements. Once Caslon has composed,
 never refile: `file_desk` refuses it, and the answer settles the call tomorrow.
+A pending answer holds a call open only inside the two-day grace. Past it,
+settle from what you have already searched.
 
 On a day when nothing settled, file:
 

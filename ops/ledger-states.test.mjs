@@ -32,3 +32,15 @@ test('a note must say something: eight words at least', () => {
   assert.equal(hasNote({ note: '   ' }), false);
   assert.equal(hasNote({ note: 'Checked the corpus and the IEA site; nothing posted yet.' }), true);
 });
+
+test('mustSettle: two days of grace past a stated deadline, seven past opening when none is stated', async () => {
+  const { mustSettle } = await import('./ledger-states.mjs');
+  const entry = (over) => ({ outcome: 'open', opened: '2026-10-02', deadline: '2026-10-04', ...over });
+  assert.equal(mustSettle(entry(), '2026-10-05'), false);
+  assert.equal(mustSettle(entry(), '2026-10-06'), false);
+  assert.equal(mustSettle(entry(), '2026-10-07'), true);
+  assert.equal(mustSettle(entry({ outcome: 'miss' }), '2026-10-20'), false, 'a settled call is done');
+  assert.equal(mustSettle(entry({ deadline: '2026-12-04' }), '2026-10-08'), false, 'a call not yet due is never forced');
+  assert.equal(mustSettle(entry({ deadline: null }), '2026-10-09'), false);
+  assert.equal(mustSettle(entry({ deadline: null }), '2026-10-10'), true);
+});

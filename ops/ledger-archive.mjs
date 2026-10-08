@@ -6,7 +6,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
-import { NOTE_MIN_WORDS, callKey, carriedCalls, dueCallFindings, ledgerHistory, missingLedgerRows } from './open-clocks.mjs';
+import { NOTE_MIN_WORDS, SETTLE_GRACE_DAYS, callKey, carriedCalls, dueCallFindings, ledgerHistory, missingLedgerRows } from './open-clocks.mjs';
 import { callState } from './ledger-states.mjs';
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
@@ -39,7 +39,11 @@ export function assertCarriedRows(edition, document, contentRoot = publicContent
   const missing = missingLedgerRows(history, edition, document);
   if (missing.length > 0)
     throw new Error(`ledger.settlements drops ${missing.length} call(s) still open from earlier editions — a call stays on the ledger until a row settles it hit, miss or cancelled. Add these rows (keep outcome "open" unless a record you can name settles it) and file again: ${JSON.stringify(missing)}`);
-  const due = dueCallFindings(history, edition, document);
+  const findings = dueCallFindings(history, edition, document);
+  const overdue = findings.filter((f) => f.must_settle);
+  if (overdue.length > 0)
+    throw new Error(`ledger.settlements keeps ${overdue.length} call(s) open more than ${SETTLE_GRACE_DAYS} days past their deadline — a call that far past its window is settled, not explained: "miss" when the record that would make it a hit is still absent after checking the corpus and the research answer (say what you searched in "note"), "hit" when that record exists (name it in "note"), or "cancelled" with the reason in "note" when no public record could ever decide it as worded. Fix these rows and file again: ${JSON.stringify(overdue.map(({ must_settle, ...f }) => f))}`);
+  const due = findings;
   if (due.length > 0)
     throw new Error(`ledger.settlements leaves ${due.length} due call(s) unexplained — each call whose deadline has passed is settled "hit" or "miss" from a record you can name, "cancelled" with the reason in "note", or stays "open" with a "note" of at least ${NOTE_MIN_WORDS} words saying what you checked and why it is still unresolved (e.g. "Checked the day's corpus and research answer ledger-<date>-calls; no IEA schedule found by 16:00 UTC"). Fix these rows and file again: ${JSON.stringify(due)}`);
 }

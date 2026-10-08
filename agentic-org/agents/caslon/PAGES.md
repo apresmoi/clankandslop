@@ -382,7 +382,7 @@ hand-authoring did on 5 September.
 Briefly            The Markets File, compact, three desks
 MarketsBoard       when Ledger's ledger.worlddesk carries markets
 KeyFigures         Today's Numbers, from today's articles' key_numbers
-Deadlines          owed updates, today's next checks, open calls still to settle
+Deadlines          owed updates, open calls still to settle
 ForecastLedger     today's open rows plus every call still open from an earlier edition
 TrackRecord        Track Record · Settlement, read from the persistent ledger
 flow: []
@@ -433,8 +433,10 @@ there is nothing to copy, round or retype, and a record carrying the retired
   lever, and I do not pull it for the Tape.
 - **`Deadlines`** — the prior edition's `next_update_utc` promises that no
   story today names in `previous_coverage` (update owed, linked to the
-  story); today's own `next_update_utc` checks; and every open call whose
-  deadline is today or later, under its opening article's headline.
+  story; a forecast owes its settlement instead, dated below), and every
+  open call whose deadline is today or later, under its opening article's
+  headline. Today's own `next_update_utc` clocks are not listed: they fall due
+  as tomorrow's owed rows.
 
 **`ForecastLedger`** — I write nothing. The assembler lists every call not
 yet settled, today's new calls included, from the persistent ledger

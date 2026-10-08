@@ -15,7 +15,7 @@
 //
 // Pure: callers read the archive (ops/ledger-archive.mjs) and pass it in.
 
-import { CALL_STATES, TERMINAL, callDeadline, callState, hasNote, NOTE_MIN_WORDS, shortDay } from './ledger-states.mjs';
+import { CALL_STATES, TERMINAL, callDeadline, callState, hasNote, mustSettle, NOTE_MIN_WORDS, SETTLE_GRACE_DAYS, shortDay } from './ledger-states.mjs';
 
 // Calls published before this date predate the carry-forward contract. Their
 // labels were never written to settle ("medium", "High", "Likely") and none of
@@ -120,13 +120,16 @@ export function dueCallFindings(history, edition, filed) {
   for (const entry of carriedCalls(history, edition)) {
     if (callState(entry, edition) !== 'due') continue;
     const row = rows.get(callKey(entry.call));
-    if (row === undefined || row.outcome === 'hit' || row.outcome === 'miss' || hasNote(row)) continue;
+    if (row === undefined || row.outcome === 'hit' || row.outcome === 'miss') continue;
+    // Past its grace a note no longer holds a call open (ledger-states.mjs).
+    if (row.outcome !== 'cancelled' && mustSettle(entry, edition)) { out.push({ call: entry.call, prior_p: entry.prior_p, deadline: entry.deadline ?? 'no date stated', outcome: row.outcome, must_settle: true }); continue; }
+    if (hasNote(row)) continue;
     out.push({ call: entry.call, prior_p: entry.prior_p, deadline: entry.deadline ?? 'no date stated', outcome: row.outcome });
   }
   return out;
 }
 
-export { NOTE_MIN_WORDS };
+export { NOTE_MIN_WORDS, SETTLE_GRACE_DAYS };
 
 /**
  * The tape's forecast table going into `edition`: every call not yet settled,
@@ -171,7 +174,9 @@ export function followUps(previous, todayArticles = {}) {
   if (!isStr(previous?.date)) return [];
   const covered = new Set(articlesOf(todayArticles).flatMap((a) => (Array.isArray(a?.previous_coverage) ? a.previous_coverage : []).map((ref) => `${ref?.date}/${ref?.slug}`)));
   return articlesOf(previous.articles)
-    .filter((a) => isStr(a?.next_update_utc) && isStr(a?.headline) && isStr(a?.id) && !covered.has(`${previous.date}/${a.id}`))
+    // A forecast's next_update_utc is its same-day facts check; what it owes
+    // later is its settlement, which the Deadlines already date.
+    .filter((a) => a?.epistemic !== 'forecast' && isStr(a?.next_update_utc) && isStr(a?.headline) && isStr(a?.id) && !covered.has(`${previous.date}/${a.id}`))
     .sort((a, b) => String(a.next_update_utc).localeCompare(String(b.next_update_utc)) || String(a.id).localeCompare(String(b.id)))
     .map((a) => ({ edition: previous.date, time: a.next_update_utc.trim(), headline: a.headline.trim(), article: a.id, ...(isStr(a.byline?.agents?.[0]) ? { who: a.byline.agents[0] } : {}) }));
 }
