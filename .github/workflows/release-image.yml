@@ -1,0 +1,103 @@
+# Builds the org image in CI with `spawnfile build --release` and pushes it to
+# Docker Hub (apresmoi/clank-and-slop, public). The image holds only public
+# inputs: this repository's committed tree, npm dependencies, the public og
+# images and the public NOAA ETOPO1 grid. Everything from clankandslop-private
+# reaches agents as host-fed volumes, so this job never checks it out and has
+# no deploy key. It does not deploy; the host pulls by digest separately.
+name: release image
+
+on:
+  push:
+    branches: [main, ci/release-image]
+    # Published editions are fed volumes, not image inputs.
+    paths-ignore:
+      - "content/editions/**"
+      - "content/bylines/**"
+  workflow_dispatch:
+
+concurrency:
+  group: release-image
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: docker.io/apresmoi/clank-and-slop
+  # ETOPO1 ice-surface grid, grid-registered GMT4 (NOAA, unchanged since 2013).
+  ETOPO_URL: https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/netcdf/ETOPO1_Ice_g_gmt4.grd.gz
+  ETOPO_GZ_SHA256: c241db385d89f3d0c22eec8138224db9f2ebee6a1b4d1ecb4ebc6a5743a28ec8
+  # Digest of agentic-org/etopo-relief.tar that every archived map was baked from.
+  ETOPO_TAR_SHA256: ae1177ef2885c339f227c67b4efb27907eae0274a5aa61c1038eaac56ce50eeb
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      digest: ${{ steps.release.outputs.digest }}
+      image-reference: ${{ steps.release.outputs.image-reference }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The image and its build context together exceed the runner's free disk.
+      - name: Free runner disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - name: Restore ETOPO1 grid
+        id: etopo-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/etopo
+          key: etopo1-ice-g-gmt4-${{ env.ETOPO_GZ_SHA256 }}
+
+      - name: Download ETOPO1 grid
+        if: steps.etopo-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "${RUNNER_TEMP}/etopo"
+          curl -fsSL --retry 5 --retry-all-errors -o "${RUNNER_TEMP}/etopo/ETOPO1_Ice_g_gmt4.grd.gz" "${ETOPO_URL}"
+
+      - name: Build the ETOPO relief bundle
+        run: |
+          gz="${RUNNER_TEMP}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
+          echo "${ETOPO_GZ_SHA256}  ${gz}" | sha256sum -c -
+          CLANK_ETOPO_GZ="${gz}" node agentic-org/scripts/build-etopo-bundle.mjs
+          echo "${ETOPO_TAR_SHA256}  agentic-org/etopo-relief.tar" | sha256sum -c -
+
+      # Generated workspace bundles (website-deps runs npm ci in a container)
+      # are content-addressed by Spawnfile; reuse them across runs.
+      - name: Restore workspace bundle cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.spawnfile/cache
+          key: spawnfile-bundles-${{ hashFiles('website/package.json', 'website/package-lock.json', 'agentic-org/bundles/**') }}
+          restore-keys: spawnfile-bundles-
+
+      - id: release
+        uses: noopolis/spawnfile/.github/actions/release-image@main
+        with:
+          project: agentic-org
+          image: ${{ env.IMAGE }}
+          tag: ${{ github.sha }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag latest
+        if: github.ref == 'refs/heads/main'
+        env:
+          DIGEST: ${{ steps.release.outputs.digest }}
+        run: |
+          set -euo pipefail
+          docker tag "${IMAGE}:${GITHUB_SHA}" "${IMAGE}:latest"
+          docker push "${IMAGE}:latest"
+          served="$(docker buildx imagetools inspect "${IMAGE}:latest" --format '{{json .Manifest}}' | jq -r '.digest')"
+          if [[ "${served}" != "${DIGEST}" ]]; then
+            echo "::error::latest serves ${served}, not ${DIGEST}"
+            exit 1
+          fi
+          {
+            echo "- latest: \`${IMAGE}:latest\` → \`${DIGEST}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+          echo "digest ${DIGEST}"
