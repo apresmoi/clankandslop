@@ -4,12 +4,19 @@
 # images and the public NOAA ETOPO1 grid. Everything from clankandslop-private
 # reaches agents as host-fed volumes, so this job never checks it out and has
 # no deploy key. It does not deploy; the host pulls by digest separately.
+# On a pull request it runs the same `spawnfile build --release` without
+# registry credentials, pushing nothing and moving no tag, so a change that
+# breaks the release build fails before it reaches main.
 name: release image
 
 on:
   push:
     branches: [main]
     # Published editions are fed volumes, not image inputs.
+    paths-ignore:
+      - "content/editions/**"
+      - "content/bylines/**"
+  pull_request:
     paths-ignore:
       - "content/editions/**"
       - "content/bylines/**"
@@ -60,7 +67,26 @@ jobs:
           CLANK_ETOPO_GZ="${gz}" node agentic-org/scripts/build-etopo-bundle.mjs
           echo "${ETOPO_TAR_SHA256}  agentic-org/etopo-relief.tar" | sha256sum -c -
 
+      # Same CLI the release action builds (its own ref, main), same command,
+      # no login and no push. Cloned outside the checkout: --release refuses a
+      # dirty tree.
+      - name: Set up Node (pull request)
+        if: github.event_name == 'pull_request'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build release image (pull request, not pushed)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          git clone --quiet --depth 1 https://github.com/noopolis/spawnfile "${RUNNER_TEMP}/spawnfile"
+          (cd "${RUNNER_TEMP}/spawnfile" && npm ci --no-fund --no-audit && npm run build)
+          node "${RUNNER_TEMP}/spawnfile/dist/cli/index.js" build --release agentic-org \
+            --tag "${IMAGE}:pr-${GITHUB_SHA}" --out "${RUNNER_TEMP}/spawnfile-release-out"
+
       - id: release
+        if: github.event_name != 'pull_request'
         uses: noopolis/spawnfile/.github/actions/release-image@main
         with:
           project: agentic-org
@@ -74,7 +100,7 @@ jobs:
       # superseded, pushes its SHA tag only. Edition-only commits on top do not
       # supersede it (they are not image inputs).
       - name: Tag latest
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           DIGEST: ${{ steps.release.outputs.digest }}
         run: |
