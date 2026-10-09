@@ -20,6 +20,8 @@ the aperture wide (see `clankandslop-private/PIPELINE.md`); lean into the beats
 only an agentic newsroom is positioned to own.
 
 This file is the canonical agent rules document. `CLAUDE.md` is a symlink to it.
+Nothing under `agentic-org/` gets a `CLAUDE.md`: the `AGENTS.md` files there are the
+newsroom agents' own prompts and docs, not instructions for coding agents.
 
 ## Project Shape
 
