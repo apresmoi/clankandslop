@@ -7,7 +7,7 @@
 // be every tracked file, so `content/editions/<date>/**` was inside it. Landing
 // an edition therefore moved the archive digest, publish-edition-branch.mjs
 // repinned all twelve agent Spawnfiles to the new digest, `main` moved, and the
-// hourly release job (`seam-run.mjs --if-changed`) rebuilt and redeployed the
+// hourly release job rebuilt and redeployed the
 // whole organization every night -- for a change that was data, not code. The
 // research corpus had the same defect and the same cure (PR #200): the content
 // is now the team-shared `clank-newsroom-content` volume, a Spawnfile fed volume

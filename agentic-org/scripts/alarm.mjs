@@ -56,7 +56,7 @@ import { hostname } from 'node:os';
 import path from 'node:path';
 
 // Every failure an unattended cycle can have that a human must hear about.
-// `seam-run.mjs` and `cycle-audit.mjs` may only raise one of these, so the
+// `release-notify.mjs` and `cycle-audit.mjs` may only raise one of these, so the
 // receiving human learns a fixed vocabulary rather than free text.
 export const REASONS = Object.freeze({
   'repin-failed': { title: 'Newsroom: repin failed', priority: 'urgent', tags: 'rotating_light' },

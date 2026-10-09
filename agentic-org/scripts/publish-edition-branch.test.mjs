@@ -7,7 +7,6 @@ import { join } from 'node:path';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
 import { PUBLIC_CONTENT_PATHS, isPublicContentPath } from './public-content.mjs';
-import { releaseGate, RELEASE_LEDGER_VERSION } from './release-ledger.mjs';
 import {
   BASE_BRANCH, CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, GENERATED_INDEX_PATHS, LANDED_VERSION, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   artifactDigest, assertNoForcedPush, assertNotProtectedRef, assertPushableRef, assertRequestedEdition, berlinToday,
@@ -490,55 +489,6 @@ test('an edition lands green on an organization base without touching any image 
     assert.deepEqual(files.sort(), ['content/bylines/cogsworth.tsv', 'content/editions/2026-09-10/articles/one.json']);
     if (organization) assert.deepEqual(imageInputs(origin.url, result.commit), imageInputs(origin.url, result.base), 'an edition commit changes nothing the image is built from');
   }
-});
-
-// THE PROPERTY THIS WHOLE CHANGE EXISTS FOR, end to end: the real publisher cuts
-// an edition branch, merge-edition.yml's merge lands it on main, and the real
-// release gate -- the one the hourly clank-release.timer runs -- reads the moved
-// origin/main and answers "already released; nothing to do". Then a real code
-// change still releases.
-test('an edition-only merge leaves the release gate at "already released; nothing to do"', async () => {
-  const origin = remote();
-  const buildRoot = scratch('build-root');
-  git(['clone', '-q', origin.url, buildRoot], buildRoot);
-  git(['config', 'user.email', 'seed@example.invalid'], buildRoot);
-  git(['config', 'user.name', 'seed'], buildRoot);
-  const released = origin.head();
-  const ledger = join(scratch('ledger'), 'released.json');
-  writeFileSync(ledger, `${JSON.stringify({ version: RELEASE_LEDGER_VERSION, commit: released, tag: 'clank-and-slop:seam-2026-10-01-000000', at: '2026-10-01T00:00:00.000Z' })}\n`);
-  const imageBefore = imageInputs(buildRoot);
-
-  const staged = stagedEdition('2026-10-02');
-  const work = scratch('work');
-  const edition = await pushStagedEditionTree({
-    url: origin.url, branch: editionBranch('2026-10-02'), editionSource: staged.source, editionPath: staged.path,
-    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-10-02')
-  });
-  origin.merge(edition.commit);
-  git(['fetch', '-q', 'origin'], buildRoot);
-
-  const lines = [];
-  const options = { repo: buildRoot, released: ledger, track: 'origin/main', fetch: false };
-  const verdict = releaseGate(options, { log: (line) => lines.push(line) });
-  assert.equal(verdict.tip, edition.commit, 'origin/main did move');
-  assert.equal(verdict.upToDate, true, lines.join('\n'));
-  assert.match(lines.join('\n'), /already released as clank-and-slop:seam-2026-10-01-000000; nothing to do/u);
-  assert.equal(git(['rev-parse', 'HEAD'], buildRoot), released, 'nothing is fast-forwarded for a build that will not happen');
-  // And the image really is unchanged: the same source archive, byte for byte.
-  git(['checkout', '-q', edition.commit], buildRoot);
-  assert.deepEqual(imageInputs(buildRoot), imageBefore);
-  git(['checkout', '-q', BASE_BRANCH], buildRoot);
-
-  // A real code change on top still releases.
-  const coder = scratch('coder');
-  git(['clone', '-q', origin.url, coder], coder);
-  writeFileSync(join(coder, 'agentic-org', 'scripts', 'production-newsroom.mjs'), 'export const newsroom = 2;\n');
-  git(['commit', '-qam', 'fix: a reviewed code change'], coder);
-  git(['push', '-q', 'origin', `HEAD:${BASE_BRANCH}`], coder);
-  git(['fetch', '-q', 'origin'], buildRoot);
-  const code = releaseGate({ repo: buildRoot, released: ledger, track: 'origin/main', fetch: false }, { log: () => {} });
-  assert.equal(code.upToDate, false);
-  assert.equal(git(['rev-parse', 'HEAD'], buildRoot), code.tip, 'the release is built from the tip it found');
 });
 
 test('the edition path may not escape the branch', async () => {

@@ -4,7 +4,7 @@
 // ---------------
 // Both halves of the organization assumed Codex. `validate-org.mjs` mapped all
 // twelve agents to `codex` and treated any other engine as "must not declare a
-// model", and `seam-run.mjs` refused to deploy an organization that contained
+// model", and the old seam release job refused to deploy an organization that contained
 // no Codex agent at all. Neither of those is the safety property. The safety
 // property is:
 //
@@ -34,9 +34,11 @@
 //          any other pair — which is why the declaration must name both.
 //
 // So the Grok equivalents of the Codex checks are asserted where they actually
-// live: the declaration side here and in `validate-org.mjs`, the compiled side
-// in `seam-run.mjs`'s `runtimePolicy` stage, which reads both the Daimon
-// organization runtime config AND the rendered broker provisioning.
+// live: the declaration side here and in `validate-org.mjs`. The compiled side
+// (`compiledEngineFindings`, `grokBrokerFindings`) read the Daimon organization
+// runtime config AND the rendered broker provisioning in the old seam release
+// job's `runtimePolicy` stage; `spawnfile release` has no pre-deploy hook, so
+// those two currently run only in their tests (open follow-up).
 //
 // An engine with no entry in this module is a REFUSAL, never a skipped agent.
 // That is the rule the old `if (engine === 'codex') … else …` broke: anything

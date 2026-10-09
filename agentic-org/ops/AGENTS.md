@@ -14,47 +14,66 @@ was:  research lands on edition/<date>   →  a person repins, rebuilds, redeplo
                                          →  a person opens and merges the PR
       something breaks                   →  systemd says Failed into a void
 
-now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unless public main's HEAD moved
+now:  clank-release.timer      (Hetzner)      hourly `spawnfile release`: no-op unless the image identity changed; drains turns, never kills one
       clank-feed-corpus        (Hetzner)      `clank-newsroom-corpus` fed volume ← edition/<today>, frozen at 12:00
       clank-feed-content       (Hetzner)      `clank-newsroom-content` fed volume ← every published edition, from public main
       clank-feed-private-tools (Hetzner)      `clank-newsroom-private-tools` fed volume ← private newsroom tools + art deps
       clank-publish.timer      (Hetzner)      17:00 staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
-      clank-alarm@.service     (both boxes)   ntfy → a phone
+      clank-alarm@.service     (both boxes)   records the failure locally
 ```
 
 ## The pieces
 
 | File | Runs | Does |
 |---|---|---|
-| `scripts/seam-run.mjs` | Hetzner, on a timer with `--if-changed` | clean public main snapshot → `spawnfile build --release` (builds every bundle) → `up` → settle → record the release |
-| `scripts/release-ledger.mjs` | inside the seam | `/home/clank/deploy-work/released.json`: which commit is actually running, so a timer can do nothing cheaply |
-| `scripts/wake-window.mjs` | inside both | derives the safe window from the Spawnfiles, and reads the container to prove nothing is awake |
+| `systemd/clank-release.service` | Hetzner, hourly | `git pull --ff-only` → `spawnfile release` (identity no-op, build, drain, deploy, settle, resume, control-token bootstrap, ledger, prune) |
+| `scripts/release-notify.mjs` | inside the release | Spawnfile's `--notify-command`: a failed or day-old deferred release → `alarm.mjs` spool |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
 | `clank-feed-content.timer` | Hetzner, every 5 min | `spawnfile volume refresh public-content-volume`: published editions + bylines at `origin/main` → `clank-newsroom-content` fed volume |
 | `clank-feed-private-tools.timer` | Hetzner, every 2 min | `spawnfile volume refresh newsroom-private-tools`: the private newsroom tools at clankandslop-private `origin/main` → `clank-newsroom-private-tools` fed volume |
 | `scripts/cycle-audit.mjs` | Hetzner, 18:15 Berlin | did today's cycle reach `composed`? |
-| `scripts/alarm.mjs` | both boxes | one HTTPS POST that reaches a person |
-| `ops/bin/clank-handler-reaper.sh` | Hetzner, every 5 min | kills leaked Daimon engine handlers older than any possible turn; its age floor is pinned above the longest Spawnfile turn timeout by `systemd-contract.test.mjs` |
+| `scripts/alarm.mjs` | both boxes | records the alarm in the spool, then POSTs it when a channel is configured |
 | `../../.github/workflows/merge-edition.yml` | GitHub | opens and merges the edition PR, only on green CI |
 
-## Why the seam refuses more often than it runs
+## The release drains; it does not wait for a quiet hour
 
-A redeploy kills every in-flight wake. `wake-window.mjs` therefore answers
-"is it safe" from two independent places and needs both:
+`spawnfile release` (Spawnfile `specs/RELEASE.md`) replaced `seam-run.mjs`, its
+release ledger, the schedule-derived deploy window and the container
+quiescence probe. A redeploy used to kill in-flight wakes, so the old job
+refused unless the hour was clear and the container quiet. Now Daimon's
+control API pauses admission (new wakes answer `work-blocked`, Moltnet retries
+them, queued wakes stay queued), running turns finish within `--drain-timeout
+30m`, and only then is the container replaced. A drain that does not finish
+resumes admission and exits 75: a deferral, retried next hour, reported once
+by the notifier after a day.
 
-- **the schedule**, parsed out of `agents/*/Spawnfile` — not out of
-  `policies/schedule.json`, and never hardcoded, because the Spawnfile is the
-  only file the compiler lowers into the container's cron. The crons have
-  already moved once: the repin script's own header still says the reporters
-  wake at 10:00; the tree now says 12:00.
-- **the running container** — daimon's wake-acceptance receipts (any in
-  `accepted` or `running`), the turn usage ledger (any incomplete turn, or any
-  turn metered in the last 15 minutes), and the process table (anything outside
-  the steady-state set). A container that cannot be read is not quiet: every
-  unreadable signal is a finding, and findings block.
+What stayed in the org, and why:
 
-## The seam is a release job, not a daily one
+- **`git pull --ff-only` before the release** (`ExecStartPre`): Spawnfile builds
+  from the checkout and fetching it is the caller's job.
+- **the control-token bootstrap** (`--post-deploy-command`): the newsroom
+  control token is not in the image; `bootstrap-control-token.sh` from the
+  private checkout installs it into the new container and proves an
+  authenticated activity read. A failure leaves the release unrecorded and the
+  next run redeploys and reruns it.
+- **the notifier target**: the alarm spool, via `scripts/release-notify.mjs`.
+- **`release-time.mjs` stays, untouched.** It is the edition release clock
+  (18:00 publication) used by the newsroom tools and the publisher, not a
+  deploy gate, so nothing in `spawnfile release` replaces it.
+
+Dropped with the seam, with no replacement:
+
+- the `wakeBudget` check of `deploy.env` (no `DAIMON_WAKE_FUSE_EPOCH`, exactly
+  one `DAIMON_WAKE_FUSE_EPOCH_ZONE=Europe/Berlin`): host configuration, already
+  correct; recheck it by hand whenever `deploy.env` changes.
+- the compiled engine-policy admission (`runtimePolicy`): `spawnfile release`
+  has no pre-deploy hook; `engine-policy.mjs`'s compiled-side checks run only in
+  their tests until one exists.
+- the handler reaper: Daimon D1 (daimon-harness#42) fixed the leak at its
+  source and runs in production.
+
+## A release ships code and prompts, never data
 
 The corpus used to be `newsroom-private.tar`, a checksum-pinned bundle whose
 digest sat in all twelve agent Spawnfiles and was repinned here every morning —
@@ -80,10 +99,9 @@ so nothing from clankandslop-private may be a layer. The state adapter, the
 art, visual and validation servers and the release adapter are the
 `clank-newsroom-private-tools` fed volume at `./tools/private`
 (`current/newsroom/...`), landed by `clank-feed-private-tools.timer`. An edition commit touches nothing an image is
-built from, and the release gate answers it with *"already released; nothing
-to do"* — `releaseGate` diffs the released commit against the tip and treats a
-diff made only of those paths as released (`publish-edition-branch.test.mjs`
-proves it end to end). Everything else under `content/` (personas, topics,
+built from (`publish-edition-branch.test.mjs` holds that), so its Docker
+build context, and therefore Spawnfile's release identity, is unchanged and
+`spawnfile release` exits 0 with *"… is already running as …; nothing to do"*. Everything else under `content/` (personas, topics,
 log, fixtures), the site code and every runtime script stay in the image and
 still ship through a release.
 
@@ -95,27 +113,22 @@ image (rebuilt only when code/prompts change)      volume (refreshed after every
                                                           content/bylines/<agent>.tsv
 ```
 
-So: **an org image is day-agnostic, and there is no `repin` stage.** What the
-seam ships is code and prompts, and `--if-changed` makes that literal — it
-compares `git rev-parse HEAD` against the release ledger and exits 0 having
-touched nothing when they match. Under `--if-changed` a closed wake window is a
-*deferral* (logged, exit 0, with the pending commit and its age written beside
-the ledger, and one `release-deferred` alarm once it passes a day), because an
-hourly job that paged on every busy hour would train you to ignore the pager.
-Run by hand, a refused gate still alarms and still exits non-zero.
+So: **an org image is day-agnostic, and there is no `repin` stage.** What a
+release ships is code and prompts; an unchanged image identity is a no-op that
+touches nothing.
 
 Two things the daily deploy was doing for free had to be given their own homes:
 
-- **the wake budget.** The org is compiled once, deployed only when `main`
-  changes (`clank-release.timer`, `--if-changed`), and **never restarted
+- **the wake budget.** The org is compiled once, deployed only when its image
+  changes (`clank-release.timer`), and **never restarted
   daily**. Daimon renews the wake fuse's budget in-process: with
   `DAIMON_WAKE_FUSE_EPOCH` unset it derives the epoch from the date in
   `DAIMON_WAKE_FUSE_EPOCH_ZONE` and rolls it at both the snapshot gate and
   admission. So `deploy.env` carries `DAIMON_WAKE_FUSE_EPOCH_ZONE=Europe/Berlin`
   exactly once and **no** `DAIMON_WAKE_FUSE_EPOCH` line — a pinned epoch never
-  rolls, and the newsroom would wedge after its first day. The seam's
-  `wakeBudget` stage refuses to deploy against any other file and writes
-  nothing. (This retired `epoch-roll-run.mjs` and its daily recreate.)
+  rolls, and the newsroom would wedge after its first day. Nothing checks this
+  automatically any more (see above). (This retired `epoch-roll-run.mjs` and
+  its daily recreate.)
 - **corpus provenance.** It travels with the data now, as Spawnfile's
   `.spawnfile-feed.json` beside the tree, checked by `scripts/corpus-contract.mjs`
   when Brass commissions; the publisher checks it against Spawnfile's host record.
@@ -128,7 +141,7 @@ the build root, published content excluded), the website dependencies
 (`npm ci` in the runtime's own digest-pinned Node image) and the og assets. It
 keys each by its inputs, refuses a build root whose bundle inputs do not match
 `HEAD`, and records every digest in the compile report. Nothing is written back
-into the tree, so the release gate refuses any tracked modification. The one
+into the tree, and `--release` refuses bundle inputs that differ from `HEAD`. The one
 prebuilt archive is `etopo-relief.tar` (`scripts/build-etopo-bundle.mjs`, from
 a ~395MB external download), which Spawnfile hashes at compile.
 
@@ -138,8 +151,8 @@ Durable volume names are derived from the **path** of the Spawnfile that was
 compiled: the edition-state volume is
 `…-team-clank-and-slop-root-work-clankandslop-agentic-org-spawnfile-016c21d8-…`.
 Building the same tree from a different directory mints different volume names
-and silently detaches every agent's mneme memory. `--repo` defaults to
-`/root/work/clankandslop` for that reason and for no other.
+and silently detaches every agent's mneme memory. `clank-release.service`
+builds `/root/work/clankandslop/agentic-org` for that reason and for no other.
 
 ## Install (Hetzner, root) — complete from clean state
 
@@ -168,16 +181,17 @@ rm -f /etc/systemd/system/clank-epoch-roll.service /etc/systemd/system/clank-epo
       /etc/systemd/system/clank-content-refresh.service /etc/systemd/system/clank-content-refresh.timer \
       /etc/systemd/system/clank-corpus-refresh.service /etc/systemd/system/clank-corpus-refresh.timer
 systemctl daemon-reload
-systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer clank-feed-content.timer clank-feed-private-tools.timer clank-feed-corpus.timer 2>/dev/null || true
+systemctl disable --now clank-seam.timer clank-handler-reaper.timer 2>/dev/null || true   # retired
+rm -f /etc/systemd/system/clank-seam.service /etc/systemd/system/clank-seam.timer \
+      /etc/systemd/system/clank-handler-reaper.service /etc/systemd/system/clank-handler-reaper.timer
+systemctl daemon-reload
+systemctl disable clank-release.timer clank-cycle-audit.timer clank-publish.timer clank-feed-content.timer clank-feed-private-tools.timer clank-feed-corpus.timer 2>/dev/null || true
 
 # 5. the retired refreshers' work roots are not used any more (Spawnfile keeps
 #    fed-volume state beside each volume, in spawnfile-feed/)
 rm -rf /var/lib/clank-content /var/lib/clank-corpus
 
-# 6. dry-run the seam without deploying
-node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
-
-# 7. prove the deploy key opens the public repository (read-only check; it
+# 6. prove the deploy key opens the public repository (read-only check; it
 #    prints the repository the key is registered against and nothing secret)
 ssh -o BatchMode=yes -i /root/.ssh/clank_public -T git@github.com
 ```
@@ -208,13 +222,73 @@ for id in newsroom-private-tools public-content-volume research-corpus; do $SF v
 rm -rf /var/lib/clank-content /var/lib/clank-corpus
 ```
 
-**To arm the seam and the audit, one command:**
+**To arm the release and the audit, one command** (first time: do the cutover
+below instead):
 
 ```bash
-systemctl enable --now clank-seam.timer clank-cycle-audit.timer
+systemctl enable --now clank-release.timer clank-cycle-audit.timer
 ```
 
-To disarm again: `systemctl disable --now clank-seam.timer clank-cycle-audit.timer`.
+To disarm again: `systemctl disable --now clank-release.timer clank-cycle-audit.timer`.
+
+**Cutover from the seam to `spawnfile release` (once, Hetzner, root) — complete from clean state.**
+Production already runs Daimon 8349559 (D4 drain/resume), so the first
+release drains like every later one: no `--no-drain` deploy is needed. The
+first run has no ledger, so it releases (build, drain, redeploy) even though
+the code is unchanged.
+
+```bash
+# 0. preconditions: Spawnfile with --runtime-env-file and --post-deploy-command
+#    (noopolis/spawnfile#59, #60), a clean org checkout, the drain token, the bootstrap
+git -C /home/clank/deploy-work/spawnfile-main fetch -q origin
+git -C /home/clank/deploy-work/spawnfile-main checkout -q --detach origin/main
+(cd /home/clank/deploy-work/spawnfile-main && PATH=/home/clank/deploy-work/node24/bin:$PATH npm ci --no-audit --no-fund && PATH=/home/clank/deploy-work/node24/bin:$PATH npm run build)
+/home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js release --help | grep -c -- '--post-deploy-command'   # 1
+GIT_SSH_COMMAND="ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes" git -C /root/work/clankandslop pull --ff-only
+test -z "$(git -C /root/work/clankandslop status --porcelain)" && echo clean
+grep -c '^SPAWNFILE_DAIMON_CONTROL_TOKEN=' /home/clank/deploy-work/deploy.env   # 1
+test -f /root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh && echo bootstrap-present
+test -f /home/clank/deploy-work/grok-runtime-identity-20261009b.json && echo identity-present
+
+# 1. stop the old jobs (a running seam finishes first)
+systemctl disable --now clank-release.timer clank-seam.timer clank-handler-reaper.timer 2>/dev/null || true
+until ! systemctl is-active -q clank-release.service && ! systemctl is-active -q clank-seam.service; do sleep 15; done   # never stop a deploy mid-way
+rm -f /etc/systemd/system/clank-seam.service /etc/systemd/system/clank-seam.timer \
+      /etc/systemd/system/clank-handler-reaper.service /etc/systemd/system/clank-handler-reaper.timer
+
+# 2. the deployment record moves from clank's Spawnfile home to root's
+test -d /home/clank/.spawnfile/deployments/clank-and-slop && echo record-present
+BACKUP=$(mktemp -d) && cp -a /root/.spawnfile "$BACKUP/" 2>/dev/null; echo "backup: $BACKUP"
+install -d -m 700 /root/.spawnfile /root/.spawnfile/deployments
+cp -a /home/clank/.spawnfile/deployments/clank-and-slop /root/.spawnfile/deployments/
+rm -f /root/.spawnfile/deployments/clank-and-slop/.lock
+chown -R root:root /root/.spawnfile/deployments/clank-and-slop
+
+# 3. the new units
+install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/clank-release.service \
+               /root/work/clankandslop/agentic-org/ops/systemd/clank-release.timer /etc/systemd/system/
+systemctl daemon-reload
+
+# 4. first release by hand, watched to a stable end state
+systemctl start clank-release.service
+systemctl show -p Result -p ExecMainStatus clank-release.service          # Result=success ExecMainStatus=0
+journalctl -u clank-release.service -n 80 --no-pager | grep -E 'release:|FAILED'   # drained, deployed, post-deploy succeeded, recorded
+cat /root/.spawnfile/releases/clank-and-slop/ledger.json
+docker inspect -f '{{.Config.Image}} {{.State.Status}} {{.State.Health.Status}} {{.RestartCount}}' spawnfile-clank-and-slop
+ls /var/lib/clank-alarm/spool | tail -3                                     # no new deploy-failed breadcrumb
+
+# 5. a second run must be a no-op
+systemctl start clank-release.service
+journalctl -u clank-release.service -n 5 --no-pager | grep 'nothing to do'
+
+# 6. arm it
+systemctl enable --now clank-release.timer
+systemctl list-timers clank-release.timer --no-pager
+
+# 7. after the SECOND real release (the first has no rollback tag): remove the
+#    seam-era images; release images are clank-and-slop:r-* and pruned by Spawnfile
+docker images clank-and-slop --format '{{.Repository}}:{{.Tag}}' | grep ':seam-' | xargs -r docker image rm
+```
 
 **To arm the publisher, one command — but read the paragraph under it first:**
 
@@ -253,7 +327,7 @@ declares midday agent schedules; create `fuse.stop` before replacing a parked
 deployment and retain it through verification. Record the prior fuse state and
 usage history before starting a new explicitly bounded run epoch.
 
-The seam runs under the scoped Node 24 binary at
+The release runs under the scoped Node 24 binary at
 `/home/clank/deploy-work/node24/bin/node`, with that directory first in its PATH.
 Install it from the immutable builder image recorded in the approved website
 dependency provenance. The private dependency packager validates that provenance
@@ -368,11 +442,9 @@ regenerated: it is a view of `topics.json`, which an edition never changes.
 
 | Reason | Raised by |
 |---|---|
-| `repin-failed` | the edition branch is missing, a desk index is absent, a digest survived the rewrite (corpus refresher only; the seam no longer repins) |
-| `release-deferred` | a commit has been waiting more than a day for a quiet deploy window — the newsroom is up, it is simply not shipping code |
-| `deploy-failed` | the image build failed, `deploy.env` pins the wake epoch or lacks the Berlin zone, `up` failed, or the container never settled |
+| `release-deferred` | `spawnfile release` has deferred the same identity for a day: running turns never drained within the bound — the newsroom is up, it is simply not shipping code |
+| `deploy-failed` | any failed `spawnfile release`; the message names Spawnfile's reason word (`build-failed`, `drain-failed`, `deploy-failed`, `health-failed`, `resume-failed`, `post-deploy-failed`, `ledger-failed`, `blocked`, `interrupted`) |
 | `no-edition` | the cycle audit found no edition, or one that stopped below `composed` |
-| `seam-blocked` | the schedule was not clear or the container was not quiet |
 | `unit-failed` | a systemd unit failed for a reason its own code never got to name — the `OnFailure=` handler |
 
 Every one of them also lands as a JSON breadcrumb under the spool directory
