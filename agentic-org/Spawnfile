@@ -79,7 +79,7 @@ shared:
         build:
           files:
             root: ..
-            exclude: [content/editions, content/bylines, website/public/og, node_modules, "**/Spawnfile", agentic-org/agents/AGENTS.md, agentic-org/policies/AGENTS.md, agentic-org/scripts/AGENTS.md]
+            exclude: [content/editions, content/bylines, website/public/og, node_modules, "**/Spawnfile"]
         mount: ./repos/newsroom
         mode: readonly
       - id: newsroom-private-tools

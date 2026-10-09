@@ -308,3 +308,20 @@ shared docs the agents read (`FLOOR.md`, `WRITING.md`, `ARTICLE_FORMAT.md`,
 `RESEARCH_ROUND_TRIP.md`, `TEAM.md`, `OPERATIONS.md`). When changing it: no
 instruction names a skill document, private corpus data never enters this
 repository, and no change weakens a failed runtime check to make it pass.
+
+Inside `agentic-org/`, `AGENTS.md` means one thing: an agent's system prompt
+(`agents/<name>/AGENTS.md`). Folder guides are not kept there:
+
+- `agents/<name>/`: `Spawnfile`, `AGENTS.md` + `SOUL.md` (compiled; budget checked by
+  `scripts/check-instruction-budget.mjs`) and the mounted `RUNBOOK.md`. Shared rules
+  live once in `FLOOR.md` and `WRITING.md`; never copy them into a brief.
+- `policies/`: machine-readable org policy read by `scripts/`. Change a value
+  together with the tests that pin it.
+- `scripts/`: newsroom MCP tools, publishing jobs and org checks, each with its
+  `*.test.mjs` beside it. Tools validate and preserve agent output; they never
+  choose the next agent or rewrite prose.
+- `bundles/`: commands Spawnfile runs to build `generated` bundles. Each writes only
+  into the output directory it is given, reads only public inputs (nothing from
+  the private repo: private code reaches agents as the `newsroom-private-tools` fed
+  volume), and every input it reads is declared in the Spawnfile that runs it.
+- `ops/README.md`: host operations (systemd units, release, volumes).

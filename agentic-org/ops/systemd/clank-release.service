@@ -38,7 +38,7 @@
 # Runs as root, so the deployment record and the release store
 # (ledger, log, deferral, drain marker) live under /root/.spawnfile. The record
 # was clank's while `seam-run.mjs` deployed through `runuser -l clank`; the
-# cutover in ops/AGENTS.md moves it once.
+# cutover in ops/README.md moves it once.
 #
 # The pull and the release run under the lock every clank-feed unit takes, so
 # no volume refresh interleaves with a checkout move or a container recreate.
@@ -53,7 +53,7 @@ OnFailure=clank-alarm@%n.service
 # (callerUid <= 0), and the live deployment record and Grok bootstrap login are
 # clank's. The two ExecStartPre steps run as root (`+`): the fetch needs root's
 # deploy key. clank reads /root/work/clankandslop through ACLs and writes only
-# its .runtime/ (see ops/AGENTS.md, "Release runs as clank").
+# its .runtime/ (see ops/README.md, "Release runs as clank").
 [Service]
 User=clank
 Group=clank
