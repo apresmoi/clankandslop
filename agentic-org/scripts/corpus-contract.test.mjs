@@ -213,7 +213,7 @@ test('the feed identity reads into a bindable corpus identity, and a foreign rec
   try {
     writeCorpus(join(root, 'trees', REVISION), EDITION, 'today');
     symlinkSync(join('trees', REVISION), join(root, 'current'));
-    const record = { version: CORPUS_FEED_VERSION, resource: CORPUS_RESOURCE, volume: 'clank-newsroom-corpus', revision: REVISION, tree: `trees/${REVISION}`, files: 9, landed_at: `${EDITION}T07:58:03Z`, source: { kind: 'git', commit: COMMIT, ref: `origin/edition/${EDITION}`, paths: null } };
+    const record = { version: CORPUS_FEED_VERSION, resource: CORPUS_RESOURCE, volume: 'clank-newsroom-corpus', revision: REVISION, tree: `trees/${REVISION}`, files: 9, landed_at: `${EDITION}T07:58:03Z`, source: { kind: 'git', commit: COMMIT, ref: `origin/edition/${EDITION}`, paths: [EDITION] } };
     const identity = corpusIdentityFromFeed(record, root);
     assert.deepEqual(identity, { version: CORPUS_IDENTITY_VERSION, commit: COMMIT, ref: `origin/edition/${EDITION}`, edition: EDITION, fetched_at: `${EDITION}T07:58:03Z`, tree: `trees/${REVISION}`, editions_present: [EDITION], source_count: 9 });
     assert.deepEqual(corpusIdentityFindings(identity, { edition: EDITION }), []);
@@ -231,7 +231,7 @@ test('the validate hook lands only the edition its ref was cut for, complete and
   const run = (provenance, tree = root) => { try { execFileSync(process.execPath, [hook], { env: { ...process.env, SPAWNFILE_FEED_TREE: tree, SPAWNFILE_FEED_PROVENANCE: JSON.stringify(provenance) }, stdio: 'pipe' }); return 0; } catch (error) { return error.status; } };
   try {
     writeCorpus(root, EDITION, 'today');
-    const provenance = { kind: 'git', commit: COMMIT, ref: `origin/edition/${EDITION}`, paths: null };
+    const provenance = { kind: 'git', commit: COMMIT, ref: `origin/edition/${EDITION}`, paths: [EDITION] };
     assert.equal(validateStagedCorpus(root, provenance).edition, EDITION);
     assert.equal(run(provenance), 0);
     assert.equal(run({ ...provenance, ref: 'origin/edition/2026-09-07' }), 1, 'a branch for a day the tree does not hold');

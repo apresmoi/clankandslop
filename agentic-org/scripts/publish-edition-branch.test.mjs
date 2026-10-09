@@ -194,7 +194,7 @@ function commission(staged, edition, { commit = CORPUS_A, corpus } = {}) {
 const HOST_REVISION = 'e'.repeat(64);
 const hostRecord = (edition, { commit = CORPUS_A, landed_at = HOST_LANDED_AT, identity = {} } = {}) => ({
   version: 'spawnfile.volume-feed-landed.v1', revision: HOST_REVISION, tree: HOST_REVISION, trees: [HOST_REVISION], heals: {}, identity_sha256: 'f'.repeat(64),
-  identity: { version: 'spawnfile.volume-feed.v1', resource: 'research-corpus', volume: 'clank-newsroom-corpus', revision: HOST_REVISION, tree: `trees/${HOST_REVISION}`, files: 9, landed_at, source: { kind: 'git', commit, ref: `origin/edition/${edition}`, paths: null }, ...identity }
+  identity: { version: 'spawnfile.volume-feed.v1', resource: 'research-corpus', volume: 'clank-newsroom-corpus', revision: HOST_REVISION, tree: `trees/${HOST_REVISION}`, files: 9, landed_at, source: { kind: 'git', commit, ref: `origin/edition/${edition}`, paths: [edition] }, ...identity }
 });
 function landed(edition, { body, ...options } = {}) {
   const file = join(scratch('landed'), 'landed.json');

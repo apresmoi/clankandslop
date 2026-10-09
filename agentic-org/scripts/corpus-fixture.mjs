@@ -41,7 +41,7 @@ export function installCorpusFixture(root, edition, { commit = 'a'.repeat(40), f
   symlinkSync(tree, corpusRoot(root));
   const record = {
     version: CORPUS_FEED_VERSION, resource: CORPUS_RESOURCE, volume: 'clank-newsroom-corpus', revision: fixtureRevision(commit), tree,
-    files: 12, landed_at: `${edition}T07:58:03Z`, source: { kind: 'git', commit, ref: `origin/edition/${edition}`, paths: null, ...source }, ...feed
+    files: 12, landed_at: `${edition}T07:58:03Z`, source: { kind: 'git', commit, ref: `origin/edition/${edition}`, paths: [edition], ...source }, ...feed
   };
   writeFileSync(corpusIdentityFile(root), `${JSON.stringify(record, null, 2)}\n`);
   return corpusIdentityFromFeed(record, root);
