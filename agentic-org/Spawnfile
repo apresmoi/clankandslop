@@ -245,6 +245,11 @@ shared:
           git:
             repo: ../clankandslop-private
             ref: { template: "origin/edition/${date:Europe/Berlin}" }
+            # Only the edition's own dated folder: every reader (desk indexes,
+            # stories, worlddesk, prepared desk files, the validate hook) reads
+            # current/<edition>/..., and nothing reads another date or the
+            # private repo's code. Expands at the same instant as the ref.
+            paths: ["${date:Europe/Berlin}"]
             fetch: true
           validate: [node, scripts/corpus-contract.mjs]
           freeze: { after: "12:00", timezone: Europe/Berlin }
