@@ -24,6 +24,6 @@ OnFailure=clank-alarm@%n.service
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
 Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-Environment=GIT_SSH_COMMAND=ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes
+Environment="GIT_SSH_COMMAND=ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes"
 ExecStart=/usr/bin/flock -n -E 0 /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js volume refresh public-content-volume /root/work/clankandslop/agentic-org
 TimeoutStartSec=600
