@@ -31,3 +31,7 @@ agentic-org/newsroom-private.tar
 # stops that from reaching a commit.
 /clankandslop-private
 /website/node_modules
+
+# Release build output and generated files written beside the tree on the host
+.runtime/
+website/dependency-provenance.json
