@@ -2,27 +2,12 @@ spawnfile_version: "0.1"
 kind: team
 name: clank-and-slop
 description: Bounded daily newspaper organization. Runtime admission is external and fail-closed.
-# Token policy: allow ordinary drafting and review revisions to finish.
-# Monitor former ceilings as warnings: reporters 4M; Spike/Caslon 5M;
-# Brass 6M; Ledger/Pressman 2M. Klaxon remains capped at 3M.
-# Execution caps still apply. Private host automation owns the separate
-# aggregate budget and pause alerts; these declarations retain hard ceilings.
 mode: hierarchical
 lead: brass
 shared:
   environment:
     packages:
       - { id: newsroom-git, manager: apt, name: git }
-    # MCP servers, declared once. `newsroom` reaches every member; each agent
-    # narrows it with `{ name: newsroom, tools: [...] }` (no `tools` here, so a
-    # member that forgets its selection fails compile instead of inheriting
-    # someone else's). `validation`, `art` and `visual` are `opt_in`: only a
-    # member that lists the name receives the server. Spawnfile resolves
-    # `${workspace}`, `${agent.name}` and `${agent.id}` per member.
-    #
-    # Private code (the state adapter, the art, visual and validation servers,
-    # the release adapter) is never in the image: it is the fed volume
-    # `newsroom-private-tools` below, read through its `current/` link.
     mcp_servers:
       - name: newsroom
         transport: stdio
@@ -36,7 +21,6 @@ shared:
           CLANK_DAIMON_CONTROL_URL: http://127.0.0.1:19700
           CLANK_DAIMON_CONTROL_TOKEN_FILE: /run/clank-newsroom-control/token
           CLANK_DAIMON_AGENT_ID: "${agent.id}"
-      # Reporters only.
       - name: validation
         opt_in: true
         transport: stdio
@@ -46,7 +30,6 @@ shared:
           CLANK_NEWSROOM_AGENT: "${agent.name}"
           CLANK_PUBLIC_SOURCE_ROOT: "${workspace}/repos/newsroom"
         tools: [validate_article]
-      # Caslon only.
       - name: art
         opt_in: true
         transport: stdio
@@ -66,7 +49,6 @@ shared:
           CLANK_ETOPO_GZ: "${workspace}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
           CLANK_ETOPO_GRD: "${workspace}/state/etopo-cache/etopo1.grd"
         tools: [list_art_catalogue, bake_map, bake_glyph, inspect_artifact, inspect_catalogue_preview, lay_pages]
-      # Pressman only.
       - name: visual
         opt_in: true
         transport: stdio
@@ -92,12 +74,6 @@ shared:
     docs:
       system: TEAM.md
     resources:
-      # The public source tree every member mounts at ./repos/newsroom. Spawnfile
-      # archives the git-tracked files of this repository and pins the digest
-      # in the compile report; nothing is hand-built or hand-pinned. Excluded:
-      # published content (the fed volume below), the generated og images
-      # (Pressman's own bundle), the Spawnfiles, and symlinks (git-recorded
-      # CLAUDE.md/AGENTS.md links, which a bundle cannot carry).
       - id: newsroom-runtime
         kind: bundle
         build:
@@ -106,14 +82,6 @@ shared:
             exclude: [content/editions, content/bylines, website/public/og, node_modules, "**/Spawnfile", CLAUDE.md, "**/CLAUDE.md", agentic-org/agents/AGENTS.md, agentic-org/policies/AGENTS.md, agentic-org/scripts/AGENTS.md]
         mount: ./repos/newsroom
         mode: readonly
-      # PRIVATE CODE NEVER ENTERS THE IMAGE. The newsroom state adapter, the
-      # art, visual and validation servers and the release adapter come from
-      # the private repo's main branch as a host-fed volume: `spawnfile volume
-      # refresh newsroom-private-tools` (a host timer) fetches the private
-      # checkout beside this repo, lands the listed directories as a frozen
-      # tree and swaps `current` to it. MCP servers run
-      # ./tools/private/current/newsroom/... . A private merge reaches agents
-      # on the next refresh, without an image build.
       - id: newsroom-private-tools
         kind: volume
         name: clank-newsroom-private-tools
@@ -126,11 +94,6 @@ shared:
             ref: origin/main
             paths: [newsroom/art, newsroom/build, newsroom/history, newsroom/runtime, newsroom/state, newsroom/validation, newsroom/visual]
             fetch: true
-          # What git does not hold, added in staging before the tree freezes:
-          # the art server's two fonts (public site fonts, renamed and checked
-          # by bundles/private-tools-prepare.mjs) and its npm dependencies
-          # (glyphcss, sharp), installed from the private art/package-lock.json
-          # in the runtime's own Node image on the runtime's platform.
           include:
             - { from: ../website/public/fonts, to: .feed/fonts }
             - { from: bundles, to: .feed/bundles }
@@ -145,96 +108,7 @@ shared:
         mount: ./state/edition
         mode: mutable
         sharing: team
-      # The day's research corpus, mounted into every member at the SAME path the
-      # private-archive bundle used, so no prompt, RUNBOOK or desk path changes.
-      #
-      # WHY A VOLUME AND NOT A BUNDLE. A checksum-pinned bundle made the corpus
-      # part of the image: a new day's research meant a new ~5GB image, so a
-      # daily build, so a daily chance to lose the day. It has: 2026-09-30 died
-      # at the candidate health probe, 2026-10-01 died at the deploy gate, and
-      # neither had anything to do with journalism. The corpus is DATA on a
-      # daily cadence and the code is not; one digest binding them made the slow
-      # thing hostage to the fast one.
-      #
-      # It is a Spawnfile fed volume. `name` is used verbatim as the host volume
-      # name: clank-feed-corpus.service runs `spawnfile volume refresh
-      # research-corpus`, which fetches the private checkout OUTSIDE this
-      # boundary, resolves today's branch (origin/edition/<date, Berlin>), runs
-      # scripts/corpus-contract.mjs against the staged tree, and swaps `current`
-      # to it. Before the branch exists the volume keeps serving what it has
-      # (waiting); after 12:00 Berlin a missing branch is a refusal. No network
-      # and no credentials ever enter the container.
-      #
-      # WHY `mode: mutable` WHEN THE CORPUS IS READ-ONLY -- read this before
-      # "fixing" it. `mode: readonly` BRICKS THE ORG, verified on the box on
-      # 2026-10-01. The compiler's `mark_readonly_resource` runs
-      # `chmod -R a-w` from /opt/spawnfile/entrypoint.sh, which runs as uid 2000
-      # with an empty capability bounding set; the volume's
-      # `.spawnfile-resource-identity` sentinel is root-owned 0644 and is
-      # deliberately excluded from the startup chown, so that chmod returns
-      # EPERM, and the entrypoint runs under `set -euo pipefail`:
-      #
-      #   $ docker exec --user 2000:2000 ... chmod -R a-w <volume>
-      #   chmod: changing permissions of '.../.spawnfile-resource-identity':
-      #          Operation not permitted            # exit 1 -> container dies
-      #
-      # It would also leave the volume root 0555, and the root ownership guard
-      # refuses to start against a volume root that is not exactly 0755.
-      #
-      # THIS MOUNT IS WRITABLE BY THE AGENTS. SAY IT PLAINLY.
-      # An earlier version of this comment claimed the guarantee here was
-      # "identical to the bundle". That was false, and a four-seat review plus a
-      # reproduction in the live container on 2026-10-01 is what it cost to find
-      # out. The truth:
-      #
-      #   * the mount is SHARED by twelve agents and DURABLE, so anything written
-      #     to it spreads and persists -- unlike the bundle, which was a per-agent
-      #     copy re-extracted from the image on every container start and
-      #     therefore reset constantly;
-      #   * `mode: mutable` plus the compiler's recursive startup chown means uid
-      #     2000 OWNS the volume root and `trees/`, and an owner can always
-      #     restore its own write bit, so `chmod -R a-w` is advisory against it:
-      #
-      #       $ docker exec --user 2000:2000 ... sh -c 'echo forged > <vol>/<identity record>'
-      #       $ docker exec --user 2000:2000 ... sh -c 'ln -s /etc <vol>/trees'
-      #       $ docker exec --user 2000:2000 ... sh -c 'chmod u+w f && echo x > f'
-      #
-      #     all three succeeded;
-      #   * bytes inside an already-frozen 0555 tree ARE immutable -- a story file
-      #     cannot be rewritten or unlinked from inside a frozen directory -- but
-      #     the identity record and the `current` link are NAMES at a 0755 root
-      #     and are not protected at all.
-      #
-      # So integrity is not asserted by permissions, it is MAINTAINED. Spawnfile
-      # keeps its own record beside the volume (spawnfile-feed/landed.json),
-      # root-owned, unreachable from any container, and takes every decision
-      # from it -- never from a name inside the mount. Every two minutes it
-      # re-verifies the served tree against its land-time manifest, exits 1 (the
-      # unit's alarm) on drift, and re-lands the tree from git so the newsroom
-      # heals itself.
-      #
-      # And provenance is asserted by the HOST at publish time, from that record
-      # and from git -- not by the file sitting in this volume, which the host
-      # treats as an output it wrote and a thing to re-check, never as truth.
-      #
-      # FROZEN FIELDS. `mode`, `sharing` and `name` are hashed into the volume's
-      # identity sentinel and/or its backing path. Changing any one of them
-      # makes a populated volume refuse to start, or silently mints a new empty
-      # volume and strands this one. `mount` is safe to change. `sharing: team`
-      # must stay in THIS file: declared on an agent it would mint twelve
-      # volumes and then fail compile on the duplicate host volume name.
-      #
-      # Provenance did not disappear with the image digest, it MOVED -- to the
-      # HOST. `.spawnfile-feed.json` (commit, ref, landing instant, tree) is
-      # published into this volume so the newsroom tools can read it and refuse a
-      # corpus that is missing, empty, unreadable or not this edition's, and the
-      # identity it names is bound into the assignment receipt and carried into
-      # the composition. But that file is a convenience for the reader, not the
-      # proof: it sits in a directory uid 2000 owns. The proof is the host's own
-      # record outside this volume, and at the 12:00 Berlin cutoff the volume is
-      # FROZEN for the day (`freeze` below) -- a branch that moves after the
-      # lineup is commissioned does not move what the reporters read, so a
-      # receipt can never end up citing research they did not read.
+      # mode: mutable is deliberate (readonly bricks the entrypoint); never change mode, sharing or name — see OPERATIONS.md
       - id: research-corpus
         kind: volume
         name: clank-newsroom-corpus
@@ -245,40 +119,12 @@ shared:
           git:
             repo: ../clankandslop-private
             ref: { template: "origin/edition/${date:Europe/Berlin}" }
-            # Only the edition's own dated folder: every reader (desk indexes,
-            # stories, worlddesk, prepared desk files, the validate hook) reads
-            # current/<edition>/..., and nothing reads another date or the
-            # private repo's code. Expands at the same instant as the ref.
             paths: ["${date:Europe/Berlin}"]
             fetch: true
           validate: [node, scripts/corpus-contract.mjs]
           freeze: { after: "12:00", timezone: Europe/Berlin }
           keep: 3
-      # Every PUBLISHED edition and the byline indexes derived from them, from
-      # this checkout's origin/main, as a Spawnfile fed volume: the host timer
-      # clank-feed-content.service runs `spawnfile volume refresh
-      # public-content-volume`, which stages outside the volume, runs the
-      # newsroom's validate hook, freezes the tree, swaps `current` with one
-      # rename(2) and re-verifies the served tree on every poll.
-      #
-      # WHY IT LEFT THE IMAGE. It used to ride inside newsroom-runtime.tar, so
-      # every published edition moved that archive's digest, the publisher
-      # repinned all twelve Spawnfiles, `main` moved in an image input, and the
-      # hourly release job rebuilt and redeployed the org every night for a change
-      # that was data. Now an edition commit touches nothing an image is built
-      # from, and the release gate answers "already released; nothing to do".
-      #
-      # WHY NOT AT ./repos/newsroom/content. The compiler refuses a volume mounted
-      # inside a bundle's mount (overlapping mounts), and a link packed into the
-      # archive cannot reach a team volume, whose backing path hashes this file's
-      # absolute path on the build host. So it sits beside the code, and readers
-      # resolve `current/content/editions` and `current/content/bylines` (the
-      # feed keeps git's paths) through CLANK_PUBLIC_CONTENT_VOLUME
-      # (scripts/public-content.mjs).
-      #
-      # Same constraints as the corpus above, for the same reasons: `mutable`
-      # (readonly bricks the entrypoint), team-shared, and `name`, `mode` and
-      # `sharing` are frozen once the volume holds data.
+      # mode: mutable is deliberate (readonly bricks the entrypoint); never change mode, sharing or name — see OPERATIONS.md
       - id: public-content-volume
         kind: volume
         name: clank-newsroom-content
@@ -352,8 +198,6 @@ networks:
           - { id: research-sensor, secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN, scopes: [attach, observe, write], agents: [research-sensor] }
           - { id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }
           - { id: clank-luna, secret: CLANK_MOLTNET_PAIR_LUNA_TOKEN, scopes: [pair] }
-      # The observer reads; Luna can relay operator instructions in every room.
-      # Neither external connection is required for the newsroom to run.
       pairings:
         - id: clank-observer
           remote_network_id: clank-observer

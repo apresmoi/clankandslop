@@ -90,3 +90,41 @@ may hold only approved summaries and durable decisions, never raw corpus.
 - Broker results expose cited URLs, retrieval times, a capture digest, private
   locator and health only. Public output and Moltnet never carry raw captures,
   prompts, HTML, account or profile identifiers, secrets or tooling details.
+
+## Why the Spawnfile is the way it is
+
+- **Read-only data on `mode: mutable` volumes.** The research corpus and public
+  content are read-only data, but `mode: readonly` bricks the org: the
+  entrypoint's `chmod -R a-w` hits the root-owned identity sentinel as uid 2000,
+  fails with EPERM under `set -e`, and the container dies.
+- **These mounts are writable by agents.** They are shared by every member and
+  durable, and uid 2000 owns the volume root, so permissions do not protect
+  them. Integrity is maintained by the host: Spawnfile keeps its own record
+  outside the volume, re-verifies the served tree on every poll, alarms on drift
+  and re-lands from git. `.spawnfile-feed.json` inside the mount is a
+  convenience for readers, never proof.
+- **Frozen volume fields.** `mode`, `sharing` and `name` are hashed into a
+  volume's identity; changing one on a populated volume refuses start or
+  strands it behind a new empty volume. `mount` is safe to change. Team volumes
+  stay declared in the team Spawnfile: on an agent, `sharing: team` mints one
+  volume per member and fails compile on the duplicate host name.
+- **Data lives in fed volumes, not the image.** The corpus and published
+  editions change daily and the code does not; baking them into a bundle forced
+  a daily rebuild and redeploy. Fed volumes refresh on host timers with no image
+  build. The corpus freezes at 12:00 Berlin so assignment receipts always cite
+  what reporters actually read.
+- **Public content sits at `./repos/newsroom-content`.** The compiler refuses a
+  volume mounted inside a bundle's mount, so readers resolve it through
+  `CLANK_PUBLIC_CONTENT_VOLUME`.
+- **Private code never enters the image.** The state adapter, art, visual and
+  validation servers and release adapter arrive as the `newsroom-private-tools`
+  fed volume, so a private merge reaches agents on the next refresh.
+- **Reporter and Spike execution ceilings.** Sized to filings including
+  revisions, not assignments: each filing costs several turns, and Spike reviews
+  everyone's. Lower ceilings stopped editions on cost rather than editorial
+  judgement. The organization-wide fuse still bounds total spend.
+- **Caslon's turn is 30 minutes.** `lay_pages` plus `compose_edition` is the
+  longest turn in the newsroom; fifteen minutes killed it one call short.
+- **Caslon has no `CLANK_PRIVATE_SOURCE_ROOT`.** Compose takes corpus identity
+  from the assignment records, not the live mount, which may have been swapped
+  since commissioning; `validate-org.mjs` refuses a declared mount no tool depends on.

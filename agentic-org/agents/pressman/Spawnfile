@@ -51,11 +51,6 @@ environment:
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
-    # The website's npm dependencies for the release build, installed by
-    # Spawnfile in the pinned Node image the runtime itself uses (so the
-    # provenance's node_major matches), on the target platform. The archive is
-    # the dependency-root layout the release adapter reads:
-    # website/node_modules/** and website/dependency-provenance.json.
     - id: website-deps
       kind: bundle
       build:
@@ -69,8 +64,6 @@ workspace:
           timeout_seconds: 1200
       mount: ./deps
       mode: readonly
-    # The generated og images the release copies into the site, at the path
-    # the adapter reads under each asset root: website/public/og.
     - id: public-assets
       kind: bundle
       build:
