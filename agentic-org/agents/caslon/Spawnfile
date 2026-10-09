@@ -12,24 +12,6 @@ runtime:
       max_tokens: 10000000
     turn_limits:
       max_tokens: 2500000
-      # THIRTY MINUTES, not fifteen. Caslon's turn is the longest in the
-      # newsroom by construction: lay_pages selects or bakes every map and glyph,
-      # assembles both page documents, and compose_edition then re-runs the
-      # canonical assembler and verifies the result against the baked structure.
-      #
-      # 2026-09-26 is the measurement, three times over. Caslon was killed at the
-      # 900,000 ms limit with the receipt reading
-      #   limit_exceeded; limit=timeout; mcp=16/17 answered
-      # -- ONE tool call short of finishing, on an edition whose compose gate was
-      # satisfied and whose four articles had all passed review. The paper existed
-      # and a fifteen-minute turn was the only thing that stopped it shipping.
-      #
-      # Requests and tokens are NOT raised: 16 of 48 requests is nowhere near the
-      # cap, so raising them would be speculative rather than measured.
-      #
-      # The manifest bound on timeoutMs is 3,600,000 ms, so this is expressible
-      # without any contract or manifest change. It is still a bound, not an
-      # absence of one: a compositor that hangs is failed at 30 minutes.
       timeout_ms: 1800000
       max_requests: 48
 execution:
@@ -61,19 +43,7 @@ surfaces:
 environment:
   mcp_servers:
     - name: newsroom
-      # No CLANK_PRIVATE_SOURCE_ROOT, deliberately. Neither of Caslon's two
-      # newsroom tools reads the research corpus volume: compose_edition takes
-      # the corpus identity from the edition's own assignment records, which is
-      # the whole point — the volume can have been swapped under the org since
-      # the lineup was commissioned, so re-reading the mount at 16:00 would
-      # publish a provenance claim the stories do not rest on. file_desk here
-      # only carries caslon.chrome and caslon.weather, which read nothing from
-      # the mount either (ledger.worlddesk is Ledger's, and Ledger declares it).
-      # A mount declared for an agent no tool refuses without reads as an
-      # enforced guarantee and is not one, so validate-org.mjs refuses it.
       env:
-        # Relief grid for ops/bake-map.mjs. Read-only source; the decompressed
-        # cache is regenerable scratch and is never an artifact.
         CLANK_ETOPO_GZ: "${workspace}/etopo/ETOPO1_Ice_g_gmt4.grd.gz"
         CLANK_ETOPO_GRD: "${workspace}/state/etopo-cache/etopo1.grd"
       tools: [file_desk, compose_edition]
@@ -82,11 +52,7 @@ workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
   resources:
     - { id: art-cache, kind: volume, name: clank-art-cache, mount: ./state/art-cache, mode: mutable, sharing: per_agent }
-    # ETOPO1 ice-surface grid, grid-registered GMT4. Shared immutable reference:
-    # every archived map was baked from it, so an edition must not be able to
-    # alter it. Ships outside the newsroom bundle because it is ~395MB.
     - { id: etopo-relief, kind: bundle, source: ../../etopo-relief.tar, mount: ./etopo, mode: readonly }
-    # Regenerable decompressed cache (~890MB). Scratch, never an artifact.
     - { id: etopo-cache, kind: volume, name: clank-etopo-cache, mount: ./state/etopo-cache, mode: mutable, sharing: per_agent }
 
 memory:
