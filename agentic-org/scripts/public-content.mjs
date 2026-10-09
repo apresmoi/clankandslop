@@ -10,9 +10,10 @@
 // hourly release job (`seam-run.mjs --if-changed`) rebuilt and redeployed the
 // whole organization every night -- for a change that was data, not code. The
 // research corpus had the same defect and the same cure (PR #200): the content
-// is now the team-shared `clank-newsroom-content` volume, populated on the HOST
-// from origin/main by content-refresh.mjs, and nothing in the image changes when
-// an edition is published.
+// is now the team-shared `clank-newsroom-content` volume, a Spawnfile fed volume
+// that the HOST keeps current from origin/main (`spawnfile volume refresh
+// public-content-volume`, agentic-org/Spawnfile), and nothing in the image
+// changes when an edition is published.
 //
 // WHAT MOVED, EXACTLY
 // -------------------
@@ -24,12 +25,11 @@
 //
 // ONE PREDICATE, FOUR READERS
 // ---------------------------
-// This list is read by the source archive (what is excluded from the image), the
-// release gate (a merge that touches only these paths is already released), the
-// host refresher (what it lands in the volume) and the edition publisher (what an
-// edition commit may contain). They cannot disagree because there is only one of
-// it; merge-edition.yml spells the same list in YAML and a test holds the two
-// equal.
+// This list is read by the release gate (a merge that touches only these paths is
+// already released) and the edition publisher (what an edition commit may
+// contain). agentic-org/Spawnfile spells the same two paths twice -- excluded from
+// the `newsroom-runtime` bundle and fed into the content volume -- and
+// merge-edition.yml spells them in YAML; tests hold all of them equal.
 //
 // WHY A SIBLING MOUNT AND NOT ./repos/newsroom/content
 // ---------------------------------------------------
@@ -37,8 +37,11 @@
 // mount is an "overlapping mounts" validation error), and a symlink packed into
 // the archive cannot point at the volume: a team volume's backing path embeds a
 // hash of the absolute path of the Spawnfile on the build host. So the volume is
-// mounted beside the code at ./repos/newsroom-content, and its `current` link is
-// what every reader resolves: `current/editions/<date>/...`, `current/bylines/`.
+// mounted beside the code at ./repos/newsroom-content. Spawnfile lands each
+// revision as `trees/<revision>` (the git paths kept, so the tree holds
+// `content/editions` and `content/bylines`) and swaps the `current` link to it;
+// every reader resolves `current/content/editions/<date>/...` and
+// `current/content/bylines/`.
 
 import { lstatSync, readFileSync, readlinkSync, statSync } from 'node:fs';
 import { cp, readdir, rm } from 'node:fs/promises';
@@ -54,8 +57,10 @@ export const CONTENT_VOLUME_NAME = 'clank-newsroom-content';
 export const CONTENT_MOUNT = './repos/newsroom-content';
 // The one name a reader resolves; the host swaps it with a single rename(2).
 export const CONTENT_LINK = 'current';
-export const CONTENT_IDENTITY_FILE = 'CONTENT.json';
-export const CONTENT_IDENTITY_VERSION = 'clank.public-content.v1';
+// Spawnfile's identity record for a fed volume, and the resource it must name.
+export const CONTENT_IDENTITY_FILE = '.spawnfile-feed.json';
+export const CONTENT_IDENTITY_VERSION = 'spawnfile.volume-feed.v1';
+export const CONTENT_RESOURCE = 'public-content-volume';
 // The environment variable every in-container reader is handed: the volume's
 // mount point. Unset means a developer checkout, where `content/` is the tree.
 export const CONTENT_VOLUME_ENV = 'CLANK_PUBLIC_CONTENT_VOLUME';
@@ -64,18 +69,21 @@ export class PublicContentError extends Error {}
 const fail = (message) => { throw new PublicContentError(message); };
 
 const COMMIT = /^[0-9a-f]{40}$/u;
-const TREE = /^[0-9a-f]{40}$/u;
+const REVISION = /^[0-9a-f]{64}$/u;
+// trees/<revision>, or trees/<revision>.<generation> after a re-land.
+const TREE_LINK = /^trees\/[0-9a-f]{64}(?:\.[1-9][0-9]*)?$/u;
 
-/** Every way a CONTENT.json record is not one the host would have written. Empty means valid. */
+/** Every way a .spawnfile-feed.json record is not the content volume's. Empty means valid. */
 export function contentIdentityFindings(record) {
   if (!record || typeof record !== 'object' || Array.isArray(record)) return ['must be a JSON object'];
   const findings = [];
   if (record.version !== CONTENT_IDENTITY_VERSION) findings.push(`version must be ${CONTENT_IDENTITY_VERSION}, got ${JSON.stringify(record.version)}`);
-  if (!COMMIT.test(record.commit ?? '')) findings.push(`commit must be a 40-character lowercase hex sha, got ${JSON.stringify(record.commit)}`);
-  if (typeof record.ref !== 'string' || !record.ref) findings.push('ref must name the tracked ref the content was landed from');
-  if (record.tree !== `trees/${record.commit}/content`) findings.push(`tree must be trees/<commit>/content, got ${JSON.stringify(record.tree)}`);
-  for (const dir of PUBLIC_CONTENT_DIRS) if (!TREE.test(record.content_trees?.[dir] ?? '')) findings.push(`content_trees.${dir} must be the git tree id the host landed`);
-  if (!Number.isInteger(record.editions) || record.editions < 1) findings.push(`editions must be a positive count, got ${JSON.stringify(record.editions)}`);
+  if (record.resource !== CONTENT_RESOURCE) findings.push(`resource must be ${CONTENT_RESOURCE}, got ${JSON.stringify(record.resource)}`);
+  if (!REVISION.test(record.revision ?? '')) findings.push(`revision must be a 64-character hex digest, got ${JSON.stringify(record.revision)}`);
+  if (!TREE_LINK.test(record.tree ?? '') || !String(record.tree).startsWith(`trees/${record.revision}`)) findings.push(`tree must be trees/<revision>[.<generation>], got ${JSON.stringify(record.tree)}`);
+  const source = record.source ?? {};
+  if (source.kind !== 'git' || !COMMIT.test(source.commit ?? '')) findings.push('source must be the git commit the host landed');
+  for (const prefix of PUBLIC_CONTENT_PATHS) if (!Array.isArray(source.paths) || !source.paths.includes(prefix.slice(0, -1))) findings.push(`source.paths must include ${prefix.slice(0, -1)}`);
   if (typeof record.landed_at !== 'string' || !record.landed_at) findings.push('landed_at must be an instant');
   return findings;
 }
@@ -86,7 +94,7 @@ export function contentIdentityFindings(record) {
  * Inside the container the volume is handed in through CLANK_PUBLIC_CONTENT_VOLUME,
  * and the answer is its `current` link -- but only once the host has landed
  * something there. FAIL CLOSED: a volume that is empty, half-written or carries
- * no valid CONTENT.json is a refusal that says so, never a silently empty archive.
+ * no valid identity record is a refusal that says so, never a silently empty archive.
  * An archive index that quietly came back empty would let compose_edition refuse
  * every archived map, and let a site build ship without the back catalogue.
  *
@@ -99,14 +107,14 @@ export function publicContentRoot({ env = process.env, repo = path.resolve(impor
   if (!path.isAbsolute(volume)) fail(`${CONTENT_VOLUME_ENV} must be an absolute path, got ${JSON.stringify(volume)}`);
   let record;
   try { record = JSON.parse(readFileSync(path.join(volume, CONTENT_IDENTITY_FILE), 'utf8')); }
-  catch (error) { fail(`the public content volume at ${volume} has no readable ${CONTENT_IDENTITY_FILE} (${error.code ?? error.message}) -- the host has not landed the published editions yet, so nothing that reads past editions can be trusted. The host job is clank-content-refresh.service.`); }
+  catch (error) { fail(`the public content volume at ${volume} has no readable ${CONTENT_IDENTITY_FILE} (${error.code ?? error.message}) -- the host has not landed the published editions yet, so nothing that reads past editions can be trusted. The host job is clank-feed-content.service (spawnfile volume refresh ${CONTENT_RESOURCE}).`); }
   const findings = contentIdentityFindings(record);
   if (findings.length) fail(`the public content volume's ${CONTENT_IDENTITY_FILE} is invalid: ${findings.join('; ')}`);
-  const root = path.join(volume, CONTENT_LINK);
+  const root = path.join(volume, CONTENT_LINK, 'content');
   for (const dir of PUBLIC_CONTENT_DIRS) {
     let info = null;
     try { info = statSync(path.join(root, dir)); } catch { /* reported below */ }
-    if (!info?.isDirectory()) fail(`the public content volume at ${volume} does not serve ${CONTENT_LINK}/${dir}/ -- refusing to read past editions from a volume the host has not landed`);
+    if (!info?.isDirectory()) fail(`the public content volume at ${volume} does not serve ${CONTENT_LINK}/content/${dir}/ -- refusing to read past editions from a volume the host has not landed`);
   }
   return root;
 }
@@ -131,7 +139,8 @@ export async function stagePublicSource(source, temporary, filter, { env = proce
   if (makeOwnerWritable) await makeOwnerWritable(temporary);
   const volume = env[CONTENT_VOLUME_ENV];
   if (volume !== undefined && volume !== '') {
-    const pinned = path.join(volume, currentTarget(publicContentRoot({ env })));
+    publicContentRoot({ env });
+    const pinned = path.join(volume, currentTarget(path.join(volume, CONTENT_LINK)), 'content');
     for (const dir of PUBLIC_CONTENT_DIRS) {
       const target = path.join(temporary, 'content', dir);
       await rm(target, { recursive: true, force: true });
@@ -145,13 +154,14 @@ export async function stagePublicSource(source, temporary, filter, { env = proce
   if (makeOwnerWritable) await makeOwnerWritable(temporary);
 }
 
-// `current` -> trees/<commit>/content. Read as a link rather than realpath'd, so
-// the copy names the tree the link pointed at when it was read even if the host
-// repoints it a millisecond later; the old tree outlives the swap (keep >= 1).
-function currentTarget(root) {
-  const info = lstatSync(root);
-  if (!info.isSymbolicLink()) fail(`${root} is not the host's ${CONTENT_LINK} link`);
-  const target = readlinkSync(root);
-  if (!/^trees\/[0-9a-f]{40}\/content$/u.test(target)) fail(`${root} points at ${JSON.stringify(target)}, not trees/<commit>/content`);
+// `current` -> trees/<revision>[.<generation>]. Read as a link rather than
+// realpath'd, so the copy names the tree the link pointed at when it was read
+// even if the host repoints it a millisecond later; the old tree outlives the
+// swap (the feed keeps 3).
+function currentTarget(link) {
+  const info = lstatSync(link);
+  if (!info.isSymbolicLink()) fail(`${link} is not the host's ${CONTENT_LINK} link`);
+  const target = readlinkSync(link);
+  if (!TREE_LINK.test(target)) fail(`${link} points at ${JSON.stringify(target)}, not trees/<revision>`);
   return target;
 }

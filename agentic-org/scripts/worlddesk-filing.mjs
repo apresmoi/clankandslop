@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, corpusLinkFindings, verifyCorpusFreshness } from './corpus-contract.mjs';
+import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, corpusIdentityFromFeed, corpusLinkFindings, corpusRoot, verifyCorpusFreshness } from './corpus-contract.mjs';
 import { canonicalJson, worldDeskCanonicalFindings } from '../../ops/worlddesk-contract.mjs';
 import { CONTENT_VOLUME_ENV, publicEditionsRoot } from './public-content.mjs';
 
@@ -55,13 +55,13 @@ async function assertCorpus(base, edition) {
   if (entries.length === 0) throw new Error(`ledger.worlddesk cannot read the research corpus mount — ${base} holds no entries, so the host has not populated it. ${CORPUS_TAIL}`);
   const file = within(base, CORPUS_IDENTITY_FILE);
   let value;
-  try { value = JSON.parse(await readFile(file, 'utf8')); } catch (error) { throw new Error(`ledger.worlddesk cannot trust the research corpus: it carries no readable identity record — ${file} is missing or unparseable (${error.code ?? error.message}). ${CORPUS_TAIL}`); }
+  try { value = corpusIdentityFromFeed(JSON.parse(await readFile(file, 'utf8')), base); } catch (error) { throw new Error(`ledger.worlddesk cannot trust the research corpus: it carries no readable identity record — ${file} is missing or unparseable (${error.code ?? error.message}). ${CORPUS_TAIL}`); }
   let findings;
   try { findings = corpusIdentityFindings(value, { edition }); } catch (error) { findings = [`the identity record could not be checked: ${error.message}`]; }
   if (!Array.isArray(findings) || findings.length > 0) throw new Error(`ledger.worlddesk cannot trust the research corpus: it is not this edition's — it declares edition ${JSON.stringify(value?.edition ?? null)} and this filing is for edition ${JSON.stringify(edition)}: ${(Array.isArray(findings) ? findings : ['the identity check returned no findings']).join('; ')}. ${CORPUS_TAIL}`);
   let unbound;
-  try { unbound = corpusLinkFindings(base, edition, value.commit); } catch (error) { unbound = [`the dated link could not be resolved: ${error.message}`]; }
-  if (!Array.isArray(unbound) || unbound.length > 0) throw new Error(`ledger.worlddesk cannot trust the research corpus: it does not bind edition ${edition} to the commit it claims — ${CORPUS_IDENTITY_FILE} names commit ${value.commit}, but ${(Array.isArray(unbound) ? unbound : ['the binding check returned no findings']).join('; ')}. Filing off this mount would derive the World Desk from one commit while the record names another. ${CORPUS_TAIL}`);
+  try { unbound = corpusLinkFindings(base, edition, value.tree); } catch (error) { unbound = [`the dated link could not be resolved: ${error.message}`]; }
+  if (!Array.isArray(unbound) || unbound.length > 0) throw new Error(`ledger.worlddesk cannot trust the research corpus: it does not bind edition ${edition} to the tree it claims — ${CORPUS_IDENTITY_FILE} names ${value.tree} (commit ${value.commit}), but ${(Array.isArray(unbound) ? unbound : ['the binding check returned no findings']).join('; ')}. Filing off this mount would derive the World Desk from one commit while the record names another. ${CORPUS_TAIL}`);
   // FRESHNESS IN, TREE OUT, AND THE ASYMMETRY IS DELIBERATE.
   // verifyCorpusFreshness reads _corpus.prepared.json and checks that this really
   // is the prepared research for this edition and that its declared sources still
@@ -77,7 +77,7 @@ async function assertCorpus(base, edition) {
   // requiring them would refuse a legitimate filing over research that has no
   // bearing on it. Brass's read calls it because a LINEUP does rest on those
   // desks. One mount, two readers, two different things to be true.
-  try { verifyCorpusFreshness(base, edition); } catch (error) { throw new Error(`ledger.worlddesk cannot trust the research corpus: it is not the prepared research for edition ${edition} — ${error.message}. ${CORPUS_TAIL}`); }
+  try { verifyCorpusFreshness(corpusRoot(base), edition); } catch (error) { throw new Error(`ledger.worlddesk cannot trust the research corpus: it is not the prepared research for edition ${edition} — ${error.message}. ${CORPUS_TAIL}`); }
 }
 
 // Prior published editions are served by the content volume, the public trace
@@ -107,7 +107,7 @@ async function latestPriorDerived(publicRoot, edition, env) {
 // used to share one message, and an error naming a document costs a wake looking
 // for a file on a path that was never mounted.
 async function authenticateFallback({ args, privateRoot, publicRoot, env }) {
-  const dir = within(privateRoot, args.edition, 'worlddesk');
+  const dir = within(corpusRoot(privateRoot), args.edition, 'worlddesk');
   const refusal = await maybeJson(path.join(dir, 'refusal.json'));
   if (refusal === undefined) throw new Error(`ledger.worlddesk has a readable research corpus for edition ${args.edition} but no World Desk document in it: neither a prepared document at ${path.join(dir, 'ledger.worlddesk.json')} nor a refusal at ${path.join(dir, 'refusal.json')} exists, so the World Desk producer has not written this edition yet`);
   if (refusal.version !== 'clank.worlddesk-trace.v1' || refusal.edition !== args.edition || refusal.refused !== true) throw new Error('ledger.worlddesk current refusal is malformed');
@@ -146,7 +146,7 @@ export async function authenticateWorldDeskFiling(args, { env = process.env, cwd
   // document in the corpus. Three causes, three refusals, none of them wearing
   // another's message.
   await assertCorpus(privateRoot, args.edition);
-  const dir = within(privateRoot, args.edition, 'worlddesk');
+  const dir = within(corpusRoot(privateRoot), args.edition, 'worlddesk');
   const preparedPath = path.join(dir, 'ledger.worlddesk.json'), traceFile = path.join(dir, 'trace.json');
   const prepared = await maybeJson(preparedPath);
   if (prepared === undefined) return authenticateFallback({ args, privateRoot, publicRoot, env });

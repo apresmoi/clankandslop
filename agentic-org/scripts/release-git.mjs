@@ -68,7 +68,7 @@ export const DEFAULT_TRACK_REF = 'origin/main';
 // `github-clank-public` and `github-clank-private`. So a bare `git fetch origin`
 // as root has no identity at all and dies on "Could not read from remote
 // repository" — which means the release gate below could fetch nothing, forever.
-// (The PRIVATE repo's remote IS an alias, which is why corpus-refresh.mjs's bare
+// (The PRIVATE repo's remote IS an alias, which is why the private feeds' bare
 // fetch works and needed no change. Only this path was affected.)
 //
 // Same shape as publish-edition-branch.mjs's `prepareSshIdentity`, deliberately:

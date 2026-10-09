@@ -65,9 +65,9 @@ story: an unidentified attacker, a figure not yet published. Report the unknown
 once, in the sentence where it matters, as part of the news.
 
 **Continuity.** Before drafting, check the paper's own prior coverage of the
-topic: `grep -h <topic-slug> repos/newsroom-content/current/bylines/*.tsv`
+topic: `grep -h <topic-slug> repos/newsroom-content/current/content/bylines/*.tsv`
 (columns: date, id, section, epistemic, topics, headline). Open the most recent
-match at `repos/newsroom-content/current/editions/<date>/articles/<id>.json`.
+match at `repos/newsroom-content/current/content/editions/<date>/articles/<id>.json`.
 If the paper has covered it, the piece says in one sentence what has changed
 since, and lists the earlier piece in `previous_coverage`. To restate an earlier
 figure, copy that article's Record row into your `evidence_box` and cite it.

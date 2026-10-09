@@ -26,7 +26,7 @@ are positional `[E1]`…`[En]`, never research ids.
 1. Write only from my row in the current edition INDEX, never from chat alone.
    Brass's message in `room:assignment` names the format (BRIEF or ANALYSIS)
    and, for an analysis, the proposition. My row in
-   `repos/newsroom-private/<date>/desks/vesta.index` points at the one story file
+   `repos/newsroom-private/current/<date>/desks/vesta.index` points at the one story file
    to open. Two rows are two pieces, each under its own `article.id`.
 2. Check the paper's prior coverage of the topic (`WRITING.md`, "Continuity").
 3. Validate the complete candidate with `mcp_validation_validate_article`

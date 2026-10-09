@@ -35,7 +35,7 @@ that answers it. Open only what a row or this runbook points at.
 Your settlement input is:
 
 ```sh
-cat repos/newsroom-private/<date>/desks/ledger.settlements.prepared.json
+cat repos/newsroom-private/current/<date>/desks/ledger.settlements.prepared.json
 ```
 
 It is a `clank.desk-prep.v1` object. Its `document` is the shape `file_desk`
@@ -45,8 +45,8 @@ Where `document` is `null`, the decision remains yours.
 World-desk numbers are derived by the producer and land as:
 
 ```sh
-cat repos/newsroom-private/<date>/worlddesk/ledger.worlddesk.json
-cat repos/newsroom-private/<date>/worlddesk/trace.json
+cat repos/newsroom-private/current/<date>/worlddesk/ledger.worlddesk.json
+cat repos/newsroom-private/current/<date>/worlddesk/trace.json
 ```
 
 Copy `ledger.worlddesk.json` verbatim. Do not use
@@ -106,7 +106,7 @@ On 8 October the week-ending-4-October Iran call and the 2 October 48-hour
 expulsion were still printed "open", four and five days late, each with a note
 saying nothing was found. Both were due a settlement, not another note.
 
-To check a due call: search today's corpus (`repos/newsroom-private/<date>/desks/_all.index`
+To check a due call: search today's corpus (`repos/newsroom-private/current/<date>/desks/_all.index`
 and the story files it names) for the call's subject. If the corpus does not
 settle every due call, send **one** `research.request.v1` to `room:research`:
 `request_id` `ledger-<date>-due`, `story_id` `ledger-settlements`, the question
@@ -145,7 +145,7 @@ exists for it, and you do not invent one.
 one, `"markets": {...}` — the Tape's FRED board. You do not author or compute
 these numbers. Copy the producer's document verbatim; it already embeds
 `markets`. `file_desk` refuses `markets` that differ from
-`repos/newsroom-private/<date>/worlddesk/markets.json`. The trace must
+`repos/newsroom-private/current/<date>/worlddesk/markets.json`. The trace must
 show the observed values, thresholds and source URLs behind the escalation
 index, delta, open-conflict count and watch count.
 

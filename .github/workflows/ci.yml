@@ -39,15 +39,6 @@ jobs:
         run: |
           node agentic-org/scripts/build-bylines-tsv.mjs
           git diff --exit-code -- content/bylines
-      # newsroom-runtime-bundle.json pins the tar every agent mounts at
-      # ./repos/newsroom. It is written by a build nobody is obliged to run, so
-      # it has now drifted three times — most recently past a module the MCP
-      # entrypoint imports at load, which would have thrown in all twelve
-      # containers at startup. The source archive is a pure function of the
-      # tracked tree, so it is checkable here without the private checkout or
-      # node_modules the rest of the build needs.
-      - name: Check the runtime bundle descriptor describes this tree
-        run: node agentic-org/scripts/check-bundle-descriptor.mjs
       # Nothing here ever built the organization, so nothing here ever saw the
       # briefs grow. `# The floor` — a preamble every brief carried verbatim —
       # crossed Daimon's 16,384-byte instruction ceiling across eight merges and
@@ -58,12 +49,13 @@ jobs:
       # compiler's contract manifest, i.e. Docker and a registry), but
       # `spawnfile validate` is not: it parses every manifest, resolves the
       # shared MCP servers and runs Daimon's compile preflight (instruction
-      # size, attention, turn limits, MCP allowlists) with no image at all.
-      # Pinned to the commit the production host compiles with; npm's
-      # `spawnfile` predates shared-MCP inheritance and cannot read this tree.
-      - name: Spawnfile validate (production compiler)
+      # size, attention, turn limits, MCP allowlists, opt-in servers, bundle
+      # recipes and volume feeds) with no image and no private checkout. Built
+      # from noopolis/spawnfile main, which this tree's declarations track; npm's
+      # `spawnfile` predates them.
+      - name: Spawnfile validate
         env:
-          SPAWNFILE_REF: 9ad3c825215e65abf4df439346838112b6aa3cd1
+          SPAWNFILE_REF: main
         run: |
           git init -q "$RUNNER_TEMP/spawnfile"
           git -C "$RUNNER_TEMP/spawnfile" fetch -q --depth 1 https://github.com/noopolis/spawnfile.git "$SPAWNFILE_REF"
@@ -80,26 +72,22 @@ jobs:
         run: |
           node agentic-org/scripts/validate-org.mjs
           node --test agentic-org/scripts/engine-policy.test.mjs agentic-org/scripts/moltnet-pairings.test.ts agentic-org/scripts/tool-bundle-contract.test.mjs agentic-org/scripts/release-time.test.mjs agentic-org/scripts/signal-disposition.test.mjs agentic-org/scripts/production-newsroom-contracts.test.mjs
-      # The corpus left the image, so the guards that used to be a build-time
-      # repin are now code: the host refresher, the volume's layout rules, the
-      # read-time gate's contract and the alarm vocabulary. None of it needs the
-      # private checkout or the state adapter -- the tests build their own git
-      # repos and their own throwaway spool -- so all of it belongs in the public
-      # gate rather than in a private integration run nobody watches.
-      # The published editions left the image the same way (public-content.mjs),
-      # so the host refresher that lands them is gated here beside the corpus.
+      # The research corpus and the published editions are Spawnfile fed
+      # volumes: their validate hooks (corpus-contract.mjs, content-validate.mjs)
+      # and the read-time gates over the landed layout need neither the private
+      # checkout nor the state adapter, so they belong in the public gate.
       - name: Check the research corpus and published-content guards
-        run: node --test agentic-org/scripts/content-refresh.test.mjs agentic-org/scripts/corpus-contract.test.mjs agentic-org/scripts/corpus-landed.test.mjs agentic-org/scripts/corpus-volume.test.mjs agentic-org/scripts/corpus-refresh.test.mjs agentic-org/scripts/corpus-integrity.test.mjs agentic-org/scripts/worlddesk-filing.test.mjs
+        run: node --test agentic-org/scripts/content-validate.test.mjs agentic-org/scripts/public-content.test.mjs agentic-org/scripts/corpus-contract.test.mjs agentic-org/scripts/worlddesk-filing.test.mjs
       # EVERYTHING ELSE under agentic-org/scripts, because CI's coverage was an
       # explicit allowlist that had fallen eighteen files behind -- including
-      # organization.test.mjs, which is the one check that the Spawnfiles, the
-      # descriptor and the tree agree. Sixteen of those eighteen ran green with no
+      # organization.test.mjs, which is the one check that the Spawnfiles and
+      # the tree agree. Sixteen of those eighteen ran green with no
       # private checkout and no state adapter; the allowlist was not protecting CI
       # from them, it had just stopped being updated. ci-coverage.test.mjs now
       # fails when a test file exists that no step here names, so this cannot fall
       # behind again silently.
       - name: Check everything the allowlist had stopped covering
-        run: node --test agentic-org/scripts/ci-coverage.test.mjs agentic-org/scripts/browser-broker-import.test.mjs agentic-org/scripts/build-bylines-tsv.test.mjs agentic-org/scripts/build-newsroom-bundle.test.mjs agentic-org/scripts/build-topics-txt.test.mjs agentic-org/scripts/compile-local.test.mjs agentic-org/scripts/cycle-audit.test.mjs agentic-org/scripts/dispatch-pages-deploy.test.mjs agentic-org/scripts/edition-index.test.mjs agentic-org/scripts/lifecycle-graph.test.mjs agentic-org/scripts/newsroom-mcp.test.mjs agentic-org/scripts/newsroom.test.mjs agentic-org/scripts/organization.test.mjs agentic-org/scripts/production-newsroom.test.mjs agentic-org/scripts/production-newsroom-article-format.test.mjs agentic-org/scripts/publication-policy.test.mjs agentic-org/scripts/release-handoff.test.mjs agentic-org/scripts/repin-private-source.test.mjs agentic-org/scripts/repin-runtime-bundle-pins.test.mjs
+        run: node --test agentic-org/scripts/ci-coverage.test.mjs agentic-org/scripts/browser-broker-import.test.mjs agentic-org/scripts/build-bylines-tsv.test.mjs agentic-org/scripts/build-topics-txt.test.mjs agentic-org/scripts/compile-local.test.mjs agentic-org/scripts/cycle-audit.test.mjs agentic-org/scripts/dispatch-pages-deploy.test.mjs agentic-org/scripts/edition-index.test.mjs agentic-org/scripts/lifecycle-graph.test.mjs agentic-org/scripts/newsroom-mcp.test.mjs agentic-org/scripts/newsroom.test.mjs agentic-org/scripts/organization.test.mjs agentic-org/scripts/production-newsroom.test.mjs agentic-org/scripts/production-newsroom-article-format.test.mjs agentic-org/scripts/publication-policy.test.mjs agentic-org/scripts/release-handoff.test.mjs
       - name: Check unattended publication recovery guards
         run: node --test ops/prose-leaks.test.mjs ops/prose-lint.test.mjs agentic-org/scripts/freshness.test.mjs agentic-org/scripts/revision-facts.test.mjs agentic-org/scripts/alarm.test.mjs agentic-org/scripts/alarm-to-moltnet.test.mjs agentic-org/scripts/ci-gate.test.mjs agentic-org/scripts/systemd-contract.test.mjs agentic-org/scripts/wake-window.test.mjs agentic-org/scripts/quiescence-activity.test.mjs agentic-org/scripts/seam-run.test.mjs agentic-org/scripts/compose-gate.test.mjs agentic-org/scripts/composition-readiness.test.mjs agentic-org/scripts/staged-edition.test.mjs agentic-org/scripts/publish-edition-branch.test.mjs agentic-org/scripts/review-handoff.test.mjs agentic-org/scripts/production-newsroom-prose-review.test.mjs agentic-org/scripts/agent-rooms.test.mjs agentic-org/scripts/refusal-log.test.mjs agentic-org/scripts/ledger-research.test.mjs
       # The page data layer has one build-time decision in it that a green

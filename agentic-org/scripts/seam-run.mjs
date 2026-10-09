@@ -31,8 +31,8 @@
 // Two things the corpus used to carry with it moved rather than disappeared:
 // the per-edition wake budget turnover, which Daimon now renews in-process per
 // Europe/Berlin day (see the wakeBudget stage — nothing restarts the org
-// daily), and the corpus provenance, which travels with the data as
-// CORPUS.json (see scripts/corpus-contract.mjs).
+// daily), and the corpus provenance, which travels with the data as the fed
+// volume's identity record (see scripts/corpus-contract.mjs).
 //
 // THE ORDER IS NOT A STYLE CHOICE
 // -------------------------------
@@ -44,8 +44,8 @@
 //      the ledger against a local HEAD nothing ever fetched could not discover a
 //      merge at all, which is a release job that never releases.
 //   2. gate         — before anything writes, because a redeploy kills wakes.
-//   3. bundle       — three commands whose order is its own lesson; see below.
-//   4. build, runtimePolicy — nothing reaches `up` unconfined.
+//   3. build, runtimePolicy — `spawnfile build` builds the declared bundles;
+//      nothing reaches `up` unconfined.
 //   5. wakeBudget   — before `up`, because `--env-file` only applies at
 //      container CREATION: refuses a deploy.env that pins the wake epoch or
 //      does not name the Europe/Berlin zone. Read-only.
@@ -81,7 +81,7 @@
 //   node agentic-org/scripts/seam-run.mjs                  # release this commit now
 //   node agentic-org/scripts/seam-run.mjs --if-changed     # the timer: no-op unless origin/main moved
 //   node agentic-org/scripts/seam-run.mjs --check          # verify only, writes nothing
-//   node agentic-org/scripts/seam-run.mjs --no-deploy      # bundle + build, no `up`
+//   node agentic-org/scripts/seam-run.mjs --no-deploy      # build, no `up`
 //   node agentic-org/scripts/seam-run.mjs --track=origin/release   # compare against another tracked ref
 //   node agentic-org/scripts/seam-run.mjs --no-fetch       # decide against the tracked ref already on disk
 //   node agentic-org/scripts/seam-run.mjs --key=/root/.ssh/clank_public   # the identity the fetch uses
@@ -135,9 +135,6 @@ export const KEEP_IMAGES_AFTER_SETTLE = 2;
 export const COMPILED_OUTPUT_DIR = '.runtime';
 export const COMPILED_OUTPUT_PREFIX = 'seam-compiled-';
 export const KEEP_COMPILED_OUTPUTS = 2;
-// Archives an agent may pin that newsroom-runtime-bundle.json deliberately does
-// not describe, because org:bundle does not build them.
-export const KNOWN_UNDESCRIBED = Object.freeze(['etopo-relief.tar']);
 
 const berlinDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' });
 export const berlinToday = (now = new Date()) => berlinDate.format(now);
@@ -212,93 +209,14 @@ export function gate(options, { now = new Date(), log = console.log } = {}) {
   return verdict;
 }
 
-// --- stage 3: the bundles ----------------------------------------------------
-// THREE commands, in one order that is the only order that works. Verified on
-// the box, 2026-09-06, by getting it wrong first:
-//
-//   a. `--repin-source` FIRST, because it finds the Spawnfile pins by searching
-//      for the descriptor's CURRENT source digest. It has to run while the
-//      descriptor still holds the digest the Spawnfiles hold.
-//   b. `org:bundle` SECOND. It writes the six tars and the descriptor, and it
-//      refreshes generated public asset pins in Spawnfiles. Running it before
-//      (a) advances the source descriptor, leaves (a) nothing to match, and
-//      silently produces an image whose agents pin a source archive that no
-//      longer exists.
-//   c. the plain check LAST, as the proof rather than the hope.
-//
-// Dependency archives have no automatic repin: their digests are only advanced
-// by reviewed source changes, so if `npm ci` moved node_modules underneath this
-// job, the descriptor advances and the pins do not. Generated public assets are
-// repinned by `org:bundle` and then checked here against the descriptor.
-// Dependency drift remains a refusal, not a repair — rewriting a dependency pin
-// from an unreviewed rebuild is how you deploy an archive nobody chose.
-export function bundle(options, { log = console.log } = {}) {
-  if (options.check) {
-    log('\n(check mode: not rebuilding the archives; verifying the descriptor against the tree instead)');
-    run('bundle-check', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs')], { cwd: options.repo, log });
-    return assertPinsMatchDescriptor(options, { log });
-  }
-  run('bundle-repin-source', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs'), '--repin-source'], { cwd: options.repo, log });
-  run('bundle', 'bundle-mismatch', 'npm', ['run', 'org:bundle'], { cwd: options.repo, log });
-  run('bundle-verify', 'bundle-mismatch', process.execPath, [path.join(options.repo, 'agentic-org/scripts/check-bundle-descriptor.mjs')], { cwd: options.repo, log });
-  return assertPinsMatchDescriptor(options, { log });
-}
-
-// Every checksum-pinned bundle resource in every agent Spawnfile, against the
-// archive of that name in the descriptor. `check-bundle-descriptor.mjs` only
-// covers the source archive — deliberately, because it must be able to run in
-// CI without the private checkout or node_modules. This job has both, so it
-// checks every archive described by the runtime, tools and article-validation descriptors.
-// `descriptor.private` was the research corpus and is deliberately absent: the
-// corpus is a host-populated volume now, so the descriptor describes no archive
-// for it and no Spawnfile pins one. Listing a block that does not exist would
-// leave a hole in this check — every entry is `.filter`ed on `archive`, so an
-// undefined one is silently dropped rather than reported.
-const descriptorEntries = (descriptor) => [descriptor.source, ...descriptor.dependencies ?? [], ...descriptor.assets ?? []]
-  .filter((entry) => entry?.archive);
-
-function describedArchives(repo) {
-  const descriptorPath = path.join(repo, 'agentic-org/newsroom-runtime-bundle.json');
-  const descriptor = JSON.parse(readFileSync(descriptorPath, 'utf8'));
-  const entries = descriptorEntries(descriptor);
-  for (const name of ['newsroom-tools-bundle.json', 'article-validation-runtime-bundle.json']) {
-    const file = path.join(repo, 'agentic-org', name);
-    if (existsSync(file)) entries.push(JSON.parse(readFileSync(file, 'utf8')));
-  }
-  return entries;
-}
-
-export function pinFindings(repo) {
-  const byArchive = new Map();
-  for (const entry of describedArchives(repo)) byArchive.set(entry.archive, entry.sha256);
-  // Caslon's relief grid is built by build-etopo-bundle.mjs from a ~395MB
-  // external download, not by org:bundle, so the descriptor does not and should
-  // not describe it. Named here rather than skipped silently: any OTHER archive
-  // the descriptor does not know about is drift and must still be a finding.
-  const undescribed = new Set(KNOWN_UNDESCRIBED);
-  const agentsRoot = path.join(repo, 'agentic-org/agents');
-  const findings = [];
-  let checked = 0;
-  for (const agent of readdirSync(agentsRoot).sort()) {
-    const file = path.join(agentsRoot, agent, 'Spawnfile');
-    if (!existsSync(file)) continue;
-    for (const [, id, archive, pinned] of readFileSync(file, 'utf8').matchAll(/- \{ id: ([\w-]+), kind: bundle, source: \.\.\/\.\.\/([\w.-]+\.tar), sha256: (sha256:[a-f0-9]{64})/gu)) {
-      const expected = byArchive.get(archive);
-      checked += 1;
-      if (expected === undefined) { if (!undescribed.has(archive)) findings.push(`agents/${agent}/Spawnfile pins ${archive} as ${id}, which the descriptor does not describe`); }
-      else if (expected !== pinned) findings.push(`agents/${agent}/Spawnfile pins ${archive} at ${pinned}, the descriptor says ${expected}`);
-    }
-  }
-  if (checked === 0) findings.push(`no agent Spawnfile under ${agentsRoot} declares a checksum-pinned bundle resource — the pin check matched nothing, which is not the same as passing`);
-  return { findings, checked, archives: [...byArchive.keys()] };
-}
-
-export function assertPinsMatchDescriptor(options, { log = console.log } = {}) {
-  const result = pinFindings(options.repo);
-  if (result.findings.length) throw new SeamError(`bundle pins disagree with the descriptor — ${result.findings.length} finding(s):\n  ${result.findings.join('\n  ')}`, 'bundle-mismatch');
-  log(`pins: ${result.checked} checksum-pinned bundle resource(s) across the agent Spawnfiles all match the descriptor (${result.archives.join(', ')})`);
-  return result;
-}
+// --- stage 3: the bundles (gone) ---------------------------------------------
+// There is no bundle stage. `spawnfile build` builds every workspace bundle
+// from the declarations in the Spawnfiles (the source tree, the website
+// dependencies, the og assets), keyed by their inputs, and records each digest
+// in the compile report. Private code never enters the image: it reaches the
+// agents through the `newsroom-private-tools` fed volume, which the host's
+// `spawnfile volume refresh` timer keeps current, so nothing here repins,
+// rebuilds or verifies an archive.
 
 // --- stage 3b: room to build in ----------------------------------------------
 // On 2026-09-20 the host reached 100% disk mid-`up`: the candidate container died,
@@ -401,8 +319,8 @@ export function compiledOutputPath(options) {
 //
 // That guard did not weaken, its SUBJECT left: no archive in this image holds
 // research any more. The same question is now answered where the corpus
-// actually is — the host refresher validates the tree it fetches and writes
-// CORPUS.json beside it, and the newsroom tools refuse a corpus that is
+// actually is — the corpus feed validates the tree it fetches before it lands
+// (scripts/corpus-contract.mjs as its hook), and the newsroom tools refuse a corpus that is
 // missing, empty, unreadable or not this edition's when Brass commissions
 // (scripts/corpus-contract.mjs). An image built from any commit, on any day, is
 // correct; what it mounts is decided at run time and checked there.
@@ -412,7 +330,7 @@ export function compiledOutputPath(options) {
 // the daily rebuild got reinvented. seam-run.test.mjs holds that line.
 export function build(options, { log = console.log } = {}) {
   options.compiledOutput = compiledOutputPath(options);
-  run('build', 'deploy-failed', process.execPath, [options.cli, 'build', path.join(options.repo, 'agentic-org'), '--tag', options.tag, '--out', options.compiledOutput], { cwd: options.repo, log });
+  run('build', 'deploy-failed', process.execPath, [options.cli, 'build', path.join(options.repo, 'agentic-org'), '--release', '--tag', options.tag, '--out', options.compiledOutput], { cwd: options.repo, log });
   return options.tag;
 }
 
@@ -562,7 +480,7 @@ export function sweepImages(options, { log = console.log, exec = execFileSync, k
 // only asserted by the header's comment. There is no `repin` key and there must
 // never be one again: a daily corpus repin is the habit this pipeline was
 // rebuilt to lose, and seam-run.test.mjs fails if the key comes back.
-export const STAGES = Object.freeze({ releaseGate, gate, bundle, reclaimBuildSpace, build, runtimePolicy, wakeBudget, deploy, settle, runtimeBootstrap, recordRelease, sweepImages });
+export const STAGES = Object.freeze({ releaseGate, gate, reclaimBuildSpace, build, runtimePolicy, wakeBudget, deploy, settle, runtimeBootstrap, recordRelease, sweepImages });
 
 export function seam(argv = [], { now = new Date(), log = console.log, alarm = raiseDetached, stageImpl = STAGES, defer = deferRelease } = {}) {
   const options = parseArgs(argv);
@@ -604,8 +522,7 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
       return { ...options, stages, ok: true, ...defer(options, error.message, { now, log, alarm }) };
     }
     stages.push('gate');
-    stageImpl.bundle(options, { log }); stages.push('bundle');
-    if (options.check) { log('\ncheck PASSED: the descriptor, every Spawnfile bundle pin and the deploy window are all current.'); return { ...options, stages, ok: true }; }
+    if (options.check) { log('\ncheck PASSED: the deploy window is open and the container is quiet.'); return { ...options, stages, ok: true }; }
     stageImpl.reclaimBuildSpace(options, { log }); stages.push('reclaimBuildSpace');
     stageImpl.build(options, { log }); stages.push('build');
     stageImpl.runtimePolicy(options, { log }); stages.push('runtimePolicy');
@@ -629,7 +546,7 @@ export function seam(argv = [], { now = new Date(), log = console.log, alarm = r
     // and a container that could not start.
     stageImpl.sweepImages(options, { log, keep: KEEP_IMAGES_AFTER_SETTLE });
     pruneBuildCache({ log });
-    log(`\nseam complete: ${String(options.releaseCommit ?? 'HEAD').slice(0, 12)} bundled, built as ${options.tag}, deployed and settled.`);
+    log(`\nseam complete: ${String(options.releaseCommit ?? 'HEAD').slice(0, 12)} built as ${options.tag}, deployed and settled.`);
     return { ...options, stages, ok: true };
   } catch (error) {
     // SeamError and release-ledger.mjs's ReleaseError both carry a reason word;

@@ -79,8 +79,8 @@ const corpusAgents = new Set(['klaxon']);
 // volume rather than a digest-pinned bundle. Exactly three, and each one is a
 // read in code, not a claim in prose:
 //
-//   brass    record_assignment -> corpusIdentity() reads CORPUS.json, verifies
-//            the tree and the dated link, and binds the identity into the
+//   brass    record_assignment -> corpusIdentity() reads the feed identity,
+//            verifies the tree and the current link, and binds the identity into the
 //            edition's assignment records.
 //   ledger   file_desk ledger.worlddesk -> authenticateWorldDeskFiling() refuses
 //            an absent or non-absolute mount by name (there is no cwd-relative
@@ -150,22 +150,30 @@ const inlineField = (value, key) => new RegExp(`\\b${key}: "?([^,"}]+)"?`).exec(
 export function validateReporterValidationDeclaration(agent, bytes, rootManifest = readRootManifest()) {
   const manifest = effectiveAgentManifest(agent, bytes, rootManifest);
   const servers = (manifest.environment?.mcp_servers ?? []).filter((item) => item.name === 'validation');
-  const bundles = (manifest.workspace?.resources ?? []).filter((item) => item.id === 'article-validation');
   if (!reporters.has(agent)) {
-    assert(servers.length === 0 && bundles.length === 0, `${agent} must not receive the reporter validation surface`);
+    assert(servers.length === 0, `${agent} must not receive the reporter validation surface`);
     return;
   }
   assert(servers.length === 1, `${agent} must declare one validation MCP server`);
   const server = servers[0];
   const workspace = `/var/lib/spawnfile/instances/daimon/daimon-organization/workspace/agents/${agent}`;
   assert(server.transport === 'stdio' && server.command === '/usr/local/bin/node', `${agent} validation transport invalid`);
-  assert(JSON.stringify(server.args) === JSON.stringify([`${workspace}/tools/article-validation/server.mjs`]), `${agent} validation entry point invalid`);
+  // Private code: the validation server runs from the fed private-tools volume.
+  assert(JSON.stringify(server.args) === JSON.stringify([`${workspace}/tools/private/current/newsroom/validation/server.mjs`]), `${agent} validation entry point invalid`);
   assert(server.env?.CLANK_NEWSROOM_AGENT === agent && server.env?.CLANK_PUBLIC_SOURCE_ROOT === `${workspace}/repos/newsroom` && Object.keys(server.env).length === 2, `${agent} validation identity or public source root invalid`);
   assert(JSON.stringify(server.tools) === JSON.stringify(['validate_article']), `${agent} validation tool allowlist invalid`);
-  assert(bundles.length === 1, `${agent} must declare one article-validation bundle`);
-  const bundle = bundles[0];
-  assert(bundle.kind === 'bundle' && bundle.source === '../../article-validation-runtime.tar' && /^sha256:[a-f0-9]{64}$/u.test(bundle.sha256), `${agent} article-validation bundle source or digest invalid`);
-  assert(bundle.mount === './tools/article-validation' && bundle.mode === 'readonly', `${agent} article-validation bundle must be mounted read-only at its tool path`);
+}
+
+// The public source tree every member mounts: a Spawnfile-built bundle of this
+// repository's tracked files, the published content excluded (it is the fed
+// content volume), and never a hand-built or hand-pinned archive.
+function validateSourceBundle(agent, resources) {
+  const sources = resources.filter((item) => item.id === 'newsroom-runtime');
+  assert(sources.length === 1, `${agent} must mount one newsroom-runtime bundle`);
+  const [bundle] = sources, files = bundle.build?.files;
+  assert(bundle.kind === 'bundle' && bundle.source === undefined && bundle.sha256 === undefined && files?.root === '..' && files.ref === undefined, `${agent} newsroom runtime bundle must be built by Spawnfile from this repository`);
+  for (const path of ['content/editions', 'content/bylines']) assert(files.exclude?.includes(path), `${agent} newsroom runtime bundle must exclude ${path}, which the content volume serves`);
+  assert(bundle.mount === './repos/newsroom' && bundle.mode === 'readonly', `${agent} newsroom runtime bundle must be mounted read-only at ./repos/newsroom`);
 }
 
 export function validateAgentDeclaration(agent, bytes, rootManifest = readRootManifest()) {
@@ -186,11 +194,10 @@ export function validateAgentDeclaration(agent, bytes, rootManifest = readRootMa
   assert(surfaces.includes('network: clank-newsroom') && surfaces.includes(`token_id: ${agent}`), `${agent} Moltnet binding invalid`);
   assert(surfaces.includes('research:') === researchMembers.has(agent), `${agent} research room binding invalid`);
   const publicResource = resourceLine(workspace, 'public-content');
-  const bundled = line => line?.includes('kind: bundle') && line.includes('source: ../../newsroom-runtime.tar') && /sha256: sha256:[a-f0-9]{64}/u.test(line) && line.includes('mount: ./repos/newsroom') && line.includes('mode: readonly') && !/kind: git|url:|branch:/.test(line);
   if (publicWriters.has(agent)) {
     assert(publicResource?.includes('kind: volume') && publicResource.includes('name: clank-release-staging') && publicResource.includes('mount: ./staging') && publicResource.includes('mode: mutable') && publicResource.includes('sharing: per_agent') && !/kind: git|url:|branch:/.test(publicResource), `${agent} public content resource invalid`);
-    assert(bundled(resourceLine(workspace,'newsroom-runtime')), `${agent} newsroom runtime bundle invalid`);
-  } else assert(bundled(publicResource), `${agent} public content resource invalid`);
+  } else assert(!publicResource, `${agent} must not declare a public content resource of its own`);
+  validateSourceBundle(agent, effectiveAgentManifest(agent, bytes, rootManifest).workspace.resources);
   const corpus = resourceLine(workspace, 'private-corpus');
   if (corpusAgents.has(agent)) {
     assert(corpus?.includes('kind: volume') && corpus.includes(`name: clank-${agent}-corpus`) && corpus.includes('mount: ./private/corpus') && corpus.includes('mode: mutable') && corpus.includes('sharing: per_agent'), `${agent} private corpus resource invalid`);

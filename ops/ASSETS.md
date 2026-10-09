@@ -61,8 +61,8 @@ entry point. Adding another permitted model remains a reviewed source change.
 
 Paths below are repository paths. Inside the newsroom the published editions
 are not under `repos/newsroom/`: they are the content volume, at
-`repos/newsroom-content/current/editions/` (bylines beside them at
-`current/bylines/`).
+`repos/newsroom-content/current/content/editions/` (bylines beside them at
+`current/content/bylines/`).
 
 ```
 find content/editions -path '*/maps/*.json' | wc -l                                    # 209 files

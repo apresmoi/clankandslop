@@ -28,7 +28,6 @@
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, chmodSync, chownSync, existsSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { bundleRewriteFindings } from './bundle-rewrite-shape.mjs';
 // The git side of a release decision, including the error type that carries the
 // alarm reason word. Re-exported, because "the release ledger's ReleaseError" is
 // how the rest of the pipeline already knows it.
@@ -54,57 +53,26 @@ export const releasePendingPath = (ledger) => path.join(path.dirname(ledger), RE
 // source and public-asset pins it advances. Anything else modified under a
 // release is a change that is not in the commit being released.
 //
-// A PATH HERE IS NOT AN EXEMPTION, IT IS A SHAPE.
+// NO PATH IS EXEMPT. There used to be an allowlist for the files the `bundle`
+// stage rewrote mid-run (the descriptor and the twelve agent Spawnfiles, limited
+// to digest-shaped changes). That stage is gone: `spawnfile build --release`
+// builds every bundle from the committed declarations and pins nothing into the
+// tree, so ANY tracked modification is a change that is not in the commit being
+// released, and is refused.
 //
-// This used to be a path allowlist and nothing more, and that was a hole wide
-// enough to release unreviewed prompts through: every one of the twelve agent
-// Spawnfiles was waved past whatever had been edited into it -- a changed prompt,
-// a new tool grant, a widened Moltnet room, a raised token ceiling. Found by
-// review on 2026-10-01. Each entry now carries the SHAPE of the change it
-// permits, checked against `git diff` by bundle-rewrite-shape.mjs: digest
-// values, plus the descriptor's own two measurements. One changed word of a
-// prompt is a refusal that names the file and the line. See that module's header
-// for why this is a diff rather than a re-read of the file.
-//
-// Untracked files (`??`) are not findings, and that is an argument rather than
-// a shortcut: the source archive is built from `git ls-files`, so an untracked
-// file cannot enter the image at all. Every tar this build writes is gitignored
-// and therefore never appears here either.
-export const BUNDLE_REWRITTEN = Object.freeze([
-  { pattern: /^agentic-org\/newsroom-runtime-bundle\.json$/u, descriptor: true },
-  { pattern: /^agentic-org\/agents\/[\w.-]+\/Spawnfile$/u, descriptor: false }
-]);
-
-// Returns the findings AND the allowlisted paths whose change was proven to be
-// nothing but a digest rewrite. The second half is what lets the fast-forward
-// below discard them: a path is only ever in that list because every changed line
-// in it was checked, and `bundle` rewrites them again two stages later.
+// Untracked files (`??`) are not findings here because `spawnfile build
+// --release` refuses them itself: a release build requires every bundle input
+// to match HEAD, untracked non-ignored files included.
 export function dirtyTreeFindings(repo, { exec = execFileSync } = {}) {
   let raw;
   try { raw = git(repo, ['status', '--porcelain'], exec); }
   catch (error) { throw new ReleaseError(`cannot read the working tree state of ${repo}: ${String(error.message).trim().slice(0, 200)}`, 'seam-blocked'); }
   const findings = [];
-  const rewritten = [];
   for (const line of raw.split('\n').filter((entry) => entry.trim())) {
     if (line.startsWith('??')) continue;
-    // A rename carries both sides; both have to be allowed. A path git chose to
-    // quote keeps its quotes and therefore matches nothing, which is the right
-    // way round: an unusual filename is a refusal, not an exemption.
-    for (const file of line.slice(3).split(' -> ')) {
-      const allowed = BUNDLE_REWRITTEN.find((entry) => entry.pattern.test(file));
-      if (!allowed) { findings.push(`${file} is modified in the working tree (${line.slice(0, 2).trim()})`); continue; }
-      // The path is one bundle rewrites; what is left to ask is whether THIS
-      // change is a bundle rewrite. `diff HEAD`, so a staged edit is read too:
-      // `git add` must not be a way past this.
-      let diff;
-      try { diff = git(repo, ['diff', 'HEAD', '-U0', '--', file], exec); }
-      catch (error) { findings.push(`${file} is modified in the working tree and its diff against HEAD cannot be read (${String(error.message).trim().slice(0, 160)}), so the change cannot be shown to be a digest rewrite`); continue; }
-      const shape = bundleRewriteFindings(file, diff, { descriptor: allowed.descriptor });
-      findings.push(...shape);
-      if (!shape.length && diff.trim()) rewritten.push(file);
-    }
+    for (const file of line.slice(3).split(' -> ')) findings.push(`${file} is modified in the working tree (${line.slice(0, 2).trim()})`);
   }
-  return { findings, rewritten };
+  return { findings, rewritten: [] };
 }
 
 // A ledger that is MISSING means "nothing has been released from this box yet",

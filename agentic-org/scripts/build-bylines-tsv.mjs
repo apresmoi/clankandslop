@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 // Reporters used to recall their own past work with
-// `rg -l <Name> ./repos/newsroom-content/current/editions/*/articles/*.json` and then
+// `rg -l <Name> ./repos/newsroom-content/current/content/editions/*/articles/*.json` and then
 // `cat` every match -- dozens of full article JSON files (body prose,
 // evidence boxes, art overlays, key_numbers) pulled into the most expensive
 // context of a wake just to see what they'd already covered. This script

@@ -1,0 +1,28 @@
+# Keeps the newsroom's research corpus volume current: the day's research corpus, from clankandslop-private's origin/edition/<today, Europe/Berlin>, frozen at the 12:00 cutoff.
+#
+# It is a Spawnfile fed volume (agentic-org/Spawnfile, resource `research-corpus`):
+# `spawnfile volume refresh` fetches, stages outside the volume, runs the
+# declared validate hook, freezes the tree, swaps `current` with one rename and
+# writes .spawnfile-feed.json. A run with nothing new re-verifies the served tree
+# against the host's land-time manifest and heals drift, so an edit to the
+# agent-writable mount survives at most one timer interval. Host state lives in
+# the volume's sibling spawnfile-feed/ directory, never inside the volume.
+#
+# ONE WRITER ACROSS THE VOLUMES AND THE RELEASE JOB: the refresh runs under the
+# lock clank-release.service takes (and every other clank-feed unit), so it
+# never interleaves with a container recreate, whose startup guard walks every
+# volume. A busy lock is "nothing to do" (exit 0); the next poll lands it.
+# Spawnfile exits 1 on a finding (tampering, repaired or not) or a refusal, which
+# is what OnFailure= reports.
+[Unit]
+Description=Keep the newsroom's research corpus volume current
+After=network-online.target docker.service
+Wants=network-online.target
+OnFailure=clank-alarm@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/work/clankandslop
+Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/usr/bin/flock -n -E 0 /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js volume refresh research-corpus /root/work/clankandslop/agentic-org
+TimeoutStartSec=600

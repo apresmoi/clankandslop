@@ -10,7 +10,7 @@ const url = 'https://ntfy.sh/topic-abcdef';
 const environment = (extra = {}) => ({ CLANK_ALARM_URL: url, CLANK_ALARM_HOST: 'testbox', ...extra });
 
 test('every reason the unattended cycle can raise has a title, a priority and a tag', () => {
-  for (const reason of ['repin-failed', 'bundle-mismatch', 'deploy-failed', 'no-edition', 'seam-blocked', 'unit-failed'])
+  for (const reason of ['repin-failed', 'deploy-failed', 'no-edition', 'seam-blocked', 'unit-failed'])
     assert.ok(REASONS[reason]?.title && REASONS[reason].priority && REASONS[reason].tags, `${reason} is not a declared alarm reason`);
 });
 

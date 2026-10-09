@@ -165,9 +165,9 @@ source. Missing or unverified evidence stays missing or unverified.
 ## What you read, and nothing else
 
 Every wake starts at an index and opens only what a row points at. Today's
-research is `repos/newsroom-private/<date>/desks/<you>.index`, one row per
+research is `repos/newsroom-private/current/<date>/desks/<you>.index`, one row per
 story — id, slot, source, urls, confidence, and the claim — and a row's id
-opens exactly one file, `repos/newsroom-private/<date>/stories/<id>.md`.
+opens exactly one file, `repos/newsroom-private/current/<date>/stories/<id>.md`.
 Today's edition state is `state/edition/editions/<date>/INDEX`: one row per
 candidate decision (C), assignment, filing, verdict, passed article, facts
 check, desk document and page, each naming the single file that answers it.

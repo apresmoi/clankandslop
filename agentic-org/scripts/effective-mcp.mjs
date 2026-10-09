@@ -2,13 +2,16 @@
 // keep asserting on resolved values while the Spawnfiles declare the newsroom
 // server once under the root's `shared.environment.mcp_servers`.
 //
-// Mirrors Spawnfile (>= 9ad3c82, SPEC §2.3 "Per-agent placeholders" and the
-// team inheritance rules):
+// Mirrors Spawnfile (SPEC §2.3 "Per-agent placeholders" and the team
+// inheritance rules):
+//   - a shared server with `opt_in: true` reaches only members that list its
+//     name; every other shared server reaches every member;
 //   - an agent entry WITH `transport` is a complete server and replaces the
 //     inherited one of the same name;
 //   - an agent entry WITHOUT `transport` narrows the inherited server: `tools`
 //     replaces the allowlist, `env` merges key by key (agent keys win), every
-//     other field is inherited; with nothing to narrow it is an error;
+//     other field is inherited (a bare `name` takes it unchanged); with nothing
+//     to narrow it is an error;
 //   - `${workspace}`, `${agent.id}`, `${agent.name}` in command/args/env
 //     resolve per agent; any other `${workspace…}`/`${agent.…}` is an error;
 //   - an agent naming one server twice is an error.
@@ -38,8 +41,10 @@ const resolvePlaceholders = (agent, server) => ({
 });
 
 export function effectiveMcpServers(agent, manifest, rootManifest) {
-  const inherited = new Map((rootManifest?.shared?.environment?.mcp_servers ?? []).map((server) => [server.name, server]));
-  const resolved = new Map(inherited), local = new Set();
+  const shared = rootManifest?.shared?.environment?.mcp_servers ?? [];
+  const inherited = new Map(shared.map(({ opt_in: _optIn, ...server }) => [server.name, server]));
+  const selected = new Set((manifest.environment?.mcp_servers ?? []).map((entry) => entry.name));
+  const resolved = new Map(shared.filter((server) => server.opt_in !== true || selected.has(server.name)).map((server) => [server.name, inherited.get(server.name)])), local = new Set();
   for (const entry of manifest.environment?.mcp_servers ?? []) {
     if (local.has(entry.name)) throw new Error(`${agent} declares MCP server ${entry.name} more than once`);
     local.add(entry.name);
@@ -53,8 +58,19 @@ export function effectiveMcpServers(agent, manifest, rootManifest) {
 
 export const readRootManifest = (root = orgRoot) => parseManifest(readFileSync(resolve(root, 'Spawnfile'), 'utf8'));
 
-/** The agent manifest with `environment.mcp_servers` replaced by what compiles. */
+/** Shared workspace resources plus the agent's own; an agent resource with the same id wins. */
+export function effectiveResources(manifest, rootManifest) {
+  const resolved = new Map((rootManifest?.shared?.workspace?.resources ?? []).map((resource) => [resource.id, resource]));
+  for (const resource of manifest.workspace?.resources ?? []) resolved.set(resource.id, resource);
+  return [...resolved.values()];
+}
+
+/** The agent manifest with `environment.mcp_servers` and `workspace.resources` replaced by what compiles. */
 export function effectiveAgentManifest(agent, bytes, rootManifest = readRootManifest()) {
   const manifest = parseManifest(bytes);
-  return { ...manifest, environment: { ...manifest.environment, mcp_servers: effectiveMcpServers(agent, manifest, rootManifest) } };
+  return {
+    ...manifest,
+    environment: { ...manifest.environment, mcp_servers: effectiveMcpServers(agent, manifest, rootManifest) },
+    workspace: { ...manifest.workspace, resources: effectiveResources(manifest, rootManifest) }
+  };
 }

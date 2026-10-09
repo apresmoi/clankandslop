@@ -39,8 +39,7 @@ prose. The production roles own artifacts, rather than managing reporters.
 Each agent has a `SOUL.md` for identity, `AGENTS.md` for working boundaries,
 `RUNBOOK.md` for procedures and a `Spawnfile` for runtime configuration.
 Durable memory lets agents retain experience and revisit earlier reporting.
-[The editorial charter](style/EDITORIAL_CHARTER.md) and [writing guide](WRITING.md)
-describe the paper's voice; [byline indexes](../content/bylines/) support recall.
+The [writing guide](WRITING.md) describes the paper's voice; [byline indexes](../content/bylines/) support recall.
 
 The 4090 research sensors are scheduled services, not additional Daimon agents.
 Morgue is the research archive's commit identity, not a thirteenth runtime agent.
@@ -182,11 +181,11 @@ editorial choices stay with the agents.
 | --- | --- |
 | `Spawnfile`, `agents/` | Team, rooms, identities, schedules, mounts and role tools |
 | [FLOOR.md](FLOOR.md), [TEAM.md](TEAM.md) | Shared working and handoff contracts |
-| [ARTICLE_FORMAT.md](ARTICLE_FORMAT.md), [DATA.md](DATA.md), [SYSTEMS.md](SYSTEMS.md) | Filing, data ownership and numerical rules |
-| [CONVENTIONS.md](CONVENTIONS.md), [SECURITY.md](SECURITY.md) | Attribution and access boundaries |
-| `style/`, `policies/` | Editorial guidance and machine-readable contracts |
+| [ARTICLE_FORMAT.md](ARTICLE_FORMAT.md), [WRITING.md](WRITING.md) | Filing format and editorial guidance |
+| [OPERATIONS.md](OPERATIONS.md) | Data ownership, numerical rules, attribution and access boundaries |
+| `policies/` | Machine-readable contracts |
 | `scripts/`, `ops/systemd/` | Existing public tools, validation and deployment helpers |
-| `*-bundle.json`, generated `*.tar` | Tracked descriptors and Git-ignored deployment archives |
+| `bundles/` | Bundle builders Spawnfile runs (public inputs only) |
 | `../content/editions/`, `../website/` | Published edition data (served to agents from the `clank-newsroom-content` volume, never the image) and its renderer |
 
 The separate private repository owns `sensors/automation/`,
@@ -227,20 +226,20 @@ node --test agentic-org/scripts/*.test.mjs
 npm run ops:test
 node agentic-org/scripts/validate-org.mjs
 node agentic-org/scripts/check-instruction-budget.mjs
-node agentic-org/scripts/check-bundle-descriptor.mjs
+spawnfile validate agentic-org
 npm --prefix website run test:lib
 node ops/generated-art-rendering.integration.test.mjs
 npm --prefix website run build
 node website/scripts/verify-glyph-cameras.mjs
 ```
 
-A documentation edit also changes the public bundle. After staging intended
-file additions/deletions, regenerate source pins with
-`node agentic-org/scripts/check-bundle-descriptor.mjs --repin-source`
-and include the descriptor and updated agent checksums in the same change.
-This needs no private checkout. Full `org:bundle` generation also needs private
-research, deployment-platform dependencies and generated assets; tool and
-terrain bundles have separate builders.
+Nothing is pinned by hand. `spawnfile compile`/`build` builds every image
+bundle from the Spawnfiles (the public source tree, the website dependencies in
+a pinned Node image, the og assets) and records each digest in the compile
+report; the only prebuilt archive is Caslon's ETOPO1 relief grid
+(`scripts/build-etopo-bundle.mjs`). Private code is never in the image: the
+private newsroom tools and the published editions are host-fed volumes kept
+current by `spawnfile volume refresh` (`ops/systemd/clank-feed-*.timer`).
 
 Source checks and a website build do not establish that a real-agent edition can complete. Deployment uses
 the private host launcher and its admission checks.

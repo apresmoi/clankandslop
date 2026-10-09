@@ -3,12 +3,12 @@
 // file_desk ledger.worlddesk reads the SAME host-populated research-corpus mount
 // record_assignment reads, and until this suite existed it read it with none of
 // record_assignment's refusals: an undeclared mount fell back to a cwd-relative
-// repos/newsroom-private, CORPUS.json was never opened, and a missing mount was
+// repos/newsroom-private, the identity record was never opened, and a missing mount was
 // reported as a missing prepared document. So these tests are about three
 // distinct causes and three distinct refusals, and every corpus here is a real
-// directory with a real CORPUS.json and a real dated symlink into
-// trees/<commit>/ — the link-binding check is a question about symlinks on disk
-// and a mocked filesystem would answer it about nothing.
+// directory with a real .spawnfile-feed.json and a real `current` symlink into
+// trees/<revision>/ — the link-binding check is a question about symlinks on
+// disk and a mocked filesystem would answer it about nothing.
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
@@ -46,10 +46,10 @@ const writeJson = (file, value) => { mkdirSync(path.dirname(file), { recursive: 
 // `prepared: null` / `trace: null` leave the file off the mount; omitting them
 // writes the good one. (`undefined` would silently take the default, which is a
 // fixture that proves the opposite of what the test name says.)
-function mount(label, { edition = EDITION, commit = COMMIT, identity, prepared = documentFor(edition), trace = traceFor(edition) } = {}) {
+function mount(label, { edition = EDITION, commit = COMMIT, source, prepared = documentFor(edition), trace = traceFor(edition) } = {}) {
   const root = path.join(temporary(label), 'corpus');
-  installCorpusFixture(root, edition, { commit, ...(identity ? { identity } : {}) });
-  const dir = path.join(root, edition, 'worlddesk');
+  installCorpusFixture(root, edition, { commit, ...(source ? { source } : {}) });
+  const dir = path.join(root, 'current', edition, 'worlddesk');
   if (prepared !== null) writeJson(path.join(dir, 'ledger.worlddesk.json'), prepared);
   if (trace !== null) writeJson(path.join(dir, 'trace.json'), trace);
   return root;
@@ -88,46 +88,48 @@ test('a World Desk filing refuses a corpus mount the host has not populated', as
 
 test('a World Desk filing refuses a corpus with no readable identity record', async () => {
   const missing = mount('identity-missing');
-  unlinkSync(path.join(missing, 'CORPUS.json'));
-  assert.match(await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: missing }), /carries no readable identity record — .*CORPUS\.json is missing or unparseable \(ENOENT\)/u);
+  unlinkSync(path.join(missing, '.spawnfile-feed.json'));
+  assert.match(await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: missing }), /carries no readable identity record — .*\.spawnfile-feed\.json is missing or unparseable \(ENOENT\)/u);
   const unparseable = mount('identity-unparseable');
-  writeFileSync(path.join(unparseable, 'CORPUS.json'), '{ "version": truncated');
+  writeFileSync(path.join(unparseable, '.spawnfile-feed.json'), '{ "version": truncated');
   assert.match(await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: unparseable }), /carries no readable identity record/u);
   // A record that parses but breaks the shared contract is refused on the
   // contract's own findings, not re-litigated here.
-  const malformed = mount('identity-malformed', { identity: { commit: 'not-a-sha', tree: 'trees/not-a-sha' } });
+  const malformed = mount('identity-malformed', { source: { commit: 'not-a-sha' } });
   assert.match(await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: malformed }), /commit must be a 40-character lowercase hex sha/u);
 });
 
 test("a World Desk filing refuses a corpus that is not this edition's, naming both days", async () => {
   // The record names another day while the tree and the dated link are this
   // one's: the stale-corpus case, where every path a reader opens resolves.
-  const root = mount('wrong-edition', { identity: { edition: OTHER_EDITION, editions_present: [OTHER_EDITION] } });
+  const root = mount('wrong-edition', { source: { ref: `origin/edition/${OTHER_EDITION}` } });
   const message = await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: root });
   assert.match(message, /cannot trust the research corpus: it is not this edition's/u);
   assert.match(message, new RegExp(`corpus is edition "${OTHER_EDITION}", not ${EDITION}`, 'u'));
   assert.match(message, new RegExp(`this filing is for edition "${EDITION}"`, 'u'));
 });
 
-test('a World Desk filing refuses a corpus whose dated link is not bound to the commit its record names', async () => {
+test('a World Desk filing refuses a corpus whose current link is not bound to the tree its record names', async () => {
   const root = mount('unbound');
-  // A second tree, the dated link moved onto it, the record left naming the
-  // first: a crashed refresh, or an agent relinking the volume it can write.
-  mkdirSync(path.join(root, 'trees', OTHER_COMMIT, EDITION), { recursive: true });
-  unlinkSync(path.join(root, EDITION));
-  symlinkSync(path.join('trees', OTHER_COMMIT, EDITION), path.join(root, EDITION));
+  // A second tree, `current` moved onto it, the record left naming the first:
+  // a crashed refresh, or an agent relinking the volume it can write.
+  const other = `trees/${'c'.repeat(64)}`;
+  mkdirSync(path.join(root, other, EDITION), { recursive: true });
+  unlinkSync(path.join(root, 'current'));
+  symlinkSync(other, path.join(root, 'current'));
   const message = await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: root });
-  assert.match(message, /does not bind edition 2026-09-11 to the commit it claims/u);
-  assert.match(message, new RegExp(`CORPUS\\.json names commit ${COMMIT}`, 'u'));
-  assert.match(message, /which is outside trees\/a{40}\//u);
+  assert.match(message, /does not bind edition 2026-09-11 to the tree it claims/u);
+  assert.match(message, new RegExp(`commit ${COMMIT}`, 'u'));
+  assert.ok(message.includes(other), 'the refusal says where current actually points');
   // Real corpus data where the link belongs is not a binding either.
   const replaced = mount('unbound-real');
-  unlinkSync(path.join(replaced, EDITION));
-  mkdirSync(path.join(replaced, EDITION, 'worlddesk'), { recursive: true });
-  writeJson(path.join(replaced, EDITION, 'worlddesk/ledger.worlddesk.json'), documentFor(EDITION));
-  writeJson(path.join(replaced, EDITION, 'worlddesk/trace.json'), traceFor(EDITION));
-  assert.match(await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: replaced }), /is a real directory on the mount, not a symlink into trees\/a{40}\//u);
+  unlinkSync(path.join(replaced, 'current'));
+  mkdirSync(path.join(replaced, 'current', EDITION, 'worlddesk'), { recursive: true });
+  writeJson(path.join(replaced, 'current', EDITION, 'worlddesk/ledger.worlddesk.json'), documentFor(EDITION));
+  writeJson(path.join(replaced, 'current', EDITION, 'worlddesk/trace.json'), traceFor(EDITION));
+  assert.match(await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: replaced }), /current is a real directory on the mount/u);
 });
+
 
 // Freshness, which is the one corpus property a World Desk filing needs that the
 // identity record cannot carry: the record says which commit this is, and
@@ -139,7 +141,7 @@ test('a World Desk filing refuses a corpus that is not the prepared research for
   // path resolving, which is what an interrupted or hand-assembled corpus looks
   // like. This was filed from without complaint.
   const bare = mount('no-prepared');
-  unlinkSync(path.join(bare, EDITION, 'desks', '_corpus.prepared.json'));
+  unlinkSync(path.join(bare, 'current', EDITION, 'desks', '_corpus.prepared.json'));
   const missing = await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: bare });
   assert.match(missing, /cannot trust the research corpus: it is not the prepared research for edition 2026-09-11/u);
   assert.match(missing, /_corpus\.prepared\.json/u);
@@ -149,7 +151,7 @@ test('a World Desk filing refuses a corpus that is not the prepared research for
   // contract notices that the figures would rest on research the record does not
   // describe.
   const stale = mount('stale-prepared');
-  const capture = path.join(stale, EDITION, 'chatgpt', 'world.md');
+  const capture = path.join(stale, 'current', EDITION, 'chatgpt', 'world.md');
   writeFileSync(capture, `${readFileSync(capture, 'utf8')}an overnight re-run nobody re-prepared\n`);
   const moved = await rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: stale });
   assert.match(moved, /stale digest\(s\) for: chatgpt\/world\.md/u);
@@ -162,7 +164,7 @@ test('a World Desk filing refuses a corpus that is not the prepared research for
   // worlddesk/, so a corpus whose desk indexes are broken still files. Brass's
   // read of the same mount refuses it, and that asymmetry is the point.
   const quietDesks = mount('desks-broken');
-  unlinkSync(path.join(quietDesks, EDITION, 'desks', 'graves.index'));
+  unlinkSync(path.join(quietDesks, 'current', EDITION, 'desks', 'graves.index'));
   await authenticate(filing(), { CLANK_PRIVATE_SOURCE_ROOT: quietDesks });
 });
 
@@ -178,7 +180,7 @@ test('a missing prepared document is reported as a missing document, never as a 
 
 test('the three causes never share one message', async () => {
   const absent = path.join(temporary('distinct'), 'never-mounted');
-  const stale = mount('distinct-stale', { identity: { edition: OTHER_EDITION, editions_present: [OTHER_EDITION] } });
+  const stale = mount('distinct-stale', { source: { ref: `origin/edition/${OTHER_EDITION}` } });
   const bare = mount('distinct-bare', { prepared: null, trace: null });
   const [mountMessage, corpusMessage, documentMessage] = await Promise.all([absent, stale, bare].map((root) => rejection(filing(), { CLANK_PRIVATE_SOURCE_ROOT: root })));
   assert.equal(new Set([mountMessage, corpusMessage, documentMessage]).size, 3);
@@ -197,7 +199,7 @@ test('the corpus gate is additive: a valid filing and the stale carry-forward ar
   //    its public trace are real files under a real public root, so this is the
   //    whole stale-carry-forward rule running, not a stub of it.
   const root = mount('refusal', { prepared: null, trace: { version: 'clank.worlddesk-trace.v1', edition: EDITION, escalation: { index: null, unresolved: ['flashpoint-registry unreachable'] } } });
-  writeJson(path.join(root, EDITION, 'worlddesk/refusal.json'), { version: 'clank.worlddesk-trace.v1', edition: EDITION, refused: true, unresolved: ['flashpoint-registry unreachable'] });
+  writeJson(path.join(root, 'current', EDITION, 'worlddesk/refusal.json'), { version: 'clank.worlddesk-trace.v1', edition: EDITION, refused: true, unresolved: ['flashpoint-registry unreachable'] });
   const publicRoot = path.join(temporary('public'), 'newsroom');
   writeJson(path.join(publicRoot, 'content/editions', OTHER_EDITION, 'desk/ledger.worlddesk.json'), documentFor(OTHER_EDITION));
   writeJson(path.join(publicRoot, 'content/log', OTHER_EDITION, 'worlddesk.json'), traceFor(OTHER_EDITION));
@@ -219,7 +221,7 @@ test('the corpus gate is additive: a valid filing and the stale carry-forward ar
 test('markets must be the producer\'s markets.json, verbatim, on derived and stale days alike', async () => {
   const markets = { source: 'FRED, Federal Reserve Bank of St. Louis', retrieved_at: '2026-09-11T05:00:00Z', series: [{ id: 'DGS10', group: 'rates', label: 'US 10-year Treasury yield', unit: 'percent', decimals: 2, basis: 'close', url: 'https://fred.stlouisfed.org/series/DGS10', value: 4.12, observed: '2026-09-10' }] };
   const root = mount('markets', { prepared: { ...documentFor(EDITION), markets } });
-  writeJson(path.join(root, EDITION, 'worlddesk/markets.json'), markets);
+  writeJson(path.join(root, 'current', EDITION, 'worlddesk/markets.json'), markets);
   const env = { CLANK_PRIVATE_SOURCE_ROOT: root };
   await authenticate(filing(EDITION, { ...documentFor(EDITION), markets }), env);
   assert.match(await rejection(filing(), env), /"markets" must be .*markets\.json copied verbatim/u, 'a dropped board is refused');
@@ -228,8 +230,8 @@ test('markets must be the producer\'s markets.json, verbatim, on derived and sta
   assert.match(await rejection(filing(EDITION, { ...documentFor(EDITION), markets }), { CLANK_PRIVATE_SOURCE_ROOT: mount('markets-none') }), /producer wrote no .*markets\.json/u, 'an invented board is refused');
 
   const stale = mount('markets-refusal', { prepared: null, trace: { version: 'clank.worlddesk-trace.v1', edition: EDITION, escalation: { index: null, unresolved: ['x'] } } });
-  writeJson(path.join(stale, EDITION, 'worlddesk/refusal.json'), { version: 'clank.worlddesk-trace.v1', edition: EDITION, refused: true, unresolved: ['x'] });
-  writeJson(path.join(stale, EDITION, 'worlddesk/markets.json'), markets);
+  writeJson(path.join(stale, 'current', EDITION, 'worlddesk/refusal.json'), { version: 'clank.worlddesk-trace.v1', edition: EDITION, refused: true, unresolved: ['x'] });
+  writeJson(path.join(stale, 'current', EDITION, 'worlddesk/markets.json'), markets);
   const publicRoot = path.join(temporary('markets-public'), 'newsroom');
   writeJson(path.join(publicRoot, 'content/editions', OTHER_EDITION, 'desk/ledger.worlddesk.json'), { ...documentFor(OTHER_EDITION), markets: { ...markets, retrieved_at: 'yesterday' } });
   writeJson(path.join(publicRoot, 'content/log', OTHER_EDITION, 'worlddesk.json'), traceFor(OTHER_EDITION));
@@ -260,7 +262,7 @@ test('file_desk ledger.worlddesk refuses an unreadable corpus through the real t
   try {
     delete process.env.CLANK_PRIVATE_SOURCE_ROOT;
     await assert.rejects(fileDesk(filing()), /CLANK_PRIVATE_SOURCE_ROOT must be the absolute path/u);
-    process.env.CLANK_PRIVATE_SOURCE_ROOT = mount('tool-wrong-edition', { identity: { edition: OTHER_EDITION, editions_present: [OTHER_EDITION] } });
+    process.env.CLANK_PRIVATE_SOURCE_ROOT = mount('tool-wrong-edition', { source: { ref: `origin/edition/${OTHER_EDITION}` } });
     await assert.rejects(fileDesk(filing()), /cannot trust the research corpus: it is not this edition's/u);
     process.env.CLANK_PRIVATE_SOURCE_ROOT = mount('tool-valid');
     assert.equal((await fileDesk(filing())).name, 'ledger.worlddesk');
