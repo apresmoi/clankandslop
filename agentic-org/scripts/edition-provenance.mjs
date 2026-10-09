@@ -23,24 +23,19 @@
 // pushes -- refuses unless the edition's own durable records and that host
 // record name the SAME commit. What lands on the branch is the commit the HOST
 // vouches for, and nothing here ever reads the mount.
+import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-// The host record's SHAPE is not restated here. corpus-landed.mjs is what the
-// refresher writes it under; a second copy of those rules is a copy that is not
-// exercised every morning, and a provenance check that has drifted is
-// indistinguishable from no provenance check at all. What this module owns is
-// the POLICY on top: the refresher may degrade a bad record to "nothing landed"
-// and re-earn it next run, and the publisher may not.
-import { readLanded } from './corpus-landed.mjs';
-import { corpusTreePath, isCorpusCommit } from './corpus-contract.mjs';
+// The host record is Spawnfile's own: `spawnfile volume refresh research-corpus`
+// keeps `landed.json` in the volume's sibling `spawnfile-feed/` directory,
+// root-owned and outside every container, and takes every decision from it.
+// Only the fields this policy needs are read, and anything unexpected in them is
+// a refusal: the refresher may degrade a bad record and re-earn it, the
+// publisher may not.
+import { editionOfRef, isCorpusCommit, isCorpusTreePath } from './corpus-contract.mjs';
 
-export { LANDED_VERSION } from './corpus-landed.mjs';
-// The same path corpus-refresh.mjs writes (its `DEFAULT_LANDED`), spelled out
-// rather than imported: the refresher is a host WRITER that pulls in the volume
-// mutators, and the publisher has no business importing any of that. A drift
-// between the two spellings is a refusal on the next publication, not a silent
-// pass — the file simply is not there.
-export const DEFAULT_LANDED_RECORD = '/var/lib/clank-corpus/landed.json';
+export const LANDED_VERSION = 'spawnfile.volume-feed-landed.v1';
+export const DEFAULT_LANDED_RECORD = '/var/lib/docker/volumes/clank-newsroom-corpus/spawnfile-feed/landed.json';
 export const CORPUS_PROVENANCE_FILE = 'corpus-provenance.json';
 export const CORPUS_PROVENANCE_VERSION = 'clank.edition-corpus-provenance.v1';
 const readJson = async (file) => JSON.parse(await readFile(file, 'utf8'));
@@ -60,7 +55,7 @@ export async function editionCorpusClaim(stateRoot, edition, compositionDigest) 
   if (value?.kind !== 'composed' || value.edition !== edition || value.digest !== compositionDigest) throw new Error(`${file} is not the composed receipt for ${edition} at ${compositionDigest} — the edition's records disagree about which composition was staged, and nothing was pushed`);
   const corpus = value.composition?.corpus;
   if (corpus === undefined || corpus === null) return { file, claim: null, reason: `${file} carries no composition.corpus` };
-  if (typeof corpus !== 'object' || !isCorpusCommit(corpus.commit ?? '') || corpus.edition !== edition || corpus.tree !== corpusTreePath(corpus.commit)) throw new Error(`${file} carries a malformed research-corpus identity (commit ${JSON.stringify(corpus.commit ?? null)}, edition ${JSON.stringify(corpus.edition ?? null)}, tree ${JSON.stringify(corpus.tree ?? null)}) — nothing was pushed`);
+  if (typeof corpus !== 'object' || !isCorpusCommit(corpus.commit ?? '') || corpus.edition !== edition || !isCorpusTreePath(corpus.tree)) throw new Error(`${file} carries a malformed research-corpus identity (commit ${JSON.stringify(corpus.commit ?? null)}, edition ${JSON.stringify(corpus.edition ?? null)}, tree ${JSON.stringify(corpus.tree ?? null)}) — nothing was pushed`);
   return { file, claim: { commit: corpus.commit, ref: typeof corpus.ref === 'string' ? corpus.ref : null, tree: corpus.tree }, reason: null };
 }
 
@@ -70,15 +65,19 @@ export async function editionCorpusClaim(stateRoot, edition, compositionDigest) 
 // value a published paper may carry.
 export function landedCorpus(file, edition) {
   if (!path.isAbsolute(file)) throw new Error(`the host corpus record path must be absolute, got ${JSON.stringify(file)}`);
-  // `readLanded` owns the shape and degrades anything it cannot trust to
-  // "nothing landed". For the refresher that is recoverable — it re-lands and
-  // rewrites the record on its next run. A published paper cannot re-earn its
-  // provenance afterwards, so here the same state is a refusal.
-  const { record, reason, missing } = readLanded(file);
-  if (record === null) throw new Error(`the host's corpus record ${file} ${missing ? 'does not exist' : `cannot be trusted — ${reason}`} — only the host can say which corpus it landed, and this job does not publish provenance the container asserted about itself. Nothing was pushed`);
-  const entry = record.editions?.[edition];
-  if (entry === undefined) throw new Error(`the host's corpus record ${file} has no entry for edition ${edition} — the host never landed a corpus for this edition, so nothing outside the container can vouch for what the paper read. Nothing was pushed`);
-  return { commit: entry.commit, tree: entry.tree, landed_at: entry.landed_at };
+  let record, missing = false;
+  try { record = JSON.parse(readFileSync(file, 'utf8')); } catch (error) { missing = error.code === 'ENOENT'; record = { unreadable: error.code ?? error.message }; }
+  const identity = record?.identity, source = identity?.source;
+  const reason = record?.unreadable ? `it is unreadable (${record.unreadable})`
+    : record?.version !== LANDED_VERSION ? `it is not a ${LANDED_VERSION} record`
+    : identity?.resource !== 'research-corpus' ? 'it does not describe the research-corpus volume'
+    : source?.kind !== 'git' || !isCorpusCommit(source?.commit) || typeof source?.ref !== 'string' ? 'it names no git commit and ref'
+    : !isCorpusTreePath(identity?.tree) || `trees/${record.tree}` !== identity.tree ? 'its serving tree is not the tree its identity names'
+    : typeof identity?.landed_at !== 'string' || !identity.landed_at ? 'it records no landing instant'
+    : null;
+  if (reason) throw new Error(`the host's corpus record ${file} ${missing ? 'does not exist' : `cannot be trusted — ${reason}`} — only the host can say which corpus it landed, and this job does not publish provenance the container asserted about itself. Nothing was pushed`);
+  if (editionOfRef(source.ref) !== edition) throw new Error(`the host's corpus record ${file} has no entry for edition ${edition} — the host serves ${source.ref}, so nothing outside the container can vouch for what the paper read. Nothing was pushed`);
+  return { commit: source.commit, tree: identity.tree, landed_at: identity.landed_at };
 }
 
 // Fail closed, and loud when overridden. The record returned is what the branch

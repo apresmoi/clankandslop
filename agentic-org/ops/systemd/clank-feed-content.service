@@ -9,7 +9,7 @@
 # the volume's sibling spawnfile-feed/ directory, never inside the volume.
 #
 # ONE WRITER ACROSS THE VOLUMES AND THE RELEASE JOB: the refresh runs under the
-# lock clank-corpus-refresh.service and clank-release.service already take, so it
+# lock clank-release.service takes (and every other clank-feed unit), so it
 # never interleaves with a container recreate, whose startup guard walks every
 # volume. A busy lock is "nothing to do" (exit 0); the next poll lands it.
 # Spawnfile exits 1 on a finding (tampering, repaired or not) or a refusal, which

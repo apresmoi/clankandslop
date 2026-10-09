@@ -31,7 +31,8 @@
 # SSH host alias, and root's ~/.ssh/config only supplies a key for the aliases
 # `github-clank-public` and `github-clank-private`. With the key it is exit 0. The
 # private corpus remote IS `git@github-clank-private:…`, which is why
-# clank-corpus-refresh.service needs no key of its own and this unit does.
+# clank-feed-corpus.service and clank-feed-private-tools.service need no key of
+# their own and this unit does.
 #
 # A missing or rejected key PAGES rather than defers, deliberately: an
 # unauthenticated fetch fails with git's same "Could not read from remote

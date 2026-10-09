@@ -15,7 +15,7 @@ const serviceUnits = readdirSync(unitDir).filter((name) => name.endsWith('.servi
 
 test('every host job unit is covered, and the list cannot fall behind the directory', () => {
   assert.ok(serviceUnits.length >= 6, `expected at least the six known host job units, found ${serviceUnits.length}: ${serviceUnits.join(', ')}`);
-  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-seam.service', 'clank-corpus-refresh.service', 'clank-feed-content.service', 'clank-feed-private-tools.service', 'clank-release.service'])
+  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-seam.service', 'clank-feed-corpus.service', 'clank-feed-content.service', 'clank-feed-private-tools.service', 'clank-release.service'])
     assert.ok(serviceUnits.includes(name), `${name} is missing from ops/systemd -- a host job unit must be tracked in the repository`);
 });
 
@@ -36,15 +36,13 @@ test('the alarm handler itself uses the local standalone recorder, not the retir
   assert.match(text, /^ExecStart=\/usr\/local\/lib\/clank-alarm\/clank-alarm\.sh %i$/mu, 'the standalone local recorder must run');
 });
 
-// One writer across every newsroom volume and the release job: the fed-volume
-// refreshes run under the corpus refresher's lock, which the release unit takes
-// with flock(1). Two different paths would be mutual exclusion that only one
+// One writer across every newsroom volume and the release job: every fed-volume
+// refresh runs under the release unit's flock(1) lock. Two different paths would be mutual exclusion that only one
 // side observes, which reads as protection and is none.
-test('the fed-volume refreshes, the corpus refresher and the release job serialize on one lock', async () => {
-  const { DEFAULT_LOCK } = await import('./corpus-refresh-options.mjs');
-  const lock = DEFAULT_LOCK.replaceAll('.', '\\.');
+test('the fed-volume refreshes and the release job serialize on one lock', () => {
+  const lock = '/run/lock/clank-corpus-refresh\\.lock';
   assert.match(unit('clank-release.service'), new RegExp(`^ExecStart=/usr/bin/flock ${lock} `, 'mu'));
-  for (const [kind, id] of [['content', 'public-content-volume'], ['private-tools', 'newsroom-private-tools']]) {
+  for (const [kind, id] of [['content', 'public-content-volume'], ['private-tools', 'newsroom-private-tools'], ['corpus', 'research-corpus']]) {
     const service = unit(`clank-feed-${kind}.service`);
     assert.match(service, new RegExp(`^ExecStart=/usr/bin/flock -n -E 0 ${lock} \\S+node \\S+/dist/cli/index\\.js volume refresh ${id} /root/work/clankandslop/agentic-org$`, 'mu'), kind);
     assert.match(unit(`clank-feed-${kind}.timer`), new RegExp(`^Unit=clank-feed-${kind}\\.service$`, 'mu'), kind);

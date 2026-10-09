@@ -1,6 +1,6 @@
-# Keeps the newsroom's private tools volume current: the private newsroom tools (state adapter, art, visual, validation and release adapters), from clankandslop-private's origin/main.
+# Keeps the newsroom's research corpus volume current: the day's research corpus, from clankandslop-private's origin/edition/<today, Europe/Berlin>, frozen at the 12:00 cutoff.
 #
-# It is a Spawnfile fed volume (agentic-org/Spawnfile, resource `newsroom-private-tools`):
+# It is a Spawnfile fed volume (agentic-org/Spawnfile, resource `research-corpus`):
 # `spawnfile volume refresh` fetches, stages outside the volume, runs the
 # declared validate hook, freezes the tree, swaps `current` with one rename and
 # writes .spawnfile-feed.json. A run with nothing new re-verifies the served tree
@@ -15,7 +15,7 @@
 # Spawnfile exits 1 on a finding (tampering, repaired or not) or a refusal, which
 # is what OnFailure= reports.
 [Unit]
-Description=Keep the newsroom's private tools volume current
+Description=Keep the newsroom's research corpus volume current
 After=network-online.target docker.service
 Wants=network-online.target
 OnFailure=clank-alarm@%n.service
@@ -24,5 +24,5 @@ OnFailure=clank-alarm@%n.service
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
 Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ExecStart=/usr/bin/flock -n -E 0 /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js volume refresh newsroom-private-tools /root/work/clankandslop/agentic-org
-TimeoutStartSec=1800
+ExecStart=/usr/bin/flock -n -E 0 /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js volume refresh research-corpus /root/work/clankandslop/agentic-org
+TimeoutStartSec=600

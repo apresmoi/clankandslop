@@ -1,0 +1,12 @@
+[Unit]
+Description=Keep the newsroom's research corpus volume current
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+AccuracySec=15s
+Persistent=false
+Unit=clank-feed-corpus.service
+
+[Install]
+WantedBy=timers.target

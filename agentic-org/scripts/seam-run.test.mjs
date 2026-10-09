@@ -624,7 +624,7 @@ test('the fetch goes out with a configured ssh identity, and refuses rather than
   // remote is `git@github.com:apresmoi/clankandslop.git` with no ssh host alias,
   // and root's ~/.ssh/config only keys the aliases — so the bare fetch this gate
   // was written with had no identity and could never see a merge. The private
-  // repo's remote IS an alias, which is why corpus-refresh.mjs needed nothing.
+  // repo's remote IS an alias, which is why the private feeds need nothing.
   assert.equal(DEFAULT_FETCH_KEY, '/root/.ssh/clank_public', 'a silent change of the identity is a release job that stops fetching');
   assert.equal(parseArgs([]).key, '/root/.ssh/clank_public');
   assert.equal(parseArgs(['--key=/root/.ssh/other']).key, '/root/.ssh/other');

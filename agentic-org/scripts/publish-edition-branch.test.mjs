@@ -189,9 +189,16 @@ function commission(staged, edition, { commit = CORPUS_A, corpus } = {}) {
   return { file, value, write };
 }
 
-function landed(edition, { commit = CORPUS_A, landed_at = HOST_LANDED_AT, body } = {}) {
+// Spawnfile's host record for the research-corpus feed, serving the edition's
+// branch. `body` replaces it whole; `identity` overrides fields of its identity.
+const HOST_REVISION = 'e'.repeat(64);
+const hostRecord = (edition, { commit = CORPUS_A, landed_at = HOST_LANDED_AT, identity = {} } = {}) => ({
+  version: 'spawnfile.volume-feed-landed.v1', revision: HOST_REVISION, tree: HOST_REVISION, trees: [HOST_REVISION], heals: {}, identity_sha256: 'f'.repeat(64),
+  identity: { version: 'spawnfile.volume-feed.v1', resource: 'research-corpus', volume: 'clank-newsroom-corpus', revision: HOST_REVISION, tree: `trees/${HOST_REVISION}`, files: 9, landed_at, source: { kind: 'git', commit, ref: `origin/edition/${edition}`, paths: null }, ...identity }
+});
+function landed(edition, { body, ...options } = {}) {
   const file = join(scratch('landed'), 'landed.json');
-  writeFileSync(file, JSON.stringify(body ?? { version: 'clank.corpus-landed.v1', editions: { [edition]: { commit, tree: `trees/${commit}`, landed_at } }, trees: [`trees/${commit}`] }));
+  writeFileSync(file, JSON.stringify(body ?? hostRecord(edition, options)));
   return file;
 }
 
@@ -586,7 +593,7 @@ test('end to end: a promoted artifact becomes an edition branch on a real remote
   const published = execFileSync('git', ['-C', origin.url, 'show', `${result.commit}:content/editions/2026-09-08/${CORPUS_PROVENANCE_FILE}`], { encoding: 'utf8' });
   assert.deepEqual(JSON.parse(published), {
     version: CORPUS_PROVENANCE_VERSION, edition: '2026-09-08', asserted_by: 'host',
-    corpus: { commit: CORPUS_A, tree: `trees/${CORPUS_A}`, landed_at: HOST_LANDED_AT },
+    corpus: { commit: CORPUS_A, tree: `trees/${HOST_REVISION}`, landed_at: HOST_LANDED_AT },
     commissioned_ref: 'refs/remotes/origin/edition/2026-09-08'
   });
   // `corpus` carries the host's values only — the branch name is the container's
@@ -628,7 +635,7 @@ test('the corpus claim is read from the composition the staged receipt names', a
   assert.equal((await editionCorpusClaim(staged.state, '2026-09-11', digest)).claim, null);
   // A corpus record that contradicts ITSELF is broken records, never a backfill:
   // it throws, and no operator flag can wave it through.
-  for (const corpus of [{ commit: 'nope' }, { edition: '2026-09-12' }, { tree: `trees/${CORPUS_B}` }, { commit: CORPUS_A.toUpperCase() }]) {
+  for (const corpus of [{ commit: 'nope' }, { edition: '2026-09-12' }, { tree: `trees/../${CORPUS_B}` }, { commit: CORPUS_A.toUpperCase() }]) {
     composed.write({ ...composed.value, composition: { tree: { articles: [] }, corpus: { ...composed.value.composition.corpus, ...corpus } } });
     await assert.rejects(editionCorpusClaim(staged.state, '2026-09-11', digest), /malformed research-corpus identity/u, JSON.stringify(corpus));
   }
@@ -640,21 +647,20 @@ test('the corpus claim is read from the composition the staged receipt names', a
 });
 
 test('the host corpus record is read from outside the volume and every defect refuses', async () => {
-  assert.equal(DEFAULT_LANDED_RECORD, '/var/lib/clank-corpus/landed.json');
-  // The SHAPE is corpus-landed.mjs's, not a second copy of it: this asserts the
-  // policy on top — the refresher may degrade an untrusted record to "nothing
-  // landed" and re-earn it next run, the publisher refuses instead.
-  assert.equal(LANDED_VERSION, 'clank.corpus-landed.v1');
-  assert.deepEqual(landedCorpus(landed('2026-09-11'), '2026-09-11'), { commit: CORPUS_A, tree: `trees/${CORPUS_A}`, landed_at: HOST_LANDED_AT });
+  // Spawnfile keeps it beside the volume, root-owned, never inside it.
+  assert.equal(DEFAULT_LANDED_RECORD, '/var/lib/docker/volumes/clank-newsroom-corpus/spawnfile-feed/landed.json');
+  assert.equal(LANDED_VERSION, 'spawnfile.volume-feed-landed.v1');
+  assert.deepEqual(landedCorpus(landed('2026-09-11'), '2026-09-11'), { commit: CORPUS_A, tree: `trees/${HOST_REVISION}`, landed_at: HOST_LANDED_AT });
   assert.throws(() => landedCorpus(join(scratch('landed'), 'absent.json'), '2026-09-11'), /does not exist[\s\S]*does not publish provenance the container asserted about itself/u);
   assert.throws(() => landedCorpus('relative/landed.json', '2026-09-11'), /must be absolute/u);
   assert.throws(() => landedCorpus(landed('2026-09-10'), '2026-09-11'), /has no entry for edition 2026-09-11/u);
+  const good = hostRecord('2026-09-11');
   for (const [label, body] of [
-    ['a version this job does not read', { version: 'clank.corpus-landed.v2', editions: {}, trees: [] }],
-    ['a commit that is not a sha', { version: LANDED_VERSION, editions: { '2026-09-11': { commit: 'short', tree: 'trees/short', landed_at: HOST_LANDED_AT } }, trees: [] }],
-    ['a tree that is not the commit\'s', { version: LANDED_VERSION, editions: { '2026-09-11': { commit: CORPUS_A, tree: `trees/${CORPUS_B}`, landed_at: HOST_LANDED_AT } }, trees: [`trees/${CORPUS_B}`] }],
-    ['a tree absent from trees[]', { version: LANDED_VERSION, editions: { '2026-09-11': { commit: CORPUS_A, tree: `trees/${CORPUS_A}`, landed_at: HOST_LANDED_AT } }, trees: [] }],
-    ['no instant it landed at', { version: LANDED_VERSION, editions: { '2026-09-11': { commit: CORPUS_A, tree: `trees/${CORPUS_A}` } }, trees: [`trees/${CORPUS_A}`] }]
+    ['a version this job does not read', { ...good, version: 'spawnfile.volume-feed-landed.v2' }],
+    ['another volume', { ...good, identity: { ...good.identity, resource: 'public-content-volume' } }],
+    ['a commit that is not a sha', { ...good, identity: { ...good.identity, source: { ...good.identity.source, commit: 'short' } } }],
+    ['a serving tree that is not the identity\'s', { ...good, tree: 'c'.repeat(64) }],
+    ['no instant it landed at', { ...good, identity: { ...good.identity, landed_at: undefined } }]
   ]) assert.throws(() => landedCorpus(landed('2026-09-11', { body }), '2026-09-11'), /cannot be trusted/u, label);
   writeFileSync(join(scratch('landed'), 'x.json'), '');
 });
@@ -681,7 +687,7 @@ test('nothing is pushed when the host cannot vouch for the corpus behind an edit
   // 3. The host's record is unparseable.
   const broken = join(scratch('landed'), 'landed.json');
   writeFileSync(broken, '{ not json');
-  await refuses({ staging: ok.root, state: ok.state, landed: broken }, /cannot be trusted[\s\S]*not parseable JSON/u, 'unparseable host record');
+  await refuses({ staging: ok.root, state: ok.state, landed: broken }, /cannot be trusted[\s\S]*unreadable/u, 'unparseable host record');
   // 4. The host landed nothing for THIS edition.
   await refuses({ staging: ok.root, state: ok.state, landed: landed('2026-09-13') }, /has no entry for edition 2026-09-12/u, 'wrong edition');
   // 5. THE ONE THE FORGERY LOOKS LIKE: the container claims one corpus and the

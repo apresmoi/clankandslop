@@ -1,29 +1,22 @@
 // The research-corpus contract: what a day's corpus must contain before any
-// reporter can be pointed at it, and how the host tells the container which
-// commit it is looking at.
+// reporter can be pointed at it, and how a reader knows which commit it is
+// looking at.
 //
-// WHY THIS IS ITS OWN MODULE
-// --------------------------
-// Two programs on opposite sides of the agent boundary have to agree on the
-// same facts. repin-private-source.mjs validated a corpus it had just cut into
-// a checksum-pinned tar; corpus-refresh.mjs validates a corpus it has just
-// extracted into a read-only docker volume, and the newsroom tools inside the
-// container read the identity record that refresher wrote. If the checks were
-// copied instead of shared, the copy that is not exercised every morning is
-// the one that drifts -- and a corpus check that has drifted is
+// The corpus is a Spawnfile fed volume (agentic-org/Spawnfile, resource
+// `research-corpus`): the host's `spawnfile volume refresh` lands the private
+// repo's `edition/<today>` branch as `trees/<revision>`, swaps `current` to it,
+// writes `.spawnfile-feed.json`, and freezes at the 12:00 Europe/Berlin cutoff.
+// Two programs read the same facts from opposite sides of the agent boundary:
+// this module is the feed's `validate` hook on the HOST (run against the staged
+// tree before it can land), and the newsroom tools read the mount through it
+// inside the container. Shared, never copied: a corpus check that has drifted is
 // indistinguishable from no corpus check at all.
 //
-// WHAT LIVES HERE AND WHAT DOES NOT
-// ---------------------------------
-// Only read-and-verify logic: nothing here builds a tar, writes a volume,
-// fetches a repo or deploys anything. The two callers keep their own side
-// effects. `resolveRef` is the exception that proves the rule -- it only ever
-// *reads* refs, and both callers must refuse a missing edition branch in
-// exactly the same way, which is the whole reason the module exists.
+// Only read-and-verify logic lives here: nothing builds, writes, fetches or
+// deploys.
 
-import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, readlinkSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 
 export const REPORTERS = ['cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta'];
@@ -31,13 +24,17 @@ export const EDITION_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 export const STORY_ID_PATTERN = /^s-[0-9a-f]{8}$/;
 export const CORPUS_PREP_VERSION = 'clank.research-corpus.prepared.v1';
 
-// The identity record the host writes at the root of the corpus volume. It is
-// what replaced the bundle's sha256 as the paper's provenance: the digest used
-// to prove which research backed an edition because the corpus was part of the
-// image, and now the corpus is data the host swaps under a running container,
-// so the proof has to travel *with the data*.
+// The corpus identity a newsroom record binds (assignments, compositions). It
+// travels with the data: Spawnfile writes `.spawnfile-feed.json` at the mount
+// root, and `corpusIdentityFromFeed` reads it into this shape. The tree a desk
+// reads is `current/`, the link Spawnfile swaps.
 export const CORPUS_IDENTITY_VERSION = 'clank.research-corpus.identity.v1';
-export const CORPUS_IDENTITY_FILE = 'CORPUS.json';
+export const CORPUS_IDENTITY_FILE = '.spawnfile-feed.json';
+export const CORPUS_FEED_VERSION = 'spawnfile.volume-feed.v1';
+export const CORPUS_RESOURCE = 'research-corpus';
+export const CORPUS_LINK = 'current';
+/** The tree every desk reads: the mount's `current` link. */
+export const corpusRoot = (mount) => path.join(mount, CORPUS_LINK);
 
 // Shape first, then Date.parse: Date.parse alone accepts 'Jan 1 2020' and
 // other locale-ish strings, which no reader on the far side should have to
@@ -52,75 +49,49 @@ export function berlinToday(now = new Date()) { return berlinDate.format(now); }
 export class CorpusError extends Error {}
 const fail = (message) => { throw new CorpusError(message); };
 
-// ONE SPELLING OF `trees/<commit>`, AND THIS IS IT
-// -----------------------------------------------
-// The commit shape and the tree path are a single rule with four readers -- this
-// contract, the host's record (corpus-landed.mjs), the host-side volume writer
-// and the edition publisher -- and every one of them had its own private copy,
-// because this module was documented as the home for shared corpus rules while
-// exporting none of them. Four copies of a validation rule are three that can
-// drift in silence, and a corpus check that has drifted is indistinguishable
-// from no corpus check at all.
-//
-// So the predicate, the builder and the validator live here and are imported,
-// never re-spelled: corpus-contract.test.mjs scans the corpus modules for a
-// private copy of either pattern and fails on a hit, so the fifth copy cannot
-// land quietly either.
-//
-// This is still the READ side: a path, not a filesystem. The host-side writer
-// re-exports the directory name (corpus-volume.mjs's TREES_DIR) so the container
-// never has to import a volume mutator to know what the path looks like.
+// ONE SPELLING OF A CORPUS TREE, AND THIS IS IT
+// ---------------------------------------------
+// A landed tree is `trees/<revision>` (or `trees/<revision>.<generation>` after
+// a re-land): the 64-hex revision Spawnfile derives from the selected git tree.
+// Editions commissioned before the corpus became a fed volume recorded
+// `trees/<commit>`, and their records still have to read as valid. The
+// predicates live here and are imported, never re-spelled.
 export const CORPUS_TREES_DIR = 'trees';
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/u;
+const FEED_TREE_PATTERN = /^[0-9a-f]{64}(?:\.[1-9][0-9]*)?$/u;
 
 /** A corpus commit id: 40 lowercase hex characters, which is what git prints and what every corpus record must carry. */
 export const isCorpusCommit = (value) => typeof value === 'string' && COMMIT_PATTERN.test(value);
 
-/** The one spelling of a corpus tree path, relative to the volume root. Refuses to build one from anything that is not a commit. */
-export const corpusTreePath = (commit) => {
-  if (!isCorpusCommit(commit)) fail(`a corpus tree path needs a 40-character lowercase hex commit, got ${JSON.stringify(commit)}`);
-  return `${CORPUS_TREES_DIR}/${commit}`;
-};
-
-/** True for exactly the strings `corpusTreePath` builds, so a record's `tree` field is validated without restating the shape. */
+/** True for a landed tree path: trees/<revision>[.<generation>], or a pre-feed record's trees/<commit>. */
 export const isCorpusTreePath = (value) => typeof value === 'string'
   && value.startsWith(`${CORPUS_TREES_DIR}/`)
-  && isCorpusCommit(value.slice(CORPUS_TREES_DIR.length + 1));
+  && (FEED_TREE_PATTERN.test(value.slice(CORPUS_TREES_DIR.length + 1)) || isCorpusCommit(value.slice(CORPUS_TREES_DIR.length + 1)));
 
-// stderr is captured rather than inherited so a probe that is *expected* to
-// miss (rev-parse on a ref that does not exist yet) does not print raw git
-// noise ahead of this module's own, far more actionable, message.
-const git = (repo, args) => execFileSync('git', ['-C', repo, ...args], { maxBuffer: 1024 * 1024 * 256, stdio: ['ignore', 'pipe', 'pipe'] }).toString();
+const EDITION_REF = /(?:^|\/)edition\/(\d{4}-\d{2}-\d{2})$/u;
+/** The edition a corpus ref was cut for (`origin/edition/<date>`), or null. */
+export const editionOfRef = (ref) => (typeof ref === 'string' ? EDITION_REF.exec(ref)?.[1] ?? null : null);
 
-// Resolves `ref` to a commit WITHOUT ever falling back to another ref: a
-// missing edition branch means the producer has not cut today's corpus yet,
-// and silently using main in that case is exactly the failure this machinery
-// was written to end.
-export function resolveRef(privateRepoPath, ref) {
-  for (const candidate of [`refs/remotes/origin/${ref}`, `refs/heads/${ref}`]) {
-    try { return { commit: git(privateRepoPath, ['rev-parse', '--verify', `${candidate}^{commit}`]).trim(), ref: candidate }; } catch { /* try the next form */ }
-  }
-  let known = '';
-  try { known = git(privateRepoPath, ['for-each-ref', '--format=%(refname:short)', 'refs/remotes/origin/edition']).trim().split('\n').filter(Boolean).slice(-5).join(', '); } catch { /* listing is advisory */ }
-  return fail(`private ref '${ref}' does not exist in ${privateRepoPath} -- refusing to fall back to another ref.\n`
-    + `  The producers commit each day's corpus to edition/<date>; if that branch is missing the corpus for this edition has not been cut yet.\n`
-    + (known ? `  Most recent edition branches seen locally: ${known}\n` : '')
-    + '  Re-run once the branch exists, or pass --ref=<branch> deliberately.');
-}
+const datedDirectories = (root) => { try { return readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory() && EDITION_PATTERN.test(entry.name)).map((entry) => entry.name).sort(); } catch { return []; } };
 
-// Every path the reporters' prompts name, checked against the commit's tree
-// before anything is written. `git ls-tree` on the commit is authoritative and
-// costs nothing next to materializing the tree.
-export function assertEditionInTree(privateRepoPath, commit, edition) {
-  const present = new Set(git(privateRepoPath, ['ls-tree', '-r', '--name-only', commit, `${edition}/`]).split('\n').filter(Boolean));
-  const missing = REPORTERS.filter((agent) => !present.has(`${edition}/desks/${agent}.index`));
-  if (missing.length) {
-    const dates = [...new Set(git(privateRepoPath, ['ls-tree', '--name-only', commit]).split('\n').filter((name) => EDITION_PATTERN.test(name.replace(/\/$/, ''))))].sort();
-    fail(`commit ${commit.slice(0, 7)} has no ${edition}/desks/<agent>.index for: ${missing.join(', ')}\n`
-      + `  Dated corpus directories present at that commit: ${dates.slice(-5).join(', ') || '(none)'}\n`
-      + `  The reporters resolve <edition-date> themselves at wake time; a bundle without ${edition}/desks/ ENOENTs every reporter's research pull.`);
-  }
-  return present;
+/**
+ * Spawnfile's identity record, read into the identity shape a newsroom record
+ * binds. Never throws: whatever is wrong with the record shows up as findings
+ * from `corpusIdentityFindings`, because every field it cannot read is absent.
+ */
+export function corpusIdentityFromFeed(record, mount) {
+  const feed = record && typeof record === 'object' && !Array.isArray(record) && record.version === CORPUS_FEED_VERSION && record.resource === CORPUS_RESOURCE;
+  const source = feed && record.source && typeof record.source === 'object' ? record.source : {};
+  return {
+    version: feed ? CORPUS_IDENTITY_VERSION : (record?.version ?? null),
+    commit: source.kind === 'git' ? source.commit : undefined,
+    ref: source.ref,
+    edition: editionOfRef(source.ref),
+    fetched_at: feed ? record.landed_at : undefined,
+    tree: feed ? record.tree : undefined,
+    editions_present: datedDirectories(corpusRoot(mount)),
+    source_count: feed ? record.files : undefined
+  };
 }
 
 // The proof that matters: read the paths back out of the tree that will
@@ -244,10 +215,8 @@ function identityFindings(value, { edition } = {}) {
   if (typeof value.ref !== 'string' || !value.ref.trim()) findings.push(`ref must name the branch the corpus was cut from, got ${JSON.stringify(value.ref)}`);
   if (typeof value.edition !== 'string' || !EDITION_PATTERN.test(value.edition)) findings.push(`edition must be YYYY-MM-DD, got ${JSON.stringify(value.edition)}`);
   if (typeof value.fetched_at !== 'string' || !ISO_INSTANT_PATTERN.test(value.fetched_at) || Number.isNaN(Date.parse(value.fetched_at))) findings.push(`fetched_at must be an ISO instant, got ${JSON.stringify(value.fetched_at)}`);
-  // Cross-checked against `commit`, not merely shaped: a record naming one
-  // commit and a tree holding another is how a reader ends up proving the
-  // provenance of research it did not read.
-  if (!isCorpusTreePath(value.tree) || !isCorpusCommit(value.commit) || value.tree !== corpusTreePath(value.commit)) findings.push(`tree must be ${CORPUS_TREES_DIR}/<commit>, got ${JSON.stringify(value.tree)}`);
+  // The tree is bound to what desks read by `corpusLinkFindings`, not here.
+  if (!isCorpusTreePath(value.tree)) findings.push(`tree must be ${CORPUS_TREES_DIR}/<revision>, got ${JSON.stringify(value.tree)}`);
   if (!Array.isArray(value.editions_present) || !value.editions_present.includes(value.edition)) findings.push(`editions_present must list the edition the record names, got ${JSON.stringify(value.editions_present)}`);
   if (!Number.isSafeInteger(value.source_count) || value.source_count < 1) findings.push(`source_count must be a positive integer, got ${JSON.stringify(value.source_count)}`);
   // Named with BOTH dates on purpose: "wrong edition" read on a lock screen or
@@ -261,42 +230,67 @@ const realpathOrNull = (target) => { try { return realpathSync(target); } catch 
 
 // THE LINK IS PART OF THE IDENTITY
 // -------------------------------
-// CORPUS.json names a commit, and no reader ever opens that commit by name: the
-// reporters cat <root>/<edition>/desks/<agent>.index, and <edition> is a symlink
-// into trees/<commit>/<edition>. So a record that validates proves NOTHING about
-// the bytes a desk reads. The host moves the dated links before it writes the
-// record, so a crashed or partial refresh leaves a volume whose record names
-// commit A while every reporter reads commit B; and the volume root is owned by
-// the uid the agents run as, so an agent can replace the link itself.
+// The identity record names a tree, and no reader ever opens that tree by name:
+// the reporters cat <mount>/current/<edition>/desks/<agent>.index. So a record
+// that validates proves NOTHING about the bytes a desk reads unless `current`
+// is the link to exactly the tree the record names, and that tree holds the
+// edition. The volume root is owned by the uid the agents run as, so an agent
+// can replace the link or the record; Spawnfile re-verifies and heals on every
+// host poll, and this is the read side asking the same question at call time.
 //
-// The host refresher's no-op check already resolved the link before it declared
-// a corpus current. The container's read side did not, which made the read side
-// strictly weaker than the write side -- and that drift is the defect, not the
-// missing check. So the predicate lives here, beside the record it completes,
-// rather than inside either program: any side that asks whether a dated link is
-// bound to a commit calls THIS, never a second copy of it.
-//
-// Fails closed on every error: an unreadable link, a dangling link, an absent
-// tree and a real directory where the link belongs are each "this corpus is not
-// bound to the commit it claims", never "probably fine".
-export function corpusLinkFindings(root, edition, commit) {
-  return answering(`the ${edition} corpus link`, () => linkFindings(root, edition, commit));
+// Fails closed on every error: an unreadable link, a dangling link, a link to
+// another tree, an absent edition and a real directory where the link belongs
+// are each "this corpus is not bound to the tree it claims", never "probably
+// fine".
+export function corpusLinkFindings(mount, edition, tree) {
+  return answering(`the ${edition} corpus link`, () => linkFindings(mount, edition, tree));
 }
 
-function linkFindings(root, edition, commit) {
+function linkFindings(mount, edition, tree) {
   // Checked first, and by type: `path.join` throws on anything that is not a string,
   // which is the one way a reader has ever been able to make this throw at all.
-  if (typeof root !== 'string' || !root) return [`the corpus mount must be a path to resolve a dated link against, got ${JSON.stringify(root)}`];
+  if (typeof mount !== 'string' || !mount) return [`the corpus mount must be a path to resolve the current link against, got ${JSON.stringify(mount)}`];
   if (typeof edition !== 'string' || !EDITION_PATTERN.test(edition)) return [`edition must be YYYY-MM-DD to resolve a corpus link, got ${JSON.stringify(edition)}`];
-  if (!isCorpusCommit(commit)) return [`commit must be a 40-character lowercase hex sha to resolve a corpus link, got ${JSON.stringify(commit)}`];
-  const link = path.join(root, edition);
+  if (!isCorpusTreePath(tree)) return [`tree must be ${CORPUS_TREES_DIR}/<revision> to resolve a corpus link, got ${JSON.stringify(tree)}`];
+  const link = corpusRoot(mount);
   let stat;
-  try { stat = lstatSync(link); } catch (error) { return [`${edition} is not on the corpus mount at all (${error.code ?? error.message})`]; }
-  if (!stat.isSymbolicLink()) return [`${edition} is a real ${stat.isDirectory() ? 'directory' : 'file'} on the mount, not a symlink into ${corpusTreePath(commit)}/`];
-  const resolved = realpathOrNull(link);
-  if (resolved === null) return [`${edition} is a dangling symlink, so nothing it names can be read`];
-  const tree = realpathOrNull(path.join(root, corpusTreePath(commit)));
-  if (tree === null) return [`${corpusTreePath(commit)} is absent from the mount, so the commit the record names holds no tree`];
-  if (!resolved.startsWith(`${tree}${path.sep}`)) return [`${edition} resolves to ${resolved}, which is outside ${corpusTreePath(commit)}/`];
+  try { stat = lstatSync(link); } catch (error) { return [`${CORPUS_LINK} is not on the corpus mount at all (${error.code ?? error.message})`]; }
+  if (!stat.isSymbolicLink()) return [`${CORPUS_LINK} is a real ${stat.isDirectory() ? 'directory' : 'file'} on the mount, not the link to ${tree}`];
+  let target;
+  try { target = readlinkSync(link); } catch (error) { return [`${CORPUS_LINK} cannot be read (${error.code ?? error.message})`]; }
+  if (target !== tree) return [`${CORPUS_LINK} points at ${JSON.stringify(target)}, not the ${tree} the record names`];
+  if (realpathOrNull(link) === null) return [`${CORPUS_LINK} is a dangling symlink, so nothing it names can be read`];
+  let edstat = null;
+  try { edstat = lstatSync(path.join(mount, tree, edition)); } catch { /* reported below */ }
+  if (!edstat?.isDirectory()) return [`${tree} holds no ${edition}/ directory, so the edition the record names was not landed`];
   return [];
+}
+
+// THE FEED'S VALIDATE HOOK
+// ------------------------
+// `spawnfile volume refresh research-corpus` runs this against the staged tree
+// before it can land (agentic-org/Spawnfile). The edition is the one the ref
+// was cut for (`origin/edition/<date>`), and the corpus must carry that
+// edition's six desk indexes, every story they name, and fresh prepared
+// metadata. A non-zero exit lands nothing and the old tree keeps serving.
+export function validateStagedCorpus(tree, provenance) {
+  const edition = editionOfRef(provenance?.ref);
+  if (!edition) fail(`the staged corpus was resolved from ${JSON.stringify(provenance?.ref ?? null)}, which names no edition/<date> branch`);
+  const desks = verifyCorpusTree(tree, edition);
+  const fresh = verifyCorpusFreshness(tree, edition);
+  return { edition, rows: desks.reduce((total, entry) => total + entry.rows, 0), sources: fresh.sources };
+}
+
+if (process.argv[1] === new URL(import.meta.url).pathname) {
+  try {
+    const tree = process.env.SPAWNFILE_FEED_TREE;
+    if (!tree || !path.isAbsolute(tree)) fail('SPAWNFILE_FEED_TREE must name the staged tree (this runs as a Spawnfile feed validate hook)');
+    let provenance;
+    try { provenance = JSON.parse(process.env.SPAWNFILE_FEED_PROVENANCE ?? ''); } catch { fail('SPAWNFILE_FEED_PROVENANCE must be the JSON provenance Spawnfile passes the hook'); }
+    const result = validateStagedCorpus(tree, provenance);
+    console.log(`research corpus OK: ${result.edition}, ${result.rows} desk row(s), ${result.sources} raw source(s)`);
+  } catch (error) {
+    console.error(`research corpus refused: ${error.message}`);
+    process.exitCode = 1;
+  }
 }

@@ -1,20 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  CORPUS_IDENTITY_VERSION, CORPUS_TREES_DIR, CorpusError, REPORTERS, corpusIdentityFindings, corpusLinkFindings,
-  corpusTreePath, isCorpusCommit, isCorpusTreePath, verifyCorpusTree
+  CORPUS_FEED_VERSION, CORPUS_IDENTITY_VERSION, CORPUS_RESOURCE, CORPUS_TREES_DIR, CorpusError, REPORTERS, corpusIdentityFindings,
+  corpusIdentityFromFeed, corpusLinkFindings, editionOfRef, isCorpusCommit, isCorpusTreePath, validateStagedCorpus, verifyCorpusTree
 } from './corpus-contract.mjs';
-// The corpus writers live in the refresher's fixture module; a third copy of
-// "how a desk index is spelled" is exactly how two checks drift apart.
-import { EDITION, STORIES, writeCorpus, writeIndex } from './corpus-refresh.fixture.mjs';
+
+// One day's corpus, written the way the producers lay it out.
+const EDITION = '2026-09-06';
+const STORIES = { cogsworth: ['s-11111111', 's-22222222'], sprockett: ['s-22222222'], foreman: ['s-33333333'], graves: ['s-33333333'], tinkerton: [], vesta: ['s-11111111'] };
+const sha256 = (text) => `sha256:${createHash('sha256').update(text).digest('hex')}`;
+const writeIndex = (root, edition, agent, ids) => {
+  mkdirSync(join(root, edition, 'desks'), { recursive: true });
+  const header = `# clank.desk-index.v1 desk=${agent} edition=${edition}\n# id          slot src  urls conf also\n`;
+  writeFileSync(join(root, edition, 'desks', `${agent}.index`), header + ids.map((id) => `${id}    0307 grok 6    h    | a claim | a summary\n`).join(''));
+};
+const writeCorpus = (root, edition, mark) => {
+  const sources = [];
+  for (const [site, slot] of [['chatgpt', '0715'], ['grok', '0730']]) {
+    mkdirSync(join(root, edition, site), { recursive: true });
+    const rel = `${site}/${site}-rolling-${slot}.md`, body = `# ${site} ${edition}\n\n${mark}\n`;
+    writeFileSync(join(root, edition, rel), body);
+    sources.push({ path: rel, sha256: sha256(body) });
+  }
+  for (const [agent, ids] of Object.entries(STORIES)) {
+    writeIndex(root, edition, agent, ids);
+    mkdirSync(join(root, edition, 'stories'), { recursive: true });
+    for (const id of ids) writeFileSync(join(root, edition, 'stories', `${id}.md`), `# ${id}\n`);
+  }
+  writeFileSync(join(root, edition, 'desks', '_corpus.prepared.json'), `${JSON.stringify({ version: 'clank.research-corpus.prepared.v1', edition, sources }, null, 2)}\n`);
+  return sources;
+};
 
 const COMMIT = 'c'.repeat(40);
+const REVISION = 'e'.repeat(64);
 const valid = (overrides = {}) => ({
-  version: CORPUS_IDENTITY_VERSION, commit: COMMIT, ref: `edition/${EDITION}`, edition: EDITION,
-  fetched_at: `${EDITION}T07:12:04Z`, tree: `trees/${COMMIT}`, editions_present: [EDITION], source_count: 2, ...overrides
+  version: CORPUS_IDENTITY_VERSION, commit: COMMIT, ref: `origin/edition/${EDITION}`, edition: EDITION,
+  fetched_at: `${EDITION}T07:12:04Z`, tree: `trees/${REVISION}`, editions_present: [EDITION], source_count: 2, ...overrides
 });
 
 test('a complete identity record has no findings', () => {
@@ -47,12 +73,12 @@ test('every field the container depends on is checked', () => {
   assert.match(finding({ fetched_at: 'Sun Sep 06 2026' }), /fetched_at must be an ISO instant/u);
   assert.match(finding({ fetched_at: '2026-13-45T99:99:99Z' }), /fetched_at must be an ISO instant/u);
   assert.match(finding({ fetched_at: 1757136724 }), /fetched_at must be an ISO instant/u);
-  assert.match(finding({ tree: COMMIT }), /tree must be trees\/<commit>/u);
-  assert.match(finding({ tree: `trees/${COMMIT}/${EDITION}` }), /tree must be trees\/<commit>/u);
-  assert.match(finding({ tree: undefined }), /tree must be trees\/<commit>/u);
-  // A record naming one commit while its tree holds another is how a reader
-  // ends up proving the provenance of research it never read.
-  assert.match(finding({ tree: `trees/${'d'.repeat(40)}` }), /tree must be trees\/<commit>/u);
+  assert.match(finding({ tree: COMMIT }), /tree must be trees\/<revision>/u);
+  assert.match(finding({ tree: `trees/${REVISION}/${EDITION}` }), /tree must be trees\/<revision>/u);
+  assert.match(finding({ tree: undefined }), /tree must be trees\/<revision>/u);
+  // A re-landed generation and a record from before the feed are still trees.
+  assert.deepEqual(corpusIdentityFindings(valid({ tree: `trees/${REVISION}.2` })), []);
+  assert.deepEqual(corpusIdentityFindings(valid({ tree: `trees/${COMMIT}` })), []);
   assert.match(finding({ editions_present: ['2026-09-05'] }), /editions_present must list the edition/u);
   assert.match(finding({ editions_present: EDITION }), /editions_present must list the edition/u);
   assert.match(finding({ source_count: 0 }), /source_count must be a positive integer/u);
@@ -131,60 +157,89 @@ test('the corpus check has ONE behaviour: no argument can soften or harden it', 
 });
 
 // ---------------------------------------------------------------------------
-// The dated link, which is the only path any reader actually opens.
+// The `current` link, which is the only path any reader actually opens.
 // corpusIdentityFindings validates a CLAIM; this is what binds the claim to the
-// bytes. Both sides of the agent boundary call it: the host refresher so it
-// knows whether a refresh is needed, the newsroom tools so they never bind a
-// commit the desks are not reading.
+// bytes the desks read.
 // ---------------------------------------------------------------------------
-const OTHER = 'd'.repeat(40);
+const OTHER = 'f'.repeat(64);
 const linkFixture = () => {
   const root = mkdtempSync(join(tmpdir(), 'clank-corpus-link-'));
-  for (const commit of [COMMIT, OTHER]) writeCorpus(join(root, 'trees', commit), EDITION, `research at ${commit}`);
-  const link = join(root, EDITION);
-  const pointAt = (commit) => { rmSync(link, { recursive: true, force: true }); symlinkSync(join('trees', commit, EDITION), link); };
-  pointAt(COMMIT);
+  for (const revision of [REVISION, OTHER]) writeCorpus(join(root, 'trees', revision), EDITION, `research at ${revision}`);
+  const link = join(root, 'current');
+  const pointAt = (revision) => { rmSync(link, { recursive: true, force: true }); symlinkSync(join('trees', revision), link); };
+  pointAt(REVISION);
   return { root, link, pointAt, cleanup: () => rmSync(root, { recursive: true, force: true }) };
 };
 
-test('a dated link that resolves into another commit is not a bound corpus, however valid the record is', () => {
+test('a current link to another tree is not a bound corpus, however valid the record is', () => {
   const fixture = linkFixture();
   try {
-    assert.deepEqual(corpusLinkFindings(fixture.root, EDITION, COMMIT), []);
+    assert.deepEqual(corpusLinkFindings(fixture.root, EDITION, `trees/${REVISION}`), []);
     // The exploit, exactly: the link moves and the record does not. Both trees
-    // are complete, valid corpora for this edition, so every other check in the
-    // contract passes -- and the record would prove the provenance of research
-    // nobody read.
+    // are complete corpora for this edition, so every other check passes.
     fixture.pointAt(OTHER);
-    const moved = corpusLinkFindings(fixture.root, EDITION, COMMIT);
+    const moved = corpusLinkFindings(fixture.root, EDITION, `trees/${REVISION}`);
     assert.equal(moved.length, 1);
-    assert.match(moved[0], new RegExp(`outside trees/${COMMIT}/`, 'u'));
     assert.ok(moved[0].includes(OTHER), 'the finding must say where the link actually goes');
-    assert.deepEqual(corpusLinkFindings(fixture.root, EDITION, OTHER), [], 'and the same volume IS bound to the commit it really points at');
+    assert.deepEqual(corpusLinkFindings(fixture.root, EDITION, `trees/${OTHER}`), [], 'and the same volume IS bound to the tree it really points at');
   } finally { fixture.cleanup(); }
 });
 
 test('every way a link can fail to bind fails closed', () => {
   const fixture = linkFixture();
+  const tree = `trees/${REVISION}`;
   try {
     rmSync(fixture.link);
     mkdirSync(fixture.link, { recursive: true });
     writeCorpus(fixture.link, EDITION, 'a corpus somebody dropped in by hand');
-    assert.match(corpusLinkFindings(fixture.root, EDITION, COMMIT)[0], /is a real directory on the mount/u, 'real corpus data in the link\'s place is not a binding');
+    assert.match(corpusLinkFindings(fixture.root, EDITION, tree)[0], /is a real directory on the mount/u, 'real corpus data in the link\'s place is not a binding');
     rmSync(fixture.link, { recursive: true, force: true });
-    assert.match(corpusLinkFindings(fixture.root, EDITION, COMMIT)[0], /is not on the corpus mount at all/u);
-    symlinkSync(join('trees', 'e'.repeat(40), EDITION), fixture.link);
-    assert.match(corpusLinkFindings(fixture.root, EDITION, COMMIT)[0], /dangling symlink/u);
-    fixture.pointAt(COMMIT);
-    rmSync(join(fixture.root, 'trees', OTHER), { recursive: true, force: true });
-    assert.match(corpusLinkFindings(fixture.root, EDITION, OTHER)[0], /absent from the mount/u);
-    // Refused before any path is built, so no caller can walk out of the mount
-    // through the commit or the date it asks about.
-    for (const commit of [undefined, '', '../../../etc', COMMIT.toUpperCase(), COMMIT.slice(0, 12)])
-      assert.match(corpusLinkFindings(fixture.root, EDITION, commit)[0], /commit must be a 40-character lowercase hex sha/u, `commit ${JSON.stringify(commit)} was accepted`);
+    assert.match(corpusLinkFindings(fixture.root, EDITION, tree)[0], /is not on the corpus mount at all/u);
+    symlinkSync(join('trees', '0'.repeat(64)), fixture.link);
+    assert.match(corpusLinkFindings(fixture.root, EDITION, `trees/${'0'.repeat(64)}`)[0], /dangling symlink/u);
+    fixture.pointAt(REVISION);
+    assert.match(corpusLinkFindings(fixture.root, '2026-09-07', tree)[0], /holds no 2026-09-07\/ directory/u, 'a tree without the edition was not landed for it');
+    // Refused before any path is built, so no caller can walk out of the mount.
+    for (const bad of [undefined, '', '../../../etc', `trees/${REVISION}/..`, `trees/${REVISION.toUpperCase()}`])
+      assert.match(corpusLinkFindings(fixture.root, EDITION, bad)[0], /tree must be trees\/<revision>/u, `tree ${JSON.stringify(bad)} was accepted`);
     for (const edition of [undefined, '', '..', '2026-9-6', `${EDITION}/../..`])
-      assert.match(corpusLinkFindings(fixture.root, edition, COMMIT)[0], /edition must be YYYY-MM-DD/u, `edition ${JSON.stringify(edition)} was accepted`);
+      assert.match(corpusLinkFindings(fixture.root, edition, tree)[0], /edition must be YYYY-MM-DD/u, `edition ${JSON.stringify(edition)} was accepted`);
   } finally { fixture.cleanup(); }
+});
+
+// Spawnfile's identity record, read into the shape a newsroom record binds.
+test('the feed identity reads into a bindable corpus identity, and a foreign record does not', () => {
+  const root = mkdtempSync(join(tmpdir(), 'clank-corpus-feed-'));
+  try {
+    writeCorpus(join(root, 'trees', REVISION), EDITION, 'today');
+    symlinkSync(join('trees', REVISION), join(root, 'current'));
+    const record = { version: CORPUS_FEED_VERSION, resource: CORPUS_RESOURCE, volume: 'clank-newsroom-corpus', revision: REVISION, tree: `trees/${REVISION}`, files: 9, landed_at: `${EDITION}T07:58:03Z`, source: { kind: 'git', commit: COMMIT, ref: `origin/edition/${EDITION}`, paths: null } };
+    const identity = corpusIdentityFromFeed(record, root);
+    assert.deepEqual(identity, { version: CORPUS_IDENTITY_VERSION, commit: COMMIT, ref: `origin/edition/${EDITION}`, edition: EDITION, fetched_at: `${EDITION}T07:58:03Z`, tree: `trees/${REVISION}`, editions_present: [EDITION], source_count: 9 });
+    assert.deepEqual(corpusIdentityFindings(identity, { edition: EDITION }), []);
+    assert.match(corpusIdentityFindings(corpusIdentityFromFeed({ ...record, resource: 'public-content-volume' }, root)).join(' '), /version must be/u, 'another volume\'s record is not a corpus identity');
+    assert.match(corpusIdentityFindings(corpusIdentityFromFeed({ ...record, source: { ...record.source, ref: 'origin/main' } }, root)).join(' '), /edition must be YYYY-MM-DD/u, 'a ref that is no edition branch names no edition');
+    assert.equal(editionOfRef('origin/edition/2026-10-09'), '2026-10-09');
+    assert.equal(editionOfRef('edition/2026-10-09'), '2026-10-09');
+    assert.equal(editionOfRef('origin/edition/2026-10-09-prepared'), null);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('the validate hook lands only the edition its ref was cut for, complete and fresh', () => {
+  const root = mkdtempSync(join(tmpdir(), 'clank-corpus-hook-'));
+  const hook = join(import.meta.dirname, 'corpus-contract.mjs');
+  const run = (provenance, tree = root) => { try { execFileSync(process.execPath, [hook], { env: { ...process.env, SPAWNFILE_FEED_TREE: tree, SPAWNFILE_FEED_PROVENANCE: JSON.stringify(provenance) }, stdio: 'pipe' }); return 0; } catch (error) { return error.status; } };
+  try {
+    writeCorpus(root, EDITION, 'today');
+    const provenance = { kind: 'git', commit: COMMIT, ref: `origin/edition/${EDITION}`, paths: null };
+    assert.equal(validateStagedCorpus(root, provenance).edition, EDITION);
+    assert.equal(run(provenance), 0);
+    assert.equal(run({ ...provenance, ref: 'origin/edition/2026-09-07' }), 1, 'a branch for a day the tree does not hold');
+    assert.equal(run({ ...provenance, ref: 'origin/main' }), 1, 'a ref that is no edition branch');
+    writeFileSync(join(root, EDITION, 'chatgpt', 'chatgpt-rolling-0715.md'), 'edited after preparation\n');
+    assert.equal(run(provenance), 1, 'stale prepared metadata');
+    assert.notEqual(run(provenance, ''), 0, 'no staged tree');
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 // ONE RULE, ONE SPELLING
@@ -196,17 +251,12 @@ test('every way a link can fail to bind fails closed', () => {
 test('the commit and tree shape are exported from the contract, and refuse everything that is not one', () => {
   const commit = 'a'.repeat(40);
   assert.equal(CORPUS_TREES_DIR, 'trees');
-  assert.equal(corpusTreePath(commit), `trees/${commit}`);
   assert.equal(isCorpusCommit(commit), true);
-  assert.equal(isCorpusTreePath(corpusTreePath(commit)), true);
-  // Every shape a record, a flag or a planted name can carry instead of a commit.
-  for (const value of [undefined, null, '', 42, {}, commit.toUpperCase(), commit.slice(0, 39), `${commit}a`, `${commit}\n`, '../../etc', ' '.repeat(40)]) {
+  for (const tree of [`trees/${REVISION}`, `trees/${REVISION}.3`, `trees/${commit}`]) assert.equal(isCorpusTreePath(tree), true, tree);
+  for (const value of [undefined, null, '', 42, {}, commit.toUpperCase(), commit.slice(0, 39), `${commit}a`, `${commit}\n`, '../../etc', ' '.repeat(40)])
     assert.equal(isCorpusCommit(value), false, `isCorpusCommit accepted ${JSON.stringify(value)}`);
-    assert.throws(() => corpusTreePath(value), CorpusError, `corpusTreePath built a path from ${JSON.stringify(value)}`);
-  }
-  // And the tree path validator is anchored on both ends, so nothing that merely
-  // CONTAINS a tree path passes for one.
-  for (const value of [undefined, null, '', commit, `trees/${commit}/`, `trees/${commit}/${EDITION}`, `/trees/${commit}`, `trees//${commit}`, `TREES/${commit}`, `trees/${commit.toUpperCase()}`, `trees/../${commit}`])
+  // Anchored on both ends, so nothing that merely CONTAINS a tree path passes for one.
+  for (const value of [undefined, null, '', commit, `trees/${REVISION}/`, `trees/${REVISION}/${EDITION}`, `/trees/${REVISION}`, `trees//${REVISION}`, `TREES/${REVISION}`, `trees/${REVISION.toUpperCase()}`, `trees/../${REVISION}`, `trees/${REVISION}.0`])
     assert.equal(isCorpusTreePath(value), false, `isCorpusTreePath accepted ${JSON.stringify(value)}`);
 });
 
@@ -223,11 +273,7 @@ test('no corpus module re-spells the commit or tree-path rule privately', () => 
   // Every module SPLIT OUT of one of these belongs here too, whether or not it
   // mentions a commit today. A list that covers a file's old name and not the file
   // the code moved into is the same unwatched gap as a list that was never updated.
-  const owned = [
-    'corpus-contract.mjs', 'corpus-verify.mjs', 'corpus-volume.mjs', 'corpus-volume-identity.mjs',
-    'corpus-host-exec.mjs', 'corpus-swap.mjs', 'corpus-landed.mjs', 'corpus-refresh.mjs',
-    'corpus-refresh-options.mjs', 'corpus-refresh-lock.mjs', 'edition-provenance.mjs'
-  ];
+  const owned = ['corpus-contract.mjs', 'edition-provenance.mjs', 'worlddesk-filing.mjs', 'corpus-fixture.mjs'];
   const forbidden = [
     // The anchored 40-hex commit rule, in any of the spellings it has appeared in.
     [/\^\[0-9a-f\]\{40\}\$/gu, 'the commit pattern: import isCorpusCommit from corpus-contract.mjs'],
@@ -235,8 +281,7 @@ test('no corpus module re-spells the commit or tree-path rule privately', () => 
     // name and a commit. `${TREES_DIR}/${commit.slice(0, 7)}` in a log line is a
     // MESSAGE about a tree, not the rule, and is deliberately not matched.
     [/trees\\\/\[0-9a-f\]\{40\}/gu, 'the tree-path pattern: import isCorpusTreePath from corpus-contract.mjs'],
-    [/\$\{TREES_DIR\}\/\$\{commit\}/gu, 'a hand-built tree path: call corpusTreePath(commit)'],
-    [/`trees\/\$\{/gu, 'a hand-built tree path: call corpusTreePath(commit)']
+    [/\$\{TREES_DIR\}\/\$\{commit\}/gu, 'a hand-built tree path from a commit']
   ];
   const home = readFileSync(join(import.meta.dirname, 'corpus-contract.mjs'), 'utf8');
   assert.equal(home.match(forbidden[0][0]).length, 1, 'the contract must declare the commit pattern exactly once; a second copy here is a copy too');
@@ -258,7 +303,7 @@ test('a shared findings predicate answers with a finding instead of throwing, wh
   // `path.join` throws a TypeError on a non-string, and `corpusLinkFindings` joins
   // the mount path: this is the one way a reader has ever been able to make it throw.
   for (const root of [undefined, null, 42, {}, []])
-    assert.match(corpusLinkFindings(root, EDITION, COMMIT)[0], /must be a path to resolve a dated link against|could not be checked/u, `root ${JSON.stringify(root)} escaped as a throw`);
+    assert.match(corpusLinkFindings(root, EDITION, `trees/${REVISION}`)[0], /must be a path to resolve the current link against|could not be checked/u, `root ${JSON.stringify(root)} escaped as a throw`);
   // And the catch itself, exercised by a record that cannot come out of JSON.parse
   // but proves the wrapper is there: every field read is inside it.
   const hostile = { get commit() { throw new Error('a getter that throws'); } };
@@ -266,7 +311,7 @@ test('a shared findings predicate answers with a finding instead of throwing, wh
   const hostileEdition = { version: CORPUS_IDENTITY_VERSION, get edition() { throw new Error('and so is this one'); } };
   assert.match(corpusIdentityFindings(hostileEdition, { edition: EDITION })[0], /could not be checked: and so is this one/u);
   // Both readers branch on a non-empty list, so the answer must always be one.
-  for (const answer of [corpusIdentityFindings(hostile), corpusLinkFindings(null, EDITION, COMMIT)]) {
+  for (const answer of [corpusIdentityFindings(hostile), corpusLinkFindings(null, EDITION, `trees/${REVISION}`)]) {
     assert.ok(Array.isArray(answer) && answer.length > 0, `${JSON.stringify(answer)} is not a refusal either reader would act on`);
     assert.ok(answer.every((finding) => typeof finding === 'string'));
   }

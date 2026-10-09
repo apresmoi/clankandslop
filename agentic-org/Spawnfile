@@ -126,6 +126,18 @@ shared:
             ref: origin/main
             paths: [newsroom/art, newsroom/build, newsroom/history, newsroom/runtime, newsroom/state, newsroom/validation, newsroom/visual]
             fetch: true
+          # What git does not hold, added in staging before the tree freezes:
+          # the art server's two fonts (public site fonts, renamed and checked
+          # by bundles/private-tools-prepare.mjs) and its npm dependencies
+          # (glyphcss, sharp), installed from the private art/package-lock.json
+          # in the runtime's own Node image on the runtime's platform.
+          include:
+            - { from: ../website/public/fonts, to: .feed/fonts }
+            - { from: bundles, to: .feed/bundles }
+          prepare:
+            command: [node, .feed/bundles/private-tools-prepare.mjs]
+            image: "node:24-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df"
+            platform: linux/amd64
           keep: 3
       - id: edition-state
         kind: volume
@@ -226,6 +238,14 @@ shared:
         mount: ./repos/newsroom-private
         mode: mutable
         sharing: team
+        feed:
+          git:
+            repo: ../clankandslop-private
+            ref: { template: "origin/edition/${date:Europe/Berlin}" }
+            fetch: true
+          validate: [node, scripts/corpus-contract.mjs]
+          freeze: { after: "12:00", timezone: Europe/Berlin }
+          keep: 3
       # Every PUBLISHED edition and the byline indexes derived from them, from
       # this checkout's origin/main, as a Spawnfile fed volume: the host timer
       # clank-feed-content.service runs `spawnfile volume refresh
