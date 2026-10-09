@@ -1,45 +1,49 @@
-# The seam, as a RELEASE job instead of a cron job.
+# The release job: `spawnfile release` on a host timer.
 #
-# It builds and deploys when the organization's code or prompts change, and
-# no-ops when they have not. The daily rebuild it replaces existed only because
-# the corpus was pinned into the image; with the corpus on a volume, an image is
-# day-agnostic and there is nothing for a clock to trigger.
+# Spawnfile owns the release (specs/RELEASE.md in noopolis/spawnfile): it
+# compiles, takes the Docker build-context digest as the identity and exits 0
+# without touching anything when that identity is already running. Otherwise it
+# builds, DRAINS Daimon (new wakes answer work-blocked and Moltnet retries them,
+# running turns finish), deploys with rollback, waits for the container to
+# settle, confirms admission, runs the post-deploy command, records the release
+# and prunes old release images. A redeploy no longer needs a quiet hour: the
+# drain is the safety property, so the old schedule window and quiescence probe
+# are gone.
 #
-# WHY A HOST TIMER AND NOT CI
-# ---------------------------
-# CI-dispatch on merge is more precise, but it puts deploy authority in GitHub
-# and needs a runner credential on this box — a new trust edge, against the
-# standing rule that deploy keys stay off anything the agents can reach — and it
-# cannot run when GitHub is down. A timer that keeps all authority here degrades
-# safely, and its no-op case is one fetch, one `rev-parse` and one JSON read. The
-# cost is up to an hour between merge and release, which for this system is
-# nothing.
+# What stays here is only what is the newsroom's:
+#   * the source: fast-forward to exactly origin/main before the release, because Spawnfile
+#     builds from this checkout and `--release` needs a clean committed tree.
+#     The checkout path is load-bearing: durable volume names derive from the
+#     Spawnfile's path, so never build the org from a different directory.
+#   * the post-deploy step: the newsroom control token is not in the image, so
+#     bootstrap-control-token.sh installs it into the new container and proves
+#     an authenticated activity read. Without it the agents' newsroom tools
+#     cannot verify wakes. Idempotent; a failure leaves the release unrecorded
+#     and the next run redeploys and reruns it.
+#   * the notifier: agentic-org/scripts/release-notify.mjs records failures (and
+#     a deferral older than 24h) in the alarm spool, like every other host job.
 #
-# IT FETCHES, AND THAT NEEDS A KEY SAID OUT LOUD
-# ---------------------------------------------
-# An earlier draft of this comment claimed the no-op was "one `git rev-parse` and
-# one JSON read" — no fetch. That was wrong in the worst direction: comparing a
-# LOCAL HEAD that nothing advances means the job no-ops forever and never notices
-# a merge, which is the whole thing it exists to notice.
+# Exit 75 is a DEFERRAL (turns did not finish within --drain-timeout; admission
+# resumed, nothing deployed), not a failure: the next hourly run tries again,
+# and the notifier reports one that has waited a day. So 75 must not trip
+# OnFailure every hour.
 #
-# The fetch needs an explicit identity. Verified on this box 2026-10-01:
+# The fetch needs an explicit identity: the public remote has no SSH host alias
+# and root's ~/.ssh/config only supplies keys for the github-clank-* aliases.
 #
-#   $ git -C /root/work/clankandslop fetch --prune --dry-run origin
-#   fatal: Could not read from remote repository.
+# SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY stays: the published Daimon image's
+# receipt lacks the attention attestation the compiler requires (Spawnfile
+# follow-up), so the host pins its local receipt for the same image.
 #
-# because the public remote is `git@github.com:apresmoi/clankandslop.git` with no
-# SSH host alias, and root's ~/.ssh/config only supplies a key for the aliases
-# `github-clank-public` and `github-clank-private`. With the key it is exit 0. The
-# private corpus remote IS `git@github-clank-private:…`, which is why
-# clank-feed-corpus.service and clank-feed-private-tools.service need no key of
-# their own and this unit does.
+# Runs as root, so the deployment record and the release store
+# (ledger, log, deferral, drain marker) live under /root/.spawnfile. The record
+# was clank's while `seam-run.mjs` deployed through `runuser -l clank`; the
+# cutover in ops/AGENTS.md moves it once.
 #
-# A missing or rejected key PAGES rather than defers, deliberately: an
-# unauthenticated fetch fails with git's same "Could not read from remote
-# repository" epilogue as a real outage, and a credential problem that deferred
-# like an outage would wait quietly forever.
+# The pull and the release run under the lock every clank-feed unit takes, so
+# no volume refresh interleaves with a checkout move or a container recreate.
 [Unit]
-Description=Release the newsroom organization when its tree has changed
+Description=Release the newsroom organization when its image inputs changed
 After=network-online.target docker.service
 Wants=network-online.target
 Requires=docker.service
@@ -48,12 +52,20 @@ OnFailure=clank-alarm@%n.service
 [Service]
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
-EnvironmentFile=-/etc/clank-alarm/alarm.env
 Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
 Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
 Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/home/clank/deploy-work/grok-runtime-identity-20261009b.json
-Environment=CLANK_RELEASE_FETCH_KEY=/root/.ssh/clank_public
-Environment=SPAWNFILE_CLI=/home/clank/deploy-work/spawnfile-main/dist/cli/index.js
-ExecStart=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --if-changed
+Environment="GIT_SSH_COMMAND=ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes"
+# ($$ is systemd's escape for a literal $ handed to the shell.)
+# Exactly origin/main: on branch main, fast-forwarded to the fetched tip, and
+# refused when local commits sit ahead of it (Spawnfile's clean-tree check
+# accepts committed changes, so this is the only "reviewed code only" gate).
+ExecStartPre=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /bin/sh -c 'r=/root/work/clankandslop; test "$$(git -C $$r symbolic-ref --short HEAD)" = main && git -C $$r fetch -q origin main && git -C $$r merge -q --ff-only FETCH_HEAD && test "$$(git -C $$r rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)"'
+# The build floor the seam enforced (the release hit the disk three times on
+# 2026-10-08); Spawnfile prunes release tags but keeps build cache. Fails loudly.
+ExecStartPre=/bin/sh -c 'test "$$(df --output=avail -B1G /var/lib/docker | tail -1 | tr -d " ")" -ge 20'
+ExecStart=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js release /root/work/clankandslop/agentic-org --deployment clank-and-slop --runtime-env-file /home/clank/deploy-work/deploy.env --image-repository clank-and-slop --out /root/work/clankandslop/.runtime/release-compiled --drain-timeout 30m --notify-command /root/work/clankandslop/agentic-org/scripts/release-notify.mjs --post-deploy-command /bin/sh --post-deploy-arg /root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh --post-deploy-arg spawnfile-clank-and-slop
+SuccessExitStatus=75
+# Build (~7 min) + drain bound (30 min) + deploy/settle + post-deploy (10 min max).
 TimeoutStartSec=3600

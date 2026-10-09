@@ -1,11 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 
 const unitDir = new URL('../ops/systemd/', import.meta.url);
 const unit = (name) => readFileSync(new URL(name, unitDir), 'utf8');
-// ENUMERATED, not listed. This read `['clank-publish.service',
-// 'clank-cycle-audit.service', 'clank-seam.service']`, so the three units added
+// ENUMERATED, not listed. This once read a fixed list of three units, so the units added
 // when the corpus moved out of the image -- corpus-refresh, epoch-roll (since retired), release
 // -- were outside the one contract that is supposed to hold for every host job,
 // and nothing said so. An allowlist of names stops covering the thing you add
@@ -15,7 +14,7 @@ const serviceUnits = readdirSync(unitDir).filter((name) => name.endsWith('.servi
 
 test('every host job unit is covered, and the list cannot fall behind the directory', () => {
   assert.ok(serviceUnits.length >= 6, `expected at least the six known host job units, found ${serviceUnits.length}: ${serviceUnits.join(', ')}`);
-  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-seam.service', 'clank-feed-corpus.service', 'clank-feed-content.service', 'clank-feed-private-tools.service', 'clank-release.service'])
+  for (const name of ['clank-publish.service', 'clank-cycle-audit.service', 'clank-feed-corpus.service', 'clank-feed-content.service', 'clank-feed-private-tools.service', 'clank-release.service'])
     assert.ok(serviceUnits.includes(name), `${name} is missing from ops/systemd -- a host job unit must be tracked in the repository`);
 });
 
@@ -50,19 +49,44 @@ test('the fed-volume refreshes and the release job serialize on one lock', () =>
   assert.match(unit('clank-feed-content.service'), /^Environment="GIT_SSH_COMMAND=ssh -i \/root\/\.ssh\/clank_public -o IdentitiesOnly=yes"$/mu, 'the public fetch names the release identity, quoted so systemd keeps the whole value');
 });
 
-// 2026-10-04: the reaper's age floor (1200s) sat under the 30-minute turn limit
-// and killed live writer turns all afternoon. The floor must clear the longest
-// turn any Spawnfile declares, with margin, whatever either number becomes.
-test('the handler reaper never reaps a handler young enough to belong to a live turn', async () => {
-  const { agents, orgRoot } = await import('./lib.mjs');
-  const { join } = await import('node:path');
-  const script = readFileSync(new URL('../ops/bin/clank-handler-reaper.sh', import.meta.url), 'utf8');
-  const floor = Number(script.match(/^MAX_AGE=\$\{MAX_AGE:-(\d+)\}$/mu)?.[1]);
-  assert.ok(Number.isFinite(floor), 'the reaper declares its default age floor');
-  const timeouts = agents.map((name) => Number(readFileSync(join(orgRoot, 'agents', name, 'Spawnfile'), 'utf8').match(/^\s*timeout_ms:\s*(\d+)/mu)?.[1] ?? 0));
-  const longest = Math.max(...timeouts) / 1000;
-  assert.ok(longest > 0, 'some Spawnfile declares a turn timeout');
-  assert.ok(floor >= longest * 1.25, `reaper floor ${floor}s must clear the longest turn ${longest}s by 25%`);
-  assert.match(unit('clank-handler-reaper.service'), /^ExecStart=\/bin\/bash \/root\/work\/clankandslop\/agentic-org\/ops\/bin\/clank-handler-reaper\.sh$/mu);
-  assert.match(unit('clank-handler-reaper.timer'), /^Unit=clank-handler-reaper\.service$/mu);
+// The release is `spawnfile release`. Each assertion is a property a past or
+// likely regression would break: Node claims `--env-file` from the script's
+// argv, a deferral (75) must not page hourly, the private control token must be
+// installed before the release counts, the source must be pulled first, and the
+// host's local Daimon receipt stays pinned until the published one carries the
+// attention attestation.
+test('the release unit runs a drained spawnfile release from the pulled checkout', () => {
+  const text = unit('clank-release.service');
+  const exec = text.match(/^ExecStart=(.*)$/mu)?.[1] ?? '';
+  const argv = exec.split(' ');
+  const flag = (name) => argv[argv.indexOf(name) + 1];
+  assert.match(exec, /\/dist\/cli\/index\.js release \/root\/work\/clankandslop\/agentic-org /u);
+  assert.equal(flag('--deployment'), 'clank-and-slop');
+  assert.equal(flag('--runtime-env-file'), '/home/clank/deploy-work/deploy.env');
+  assert.ok(!argv.includes('--env-file'), 'Node itself claims --env-file from the argv; use --runtime-env-file');
+  assert.ok(!argv.includes('--no-drain'), 'production runs Daimon with drain/resume; never deploy over running turns');
+  assert.match(flag('--drain-timeout'), /^\d+m$/u);
+  const notifier = flag('--notify-command');
+  assert.equal(notifier, '/root/work/clankandslop/agentic-org/scripts/release-notify.mjs');
+  assert.ok(statSync(new URL('./release-notify.mjs', import.meta.url)).mode & 0o111, 'the notifier is executed directly, so it must be executable');
+  assert.equal(flag('--post-deploy-command'), '/bin/sh');
+  const hookArgs = argv.flatMap((value, index) => (argv[index - 1] === '--post-deploy-arg' ? [value] : []));
+  assert.deepEqual(hookArgs, ['/root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh', 'spawnfile-clank-and-slop']);
+  assert.match(text, /^SuccessExitStatus=75$/mu, 'a deferred release is not a unit failure');
+  const source = text.match(/^ExecStartPre=\/usr\/bin\/flock \/run\/lock\/clank-corpus-refresh\.lock \/bin\/sh -c '(.*)'$/mu)?.[1] ?? '';
+  assert.doesNotMatch(source.replaceAll('$$', ''), /\$/u, 'every $ must be written $$, or systemd expands it before the shell sees it');
+  for (const piece of ['symbolic-ref --short HEAD)" = main', 'fetch -q origin main', 'merge -q --ff-only FETCH_HEAD', 'rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)'])
+    assert.ok(source.includes(piece), `the source step must build exactly origin/main (missing: ${piece})`);
+  assert.match(text, /^ExecStartPre=\/bin\/sh -c 'test "\$\$\(df --output=avail -B1G \/var\/lib\/docker .* -ge 20'$/mu, 'the 20 GiB build floor');
+  assert.match(text, /^Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=\/home\/clank\/deploy-work\/grok-runtime-identity-20261009b\.json$/mu);
+  assert.match(text, /^Environment="GIT_SSH_COMMAND=ssh -i \/root\/\.ssh\/clank_public -o IdentitiesOnly=yes"$/mu);
+  const timeout = Number(text.match(/^TimeoutStartSec=(\d+)$/mu)?.[1]);
+  assert.ok(timeout >= Number(flag('--drain-timeout').slice(0, -1)) * 60 + 1200, 'the unit must outlast build + drain bound + deploy + post-deploy');
+});
+
+// D1 (daimon-harness#42) fixed the leaked engine-broker handlers at the source
+// and is live, so the reaper is retired. It must not come back by accident.
+test('the retired seam and reaper units stay retired', () => {
+  for (const name of ['clank-seam.service', 'clank-seam.timer', 'clank-handler-reaper.service', 'clank-handler-reaper.timer'])
+    assert.ok(!readdirSync(unitDir).includes(name), `${name} is retired`);
 });
