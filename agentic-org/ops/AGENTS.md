@@ -27,7 +27,7 @@ now:  clank-release.timer      (Hetzner)      hourly `spawnfile release`: no-op 
 
 | File | Runs | Does |
 |---|---|---|
-| `systemd/clank-release.service` | Hetzner, hourly | `git pull --ff-only` → `spawnfile release` (identity no-op, build, drain, deploy, settle, resume, control-token bootstrap, ledger, prune) |
+| `systemd/clank-release.service` | Hetzner, hourly | fast-forward to `origin/main` + disk floor → `spawnfile release` (identity no-op, build, drain, deploy, settle, resume, control-token bootstrap, ledger, prune) |
 | `scripts/release-notify.mjs` | inside the release | Spawnfile's `--notify-command`: a failed or day-old deferred release → `alarm.mjs` spool |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
 | `clank-feed-content.timer` | Hetzner, every 5 min | `spawnfile volume refresh public-content-volume`: published editions + bylines at `origin/main` → `clank-newsroom-content` fed volume |
@@ -50,8 +50,11 @@ by the notifier after a day.
 
 What stayed in the org, and why:
 
-- **`git pull --ff-only` before the release** (`ExecStartPre`): Spawnfile builds
-  from the checkout and fetching it is the caller's job.
+- **the source** (`ExecStartPre`): fast-forward the checkout to exactly
+  `origin/main` on branch `main`, refusing local commits ahead of it; Spawnfile
+  builds from the checkout and fetching it is the caller's job.
+- **the 20 GiB disk floor** (`ExecStartPre`): Spawnfile prunes release tags but
+  not build cache; a full disk fails the unit loudly instead of mid-build.
 - **the control-token bootstrap** (`--post-deploy-command`): the newsroom
   control token is not in the image; `bootstrap-control-token.sh` from the
   private checkout installs it into the new container and proves an
@@ -238,25 +241,30 @@ first run has no ledger, so it releases (build, drain, redeploy) even though
 the code is unchanged.
 
 ```bash
-# 0. preconditions: Spawnfile with --runtime-env-file and --post-deploy-command
-#    (noopolis/spawnfile#59, #60), a clean org checkout, the drain token, the bootstrap
+# 1. stop the old jobs FIRST, and wait for a running seam to end on its own
+#    (a oneshot mid-run is "activating"; never stop a deploy mid-way)
+systemctl disable --now clank-release.timer clank-seam.timer clank-handler-reaper.timer 2>/dev/null || true
+while systemctl show -p ActiveState --value clank-release.service clank-seam.service | grep -qE '^(activating|active|deactivating|reloading)$'; do sleep 15; done
+rm -f /etc/systemd/system/clank-seam.service /etc/systemd/system/clank-seam.timer \
+      /etc/systemd/system/clank-handler-reaper.service /etc/systemd/system/clank-handler-reaper.timer
+systemctl daemon-reload
+
+# 2. Spawnfile with --runtime-env-file and --post-deploy-command (noopolis/spawnfile#59, #60),
+#    the org checkout on exactly origin/main, the drain token, the bootstrap, disk
 git -C /home/clank/deploy-work/spawnfile-main fetch -q origin
 git -C /home/clank/deploy-work/spawnfile-main checkout -q --detach origin/main
 (cd /home/clank/deploy-work/spawnfile-main && PATH=/home/clank/deploy-work/node24/bin:$PATH npm ci --no-audit --no-fund && PATH=/home/clank/deploy-work/node24/bin:$PATH npm run build)
 /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js release --help | grep -c -- '--post-deploy-command'   # 1
-GIT_SSH_COMMAND="ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes" git -C /root/work/clankandslop pull --ff-only
+git -C /root/work/clankandslop symbolic-ref --short HEAD                                   # main
+GIT_SSH_COMMAND="ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes" git -C /root/work/clankandslop pull --ff-only origin main
 test -z "$(git -C /root/work/clankandslop status --porcelain)" && echo clean
+test "$(git -C /root/work/clankandslop rev-parse HEAD)" = "$(git -C /root/work/clankandslop rev-parse origin/main)" && echo at-origin-main
 grep -c '^SPAWNFILE_DAIMON_CONTROL_TOKEN=' /home/clank/deploy-work/deploy.env   # 1
 test -f /root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh && echo bootstrap-present
 test -f /home/clank/deploy-work/grok-runtime-identity-20261009b.json && echo identity-present
+df -h /var/lib/docker                                                                       # >= 20G available
 
-# 1. stop the old jobs (a running seam finishes first)
-systemctl disable --now clank-release.timer clank-seam.timer clank-handler-reaper.timer 2>/dev/null || true
-until ! systemctl is-active -q clank-release.service && ! systemctl is-active -q clank-seam.service; do sleep 15; done   # never stop a deploy mid-way
-rm -f /etc/systemd/system/clank-seam.service /etc/systemd/system/clank-seam.timer \
-      /etc/systemd/system/clank-handler-reaper.service /etc/systemd/system/clank-handler-reaper.timer
-
-# 2. the deployment record moves from clank's Spawnfile home to root's
+# 2b. the deployment record moves from clank's Spawnfile home to root's
 test -d /home/clank/.spawnfile/deployments/clank-and-slop && echo record-present
 BACKUP=$(mktemp -d) && cp -a /root/.spawnfile "$BACKUP/" 2>/dev/null; echo "backup: $BACKUP"
 install -d -m 700 /root/.spawnfile /root/.spawnfile/deployments

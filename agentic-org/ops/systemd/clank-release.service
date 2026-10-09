@@ -11,7 +11,7 @@
 # are gone.
 #
 # What stays here is only what is the newsroom's:
-#   * the source: `git pull --ff-only` before the release, because Spawnfile
+#   * the source: fast-forward to exactly origin/main before the release, because Spawnfile
 #     builds from this checkout and `--release` needs a clean committed tree.
 #     The checkout path is load-bearing: durable volume names derive from the
 #     Spawnfile's path, so never build the org from a different directory.
@@ -57,7 +57,14 @@ Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
 Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
 Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/home/clank/deploy-work/grok-runtime-identity-20261009b.json
 Environment="GIT_SSH_COMMAND=ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes"
-ExecStartPre=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /usr/bin/git -C /root/work/clankandslop pull --ff-only --quiet
+# ($$ is systemd's escape for a literal $ handed to the shell.)
+# Exactly origin/main: on branch main, fast-forwarded to the fetched tip, and
+# refused when local commits sit ahead of it (Spawnfile's clean-tree check
+# accepts committed changes, so this is the only "reviewed code only" gate).
+ExecStartPre=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /bin/sh -c 'r=/root/work/clankandslop; test "$$(git -C $$r symbolic-ref --short HEAD)" = main && git -C $$r fetch -q origin main && git -C $$r merge -q --ff-only FETCH_HEAD && test "$$(git -C $$r rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)"'
+# The build floor the seam enforced (the release hit the disk three times on
+# 2026-10-08); Spawnfile prunes release tags but keeps build cache. Fails loudly.
+ExecStartPre=/bin/sh -c 'test "$$(df --output=avail -B1G /var/lib/docker | tail -1 | tr -d " ")" -ge 20'
 ExecStart=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js release /root/work/clankandslop/agentic-org --deployment clank-and-slop --runtime-env-file /home/clank/deploy-work/deploy.env --image-repository clank-and-slop --out /root/work/clankandslop/.runtime/release-compiled --drain-timeout 30m --notify-command /root/work/clankandslop/agentic-org/scripts/release-notify.mjs --post-deploy-command /bin/sh --post-deploy-arg /root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh --post-deploy-arg spawnfile-clank-and-slop
 SuccessExitStatus=75
 # Build (~7 min) + drain bound (30 min) + deploy/settle + post-deploy (10 min max).

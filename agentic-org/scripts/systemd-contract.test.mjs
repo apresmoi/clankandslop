@@ -73,7 +73,11 @@ test('the release unit runs a drained spawnfile release from the pulled checkout
   const hookArgs = argv.flatMap((value, index) => (argv[index - 1] === '--post-deploy-arg' ? [value] : []));
   assert.deepEqual(hookArgs, ['/root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh', 'spawnfile-clank-and-slop']);
   assert.match(text, /^SuccessExitStatus=75$/mu, 'a deferred release is not a unit failure');
-  assert.match(text, /^ExecStartPre=\/usr\/bin\/flock \/run\/lock\/clank-corpus-refresh\.lock \/usr\/bin\/git -C \/root\/work\/clankandslop pull --ff-only/mu);
+  const source = text.match(/^ExecStartPre=\/usr\/bin\/flock \/run\/lock\/clank-corpus-refresh\.lock \/bin\/sh -c '(.*)'$/mu)?.[1] ?? '';
+  assert.doesNotMatch(source.replaceAll('$$', ''), /\$/u, 'every $ must be written $$, or systemd expands it before the shell sees it');
+  for (const piece of ['symbolic-ref --short HEAD)" = main', 'fetch -q origin main', 'merge -q --ff-only FETCH_HEAD', 'rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)'])
+    assert.ok(source.includes(piece), `the source step must build exactly origin/main (missing: ${piece})`);
+  assert.match(text, /^ExecStartPre=\/bin\/sh -c 'test "\$\$\(df --output=avail -B1G \/var\/lib\/docker .* -ge 20'$/mu, 'the 20 GiB build floor');
   assert.match(text, /^Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=\/home\/clank\/deploy-work\/grok-runtime-identity-20261009b\.json$/mu);
   assert.match(text, /^Environment="GIT_SSH_COMMAND=ssh -i \/root\/\.ssh\/clank_public -o IdentitiesOnly=yes"$/mu);
   const timeout = Number(text.match(/^TimeoutStartSec=(\d+)$/mu)?.[1]);
