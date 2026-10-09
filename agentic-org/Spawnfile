@@ -156,10 +156,14 @@ shared:
       # daily cadence and the code is not; one digest binding them made the slow
       # thing hostage to the fast one.
       #
-      # `name` is used verbatim as the host volume name, which is the whole
-      # point: clank-corpus-refresh.service fetches the private repo OUTSIDE
-      # this boundary and swaps a symlink inside `clank-newsroom-corpus`. No
-      # network and no credentials ever enter the container.
+      # It is a Spawnfile fed volume. `name` is used verbatim as the host volume
+      # name: clank-feed-corpus.service runs `spawnfile volume refresh
+      # research-corpus`, which fetches the private checkout OUTSIDE this
+      # boundary, resolves today's branch (origin/edition/<date, Berlin>), runs
+      # scripts/corpus-contract.mjs against the staged tree, and swaps `current`
+      # to it. Before the branch exists the volume keeps serving what it has
+      # (waiting); after 12:00 Berlin a missing branch is a refusal. No network
+      # and no credentials ever enter the container.
       #
       # WHY `mode: mutable` WHEN THE CORPUS IS READ-ONLY -- read this before
       # "fixing" it. `mode: readonly` BRICKS THE ORG, verified on the box on
@@ -191,24 +195,23 @@ shared:
       #     2000 OWNS the volume root and `trees/`, and an owner can always
       #     restore its own write bit, so `chmod -R a-w` is advisory against it:
       #
-      #       $ docker exec --user 2000:2000 ... sh -c 'echo forged > <vol>/CORPUS.json'
+      #       $ docker exec --user 2000:2000 ... sh -c 'echo forged > <vol>/<identity record>'
       #       $ docker exec --user 2000:2000 ... sh -c 'ln -s /etc <vol>/trees'
       #       $ docker exec --user 2000:2000 ... sh -c 'chmod u+w f && echo x > f'
       #
       #     all three succeeded;
       #   * bytes inside an already-frozen 0555 tree ARE immutable -- a story file
       #     cannot be rewritten or unlinked from inside a frozen directory -- but
-      #     CORPUS.json and the `<date>` symlinks are NAMES at a 0755 root and are
-      #     not protected at all.
+      #     the identity record and the `current` link are NAMES at a 0755 root
+      #     and are not protected at all.
       #
-      # So integrity is not asserted by permissions, it is MAINTAINED. The host
-      # refresher (corpus-refresh.mjs) keeps its own record outside the volume at
-      # /var/lib/clank-corpus/landed.json, root-owned 0600, unreachable from any
-      # container, and takes every decision from it -- never from a name inside
-      # the mount. Every two minutes it re-verifies the mounted tree against a
-      # land-time manifest and against `git ls-tree`, alarms with the drifted
-      # paths, and re-lands the tree from git so the newsroom heals itself. The
-      # bundle, by contrast, was never verified once after extraction.
+      # So integrity is not asserted by permissions, it is MAINTAINED. Spawnfile
+      # keeps its own record beside the volume (spawnfile-feed/landed.json),
+      # root-owned, unreachable from any container, and takes every decision
+      # from it -- never from a name inside the mount. Every two minutes it
+      # re-verifies the served tree against its land-time manifest, exits 1 (the
+      # unit's alarm) on drift, and re-lands the tree from git so the newsroom
+      # heals itself.
       #
       # And provenance is asserted by the HOST at publish time, from that record
       # and from git -- not by the file sitting in this volume, which the host
@@ -222,16 +225,16 @@ shared:
       # volumes and then fail compile on the duplicate host volume name.
       #
       # Provenance did not disappear with the image digest, it MOVED -- to the
-      # HOST. CORPUS.json {commit, ref, edition, fetched_at} is published into
-      # this volume so the newsroom tools can read it and refuse a corpus that is
-      # missing, empty, unreadable or not this edition's, and the identity it
-      # names is bound into the assignment receipt and carried into the
-      # composition. But that file is a convenience for the reader, not the proof:
-      # it sits in a directory uid 2000 owns. The proof is the host's own record
-      # outside this volume, which the refresher re-verifies against git every two
-      # minutes, and once an edition is commissioned its corpus is FROZEN -- the
-      # date's link stops following the branch, so a receipt can never end up
-      # citing research the reporters did not read.
+      # HOST. `.spawnfile-feed.json` (commit, ref, landing instant, tree) is
+      # published into this volume so the newsroom tools can read it and refuse a
+      # corpus that is missing, empty, unreadable or not this edition's, and the
+      # identity it names is bound into the assignment receipt and carried into
+      # the composition. But that file is a convenience for the reader, not the
+      # proof: it sits in a directory uid 2000 owns. The proof is the host's own
+      # record outside this volume, and at the 12:00 Berlin cutoff the volume is
+      # FROZEN for the day (`freeze` below) -- a branch that moves after the
+      # lineup is commissioned does not move what the reporters read, so a
+      # receipt can never end up citing research they did not read.
       - id: research-corpus
         kind: volume
         name: clank-newsroom-corpus

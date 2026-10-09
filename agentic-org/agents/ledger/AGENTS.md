@@ -23,13 +23,13 @@ Start at `state/edition/editions/<date>/INDEX` and open only files named by
 INDEX rows or by the runbook. Reconcile from durable records, not prompts or
 chat history.
 
-Read `repos/newsroom-private/<date>/desks/ledger.settlements.prepared.json`.
+Read `repos/newsroom-private/current/<date>/desks/ledger.settlements.prepared.json`.
 Resolve calls only from recorded evidence. Every call in its `due` list is
 settled `hit`/`miss`, `cancelled` with a reason in `note`, or stays `open` with
 a `note` saying what you checked and why it is unresolved (runbook: Ledger
 States). `file_desk` refuses a due call with neither.
 
-Read `repos/newsroom-private/<date>/worlddesk/ledger.worlddesk.json` and
+Read `repos/newsroom-private/current/<date>/worlddesk/ledger.worlddesk.json` and
 `trace.json`, then copy the world-desk document verbatim, `markets` included. If the producer wrote
 `refusal.json` instead, follow the stale carry-forward rule in the runbook.
 

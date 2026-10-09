@@ -35,7 +35,7 @@ const NAMED_PERSONAS = ['Klaxon', 'Cogsworth', 'Sprockett', 'Tinkerton', 'Vesta'
 const PERSONA_PATTERN = new RegExp(`\\b(?:${NAMED_PERSONAS.join('|')})\\b|@(?:${AGENT_IDS.join('|')})\\b|Clank\\s*(?:&|and)\\s*Slop`, 'u');
 const CITATION_PATTERN = /\[(E\d+)\]/gu;
 // The id shape the private research corpus uses for one gathered source —
-// `s-` and eight hex characters, as in `repos/newsroom-private/<date>/`. It is
+// `s-` and eight hex characters, as in `repos/newsroom-private/current/<date>/`. It is
 // an internal handle: it identifies a row in a store no reader can open, it is
 // not a citation, and a body that prints it has published a dead reference.
 const PRIVATE_RESEARCH_ID = /\bs-[0-9a-f]{8}\b/gu;

@@ -435,3 +435,25 @@ test('the published editions are a team fed volume, never part of the image arch
   assert.match(root, /- id: public-content-volume\n\s+kind: volume\n\s+name: clank-newsroom-content\n\s+mount: \.\/repos\/newsroom-content\n\s+mode: mutable\n\s+sharing: team/u);
 });
 
+
+// The research corpus is the private repo's edition/<today> branch, validated by
+// the corpus contract and frozen at the noon cutoff -- the rules the retired host
+// refresher enforced. The private tools carry only public additions (the site's
+// fonts, the bundle builders) and install the art server's dependencies in a
+// digest-pinned image on the runtime's platform.
+test('the corpus and private-tools feeds keep the newsroom rules and add nothing private to the image', () => {
+  const resources = readRootManifest().shared.workspace.resources;
+  const corpus = resources.find((item) => item.id === 'research-corpus');
+  assert.equal(corpus.feed.git.repo, '../clankandslop-private');
+  assert.deepEqual(corpus.feed.git.ref, { template: 'origin/edition/${date:Europe/Berlin}' }, 'no fallback: a missing branch waits before the cutoff and refuses after it');
+  assert.deepEqual(corpus.feed.freeze, { after: '12:00', timezone: 'Europe/Berlin' });
+  assert.deepEqual(corpus.feed.validate, ['node', 'scripts/corpus-contract.mjs']);
+  assert.ok(corpus.feed.keep >= 3);
+  const tools = resources.find((item) => item.id === 'newsroom-private-tools');
+  assert.match(tools.feed.prepare.image, /^node:24-bookworm-slim@sha256:[a-f0-9]{64}$/u);
+  assert.equal(tools.feed.prepare.platform, 'linux/amd64');
+  assert.deepEqual(tools.feed.include.map((entry) => entry.from), ['../website/public/fonts', 'bundles'], 'only public directories are staged into the private tree');
+  assert.deepEqual(tools.feed.prepare.command, ['node', '.feed/bundles/private-tools-prepare.mjs']);
+  // The image's bundles never reach into the private checkout.
+  for (const resource of resources.filter((item) => item.kind === 'bundle')) assert.doesNotMatch(JSON.stringify(resource), /clankandslop-private/u, resource.id);
+});

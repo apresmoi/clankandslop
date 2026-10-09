@@ -79,8 +79,8 @@ const corpusAgents = new Set(['klaxon']);
 // volume rather than a digest-pinned bundle. Exactly three, and each one is a
 // read in code, not a claim in prose:
 //
-//   brass    record_assignment -> corpusIdentity() reads CORPUS.json, verifies
-//            the tree and the dated link, and binds the identity into the
+//   brass    record_assignment -> corpusIdentity() reads the feed identity,
+//            verifies the tree and the current link, and binds the identity into the
 //            edition's assignment records.
 //   ledger   file_desk ledger.worlddesk -> authenticateWorldDeskFiling() refuses
 //            an absent or non-absolute mount by name (there is no cwd-relative

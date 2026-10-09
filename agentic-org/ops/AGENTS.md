@@ -15,8 +15,9 @@ was:  research lands on edition/<date>   →  a person repins, rebuilds, redeplo
       something breaks                   →  systemd says Failed into a void
 
 now:  the release timer        (Hetzner)      hourly, `--if-changed`: no-op unless public main's HEAD moved
-      the corpus refresher     (Hetzner)      `clank-newsroom-corpus` volume ← the day's research, outside the org
-      the content refresher    (Hetzner)      `clank-newsroom-content` volume ← every published edition, from public main
+      clank-feed-corpus        (Hetzner)      `clank-newsroom-corpus` fed volume ← edition/<today>, frozen at 12:00
+      clank-feed-content       (Hetzner)      `clank-newsroom-content` fed volume ← every published edition, from public main
+      clank-feed-private-tools (Hetzner)      `clank-newsroom-private-tools` fed volume ← private newsroom tools + art deps
       clank-publish.timer      (Hetzner)      17:00 staged artifact → edition/<date>
       merge-edition.yml        (Actions)      PR + merge, only on its own green CI
       clank-alarm@.service     (both boxes)   ntfy → a phone
@@ -61,8 +62,8 @@ so a new day's research meant a new ~5GB image, a daily build, and a daily
 chance to lose the day to something that had nothing to do with journalism. It
 happened twice in two days (2026-09-30 at the candidate health probe, 2026-10-01
 at the deploy gate). `agentic-org/Spawnfile` now mounts the corpus as the
-team-shared `clank-newsroom-corpus` volume, populated by the host refresher
-outside the agent boundary.
+team-shared `clank-newsroom-corpus` fed volume, landed by `spawnfile volume
+refresh` outside the agent boundary.
 
 The published editions had the same defect one level down, and it is closed
 the same way. They rode inside `newsroom-runtime.tar`, so every edition moved
@@ -115,8 +116,9 @@ Two things the daily deploy was doing for free had to be given their own homes:
   rolls, and the newsroom would wedge after its first day. The seam's
   `wakeBudget` stage refuses to deploy against any other file and writes
   nothing. (This retired `epoch-roll-run.mjs` and its daily recreate.)
-- **corpus provenance.** It travels with the data now, as `CORPUS.json` beside
-  the tree, checked by `scripts/corpus-contract.mjs` when Brass commissions.
+- **corpus provenance.** It travels with the data now, as Spawnfile's
+  `.spawnfile-feed.json` beside the tree, checked by `scripts/corpus-contract.mjs`
+  when Brass commissions; the publisher checks it against Spawnfile's host record.
 
 ## No bundle stage
 
@@ -161,15 +163,16 @@ tail -5 /var/lib/clank-alarm/alarm.log
 install -m 644 /root/work/clankandslop/agentic-org/ops/systemd/*.service \
                /root/work/clankandslop/agentic-org/ops/systemd/*.timer \
                /etc/systemd/system/
-systemctl disable --now clank-epoch-roll.timer clank-content-refresh.timer 2>/dev/null || true   # retired
+systemctl disable --now clank-epoch-roll.timer clank-content-refresh.timer clank-corpus-refresh.timer 2>/dev/null || true   # retired
 rm -f /etc/systemd/system/clank-epoch-roll.service /etc/systemd/system/clank-epoch-roll.timer \
-      /etc/systemd/system/clank-content-refresh.service /etc/systemd/system/clank-content-refresh.timer
+      /etc/systemd/system/clank-content-refresh.service /etc/systemd/system/clank-content-refresh.timer \
+      /etc/systemd/system/clank-corpus-refresh.service /etc/systemd/system/clank-corpus-refresh.timer
 systemctl daemon-reload
-systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer clank-feed-content.timer clank-feed-private-tools.timer 2>/dev/null || true
+systemctl disable clank-seam.timer clank-cycle-audit.timer clank-publish.timer clank-feed-content.timer clank-feed-private-tools.timer clank-feed-corpus.timer 2>/dev/null || true
 
-# 5. the retired published-content refresher's work root is not used any more
-#    (Spawnfile keeps fed-volume state beside each volume, in spawnfile-feed/)
-rm -rf /var/lib/clank-content
+# 5. the retired refreshers' work roots are not used any more (Spawnfile keeps
+#    fed-volume state beside each volume, in spawnfile-feed/)
+rm -rf /var/lib/clank-content /var/lib/clank-corpus
 
 # 6. dry-run the seam without deploying
 node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
@@ -179,25 +182,30 @@ node /root/work/clankandslop/agentic-org/scripts/seam-run.mjs --check
 ssh -o BatchMode=yes -i /root/.ssh/clank_public -T git@github.com
 ```
 
-**To arm the fed volumes — only AFTER the first release that declares them has
-deployed.** The container creates each volume and writes its identity sentinel
-on first start, and `spawnfile volume refresh` refuses a volume no container has
-initialized. Until the first land the readers refuse loudly (no
-`.spawnfile-feed.json`, no `current/`) rather than read nothing, so arm them
-straight after the deploy settles. The content volume still holds the retired
-refresher's layout (`CONTENT.json`, `trees/<commit>`, a `current` link into
-`trees/<commit>/content`), which Spawnfile reports and never deletes, so clear it
-first; the back catalogue is unreadable for the minute until the first land.
+**Moving to the fed volumes (once).** The three volumes are Spawnfile fed
+volumes; `spawnfile volume refresh` refuses a volume no container has
+initialized, and the new readers refuse a volume with no `.spawnfile-feed.json`
+or `current/` rather than read nothing. Do it inside a deploy window.
 
 ```bash
-V=/var/lib/docker/volumes/clank-newsroom-content/_data
-rm -rf "$V/current" "$V/CONTENT.json" "$V/trees"
-systemctl enable --now clank-feed-content.timer clank-feed-private-tools.timer
-systemctl start clank-feed-content.service clank-feed-private-tools.service   # land now
 SF="/home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js"
-$SF volume verify public-content-volume /root/work/clankandslop/agentic-org     # exit 0 = served tree is what the host landed
-$SF volume verify newsroom-private-tools /root/work/clankandslop/agentic-org
-readlink "$V/current"
+ORG=/root/work/clankandslop/agentic-org
+VOL=/var/lib/docker/volumes
+# BEFORE the deploy: stop the retired refreshers, and land the corpus beside
+# its old layout (the running container keeps reading CORPUS.json and the dated
+# links; the new names do not collide). Exit 1 here only reports those old names.
+systemctl disable --now clank-corpus-refresh.timer clank-content-refresh.timer
+$SF volume refresh research-corpus $ORG || true
+readlink $VOL/clank-newsroom-corpus/_data/current
+# DEPLOY (the release creates clank-newsroom-private-tools), then at once:
+C=$VOL/clank-newsroom-content/_data
+rm -rf "$C/current" "$C/CONTENT.json" "$C/trees"            # the old content layout uses `current` too
+P=$VOL/clank-newsroom-corpus/_data
+rm -rf "$P/CORPUS.json" "$P"/20??-??-?? "$P"/trees/????????????????????????????????????????   # old 40-hex trees and dated links only
+systemctl enable --now clank-feed-corpus.timer clank-feed-content.timer clank-feed-private-tools.timer
+systemctl start clank-feed-private-tools.service clank-feed-content.service clank-feed-corpus.service
+for id in newsroom-private-tools public-content-volume research-corpus; do $SF volume verify $id $ORG; done   # each exit 0
+rm -rf /var/lib/clank-content /var/lib/clank-corpus
 ```
 
 **To arm the seam and the audit, one command:**

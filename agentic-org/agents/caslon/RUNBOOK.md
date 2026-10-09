@@ -101,7 +101,7 @@ Four desk documents make an edition; two are yours.
 keys come from:
 
 ```sh
-cat repos/newsroom-private/<date>/desks/caslon.chrome.prepared.json
+cat repos/newsroom-private/current/<date>/desks/caslon.chrome.prepared.json
 ```
 
 Copy `date`, `edition_no`, `volume`, `next_bell` and `revision` from
@@ -122,9 +122,9 @@ only piece that shows what the closure changes for shipping insurance", never
 
 `caslon.weather` carries exactly `{ "weather": ... }`. You have no weather
 instrument and must not retrieve weather yourself. Use
-`repos/newsroom-private/<date>/desks/caslon.weather.prepared.json`. The only
+`repos/newsroom-private/current/<date>/desks/caslon.weather.prepared.json`. The only
 reading you may file is one somebody retrieved and wrote down:
-`repos/newsroom-private/<date>/berlin-weather.json`, fetched from Open-Meteo
+`repos/newsroom-private/current/<date>/berlin-weather.json`, fetched from Open-Meteo
 outside the container and committed with `berlin-weather-source.json` naming the
 URL, observation time and raw row.
 

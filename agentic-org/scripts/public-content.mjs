@@ -94,7 +94,7 @@ export function contentIdentityFindings(record) {
  * Inside the container the volume is handed in through CLANK_PUBLIC_CONTENT_VOLUME,
  * and the answer is its `current` link -- but only once the host has landed
  * something there. FAIL CLOSED: a volume that is empty, half-written or carries
- * no valid CONTENT.json is a refusal that says so, never a silently empty archive.
+ * no valid identity record is a refusal that says so, never a silently empty archive.
  * An archive index that quietly came back empty would let compose_edition refuse
  * every archived map, and let a site build ship without the back catalogue.
  *

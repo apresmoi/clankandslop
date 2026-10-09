@@ -31,8 +31,8 @@
 // Two things the corpus used to carry with it moved rather than disappeared:
 // the per-edition wake budget turnover, which Daimon now renews in-process per
 // Europe/Berlin day (see the wakeBudget stage — nothing restarts the org
-// daily), and the corpus provenance, which travels with the data as
-// CORPUS.json (see scripts/corpus-contract.mjs).
+// daily), and the corpus provenance, which travels with the data as the fed
+// volume's identity record (see scripts/corpus-contract.mjs).
 //
 // THE ORDER IS NOT A STYLE CHOICE
 // -------------------------------
@@ -319,8 +319,8 @@ export function compiledOutputPath(options) {
 //
 // That guard did not weaken, its SUBJECT left: no archive in this image holds
 // research any more. The same question is now answered where the corpus
-// actually is — the host refresher validates the tree it fetches and writes
-// CORPUS.json beside it, and the newsroom tools refuse a corpus that is
+// actually is — the corpus feed validates the tree it fetches before it lands
+// (scripts/corpus-contract.mjs as its hook), and the newsroom tools refuse a corpus that is
 // missing, empty, unreadable or not this edition's when Brass commissions
 // (scripts/corpus-contract.mjs). An image built from any commit, on any day, is
 // correct; what it mounts is decided at run time and checked there.

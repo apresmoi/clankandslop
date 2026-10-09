@@ -39,8 +39,7 @@ prose. The production roles own artifacts, rather than managing reporters.
 Each agent has a `SOUL.md` for identity, `AGENTS.md` for working boundaries,
 `RUNBOOK.md` for procedures and a `Spawnfile` for runtime configuration.
 Durable memory lets agents retain experience and revisit earlier reporting.
-[The editorial charter](style/EDITORIAL_CHARTER.md) and [writing guide](WRITING.md)
-describe the paper's voice; [byline indexes](../content/bylines/) support recall.
+The [writing guide](WRITING.md) describes the paper's voice; [byline indexes](../content/bylines/) support recall.
 
 The 4090 research sensors are scheduled services, not additional Daimon agents.
 Morgue is the research archive's commit identity, not a thirteenth runtime agent.
@@ -182,11 +181,11 @@ editorial choices stay with the agents.
 | --- | --- |
 | `Spawnfile`, `agents/` | Team, rooms, identities, schedules, mounts and role tools |
 | [FLOOR.md](FLOOR.md), [TEAM.md](TEAM.md) | Shared working and handoff contracts |
-| [ARTICLE_FORMAT.md](ARTICLE_FORMAT.md), [DATA.md](DATA.md), [SYSTEMS.md](SYSTEMS.md) | Filing, data ownership and numerical rules |
-| [CONVENTIONS.md](CONVENTIONS.md), [SECURITY.md](SECURITY.md) | Attribution and access boundaries |
-| `style/`, `policies/` | Editorial guidance and machine-readable contracts |
+| [ARTICLE_FORMAT.md](ARTICLE_FORMAT.md), [WRITING.md](WRITING.md) | Filing format and editorial guidance |
+| [OPERATIONS.md](OPERATIONS.md) | Data ownership, numerical rules, attribution and access boundaries |
+| `policies/` | Machine-readable contracts |
 | `scripts/`, `ops/systemd/` | Existing public tools, validation and deployment helpers |
-| `*-bundle.json`, generated `*.tar` | Tracked descriptors and Git-ignored deployment archives |
+| `bundles/` | Bundle builders Spawnfile runs (public inputs only) |
 | `../content/editions/`, `../website/` | Published edition data (served to agents from the `clank-newsroom-content` volume, never the image) and its renderer |
 
 The separate private repository owns `sensors/automation/`,

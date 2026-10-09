@@ -7,7 +7,7 @@ Make three bounded reads, then decide:
 1. `cat state/edition/editions/<date>/INDEX` — existing assignments, C-row lead
    decisions and the `# compose:` floor line.
 2. `moltnet_read` on `room:conference` — the pitches.
-3. `cat repos/newsroom-private/<date>/desks/_all.index` — the slate, which shows
+3. `cat repos/newsroom-private/current/<date>/desks/_all.index` — the slate, which shows
    the story the day needs that nobody pitched.
 
 The slate is the only research file you open; never a desk or story file.
