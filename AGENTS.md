@@ -300,3 +300,11 @@ branch.
   *why* is non-obvious
 - Don't let the dev server's word be final — it serves stale modules after
   edits sometimes; trust `npm run build` + a fresh server
+
+## agentic-org/
+
+`agentic-org/` is the newsroom organization: `Spawnfile`, `agents/<name>/`, and the
+shared docs the agents read (`FLOOR.md`, `WRITING.md`, `ARTICLE_FORMAT.md`,
+`RESEARCH_ROUND_TRIP.md`, `TEAM.md`, `OPERATIONS.md`). When changing it: no
+instruction names a skill document, private corpus data never enters this
+repository, and no change weakens a failed runtime check to make it pass.
