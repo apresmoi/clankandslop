@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: release-image
+  group: release-image-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -60,15 +60,6 @@ jobs:
           CLANK_ETOPO_GZ="${gz}" node agentic-org/scripts/build-etopo-bundle.mjs
           echo "${ETOPO_TAR_SHA256}  agentic-org/etopo-relief.tar" | sha256sum -c -
 
-      # Generated workspace bundles (website-deps runs npm ci in a container)
-      # are content-addressed by Spawnfile; reuse them across runs.
-      - name: Restore workspace bundle cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.spawnfile/cache
-          key: spawnfile-bundles-${{ hashFiles('website/package.json', 'website/package-lock.json', 'agentic-org/bundles/**') }}
-          restore-keys: spawnfile-bundles-
-
       - id: release
         uses: noopolis/spawnfile/.github/actions/release-image@main
         with:
@@ -78,11 +69,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Only an image equal to main's head may move `latest`: a dispatch from
+      # another branch, or a rerun of a main commit that later image inputs
+      # superseded, pushes its SHA tag only. Edition-only commits on top do not
+      # supersede it (they are not image inputs).
       - name: Tag latest
+        if: github.ref == 'refs/heads/main'
         env:
           DIGEST: ${{ steps.release.outputs.digest }}
         run: |
           set -euo pipefail
+          git fetch --quiet --depth=200 origin main
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" FETCH_HEAD ||
+             ! git diff --quiet "${GITHUB_SHA}" FETCH_HEAD -- . ':!content/editions' ':!content/bylines'; then
+            echo "main has newer image inputs than ${GITHUB_SHA}; leaving latest alone"
+            exit 0
+          fi
           docker tag "${IMAGE}:${GITHUB_SHA}" "${IMAGE}:latest"
           docker push "${IMAGE}:latest"
           served="$(docker buildx imagetools inspect "${IMAGE}:latest" --format '{{json .Manifest}}' | jq -r '.digest')"
