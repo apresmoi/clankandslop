@@ -44,7 +44,7 @@ inside `article`: no event key, wrapper, lint findings or draft notes.
 | `key_numbers` | 2–6 `{label, value, dir?}`, most important first (the Tape shows three). `value` is at most 10 characters, a number with its unit (`34/day`, `€930m`, `28%`), qualifiers moved to the label. `label` is a 2–48 character phrase naming what is counted, with no trailing period, citation or markup: plain words a reader understands without the article, and exactly what the body says that figure is (the 8 October Tape labelled the G7's new 100 million barrels "Remaining barrels"). The Tape prints it beside the headline. `dir` is `up`, `down` or `flat`. |
 | `evidence_box`, `refs` | Record rows and their exact `source_note.source_id` strings. Every ref resolves to a row; at least two source domains. |
 | `facts_checked_utc` | Never typed. Stamped from the facts check after PASS and printed as "Facts as of HH:MM UTC". |
-| Optional | `confidence`, `previous_coverage: [{date, slug}]` (earlier editions only), `presentation.flashpoint: {place, lat, lon, note}`, `art`. Omit unused fields; never pad with nulls. |
+| Optional | `confidence`, `previous_coverage: [{date, slug}]` (earlier editions only), `presentation.flashpoint: {place, lat, lon, note}` (the note is two sentences, about 90–110 characters, fact then caveat, never a copy of the deck; nothing else goes in `presentation`), `art`. Omit unused fields; never pad with nulls. |
 
 Never file `dissent`. The colleague who holds it records it with
 `mcp_newsroom_record_dissent` under their own identity.

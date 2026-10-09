@@ -5,6 +5,9 @@ commissions against it, Spike reviews against it. Each rule lives here once.
 
 Our voice is skeptical of power, interested in how things work, and humane about
 consequences. Lead with the news. Let wit earn its place through a telling fact.
+Write for a reader who reads each paragraph once. Shared standards never
+prescribe conclusions: desks may reach different judgments from the same
+evidence, and fact, inference, forecast and opinion stay distinct.
 
 ## Two formats
 
@@ -72,8 +75,10 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
 ## The reporting bar
 
 - **Lead with the news.** Actor, action and consequential detail first; context
-  after. Avoid an abbreviated first word with a full stop: the page uses that
-  word for its dropcap.
+  after. Never open on what kind of thing happened, what it means or what the
+  desk noticed. The first word becomes the dropcap, so it is never an
+  abbreviation with a full stop or a spelled-out acronym: "Judge Talwani of the
+  U.S. District Court", not "U.S. District Judge Talwani".
 - **Use every verified fact, once.** Each `evidence_box` row with a
   `raw_excerpt` that carries a distinct fact appears in the body with its
   `[En]`. Length follows the captured facts: three verified facts make a
@@ -93,7 +98,13 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
 - **No notes about sources.** "CNBC reported" is enough. Never write which page,
   sentence or outlet "carries" a detail.
 - **No answers to claims nobody made.** No "X, not Y" unless a reader would
-  genuinely assume Y.
+  genuinely assume Y. "Not X but Y" and its variants (rather than, not whether
+  X but whether Y, X as much as Y) appear at most once per piece, never in the
+  headline or deck.
+- **Paragraphs vary.** Six paragraphs of four sentences is a template. A
+  paragraph that opens by explaining the previous one ("That distinction
+  matters because", "The useful part is") is commentary: cut it or replace it
+  with the fact it points at.
 - **Answer the essential question.** A protest piece says what the protesters
   want. A strike or military piece reports the challenge to the official
   justification when a source carries one. If the answer is unknown, say so once.
@@ -107,7 +118,8 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
   stations", "go-fast vessel") into what physically happened.
 - **End within the evidence.** The last paragraph follows from what the piece
   established, with no flourish that adds a meaning the reporting did not
-  develop.
+  develop. A brief closes on a fact still true next week (a date, a number, a
+  name), never on what would settle the question or a recap of method.
 
 ## Names and meaning
 
@@ -138,6 +150,8 @@ Each sentence keeps the meaning of the passage it cites:
   projection is not "leading in 59 seats".
 - "Though", "but", "while" or "after" join two facts only in a relation a
   source states.
+- Quotes stay exact. Paraphrase may explain context; it never softens,
+  embellishes or repairs the source.
 
 ## Forecasts
 
@@ -185,9 +199,12 @@ the same bar.
   only there, request the sentence or leave the claim out.
 - A missing fragment needs captured support or a faithful paraphrase marked in
   `source_note.provenance_note`. Never invent an excerpt, URL or access.
-- Research mechanics never print: no "captured", "the Record", "fragment",
-  "on that page", "the filing", "the supplied record" or what "the article can
-  say". A paragraph whose subject is missing evidence is not a paragraph.
+- Research mechanics never print: no "captured", "retrieved", "the Record",
+  "fragment", "countercase", "discriminator", "on that page", "the filing",
+  "the supplied record", private research ids or what "the article can say".
+  Say the missing fact about the world ("no restart date has been published"),
+  once, never a checklist of what would settle it. A paragraph whose subject
+  is missing evidence is not a paragraph.
 
 ## Revisions and messages
 

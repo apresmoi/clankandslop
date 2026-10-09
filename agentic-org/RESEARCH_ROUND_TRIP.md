@@ -2,25 +2,26 @@
 
 Direct Internet research is prohibited for all twelve agents: no browser tools,
 shell HTTP clients or another CLI/agent to search or fetch. Bounded local reads
-and declared offline commands stay permitted. This is an instruction; runtime
-egress enforcement is a separate production requirement.
+and declared offline commands stay permitted. Runtime egress enforcement is a
+separate requirement.
 
 ## Who asks
 
 The six reporters and Brass send `research.request.v1` to `room:research` on
 `clank-newsroom`. Ledger sends its own due-call request there too; if that send
-is refused, Ledger asks `@brass` in `room:release` instead. The responder checks
-the credential-bound sender against the request's `from`.
+is refused, Ledger asks `@brass` in `room:release`. The responder checks the
+credential-bound sender against the request's `from`.
 
 Everyone else asks a colleague, naming the missing fact and what would settle
 it: Spike asks the article owner in `room:filing`; Caslon asks the owner there
 or `@brass` in `room:release`; Pressman asks `@brass` in `room:release`; Klaxon
 asks `@brass` in `room:conference`. Whoever relays an answer posts its findings,
-source URLs, capture time and request id in that shared room with a mention of
-the desk that asked: not every desk can read `room:research`.
+source URLs, capture time and request id in that shared room, mentioning the
+desk that asked: not every desk can read `room:research`.
 
-Read the story file first (Brass: the slate and pitches). Ask one load-bearing question the evidence cannot
-answer; the discriminator names the fact that would settle it.
+Read the story file first (Brass: the slate and pitches). Ask one load-bearing
+question the evidence cannot answer; the discriminator names the fact that
+would settle it.
 
 ## Request
 
@@ -74,25 +75,25 @@ Accept only a `research.answer.v1` from `research-sensor` matching your pending
 - `not_found` is a completed search without the evidence.
 - `refused` covers an exhausted budget, failed capture, timeout or expiry.
 
-`not_found` and `refused` establish nothing. An unreadable page does not make a
-claim false. A sensor finding is attributed research: never claim you fetched
-the page or checked a quotation you did not receive. Keep the URLs, `ran_at`
-and any unresolved qualifications.
+`not_found` and `refused` establish nothing; an unreadable page does not make a
+claim false. A finding is attributed research: never claim you fetched the page
+or checked a quotation you did not receive. Keep the URLs, `ran_at` and any
+unresolved qualifications.
 
 ## The facts check after PASS
 
 Research froze at 12:00 Berlin; the paper composes at 16:00. Every passed piece
-gets one check for what changed in between. It is one request per piece:
+gets one check for what changed in between, one request per piece:
 
 ```json
 {"kind":"research.request.v1","request_id":"<owner>-<date>-facts-<article id>","from":"<owner>","edition":"<date>","story_id":"<story id>","question":"What has changed since 12:00 Berlin time today about <the story in one line>? Give dated, sourced developments.","discriminator":"A dated, sourced development after 12:00 Berlin that changes a fact, figure or status in the piece."}
 ```
 
-Spike's PASS message tells the owner whether this request was already sent at
-PASS. If it was, do not send another; if it was not, the owner sends it. Then
-the owner ends the turn. On the answer, the owner calls
-`mcp_newsroom_record_freshness_check` with the edition, article id, the passed
-revision, `request_id` and `checked_at` = the answer's `ran_at`:
+Spike's PASS message says whether this request was already sent. If it was, do
+not send another; if not, the owner sends it. Then the owner ends the turn. On
+the answer, the owner calls `mcp_newsroom_record_freshness_check` with the
+edition, article id, the passed revision, `request_id` and `checked_at` = the
+answer's `ran_at`:
 
 - `unchanged`: nothing material moved, or `not_found`.
 - `updated`: a count, result, vote, status or quoted position moved. `changes`
@@ -108,23 +109,13 @@ revision, `request_id` and `checked_at` = the answer's `ran_at`:
 If the tool result's `next` says the edition is ready to compose, the owner
 tells `@caslon` in `room:filing` with the edition and article id.
 
-## Operational bounds
+## Bounds
 
-- One queue; captures run as tabs of a shared browser, up to three at once.
-  Production allows 6 requests per agent and 30 per edition
+- Production allows 6 requests per agent and 30 per edition
   (`CLANK_ADHOC_MAX_PER_AGENT`, `CLANK_ADHOC_MAX_PER_EDITION` on the sensor
-  host); each passed piece spends one on its facts check. A `research_budget_exhausted` refusal makes
-  that check `unavailable`, never a silent pass.
-- Duplicate requests cannot relaunch research; conflicting reuse cannot replace
-  the original question; uncertain interrupted runs are not repeated.
-- A reply is complete only once its stored text and authenticated sender are
-  read back from Moltnet.
-- Validated findings do not independently prove the research model's claims.
-  No answer time is guaranteed.
-
-## Ownership
-
-Automation, installation and raw research live in `clankandslop-private`; raw
-ad hoc reports stay on the 4090. This repository owns the protocol.
-Production delivery runs through Hetzner's Moltnet server; the 4090 reaches it
-through its managed loopback client.
+  host); each facts check spends one. A `research_budget_exhausted` refusal
+  makes that check `unavailable`, never a silent pass.
+- Duplicate or conflicting reuse of a request id never relaunches or replaces
+  the original question. No answer time is guaranteed.
+- The sensors, raw research and their automation live in
+  `clankandslop-private`; this repository owns the protocol.

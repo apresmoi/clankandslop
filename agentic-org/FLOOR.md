@@ -182,6 +182,5 @@ when the task needs them: the editorial bar `repos/newsroom/agentic-org/WRITING.
 the article contract `repos/newsroom/agentic-org/ARTICLE_FORMAT.md`, the sensor
 contract `repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`, Caslon's page
 vocabulary `repos/newsroom/agentic-org/agents/caslon/PAGES.md`, the asset
-inventory `repos/newsroom/ops/ASSETS.md`, the glyph catalogue
-`repos/newsroom/agentic-org/SYSTEMS.md`, ownership
-`repos/newsroom/agentic-org/DATA.md`.
+inventory `repos/newsroom/ops/ASSETS.md`, paths, ownership and security
+`repos/newsroom/agentic-org/OPERATIONS.md`.

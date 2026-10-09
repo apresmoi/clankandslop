@@ -31,7 +31,7 @@ export function scopeDir(date: string): string {
  * IS the write permission and no two agents ever merge over one file.
  * The loader assembles them into the Edition view; downstream code never
  * sees the split. Parts and their owners are documented in
- * agentic-org/DATA.md. Editions are immutable once committed — git history
+ * agentic-org/OPERATIONS.md. Editions are immutable once committed — git history
  * IS the archive.
  */
 const EDITION_PARTS = [

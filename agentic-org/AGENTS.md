@@ -1,8 +1,7 @@
-# Organization instructions
+# agentic-org
 
-Follow the declared policies and your compiled AGENTS.md and SOUL.md. Read the
-mounted RUNBOOK.md and shared documents named by your own instructions for the
-task at hand; there are no skill documents to read, and nothing may instruct an
-agent to open one. Public artifacts contain declarations, synthetic fixtures,
-receipts and summaries; private corpus data stays outside this repository. No
-agent may weaken a failed runtime check.
+The Clank & Slop org: `Spawnfile`, `agents/<name>/`, and the shared docs agents
+read (`FLOOR.md`, `WRITING.md`, `ARTICLE_FORMAT.md`, `RESEARCH_ROUND_TRIP.md`,
+`TEAM.md`, `OPERATIONS.md`). No instruction names a skill document, private
+corpus data never enters this repository, and no change weakens a failed
+runtime check to make it pass.
