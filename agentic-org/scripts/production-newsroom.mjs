@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { chmod, cp, link, lstat, mkdir, readFile, readdir, rename, rm, symlink, unlink, writeFile } from 'node:fs/promises';
+import { chmod, cp, link, lstat, mkdir, readFile, readdir, realpath, rename, rm, symlink, unlink, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -378,7 +378,9 @@ export async function makeOwnerWritable(rootDir){
 // Code from the image, published editions and bylines from the content volume: public-content.mjs.
 export const stagePublicSource=(source,temporary,filter)=>stagePublicContent(source,temporary,filter,{makeOwnerWritable});
 export async function mergeBundle(from,into){
-  await cp(from,into,{recursive:true,force:true});
+  // A Spawnfile bundle mounted at this path is a symlink to its backing tree;
+  // copy the tree, never the link (the release artifact refuses symlinks).
+  await cp(await realpath(from),into,{recursive:true,force:true});
   await makeOwnerWritable(into);
 }
 async function releaseAction(method,args){
