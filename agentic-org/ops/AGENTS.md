@@ -457,3 +457,23 @@ regenerated: it is a view of `topics.json`, which an edition never changes.
 
 Every one of them also lands as a JSON breadcrumb under the spool directory
 before the send, so an undeliverable alarm still leaves the text on disk.
+
+## Release runs as clank
+
+`spawnfile release` runs as `clank` (Spawnfile refuses Daimon credentials as
+root). One-time host setup, already applied on 2026-10-09:
+
+```bash
+setfacl -m u:clank:--x /root /root/work
+setfacl -R -m u:clank:rX /root/work/clankandslop
+find /root/work/clankandslop -type d -exec setfacl -d -m u:clank:rX {} +
+mkdir -p /root/work/clankandslop/.runtime/release-compiled
+setfacl -R -m u:clank:rwX /root/work/clankandslop/.runtime
+find /root/work/clankandslop/.runtime -type d -exec setfacl -d -m u:clank:rwX {} +
+setfacl -R -m u:clank:rwX /var/lib/clank-alarm
+find /var/lib/clank-alarm -type d -exec setfacl -d -m u:clank:rwX {} +
+sudo -u clank git config --global --add safe.directory /root/work/clankandslop
+sudo -u clank git config --global --add safe.directory /root/work/clankandslop/clankandslop-private
+# Moltnet local release lives where clank can write (compile writes a verify dir there)
+install -d -o clank -g clank /home/clank/deploy-work/moltnet-local-release
+```

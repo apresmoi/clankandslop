@@ -49,22 +49,30 @@ Wants=network-online.target
 Requires=docker.service
 OnFailure=clank-alarm@%n.service
 
+# Runs as clank: Spawnfile refuses to mount Daimon credentials as root
+# (callerUid <= 0), and the live deployment record and Grok bootstrap login are
+# clank's. The two ExecStartPre steps run as root (`+`): the fetch needs root's
+# deploy key. clank reads /root/work/clankandslop through ACLs and writes only
+# its .runtime/ (see ops/AGENTS.md, "Release runs as clank").
 [Service]
+User=clank
+Group=clank
+Environment=HOME=/home/clank
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
 Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
-Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/root/work/moltnet/dist/spawnfile-local-release
+Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/home/clank/deploy-work/moltnet-local-release
 Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/home/clank/deploy-work/grok-runtime-identity-20261009b.json
 Environment="GIT_SSH_COMMAND=ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes"
 # ($$ is systemd's escape for a literal $ handed to the shell.)
 # Exactly origin/main: on branch main, fast-forwarded to the fetched tip, and
 # refused when local commits sit ahead of it (Spawnfile's clean-tree check
 # accepts committed changes, so this is the only "reviewed code only" gate).
-ExecStartPre=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /bin/sh -c 'r=/root/work/clankandslop; test "$$(git -C $$r symbolic-ref --short HEAD)" = main && git -C $$r fetch -q origin main && git -C $$r merge -q --ff-only FETCH_HEAD && test "$$(git -C $$r rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)"'
+ExecStartPre=+/usr/bin/flock /run/lock/clank-corpus-refresh.lock /bin/sh -c 'r=/root/work/clankandslop; test "$$(git -C $$r symbolic-ref --short HEAD)" = main && git -C $$r fetch -q origin main && git -C $$r merge -q --ff-only FETCH_HEAD && test "$$(git -C $$r rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)"'
 # The build floor the seam enforced (the release hit the disk three times on
 # 2026-10-08); Spawnfile prunes release tags but keeps build cache. Fails loudly.
-ExecStartPre=/bin/sh -c 'test "$$(df --output=avail -B1G /var/lib/docker | tail -1 | tr -d " ")" -ge 20'
+ExecStartPre=+/bin/sh -c 'test "$$(df --output=avail -B1G /var/lib/docker | tail -1 | tr -d " ")" -ge 20'
 ExecStart=/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js release /root/work/clankandslop/agentic-org --deployment clank-and-slop --runtime-env-file /home/clank/deploy-work/deploy.env --image-repository clank-and-slop --out /root/work/clankandslop/.runtime/release-compiled --drain-timeout 30m --notify-command /root/work/clankandslop/agentic-org/scripts/release-notify.mjs --post-deploy-command /bin/sh --post-deploy-arg /root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh --post-deploy-arg spawnfile-clank-and-slop
 SuccessExitStatus=75
 # Build (~7 min) + drain bound (30 min) + deploy/settle + post-deploy (10 min max).
