@@ -15,7 +15,7 @@
 #
 # NOT enabled. `systemctl enable --now clank-publish.timer` arms it — and only
 # once `stage_release` has produced a `staged-` receipt unattended, per
-# agentic-org/ops/AGENTS.md.
+# agentic-org/ops/README.md.
 [Unit]
 Description=Publish today's staged edition after press time
 

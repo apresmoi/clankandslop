@@ -341,7 +341,7 @@ export function validateRuntimeBindings(root = orgRoot) {
   }
 }
 
-export function validateTree() { for (const agent of agents) for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md', 'RUNBOOK.md', 'CLAUDE.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
+export function validateTree() { for (const agent of agents) { for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md', 'RUNBOOK.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); assert(!existsSync(resolve(orgRoot, 'agents', agent, 'CLAUDE.md')), `${agent} has a CLAUDE.md: an agent's AGENTS.md is its prompt, not a guide for coding agents`); } const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
 export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
   assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '18:00' && schedule.effective_from === '2026-09-09', 'schedule zone or deadline invalid');

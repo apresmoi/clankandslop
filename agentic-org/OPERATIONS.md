@@ -84,7 +84,7 @@ may hold only approved summaries and durable decisions, never raw corpus.
   protection on `main` is the real control; nothing here merges to `main`, and
   publication stays a human decision.
 - Releases run only on the host: `clank-release.timer` runs `spawnfile release`
-  as root (drained deploy, see `ops/AGENTS.md`). The newsroom control token
+  as clank (drained deploy, see `ops/README.md`). The newsroom control token
   reaches each new container through `bootstrap-control-token.sh` after the
   deploy, never through the public image.
 - Broker results expose cited URLs, retrieval times, a capture digest, private
