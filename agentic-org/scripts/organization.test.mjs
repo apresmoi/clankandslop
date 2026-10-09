@@ -446,7 +446,7 @@ test('the corpus and private-tools feeds keep the newsroom rules and add nothing
   const corpus = resources.find((item) => item.id === 'research-corpus');
   assert.equal(corpus.feed.git.repo, '../clankandslop-private');
   assert.deepEqual(corpus.feed.git.ref, { template: 'origin/edition/${date:Europe/Berlin}' }, 'no fallback: a missing branch waits before the cutoff and refuses after it');
-  assert.deepEqual(corpus.feed.git.paths, ['${date:Europe/Berlin}'], 'agents see only the edition folder, never the private code or other dates');
+  assert.deepEqual(corpus.feed.git.paths, ['${date:Europe/Berlin}'], 'the feed selects only the edition folder: the served tree carries no private code and no other date');
   assert.deepEqual(corpus.feed.freeze, { after: '12:00', timezone: 'Europe/Berlin' });
   assert.deepEqual(corpus.feed.validate, ['node', 'scripts/corpus-contract.mjs']);
   assert.ok(corpus.feed.keep >= 3);
