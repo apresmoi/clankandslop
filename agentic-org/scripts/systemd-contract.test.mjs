@@ -47,7 +47,7 @@ test('the fed-volume refreshes and the release job serialize on one lock', () =>
     assert.match(service, new RegExp(`^ExecStart=/usr/bin/flock -n -E 0 ${lock} \\S+node \\S+/dist/cli/index\\.js volume refresh ${id} /root/work/clankandslop/agentic-org$`, 'mu'), kind);
     assert.match(unit(`clank-feed-${kind}.timer`), new RegExp(`^Unit=clank-feed-${kind}\\.service$`, 'mu'), kind);
   }
-  assert.match(unit('clank-feed-content.service'), /^Environment=GIT_SSH_COMMAND=ssh -i \/root\/\.ssh\/clank_public -o IdentitiesOnly=yes$/mu, 'the public fetch names the release identity');
+  assert.match(unit('clank-feed-content.service'), /^Environment="GIT_SSH_COMMAND=ssh -i \/root\/\.ssh\/clank_public -o IdentitiesOnly=yes"$/mu, 'the public fetch names the release identity, quoted so systemd keeps the whole value');
 });
 
 // 2026-10-04: the reaper's age floor (1200s) sat under the 30-minute turn limit
