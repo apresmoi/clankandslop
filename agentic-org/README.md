@@ -36,8 +36,8 @@ prose. The production roles own artifacts, rather than managing reporters.
 | Caslon | Artwork, desk chrome and page composition |
 | Pressman | Mechanical release checks, build and local staging |
 
-Each agent has a `SOUL.md` for identity, `AGENTS.md` for working boundaries,
-`RUNBOOK.md` for procedures and a `Spawnfile` for runtime configuration.
+Each agent has a `SOUL.md` for identity, `AGENTS.md` for its working rules and
+procedures, and a `Spawnfile` for runtime configuration.
 Durable memory lets agents retain experience and revisit earlier reporting.
 The [writing guide](WRITING.md) describes the paper's voice; [byline indexes](../content/bylines/) support recall.
 

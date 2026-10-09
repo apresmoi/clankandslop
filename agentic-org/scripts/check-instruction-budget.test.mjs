@@ -97,7 +97,7 @@ function sourceBundleEntries(repo) {
   return new Set(execFileSync('git', ['ls-files', '-z'], { cwd: repo, encoding: 'utf8' }).split('\0').filter(Boolean).filter((name) => !excluded(name)));
 }
 
-test('every identity is declared in instructions and every task runbook ships in the mounted source', () => {
+test('every agent compiles its whole prompt, and every file that prompt names ships in the mounted source', () => {
   const entries = sourceBundleEntries(path.resolve(orgRoot, '..'));
   assert.ok(entries.has('agentic-org/WRITING.md'));
   for (const agent of listAgents()) {
@@ -107,9 +107,14 @@ test('every identity is declared in instructions and every task runbook ships in
     const soul = manifest(`agents/${agent}/SOUL.md`);
     assert.ok(soul.trim().length > 0);
     assert.ok(instructions.includes(soul.trim()), `${agent} identity must reach instructions`);
-    assert.ok(instructions.includes(`repos/newsroom/agentic-org/agents/${agent}/RUNBOOK.md`));
-    for (const file of ['AGENTS.md', 'SOUL.md', 'RUNBOOK.md']) {
+    const prompt = manifest(`agents/${agent}/AGENTS.md`);
+    assert.ok(instructions.includes(prompt.trim()), `${agent} prompt must reach instructions whole`);
+    assert.doesNotMatch(instructions, /RUNBOOK\.md/u, `${agent} must not defer its procedure to a runbook file`);
+    for (const file of ['AGENTS.md', 'SOUL.md']) {
       assert.ok(entries.has(`agentic-org/agents/${agent}/${file}`), `${agent}/${file} missing from mounted source`);
+    }
+    for (const [, named] of instructions.matchAll(/repos\/newsroom\/([\w./-]+\.md)\b/gu)) {
+      assert.ok(entries.has(named), `${agent} names ${named}, which is missing from mounted source`);
     }
     const missingSoul = source.replace(', soul: SOUL.md', '');
     assert.notEqual(missingSoul, source);
@@ -170,4 +175,14 @@ test('the shared floor is a mounted document every brief that used it points at'
     const { instructions } = agentInstructions(agent);
     assert.ok(!instructions.includes('## The roster'), `${agent} still carries the floor inline`);
   }
+});
+
+// `spawnfile release` refuses a symlink anywhere in the workspace bundle, so
+// every tracked symlink (the CLAUDE.md links to AGENTS.md) must be excluded.
+test('the mounted source bundle contains no symlink', () => {
+  const repo = path.resolve(orgRoot, '..');
+  const entries = sourceBundleEntries(repo);
+  const links = execFileSync('git', ['ls-files', '-s', '-z'], { cwd: repo, encoding: 'utf8' }).split('\0').filter((line) => line.startsWith('120000 ')).map((line) => line.split('\t')[1]);
+  assert.ok(links.length > 0, 'expected the tracked CLAUDE.md links this test guards');
+  assert.deepEqual(links.filter((name) => entries.has(name)), []);
 });

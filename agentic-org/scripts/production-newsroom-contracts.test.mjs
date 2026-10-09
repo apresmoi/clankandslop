@@ -12,12 +12,15 @@ import { ASSIGNMENTS_MINIMUM, PASSED_ARTICLES_MINIMUM } from '../../ops/edition-
 // DAIMON_WAKE_ID when Daimon injects one, and the MCP layer's schemas
 // actually being typed (not `{}`) for every tool.
 
+// An agent's AGENTS.md is its one prompt: the procedure these contracts check
+// must be in the compiled file itself, never in a side file it points at.
 async function instructionText(file) {
   const text = await readFile(file, 'utf8');
   if (path.basename(file) !== 'AGENTS.md') return text;
   const role = path.basename(path.dirname(file));
-  assert.ok(text.includes(`repos/newsroom/agentic-org/agents/${role}/RUNBOOK.md`), `${role} must explicitly load its task runbook`);
-  return `${text}\n${await readFile(path.join(path.dirname(file), 'RUNBOOK.md'), 'utf8')}`;
+  assert.ok(!/RUNBOOK\.md/u.test(text), `${role} must not defer its procedure to a runbook file`);
+  await assert.rejects(readFile(path.join(path.dirname(file), 'RUNBOOK.md'), 'utf8'), { code: 'ENOENT' }, `${role} must keep its procedure in AGENTS.md`);
+  return text;
 }
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter unavailable; run the private integration gate' }, action);

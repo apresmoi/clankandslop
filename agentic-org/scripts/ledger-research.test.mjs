@@ -6,7 +6,7 @@ import { openDueCalls } from '../../ops/ledger-archive.mjs';
 const edition = '2026-10-07';
 const calls = [{ call: 'Alito remains off the bench for Suncor when argument begins on 5 October 2026', deadline: '2026-10-05' }, { call: 'YES if the IEA posts a 100 million barrel schedule by 16:00 UTC on 6 October 2026', deadline: '2026-10-06' }];
 
-test('Ledger asks the sensor itself, in the request its runbook names, with every call whole', () => {
+test('Ledger asks the sensor itself, in the request its instructions name, with every call whole', () => {
   const { texts, left } = ledgerResearchRequests(edition, calls);
   assert.equal(texts.length, 1);
   assert.equal(left, 0);
