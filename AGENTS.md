@@ -312,8 +312,9 @@ repository, and no change weakens a failed runtime check to make it pass.
 Inside `agentic-org/`, `AGENTS.md` means one thing: an agent's system prompt
 (`agents/<name>/AGENTS.md`). Folder guides are not kept there:
 
-- `agents/<name>/`: `Spawnfile`, `AGENTS.md` + `SOUL.md` (compiled; budget checked by
-  `scripts/check-instruction-budget.mjs`) and the mounted `RUNBOOK.md`. Shared rules
+- `agents/<name>/`: `Spawnfile` and `AGENTS.md` + `SOUL.md` (compiled; budget checked by
+  `scripts/check-instruction-budget.mjs`). `AGENTS.md` is the agent's one prompt:
+  no separate runbook file (`validate-org.mjs` refuses one). Shared rules
   live once in `FLOOR.md` and `WRITING.md`; never copy them into a brief.
 - `policies/`: machine-readable org policy read by `scripts/`. Change a value
   together with the tests that pin it.

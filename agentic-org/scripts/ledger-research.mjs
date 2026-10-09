@@ -21,7 +21,7 @@ export const LEDGER_REQUESTS_MAX = 3;
 const bytes = (text) => Buffer.byteLength(text, 'utf8');
 const HEAD = 'Which of these forecast calls has resolved? For each, give the dated, sourced outcome, or say none is published yet:';
 
-/** `ledger-<date>-due`, then `-due-2`, `-due-3`: the ids RUNBOOK and RESEARCH_ROUND_TRIP name. */
+/** `ledger-<date>-due`, then `-due-2`, `-due-3`: the ids Ledger's AGENTS.md and RESEARCH_ROUND_TRIP name. */
 export const ledgerRequestId = (edition, batch = 1) => `ledger-${edition}-due${batch > 1 ? `-${batch}` : ''}`;
 const line = (index, { call, deadline }) => ` (${index}) ${String(call).replace(/\s+/gu, ' ').trim()}${deadline ? ` [deadline ${deadline}]` : ''}`;
 

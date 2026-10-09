@@ -176,8 +176,7 @@ grep it, never read it whole.
 
 Never `ls`. Never open a whole desk, a directory of filings, or a SKILL.md
 file: there are no skill documents. Your AGENTS.md and SOUL.md are compiled
-instructions; your task runbook is
-`repos/newsroom/agentic-org/agents/<you>/RUNBOOK.md`. Shared references, read
+instructions and already hold your whole task procedure. Shared references, read
 when the task needs them: the editorial bar `repos/newsroom/agentic-org/WRITING.md`,
 the article contract `repos/newsroom/agentic-org/ARTICLE_FORMAT.md`, the sensor
 contract `repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`, Caslon's page

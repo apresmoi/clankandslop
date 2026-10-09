@@ -186,7 +186,7 @@ export function validateAgentDeclaration(agent, bytes, rootManifest = readRootMa
   const manifest = parseManifest(bytes);
   const engineErrors = engineDeclarationFindings(agent, engine, manifest);
   assert(engineErrors.length === 0, engineErrors.join('; '));
-  assert(JSON.stringify(manifest.workspace?.docs) === JSON.stringify({system: 'AGENTS.md', soul: 'SOUL.md'}), `${agent} must compile AGENTS.md and SOUL.md, leaving task details in the mounted RUNBOOK.md`);
+  assert(JSON.stringify(manifest.workspace?.docs) === JSON.stringify({system: 'AGENTS.md', soul: 'SOUL.md'}), `${agent} must compile AGENTS.md and SOUL.md`);
   const attention = manifest.runtime?.options?.attention;
   assert(attention && ['max_batch_messages', 'max_batch_bytes', 'max_executions', 'max_tokens'].every(key => Number.isSafeInteger(attention[key]) && attention[key] > 0), `${agent} explicit bounded attention declaration required`);
   assert(execution.includes('sandbox:\n    mode: workspace'), `${agent} workspace sandbox declaration invalid`);
@@ -341,7 +341,7 @@ export function validateRuntimeBindings(root = orgRoot) {
   }
 }
 
-export function validateTree() { for (const agent of agents) { for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md', 'RUNBOOK.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); assert(!existsSync(resolve(orgRoot, 'agents', agent, 'CLAUDE.md')), `${agent} has a CLAUDE.md: an agent's AGENTS.md is its prompt, not a guide for coding agents`); } const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
+export function validateTree() { for (const agent of agents) { for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); assert(!existsSync(resolve(orgRoot, 'agents', agent, 'RUNBOOK.md')), `${agent} has a RUNBOOK.md: AGENTS.md is the agent's one prompt, so task procedure belongs there`); assert(!existsSync(resolve(orgRoot, 'agents', agent, 'CLAUDE.md')), `${agent} has a CLAUDE.md: an agent's AGENTS.md is its prompt, not a guide for coding agents`); } const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
 export function validateSchedule() {
   const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
   assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '18:00' && schedule.effective_from === '2026-09-09', 'schedule zone or deadline invalid');

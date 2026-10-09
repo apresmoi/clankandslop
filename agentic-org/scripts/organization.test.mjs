@@ -11,14 +11,14 @@ import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
 import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
 import { effectiveAgentManifest, readRootManifest } from './effective-mcp.mjs';
-import { PUBLISHER_TOOLS, engineByAgent, researchCorpusReaders, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateLifecycle, validateManifest, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule } from './validate-org.mjs';
+import { PUBLISHER_TOOLS, engineByAgent, researchCorpusReaders, validateAgentDeclaration, validateNoPublishingCredential, validatePublisherSurface, validateEditorialContracts, validateLifecycle, validateManifest, validateMessage, validateRootDeclaration, validateRuntimeBindings, validateSchedule, validateTree } from './validate-org.mjs';
 
 // Synthetic newsroom inputs: one daily cycle of lifecycle messages, a corpus
 // manifest, the release receipts and every persona's voice boundary.
 const testdata = () => JSON.parse(readFileSync(new URL('./organization.testdata.json', import.meta.url), 'utf8'));
 const messages = () => testdata().dailyCycle;
 const receipts = () => testdata().lifecycleReceipts;
-const readVestaDocs = () => ['AGENTS.md', 'RUNBOOK.md'].map((file) => readFileSync(resolve(import.meta.dirname, '../agents/vesta', file), 'utf8')).join('\n');
+const readVestaDocs = () => readFileSync(resolve(import.meta.dirname, '../agents/vesta/AGENTS.md'), 'utf8');
 const validate = (items) => { const prior = []; for (const item of items) { validateMessage(item, prior); prior.push(item); } };
 const admittedEnv = (root) => {
   const env = { CLANK_PRIVATE_ROOT: root, CLANK_BROKER_READY: 'yes', CLANK_MOLTNET_READY: 'yes', CLANK_NETWORK_POLICY_READY: 'yes', CLANK_GIT_POLICY_READY: 'yes' };
@@ -180,7 +180,7 @@ test('all six reporter declarations reject broken validation identity, tools and
       const changed = structuredClone(root); mutate(validation(changed));
       assert.throws(() => validateAgentDeclaration(agent, source, changed), /validation/u, `${agent}: ${name}`);
     }
-    const doc = ['AGENTS.md', 'RUNBOOK.md'].map(file => readFileSync(resolve(import.meta.dirname, `../agents/${agent}/${file}`), 'utf8')).join('\n').replace(/\s+/gu, ' ');
+    const doc = readFileSync(resolve(import.meta.dirname, `../agents/${agent}/AGENTS.md`), 'utf8').replace(/\s+/gu, ' ');
     for (const phrase of ['ARTICLE_FORMAT.md', 'mcp_validation_validate_article', '{edition, article}', 'complete candidate', 'revalidate in the same wake', 'before any durable write', 'not proof of a source or quote', `"agents": ["${agent[0].toUpperCase()}${agent.slice(1)}"]`]) assert.ok(doc.includes(phrase), `${agent} needs ${phrase}`);
   }
 });
@@ -226,7 +226,7 @@ test('the newsroom tools that read the research corpus declare its mount', () =>
 
 test('production roles declare exact newsroom tools and carry the folded editorial rules',()=>{const expected={klaxon:['qualify_signal'],brass:['record_assignment','record_freshness_check'],cogsworth:['file_article','record_dissent','record_freshness_check'],sprockett:['file_article','record_dissent','record_freshness_check'],foreman:['file_article','record_dissent','record_freshness_check'],graves:['file_article','record_dissent','record_freshness_check'],tinkerton:['file_article','record_dissent','record_freshness_check'],vesta:['file_article','record_dissent','record_freshness_check'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};// Skill documents are gone: six reporters used to `cat` two or three
 // identical SKILL.md files at the top of every wake. Their content now
-// lives in compiled working boundaries and the linked task runbook.
+// lives in the compiled AGENTS.md.
 // No agent declares a skill; ownership and source truth remain in the prefix.
 const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricate provenance'];for(const[agent,tools]of Object.entries(expected)){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.match(source,/environment:\n  mcp_servers:/u);const newsroom=effectiveAgentManifest(agent,source).environment.mcp_servers.find(item=>item.name==='newsroom');assert.equal(newsroom?.transport,'stdio',agent);assert.equal(newsroom?.command,'/usr/local/bin/node',agent);assert.deepEqual(newsroom?.tools,tools,agent);for(const tool of tools)assert.match(source,new RegExp(`tools: \\[[^\\]]*${tool}`,'u'));assert.doesNotMatch(source,/^  skills:/mu,`${agent} must not declare a skill document`);assert.doesNotMatch(source,/SKILL\.md/u);const doc=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/AGENTS.md`),'utf8').replace(/\s+/gu,' ').toLowerCase();if(['cogsworth','sprockett','foreman','graves','tinkerton','vesta'].includes(agent))for(const phrase of foldedIntoAgentsMd)assert.ok(doc.includes(phrase),`${agent} AGENTS.md lost the folded skill rule: ${phrase}`);assert.doesNotMatch(source,/clankandslop-private|deep-research|ChatGPT|Grok\.com/u);}});
 // The composition floor is DERIVED here, never spelled. This test asserted the
@@ -254,7 +254,7 @@ test('production declarations build their bundles from public inputs and pin not
 // identity record and the call-time corpus refusals in scripts/corpus-contract.mjs.
 test('no declaration pins the research corpus as a bundle any more',()=>{for(const agent of agents){const source=readFileSync(resolve(import.meta.dirname,`../agents/${agent}/Spawnfile`),'utf8');assert.doesNotMatch(source,/newsroom-private\.tar/u,`${agent} still pins the corpus as an image bundle`);}const root=readFileSync(resolve(import.meta.dirname,'../Spawnfile'),'utf8');assert.match(root,/kind: volume\n\s+name: clank-newsroom-corpus/u,'the corpus must be declared once, team-shared, on the root');});
 test('receipt references reject hostile path components',()=>{const source=receipts();for(const ref of ['state/edition/receipts/has space','state/edition/receipts/Upper','state/edition/receipts/back\\slash','state/edition/receipts/é','state/edition/receipts/../bad','state/edition/receipts//bad','state/edition/receipts/bad/','state/edition/receipts/./bad']){const changed=structuredClone(source);changed[1].receipt_ref=ref;assert.throws(()=>validateLifecycle(changed),/reference/,ref);}const accepted=structuredClone(source);accepted[1].receipt_ref='state/edition/receipts/lower-case_1.0/file.json';assert.doesNotThrow(()=>validateLifecycle(accepted));});
-test('Vesta and DATA boundary mutations fail closed',()=>{const vesta=['AGENTS.md','RUNBOOK.md'].map(file=>readFileSync(resolve(import.meta.dirname,'../agents/vesta',file),'utf8')).join('\n');const data=readFileSync(resolve(import.meta.dirname,'../OPERATIONS.md'),'utf8');const voices=testdata().voiceBoundaries;assert.doesNotThrow(()=>validateEditorialContracts(vesta,data,voices));for(const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike'])assert.throws(()=>validateEditorialContracts(vesta.replaceAll(phrase,'removed'),data,voices),/Vesta constraint/);assert.throws(()=>validateEditorialContracts(vesta,data.replace('public content: read-only','public content: mutable'),voices),/DATA boundary/);const forged=structuredClone(voices);forged.vesta.bad='A fine pattern.';assert.throws(()=>validateEditorialContracts(vesta,data,forged),/Vesta voice/);});
+test('Vesta and DATA boundary mutations fail closed',()=>{const vesta=readFileSync(resolve(import.meta.dirname,'../agents/vesta/AGENTS.md'),'utf8');const data=readFileSync(resolve(import.meta.dirname,'../OPERATIONS.md'),'utf8');const voices=testdata().voiceBoundaries;assert.doesNotThrow(()=>validateEditorialContracts(vesta,data,voices));for(const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike'])assert.throws(()=>validateEditorialContracts(vesta.replaceAll(phrase,'removed'),data,voices),/Vesta constraint/);assert.throws(()=>validateEditorialContracts(vesta,data.replace('public content: read-only','public content: mutable'),voices),/DATA boundary/);const forged=structuredClone(voices);forged.vesta.bad='A fine pattern.';assert.throws(()=>validateEditorialContracts(vesta,data,forged),/Vesta voice/);});
 test('root declaration keeps Moltnet durable, authenticated, direct and secret-backed', () => {
   const root = readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8');
   assert.doesNotThrow(() => validateRootDeclaration(root));
@@ -457,4 +457,13 @@ test('the corpus and private-tools feeds keep the newsroom rules and add nothing
   assert.deepEqual(tools.feed.prepare.command, ['node', '.feed/bundles/private-tools-prepare.mjs']);
   // The image's bundles never reach into the private checkout.
   for (const resource of resources.filter((item) => item.kind === 'bundle')) assert.doesNotMatch(JSON.stringify(resource), /clankandslop-private/u, resource.id);
+});
+
+// One prompt per agent: a task file beside AGENTS.md is how procedure drifts
+// out of the compiled instructions, so the tree refuses one.
+test('an agent folder with a RUNBOOK.md fails validation', () => {
+  assert.doesNotThrow(() => validateTree());
+  const stray = resolve(import.meta.dirname, '../agents/vesta/RUNBOOK.md');
+  writeFileSync(stray, '# stray\n');
+  try { assert.throws(() => validateTree(), /vesta has a RUNBOOK.md/u); } finally { rmSync(stray, { force: true }); }
 });
