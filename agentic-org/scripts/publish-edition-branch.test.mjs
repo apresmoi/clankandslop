@@ -391,9 +391,12 @@ test('a real push creates the edition branch and leaves main exactly where it wa
   assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%aI', result.commit], { encoding: 'utf8' }).trim(), '2026-09-09T18:00:00+02:00');
 });
 
-test('the edition\'s World Desk trace is published with it, and only that one file outside the edition', async () => {
+test('the edition\'s World Desk log entry is published with it, and nothing else outside the edition', async () => {
   const origin = remote();
   const staged = stagedEdition('2026-09-10');
+  mkdirSync(join(staged.source, 'desk'), { recursive: true });
+  writeFileSync(join(staged.source, 'desk', 'ledger.worlddesk.json'), '{"world_desk":{"from":"content/log/2026-09-10/worlddesk.json"},"summary":"desk prose"}\n');
+  writeFileSync(join(staged.source, 'desk', 'caslon.weather.json'), '{"weather":{}}\n');
   const work = scratch('work');
   const trace = join(scratch('trace'), 'worlddesk.json');
   writeFileSync(trace, '{"version":"clank.worlddesk-trace.v1","edition":"2026-09-10"}\n');
@@ -403,7 +406,8 @@ test('the edition\'s World Desk trace is published with it, and only that one fi
   });
   assert.match(execFileSync('git', ['-C', origin.url, 'show', `${result.commit}:content/log/2026-09-10/worlddesk.json`], { encoding: 'utf8' }), /"edition":"2026-09-10"/u);
   const changed = execFileSync('git', ['-C', origin.url, 'show', '--name-only', '--format=', result.commit], { encoding: 'utf8' }).trim().split('\n');
-  assert.deepEqual(changed.filter((name) => !name.startsWith('content/editions/') && !name.startsWith('content/bylines/')), ['content/log/2026-09-10/worlddesk.json']);
+  assert.deepEqual(changed.filter((name) => !name.startsWith('content/editions/') && !name.startsWith('content/bylines/')).sort(), ['content/log/2026-09-10/caslon.weather.json', 'content/log/2026-09-10/ledger.worlddesk.json', 'content/log/2026-09-10/worlddesk.json']);
+  assert.deepEqual(Object.keys(JSON.parse(execFileSync('git', ['-C', origin.url, 'show', `${result.commit}:content/log/2026-09-10/ledger.worlddesk.json`], { encoding: 'utf8' }))), ['world_desk']);
 });
 
 test('a push aimed at main is refused before git runs and the remote is untouched', async () => {

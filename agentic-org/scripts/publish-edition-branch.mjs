@@ -224,6 +224,16 @@ const git = (args, { home, sshCommand, date }) => new Promise((resolve, reject) 
 // derive from a prior World Desk whose trace was never published, which is how
 // 2026-10-10 stalled. Only that exact path rides along; nothing else widens.
 export const tracePathFor = (edition) => path.posix.join('content', 'log', edition, 'worlddesk.json');
+export const logEntryPaths = (edition) => ['worlddesk.json', 'ledger.worlddesk.json', 'caslon.weather.json'].map((name) => path.posix.join('content', 'log', edition, name));
+
+async function writeLogEntry(workdir, editionSource, edition, traceSource) {
+  const dir = path.join(workdir, 'content', 'log', edition);
+  await mkdir(dir, { recursive: true });
+  await cp(traceSource, path.join(dir, 'worlddesk.json'));
+  const ledger = JSON.parse(await readFile(path.join(editionSource, 'desk', 'ledger.worlddesk.json'), 'utf8'));
+  await writeFile(path.join(dir, 'ledger.worlddesk.json'), `${JSON.stringify({ world_desk: ledger.world_desk }, undefined, 2)}\n`);
+  await cp(path.join(editionSource, 'desk', 'caslon.weather.json'), path.join(dir, 'caslon.weather.json'));
+}
 
 export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, traceSource, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false }) {
   assertPushableRef(branch);
@@ -241,11 +251,10 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   await rm(path.join(workdir, scoped), { recursive: true, force: true });
   await mkdir(path.dirname(path.join(workdir, scoped)), { recursive: true });
   await cp(editionSource, path.join(workdir, scoped), { recursive: true });
-  const traced = traceSource === undefined ? [] : [tracePathFor(branch.slice('edition/'.length))];
-  for (const trace of traced) {
-    await mkdir(path.dirname(path.join(workdir, trace)), { recursive: true });
-    await cp(traceSource, path.join(workdir, trace));
-  }
+  // A log entry is the trace plus the two desk documents it substantiates,
+  // as content/log/<date>/ has always held them (ops/worlddesk-artifacts.test.mjs).
+  const traced = traceSource === undefined ? [] : logEntryPaths(branch.slice('edition/'.length));
+  if (traceSource !== undefined) await writeLogEntry(workdir, editionSource, branch.slice('edition/'.length), traceSource);
   // Inside the edition directory, so the host's assertion rides along in the one
   // pathspec the commit already carries: nothing about what may be committed or
   // pushed widens by a byte. Written before `add`, so it is part of the tree the
