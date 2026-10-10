@@ -1,0 +1,970 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-09",
+  "generated_at": "2026-10-09T07:50:50Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 125.44,
+        "observed_at": "2026-10-06",
+        "stale_days": 3,
+        "contributes": 3,
+        "reason": "125.44 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 96.24,
+        "observed_at": "2026-10-06",
+        "stale_days": 3,
+        "contributes": 1,
+        "reason": "96.24 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.199,
+        "observed_at": "2026-10-05",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "6.199 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.03,
+        "observed_at": "2026-10-06",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "3.03 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 15.01,
+        "observed_at": "2026-10-06",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "15.01 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.03,
+        "observed_at": "2026-10-06",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "3.03 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.3848,
+        "observed_at": "2026-10-02",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "121.3848 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-08T10:50:55Z",
+        "http_status": 200,
+        "bytes": 170003,
+        "sha256": "ed1eaa6fd4a95178f922ac8673890d4b39029681be8ad498087545a8accdaaba",
+        "cached": true
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-08T10:50:56Z",
+        "http_status": 200,
+        "bytes": 175782,
+        "sha256": "0440ec6862dccc8c753a91d63d287808e086e4b4f1267515b9e90209f3f2e061",
+        "cached": true
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-08T10:50:56Z",
+        "http_status": 200,
+        "bytes": 28908,
+        "sha256": "aca8fefdbb54bdf16a2ab2c225d8b1f59c033e04d6fb96d8c232c3cc45417bdf",
+        "cached": true
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-08T10:50:56Z",
+        "http_status": 200,
+        "bytes": 116073,
+        "sha256": "d92a00ae2db57058127c6548af5dd9ce5984c04f949f3eafd050fad284b1037b",
+        "cached": true
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-08T10:50:56Z",
+        "http_status": 200,
+        "bytes": 161493,
+        "sha256": "2f5c1214537be30fbf01e26d0a0b4ec79624ba5858e0c8bc6c9da31eb8f5d5b4",
+        "cached": true
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-08T10:50:56Z",
+        "http_status": 200,
+        "bytes": 12686,
+        "sha256": "bdcc75849281bd918233ff1d076ad4725722b2ef5d51f7ff04bad8ffb81942f6",
+        "cached": true
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-08T10:50:56Z",
+        "http_status": 200,
+        "bytes": 104537,
+        "sha256": "75edd28ba1eceade938fa6621edfebc4d4e9cbcc846c6f07be27f8aef0ead321",
+        "cached": true
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 37,
+    "open_conflicts": 3,
+    "watch": 4,
+    "dormant": 6,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-3a77d1ca",
+            "story_title": "Middle East: Trump closes the pre-midterm U.S.-strike gate, oil reprices, but a Houthi-claimed Riyadh…",
+            "source": "chatgpt/chatgpt-rolling-2123.md",
+            "slot": "2123",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+            "source_urls": [
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://www.reuters.com/business/energy/oil-rises-middle-east-supply-concerns-persist-amid-shipping-attacks-2026-10-08/",
+              "https://www.reuters.com/business/energy/oil-rises-middle-east-supply-concerns-persist-amid-shipping-attacks-2026-10-08/",
+              "https://www.reuters.com/business/energy/oil-rises-middle-east-supply-concerns-persist-amid-shipping-attacks-2026-10-08/",
+              "https://apnews.com/article/israel-consulate-britain-mideast-october-8-2026-c7a446e1bd01966f19b88af07149c3d5",
+              "https://apnews.com/article/israel-consulate-britain-mideast-october-8-2026-c7a446e1bd01966f19b88af07149c3d5",
+              "https://apnews.com/article/israel-consulate-britain-mideast-october-8-2026-c7a446e1bd01966f19b88af07149c3d5",
+              "https://sa.usembassy.gov/security-alert-u-s-mission-saudi-arabia-october-8-2026/"
+            ],
+            "observed_at": "2026-10-08T19:23:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-829c4223",
+            "story_title": "Pentagon told to finish preparations for renewed Iran strikes — exceptional, thin on open text",
+            "source": "grok/grok-rolling-1545.md",
+            "slot": "1545",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.timesofisrael.com/us-military-told-to-prepare-for-potential-resumption-of-iran-strikes-reports/",
+            "source_urls": [
+              "https://www.timesofisrael.com/us-military-told-to-prepare-for-potential-resumption-of-iran-strikes-reports/",
+              "https://www.timesofisrael.com/us-military-told-to-prepare-for-potential-resumption-of-iran-strikes-reports/",
+              "https://www.timesofisrael.com/us-military-told-to-prepare-for-potential-resumption-of-iran-strikes-reports/",
+              "https://www.timesofisrael.com/us-military-told-to-prepare-for-potential-resumption-of-iran-strikes-reports/",
+              "https://www.timesofisrael.com/us-military-told-to-prepare-for-potential-resumption-of-iran-strikes-reports/",
+              "https://www.axios.com/2026/10/07/trump-us-central-command-iran-israel-war-elections",
+              "https://www.axios.com/2026/10/07/trump-us-central-command-iran-israel-war-elections",
+              "https://today.lorientlejour.com/article/1550099/pentagon-asks-centcom-to-prepare-for-renewed-strikes-on-iran-according-to-axios.html"
+            ],
+            "observed_at": "2026-10-08T13:45:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-90a0bcb3",
+            "story_title": "USS Abraham Lincoln docks in San Diego after the Iran deployment",
+            "source": "grok/grok-rolling-2142.md",
+            "slot": "2142",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+            "source_urls": [
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.sandiegouniontribune.com/2026/10/08/uss-abraham-lincoln-returns-to-san-diego-after-long-combat-deployment-in-middle-east/",
+              "https://www.kpbs.org/news/military/2026/10/07/uss-abraham-lincoln-returning-to-san-diego-after-extended-iran-deployment",
+              "https://www.kpbs.org/news/military/2026/10/07/uss-abraham-lincoln-returning-to-san-diego-after-extended-iran-deployment",
+              "https://www.kpbs.org/news/military/2026/10/07/uss-abraham-lincoln-returning-to-san-diego-after-extended-iran-deployment",
+              "https://www.kpbs.org/news/military/2026/10/07/uss-abraham-lincoln-returning-to-san-diego-after-extended-iran-deployment",
+              "https://www.kpbs.org/news/military/2026/10/07/uss-abraham-lincoln-returning-to-san-diego-after-extended-iran-deployment",
+              "https://www.kpbs.org/news/military/2026/10/07/uss-abraham-lincoln-returning-to-san-diego-after-extended-iran-deployment",
+              "https://www.kpbs.org/news/military/2026/10/07/uss-abraham-lincoln-returning-to-san-diego-after-extended-iran-deployment"
+            ],
+            "observed_at": "2026-10-08T19:42:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-afa3fba4",
+            "story_title": "Trump says the United States will not attack Iran before the 3 November midterms",
+            "source": "grok/grok-rolling-1842.md",
+            "slot": "1842",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+            "source_urls": [
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/08/trump-says-he-will-not-attack-before-us-elections-in-november",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/08/trump-says-he-will-not-attack-before-us-elections-in-november",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/08/trump-says-he-will-not-attack-before-us-elections-in-november",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/08/trump-says-he-will-not-attack-before-us-elections-in-november",
+              "https://www.informnny.com/news/politics/ap-trump-says-us-will-not-resume-military-strikes-on-iran-before-the-nov-3-midterm-elections/"
+            ],
+            "observed_at": "2026-10-08T16:42:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 5,
+        "evidence": [
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-1a00e127",
+            "story_title": "UK sanctions package on Miliband’s first Kyiv visit — clock caveat",
+            "source": "grok/grok-rolling-2142.md",
+            "slot": "2142",
+            "matched": [
+              "Kyiv"
+            ],
+            "source_url": "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+            "source_urls": [
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.gov.uk/government/news/you-cannot-wait-us-out-miliband-tells-putin-during-first-visit-to-ukraine-as-foreign-secretary",
+              "https://www.dpa-international.com/politics/urn:newsml:dpa.com:20090101:261008-930-810640",
+              "https://www.dpa-international.com/politics/urn:newsml:dpa.com:20090101:261008-930-810640",
+              "https://www.dpa-international.com/politics/urn:newsml:dpa.com:20090101:261008-930-810640",
+              "https://www.dpa-international.com/politics/urn:newsml:dpa.com:20090101:261008-930-810640",
+              "https://www.dpa-international.com/politics/urn:newsml:dpa.com:20090101:261008-930-810640",
+              "https://www.dpa-international.com/politics/urn:newsml:dpa.com:20090101:261008-930-810640"
+            ],
+            "observed_at": "2026-10-08T19:42:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-59746f3b",
+            "story_title": "Ukraine: Kramatorsk bus-strike toll rose to thirty and authorities stopped local transit",
+            "source": "chatgpt/chatgpt-rolling-2123.md",
+            "slot": "2123",
+            "matched": [
+              "Ukraine",
+              "Donetsk"
+            ],
+            "source_url": "https://dn.gov.ua/news/u-kramatorskii-ta-slovianskii-hromadakh-zupyniaiut-rukh-hromadskoho-transportu",
+            "source_urls": [
+              "https://dn.gov.ua/news/u-kramatorskii-ta-slovianskii-hromadakh-zupyniaiut-rukh-hromadskoho-transportu",
+              "https://dn.gov.ua/news/u-kramatorskii-ta-slovianskii-hromadakh-zupyniaiut-rukh-hromadskoho-transportu",
+              "https://dn.gov.ua/news/u-kramatorskii-ta-slovianskii-hromadakh-zupyniaiut-rukh-hromadskoho-transportu",
+              "https://apnews.com/article/russia-ukraine-war-drones-missiles-zelenskyy-putin-7f395d215bb67082da29f9c4467ef776",
+              "https://apnews.com/article/russia-ukraine-war-drones-missiles-zelenskyy-putin-7f395d215bb67082da29f9c4467ef776",
+              "https://apnews.com/article/russia-ukraine-war-drones-missiles-zelenskyy-putin-7f395d215bb67082da29f9c4467ef776",
+              "https://www.theguardian.com/world/2026/oct/08/russian-attack-buses-ukraine-frontline-kramatorsk",
+              "https://www.theguardian.com/world/2026/oct/08/russian-attack-buses-ukraine-frontline-kramatorsk",
+              "https://www.theguardian.com/world/2026/oct/08/russian-attack-buses-ukraine-frontline-kramatorsk",
+              "https://gp.gov.ua/ua/posts/u-kramatorsku-rosiiski-viiska-atakuvali-reisovii-avtobus-12-zagiblix-ta-13-poranenix"
+            ],
+            "observed_at": "2026-10-08T19:23:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-986c4a01",
+            "story_title": "Kramatorsk bus strike toll revised to 33 dead, 18 injured",
+            "source": "grok/grok-rolling-1545.md",
+            "slot": "1545",
+            "matched": [
+              "Kyiv",
+              "Donetsk"
+            ],
+            "source_url": "https://www.ukrinform.net/rubric-ato/4172298-death-toll-from-russian-strike-on-two-buses-in-kramatorsk-rises-to-33-18-injured.html",
+            "source_urls": [
+              "https://www.ukrinform.net/rubric-ato/4172298-death-toll-from-russian-strike-on-two-buses-in-kramatorsk-rises-to-33-18-injured.html",
+              "https://www.ukrinform.net/rubric-ato/4172298-death-toll-from-russian-strike-on-two-buses-in-kramatorsk-rises-to-33-18-injured.html",
+              "https://www.ukrinform.net/rubric-ato/4172298-death-toll-from-russian-strike-on-two-buses-in-kramatorsk-rises-to-33-18-injured.html",
+              "https://www.ukrinform.net/rubric-ato/4172298-death-toll-from-russian-strike-on-two-buses-in-kramatorsk-rises-to-33-18-injured.html",
+              "https://www.ukrinform.net/rubric-ato/4172298-death-toll-from-russian-strike-on-two-buses-in-kramatorsk-rises-to-33-18-injured.html",
+              "https://www.ukrinform.net/rubric-ato/4172298-death-toll-from-russian-strike-on-two-buses-in-kramatorsk-rises-to-33-18-injured.html",
+              "https://www.aljazeera.com/news/2026/10/8/russia-attack-in-ukraines-kramatorsk-kills-12",
+              "https://www.aljazeera.com/news/2026/10/8/russia-attack-in-ukraines-kramatorsk-kills-12",
+              "https://www.aljazeera.com/news/2026/10/8/russia-attack-in-ukraines-kramatorsk-kills-12",
+              "https://www.aljazeera.com/news/2026/10/8/russia-attack-in-ukraines-kramatorsk-kills-12",
+              "https://www.aljazeera.com/news/2026/10/8/russia-attack-in-ukraines-kramatorsk-kills-12",
+              "https://www.aljazeera.com/news/2026/10/8/russia-attack-in-ukraines-kramatorsk-kills-12",
+              "https://www.aljazeera.com/news/2026/10/8/russia-attack-in-ukraines-kramatorsk-kills-12",
+              "https://meduza.io/en/news/2026/10/08/russian-strike-on-two-passenger-buses-in-ukraine-s-kramatorsk-kills-33",
+              "https://meduza.io/en/news/2026/10/08/russian-strike-on-two-passenger-buses-in-ukraine-s-kramatorsk-kills-33",
+              "https://meduza.io/en/news/2026/10/08/russian-strike-on-two-passenger-buses-in-ukraine-s-kramatorsk-kills-33",
+              "https://meduza.io/en/news/2026/10/08/russian-strike-on-two-passenger-buses-in-ukraine-s-kramatorsk-kills-33"
+            ],
+            "observed_at": "2026-10-08T13:45:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-c15224bf",
+            "story_title": "Russian glide bomb hits two passenger buses in Kramatorsk; toll rising past 30",
+            "source": "grok/grok-rolling-1241.md",
+            "slot": "1241",
+            "matched": [
+              "Kyiv",
+              "Donetsk"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/c875pwq134l3o",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/c875pwq134l3o",
+              "https://www.bbc.com/news/articles/c875pwq134l3o",
+              "https://www.bbc.com/news/articles/c875pwq134l3o",
+              "https://www.bbc.com/news/articles/c875pwq134l3o",
+              "https://www.bbc.com/news/articles/c875pwq134l3o",
+              "https://www.bbc.com/news/articles/c875pwq134l3o",
+              "https://www.bbc.com/news/articles/c875pwq134l3o",
+              "https://english.aawsat.com/world/5327333-death-toll-russian-bus-strike-eastern-ukraine-jumps-30",
+              "https://english.aawsat.com/world/5327333-death-toll-russian-bus-strike-eastern-ukraine-jumps-30",
+              "https://english.aawsat.com/world/5327333-death-toll-russian-bus-strike-eastern-ukraine-jumps-30",
+              "https://english.aawsat.com/world/5327333-death-toll-russian-bus-strike-eastern-ukraine-jumps-30",
+              "https://kyivindependent.com/at-least-12-dead-after-russian-glide-bomb-strikes-kramatorsk-bus-stop/"
+            ],
+            "observed_at": "2026-10-08T10:41:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-ee129e9f",
+            "story_title": "Britain adds a broad Russia package spanning oil producers, twelve tankers, crypto rails and military inputs",
+            "source": "chatgpt/chatgpt-rolling-1513.md",
+            "slot": "1513",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.gov.uk/government/news/new-uk-sanctions-hit-the-money-oil-and-supply-chains-fuelling-russias-war",
+            "source_urls": [
+              "https://www.gov.uk/government/news/new-uk-sanctions-hit-the-money-oil-and-supply-chains-fuelling-russias-war",
+              "https://www.gov.uk/government/news/new-uk-sanctions-hit-the-money-oil-and-supply-chains-fuelling-russias-war",
+              "https://www.gov.uk/government/news/new-uk-sanctions-hit-the-money-oil-and-supply-chains-fuelling-russias-war",
+              "https://home.treasury.gov/news/press-releases/sb0225",
+              "https://home.treasury.gov/news/press-releases/sb0225",
+              "https://home.treasury.gov/news/press-releases/sb0225",
+              "https://www.consilium.europa.eu/en/press/press-releases/2026/07/23/21st-package-of-sanctions-eu-hits-russian-energy-financial-services-and-crypto-hard/",
+              "https://www.consilium.europa.eu/en/press/press-releases/2026/07/23/21st-package-of-sanctions-eu-hits-russian-energy-financial-services-and-crypto-hard/",
+              "https://www.consilium.europa.eu/en/press/press-releases/2026/07/23/21st-package-of-sanctions-eu-hits-russian-energy-financial-services-and-crypto-hard/",
+              "https://www.gov.uk/guidance/russia-list-of-designations-and-sanctions-notices",
+              "https://www.reuters.com/world/uk/uk-announces-new-round-russia-sanctions-targeting-financial-services-shadow-2026-10-08/"
+            ],
+            "observed_at": "2026-10-08T13:13:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-07 and drew no qualifying story today",
+        "last_open_edition": "2026-10-07",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-07",
+            "story_id": "s-2be355f3",
+            "story_title": "Third anniversary commemorations, NSC travel warning, and overnight Gaza strikes",
+            "source": "grok/grok-rolling-0944.md",
+            "slot": "0944",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.wral.com/news/ap/da708-israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-live-in-devastated-gaza/",
+            "source_urls": [
+              "https://www.wral.com/news/ap/da708-israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-live-in-devastated-gaza/",
+              "https://www.wral.com/news/ap/da708-israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-live-in-devastated-gaza/",
+              "https://www.wral.com/news/ap/da708-israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-live-in-devastated-gaza/",
+              "https://www.wral.com/news/ap/da708-israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-live-in-devastated-gaza/",
+              "https://www.wral.com/news/ap/da708-israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-live-in-devastated-gaza/",
+              "https://www.khaleejtimes.com/world/mena/israel-strikes-gaza-october-7-anniversary-2026-death-toll",
+              "https://www.khaleejtimes.com/world/mena/israel-strikes-gaza-october-7-anniversary-2026-death-toll",
+              "https://www.khaleejtimes.com/world/mena/israel-strikes-gaza-october-7-anniversary-2026-death-toll",
+              "https://www.nbcnews.com/world/middle-east/live-blog/live-updates-israel-marks-three-year-anniversary-oct-7-attack-rcna601912",
+              "https://www.nbcnews.com/world/middle-east/live-blog/live-updates-israel-marks-three-year-anniversary-oct-7-attack-rcna601912"
+            ],
+            "observed_at": "2026-10-07T07:44:00Z"
+          },
+          {
+            "edition": "2026-10-07",
+            "story_id": "s-5e5c20ea",
+            "story_title": "Israel’s calendar-date Oct. 7 commemorations open under election alert and a Katz vigilance order",
+            "source": "grok/grok-rolling-0350.md",
+            "slot": "0350",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.ynetnews.com/article/ryx0cagizx",
+            "source_urls": [
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.ynetnews.com/article/ryx0cagizx",
+              "https://www.laprovence.com/article/france-monde/30150354223323/avant-les-elections-israel-commemore-lattaque-du-7-octobre",
+              "https://www.laprovence.com/article/france-monde/30150354223323/avant-les-elections-israel-commemore-lattaque-du-7-octobre",
+              "https://www.laprovence.com/article/france-monde/30150354223323/avant-les-elections-israel-commemore-lattaque-du-7-octobre",
+              "https://www.laprovence.com/article/france-monde/30150354223323/avant-les-elections-israel-commemore-lattaque-du-7-octobre",
+              "https://www.laprovence.com/article/france-monde/30150354223323/avant-les-elections-israel-commemore-lattaque-du-7-octobre",
+              "https://www.laprovence.com/article/france-monde/30150354223323/avant-les-elections-israel-commemore-lattaque-du-7-octobre",
+              "https://www.reuters.com/business/media-telecom/spacex-seeks-40-billion-buy-nvidia-chips-ft-reports-2026-10-06/",
+              "https://www.bloomberg.com/news/articles/2026-10-06/spacex-seeking-to-raise-40-billion-to-buy-nvidia-chips-ft-says"
+            ],
+            "observed_at": "2026-10-07T01:50:00Z"
+          },
+          {
+            "edition": "2026-10-07",
+            "story_id": "s-f5aa4a78",
+            "story_title": "Israel marks three years; Gaza death claim still thin",
+            "source": "grok/grok-rolling-0649.md",
+            "slot": "0649",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.rte.ie/news/middle-east/2026/1007/1594333-middle-east/",
+            "source_urls": [
+              "https://www.rte.ie/news/middle-east/2026/1007/1594333-middle-east/",
+              "https://www.rte.ie/news/middle-east/2026/1007/1594333-middle-east/",
+              "https://www.rte.ie/news/middle-east/2026/1007/1594333-middle-east/",
+              "https://www.rte.ie/news/middle-east/2026/1007/1594333-middle-east/",
+              "https://www.bbc.co.uk/news/live/cq2e9kyzer2nt",
+              "https://www.bbc.co.uk/news/live/cq2e9kyzer2nt",
+              "https://www.ajc.com/news/2026/10/israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-grapple-with-war-it-sparked/",
+              "https://www.ajc.com/news/2026/10/israelis-mourn-on-the-anniversary-of-the-oct-7-attack-as-palestinians-grapple-with-war-it-sparked/",
+              "https://www.arabnews.com/node/3005003/middle-east"
+            ],
+            "observed_at": "2026-10-07T04:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-2f462148",
+            "story_title": "Houthis claim a Thursday hit on King Khalid airport; Saudia jet reported burned; Air India and Lufthansa…",
+            "source": "grok/grok-rolling-0650.md",
+            "slot": "0650",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.aljazeera.com/news/2026/10/8/saudi-led-coalition-says-it-intercepts-three-houthi-ballistic-missiles",
+              "https://www.theguardian.com/world/2026/oct/09/riyadh-airport-flights-suspended-houthis-claim-attack",
+              "https://www.theguardian.com/world/2026/oct/09/riyadh-airport-flights-suspended-houthis-claim-attack",
+              "https://www.theguardian.com/world/2026/oct/09/riyadh-airport-flights-suspended-houthis-claim-attack",
+              "https://www.theguardian.com/world/2026/oct/09/riyadh-airport-flights-suspended-houthis-claim-attack",
+              "https://www.theguardian.com/world/2026/oct/09/riyadh-airport-flights-suspended-houthis-claim-attack"
+            ],
+            "observed_at": "2026-10-09T04:50:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-376d61a8",
+            "story_title": "Türkiye publicly narrows its possible Saudi role to defensive support as the Makkah pact moves toward…",
+            "source": "chatgpt/chatgpt-rolling-1513.md",
+            "slot": "1513",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.dailysabah.com/politics/diplomacy/turkiye-rules-out-ops-against-houthis-vows-helping-saudi-defense",
+            "source_urls": [
+              "https://www.dailysabah.com/politics/diplomacy/turkiye-rules-out-ops-against-houthis-vows-helping-saudi-defense",
+              "https://www.arabnews.pk/saudi-arabia/pakistan-military-confirms-deployment-of-forces-to-saudi-arabia-under-makkah-pact-3003533",
+              "https://www.arabnews.pk/saudi-arabia/pakistan-military-confirms-deployment-of-forces-to-saudi-arabia-under-makkah-pact-3003533",
+              "https://www.arabnews.pk/saudi-arabia/pakistan-military-confirms-deployment-of-forces-to-saudi-arabia-under-makkah-pact-3003533",
+              "https://mofa.gov.pk/press-releases/joint-statementemergency-meeting-of-the-strategic-political-and-defense-committee-of-the-makkah-alliance-for-defense-riyadh-5-october-2026",
+              "https://mofa.gov.pk/press-releases/joint-statementemergency-meeting-of-the-strategic-political-and-defense-committee-of-the-makkah-alliance-for-defense-riyadh-5-october-2026",
+              "https://mofa.gov.pk/press-releases/joint-statementemergency-meeting-of-the-strategic-political-and-defense-committee-of-the-makkah-alliance-for-defense-riyadh-5-october-2026",
+              "https://ww.spa.gov.sa/N2649223",
+              "https://www.reuters.com/world/asia-pacific/turkeys-foreign-minister-says-ankara-weighing-saudi-defence-support-rules-out-2026-10-08/"
+            ],
+            "observed_at": "2026-10-08T13:13:00Z"
+          },
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-3a77d1ca",
+            "story_title": "Middle East: Trump closes the pre-midterm U.S.-strike gate, oil reprices, but a Houthi-claimed Riyadh…",
+            "source": "chatgpt/chatgpt-rolling-2123.md",
+            "slot": "2123",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+            "source_urls": [
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://apnews.com/article/trump-iran-war-midterms-attack-422b1799a1a06466279ac265f560e014",
+              "https://www.reuters.com/business/energy/oil-rises-middle-east-supply-concerns-persist-amid-shipping-attacks-2026-10-08/",
+              "https://www.reuters.com/business/energy/oil-rises-middle-east-supply-concerns-persist-amid-shipping-attacks-2026-10-08/",
+              "https://www.reuters.com/business/energy/oil-rises-middle-east-supply-concerns-persist-amid-shipping-attacks-2026-10-08/",
+              "https://apnews.com/article/israel-consulate-britain-mideast-october-8-2026-c7a446e1bd01966f19b88af07149c3d5",
+              "https://apnews.com/article/israel-consulate-britain-mideast-october-8-2026-c7a446e1bd01966f19b88af07149c3d5",
+              "https://apnews.com/article/israel-consulate-britain-mideast-october-8-2026-c7a446e1bd01966f19b88af07149c3d5",
+              "https://sa.usembassy.gov/security-alert-u-s-mission-saudi-arabia-october-8-2026/"
+            ],
+            "observed_at": "2026-10-08T19:23:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-41e068fc",
+            "story_title": "GlobalFoundries and TSMC strike a $2 billion U.S. interposer deal, with production targeted for 2028",
+            "source": "chatgpt/chatgpt-rolling-1513.md",
+            "slot": "1513",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://www.taiwannews.com.tw/news/6454735",
+            "source_urls": [
+              "https://www.taiwannews.com.tw/news/6454735",
+              "https://www.taiwannews.com.tw/news/6454735",
+              "https://www.taiwannews.com.tw/news/6454735",
+              "https://www.stocktitan.net/news/GFS/global-foundries-reaches-agreement-to-establish-u-s-based-supply-of-7qwxjvp41ohm.html",
+              "https://www.stocktitan.net/news/GFS/global-foundries-reaches-agreement-to-establish-u-s-based-supply-of-7qwxjvp41ohm.html",
+              "https://www.stocktitan.net/news/GFS/global-foundries-reaches-agreement-to-establish-u-s-based-supply-of-7qwxjvp41ohm.html",
+              "https://www.commerce.gov/news/press-releases/2025/01/us-department-commerce-announces-chips-incentives-awards-corning",
+              "https://www.commerce.gov/news/press-releases/2025/01/us-department-commerce-announces-chips-incentives-awards-corning",
+              "https://investors.gf.com/news-releases/news-release-details/globalfoundries-licenses-gan-technology-tsmc-accelerate-us",
+              "https://investors.gf.com/news-releases/news-release-details/globalfoundries-licenses-gan-technology-tsmc-accelerate-us",
+              "https://investors.gf.com/news-releases/news-release-details/globalfoundries-licenses-gan-technology-tsmc-accelerate-us",
+              "https://www.reuters.com/world/asia-pacific/globalfoundries-make-key-ai-chip-component-tsmc-2026-10-08/"
+            ],
+            "observed_at": "2026-10-08T13:13:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-04 and drew no qualifying story today",
+        "last_open_edition": "2026-10-04",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-04",
+            "story_id": "s-de8f9259",
+            "story_title": "North Korea’s Sunday state-media account says Saturday’s IRBM drill used AI to change a low-altitude path",
+            "source": "grok/grok-rolling-0949.md",
+            "slot": "0949",
+            "matched": [
+              "North Korea",
+              "Pyongyang"
+            ],
+            "source_url": "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/04/north-korea039s-kim-oversaw-launch-of-missile-that-uses-ai",
+            "source_urls": [
+              "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/04/north-korea039s-kim-oversaw-launch-of-missile-that-uses-ai",
+              "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/04/north-korea039s-kim-oversaw-launch-of-missile-that-uses-ai",
+              "https://www.afp.com/en/north-korea-says-test-intermediate-range-strategic-missile-included-use-ai-0"
+            ],
+            "observed_at": "2026-10-04T07:49:00Z"
+          },
+          {
+            "edition": "2026-10-04",
+            "story_id": "s-eed02b53",
+            "story_title": "KCNA says Kim oversaw an “AI” intermediate-range launch — just outside this window",
+            "source": "grok/grok-rolling-0646.md",
+            "slot": "0646",
+            "matched": [
+              "Pyongyang"
+            ],
+            "source_url": "https://www.koreaherald.com/article/10892762",
+            "source_urls": [
+              "https://www.koreaherald.com/article/10892762",
+              "https://www.koreaherald.com/article/10892762",
+              "https://www.koreaherald.com/article/10892762",
+              "https://www.arabnews.com/node/3004496/world",
+              "https://www.arabnews.com/node/3004496/world",
+              "https://www.thehindu.com/news/morning-digest-october-4-2026/article71541679.ece",
+              "https://www.thehindu.com/news/morning-digest-october-4-2026/article71541679.ece"
+            ],
+            "observed_at": "2026-10-04T04:46:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-09",
+            "story_id": "s-376d61a8",
+            "story_title": "Türkiye publicly narrows its possible Saudi role to defensive support as the Makkah pact moves toward…",
+            "source": "chatgpt/chatgpt-rolling-1513.md",
+            "slot": "1513",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://www.dailysabah.com/politics/diplomacy/turkiye-rules-out-ops-against-houthis-vows-helping-saudi-defense",
+            "source_urls": [
+              "https://www.dailysabah.com/politics/diplomacy/turkiye-rules-out-ops-against-houthis-vows-helping-saudi-defense",
+              "https://www.arabnews.pk/saudi-arabia/pakistan-military-confirms-deployment-of-forces-to-saudi-arabia-under-makkah-pact-3003533",
+              "https://www.arabnews.pk/saudi-arabia/pakistan-military-confirms-deployment-of-forces-to-saudi-arabia-under-makkah-pact-3003533",
+              "https://www.arabnews.pk/saudi-arabia/pakistan-military-confirms-deployment-of-forces-to-saudi-arabia-under-makkah-pact-3003533",
+              "https://mofa.gov.pk/press-releases/joint-statementemergency-meeting-of-the-strategic-political-and-defense-committee-of-the-makkah-alliance-for-defense-riyadh-5-october-2026",
+              "https://mofa.gov.pk/press-releases/joint-statementemergency-meeting-of-the-strategic-political-and-defense-committee-of-the-makkah-alliance-for-defense-riyadh-5-october-2026",
+              "https://mofa.gov.pk/press-releases/joint-statementemergency-meeting-of-the-strategic-political-and-defense-committee-of-the-makkah-alliance-for-defense-riyadh-5-october-2026",
+              "https://ww.spa.gov.sa/N2649223",
+              "https://www.reuters.com/world/asia-pacific/turkeys-foreign-minister-says-ankara-weighing-saudi-defence-support-rules-out-2026-10-08/"
+            ],
+            "observed_at": "2026-10-08T13:13:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-07",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}

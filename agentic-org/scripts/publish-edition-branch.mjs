@@ -218,7 +218,24 @@ const git = (args, { home, sshCommand, date }) => new Promise((resolve, reject) 
 // directory to it, and fast-forward pushes that one ref. `add`, `commit` and
 // `status` are all path-scoped to the edition directory, so nothing else in the
 // scratch tree can ride along in the commit.
-export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false }) {
+// The World Desk public trace the release staged beside the edition
+// (`content/log/<edition>/worlddesk.json`). It is the one file outside the
+// edition directory an edition publishes: tomorrow's Ledger filing refuses to
+// derive from a prior World Desk whose trace was never published, which is how
+// 2026-10-10 stalled. Only that exact path rides along; nothing else widens.
+export const tracePathFor = (edition) => path.posix.join('content', 'log', edition, 'worlddesk.json');
+export const logEntryPaths = (edition) => ['worlddesk.json', 'ledger.worlddesk.json', 'caslon.weather.json'].map((name) => path.posix.join('content', 'log', edition, name));
+
+async function writeLogEntry(workdir, editionSource, edition, traceSource) {
+  const dir = path.join(workdir, 'content', 'log', edition);
+  await mkdir(dir, { recursive: true });
+  await cp(traceSource, path.join(dir, 'worlddesk.json'));
+  const ledger = JSON.parse(await readFile(path.join(editionSource, 'desk', 'ledger.worlddesk.json'), 'utf8'));
+  await writeFile(path.join(dir, 'ledger.worlddesk.json'), `${JSON.stringify({ world_desk: ledger.world_desk }, undefined, 2)}\n`);
+  await cp(path.join(editionSource, 'desk', 'caslon.weather.json'), path.join(dir, 'caslon.weather.json'));
+}
+
+export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, traceSource, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false }) {
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
   const scoped = path.normalize(editionPath);
@@ -234,6 +251,10 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   await rm(path.join(workdir, scoped), { recursive: true, force: true });
   await mkdir(path.dirname(path.join(workdir, scoped)), { recursive: true });
   await cp(editionSource, path.join(workdir, scoped), { recursive: true });
+  // A log entry is the trace plus the two desk documents it substantiates,
+  // as content/log/<date>/ has always held them (ops/worlddesk-artifacts.test.mjs).
+  const traced = traceSource === undefined ? [] : logEntryPaths(branch.slice('edition/'.length));
+  if (traceSource !== undefined) await writeLogEntry(workdir, editionSource, branch.slice('edition/'.length), traceSource);
   // Inside the edition directory, so the host's assertion rides along in the one
   // pathspec the commit already carries: nothing about what may be committed or
   // pushed widens by a byte. Written before `add`, so it is part of the tree the
@@ -242,8 +263,8 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   // Whether the edition is worth a branch is still decided by the edition
   // directory alone: a re-run of an edition already on the base branch is
   // refused here, exactly as before, and never on generated-index drift.
-  await git(['-C', workdir, 'add', '--', scoped], options);
-  const staged = await git(['-C', workdir, 'status', '--porcelain', '--', scoped], options);
+  await git(['-C', workdir, 'add', '--', scoped, ...traced], options);
+  const staged = await git(['-C', workdir, 'status', '--porcelain', '--', scoped, ...traced], options);
   // Already on the base branch, byte for byte: the edition was published and
   // merged, and this is a second run of a timer that fires every night. That is
   // a SUCCESS with nothing to do, not a failure — a nightly alarm for "the
@@ -258,14 +279,14 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   // Asked as "what is staged OUTSIDE the content paths", so the answer that lets
   // the commit through is an empty one: this job's git output is capped, and a
   // truncated list of everything could hide the one path that matters.
-  const stagedPaths = (await git(['-C', workdir, '-c', 'core.quotePath=false', 'diff', '--cached', '--no-renames', '--name-only', '-z', 'HEAD', '--', '.', ...PUBLIC_CONTENT_PATHS.map((prefix) => `:(exclude)${prefix}`)], options)).split('\0').filter(Boolean);
+  const stagedPaths = (await git(['-C', workdir, '-c', 'core.quotePath=false', 'diff', '--cached', '--no-renames', '--name-only', '-z', 'HEAD', '--', '.', ...PUBLIC_CONTENT_PATHS.map((prefix) => `:(exclude)${prefix}`), ...traced.map((trace) => `:(exclude)${trace}`)], options)).split('\0').filter(Boolean);
   const outside = contentOnlyFindings(stagedPaths);
   if (outside.length) throw new Error(`refusing to commit edition ${branch}: ${outside.join('; ')}`);
   // Pinned to the edition's own Berlin release instant so a retry after a
   // failed push rebuilds the identical commit instead of a new one every run.
   const edition = branch.slice('edition/'.length);
   const date = `${edition}T${releaseClock(edition)}:00+02:00`;
-  const committed = [scoped, ...GENERATED_INDEX_PATHS];
+  const committed = [scoped, ...traced, ...GENERATED_INDEX_PATHS];
   await git(['-C', workdir, '-c', `user.name=${COMMIT_NAME}`, '-c', `user.email=${COMMIT_EMAIL}`, 'commit', '-q', '-m', message, '--', ...committed], { ...options, date });
   const commit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
   if (dryRun) return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: false, already_published: false };
@@ -304,6 +325,12 @@ export function parseArguments(argv) {
   return options;
 }
 
+/** The staged edition's own World Desk trace, when the release built one. */
+export async function stagedTrace(staged) {
+  const file = path.join(staged.artifact, ...tracePathFor(staged.edition).split('/'));
+  return stat(file).then((info) => (info.isFile() ? file : undefined), () => undefined);
+}
+
 // `url` defaults to the one constant remote and is a test seam, not a knob:
 // `parseArguments` has no flag that can set it, so the command line cannot
 // redirect this job at another repository.
@@ -319,6 +346,7 @@ export async function publishEditionBranch(options, url = remoteUrl(EDITION_PUSH
     const result = await pushStagedEditionTree({
       url, branch: editionBranch(staged.edition),
       editionSource: staged.source, editionPath: staged.editionPath,
+      traceSource: await stagedTrace(staged),
       workdir: path.join(scratch, 'repo'), home: path.join(scratch, 'home'),
       sshCommand: identity.sshCommand, message: editionCommitMessage(staged.edition),
       provenance: provenance.record, dryRun: options.dryRun
