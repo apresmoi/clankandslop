@@ -391,6 +391,21 @@ test('a real push creates the edition branch and leaves main exactly where it wa
   assert.equal(execFileSync('git', ['-C', bare, 'show', '--no-patch', '--format=%aI', result.commit], { encoding: 'utf8' }).trim(), '2026-09-09T18:00:00+02:00');
 });
 
+test('the edition\'s World Desk trace is published with it, and only that one file outside the edition', async () => {
+  const origin = remote();
+  const staged = stagedEdition('2026-09-10');
+  const work = scratch('work');
+  const trace = join(scratch('trace'), 'worlddesk.json');
+  writeFileSync(trace, '{"version":"clank.worlddesk-trace.v1","edition":"2026-09-10"}\n');
+  const result = await pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-09-10'), editionSource: staged.source, editionPath: staged.path, traceSource: trace,
+    workdir: join(work, 'repo'), home: join(work, 'home'), message: editionCommitMessage('2026-09-10')
+  });
+  assert.match(execFileSync('git', ['-C', origin.url, 'show', `${result.commit}:content/log/2026-09-10/worlddesk.json`], { encoding: 'utf8' }), /"edition":"2026-09-10"/u);
+  const changed = execFileSync('git', ['-C', origin.url, 'show', '--name-only', '--format=', result.commit], { encoding: 'utf8' }).trim().split('\n');
+  assert.deepEqual(changed.filter((name) => !name.startsWith('content/editions/') && !name.startsWith('content/bylines/')), ['content/log/2026-09-10/worlddesk.json']);
+});
+
 test('a push aimed at main is refused before git runs and the remote is untouched', async () => {
   const origin = remote(), before = origin.head();
   const staged = stagedEdition('2026-09-05');
