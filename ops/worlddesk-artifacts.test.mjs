@@ -91,7 +91,8 @@ for (const date of editions) {
         assert.match(row.story_id, /^s-[0-9a-f]+$/, `${entry.id} evidence has no story id`);
         assert.match(row.source_url, /^https?:\/\//, `${entry.id} evidence row ${row.story_id} has no source URL`);
         assert.ok(Array.isArray(row.matched) && row.matched.length > 0, `${entry.id} does not say which term fired`);
-        assert.ok(row.observed_at, `${entry.id} evidence row ${row.story_id} has no observation time`);
+        // null is the producer saying the source carried no retrieval time; absent or malformed is a defect.
+        assert.ok(row.observed_at === null || !Number.isNaN(Date.parse(row.observed_at)), `${entry.id} evidence row ${row.story_id} has no observation time`);
       }
       if (entry.status === 'open') assert.ok(entry.evidence.length >= policy.open_min_stories);
     }
