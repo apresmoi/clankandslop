@@ -1,0 +1,829 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-11",
+  "generated_at": "2026-10-11T07:51:24Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 125.44,
+        "observed_at": "2026-10-06",
+        "stale_days": 5,
+        "contributes": 3,
+        "reason": "125.44 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 96.24,
+        "observed_at": "2026-10-06",
+        "stale_days": 5,
+        "contributes": 1,
+        "reason": "96.24 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.199,
+        "observed_at": "2026-10-05",
+        "stale_days": 6,
+        "contributes": 2,
+        "reason": "6.199 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.03,
+        "observed_at": "2026-10-06",
+        "stale_days": 5,
+        "contributes": 0,
+        "reason": "3.03 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 15.41,
+        "observed_at": "2026-10-08",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "15.41 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.15,
+        "observed_at": "2026-10-08",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "3.15 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.3848,
+        "observed_at": "2026-10-02",
+        "stale_days": 9,
+        "contributes": 0,
+        "reason": "121.3848 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-11T07:51:23Z",
+        "http_status": 200,
+        "bytes": 170003,
+        "sha256": "ed1eaa6fd4a95178f922ac8673890d4b39029681be8ad498087545a8accdaaba",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-11T07:51:23Z",
+        "http_status": 200,
+        "bytes": 175782,
+        "sha256": "0440ec6862dccc8c753a91d63d287808e086e4b4f1267515b9e90209f3f2e061",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-11T07:51:24Z",
+        "http_status": 200,
+        "bytes": 28908,
+        "sha256": "aca8fefdbb54bdf16a2ab2c225d8b1f59c033e04d6fb96d8c232c3cc45417bdf",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-11T07:51:24Z",
+        "http_status": 200,
+        "bytes": 116073,
+        "sha256": "d92a00ae2db57058127c6548af5dd9ce5984c04f949f3eafd050fad284b1037b",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-11T07:51:24Z",
+        "http_status": 200,
+        "bytes": 161527,
+        "sha256": "d1fd366c92ba4211858a4272c593c292c274519bb96f81c06537edeec76b5aee",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-11T07:51:24Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "940930a0477cf69dcc40a3526a3a9c9e93ec735df688fd6c7c2871ccfe6c924d",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-11T07:51:24Z",
+        "http_status": 200,
+        "bytes": 104537,
+        "sha256": "75edd28ba1eceade938fa6621edfebc4d4e9cbcc846c6f07be27f8aef0ead321",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 33,
+    "open_conflicts": 2,
+    "watch": 3,
+    "dormant": 8,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-9aeb6c51",
+            "story_title": "Lead 2: IRGC says “violating” supertanker hit mine and is burning in Hormuz; CENTCOM announces it disabled…",
+            "source": "grok/grok-rolling-0347.md",
+            "slot": "0347",
+            "matched": [
+              "Hormuz",
+              "IRGC",
+              "Gulf of Oman"
+            ],
+            "source_url": "https://english.news.cn/20261011/44d18296666e4512a8b77e9b6c0ba0bf/c.html",
+            "source_urls": [
+              "https://english.news.cn/20261011/44d18296666e4512a8b77e9b6c0ba0bf/c.html",
+              "https://english.news.cn/20261011/44d18296666e4512a8b77e9b6c0ba0bf/c.html",
+              "https://www.dvidshub.net/news/printable/576778",
+              "https://www.dvidshub.net/news/printable/576778",
+              "https://www.dvidshub.net/news/printable/576778",
+              "https://www.dvidshub.net/news/printable/576778",
+              "https://www.dvidshub.net/news/printable/576778",
+              "https://www.dvidshub.net/news/printable/576778",
+              "https://www.reuters.com/world/us-military-says-it-disabled-cargo-vessel-trying-run-iran-blockade-2026-10-11/",
+              "https://www.reuters.com/world/us-military-says-it-disabled-cargo-vessel-trying-run-iran-blockade-2026-10-11/",
+              "https://www.jpost.com/middle-east/iran-news/article-911241"
+            ],
+            "observed_at": "2026-10-11T01:47:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-10ac7290",
+            "story_title": "Lead 1: Trump-Putin Russian diesel supply deal with temporary US sanctions waiver",
+            "source": "grok/grok-rolling-1846.md",
+            "slot": "1846",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.cbsnews.com/news/trump-russia-release-diesel-oil-iran-skyrocketing-costs/",
+            "source_urls": [
+              "https://www.cbsnews.com/news/trump-russia-release-diesel-oil-iran-skyrocketing-costs/",
+              "https://www.cbsnews.com/news/trump-russia-release-diesel-oil-iran-skyrocketing-costs/",
+              "https://www.cbsnews.com/news/trump-russia-release-diesel-oil-iran-skyrocketing-costs/",
+              "https://www.aljazeera.com/economy/2026/10/9/trump-announces-russian-diesel-deal-amid-soaring-us-fuel-prices",
+              "https://www.aljazeera.com/economy/2026/10/9/trump-announces-russian-diesel-deal-amid-soaring-us-fuel-prices",
+              "https://www.aljazeera.com/economy/2026/10/9/trump-announces-russian-diesel-deal-amid-soaring-us-fuel-prices",
+              "https://www.aljazeera.com/economy/2026/10/9/trump-announces-russian-diesel-deal-amid-soaring-us-fuel-prices",
+              "https://www.pbs.org/newshour/world/trump-strikes-deal-with-putin-for-russian-diesel-in-sharp-reversal-of-u-s-policy-ahead-of-midterms",
+              "https://www.pbs.org/newshour/world/trump-strikes-deal-with-putin-for-russian-diesel-in-sharp-reversal-of-u-s-policy-ahead-of-midterms"
+            ],
+            "observed_at": "2026-10-10T16:46:00Z"
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-60e259a5",
+            "story_title": "Germany refuses to follow Washington’s Russian-diesel sanctions easing",
+            "source": "chatgpt/chatgpt-rolling-1520.md",
+            "slot": "1520",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/germany-sticks-russia-sanctions-after-trump-announcement-diesel-2026-10-10/",
+            "source_urls": [
+              "https://www.reuters.com/world/germany-sticks-russia-sanctions-after-trump-announcement-diesel-2026-10-10/",
+              "https://www.reuters.com/world/germany-sticks-russia-sanctions-after-trump-announcement-diesel-2026-10-10/",
+              "https://www.reuters.com/world/germany-sticks-russia-sanctions-after-trump-announcement-diesel-2026-10-10/",
+              "https://www.welt.de/newsticker/dpa_nt/infoline_nt/wirtschaft_nt/article6aca1756194cb627ee596efd/bundesregierung-zu-trumps-diesel-deal-kein-oel-aus-russland.html",
+              "https://www.welt.de/newsticker/dpa_nt/infoline_nt/wirtschaft_nt/article6aca1756194cb627ee596efd/bundesregierung-zu-trumps-diesel-deal-kein-oel-aus-russland.html",
+              "https://www.welt.de/newsticker/dpa_nt/infoline_nt/wirtschaft_nt/article6aca1756194cb627ee596efd/bundesregierung-zu-trumps-diesel-deal-kein-oel-aus-russland.html"
+            ],
+            "observed_at": "2026-10-10T13:20:00Z"
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-6d69617e",
+            "story_title": "Lead 2: Trump-Putin diesel supply deal with temporary sanctions waiver, followed by Russian glide-bomb…",
+            "source": "grok/grok-rolling-0048.md",
+            "slot": "0048",
+            "matched": [
+              "Zaporizhzhia"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/cm1dwgr666wno",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/cm1dwgr666wno",
+              "https://www.bbc.co.uk/news/articles/cm1dwgr666wno",
+              "https://www.bbc.co.uk/news/articles/cm1dwgr666wno",
+              "https://www.bbc.co.uk/news/articles/cwvgdpv642g5o",
+              "https://en.interfax.com.ua/news/general/1217651.html",
+              "https://en.interfax.com.ua/news/general/1217651.html"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-f438d9eb",
+            "story_title": "Lead 1: Russian glide-bomb strike on Zaporizhzhia residential buildings kills at least 20 (including three…",
+            "source": "grok/grok-rolling-2141.md",
+            "slot": "2141",
+            "matched": [
+              "Ukraine",
+              "Zaporizhzhia"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/cwvgdpv642g5o",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/cwvgdpv642g5o",
+              "https://www.bbc.com/news/articles/cwvgdpv642g5o",
+              "https://www.bbc.com/news/articles/cwvgdpv642g5o",
+              "https://www.bbc.com/news/articles/cwvgdpv642g5o",
+              "https://www.bbc.com/news/articles/cwvgdpv642g5o",
+              "https://www.bbc.com/news/articles/cwvgdpv642g5o",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261010-930-820526/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261010-930-820526/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261010-930-820526/",
+              "https://www.latimes.com/world-nation/story/2026-10-10/russian-attacks-kill-20-in-ukraine-after-trump-strikes-diesel-deal-with-putin",
+              "https://www.latimes.com/world-nation/story/2026-10-10/russian-attacks-kill-20-in-ukraine-after-trump-strikes-diesel-deal-with-putin",
+              "https://www.aljazeera.com/news/2026/10/10/us-hosts-productive-trilateral-talks-to-end-russia-ukraine-war"
+            ],
+            "observed_at": "2026-10-10T19:41:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-b74e9176",
+            "story_title": "Abbas moves Palestinian presidential and legislative elections to September 2027",
+            "source": "chatgpt/chatgpt-rolling-1520.md",
+            "slot": "1520",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/abbas-postpones-palestinian-elections-sets-presidential-poll-september-2027-2026-10-10/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/abbas-postpones-palestinian-elections-sets-presidential-poll-september-2027-2026-10-10/",
+              "https://www.reuters.com/world/middle-east/abbas-postpones-palestinian-elections-sets-presidential-poll-september-2027-2026-10-10/",
+              "https://www.reuters.com/world/middle-east/abbas-postpones-palestinian-elections-sets-presidential-poll-september-2027-2026-10-10/",
+              "https://aa.com.tr/en/middle-east/palestinian-president-postpones-legislative-elections-to-sept-11-2027/4084448",
+              "https://aa.com.tr/en/middle-east/palestinian-president-postpones-legislative-elections-to-sept-11-2027/4084448",
+              "https://english.wafa.ps/Pages/Details/175699",
+              "https://www.reuters.com/business/environment/category-3-hurricane-isaias-makes-landfall-near-destin-florida-nhc-says-2026-10-10/?utm_source=chatgpt.com",
+              "https://www.reuters.com/world/africa/ethiopian-forces-regain-control-border-city-after-reported-eritrean-incursion-2026-10-10/?utm_source=chatgpt.com",
+              "https://apnews.com/article/9386a16a06e537a29ffe2de273267c8b?utm_source=chatgpt.com",
+              "https://www.welt.de/newsticker/dpa_nt/infoline_nt/wirtschaft_nt/article6aca1756194cb627ee596efd/bundesregierung-zu-trumps-diesel-deal-kein-oel-aus-russland.html?utm_source=chatgpt.com"
+            ],
+            "observed_at": "2026-10-10T13:20:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 7,
+        "evidence": [
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-641be550",
+            "story_title": "Riyadh airport hit; operations suspended; Trump says Washington may join Saudi strikes on the Houthis",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/loud-blast-heard-riyadh-airport-airlines-cancel-more-flights-2026-10-10/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/loud-blast-heard-riyadh-airport-airlines-cancel-more-flights-2026-10-10/",
+              "https://www.reuters.com/world/middle-east/loud-blast-heard-riyadh-airport-airlines-cancel-more-flights-2026-10-10/",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-f0e0e6105f33400e37bb20bb9a8130af",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-f0e0e6105f33400e37bb20bb9a8130af",
+              "https://www.theguardian.com/world/2026/oct/10/yemen-government-allied-forces-recapture-bab-al-mandab-strait-houthis-taiz",
+              "https://www.theguardian.com/world/2026/oct/10/yemen-government-allied-forces-recapture-bab-al-mandab-strait-houthis-taiz"
+            ],
+            "observed_at": "2026-10-10T19:14:00Z"
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-7d6ecf47",
+            "story_title": "Ethiopian forces are reported back in Adigrat as the Eritrea confrontation crosses another escalation gate",
+            "source": "chatgpt/chatgpt-rolling-1520.md",
+            "slot": "1520",
+            "matched": [
+              "Red Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/africa/ethiopian-forces-regain-control-border-city-after-reported-eritrean-incursion-2026-10-10/",
+            "source_urls": [
+              "https://www.reuters.com/world/africa/ethiopian-forces-regain-control-border-city-after-reported-eritrean-incursion-2026-10-10/",
+              "https://www.reuters.com/world/africa/ethiopian-forces-regain-control-border-city-after-reported-eritrean-incursion-2026-10-10/",
+              "https://www.reuters.com/world/africa/ethiopian-forces-regain-control-border-city-after-reported-eritrean-incursion-2026-10-10/",
+              "https://apnews.com/article/ethiopia-eritrea-tigray-conflict-mekelle-un-abiy-9386a16a06e537a29ffe2de273267c8b",
+              "https://apnews.com/article/ethiopia-eritrea-tigray-conflict-mekelle-un-abiy-9386a16a06e537a29ffe2de273267c8b",
+              "https://apnews.com/article/ethiopia-eritrea-tigray-conflict-mekelle-un-abiy-9386a16a06e537a29ffe2de273267c8b"
+            ],
+            "observed_at": "2026-10-10T13:20:00Z"
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-af51d303",
+            "story_title": "Lead 3: Houthi missile strike on Riyadh King Khalid International Airport Saturday; operations suspended…",
+            "source": "grok/grok-rolling-2141.md",
+            "slot": "2141",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/10/yemen-government-allied-forces-recapture-bab-al-mandab-strait-houthis-taiz",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/10/yemen-government-allied-forces-recapture-bab-al-mandab-strait-houthis-taiz",
+              "https://www.theguardian.com/world/2026/oct/10/yemen-government-allied-forces-recapture-bab-al-mandab-strait-houthis-taiz",
+              "https://www.dawn.com/news/2036199",
+              "https://www.dawn.com/news/2036199",
+              "https://www.dawn.com/news/2036199",
+              "https://www.dawn.com/news/2036199",
+              "https://www.dawn.com/news/2036199",
+              "https://www.dawn.com/news/2036199",
+              "https://www.timesofisrael.com/dozens-hurt-as-houthis-hit-riyadh-airport-trump-us-may-join-saudi-strikes/"
+            ],
+            "observed_at": "2026-10-10T19:41:00Z"
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-c9914b56",
+            "story_title": "Lead 3: Suspected Houthi missile strike hits Riyadh’s King Khalid International Airport on Saturday, killing…",
+            "source": "grok/grok-rolling-0048.md",
+            "slot": "0048",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://www.channelnewsasia.com/world/suspected-houthi-attack-riyadh-airport-kills-two-wounds-dozens-medical-sources-6449071",
+            "source_urls": [
+              "https://www.channelnewsasia.com/world/suspected-houthi-attack-riyadh-airport-kills-two-wounds-dozens-medical-sources-6449071",
+              "https://www.channelnewsasia.com/world/suspected-houthi-attack-riyadh-airport-kills-two-wounds-dozens-medical-sources-6449071",
+              "https://www.channelnewsasia.com/world/suspected-houthi-attack-riyadh-airport-kills-two-wounds-dozens-medical-sources-6449071",
+              "https://www.channelnewsasia.com/world/suspected-houthi-attack-riyadh-airport-kills-two-wounds-dozens-medical-sources-6449071",
+              "https://www.channelnewsasia.com/world/suspected-houthi-attack-riyadh-airport-kills-two-wounds-dozens-medical-sources-6449071",
+              "https://www.channelnewsasia.com/world/suspected-houthi-attack-riyadh-airport-kills-two-wounds-dozens-medical-sources-6449071"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-dd4dffc8",
+            "story_title": "Lead 3: GACA confirms 12 dead and 309 injured in Saturday Riyadh airport attack (material casualty update…",
+            "source": "grok/grok-rolling-0944.md",
+            "slot": "0944",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.spa.gov.sa/w2697996",
+            "source_urls": [
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-f0e0e6105f33400e37bb20bb9a8130af",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-f0e0e6105f33400e37bb20bb9a8130af"
+            ],
+            "observed_at": "2026-10-11T07:44:00Z"
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-e07967f7",
+            "story_title": "Lead 1: Saudi GACA confirms 12 dead (including 1 US citizen) and 309 injured in Oct. 10 Riyadh airport…",
+            "source": "grok/grok-rolling-0347.md",
+            "slot": "0347",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.spa.gov.sa/en/w2697996",
+            "source_urls": [
+              "https://www.spa.gov.sa/en/w2697996",
+              "https://www.spa.gov.sa/en/w2697996",
+              "https://www.spa.gov.sa/en/w2697996",
+              "https://www.spa.gov.sa/en/w2697996",
+              "https://www.arabnews.com/saudi-arabia/passengers-told-to-confirm-flight-status-before-heading-to-riyadh-airport-3005640",
+              "https://www.arabnews.com/saudi-arabia/passengers-told-to-confirm-flight-status-before-heading-to-riyadh-airport-3005640",
+              "https://www.arabnews.com/saudi-arabia/passengers-told-to-confirm-flight-status-before-heading-to-riyadh-airport-3005640",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.cnn.com/2026/10/10/middleeast/riyadh-airport-saudi-houthis-intl",
+              "https://www.cnn.com/2026/10/10/middleeast/riyadh-airport-saudi-houthis-intl",
+              "https://www.cnn.com/2026/10/10/middleeast/riyadh-airport-saudi-houthis-intl",
+              "https://www.cnn.com/2026/10/10/middleeast/riyadh-airport-saudi-houthis-intl",
+              "https://www.arabnews.com/saudi-arabia/coalition-forces-vow-firm-response-over-riyadh-airport-strike-trump-says-houthi-attack-not-acceptable-3005704",
+              "https://www.arabnews.com/saudi-arabia/coalition-forces-vow-firm-response-over-riyadh-airport-strike-trump-says-houthi-attack-not-acceptable-3005704",
+              "https://www.arabnews.com/saudi-arabia/coalition-forces-vow-firm-response-over-riyadh-airport-strike-trump-says-houthi-attack-not-acceptable-3005704"
+            ],
+            "observed_at": "2026-10-11T01:47:00Z"
+          },
+          {
+            "edition": "2026-10-11",
+            "story_id": "s-eeefb952",
+            "story_title": "Lead 1: Saudi GACA confirms 12 killed and 309 injured in Saturday attack on Riyadh’s King Khalid…",
+            "source": "grok/grok-rolling-0645.md",
+            "slot": "0645",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.spa.gov.sa/w2697996",
+            "source_urls": [
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.spa.gov.sa/w2697996",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.bbc.co.uk/news/articles/cw33x4y8k82no",
+              "https://www.chinadailyhk.com/hk/article/640875",
+              "https://www.chinadailyhk.com/hk/article/640875",
+              "https://www.khaleejtimes.com/world/gulf/saudi-arabia-attack-king-khalid-international-airport-october-10-2026",
+              "https://www.khaleejtimes.com/world/gulf/saudi-arabia-attack-king-khalid-international-airport-october-10-2026"
+            ],
+            "observed_at": "2026-10-11T04:45:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-04 and drew no qualifying story today",
+        "last_open_edition": "2026-10-04",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-04",
+            "story_id": "s-de8f9259",
+            "story_title": "North Korea’s Sunday state-media account says Saturday’s IRBM drill used AI to change a low-altitude path",
+            "source": "grok/grok-rolling-0949.md",
+            "slot": "0949",
+            "matched": [
+              "North Korea",
+              "Pyongyang"
+            ],
+            "source_url": "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/04/north-korea039s-kim-oversaw-launch-of-missile-that-uses-ai",
+            "source_urls": [
+              "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/04/north-korea039s-kim-oversaw-launch-of-missile-that-uses-ai",
+              "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/04/north-korea039s-kim-oversaw-launch-of-missile-that-uses-ai",
+              "https://www.afp.com/en/north-korea-says-test-intermediate-range-strategic-missile-included-use-ai-0"
+            ],
+            "observed_at": "2026-10-04T07:49:00Z"
+          },
+          {
+            "edition": "2026-10-04",
+            "story_id": "s-eed02b53",
+            "story_title": "KCNA says Kim oversaw an “AI” intermediate-range launch — just outside this window",
+            "source": "grok/grok-rolling-0646.md",
+            "slot": "0646",
+            "matched": [
+              "Pyongyang"
+            ],
+            "source_url": "https://www.koreaherald.com/article/10892762",
+            "source_urls": [
+              "https://www.koreaherald.com/article/10892762",
+              "https://www.koreaherald.com/article/10892762",
+              "https://www.koreaherald.com/article/10892762",
+              "https://www.arabnews.com/node/3004496/world",
+              "https://www.arabnews.com/node/3004496/world",
+              "https://www.thehindu.com/news/morning-digest-october-4-2026/article71541679.ece",
+              "https://www.thehindu.com/news/morning-digest-october-4-2026/article71541679.ece"
+            ],
+            "observed_at": "2026-10-04T04:46:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-09",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
