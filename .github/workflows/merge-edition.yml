@@ -94,6 +94,9 @@ jobs:
           ALLOWED: ${{ env.ALLOWED_PATHS }}
         run: |
           set -euo pipefail
+          # The edition's own World Desk log entry rides with it (publish-edition-branch.mjs
+          # logEntryPaths); only that date's directory, never the log at large.
+          ALLOWED="$ALLOWED content/log/${GITHUB_REF_NAME#edition/}/"
           git fetch --quiet origin "$BASE"
           changed="$(git diff --name-only "origin/$BASE...HEAD")"
           if [ -z "$changed" ]; then
