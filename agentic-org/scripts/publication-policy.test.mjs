@@ -10,6 +10,7 @@ const required = [
   // The checksum-only leash for agentic-org/ is gone, not loosened: an edition
   // may carry published content and nothing else (public-content.mjs).
   'ALLOWED_PATHS: "content/editions/ content/bylines/"',
+  'ALLOWED="$ALLOWED content/log/${GITHUB_REF_NAME#edition/}/"',
   '[ "$bad" -eq 0 ] ||',
   'gh pr create', '[ "$head" = "$SHA" ] ||',
   'node agentic-org/scripts/ci-gate.mjs --sha="$SHA"',
