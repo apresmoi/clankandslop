@@ -107,6 +107,17 @@ test('the push argv is fast-forward, single-ref, and refuses every destructive f
   assert.throws(() => assertNoForcedPush(['push', 7]), /must be strings/u);
 });
 
+test('replacement argv leases exactly the observed edition SHA and refuses protected or non-edition refs', () => {
+  const observed = 'a'.repeat(40), branch = 'edition/2026-09-05';
+  assert.deepEqual(pushArgv('/remote.git', branch, observed), [
+    'push', '--porcelain', `--force-with-lease=refs/heads/${branch}:${observed}`, '/remote.git', `refs/heads/${branch}:refs/heads/${branch}`
+  ]);
+  for (const ref of [...PROTECTED_REFS, 'refs/heads/main', 'edition/main', 'feature/x', 'refs/tags/v1'])
+    assert.throws(() => pushArgv('/remote.git', ref, observed), /not an edition branch|protected ref/u, ref);
+  for (const sha of ['', 'HEAD', 'a'.repeat(39), `${observed}:main`, null])
+    assert.throws(() => pushArgv('/remote.git', branch, sha), /observed remote SHA/u);
+});
+
 test('the publisher may only ever address the public repository', () => {
   assert.equal(EDITION_PUSH_REMOTE, 'clankandslop');
   assert.equal(remoteUrl(EDITION_PUSH_REMOTE), 'git@clankandslop.deploy:apresmoi/clankandslop.git');
@@ -445,14 +456,14 @@ test('the commit carries only the edition directory, whatever else is in the tre
   assert.deepEqual(contentOnlyFindings(files), []);
 });
 
-test('a retry of the same edition converges, and changed content is refused rather than forced', async () => {
-  const origin = remote();
+test('a retry converges, and a stale unmerged edition branch is replaced with changed staged content', async () => {
+  const origin = remote(), before = origin.head(), logs = [];
   const staged = stagedEdition('2026-09-07');
   const work = scratch('work');
   let attempt = 0;
   const call = () => pushStagedEditionTree({
     url: origin.url, branch: editionBranch('2026-09-07'), editionSource: staged.source, editionPath: staged.path,
-    workdir: join(work, `repo-${attempt += 1}`), home: join(work, 'home'), message: editionCommitMessage('2026-09-07')
+    workdir: join(work, `repo-${attempt += 1}`), home: join(work, 'home'), message: editionCommitMessage('2026-09-07'), log: (line) => logs.push(line)
   });
   const first = await call();
   // The commit is fully determined by the base, the staged tree, the pinned
@@ -461,11 +472,58 @@ test('a retry of the same edition converges, and changed content is refused rath
   const second = await call();
   assert.equal(second.commit, first.commit);
   assert.deepEqual(origin.refs().sort(), ['refs/heads/edition/2026-09-07', 'refs/heads/main']);
-  // Different staged content is a different commit that is not a descendant of
-  // what is already on the branch. Without a force flag git must refuse it.
+  assert.deepEqual(logs, [], 'an identical retry is not reported as a replacement');
   writeFileSync(join(staged.source, 'articles', 'two.json'), '{"id":"two"}\n');
-  await assert.rejects(call(), /non-fast-forward|rejected|failed/iu);
-  assert.equal(execFileSync('git', ['-C', origin.url, 'rev-parse', 'refs/heads/edition/2026-09-07'], { encoding: 'utf8' }).trim(), first.commit);
+  const replaced = await call();
+  assert.notEqual(replaced.commit, first.commit);
+  assert.equal(replaced.replaced_commit, first.commit);
+  assert.equal(replaced.pushed, true);
+  assert.equal(git(['rev-parse', `refs/heads/${first.branch}`], origin.url), replaced.commit);
+  assert.match(git(['show', `${replaced.commit}:${staged.path}/articles/two.json`], origin.url), /"id":"two"/u);
+  assert.equal(origin.head(), before);
+  assert.deepEqual(logs, [`replaced stale unmerged edition branch ${first.branch}: ${first.commit} -> ${replaced.commit}`]);
+});
+
+test('a moved remote edition rejects the observed-SHA lease and preserves every remote ref', async () => {
+  const origin = remote(), staged = stagedEdition('2026-09-07'), work = scratch('lease');
+  const branch = editionBranch('2026-09-07');
+  const build = (name, dryRun = false) => pushStagedEditionTree({
+    url: origin.url, branch, editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, name), home: join(work, 'home'), message: editionCommitMessage('2026-09-07'), dryRun, log: () => {}
+  });
+  const observed = await build('first');
+  writeFileSync(join(staged.source, 'articles', 'two.json'), '{"id":"two"}\n');
+  await build('candidate', true);
+  assert.equal(git(['rev-parse', `refs/heads/${branch}`], origin.url), observed.commit, 'dry run must not replace a stale ref');
+  writeFileSync(join(staged.source, 'articles', 'three.json'), '{"id":"three"}\n');
+  const moved = await build('concurrent');
+  const before = git(['show-ref'], origin.url);
+  assert.throws(() => git(pushArgv(origin.url, branch, observed.commit), join(work, 'candidate')), /stale info|rejected|failed/iu);
+  assert.equal(git(['show-ref'], origin.url), before);
+  assert.equal(git(['rev-parse', `refs/heads/${branch}`], origin.url), moved.commit);
+});
+
+test('a merged edition ancestor is untouched even when main advances and staged content differs', async () => {
+  const origin = remote(), staged = stagedEdition('2026-09-07'), work = scratch('merged');
+  let attempt = 0;
+  const call = () => pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-09-07'), editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, `repo-${++attempt}`), home: join(work, 'home'), message: editionCommitMessage('2026-09-07')
+  });
+  const first = await call();
+  origin.merge(first.commit);
+  const tree = git(['rev-parse', `${first.commit}^{tree}`], origin.url);
+  const later = git(['commit-tree', tree, '-p', first.commit, '-m', 'later main change'], origin.url);
+  origin.merge(later);
+  writeFileSync(join(staged.source, 'articles', 'two.json'), '{"id":"two"}\n');
+  const before = git(['show-ref'], origin.url);
+  const result = await call();
+  assert.equal(result.already_published, true);
+  assert.equal(result.pushed, false);
+  assert.equal(result.commit, first.commit);
+  assert.equal(result.base, later);
+  assert.equal(result.generated, null);
+  assert.equal(git(['show-ref'], origin.url), before);
 });
 
 test('an edition already merged into the base is a quiet success, not a nightly alarm', async () => {

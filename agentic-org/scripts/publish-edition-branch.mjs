@@ -110,9 +110,7 @@ export function assertPushableRef(ref) {
   return assertNotProtectedRef(ref);
 }
 
-// Built here rather than at the call site so the refused flags are a property
-// of the policy and not of whoever last edited the caller. Fast-forward only,
-// one ref, spelled out on both sides: there is no shorthand for git to read.
+// Generic force flags stay forbidden; only pushArgv may construct an exact-SHA lease.
 const REFUSED_PUSH_FLAGS = Object.freeze(['-f', '--force', '--force-with-lease', '--force-if-includes', '--mirror', '--delete', '-d', '--all', '--tags', '--follow-tags', '--prune', '--atomic', '--receive-pack', '--exec']);
 
 export function assertNoForcedPush(argv) {
@@ -126,9 +124,14 @@ export function assertNoForcedPush(argv) {
   return argv;
 }
 
-export function pushArgv(remoteUrlValue, ref) {
+export function pushArgv(remoteUrlValue, ref, observedSha) {
   assertPushableRef(ref);
-  return assertNoForcedPush(['push', '--porcelain', remoteUrlValue, `refs/heads/${ref}:refs/heads/${ref}`]);
+  const args = assertNoForcedPush(['push', '--porcelain', remoteUrlValue, `refs/heads/${ref}:refs/heads/${ref}`]);
+  if (observedSha !== undefined) {
+    if (!/^[0-9a-f]{40}$/u.test(observedSha)) throw new Error('edition replacement requires an observed remote SHA');
+    args.splice(2, 0, `--force-with-lease=refs/heads/${ref}:${observedSha}`);
+  }
+  return args;
 }
 
 // References the operator's key file; it is never read, copied or re-written by
@@ -211,11 +214,11 @@ const git = (args, { home, sshCommand, date }) => new Promise((resolve, reject) 
   child.stdout.on('data', (chunk) => { if (out.length < 65536) out += chunk; });
   child.stderr.on('data', (chunk) => { if (err.length < 65536) err += chunk; });
   child.once('error', (error) => reject(new Error(`git ${args[0]} could not run: ${error.message}`)));
-  child.once('exit', (code) => code === 0 ? resolve(out.trim()) : reject(new Error(`git ${args.slice(0, 4).join(' ')} failed (${code}): ${err.trim().slice(-1500)}`)));
+  child.once('exit', (code) => code === 0 ? resolve(out.trim()) : reject(Object.assign(new Error(`git ${args.slice(0, 4).join(' ')} failed (${code}): ${err.trim().slice(-1500)}`), { code })));
 });
 
 // Cuts one branch from the remote's base branch, adds exactly the edition
-// directory to it, and fast-forward pushes that one ref. `add`, `commit` and
+// directory to it, and pushes that one ref. `add`, `commit` and
 // `status` are all path-scoped to the edition directory, so nothing else in the
 // scratch tree can ride along in the commit.
 // The World Desk public trace the release staged beside the edition
@@ -235,7 +238,7 @@ async function writeLogEntry(workdir, editionSource, edition, traceSource) {
   await cp(path.join(editionSource, 'desk', 'caslon.weather.json'), path.join(dir, 'caslon.weather.json'));
 }
 
-export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, traceSource, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false }) {
+export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, traceSource, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false, log = console.warn }) {
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
   const scoped = path.normalize(editionPath);
@@ -245,8 +248,18 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   await mkdir(path.join(home, 'tmp'), { recursive: true });
   await mkdir(workdir, { recursive: true });
   await git(['-C', workdir, 'init', '-q'], options);
-  await git(['-C', workdir, 'fetch', '-q', '--depth=1', '--no-tags', url, `refs/heads/${base}`], options);
-  await git(['-C', workdir, 'checkout', '-q', '-b', branch, 'FETCH_HEAD'], options);
+  const baseRef = `refs/remotes/origin/${base}`, remoteRef = `refs/remotes/origin/${branch}`;
+  await git(['-C', workdir, 'fetch', '-q', '--depth=1', '--no-tags', url, `refs/heads/${base}:${baseRef}`], options);
+  let observedSha;
+  if (await git(['-C', workdir, 'ls-remote', '--heads', url, `refs/heads/${branch}`], options)) {
+    // A shallow boundary cannot prove that an older edition was merged.
+    await git(['-C', workdir, 'fetch', '-q', '--unshallow', '--no-tags', url, `refs/heads/${base}:${baseRef}`, `refs/heads/${branch}:${remoteRef}`], options);
+    observedSha = await git(['-C', workdir, 'rev-parse', remoteRef], options);
+    const merged = await git(['-C', workdir, 'merge-base', '--is-ancestor', observedSha, baseRef], options)
+      .then(() => true, (error) => { if (error.code === 1) return false; throw error; });
+    if (merged) return { branch, commit: observedSha, base: await git(['-C', workdir, 'rev-parse', baseRef], options), remote_url: url, generated: null, pushed: false, already_published: true };
+  }
+  await git(['-C', workdir, 'checkout', '-q', '-b', branch, baseRef], options);
   const baseCommit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
   await rm(path.join(workdir, scoped), { recursive: true, force: true });
   await mkdir(path.dirname(path.join(workdir, scoped)), { recursive: true });
@@ -265,13 +278,7 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   // refused here, exactly as before, and never on generated-index drift.
   await git(['-C', workdir, 'add', '--', scoped, ...traced], options);
   const staged = await git(['-C', workdir, 'status', '--porcelain', '--', scoped, ...traced], options);
-  // Already on the base branch, byte for byte: the edition was published and
-  // merged, and this is a second run of a timer that fires every night. That is
-  // a SUCCESS with nothing to do, not a failure — a nightly alarm for "the
-  // paper you published is published" trains a person to ignore the alarm, and
-  // the alarm is the only thing standing between a broken cycle and a silent
-  // one. A branch that exists at a DIFFERENT commit is still a refusal below:
-  // that one really does need a person.
+  // Byte-identical content is also a success after the merged ref was deleted.
   if (staged.length === 0)
     return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
   const generated = await regenerateIndexes(workdir);
@@ -290,8 +297,10 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   await git(['-C', workdir, '-c', `user.name=${COMMIT_NAME}`, '-c', `user.email=${COMMIT_EMAIL}`, 'commit', '-q', '-m', message, '--', ...committed], { ...options, date });
   const commit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
   if (dryRun) return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: false, already_published: false };
-  await git(['-C', workdir, ...pushArgv(url, branch)], options);
-  return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: true, already_published: false };
+  const replaced = observedSha !== undefined && observedSha !== commit;
+  await git(['-C', workdir, ...pushArgv(url, branch, replaced ? observedSha : undefined)], options);
+  if (replaced) log(`replaced stale unmerged edition branch ${branch}: ${observedSha} -> ${commit}`);
+  return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: true, already_published: false, ...(replaced ? { replaced_commit: observedSha } : {}) };
 }
 
 export function parseArguments(argv) {
@@ -349,7 +358,7 @@ export async function publishEditionBranch(options, url = remoteUrl(EDITION_PUSH
       traceSource: await stagedTrace(staged),
       workdir: path.join(scratch, 'repo'), home: path.join(scratch, 'home'),
       sshCommand: identity.sshCommand, message: editionCommitMessage(staged.edition),
-      provenance: provenance.record, dryRun: options.dryRun
+      provenance: provenance.record, dryRun: options.dryRun, log: warn
     });
     return { ...result, edition: staged.edition, remote: EDITION_PUSH_REMOTE, artifact: staged.artifact, published: false, provenance: provenance.record, landed_record: provenance.landed_record };
   } finally {

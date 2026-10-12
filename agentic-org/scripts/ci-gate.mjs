@@ -46,6 +46,8 @@ export function parseArgs(argv) {
   }
   if (!/^[0-9a-f]{40}$/u.test(options.sha ?? '')) throw new GateError('--sha=<40 hex characters> is required');
   if (!/^[\w.-]+\/[\w.-]+$/u.test(options.repo ?? '')) throw new GateError('--repo=owner/name is required');
+  if (!Number.isFinite(options.timeoutSeconds) || options.timeoutSeconds <= 0) throw new GateError('--timeout-seconds must be positive and finite');
+  if (!Number.isFinite(options.pollSeconds) || options.pollSeconds < 0) throw new GateError('--poll-seconds must be non-negative and finite');
   return options;
 }
 
@@ -89,29 +91,60 @@ export function parseJobCount(raw) {
   return parsed;
 }
 
-export function fetchRuns(options, { exec = execFileSync } = {}) {
-  const listing = JSON.parse(exec('gh', [
-    'api', `repos/${options.repo}/actions/workflows/${options.workflow}/runs?head_sha=${options.sha}&per_page=100`,
-    '--jq', '[.workflow_runs[] | {id, event, status, conclusion, actor: .actor.login}]'
-  ], { encoding: 'utf8', maxBuffer: 1 << 24 }));
-  return listing.map((run) => {
-    if (run.event !== 'pull_request' || run.status !== 'completed' || run.conclusion !== 'failure') return run;
-    const jobCount = parseJobCount(exec('gh', [
-      'api', `repos/${options.repo}/actions/runs/${run.id}/jobs`, '--jq', '.total_count'
-    ], { encoding: 'utf8', maxBuffer: 1 << 20 }));
-    return { ...run, jobCount };
-  });
+const sleepFor = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const timeoutError = (options) => new GateError(`CI did not conclude within ${options.timeoutSeconds ?? 1800}s — refusing to merge on a timeout`);
+
+export function isTransientApiError(error) {
+  const detail = `${error.message ?? ''}\n${error.stderr ?? ''}`;
+  const status = /\bHTTP\s+(\d{3})\b/iu.exec(detail)?.[1];
+  if (status) return Number(status) === 429 || Number(status) >= 500 && Number(status) <= 599;
+  return /\b(?:ETIMEDOUT|ECONNRESET|ECONNREFUSED|ECONNABORTED|EPIPE|EAI_AGAIN|ENETUNREACH|ENETDOWN|EHOSTUNREACH|ENOTFOUND)\b/iu.test(`${error.code ?? ''} ${detail}`)
+    || /timed?\s*out|timeout|TLS handshake|connection (?:reset|refused|closed)|network is unreachable|no such host|temporary failure in name resolution|\bEOF\b|broken pipe|error connecting to/iu.test(detail);
 }
 
-export async function waitForGreen(options, { runs = fetchRuns, log = console.log, now = () => Date.now(), sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
+export async function fetchRuns(options, { exec = execFileSync, now = Date.now, sleep = sleepFor, log = console.log, deadline = now() + (options.timeoutSeconds ?? 1800) * 1000 } = {}) {
+  const api = async (args, maxBuffer) => {
+    let backoff = 1000;
+    for (;;) {
+      const remaining = deadline - now();
+      if (remaining <= 0) throw timeoutError(options);
+      try {
+        return exec('gh', args, { encoding: 'utf8', maxBuffer, timeout: Math.max(1, Math.min(30000, remaining)), killSignal: 'SIGKILL' });
+      } catch (error) {
+        if (!isTransientApiError(error)) throw error;
+        const delay = Math.min(backoff, deadline - now());
+        if (delay <= 0) throw timeoutError(options);
+        log(`CI API transient failure; retrying in ${delay}ms: ${String(error.stderr || error.message).trim()}`);
+        await sleep(delay);
+        backoff = Math.min(backoff * 2, 10000);
+      }
+    }
+  };
+  const listing = JSON.parse(await api([
+    'api', `repos/${options.repo}/actions/workflows/${options.workflow}/runs?head_sha=${options.sha}&per_page=100`,
+    '--jq', '[.workflow_runs[] | {id, event, status, conclusion, actor: .actor.login}]'
+  ], 1 << 24));
+  const runs = [];
+  for (const run of listing) {
+    if (run.event !== 'pull_request' || run.status !== 'completed' || run.conclusion !== 'failure') { runs.push(run); continue; }
+    const jobCount = parseJobCount(await api([
+      'api', `repos/${options.repo}/actions/runs/${run.id}/jobs`, '--jq', '.total_count'
+    ], 1 << 20));
+    runs.push({ ...run, jobCount });
+  }
+  return runs;
+}
+
+export async function waitForGreen(options, { runs = fetchRuns, log = console.log, now = Date.now, sleep = sleepFor } = {}) {
   const deadline = now() + options.timeoutSeconds * 1000;
   for (;;) {
-    const result = verdict(runs(options));
+    if (now() >= deadline) throw timeoutError(options);
+    const result = verdict(await runs(options, { deadline, now, sleep, log }));
+    if (now() >= deadline) throw timeoutError(options);
     log(`CI ${options.workflow} @ ${options.sha.slice(0, 8)}: ${result.verdict} — ${result.reasons.join('; ')} (total=${result.counts.total} push=${result.counts.push} pending=${result.counts.pending})`);
     if (result.verdict === GREEN) return result;
     if (result.verdict === RED) throw new GateError(`refusing to merge a red branch:\n  ${result.reasons.join('\n  ')}`);
-    if (now() >= deadline) throw new GateError(`CI did not conclude within ${options.timeoutSeconds}s — refusing to merge on a timeout`);
-    await sleep(options.pollSeconds * 1000);
+    await sleep(Math.min(options.pollSeconds * 1000, Math.max(0, deadline - now())));
   }
 }
 

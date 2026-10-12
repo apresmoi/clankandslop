@@ -79,9 +79,9 @@ test('job-count parsing requires positive JSON evidence', () => {
     assert.throws(() => parseJobCount(raw), GateError, JSON.stringify(raw));
 });
 
-test('fetchRuns queries exact commit workflow runs and positive job evidence for failed PR duplicates', () => {
+test('fetchRuns queries exact commit workflow runs and positive job evidence for failed PR duplicates', async () => {
   const calls = [];
-  const result = fetchRuns({ sha, repo: 'owner/repo', workflow: 'ci.yml' }, {
+  const result = await fetchRuns({ sha, repo: 'owner/repo', workflow: 'ci.yml' }, {
     exec(command, args) {
       calls.push([command, args]);
       if (args[1] === `repos/owner/repo/actions/workflows/ci.yml/runs?head_sha=${sha}&per_page=100`)
@@ -97,9 +97,9 @@ test('fetchRuns queries exact commit workflow runs and positive job evidence for
   ]);
 });
 
-test('fetchRuns fails closed when failed duplicate job evidence is blank or malformed', () => {
+test('fetchRuns fails closed when failed duplicate job evidence is blank or malformed', async () => {
   for (const payload of ['', 'not-json', 'null']) {
-    assert.throws(() => fetchRuns({ sha, repo: 'owner/repo', workflow: 'ci.yml' }, {
+    await assert.rejects(fetchRuns({ sha, repo: 'owner/repo', workflow: 'ci.yml' }, {
       exec(command, args) {
         if (args[1].includes('/workflows/')) return JSON.stringify([{ id: 7, event: 'pull_request', status: 'completed', conclusion: 'failure', actor: 'github-actions[bot]' }]);
         if (args[1].includes('/jobs')) return payload;
@@ -107,6 +107,90 @@ test('fetchRuns fails closed when failed duplicate job evidence is blank or malf
       }
     }), GateError, payload);
   }
+});
+
+const apiOptions = { sha, repo: 'owner/repo', workflow: 'ci.yml', timeoutSeconds: 60, pollSeconds: 20 };
+const apiError = (detail) => Object.assign(new Error('gh failed'), { stderr: Buffer.from(detail) });
+function retryClock(exec) {
+  let clock = 0;
+  const delays = [], logs = [], calls = [];
+  return { delays, logs, calls, now: () => clock, sleep: async (ms) => {
+    delays.push(ms); clock += ms;
+    assert.ok(clock <= 120000, 'retry exceeded the bounded test clock');
+  },
+    log: (line) => logs.push(line), exec: (...args) => { calls.push(args); return exec(...args); } };
+}
+
+test('fetchRuns retries 502 then succeeds within the original wait deadline', async () => {
+  let attempt = 0;
+  const deps = retryClock(() => {
+    if (++attempt === 1) throw apiError('gh: Server Error (HTTP 502)');
+    return JSON.stringify([run('push', 'success')]);
+  });
+  const result = await waitForGreen(apiOptions, { ...deps, runs: (options, runtime) => fetchRuns(options, { ...deps, ...runtime }) });
+  assert.equal(result.verdict, GREEN);
+  assert.equal(attempt, 2);
+  assert.deepEqual(deps.delays, [1000]);
+  assert.match(deps.logs[0], /transient failure.*1000ms.*HTTP 502/u);
+});
+
+test('persistent 502 exhausts the shared deadline with capped backoff and bounded API calls', async () => {
+  const deps = retryClock(() => { throw apiError('gh: Server Error (HTTP 502)'); });
+  await assert.rejects(waitForGreen(apiOptions, {
+    ...deps, runs: (options, runtime) => fetchRuns(options, { ...deps, ...runtime })
+  }), /did not conclude within 60s/u);
+  assert.equal(deps.now(), 60000);
+  assert.deepEqual(deps.delays, [1000, 2000, 4000, 8000, 10000, 10000, 10000, 10000, 5000]);
+  assert.equal(deps.calls.length, 9);
+  assert.equal(deps.calls.at(-1)[2].timeout, 5000);
+  assert.ok(deps.calls.every(([, , options]) => options.timeout <= 30000 && options.killSignal === 'SIGKILL'));
+});
+
+test('transient 429, 5xx, network and timeouts retry; permanent failures and malformed JSON fail fast', async () => {
+  for (const error of [apiError('HTTP 429'), apiError('HTTP 503'), apiError('dial tcp: no such host'), apiError('TLS handshake timeout'), apiError('error connecting to api.github.com'), apiError('Get "https://api.github.com/": EOF'), apiError('write: broken pipe'), Object.assign(new Error('spawnSync gh ETIMEDOUT'), { code: 'ETIMEDOUT' }), apiError('read: connection reset by peer')]) {
+    let calls = 0;
+    const deps = retryClock(() => { if (++calls === 1) throw error; return '[]'; });
+    assert.deepEqual(await fetchRuns(apiOptions, deps), []);
+    assert.equal(calls, 2);
+  }
+  for (const error of [apiError('HTTP 400'), apiError('HTTP 401'), apiError('HTTP 403'), apiError('HTTP 404 network timeout'), new Error('spawnSync gh ENOENT')]) {
+    const deps = retryClock(() => { throw error; });
+    await assert.rejects(fetchRuns(apiOptions, deps), (actual) => actual === error);
+    assert.equal(deps.calls.length, 1);
+    assert.deepEqual(deps.delays, []);
+  }
+  const deps = retryClock(() => 'not JSON');
+  await assert.rejects(fetchRuns(apiOptions, deps), SyntaxError);
+  assert.equal(deps.calls.length, 1);
+  assert.deepEqual(deps.delays, []);
+});
+
+test('failed duplicate job lookup retries without losing job evidence or resetting the deadline', async () => {
+  let jobs = 0;
+  const deps = retryClock((command, args) => {
+    if (args[1].includes('/workflows/')) return JSON.stringify([run('push', 'success'), { ...run('pull_request', 'failure', 7), actor: 'github-actions[bot]' }]);
+    if (++jobs === 1) throw apiError('HTTP 502');
+    return '0';
+  });
+  assert.equal(verdict(await fetchRuns(apiOptions, deps)).verdict, GREEN);
+  assert.equal(jobs, 2);
+  assert.deepEqual(deps.delays, [1000]);
+});
+
+test('pending polls and API retries share one deadline, and pending sleeps do not overshoot it', async () => {
+  let calls = 0;
+  const deps = retryClock(() => {
+    if (++calls === 1) return '[]';
+    throw apiError('HTTP 502');
+  });
+  await assert.rejects(waitForGreen({ ...apiOptions, timeoutSeconds: 3, pollSeconds: 2 }, {
+    ...deps, runs: (options, runtime) => fetchRuns(options, { ...deps, ...runtime })
+  }), /did not conclude within 3s/u);
+  assert.equal(deps.now(), 3000);
+  assert.equal(calls, 2);
+  const pending = retryClock(() => '[]');
+  await assert.rejects(waitForGreen({ ...apiOptions, timeoutSeconds: 1 }, { ...pending, runs: () => [] }), /timeout/u);
+  assert.deepEqual(pending.delays, [1000]);
 });
 
 
@@ -126,5 +210,7 @@ test('the arguments are checked before a single API call is made', () => {
   assert.throws(() => parseArgs([`--sha=${sha}`]), GateError);
   assert.throws(() => parseArgs(['--sha=nope', '--repo=o/r']), GateError);
   assert.throws(() => parseArgs([`--sha=${sha}`, '--repo=o/r', '--admin']), GateError);
+  for (const flag of ['--timeout-seconds=0', '--timeout-seconds=-1', '--timeout-seconds=Infinity', '--poll-seconds=NaN', '--poll-seconds=-1'])
+    assert.throws(() => parseArgs([`--sha=${sha}`, '--repo=o/r', flag]), GateError);
   assert.deepEqual(parseArgs([`--sha=${sha}`, '--repo=o/r']), { sha, repo: 'o/r', workflow: 'ci.yml', timeoutSeconds: 1800, pollSeconds: 20 });
 });
