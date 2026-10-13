@@ -81,7 +81,7 @@ test('the fold: open until a row settles it, junk labels never carried, calls be
   const history = ledgerHistory([...archive, { date: '2026-09-01', settlements: { resolved_last_edition: [{ call: 'An old call before the epoch', outcome: 'open', prior_p: 0.5 }] }, articles: [] }, { date: '2026-10-04', settlements: { resolved_last_edition: [{ call: 'medium', outcome: 'open', prior_p: 0.64 }] }, articles: [] }]);
   assert.deepEqual(carriedCalls(history, '2026-10-05').map((c) => c.call), [IEA]);
   assert.deepEqual(carriedCalls(history, '2026-10-05', { resolved_last_edition: [{ call: IEA.toUpperCase(), outcome: 'miss', prior_p: 0.62 }] }), []);
-  assert.deepEqual(missingLedgerRows(history, '2026-10-05', { resolved_last_edition: [] }), [{ call: IEA, outcome: 'open', prior_p: 0.62 }]);
+  assert.deepEqual(missingLedgerRows(history, '2026-10-05', { resolved_last_edition: [] }), [{ call: IEA, outcome: 'open', prior_p: 0.62, event_id: history[0].event_id, negated: false }]);
   assert.deepEqual(followUps(undefined), []);
 });
 

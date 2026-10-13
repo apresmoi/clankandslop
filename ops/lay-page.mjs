@@ -7,7 +7,7 @@ import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-forma
 import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
 import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
 import { decisionSummaryFindings } from './summary-fidelity.mjs';
-import { LEDGER_EPOCH, carriedCalls, carryTape, followUps, forecastRows, ledgerHistory } from './open-clocks.mjs';
+import { LEDGER_EPOCH, carriedCalls, carryTape, followUps, ledgerHistory, ledgerSnapshot } from './open-clocks.mjs';
 import { archiveLedger } from './ledger-archive.mjs';
 import { deadlinesBlock, keyFiguresBlock } from './tape-blocks.mjs';
 
@@ -218,8 +218,7 @@ function tapePage(edition, order, articles, decisions, desk, agents, carry) {
   // Every call not yet settled, today's new ones included, each in its state.
   const open = carry.table;
   if (open.length > 0) {
-    const due = open.filter((row) => row.state === 'due').length;
-    const meta = `${open.length} open call${open.length === 1 ? '' : 's'}${due > 0 ? ` · ${due} due, awaiting verification` : ''}${isStr(tape.forecast_meta) ? ` · ${tape.forecast_meta}` : ''}`;
+    const meta = `${carry.snapshot.meta}${isStr(tape.forecast_meta) ? ` · ${tape.forecast_meta}` : ''}`;
     head.push({ block: 'ForecastLedger', props: { meta, open_calls: open } });
   }
   head.push({ block: 'TrackRecord', props: { label: 'Track Record · Settlement', resolved: 'edition' } });
@@ -314,8 +313,9 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
   const prior = (ledger ?? archiveLedger(undefined, { before: edition })).filter((entry) => entry.date < edition);
   const previous = prior.reduce((latest, entry) => (latest === undefined || entry.date > latest.date ? entry : latest), undefined);
   const today = { date: edition, settlements: desk['ledger.settlements'], articles: Object.values(articles) };
-  const history = ledgerHistory([...prior, today], { epoch: edition < LEDGER_EPOCH ? edition : LEDGER_EPOCH });
-  const carry = { calls: carriedCalls(ledgerHistory(prior), edition, desk['ledger.settlements']), follow: followUps(previous, articles), table: forecastRows(history, edition), open: history.filter((entry) => entry.outcome === 'open') };
+  const snapshot = ledgerSnapshot([...prior, today], edition, { epoch: edition < LEDGER_EPOCH ? edition : LEDGER_EPOCH });
+  const history = snapshot.history;
+  const carry = { calls: carriedCalls(ledgerHistory(prior), edition, desk['ledger.settlements']), follow: followUps(previous, articles), snapshot, table: snapshot.rows, open: history.filter((entry) => entry.outcome === 'open') };
   const front = frontPage(edition, order, articles, decisions, resolved, agents);
   const tape = tapePage(edition, order, articles, decisions, desk, agents, carry);
 

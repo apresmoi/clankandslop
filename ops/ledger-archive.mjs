@@ -6,7 +6,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
-import { NOTE_MIN_WORDS, SETTLE_GRACE_DAYS, callKey, carriedCalls, dueCallFindings, ledgerHistory, missingLedgerRows } from './open-clocks.mjs';
+import { NOTE_MIN_WORDS, SETTLE_GRACE_DAYS, carriedCalls, dueCallFindings, ledgerHistory, missingLedgerRows, matchesEvent } from './open-clocks.mjs';
 import { callState } from './ledger-states.mjs';
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
@@ -55,6 +55,6 @@ export function assertCarriedRows(edition, document, contentRoot = publicContent
  */
 export function openDueCalls(edition, document, contentRoot = publicContentRoot()) {
   const history = ledgerHistory(archiveLedger(contentRoot, { before: edition }));
-  const rows = new Map((Array.isArray(document?.resolved_last_edition) ? document.resolved_last_edition : []).map((row) => [callKey(row?.call), row]));
-  return carriedCalls(history, edition).filter((entry) => callState(entry, edition) === 'due' && (rows.get(callKey(entry.call))?.outcome ?? 'open') === 'open').map(({ call, deadline }) => ({ call, deadline: deadline ?? null }));
+  const rows = Array.isArray(document?.resolved_last_edition) ? document.resolved_last_edition : [];
+  return carriedCalls(history, edition).filter((entry) => callState(entry, edition) === 'due' && (rows.find(row => matchesEvent(entry, row))?.outcome ?? 'open') === 'open').map(({ call, deadline }) => ({ call, deadline: deadline ?? null }));
 }

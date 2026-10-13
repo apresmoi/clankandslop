@@ -51,7 +51,7 @@ const article = (id, agent, edition, index) => ({ id, edition_date: edition, sec
 const deskDocument = (name, edition, lead = 'story-0') => ({
   'caslon.chrome': { date: edition, edition_no: '0099', volume: 'I', issued_at: `${edition}T14:00:00Z`, revision: 1, tagline: "All the slop that's fit to print.", next_bell: '14:00 UTC', compiled_by: ['Cogsworth'], lead_story_id: lead, lead_reason: 'It explains what the day changes for readers.' },
   'caslon.weather': { weather: { city: 'Berlin', temp_c: 20, summary: 'partly cloudy', humidity_pct: 58, wind: 'W 11km/h' } },
-  'ledger.settlements': { resolved_last_edition: [{ call: 'A dated call that came in.', outcome: 'hit', prior_p: 0.62 }] },
+  'ledger.settlements': { resolved_last_edition: [{ call: 'A dated call that came in.', outcome: 'hit', event_outcome: true, prior_p: 0.62 }] },
   'ledger.worlddesk': { world_desk: { escalation_index: 0.68, delta: 'steady', open_conflicts: 8, watch: 5, derived: true, from: `content/log/${edition}/worlddesk.json`, method: 'clank.escalation-registry.v1 rev 1 · clank.flashpoint-registry.v1 rev 1' } },
 }[name]);
 function installWorldDeskPrivate(root, edition, document = deskDocument('ledger.worlddesk', edition)) {
@@ -439,7 +439,7 @@ runtimeTest('compose does not wait for a facts check: an unchecked piece runs st
     // A late Ledger refile cannot change the desk the composition sealed.
     process.env.CLANK_NEWSROOM_AGENT = 'ledger';
     const settlements = preparedDeskDocument('ledger.settlements', edition);
-    await assert.rejects(fileDesk({ edition, event_key: 'late-ledger-answer', name: 'ledger.settlements', document: { ...settlements, resolved_last_edition: [...settlements.resolved_last_edition, { call: 'A late call settled after composition', outcome: 'hit', prior_p: 0.6 }] } }), /is composed; refiling ledger\.settlements now would change the desk the composition sealed/u);
+    await assert.rejects(fileDesk({ edition, event_key: 'late-ledger-answer', name: 'ledger.settlements', document: { ...settlements, resolved_last_edition: [...settlements.resolved_last_edition, { call: 'A late call settled after composition', outcome: 'hit', event_outcome: true, prior_p: 0.6 }] } }), /is composed; refiling ledger\.settlements now would change the desk the composition sealed/u);
     await fileDesk({ edition, event_key: 'late-ledger-same', name: 'ledger.settlements', document: settlements });
     assert.ok(await authenticatedCurrentComposition(edition), 'an unchanged refile leaves the composition authentic');
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
@@ -1088,7 +1088,7 @@ runtimeTest('file_desk refuses a desk document the edition cannot be assembled f
     await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'worlddesk-mismatch', name: 'ledger.worlddesk', document: { world_desk: { ...worlddesk.world_desk, escalation_index: 0.7 } } }), /does not match the mounted private prepared document/u);
     await fileDesk({ edition: missingEdition, event_key: 'worlddesk-prepared', name: 'ledger.worlddesk', document: worlddesk });
     await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'settle-outcome', name: 'ledger.settlements', document: { resolved_last_edition: [{ call: 'A call.', outcome: 'partial', prior_p: 0.5 }] } }), /resolved_last_edition\[0\]\.outcome must be hit\|miss\|open/u);
-    await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'settle-prior', name: 'ledger.settlements', document: { resolved_last_edition: [{ call: 'A call.', outcome: 'hit', prior_p: 1.4 }] } }), /resolved_last_edition\[0\]\.prior_p must be a number in \[0,1\]/u);
+    await assert.rejects(fileDesk({ edition: missingEdition, event_key: 'settle-prior', name: 'ledger.settlements', document: { resolved_last_edition: [{ call: 'A call.', outcome: 'hit', event_outcome: true, prior_p: 1.4 }] } }), /resolved_last_edition\[0\]\.prior_p must be a number in \[0,1\]/u);
     // Nothing settled is the empty array, which is a complete document.
     await fileDesk({ edition: missingEdition, event_key: 'settle-empty', name: 'ledger.settlements', document: { resolved_last_edition: [] } });
 

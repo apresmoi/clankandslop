@@ -18,6 +18,12 @@ async function stages(t) {
     const artifact = path.join(staging, name), source = path.join(artifact, 'content', 'editions', edition);
     await mkdir(source, { recursive: true });
     await writeFile(path.join(source, 'front.json'), JSON.stringify({ headline }));
+    await mkdir(path.join(source, 'articles'));
+    for (const page of ['index.html', `editions/${edition}/index.html`, 'tape/index.html', `editions/${edition}/tape/index.html`, 'method/index.html']) {
+      const file = path.join(artifact, 'website/dist', page);
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, '<html>Clean publication</html>');
+    }
     const receipt = { version: 'clank.newsroom-release-receipt.v2', state: 'staged', edition,
       composition_digest: digest, artifact_digest: await artifactDigest(artifact),
       staging_root: `/agent/pressman/staging/${name}`, mechanical_digest: `sha256:${'a'.repeat(64)}` };
@@ -78,4 +84,20 @@ test('a malformed promoted artifact suffix cannot choose a receipt path', async 
   await symlink(malformed, path.join(f.staging, '.next'));
   await rename(path.join(f.staging, '.next'), path.join(f.staging, 'current-edition'));
   await assert.rejects(f.resolve(), /must be <edition>-<16 composition hex digits>/);
+});
+
+test('publication rechecks final evidence even when the receipt authenticates contaminated bytes', async t => {
+  const f = await stages(t), latest = f.entries[1];
+  const article = path.join(latest.artifact, 'content/editions', edition, 'articles/story.json');
+  await writeFile(article, JSON.stringify({ evidence_box: [{ fragment: 'Clean source' }] }));
+  const file = path.join(latest.artifact, 'website/dist/editions', edition, 'articles/story/index.html');
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, '<div class="evidence-row"><span class="frag">Skip&#32;to <b>content</b></span></div>');
+  latest.receipt.artifact_digest = await artifactDigest(latest.artifact);
+  await writeFile(latest.file, JSON.stringify(latest.receipt));
+  await assert.rejects(f.resolve(), /navigation: Skip to content/);
+  await writeFile(file, '<div class="evidence-row"><span class="frag">Clean source</span></div>');
+  latest.receipt.artifact_digest = await artifactDigest(latest.artifact);
+  await writeFile(latest.file, JSON.stringify(latest.receipt));
+  assert.equal((await f.resolve()).artifact, latest.artifact);
 });
