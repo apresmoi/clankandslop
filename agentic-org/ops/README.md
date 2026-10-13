@@ -235,7 +235,7 @@ systemctl enable --now clank-release.timer clank-cycle-audit.timer
 To disarm again: `systemctl disable --now clank-release.timer clank-cycle-audit.timer`.
 
 **Cutover from the seam to `spawnfile release` (once, Hetzner, root) — complete from clean state.**
-Production already runs Daimon 8349559 (D4 drain/resume), so the first
+Production already runs Daimon f728ad3 (D4 drain/resume), so the first
 release drains like every later one: no `--no-drain` deploy is needed. The
 first run has no ledger, so it releases (build, drain, redeploy) even though
 the code is unchanged.
