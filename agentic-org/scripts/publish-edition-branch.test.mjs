@@ -166,6 +166,12 @@ async function promoted(edition, short, seed = '{"page":"front"}\n') {
   const directory = join(root, artifact, 'content', 'editions', edition);
   mkdirSync(directory, { recursive: true });
   writeFileSync(join(directory, 'front.json'), seed);
+  mkdirSync(join(directory, 'articles'));
+  for (const page of ['index.html', `editions/${edition}/index.html`, 'tape/index.html', `editions/${edition}/tape/index.html`, 'method/index.html']) {
+    const file = join(root, artifact, 'website/dist', page);
+    mkdirSync(join(file, '..'), { recursive: true });
+    writeFileSync(file, '<html>Clean publication</html>');
+  }
   symlinkSync(artifact, join(root, 'current-edition'));
   const state = scratch('state'), receipts = join(state, 'editions', edition, 'receipts');
   mkdirSync(receipts, { recursive: true });
@@ -587,6 +593,12 @@ test('end to end: a promoted artifact becomes an edition branch on a real remote
   const editionDir = join(staging, artifact, 'content', 'editions', '2026-09-08');
   mkdirSync(join(editionDir, 'pages'), { recursive: true });
   writeFileSync(join(editionDir, 'pages', 'front.json'), '{"page":"front"}\n');
+  mkdirSync(join(editionDir, 'articles'));
+  for (const page of ['index.html', 'editions/2026-09-08/index.html', 'tape/index.html', 'editions/2026-09-08/tape/index.html', 'method/index.html']) {
+    const file = join(staging, artifact, 'website/dist', page);
+    mkdirSync(join(file, '..'), { recursive: true });
+    writeFileSync(file, '<html>Clean publication</html>');
+  }
   symlinkSync(artifact, join(staging, 'current-edition'));
   const receipts = join(state, 'editions', '2026-09-08', 'receipts');
   mkdirSync(receipts, { recursive: true });

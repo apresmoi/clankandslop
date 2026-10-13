@@ -1,4 +1,5 @@
 ---
+import { directionalOutcome, eventHappened } from '../../../ops/forecast-events.mjs';
 import type { TrackItem } from '../lib/track-record.ts';
 interface Legacy { call: string; outcome: 'hit' | 'miss' | 'open' | 'cancelled'; prior_p: number }
 interface Props {
@@ -8,7 +9,8 @@ interface Props {
   /** The paper's settled calls to date, across every edition. */
   record?: { hit: number; miss: number };
 }
-const { label: title = 'Resolved · Last Edition', items, record } = Astro.props;
+const { label: title = 'Resolved · Last Edition', record } = Astro.props;
+const items = Astro.props.items.map(r => ['hit', 'miss'].includes(r.outcome) ? { ...r, outcome: directionalOutcome(r.prior_p, eventHappened(r)) } : r);
 const settled = (record?.hit ?? 0) + (record?.miss ?? 0);
 // Open calls already sit in the Forecast Ledger above; this block is the record:
 // only what settled (or was cancelled) at this bell.

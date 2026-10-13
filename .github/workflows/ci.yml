@@ -123,9 +123,11 @@ jobs:
         run: npm run test:lib
       - name: Test generated art rendering
         run: node ops/generated-art-rendering.integration.test.mjs
+      - name: Verify forecast and evidence publication artifacts
+        run: node --test ops/forecast-artifacts.integration.test.mjs
       - name: Build website
         working-directory: website
-        run: npx astro build
+        run: npm run build
       # A green build says nothing about whether the glyphcss scenes RENDER:
       # feeding the camera pre-0.1 units type-checks, builds, and draws the
       # whole globe into one character cell. This rasterizes it headlessly and

@@ -1,4 +1,5 @@
 ---
+import { directionalOutcome, eventHappened } from '../../../ops/forecast-events.mjs';
 import { ledgerKey } from '../lib/tape.ts';
 interface Call {
   horizon?: string;
@@ -6,6 +7,8 @@ interface Call {
   call: 'YES' | 'NO' | 'FLAT';
   direction: 'bull' | 'bear' | 'flat';
   p: number;
+  update?: string;
+  updated?: string;
   /** The forecaster's own uncertainty band, when one was filed. */
   interval?: number;
   /** pending | due — the call's ledger state (ops/ledger-states.mjs). */
@@ -27,7 +30,8 @@ interface Props {
   open_calls: Call[];
   resolved?: Resolved[];
 }
-const { meta, open_calls, resolved } = Astro.props;
+const { meta, open_calls } = Astro.props;
+const resolved = Astro.props.resolved?.map(r => ({ ...r, outcome: ['hit', 'miss'].includes(r.outcome) ? directionalOutcome(r.prior_p, eventHappened(r)) : r.outcome }));
 const key = ledgerKey(open_calls);
 // Column heads carry the key as hover text; the footer keeps the one term a reader needs.
 const hint = (term: string) => { const k = key.find((x) => x.term === term); return k ? `${k.term}: ${k.text}` : undefined; };
@@ -65,6 +69,7 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
         </div>
         <span class={`ledger-call ${c.direction}`}>{c.call}<span class="arrow">{arrowFor(c.direction)}</span></span>
         <div class="ledger-pcol">
+          {c.update && <span class="ledger-update">Update {c.updated}: {c.update}</span>}
           <span class="ledger-p">{c.p.toFixed(2)}{c.interval !== undefined && <span class="ledger-int"> ±{c.interval.toFixed(2)}</span>}</span>
         </div>
         <span class="ledger-dis">

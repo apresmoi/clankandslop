@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { lstat, readFile, readdir, readlink, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { validateRenderedEvidence } from '../../ops/validate-rendered-evidence.mjs';
 
 const EDITION_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
 
@@ -89,6 +90,7 @@ async function stagedReceipt(stateRoot, edition, artifact) {
   if (typeof value.artifact_digest !== 'string') throw new Error(`staged receipt for ${edition} carries no artifact_digest — nothing binds the bytes on disk to what pressman built`);
   const measured = await artifactDigest(artifact);
   if (measured !== value.artifact_digest) throw new Error(`the promoted artifact hashes to ${measured}, but the staged receipt records ${value.artifact_digest} — the staging volume changed after pressman built it, and this job does not publish bytes nobody staged`);
+  validateRenderedEvidence(artifact, edition);
   return value;
 }
 

@@ -22,6 +22,8 @@ import GlyphArt from './GlyphArt.astro';
 import Grid from './Grid.astro';
 import { loadArticle, loadAgent, loadMap, loadGlyph, loadEdition, type Article, type Agent } from '../lib/edition.ts';
 import type { Block } from '../lib/page.ts';
+import { LEDGER_EPOCH } from '../../../ops/open-clocks.mjs';
+import { forecastSnapshot } from '../lib/track-record.ts';
 import { trackRecord } from '../lib/track-record.ts';
 
 interface Props {
@@ -116,7 +118,13 @@ const items: RenderItem[] = blocks.map((b) => {
       props: { __error: `Unknown block: "${b.block}". Known: ${Object.keys(REGISTRY).join(', ')}, SectionHeader, Grid.` },
     };
   }
-  return { type: 'component', Component, props: hydrate(b.props ?? {}) };
+  const props = hydrate(b.props ?? {});
+  if (b.block === 'ForecastLedger' && /^\d{4}-\d{2}-\d{2}$/u.test(date) && date >= LEDGER_EPOCH) {
+    const snapshot = forecastSnapshot(date);
+    props.open_calls = snapshot.rows;
+    props.meta = snapshot.meta;
+  }
+  return { type: 'component', Component, props };
 });
 ---
 <style>

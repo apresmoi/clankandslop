@@ -27,7 +27,7 @@ export const articleFilingSchema = object({
   topics: { ...list(text), uniqueItems: true }, body: list(text, 2),
   key_numbers: list(object({ label: text, value: text, dir: { enum: ['up', 'down', 'flat'] } }, ['label', 'value'])),
   evidence_box: list(evidence, 1), refs: { ...list(text, 1), uniqueItems: true },
-  confidence: object({ label: text, value: probability, interval: probability }, ['label', 'value']),
+  confidence: object({ label: text, value: probability, interval: probability, event_id: text, negated: { type: 'boolean' } }, ['label', 'value']),
   presentation: object({ flashpoint: object({ place: text, lat: number, lon: number, note: text }) }),
   previous_coverage: list(object({ date: { ...text, pattern: '^\\d{4}-\\d{2}-\\d{2}$' }, slug })), art,
 }, ['edition_date', 'section', 'kicker', 'headline', 'deck', 'epistemic', 'byline', 'timestamp', 'revision', 'next_update_utc', 'topics', 'body', 'key_numbers', 'evidence_box', 'refs']);

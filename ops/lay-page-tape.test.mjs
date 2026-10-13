@@ -78,5 +78,5 @@ test('the tape derives its open calls from the settlement document, and omits th
   }));
   const ledger = page.head.find((b) => b.block === 'ForecastLedger');
   assert.equal(ledger.props.meta, '1 open call');
-  assert.deepEqual(ledger.props.open_calls, [{ horizon: 'no date', question: 'A thing happens by Friday', call: 'YES', direction: 'bull', p: 0.62, state: 'pending', state_label: 'not yet due', detail: 'new in the 9 Sep edition' }]);
+  assert.deepEqual(ledger.props.open_calls.map(({ event_id, ...row }) => row), [{ horizon: 'no date', question: 'A thing happens by Friday', call: 'YES', direction: 'bull', p: 0.62, state: 'pending', state_label: 'not yet due', detail: 'new in the 9 Sep edition' }]);
 });

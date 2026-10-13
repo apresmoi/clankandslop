@@ -1,15 +1,7 @@
-// The paper's forecasting record, scored. /method prints it.
-//
-// Same ledger as the Track Record (track-record.ts) and the Tape: one fold
-// over every published edition (ops/open-clocks.mjs). A call is a YES/NO
-// question with a probability p for YES; the paper's call is YES when p >= 0.5.
-// Ledger settles it `hit` when the call came true and `miss` when it did not
-// (clankandslop-private/agentic-org/SYSTEMS.md §2.4), so whether the event
-// happened is recoverable from the row: YES happened exactly when a YES call
-// hit or a NO call missed.
-import { ledgerHistory } from '../../../ops/open-clocks.mjs';
-import { callState } from '../../../ops/ledger-states.mjs';
-import { ledgerArchive, type LedgerEdition } from './track-record.ts';
+// Scores use the first publication and the observed event in the same orientation.
+import { ledgerHistory, ledgerSnapshot } from '../../../ops/open-clocks.mjs';
+import { eventHappened } from '../../../ops/forecast-events.mjs';
+import { ledgerArchive, forecastSnapshot, type LedgerEdition } from './track-record.ts';
 
 interface Entry { call: string; prior_p: number; outcome: 'hit' | 'miss' | 'open' | 'cancelled'; opened: string; deadline?: string | null }
 
@@ -50,16 +42,13 @@ const round = (x: number) => Math.round(x * 1000) / 1000;
 const confidence = (p: number) => Math.round(Math.max(p, 1 - p) * 1e9) / 1e9;
 
 /** Did the event the call asks about happen? */
-export const happened = (entry: { prior_p: number; outcome: 'hit' | 'miss' }) => (entry.prior_p >= 0.5) === (entry.outcome === 'hit');
+export const happened = eventHappened;
 
-export function methodRecordFrom(editions: LedgerEdition[], date: string): MethodRecord {
+export function methodRecordFrom(editions: LedgerEdition[], date: string, snapshot = ledgerSnapshot(editions, date)): MethodRecord {
   const upTo = editions.filter((e) => e.date <= date);
   // Every call ever settled, the Track Record's "record to date".
   const all = ledgerHistory(upTo, { epoch: '0000-00-00' }) as Entry[];
   const settled = all.filter((c): c is Entry & { outcome: 'hit' | 'miss' } => c.outcome === 'hit' || c.outcome === 'miss');
-  // Open calls are the carried ledger the Tape prints (today's articles open tomorrow's calls).
-  const open = (ledgerHistory(upTo.map((e) => (e.date === date ? { ...e, articles: [] } : e))) as Entry[]).filter((c) => c.outcome === 'open');
-  const states = open.map((c) => callState(c, date));
 
   const n = settled.length;
   const ys = settled.map((c) => (happened(c) ? 1 : 0));
@@ -90,11 +79,11 @@ export function methodRecordFrom(editions: LedgerEdition[], date: string): Metho
     base_rate: base === null ? null : round(base),
     base_rate_brier: base === null ? null : round(base * (1 - base)),
     calibration,
-    pending: states.filter((s) => s === 'pending').length,
-    due: states.filter((s) => s === 'due').length,
+    pending: snapshot.pending,
+    due: snapshot.due,
   };
 }
 
 export function methodRecord(date: string): MethodRecord {
-  return methodRecordFrom(ledgerArchive(), date);
+  return methodRecordFrom(ledgerArchive(), date, forecastSnapshot(date));
 }

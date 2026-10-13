@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { contentRoot } from './edition.ts';
 // One fold for the tape, Ledger's filing gate and this strip: a call stays
 // open across editions until a settlement row marks it hit or miss.
-import { ledgerHistory } from '../../../ops/open-clocks.mjs';
+import { ledgerHistory, ledgerSnapshot } from '../../../ops/open-clocks.mjs';
 import { CALL_STATES, callState, shortDay } from '../../../ops/ledger-states.mjs';
 
 export type Outcome = 'hit' | 'miss' | 'open' | 'cancelled';
@@ -25,8 +25,7 @@ type Entry = TrackRow & { opened: string; settled_on?: string; deadline?: string
  */
 export function trackRecordFrom(editions: LedgerEdition[], date: string): TrackRecordView {
   const upTo = editions.filter((e) => e.date <= date);
-  // Today's articles open calls for tomorrow; only today's rows count today.
-  const asOf = upTo.map((e) => (e.date === date ? { ...e, articles: [] } : e));
+  const asOf = upTo;
   const history = ledgerHistory(asOf) as Entry[];
   const items = [
     ...history.filter((c) => c.outcome !== 'open' && c.settled_on === date),
@@ -64,4 +63,10 @@ export function ledgerArchive(root: string = contentRoot): LedgerEdition[] {
 
 export function trackRecord(date: string): TrackRecordView {
   return trackRecordFrom(ledgerArchive(), date);
+}
+
+const snapshots = new Map<string, ReturnType<typeof ledgerSnapshot>>();
+export function forecastSnapshot(date: string) {
+  if (!snapshots.has(date)) snapshots.set(date, ledgerSnapshot(ledgerArchive(), date));
+  return snapshots.get(date)!;
 }

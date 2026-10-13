@@ -10,6 +10,10 @@
 // through. Published editions are not re-checked.
 
 const MARKERS = [
+  ['navigation', /\bskip to (?:main )?content\b/iu],
+  ['navigation', /\border a flag\b/iu],
+  ['navigation', /\b(?:submit site search query|home logo link|website search|e-newsletter signup)\b/iu],
+  ['navigation', /\b(?:service academy nominations|invitations & meeting requests|fellowships, internships & page program)\b/iu],
   ['ad_slug', /\bstory continues below(?: this)?(?: ad(?:vertisement)?)?\b/iu],
   ['ad_slug', /(?:^|[.!?"”]\s+)(?:ADVERTISEMENT|Advertisement)(?=\s+\p{Lu}|\s*$)/u],
   ['ad_slug', /\bscroll (?:down )?to continue(?: with content| reading)?\b/iu],

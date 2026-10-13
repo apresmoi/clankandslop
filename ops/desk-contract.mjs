@@ -13,7 +13,7 @@
 // `website/src/components/{WorldGlyph,TrackRecord}.astro`.
 
 export const OUTCOMES = new Set(['hit', 'miss', 'open', 'cancelled']);
-const ROW_KEYS = new Set(['call', 'outcome', 'prior_p', 'note']);
+const ROW_KEYS = new Set(['call', 'outcome', 'prior_p', 'note', 'event_outcome', 'event_id', 'negated']);
 export const MARKET_GROUPS = Object.freeze(['rates', 'fx', 'commodities', 'equities']);
 const DAY = /^\d{4}-\d{2}-\d{2}$/u;
 
@@ -74,15 +74,26 @@ const SHAPES = {
   },
   'ledger.settlements': {
     keys: ['resolved_last_edition'],
+    optional: ['event_links'],
     check(document, out) {
       // An edition where nothing settled files the empty array. Omitting the
       // document instead leaves desk.length !== 4 and there is no edition.
       if (!Array.isArray(document.resolved_last_edition)) { out.push('resolved_last_edition must be an array (file [] when nothing settled)'); return; }
+      if (document.event_links !== undefined) {
+        if (!Array.isArray(document.event_links)) out.push('event_links must be an array');
+        else for (const link of document.event_links) {
+          if (!isStr(link?.call) || !isStr(link?.event_id) || typeof link?.negated !== 'boolean' || Object.keys(link).some(k => !['call', 'event_id', 'negated'].includes(k))) out.push('event_links entries must be {call, event_id, negated}');
+        }
+      }
       for (const [i, row] of document.resolved_last_edition.entries()) {
         if (!isObj(row)) { out.push(`resolved_last_edition[${i}] must be an object {call, outcome, prior_p}`); continue; }
         if (!isStr(row.call)) out.push(`resolved_last_edition[${i}].call must be a non-empty string`);
         if (!OUTCOMES.has(row.outcome)) out.push(`resolved_last_edition[${i}].outcome must be hit|miss|open|cancelled`);
         if (!isP(row.prior_p)) out.push(`resolved_last_edition[${i}].prior_p must be a number in [0,1]`);
+        if (row.event_outcome !== undefined && typeof row.event_outcome !== 'boolean') out.push(`resolved_last_edition[${i}].event_outcome must be boolean`);
+        if (out.profile === 'filing' && ['hit', 'miss'].includes(row.outcome) && typeof row.event_outcome !== 'boolean') out.push(`resolved_last_edition[${i}].event_outcome must record whether the event happened; hit/miss is derived from the first publication`);
+        if (row.event_id !== undefined && !isStr(row.event_id)) out.push(`resolved_last_edition[${i}].event_id must be non-empty`);
+        if (row.negated !== undefined && typeof row.negated !== 'boolean') out.push(`resolved_last_edition[${i}].negated must be boolean`);
         const extra = Object.keys(row).filter((key) => !ROW_KEYS.has(key));
         if (extra.length > 0) out.push(`resolved_last_edition[${i}] carries unexpected key(s) [${extra.join(', ')}] — a row is {call, outcome, prior_p, note?}`);
         if (row.note !== undefined && !isStr(row.note)) out.push(`resolved_last_edition[${i}].note must be a non-empty string when present`);
