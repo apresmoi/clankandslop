@@ -152,3 +152,60 @@ test('built publication scores NO correctly, renders the complementary update, s
     assert.throws(() => validateRenderedEvidence(root, date), /raw_excerpt count/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('built Tape merges has/have reforecasts and scores a negative first publication at 50% as YES', () => {
+  const root = mkdtempSync(resolve(tmpdir(), 'forecast-direction-artifacts-'));
+  try {
+    fixture(root, clean);
+    for (const day of [firstDate, date]) {
+      const path = resolve(root, `content/editions/${day}/articles`);
+      rmSync(path, { recursive: true });
+      mkdirSync(path);
+    }
+    const majority = 'The council has a majority by 30 November 2026.';
+    const noMajority = majority.replace('has', 'does not have');
+    write(root, `content/editions/${firstDate}/articles/first.json`, article(firstDate, 'first', majority, 0.42, clean));
+    write(root, `content/editions/${firstDate}/articles/budget.json`, article(firstDate, 'budget', negative, 0.5, clean));
+    write(root, `content/editions/${date}/articles/update.json`, article(date, 'update', noMajority, 0.67, clean));
+    const ledgerPath = `content/editions/${date}/desk/ledger.settlements.json`;
+    write(root, ledgerPath, { resolved_last_edition: [] });
+    const assertBudgetDirection = path => {
+      const html = read(root, `website/dist/${path}`);
+      const row = (html.match(/<div class="ledger-row\b[^]*?(?=<div class="ledger-row\b|<p class="ledger-foot")/gu) ?? []).find(row => row.includes('The council passes the budget'));
+      assert.ok(row, `${path}: the canonical budget question is visible`);
+      assert.doesNotMatch(row, /does not pass/);
+      assert.match(row, /class="ledger-call bear"[^]*?NO\s*<span class="arrow"[^]*?▼/);
+      assert.match(row, /class="ledger-p"[^]*?0\.50/);
+      assert.doesNotMatch(row, /YES|▲/);
+      return row;
+    };
+    const before = execFileSync('npm', ['run', 'build'], { cwd: resolve(root, 'website'), encoding: 'utf8', stdio: 'pipe', timeout: 180000 });
+    assert.match(before, /OK — rendered evidence/);
+    const originalPath = `editions/${firstDate}/tape/index.html`;
+    const originalBudget = assertBudgetDirection(originalPath);
+    for (const path of ['tape/index.html', `editions/${date}/tape/index.html`]) assertBudgetDirection(path);
+    write(root, ledgerPath, { resolved_last_edition: [
+      { call: negative, prior_p: 0.5, outcome: 'miss', event_outcome: true, note: 'The council rejected the budget, so the negative published event happened.' },
+    ] });
+    const output = execFileSync('npm', ['run', 'build'], { cwd: resolve(root, 'website'), encoding: 'utf8', stdio: 'pipe', timeout: 180000 });
+    assert.match(output, /OK — rendered evidence/);
+    for (const path of ['tape/index.html', `editions/${date}/tape/index.html`]) {
+      const html = read(root, `website/dist/${path}`), plain = text(html);
+      assert.equal((html.match(/class="ledger-row /gu) ?? []).length, 1, path);
+      assert.match(plain, /1 open call/);
+      assert.match(plain, /42% → 33%/);
+      assert.doesNotMatch(plain, /haves|does not have/);
+      assert.match(plain, /Settled · hit Yes if The council passes the budget/);
+      assert.match(plain, /Record to date · 1 hit · 0 miss/);
+      assert.doesNotMatch(html, /tr-state miss/);
+    }
+    const method = text(read(root, 'website/dist/method/index.html'));
+    assert.match(method, /1 settled calls: 1 hits and 0 misses/);
+    assert.match(method, /Another 1 are open:/);
+    assert.match(method, /0\.250 Brier score, the paper/);
+    assert.equal(assertBudgetDirection(originalPath), originalBudget, 'Settlement preserves the rendered original call');
+    const original = text(read(root, `website/dist/editions/${firstDate}/tape/index.html`));
+    assert.match(original, /2 open calls/);
+    assert.doesNotMatch(original, /42% → 33%/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

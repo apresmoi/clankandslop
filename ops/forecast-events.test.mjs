@@ -94,3 +94,59 @@ test('explicit polarity for unknown grammar complements the whole displayed cond
   assert.throws(() => forecastEvent(NEGATIVE, '2026-10-14', { negated: false }), /conflicts/);
   assert.match(forecastEvent('Without a loading report', '2026-10-14', { negated: true }).call, /condition is false: “Without a loading report”/);
 });
+
+test('has and does not have share one event and complementary posterior updates', () => {
+  const positive = 'The council has a majority by 30 November 2026.';
+  for (const auxiliary of ['does not', "doesn't"]) {
+    const negative = positive.replace('has', `${auxiliary} have`);
+    const snapshot = ledgerSnapshot([
+      { date: '2026-10-14', articles: [article('first', positive, 0.42)] },
+      { date: '2026-10-16', articles: [article('update', negative, 0.67)] },
+    ], '2026-10-16');
+    assert.equal(snapshot.open, 1);
+    assert.equal(snapshot.rows[0].update, '42% → 33%');
+  }
+});
+
+test('settlement scores the first published direction at and around 50% in either orientation', () => {
+  for (const label of [POSITIVE, NEGATIVE]) for (const p of [0.49, 0.5, 0.51]) for (const observed of [true, false]) {
+    for (const fromArticle of [true, false]) {
+      const first = fromArticle ? { articles: [article('first', label, p)] } : { settlements: [{ call: label, prior_p: p, outcome: 'open' }] };
+      const [entry] = ledgerHistory([
+        { date: '2026-10-14', ...first },
+        { date: '2026-10-16', articles: [article('update', label, 1 - p)] },
+        { date: '2026-11-30', settlements: [{ call: label, prior_p: 1 - p, outcome: 'miss', event_outcome: observed }] },
+      ]);
+      assert.equal(entry.outcome, (p >= 0.5) === observed ? 'hit' : 'miss', `${label}, p=${p}, observed=${observed}, fromArticle=${fromArticle}`);
+      assert.equal(entry.event_outcome, label === NEGATIVE ? !observed : observed);
+      if (p === 0.5) assert.equal((entry.prior_p - Number(entry.event_outcome)) ** 2, 0.25);
+    }
+  }
+});
+
+test('Tape preserves the latest published direction at and around 50% before and after settlement', () => {
+  for (const label of [POSITIVE, NEGATIVE]) for (const p of [0.49, 0.5, 0.51]) for (const fromArticle of [true, false]) {
+    const first = fromArticle ? { articles: [article('first', label, p)] } : { settlements: [{ call: label, prior_p: p, outcome: 'open' }] };
+    const editions = [{ date: '2026-10-14', ...first }];
+    const check = (day, publishedLabel, publishedP) => {
+      const [row] = ledgerSnapshot(editions, day).rows;
+      const yes = (publishedP >= 0.5) !== (publishedLabel === NEGATIVE);
+      assert.match(row.question, /The council passes the budget/);
+      assert.doesNotMatch(row.question, /does not pass/);
+      assert.equal(row.call, yes ? 'YES' : 'NO');
+      assert.equal(row.direction, yes ? 'bull' : 'bear');
+      assert.equal(row.p, publishedLabel === NEGATIVE ? Math.round((1 - publishedP) * 100) / 100 : publishedP);
+      return row;
+    };
+    const original = check('2026-10-14', label, p);
+    editions.push({ date: '2026-10-15', settlements: [{ call: POSITIVE, prior_p: original.p, outcome: 'open' }] });
+    assert.deepEqual(check('2026-10-15', label, p).call, original.call, 'Canonical carry must retain the published direction');
+    for (const updateLabel of [NEGATIVE, POSITIVE]) {
+      editions.push({ date: '2026-10-16', articles: [article(updateLabel, updateLabel, p)] });
+      check('2026-10-16', updateLabel, p);
+    }
+    editions.push({ date: '2026-11-30', settlements: [{ call: label, prior_p: p, outcome: 'miss', event_outcome: true }] });
+    assert.equal(ledgerSnapshot(editions, '2026-11-30').rows.length, 0);
+    assert.deepEqual(check('2026-10-14', label, p), original, 'Settlement cannot rewrite the original Tape');
+  }
+});

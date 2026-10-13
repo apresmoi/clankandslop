@@ -94,7 +94,7 @@ export function ledgerHistory(editions, { epoch = LEDGER_EPOCH } = {}) {
       if (!isCallLabel(row?.call) || !isP(row?.prior_p)) continue;
       const event = identity(row.call, edition.date, row);
       const key = event.event_id, p = orientedProbability(row.prior_p, event.negated);
-      if (!calls.has(key)) calls.set(key, { event_id: key, call: event.call, prior_p: p, latest_p: p, updates: [], opened: edition.date, deadline: event.deadline, ...sources.get(callKey(row.call)), outcome: 'open' });
+      if (!calls.has(key)) calls.set(key, { event_id: key, call: event.call, prior_p: p, latest_p: p, updates: [], first_publication: { date: edition.date, call: row.call, p: row.prior_p, negated: event.negated }, opened: edition.date, deadline: event.deadline, ...sources.get(callKey(row.call)), outcome: 'open' });
       const entry = calls.get(key);
       if (event.deadline && entry.deadline && event.deadline !== entry.deadline) throw new Error('A forecast event cannot change its deadline; publish a distinct event id');
       entry.aliases = [...new Set([...(entry.aliases ?? []), callKey(row.call), callKey(event.call)])];
@@ -103,7 +103,11 @@ export function ledgerHistory(editions, { epoch = LEDGER_EPOCH } = {}) {
       if (TERMINAL.has(row.outcome)) {
         const observed = eventHappened(row);
         const event_outcome = event.negated ? !observed : observed;
-        Object.assign(entry, { outcome: row.outcome === 'cancelled' ? 'cancelled' : directionalOutcome(entry.prior_p, event_outcome), event_outcome, settled_on: edition.date });
+        // Complementing 50% preserves the number but reverses its YES direction.
+        // Score in the first publication's wording; keep canonical inputs for Brier.
+        const first = entry.first_publication;
+        const publishedOutcome = first.negated ? !event_outcome : event_outcome;
+        Object.assign(entry, { outcome: row.outcome === 'cancelled' ? 'cancelled' : directionalOutcome(first.p, publishedOutcome), event_outcome, settled_on: edition.date });
       }
     }
   }
@@ -180,12 +184,15 @@ export function forecastRows(history, edition) {
     .sort((a, b) => String(a.deadline ?? '9999').localeCompare(String(b.deadline ?? '9999')) || a.opened.localeCompare(b.opened))
     .map((entry) => {
       const state = callState(entry, edition);
+      const published = entry.updates?.at(-1) ?? entry.first_publication;
+      // At 50%, canonical probability alone cannot retain a negated YES call.
+      const yes = published ? ((published.published_p ?? published.p) >= 0.5) !== published.negated : (entry.latest_p ?? entry.prior_p) >= 0.5;
       return {
         horizon: entry.deadline ? shortDay(entry.deadline) : 'no date',
         question: entry.call,
         event_id: entry.event_id,
-        call: (entry.latest_p ?? entry.prior_p) >= 0.5 ? 'YES' : 'NO',
-        direction: (entry.latest_p ?? entry.prior_p) >= 0.5 ? 'bull' : 'bear',
+        call: yes ? 'YES' : 'NO',
+        direction: yes ? 'bull' : 'bear',
         p: entry.latest_p ?? entry.prior_p,
         ...(entry.updates?.length ? { update: `${Math.round(entry.prior_p * 100)}% → ${Math.round(entry.latest_p * 100)}%`, updated: shortDay(entry.updates.at(-1).date) } : {}),
         state,

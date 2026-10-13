@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { callDeadline } from './ledger-states.mjs';
 
 export const wordingKey = (call) => String(call ?? '').toLowerCase().replace(/\s+/gu, ' ').trim();
-const thirdPerson = verb => /(?:s|sh|ch|x|z|o)$/iu.test(verb) ? `${verb}es` : /[^aeiou]y$/iu.test(verb) ? `${verb.slice(0, -1)}ies` : `${verb}s`;
+const thirdPerson = verb => /^have$/iu.test(verb) ? 'has' : /(?:s|sh|ch|x|z|o)$/iu.test(verb) ? `${verb}es` : /[^aeiou]y$/iu.test(verb) ? `${verb.slice(0, -1)}ies` : `${verb}s`;
 
 export function forecastEvent(call, opened, metadata = {}) {
   const published = String(call).trim();
