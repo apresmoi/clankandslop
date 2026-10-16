@@ -1,0 +1,1409 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-16",
+  "generated_at": "2026-10-16T07:53:29Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 126.55,
+        "observed_at": "2026-10-14",
+        "stale_days": 2,
+        "contributes": 3,
+        "reason": "126.55 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 101.91,
+        "observed_at": "2026-10-14",
+        "stale_days": 2,
+        "contributes": 1,
+        "reason": "101.91 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.179,
+        "observed_at": "2026-10-12",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "6.179 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.22,
+        "observed_at": "2026-10-14",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3.22 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 16.87,
+        "observed_at": "2026-10-14",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "16.87 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.25,
+        "observed_at": "2026-10-14",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3.25 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.6023,
+        "observed_at": "2026-10-09",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "121.6023 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-16T07:53:29Z",
+        "http_status": 200,
+        "bytes": 170111,
+        "sha256": "cf9f077822a7620434e86b7d48aa44bada7ef99f57726d50035ae50b549e9011",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-16T07:53:29Z",
+        "http_status": 200,
+        "bytes": 175886,
+        "sha256": "dccb1f7fda2711b3cdedba44362f1e4300a319eaf822b47a716b22290bda286a",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-16T07:53:29Z",
+        "http_status": 200,
+        "bytes": 28925,
+        "sha256": "d91455eb9474f645256f000a6a31ac07f201b5e2301cb71c72e8e776d201bd2d",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-16T07:53:29Z",
+        "http_status": 200,
+        "bytes": 116169,
+        "sha256": "40ae0c0c11c1e1d735872905a23b9f9fe213b7de6da439ba256a52f13254043a",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-16T07:53:29Z",
+        "http_status": 200,
+        "bytes": 161595,
+        "sha256": "b3f6f3483e48d15c041dbf082e08c7521fbc7e0d64616cf569a1d96a6b8041bb",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-16T07:53:29Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "ba231938364042eec523d15a86cd6ff3fff5a22221ca016dfeec90e9fe7cf460",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-16T07:53:29Z",
+        "http_status": 200,
+        "bytes": 104637,
+        "sha256": "a7b6e593bf1c9dd6c4601c1bd52de979b148eb2e98679ce1cafcda789f372d59",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 47,
+    "open_conflicts": 4,
+    "watch": 6,
+    "dormant": 3,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-0239cda0",
+            "story_title": "IEA accelerates emergency stocks, including more than twenty million barrels of diesel",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+            "source_urls": [
+              "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+              "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+              "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+              "https://www.iea.org/topics/the-middle-east-and-global-energy-markets",
+              "https://www.iea.org/topics/the-middle-east-and-global-energy-markets",
+              "https://www.iea.org/topics/the-middle-east-and-global-energy-markets",
+              "https://www.iea.org/data-and-statistics/data-tools/2026-energy-crisis-policy-response-tracker",
+              "https://www.iea.org/data-and-statistics/data-tools/2026-energy-crisis-policy-response-tracker",
+              "https://www.iea.org/data-and-statistics/data-tools/2026-energy-crisis-policy-response-tracker",
+              "https://www.iea.org/topics/energy-security",
+              "https://www.iea.org/topics/energy-security",
+              "https://www.iea.org/topics/energy-security",
+              "https://www.reuters.com/business/energy/iea-speed-up-oil-stocks-release-including-over-20-million-barrels-diesel-2026-10-15/"
+            ],
+            "observed_at": "2026-10-15T19:14:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-929ad480",
+            "story_title": "Trump publicly turned Ukraine’s refinery campaign into the target of his energy-price pressure",
+            "source": "chatgpt/chatgpt-rolling-0914.md",
+            "slot": "0914",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.newsmax.com/newsmax-tv/donald-trump-russia-ukraine/2026/10/15/id/1272958/"
+            ],
+            "observed_at": "2026-10-16T07:14:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-60b660be",
+            "story_title": "Rubio turns the seized Hezbollah explosives into a test of Lebanese state authority",
+            "source": "chatgpt/chatgpt-rolling-0323.md",
+            "slot": "0323",
+            "matched": [
+              "Hezbollah",
+              "southern Lebanon"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/rubio-urges-lebanon-not-return-confiscated-explosives-hezbollah-us-official-says-2026-10-15/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/rubio-urges-lebanon-not-return-confiscated-explosives-hezbollah-us-official-says-2026-10-15/",
+              "https://www.reuters.com/world/middle-east/rubio-urges-lebanon-not-return-confiscated-explosives-hezbollah-us-official-says-2026-10-15/",
+              "https://www.reuters.com/world/middle-east/rubio-urges-lebanon-not-return-confiscated-explosives-hezbollah-us-official-says-2026-10-15/",
+              "https://apnews.com/article/lebanon-hezbollah-explosives-truck-israel-assassinations-afd966f3b357d29a486eb042de9744ae",
+              "https://apnews.com/article/lebanon-hezbollah-explosives-truck-israel-assassinations-afd966f3b357d29a486eb042de9744ae",
+              "https://apnews.com/article/lebanon-hezbollah-explosives-truck-israel-assassinations-afd966f3b357d29a486eb042de9744ae"
+            ],
+            "observed_at": "2026-10-16T01:23:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 19,
+        "evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-0d32ade0",
+            "story_title": "Lead 1: Russian overnight/daytime drone campaign kills at least 17 and injures 67 across multiple Ukrainian…",
+            "source": "grok/grok-rolling-1848.md",
+            "slot": "1848",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+            "source_urls": [
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://kyivindependent.com/russian-attacks-kill-at-least-17-injure-67-across-ukraine-as-drone-waves-wreak-havoc-in-central-western-oblasts/",
+              "https://www.ukrinform.net/rubric-ato/4174564-russia-launches-massive-drone-attack-on-ukraine-air-defence-neutralizes-536-of-580-targets.html",
+              "https://www.ukrinform.net/rubric-ato/4174564-russia-launches-massive-drone-attack-on-ukraine-air-defence-neutralizes-536-of-580-targets.html",
+              "https://www.ukrinform.net/rubric-ato/4174564-russia-launches-massive-drone-attack-on-ukraine-air-defence-neutralizes-536-of-580-targets.html",
+              "https://www.ukrinform.net/rubric-ato/4174564-russia-launches-massive-drone-attack-on-ukraine-air-defence-neutralizes-536-of-580-targets.html",
+              "https://newsukraine.rbc.ua/news/missiles-and-hundreds-of-drones-how-ukraine-1792048013.html"
+            ],
+            "observed_at": "2026-10-15T16:48:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-0daaafb4",
+            "story_title": "Lead 2: Ukraine restores Starshield/Starlink after throttling; resumes Ryazan refinery strike as Zelensky…",
+            "source": "grok/grok-rolling-0342.md",
+            "slot": "0342",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+            "source_urls": [
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+              "https://www.kyivpost.com/post/87154",
+              "https://www.kyivpost.com/post/87154",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://www.bbc.com",
+              "https://meduza.io/en/news/2026/10/15/starlink-service-for-ukraine-s-military-fully-resumes"
+            ],
+            "observed_at": "2026-10-16T01:42:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-0fb4ee67",
+            "story_title": "France and Ukraine put an October aviation package and a year-end FREYJA milestone on the clock",
+            "source": "chatgpt/chatgpt-rolling-0323.md",
+            "slot": "0323",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.president.gov.ua/en/news/cogo-misyacya-budut-novi-paketi-na-posilennya-ukrayinskoyi-a-106901",
+            "source_urls": [
+              "https://www.president.gov.ua/en/news/cogo-misyacya-budut-novi-paketi-na-posilennya-ukrayinskoyi-a-106901",
+              "https://www.president.gov.ua/en/news/cogo-misyacya-budut-novi-paketi-na-posilennya-ukrayinskoyi-a-106901",
+              "https://www.president.gov.ua/en/news/cogo-misyacya-budut-novi-paketi-na-posilennya-ukrayinskoyi-a-106901",
+              "https://www.reuters.com/business/aerospace-defense/crucial-give-ukraine-all-means-needed-to-defend-population-infrastructure-frances-2026-10-15/",
+              "https://www.reuters.com/business/aerospace-defense/crucial-give-ukraine-all-means-needed-to-defend-population-infrastructure-frances-2026-10-15/",
+              "https://www.reuters.com/business/aerospace-defense/crucial-give-ukraine-all-means-needed-to-defend-population-infrastructure-frances-2026-10-15/",
+              "https://www.kyivpost.com/post/87214",
+              "https://www.kyivpost.com/post/87214",
+              "https://www.kyivpost.com/post/87214",
+              "https://unn.ua/en/news/this-month-there-will-be-new-packages-to-strengthen-ukraines-aviation-capabilities-zelenskyy-after-meeting-with-macron",
+              "https://unn.ua/en/news/this-month-there-will-be-new-packages-to-strengthen-ukraines-aviation-capabilities-zelenskyy-after-meeting-with-macron",
+              "https://unn.ua/en/news/this-month-there-will-be-new-packages-to-strengthen-ukraines-aviation-capabilities-zelenskyy-after-meeting-with-macron"
+            ],
+            "observed_at": "2026-10-16T01:23:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-27f08d04",
+            "story_title": "Lead 1: Trump labels Ukraine’s resumed Russian refinery strikes a “disgrace,” calls Zelensky harder to deal…",
+            "source": "grok/grok-rolling-0947.md",
+            "slot": "0947",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.kyivpost.com/post/87217",
+              "https://www.kyivpost.com/post/87217",
+              "https://www.kyivpost.com/post/87217",
+              "https://www.france24.com/en/europe/20261016-live-trump-calls-renewed-ukraine-attacks-on-russian-oil-refineries-a-disgrace",
+              "https://www.france24.com/en/europe/20261016-live-trump-calls-renewed-ukraine-attacks-on-russian-oil-refineries-a-disgrace"
+            ],
+            "observed_at": "2026-10-16T07:47:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-310883d1",
+            "story_title": "Lead 3 (material update on previously published Starlink item): Ukrainian Defence Ministry sources and Axios…",
+            "source": "grok/grok-rolling-1848.md",
+            "slot": "1848",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+            "source_urls": [
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://www.theverge.com/science/1011928/ukraine-spacex-starshield-services-restored",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/"
+            ],
+            "observed_at": "2026-10-15T16:48:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-4dce2638",
+            "story_title": "Material update to the previously published “Twelve Senators Tell Trump to Rescind the Russia Diesel License.”",
+            "source": "chatgpt/chatgpt-rolling-1514.md",
+            "slot": "1514",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+              "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+              "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+              "https://www.siliconvalley.ma/en/russian-diesel-morocco-tanker/",
+              "https://www.siliconvalley.ma/en/russian-diesel-morocco-tanker/",
+              "https://www.siliconvalley.ma/en/russian-diesel-morocco-tanker/",
+              "https://www.theins.ru/en/news/297795",
+              "https://www.theins.ru/en/news/297795",
+              "https://www.theins.ru/en/news/297795",
+              "https://ofac.treasury.gov/recent-actions/20261009_33"
+            ],
+            "observed_at": "2026-10-15T13:14:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-5a408906",
+            "story_title": "Material update to two previously published strands: the Ukraine energy-targeting halt and the assessment…",
+            "source": "chatgpt/chatgpt-rolling-1514.md",
+            "slot": "1514",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://apnews.com/article/russia-ukraine-war-oil-refinery-attacks-resume-0071b4f3792c9912b977b0ee73505b18",
+            "source_urls": [
+              "https://apnews.com/article/russia-ukraine-war-oil-refinery-attacks-resume-0071b4f3792c9912b977b0ee73505b18",
+              "https://apnews.com/article/russia-ukraine-war-oil-refinery-attacks-resume-0071b4f3792c9912b977b0ee73505b18",
+              "https://apnews.com/article/russia-ukraine-war-oil-refinery-attacks-resume-0071b4f3792c9912b977b0ee73505b18",
+              "https://www.reuters.com/world/zelenskiy-says-ukraine-will-resume-strikes-russian-refineries-ft-reports-2026-10-15/",
+              "https://www.reuters.com/world/zelenskiy-says-ukraine-will-resume-strikes-russian-refineries-ft-reports-2026-10-15/",
+              "https://www.reuters.com/world/zelenskiy-says-ukraine-will-resume-strikes-russian-refineries-ft-reports-2026-10-15/",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://english.nv.ua/nation/starshield-service-restored-in-ukraine-on-oct-15-50650328.html",
+              "https://english.nv.ua/nation/starshield-service-restored-in-ukraine-on-oct-15-50650328.html"
+            ],
+            "observed_at": "2026-10-15T13:14:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-61615daf",
+            "story_title": "White House provenance and a 160-kph ceiling materially change the Starshield story",
+            "source": "chatgpt/chatgpt-rolling-0323.md",
+            "slot": "0323",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/order-limit-starshield-ukraine-came-inside-white-house-sources-say-2026-10-15/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/order-limit-starshield-ukraine-came-inside-white-house-sources-say-2026-10-15/",
+              "https://www.reuters.com/world/europe/order-limit-starshield-ukraine-came-inside-white-house-sources-say-2026-10-15/",
+              "https://www.reuters.com/world/europe/order-limit-starshield-ukraine-came-inside-white-house-sources-say-2026-10-15/",
+              "https://apnews.com/article/russia-ukraine-war-oil-refinery-attacks-resume-0071b4f3792c9912b977b0ee73505b18",
+              "https://apnews.com/article/russia-ukraine-war-oil-refinery-attacks-resume-0071b4f3792c9912b977b0ee73505b18",
+              "https://apnews.com/article/russia-ukraine-war-oil-refinery-attacks-resume-0071b4f3792c9912b977b0ee73505b18",
+              "https://www.president.gov.ua/en/news/cogo-misyacya-budut-novi-paketi-na-posilennya-ukrayinskoyi-a-106901",
+              "https://www.president.gov.ua/en/news/cogo-misyacya-budut-novi-paketi-na-posilennya-ukrayinskoyi-a-106901",
+              "https://www.president.gov.ua/en/news/cogo-misyacya-budut-novi-paketi-na-posilennya-ukrayinskoyi-a-106901",
+              "https://www.kyivpost.com/post/87214",
+              "https://www.kyivpost.com/post/87214",
+              "https://www.kyivpost.com/post/87214"
+            ],
+            "observed_at": "2026-10-16T01:23:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-70a39289",
+            "story_title": "Lead 2: Ukrainian sources report Starshield in-motion service restored after speed restrictions",
+            "source": "grok/grok-rolling-0947.md",
+            "slot": "0947",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.kyivpost.com/post/87154",
+            "source_urls": [
+              "https://www.kyivpost.com/post/87154",
+              "https://www.kyivpost.com/post/87154",
+              "https://www.kyivpost.com/post/87154",
+              "https://www.kyivpost.com/post/87154",
+              "https://www.kyivpost.com/post/87154",
+              "https://www.businessinsider.com/ukraine-starlink-speed-starshield-service-coming-back-2026-10",
+              "https://www.businessinsider.com/ukraine-starlink-speed-starshield-service-coming-back-2026-10",
+              "https://www.businessinsider.com/ukraine-starlink-speed-starshield-service-coming-back-2026-10",
+              "https://www.businessinsider.com/ukraine-starlink-speed-starshield-service-coming-back-2026-10",
+              "https://www.businessinsider.com/ukraine-starlink-speed-starshield-service-coming-back-2026-10",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk"
+            ],
+            "observed_at": "2026-10-16T07:47:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-850d0334",
+            "story_title": "Lead 4 (shorter, earlier in day but consequential): Peshawar school roof collapse kills at least 33 pupils…",
+            "source": "grok/grok-rolling-0342.md",
+            "slot": "0342",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/cked326llddgo",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/cked326llddgo",
+              "https://www.bbc.com/news/articles/cked326llddgo",
+              "https://www.bbc.com/news/articles/cked326llddgo",
+              "https://www.aljazeera.com/news/2026/10/15/school-roof-collapses-in-northwestern-pakistan-killing-at-least-29-people"
+            ],
+            "observed_at": "2026-10-16T01:42:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-929ad480",
+            "story_title": "Trump publicly turned Ukraine’s refinery campaign into the target of his energy-price pressure",
+            "source": "chatgpt/chatgpt-rolling-0914.md",
+            "slot": "0914",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.newsmax.com/newsmax-tv/donald-trump-russia-ukraine/2026/10/15/id/1272958/"
+            ],
+            "observed_at": "2026-10-16T07:14:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-a59f1694",
+            "story_title": "Lead 1 (primary): Zelensky ends three-day energy-strike pause; Ukraine hits Ryazan refinery…",
+            "source": "grok/grok-rolling-2148.md",
+            "slot": "2148",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+            "source_urls": [
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/",
+              "https://www.themoscowtimes.com/2026/10/15/starlink-functionality-restored-fully-for-ukrainian-military-source-says-a93985",
+              "https://www.themoscowtimes.com/2026/10/15/starlink-functionality-restored-fully-for-ukrainian-military-source-says-a93985",
+              "https://www.themoscowtimes.com/2026/10/15/starlink-functionality-restored-fully-for-ukrainian-military-source-says-a93985",
+              "https://meduza.io/en/news/2026/10/15/ukrainian-drones-strike-ryazan-oil-refinery-prompting-school-and-kindergarten-closures-across-the-city",
+              "https://meduza.io/en/news/2026/10/15/ukrainian-drones-strike-ryazan-oil-refinery-prompting-school-and-kindergarten-closures-across-the-city",
+              "https://meduza.io/en/news/2026/10/15/ukrainian-drones-strike-ryazan-oil-refinery-prompting-school-and-kindergarten-closures-across-the-city",
+              "https://meduza.io/en/news/2026/10/15/we-re-done-zelensky-says-ukraine-will-resume-strikes-on-russian-oil-refineries",
+              "https://meduza.io/en/news/2026/10/15/we-re-done-zelensky-says-ukraine-will-resume-strikes-on-russian-oil-refineries",
+              "https://www.kyivpost.com/post/87156",
+              "https://www.kyivpost.com/post/87156",
+              "https://www.themoscowtimes.com/2026/10/15/ukrainian-drones-spark-fire-at-ryazan-refinery-as-zelensky-vows-to-resume-attacks-a93981",
+              "https://www.themoscowtimes.com/2026/10/15/ukrainian-drones-spark-fire-at-ryazan-refinery-as-zelensky-vows-to-resume-attacks-a93981"
+            ],
+            "observed_at": "2026-10-15T19:48:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-b2b870cb",
+            "story_title": "Lead 2: Kremlin confirms Russian diesel has begun reaching global markets under the Trump deal",
+            "source": "grok/grok-rolling-2148.md",
+            "slot": "2148",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.themoscowtimes.com/2026/10/15/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-a93977",
+            "source_urls": [
+              "https://www.themoscowtimes.com/2026/10/15/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-a93977",
+              "https://www.themoscowtimes.com/2026/10/15/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-a93977",
+              "https://www.themoscowtimes.com/2026/10/15/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-a93977",
+              "https://www.themoscowtimes.com/2026/10/15/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-a93977"
+            ],
+            "observed_at": "2026-10-15T19:48:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-bebd1d7e",
+            "story_title": "Lead 4: Drones strike chemical tankers in/near Romanian waters; seven sailors missing",
+            "source": "grok/grok-rolling-0947.md",
+            "slot": "0947",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/15/sailors-missing-drone-strike-tankers-romania-black-sea-coast",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/15/sailors-missing-drone-strike-tankers-romania-black-sea-coast",
+              "https://www.theguardian.com/world/2026/oct/15/sailors-missing-drone-strike-tankers-romania-black-sea-coast",
+              "https://arstechnica.com/gadgets/2026/10/black-sea-drone-attacks-enter-nato-countrys-territorial-waters-for-first-time/",
+              "https://arstechnica.com/gadgets/2026/10/black-sea-drone-attacks-enter-nato-countrys-territorial-waters-for-first-time/",
+              "https://arstechnica.com/gadgets/2026/10/black-sea-drone-attacks-enter-nato-countrys-territorial-waters-for-first-time/",
+              "https://arstechnica.com/gadgets/2026/10/black-sea-drone-attacks-enter-nato-countrys-territorial-waters-for-first-time/",
+              "https://arstechnica.com/gadgets/2026/10/black-sea-drone-attacks-enter-nato-countrys-territorial-waters-for-first-time/",
+              "https://www.pbs.org/newshour/world/drone-strike-on-ship-in-romanian-waters-raises-fear-that-war-in-ukraine-is-spreading",
+              "https://www.pbs.org/newshour/world/drone-strike-on-ship-in-romanian-waters-raises-fear-that-war-in-ukraine-is-spreading"
+            ],
+            "observed_at": "2026-10-16T07:47:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-c0c6fcd5",
+            "story_title": "Lead 1: Ukraine resumes strikes on Russian oil refineries as Trump-declared energy ceasefire collapses",
+            "source": "grok/grok-rolling-0043.md",
+            "slot": "0043",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/15/us-effort-to-get-russia-ukraine-energy-ceasefire-collapses",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/15/us-effort-to-get-russia-ukraine-energy-ceasefire-collapses",
+              "https://www.theguardian.com/world/2026/oct/15/us-effort-to-get-russia-ukraine-energy-ceasefire-collapses",
+              "https://www.theguardian.com/world/2026/oct/15/us-effort-to-get-russia-ukraine-energy-ceasefire-collapses",
+              "https://meduza.io/en/news/2026/10/15/we-re-done-zelensky-says-ukraine-will-resume-strikes-on-russian-oil-refineries",
+              "https://meduza.io/en/news/2026/10/15/we-re-done-zelensky-says-ukraine-will-resume-strikes-on-russian-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.cnbc.com/2026/10/15/ukraine-russia-energy-ceasefire-zelenskyy.html",
+              "https://www.cnbc.com/2026/10/15/ukraine-russia-energy-ceasefire-zelenskyy.html"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-d9b1791f",
+            "story_title": "Lead 2: Trump says US holding denuclearization talks with Russia and China after New START expiry",
+            "source": "grok/grok-rolling-0649.md",
+            "slot": "0649",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+            "source_urls": [
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.channelnewsasia.com/world/trump-russia-china-denuclearisation-6464736",
+              "https://www.usnews.com/news/world/articles/2026-10-15/trump-says-he-is-talking-to-russia-and-china-about-denuclearization",
+              "https://www.cnbctv18.com/world/trump-says-he-is-talking-to-russia-and-china-about-denuclearisation-20013157.htm",
+              "https://m.economictimes.com/news/international/world-news/trump-says-he-is-talking-to-russia-and-china-about-denuclearization/articleshow/134980518.cms",
+              "https://www.jpost.com/international/article-911898"
+            ],
+            "observed_at": "2026-10-16T04:49:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-dc98ef56",
+            "story_title": "Lead 1: Zelensky declares refinery-strike pause over (“We’re done”); Russian officials report fire at Ryazan…",
+            "source": "grok/grok-rolling-1249.md",
+            "slot": "1249",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.themoscowtimes.com/2026/10/15/ukrainian-drones-spark-fire-at-ryazan-refinery-as-zelensky-vows-to-resume-attacks-a93981",
+              "https://www.themoscowtimes.com/2026/10/15/ukrainian-drones-spark-fire-at-ryazan-refinery-as-zelensky-vows-to-resume-attacks-a93981",
+              "https://www.themoscowtimes.com/2026/10/15/ukrainian-drones-spark-fire-at-ryazan-refinery-as-zelensky-vows-to-resume-attacks-a93981",
+              "https://www.straitstimes.com/world/europe/drone-attack-causes-fire-at-russias-ryazan-refinery-regional-governor-says",
+              "https://www.straitstimes.com/world/europe/drone-attack-causes-fire-at-russias-ryazan-refinery-regional-governor-says"
+            ],
+            "observed_at": "2026-10-15T10:49:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-f89d07bc",
+            "story_title": "Lead 1: Ukraine resumes Russian oil-refinery strikes and reports Starshield restoration, ending three-day…",
+            "source": "grok/grok-rolling-1545.md",
+            "slot": "1545",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.bbc.com/news/articles/cqwyrnwd9dw1o",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://www.axios.com/2026/10/15/ukraine-starlink-restored-strikes-russia-trump-musk",
+              "https://www.kyivpost.com/post/87156",
+              "https://kyivindependent.com/breaking-starlink-service-in-ukraine-restored-defense-ministry-source-says/"
+            ],
+            "observed_at": "2026-10-15T13:45:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-ff6b2f51",
+            "story_title": "Lead 3: Overnight Russian strikes leave 370,000 without power in Volyn; emergency cuts in Kyiv…",
+            "source": "grok/grok-rolling-0947.md",
+            "slot": "0947",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.devdiscourse.com/article/international/3993440-russian-drones-leave-370000-people-without-power-in-ukraines-volyn-governor-says",
+            "source_urls": [
+              "https://www.devdiscourse.com/article/international/3993440-russian-drones-leave-370000-people-without-power-in-ukraines-volyn-governor-says",
+              "https://www.devdiscourse.com/article/international/3993440-russian-drones-leave-370000-people-without-power-in-ukraines-volyn-governor-says",
+              "https://www.devdiscourse.com/article/international/3993440-russian-drones-leave-370000-people-without-power-in-ukraines-volyn-governor-says",
+              "https://censor.net/en/news/4028696/downed-drone-debris-disrupts-power-and-water-in-lutsk-community",
+              "https://censor.net/en/news/4028696/downed-drone-debris-disrupts-power-and-water-in-lutsk-community"
+            ],
+            "observed_at": "2026-10-16T07:47:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-10 and drew no qualifying story today",
+        "last_open_edition": "2026-10-10",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-10",
+            "story_id": "s-1b43c11f",
+            "story_title": "Lead 1 — Nobel Peace Prize to Navi Pillay",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+            "source_urls": [
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.jpost.com/international/article-911163",
+              "https://www.jpost.com/international/article-911163",
+              "https://www.jpost.com/international/article-911163",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://www.nhc.noaa.gov/text/MIATCPAT4.shtml"
+            ],
+            "observed_at": "2026-10-09T10:48:00Z"
+          },
+          {
+            "edition": "2026-10-10",
+            "story_id": "s-4ae915f8",
+            "story_title": "Nobel Peace Prize to Navi Pillay; committee says it is not ruling on Gaza",
+            "source": "grok/grok-rolling-1543.md",
+            "slot": "1543",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.nobelprize.org/prizes/peace/2026/press-release",
+            "source_urls": [
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.timesofisrael.com/liveblog_entry/nobel-peace-committee-says-not-up-to-it-to-decide-if-gaza-war-constitutes-genocide-after-awarding-prize-to-head-of-un-panel-which-said-it-was/",
+              "https://www.timesofisrael.com/liveblog_entry/nobel-peace-committee-says-not-up-to-it-to-decide-if-gaza-war-constitutes-genocide-after-awarding-prize-to-head-of-un-panel-which-said-it-was/",
+              "https://www.timesofisrael.com/liveblog_entry/nobel-peace-committee-says-not-up-to-it-to-decide-if-gaza-war-constitutes-genocide-after-awarding-prize-to-head-of-un-panel-which-said-it-was/"
+            ],
+            "observed_at": "2026-10-09T13:43:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-86c4dde9",
+            "story_title": "Lead 3: Saudi-led coalition intercepts cruise missile over Medina region; Houthis deny launch",
+            "source": "grok/grok-rolling-0043.md",
+            "slot": "0043",
+            "matched": [
+              "Houthi",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://apnews.com/article/mideast-saudi-medina-houthis-october-15-2026-ffa2a29fe8f91f400b0b75067d269ad3",
+            "source_urls": [
+              "https://apnews.com/article/mideast-saudi-medina-houthis-october-15-2026-ffa2a29fe8f91f400b0b75067d269ad3",
+              "https://www.channelnewsasia.com/world/saudi-arabia-medina-missile-intercepted-houthi-6462156",
+              "https://www.channelnewsasia.com/world/saudi-arabia-medina-missile-intercepted-houthi-6462156",
+              "https://shafaq.com/en/Middle-East/Riyadh-intercepts-missile-over-Medina-Houthis-deny-involvement"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-a725caa0",
+            "story_title": "Houthi missiles and drones hit Yemen's government seat in Aden",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.thenationalnews.com/news/mena/2026/10/15/yemens-houthi-rebels-hit-presidential-palace-in-aden/",
+            "source_urls": [
+              "https://www.thenationalnews.com/news/mena/2026/10/15/yemens-houthi-rebels-hit-presidential-palace-in-aden/",
+              "https://www.thenationalnews.com/news/mena/2026/10/15/yemens-houthi-rebels-hit-presidential-palace-in-aden/",
+              "https://www.thenationalnews.com/news/mena/2026/10/15/yemens-houthi-rebels-hit-presidential-palace-in-aden/",
+              "https://apnews.com/article/saudia-arabia-yemen-houthi-rebels-explosions-ed4dcdad5cfd4b08033b1af5cf81dca5",
+              "https://apnews.com/article/saudia-arabia-yemen-houthi-rebels-explosions-ed4dcdad5cfd4b08033b1af5cf81dca5",
+              "https://apnews.com/article/saudia-arabia-yemen-houthi-rebels-explosions-ed4dcdad5cfd4b08033b1af5cf81dca5",
+              "https://www.aljazeera.com/news/2026/10/15/houthis-target-yemens-presidential-palace-in-aden-with-missiles",
+              "https://www.aljazeera.com/news/2026/10/15/houthis-target-yemens-presidential-palace-in-aden-with-missiles",
+              "https://www.aljazeera.com/news/2026/10/15/houthis-target-yemens-presidential-palace-in-aden-with-missiles",
+              "https://www.al-monitor.com/originals/2026/10/houthis-strike-yemeni-governments-presidential-palace-aden-what-know",
+              "https://www.al-monitor.com/originals/2026/10/houthis-strike-yemeni-governments-presidential-palace-aden-what-know",
+              "https://www.al-monitor.com/originals/2026/10/houthis-strike-yemeni-governments-presidential-palace-aden-what-know",
+              "https://www.reuters.com/world/middle-east/houthis-fire-missiles-presidential-palace-yemens-aden-officials-say-2026-10-15/"
+            ],
+            "observed_at": "2026-10-15T19:14:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-4dce2638",
+            "story_title": "Material update to the previously published “Twelve Senators Tell Trump to Rescind the Russia Diesel License.”",
+            "source": "chatgpt/chatgpt-rolling-1514.md",
+            "slot": "1514",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+              "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+              "https://www.reuters.com/business/energy/kremlin-says-russia-restarts-diesel-exports-after-deal-with-trump-2026-10-15/",
+              "https://www.siliconvalley.ma/en/russian-diesel-morocco-tanker/",
+              "https://www.siliconvalley.ma/en/russian-diesel-morocco-tanker/",
+              "https://www.siliconvalley.ma/en/russian-diesel-morocco-tanker/",
+              "https://www.theins.ru/en/news/297795",
+              "https://www.theins.ru/en/news/297795",
+              "https://www.theins.ru/en/news/297795",
+              "https://ofac.treasury.gov/recent-actions/20261009_33"
+            ],
+            "observed_at": "2026-10-15T13:14:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-3ff1f648",
+            "story_title": "Manila formally escalated the Chinese envoy’s force remarks into a diplomatic issue",
+            "source": "chatgpt/chatgpt-rolling-0914.md",
+            "slot": "0914",
+            "matched": [
+              "South China Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/china/philippines-hits-back-chinese-envoy-over-thinly-veiled-threat-force-2026-10-16/",
+            "source_urls": [
+              "https://www.reuters.com/world/china/philippines-hits-back-chinese-envoy-over-thinly-veiled-threat-force-2026-10-16/",
+              "https://www.reuters.com/world/china/philippines-hits-back-chinese-envoy-over-thinly-veiled-threat-force-2026-10-16/",
+              "https://www.reuters.com/world/china/philippines-hits-back-chinese-envoy-over-thinly-veiled-threat-force-2026-10-16/",
+              "https://cambodianess.com/article/china-says-can-easily-win-confrontation-with-philippines",
+              "https://cambodianess.com/article/china-says-can-easily-win-confrontation-with-philippines",
+              "https://cambodianess.com/article/china-says-can-easily-win-confrontation-with-philippines",
+              "https://pco.gov.ph/news_releases/president-marcos-seeks-dialogue-with-chinese-envoy-over-remarks-on-use-of-force/"
+            ],
+            "observed_at": "2026-10-16T07:14:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-6f376310",
+            "story_title": "Lead 5: China and North Korea open long-delayed New Yalu River Bridge",
+            "source": "grok/grok-rolling-0043.md",
+            "slot": "0043",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.chinadailyhk.com/hk/article/641149"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-c43ccee2",
+            "story_title": "Lead 3: China and North Korea open long-delayed New Yalu River Bridge after 12 years",
+            "source": "grok/grok-rolling-1249.md",
+            "slot": "1249",
+            "matched": [
+              "North Korea",
+              "DPRK"
+            ],
+            "source_url": "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+            "source_urls": [
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay"
+            ],
+            "observed_at": "2026-10-15T10:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-12 and drew no qualifying story today",
+        "last_open_edition": "2026-10-12",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-398eafd3",
+            "story_title": "Lead 4: Pakistani President Zardari imposes emergency and governor’s rule in Khyber Pakhtunkhwa, suspending…",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+            "source_urls": [
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://www.dawn.com/news/2036352",
+              "https://www.dawn.com/news/2036352",
+              "https://indianexpress.com/article/pakistan/pakistan-khyber-pakhtunkhwa-emergency-asif-ali-zardari-imran-khan-pti-government-suspended-10916856/"
+            ],
+            "observed_at": "2026-10-11T16:49:00Z"
+          },
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-3fa8b309",
+            "story_title": "Editorial status: high-consequence hold; underlying detention is independently corroborated, but the…",
+            "source": "chatgpt/chatgpt-rolling-0922.md",
+            "slot": "0922",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+            "source_urls": [
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://www.reuters.com/world/asia-pacific/pakistan-province-leaders-ex-pm-imran-khans-party-detained-junior-minister-says-2026-10-12/",
+              "https://www.tbsnews.net/world/south-asia/pakistan-province-leaders-ex-pm-imran-khans-party-detained-junior-minister-1570081",
+              "https://www.ft.com/content/786cb0a4-a235-4884-ab1c-b2234bc3cefe",
+              "https://www.reuters.com/world/china/imf-says-ai-investment-keeps-global-growth-around-3-with-major-asia-benefits-2026-10-12/",
+              "https://www.reuters.com/business/volkswagen-reports-14-drop-third-quarter-deliveries-2026-10-12/",
+              "https://www.reuters.com/world/india/german-finance-minister-cancels-india-trip-amid-berlin-turmoil-2026-10-12/"
+            ],
+            "observed_at": "2026-10-12T07:22:00Z"
+          },
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-c573ec0f",
+            "story_title": "Pakistan suspends the PTI provincial executive under emergency powers",
+            "source": "chatgpt/chatgpt-rolling-1515.md",
+            "slot": "1515",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+            "source_urls": [
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://www.dawn.com/news/2036352",
+              "https://www.dawn.com/news/2036352",
+              "https://www.dawn.com/news/2036352",
+              "https://www.geo.tv/latest/686046-kp-emergency-governors-rule-legal-experts-explain-govts-constitutional-powers",
+              "https://www.geo.tv/latest/686046-kp-emergency-governors-rule-legal-experts-explain-govts-constitutional-powers",
+              "https://www.geo.tv/latest/686046-kp-emergency-governors-rule-legal-experts-explain-govts-constitutional-powers",
+              "https://www.reuters.com/world/asia-pacific/pakistan-president-imposes-emergency-province-ruled-by-ex-pm-imran-khans-party-2026-10-11/",
+              "https://www.reuters.com/world/asia-pacific/pakistan-president-imposes-emergency-province-ruled-by-ex-pm-imran-khans-party-2026-10-11/",
+              "https://www.reuters.com/world/asia-pacific/pakistan-president-imposes-emergency-province-ruled-by-ex-pm-imran-khans-party-2026-10-11/"
+            ],
+            "observed_at": "2026-10-11T13:15:00Z"
+          },
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-fcd6763b",
+            "story_title": "Pakistan’s emergency becomes a crackdown and a prospective court fight",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+            "source_urls": [
+              "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+              "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+              "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+              "https://www.geo.tv/latest/686028-pti-calls-centres-move-to-impose-emergency-in-kp-a-grave-political-mistake",
+              "https://www.geo.tv/latest/686028-pti-calls-centres-move-to-impose-emergency-in-kp-a-grave-political-mistake",
+              "https://www.geo.tv/latest/686028-pti-calls-centres-move-to-impose-emergency-in-kp-a-grave-political-mistake",
+              "https://tribune.com.pk/story/2634339/pti-march-fizzles-out-after-k-p-emergency-arrests",
+              "https://tribune.com.pk/story/2634339/pti-march-fizzles-out-after-k-p-emergency-arrests",
+              "https://tribune.com.pk/story/2634339/pti-march-fizzles-out-after-k-p-emergency-arrests",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-d2e0868ffb18d883c16465d7d6a87ccb",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-d2e0868ffb18d883c16465d7d6a87ccb",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-d2e0868ffb18d883c16465d7d6a87ccb",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-renew-warning-over-saudi-airports-after-deadly-riyadh-attack-2026-10-11/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-renew-warning-over-saudi-airports-after-deadly-riyadh-attack-2026-10-11/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-renew-warning-over-saudi-airports-after-deadly-riyadh-attack-2026-10-11/",
+              "https://www.spa.gov.sa/en/N2697996",
+              "https://apnews.com/article/north-korea-kim-missiles-south-5b2d3a2d9a31118648b9f82022b9c4e3",
+              "https://apnews.com/article/f621fa788196f204448e7f75fcc78c68?utm_source=chatgpt.com",
+              "https://apnews.com/article/d2e0868ffb18d883c16465d7d6a87ccb?utm_source=chatgpt.com",
+              "https://www.theguardian.com/politics/2026/oct/11/andy-burnham-russia-interfered-brexit-vote?utm_source=chatgpt.com",
+              "https://apnews.com/article/3fee40be73c3f5632f2be3204e9c47f8?utm_source=chatgpt.com",
+              "https://apnews.com/article/5b2d3a2d9a31118648b9f82022b9c4e3?utm_source=chatgpt.com",
+              "https://www.reuters.com/business/environment/panama-suffers-over-200-aftershocks-after-fridays-77-magnitude-earthquake-2026-10-11/?utm_source=chatgpt.com",
+              "https://apnews.com/article/93fa63c8a88e538f1456e7d448fc550d?utm_source=chatgpt.com"
+            ],
+            "observed_at": "2026-10-12T01:18:00Z"
+          }
+        ]
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-10 and drew no qualifying story today",
+        "last_open_edition": "2026-10-10",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-10",
+            "story_id": "s-1b43c11f",
+            "story_title": "Lead 1 — Nobel Peace Prize to Navi Pillay",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+            "source_urls": [
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release/",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.jpost.com/international/article-911163",
+              "https://www.jpost.com/international/article-911163",
+              "https://www.jpost.com/international/article-911163",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://forecast.weather.gov/product.php?site=NWS&issuedby=AT&product=TWD&glossary=1",
+              "https://www.nhc.noaa.gov/text/MIATCPAT4.shtml"
+            ],
+            "observed_at": "2026-10-09T10:48:00Z"
+          },
+          {
+            "edition": "2026-10-10",
+            "story_id": "s-4ae915f8",
+            "story_title": "Nobel Peace Prize to Navi Pillay; committee says it is not ruling on Gaza",
+            "source": "grok/grok-rolling-1543.md",
+            "slot": "1543",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://www.nobelprize.org/prizes/peace/2026/press-release",
+            "source_urls": [
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.nobelprize.org/prizes/peace/2026/press-release",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.aljazeera.com/news/2026/10/9/2026-nobel-peace-prize-awarded-to-navi-pillay",
+              "https://www.timesofisrael.com/liveblog_entry/nobel-peace-committee-says-not-up-to-it-to-decide-if-gaza-war-constitutes-genocide-after-awarding-prize-to-head-of-un-panel-which-said-it-was/",
+              "https://www.timesofisrael.com/liveblog_entry/nobel-peace-committee-says-not-up-to-it-to-decide-if-gaza-war-constitutes-genocide-after-awarding-prize-to-head-of-un-panel-which-said-it-was/",
+              "https://www.timesofisrael.com/liveblog_entry/nobel-peace-committee-says-not-up-to-it-to-decide-if-gaza-war-constitutes-genocide-after-awarding-prize-to-head-of-un-panel-which-said-it-was/"
+            ],
+            "observed_at": "2026-10-09T13:43:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-14",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
