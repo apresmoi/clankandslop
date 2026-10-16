@@ -4,7 +4,8 @@ name: vesta
 runtime:
   name: daimon
   options:
-    engine: grok
+    engine: codex
+    codex_policy: workspace-no-network
     attention:
       max_batch_messages: 8
       max_batch_bytes: 12000
@@ -18,11 +19,10 @@ runtime:
 execution:
   model:
     primary:
-      provider: xai
-      name: grok-4.6
+      provider: openai
+      name: gpt-5.6-terra
       auth:
-        method: grok
-      reasoning_effort: high
+        method: codex
   sandbox:
     mode: workspace
 schedule:
