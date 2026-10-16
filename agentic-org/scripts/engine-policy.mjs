@@ -54,7 +54,7 @@ export const KNOWN_ENGINES = Object.freeze([...SUPPORTED_ENGINES, ...DEFERRED_EN
 // Spawnfile's DAIMON_CODEX_WORKSPACE_NO_NETWORK_POLICY, byte for byte.
 export const CODEX_STRICT_SANDBOX = Object.freeze({ mode: 'workspace-write', networkAccess: false, webSearch: 'disabled' });
 export const CODEX_POLICY_OPTION = 'workspace-no-network';
-export const CODEX_ACCOUNT_MODEL = 'gpt-5.5';
+export const CODEX_ACCOUNT_MODEL = 'gpt-5.6-terra';
 
 // Spawnfile's DAIMON_GROK_BROKER_MODELS / _REASONING_EFFORTS and the pinned
 // worker contract bytes those two select.

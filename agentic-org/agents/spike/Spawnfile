@@ -4,25 +4,21 @@ name: spike
 runtime:
   name: daimon
   options:
-    engine: grok
+    engine: codex
+    codex_policy: workspace-no-network
     attention:
       max_batch_messages: 8
       max_batch_bytes: 12000
       # sized to filings including revisions, not assignments; do not lower — see OPERATIONS.md
       max_executions: 100
       max_tokens: 12000000
-    turn_limits:
-      max_tokens: 2500000
-      timeout_ms: 1800000
-      max_requests: 48
 execution:
   model:
     primary:
-      provider: xai
-      name: grok-4.6
+      provider: openai
+      name: gpt-5.6-terra
       auth:
-        method: grok
-      reasoning_effort: high
+        method: codex
   sandbox:
     mode: workspace
 schedule:

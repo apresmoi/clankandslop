@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { checkRuntime } from './check-runtime.mjs';
 import { provision } from './provision.mjs';
 import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
-import { GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
+import { CODEX_ACCOUNT_MODEL, GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
 import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
 import { effectiveAgentManifest, readRootManifest } from './effective-mcp.mjs';
@@ -120,7 +120,7 @@ test('Daimon engine declarations preserve their real model-auth boundary', () =>
     assert.doesNotThrow(() => validateAgentDeclaration(agent, bytes));
     const primary = parseManifest(bytes).execution?.model?.primary;
     if (engineByAgent[agent] === 'codex') {
-      assert.equal(primary.name, 'gpt-5.5', `${agent} must declare the supported Codex account model`);
+      assert.equal(primary.name, CODEX_ACCOUNT_MODEL, `${agent} must declare the supported Codex account model`);
       assert.doesNotMatch(bytes, /gpt-5\.4-mini/u, `${agent} must not declare the retired Codex account model`);
     } else {
       assert.equal(primary.provider, 'xai', agent);
@@ -129,12 +129,9 @@ test('Daimon engine declarations preserve their real model-auth boundary', () =>
     }
   }
   const brass = readFileSync(resolve(import.meta.dirname, '../agents/brass/Spawnfile'), 'utf8');
-  assert.throws(() => validateAgentDeclaration('brass', brass.replace('method: grok', 'method: api_key')), /Grok broker auth invalid/u);
-  // Derived, not typed: this line used to read `replace('reasoning_effort: low', …)`,
-  // so the moment Brass moved off `low` the replace became a no-op and the
-  // assertion tested nothing. Mutate whatever effort is actually declared.
-  assert.throws(() => validateAgentDeclaration('brass', brass.replace(/reasoning_effort: \w+/u, 'reasoning_effort: xhigh')), /Grok reasoning_effort invalid/u);
-  assert.throws(() => validateAgentDeclaration('brass', brass.replace('name: grok-4.6', 'name: grok-9')), /Grok broker model invalid/u);
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace('method: codex', 'method: api_key')), /Codex subscription intent invalid/u);
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace(`name: ${CODEX_ACCOUNT_MODEL}`, 'name: gpt-5.4-mini')), /Codex account model invalid/u);
+  assert.throws(() => validateAgentDeclaration('brass', brass.replace('codex_policy: workspace-no-network', 'codex_policy: danger-full-access')), /codex_policy must be workspace-no-network/u);
 });
 test('workspace resources enforce public modes and private corpus least privilege', () => {
   const scout = readFileSync(resolve(import.meta.dirname, '../agents/klaxon/Spawnfile'), 'utf8');

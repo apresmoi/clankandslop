@@ -69,8 +69,8 @@ export function validateManifest(manifest) { for (const artifact of manifest.art
 // declare lives in engine-policy.mjs, per engine, so an unknown engine is a
 // refusal instead of an unchecked pass.
 export const engineByAgent = Object.freeze({
-  klaxon: 'grok', cogsworth: 'grok', sprockett: 'grok', foreman: 'grok', graves: 'grok', tinkerton: 'grok', vesta: 'grok',
-  brass: 'grok', spike: 'grok', ledger: 'grok', caslon: 'grok', pressman: 'grok'
+  klaxon: 'codex', cogsworth: 'codex', sprockett: 'codex', foreman: 'codex', graves: 'codex', tinkerton: 'codex', vesta: 'codex',
+  brass: 'codex', spike: 'codex', ledger: 'codex', caslon: 'codex', pressman: 'codex'
 });
 
 const corpusAgents = new Set(['klaxon']);

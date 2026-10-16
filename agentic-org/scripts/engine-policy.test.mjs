@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { agents } from './lib.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
 import { engineByAgent } from './validate-org.mjs';
-import { CODEX_STRICT_SANDBOX, GROK_BROKER, SUPPORTED_ENGINES, compiledEngineFindings, engineDeclarationFindings, grokBrokerFindings } from './engine-policy.mjs';
+import { CODEX_ACCOUNT_MODEL, CODEX_POLICY_OPTION, CODEX_STRICT_SANDBOX, GROK_BROKER, SUPPORTED_ENGINES, compiledEngineFindings, engineDeclarationFindings, grokBrokerFindings } from './engine-policy.mjs';
 
 const spawnfile = (agent) => readFileSync(resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`), 'utf8');
 const manifestFor = (agent) => parseManifest(spawnfile(agent));
@@ -15,7 +15,7 @@ const manifestFor = (agent) => parseManifest(spawnfile(agent));
 // nothing exercises is a branch that quietly stops working.
 const codexManifest = () => ({
   runtime: { name: 'daimon', options: { engine: 'codex', codex_policy: 'workspace-no-network' } },
-  execution: { model: { primary: { provider: 'openai', name: 'gpt-5.5', auth: { method: 'codex' } } }, sandbox: { mode: 'workspace' } }
+  execution: { model: { primary: { provider: 'openai', name: CODEX_ACCOUNT_MODEL, auth: { method: 'codex' } } }, sandbox: { mode: 'workspace' } }
 });
 
 test('every agent is assigned a supported engine and its Spawnfile declares that same engine', () => {
@@ -27,17 +27,17 @@ test('every agent is assigned a supported engine and its Spawnfile declares that
   }
 });
 
-// The organization is Grok-only. This is the assertion that says so, and the
+// The organization runs on Codex. This is the assertion that says so, and the
 // one that has to be revisited — rather than silently satisfied — when an
-// agent moves back onto another engine.
-test('the whole newsroom runs on the brokered Grok engine, model and effort pinned', () => {
+// agent moves onto another engine.
+test('the whole newsroom runs on the Codex subscription engine, model and sandbox pinned', () => {
   for (const agent of agents) {
-    const primary = manifestFor(agent).execution?.model?.primary;
-    assert.equal(engineByAgent[agent], 'grok', agent);
-    assert.equal(primary.provider, 'xai', agent);
-    assert.equal(primary.auth?.method, 'grok', agent);
-    assert.ok(GROK_BROKER.models.includes(primary.name), `${agent} pins ${primary.name}`);
-    assert.ok(GROK_BROKER.efforts.includes(primary.reasoning_effort), `${agent} pins effort ${primary.reasoning_effort}`);
+    const manifest = manifestFor(agent), primary = manifest.execution?.model?.primary;
+    assert.equal(engineByAgent[agent], 'codex', agent);
+    assert.equal(manifest.runtime?.options?.codex_policy, CODEX_POLICY_OPTION, agent);
+    assert.equal(primary.provider, 'openai', agent);
+    assert.equal(primary.auth?.method, 'codex', agent);
+    assert.equal(primary.name, CODEX_ACCOUNT_MODEL, agent);
   }
 });
 
