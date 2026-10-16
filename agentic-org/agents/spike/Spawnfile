@@ -12,10 +12,6 @@ runtime:
       # sized to filings including revisions, not assignments; do not lower — see OPERATIONS.md
       max_executions: 100
       max_tokens: 12000000
-    turn_limits:
-      max_tokens: 2500000
-      timeout_ms: 1800000
-      max_requests: 48
 execution:
   model:
     primary:
