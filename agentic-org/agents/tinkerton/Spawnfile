@@ -44,6 +44,23 @@ environment:
 workspace:
   docs: { system: AGENTS.md, soul: SOUL.md }
 
+training:
+  preparation: { hook: newsroom/reporter-writing }
+  optimizer:
+    method: gepa
+    model: gpt-6-astra
+    variants: 4
+    keep: 2
+    budget: { rounds: 3 }
+  graders: { writing: ../../training/atomic/writing.grader.yaml }
+  targets:
+    - files: [AGENTS.md]
+      grader: writing
+      datasets:
+        train: training/train.yaml
+        validation: training/validation.yaml
+        test: training/test.yaml
+
 memory:
   - id: self
     store:
