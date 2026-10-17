@@ -341,9 +341,20 @@ export function validateRuntimeBindings(root = orgRoot) {
   }
 }
 
-export function validateTree() { for (const agent of agents) { for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md']) assert(existsSync(resolve(orgRoot, 'agents', agent, file)), `${agent} missing ${file}`); assert(!existsSync(resolve(orgRoot, 'agents', agent, 'RUNBOOK.md')), `${agent} has a RUNBOOK.md: AGENTS.md is the agent's one prompt, so task procedure belongs there`); assert(!existsSync(resolve(orgRoot, 'agents', agent, 'CLAUDE.md')), `${agent} has a CLAUDE.md: an agent's AGENTS.md is its prompt, not a guide for coding agents`); } const root = readFileSync(resolve(orgRoot, 'Spawnfile'), 'utf8'); for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!root.includes(banned), `banned root field ${banned}`); assert(!/^policy:/m.test(root), 'root must not override Spawnfile policy'); validateRootDeclaration(root); validateRuntimeBindings(); }
-export function validateSchedule() {
-  const schedule = readJson(resolve(orgRoot, 'policies/schedule.json'));
+export function validateTree(root = orgRoot) {
+  for (const agent of agents) {
+    for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md']) assert(existsSync(resolve(root, 'agents', agent, file)), `${agent} missing ${file}`);
+    assert(!existsSync(resolve(root, 'agents', agent, 'RUNBOOK.md')), `${agent} has a RUNBOOK.md: AGENTS.md is the agent's one prompt, so task procedure belongs there`);
+    assert(!existsSync(resolve(root, 'agents', agent, 'CLAUDE.md')), `${agent} has a CLAUDE.md: an agent's AGENTS.md is its prompt, not a guide for coding agents`);
+  }
+  const bytes = readFileSync(resolve(root, 'Spawnfile'), 'utf8');
+  for (const banned of ['browser_profile', 'profile_path', 'raw_html', 'account_name']) assert(!bytes.includes(banned), `banned root field ${banned}`);
+  assert(!/^policy:/m.test(bytes), 'root must not override Spawnfile policy');
+  validateRootDeclaration(bytes);
+  validateRuntimeBindings(root);
+}
+export function validateSchedule(root = orgRoot) {
+  const schedule = readJson(resolve(root, 'policies/schedule.json'));
   assert(schedule.timezone === 'Europe/Berlin' && schedule.deadline === '18:00' && schedule.effective_from === '2026-09-09', 'schedule zone or deadline invalid');
   assert(policy.deadline === schedule.deadline, 'runtime and schedule deadline drift');
   assert(JSON.stringify(schedule.release_clock) === JSON.stringify([{before:'2026-09-08',deadline:'16:00'},{from:'2026-09-08',before:'2026-09-09',deadline:'22:00'},{from:'2026-09-09',deadline:'18:00'}]), 'release clock history invalid');
@@ -366,15 +377,15 @@ export function validateSchedule() {
   // carried nothing but `wake: mentions`, so neither had ever run on its own.
   for (const checkpoint of schedule.checkpoints) if (agents.includes(checkpoint.owner)) assert(Object.hasOwn(owners, checkpoint.owner), `${checkpoint.owner} owns the ${checkpoint.id} checkpoint with no schedule to fire it`);
   for (const agent of agents) {
-    const bytes = readFileSync(resolve(orgRoot, 'agents', agent, 'Spawnfile'), 'utf8');
+    const bytes = readFileSync(resolve(root, 'agents', agent, 'Spawnfile'), 'utf8');
     assert(Object.hasOwn(owners, agent) === /^schedule:/m.test(bytes), `${agent} schedule authority invalid`);
     if (Object.hasOwn(owners, agent)) assert(bytes.includes(`cron: "${owners[agent]}"`), `${agent} schedule cron drift`);
   }
   for (const agent of Object.keys(owners)) {
-    const bytes = readFileSync(resolve(orgRoot, 'agents', agent, 'Spawnfile'), 'utf8');
+    const bytes = readFileSync(resolve(root, 'agents', agent, 'Spawnfile'), 'utf8');
     assert(bytes.includes('timezone: Europe/Berlin'), `${agent} schedule timezone invalid`);
   }
-  const klaxon = readFileSync(resolve(orgRoot, 'agents/klaxon/Spawnfile'), 'utf8'); assert(klaxon.includes('wake: all, allowed_wake_senders: [research-sensor]') && klaxon.includes('sensor: { wake: mentions }'), 'Klaxon selective sensor wake policy invalid');
+  const klaxon = readFileSync(resolve(root, 'agents/klaxon/Spawnfile'), 'utf8'); assert(klaxon.includes('wake: all, allowed_wake_senders: [research-sensor]') && klaxon.includes('sensor: { wake: mentions }'), 'Klaxon selective sensor wake policy invalid');
 }
 export function validateEditorialContracts(vesta, data, voices) {
   for (const phrase of ['ordinary Record','boring null','observable falsifier','hidden hands','default-spike']) assert(vesta.includes(phrase), `Vesta constraint missing: ${phrase}`);
