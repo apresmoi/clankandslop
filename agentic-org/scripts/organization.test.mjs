@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, existsSync, readFileSync, readdirSync, rmSync, statSync, realpathSync, writeFileSync as writeFileSyncUnchecked } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { checkRuntime } from './check-runtime.mjs';
 import { provision } from './provision.mjs';
-import { agents, declaredMoltnetSecretRefs } from './lib.mjs';
+import { agents, declaredMoltnetSecretRefs, orgRoot } from './lib.mjs';
 import { CODEX_ACCOUNT_MODEL, GROK_BROKER, SUPPORTED_ENGINES } from './engine-policy.mjs';
 import { PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { parseManifest } from './check-instruction-budget.mjs';
@@ -27,18 +27,48 @@ const admittedEnv = (root) => {
   return env;
 };
 
-// Writes one agent's Spawnfile into a throwaway org root so a declaration
-// mutation can be validated without touching the real tree.
-const mutatedOrg = (agent, mutate) => {
+const beneath = (root, file) => {
+  const rel = relative(root, file);
+  return rel !== '' && rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+};
+const assertTemporaryPath = (file) => {
+  const target = existsSync(file) ? realpathSync(file) : join(realpathSync(dirname(file)), relative(dirname(file), file));
+  assert.ok(beneath(realpathSync(tmpdir()), target) && !beneath(realpathSync(orgRoot), target), 'test writes must stay in temporary directories outside the live org');
+};
+const writeFileSync = (file, ...args) => {
+  assertTemporaryPath(file);
+  return writeFileSyncUnchecked(file, ...args);
+};
+const orgFixtures = [];
+test.after(() => { for (const root of orgFixtures) rmSync(root, { recursive: true, force: true }); });
+const copiedOrg = () => {
   const root = mkdtempSync(join(tmpdir(), 'clank-org-'));
-  writeFileSync(join(root, 'Spawnfile'), readFileSync(resolve(import.meta.dirname, '../Spawnfile'), 'utf8'));
+  orgFixtures.push(root);
+  writeFileSync(join(root, 'Spawnfile'), readFileSync(join(orgRoot, 'Spawnfile')));
+  mkdirSync(join(root, 'policies'));
+  for (const name of readdirSync(join(orgRoot, 'policies'))) writeFileSync(join(root, 'policies', name), readFileSync(join(orgRoot, 'policies', name)));
   for (const name of agents) {
     mkdirSync(join(root, 'agents', name), { recursive: true });
-    const source = readFileSync(resolve(import.meta.dirname, `../agents/${name}/Spawnfile`), 'utf8');
-    writeFileSync(join(root, 'agents', name, 'Spawnfile'), name === agent ? mutate(source) : source);
+    for (const file of ['Spawnfile', 'AGENTS.md', 'SOUL.md']) writeFileSync(join(root, 'agents', name, file), readFileSync(join(orgRoot, 'agents', name, file)));
   }
   return root;
 };
+const mutatedOrg = (agent, mutate) => {
+  const root = copiedOrg();
+  const file = join(root, 'agents', agent, 'Spawnfile');
+  writeFileSync(file, mutate(readFileSync(file, 'utf8')));
+  return root;
+};
+
+test('test writes reject live org paths before touching their bytes', () => {
+  for (const file of ['policies/schedule.json', 'agents/klaxon/Spawnfile', 'agents/vesta/RUNBOOK.md']) {
+    const target = join(orgRoot, file);
+    const original = existsSync(target) ? readFileSync(target) : undefined;
+    assert.throws(() => writeFileSync(target, 'must never be written'), /test writes must stay in temporary directories/u);
+    if (original) assert.deepEqual(readFileSync(target), original);
+    else assert.equal(existsSync(target), false);
+  }
+});
 
 test('the daily cycle, corpus manifest, release receipts and voice boundaries satisfy the newsroom rules', () => {
   const data = testdata(), prior = [];
@@ -73,14 +103,17 @@ test('hostile envelope mutations reject for their intended reason', () => {
 test('native Brass checkpoints replace operator kickoff and polling', () => assert.doesNotThrow(validateSchedule));
 test('all current policy files agree on 18:00 with historical receipts preserved',()=>{const runtime=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/runtime.json'),'utf8'));const schedule=JSON.parse(readFileSync(resolve(import.meta.dirname,'../policies/schedule.json'),'utf8'));assert.equal(runtime.deadline,'18:00');assert.equal(schedule.deadline,runtime.deadline);assert.deepEqual(schedule.release_clock,[{before:'2026-09-08',deadline:'16:00'},{from:'2026-09-08',before:'2026-09-09',deadline:'22:00'},{from:'2026-09-09',deadline:'18:00'}]);const root=resolve(import.meta.dirname,'..');const visit=(directory)=>{for(const name of readdirSync(directory)){const file=join(directory,name);if(statSync(file).isDirectory())visit(file);else if(!name.endsWith('.test.mjs')&&!name.endsWith('.tar'))assert.doesNotMatch(readFileSync(file,'utf8'),/16:20/);}};visit(root);});
 test('autonomy mutations fail closed', () => {
-  const schedulePath=resolve(import.meta.dirname,'../policies/schedule.json'); const original=readFileSync(schedulePath,'utf8');
-  // try/finally throughout: an assertion that fails here must not leave a
-  // mutated declaration behind for every later test and run to trip over.
-  writeFileSync(schedulePath,original.replace('"operator_kickoff": false','"operator_kickoff": true'));
-  try { assert.throws(validateSchedule,/operator kickoff/); } finally { writeFileSync(schedulePath,original); }
-  const klaxonPath=resolve(import.meta.dirname,'../agents/klaxon/Spawnfile'); const klaxon=readFileSync(klaxonPath,'utf8');
-  writeFileSync(klaxonPath,klaxon.replace('wake: all, allowed_wake_senders: [research-sensor]','wake: all'));
-  try { assert.throws(validateSchedule,/Klaxon selective/); } finally { writeFileSync(klaxonPath,klaxon); }
+  const root = copiedOrg();
+  assert.doesNotThrow(() => validateSchedule(root));
+  const schedulePath = join(root, 'policies/schedule.json');
+  const original = readFileSync(schedulePath, 'utf8');
+  writeFileSync(schedulePath, original.replace('"operator_kickoff": false', '"operator_kickoff": true'));
+  assert.throws(() => validateSchedule(root), /operator kickoff/u);
+  writeFileSync(schedulePath, original);
+  const klaxonPath = join(root, 'agents/klaxon/Spawnfile');
+  const klaxon = readFileSync(klaxonPath, 'utf8');
+  writeFileSync(klaxonPath, klaxon.replace('wake: all, allowed_wake_senders: [research-sensor]', 'wake: all'));
+  assert.throws(() => validateSchedule(root), /Klaxon selective/u);
 });
 test('lifecycle release receipts reject duplicate publication and broken lineage', () => { const source=receipts(); assert.doesNotThrow(()=>validateLifecycle(source)); assert.throws(()=>validateLifecycle([...source,source.at(-1)]),/unique|cardinality/); const broken=structuredClone(source); broken.at(-1).causal_parent='missing'; assert.throws(()=>validateLifecycle(broken),/parent/); });
 test('receipt shape adapter rejects extra and missing fields',()=>{const source=receipts();const extra=structuredClone(source);extra[0].unexpected=true;assert.throws(()=>validateLifecycle(extra),/shape/);const missing=structuredClone(source);delete missing[0].receipt_ref;assert.throws(()=>validateLifecycle(missing),/shape/);});
@@ -330,17 +363,19 @@ test('every scheduled checkpoint owner carries a schedule that actually fires', 
 });
 
 test('removing either publishing desk schedule fails closed', () => {
-  const schedulePath = resolve(import.meta.dirname, '../policies/schedule.json');
+  const root = copiedOrg();
+  assert.doesNotThrow(() => validateSchedule(root));
+  const schedulePath = join(root, 'policies/schedule.json');
   const original = readFileSync(schedulePath, 'utf8');
   for (const agent of ['ledger', 'pressman']) {
-    const agentPath = resolve(import.meta.dirname, `../agents/${agent}/Spawnfile`);
+    const agentPath = join(root, 'agents', agent, 'Spawnfile');
     const source = readFileSync(agentPath, 'utf8');
     const start = source.indexOf('schedule:\n'), end = source.indexOf('\nsurfaces:\n') + 1;
     writeFileSync(agentPath, source.slice(0, start) + source.slice(end));
-    try { assert.throws(validateSchedule, /schedule authority invalid/u, agent); } finally { writeFileSync(agentPath, source); }
+    try { assert.throws(() => validateSchedule(root), /schedule authority invalid/u, agent); } finally { writeFileSync(agentPath, source); }
     // And the reverse: dropping it from the roster while the Spawnfile keeps it.
     writeFileSync(schedulePath, original.replace(new RegExp(`\\s*"${agent}": "[^"]+",?`, 'u'), '').replace(',\n    }', '\n    }'));
-    try { assert.throws(validateSchedule, new RegExp(`${agent} checkpoint clock disagrees with native cron`, 'u'), agent); } finally { writeFileSync(schedulePath, original); }
+    try { assert.throws(() => validateSchedule(root), new RegExp(`${agent} checkpoint clock disagrees with native cron`, 'u'), agent); } finally { writeFileSync(schedulePath, original); }
   }
 });
 
@@ -459,8 +494,9 @@ test('the corpus and private-tools feeds keep the newsroom rules and add nothing
 // One prompt per agent: a task file beside AGENTS.md is how procedure drifts
 // out of the compiled instructions, so the tree refuses one.
 test('an agent folder with a RUNBOOK.md fails validation', () => {
-  assert.doesNotThrow(() => validateTree());
-  const stray = resolve(import.meta.dirname, '../agents/vesta/RUNBOOK.md');
+  const root = copiedOrg();
+  assert.doesNotThrow(() => validateTree(root));
+  const stray = join(root, 'agents/vesta/RUNBOOK.md');
   writeFileSync(stray, '# stray\n');
-  try { assert.throws(() => validateTree(), /vesta has a RUNBOOK.md/u); } finally { rmSync(stray, { force: true }); }
+  assert.throws(() => validateTree(root), /vesta has a RUNBOOK.md/u);
 });
