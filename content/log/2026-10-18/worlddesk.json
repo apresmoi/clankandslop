@@ -1,0 +1,1042 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-18",
+  "generated_at": "2026-10-18T07:56:54Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 126.55,
+        "observed_at": "2026-10-14",
+        "stale_days": 4,
+        "contributes": 3,
+        "reason": "126.55 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 101.91,
+        "observed_at": "2026-10-14",
+        "stale_days": 4,
+        "contributes": 1,
+        "reason": "101.91 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.179,
+        "observed_at": "2026-10-12",
+        "stale_days": 6,
+        "contributes": 2,
+        "reason": "6.179 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.22,
+        "observed_at": "2026-10-14",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "3.22 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 16.46,
+        "observed_at": "2026-10-15",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "16.46 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.23,
+        "observed_at": "2026-10-15",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "3.23 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.6023,
+        "observed_at": "2026-10-09",
+        "stale_days": 9,
+        "contributes": 0,
+        "reason": "121.6023 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-18T07:56:53Z",
+        "http_status": 200,
+        "bytes": 170111,
+        "sha256": "cf9f077822a7620434e86b7d48aa44bada7ef99f57726d50035ae50b549e9011",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-18T07:56:53Z",
+        "http_status": 200,
+        "bytes": 175886,
+        "sha256": "dccb1f7fda2711b3cdedba44362f1e4300a319eaf822b47a716b22290bda286a",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-18T07:56:54Z",
+        "http_status": 200,
+        "bytes": 28925,
+        "sha256": "d91455eb9474f645256f000a6a31ac07f201b5e2301cb71c72e8e776d201bd2d",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-18T07:56:54Z",
+        "http_status": 200,
+        "bytes": 116169,
+        "sha256": "40ae0c0c11c1e1d735872905a23b9f9fe213b7de6da439ba256a52f13254043a",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-18T07:56:54Z",
+        "http_status": 200,
+        "bytes": 161612,
+        "sha256": "90b0099e6536c38d8ed72ef4347977722f33648bb7458827f6c6e5b17a18332c",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-18T07:56:54Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "0375dc59107089bac075b5cbb5144fe54431e539487c9cb861b3fdadba815a94",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-18T07:56:54Z",
+        "http_status": 200,
+        "bytes": 104637,
+        "sha256": "a7b6e593bf1c9dd6c4601c1bd52de979b148eb2e98679ce1cafcda789f372d59",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 44,
+    "open_conflicts": 1,
+    "watch": 6,
+    "dormant": 6,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-16 and drew no qualifying story today",
+        "last_open_edition": "2026-10-16",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-0239cda0",
+            "story_title": "IEA accelerates emergency stocks, including more than twenty million barrels of diesel",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+            "source_urls": [
+              "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+              "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+              "https://www.iea.org/news/iea-governing-board-statement-on-energy-markets-and-security",
+              "https://www.iea.org/topics/the-middle-east-and-global-energy-markets",
+              "https://www.iea.org/topics/the-middle-east-and-global-energy-markets",
+              "https://www.iea.org/topics/the-middle-east-and-global-energy-markets",
+              "https://www.iea.org/data-and-statistics/data-tools/2026-energy-crisis-policy-response-tracker",
+              "https://www.iea.org/data-and-statistics/data-tools/2026-energy-crisis-policy-response-tracker",
+              "https://www.iea.org/data-and-statistics/data-tools/2026-energy-crisis-policy-response-tracker",
+              "https://www.iea.org/topics/energy-security",
+              "https://www.iea.org/topics/energy-security",
+              "https://www.iea.org/topics/energy-security",
+              "https://www.reuters.com/business/energy/iea-speed-up-oil-stocks-release-including-over-20-million-barrels-diesel-2026-10-15/"
+            ],
+            "observed_at": "2026-10-15T19:14:00Z"
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-929ad480",
+            "story_title": "Trump publicly turned Ukraine’s refinery campaign into the target of his energy-price pressure",
+            "source": "chatgpt/chatgpt-rolling-0914.md",
+            "slot": "0914",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.reuters.com/business/energy/ukraines-resumption-strikes-russian-refineries-is-disgrace-trump-says-2026-10-16/",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.theguardian.com/world/2026/oct/16/trump-calls-ukraines-resumption-of-strikes-on-russian-oil-refineries-a-disgrace",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.aljazeera.com/news/2026/10/15/russia-says-ukraine-resumes-attacks-on-oil-refineries",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.president.gov.ua/en/news/zvernennya-prezidenta-ukrayini-do-uchasnikiv-varshavskogo-be-106853",
+              "https://www.newsmax.com/newsmax-tv/donald-trump-russia-ukraine/2026/10/15/id/1272958/"
+            ],
+            "observed_at": "2026-10-16T07:14:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-c115bf55",
+            "story_title": "Lebanon sets an October 20 Tampa gate for the Israel-Hezbollah sequencing problem",
+            "source": "chatgpt/chatgpt-rolling-0314.md",
+            "slot": "0314",
+            "matched": [
+              "Hezbollah"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/lebanon-says-military-delegation-will-press-halt-israeli-attacks-us-talks-2026-10-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/lebanon-says-military-delegation-will-press-halt-israeli-attacks-us-talks-2026-10-17/",
+              "https://www.reuters.com/world/middle-east/lebanon-says-military-delegation-will-press-halt-israeli-attacks-us-talks-2026-10-17/",
+              "https://www.reuters.com/world/middle-east/lebanon-says-military-delegation-will-press-halt-israeli-attacks-us-talks-2026-10-17/",
+              "https://www.aa.com.tr/en/middle-east/lebanon-to-take-part-in-us-backed-trilateral-talks-with-israel-on-oct-20-president-says/4092254",
+              "https://www.aa.com.tr/en/middle-east/lebanon-to-take-part-in-us-backed-trilateral-talks-with-israel-on-oct-20-president-says/4092254",
+              "https://www.aa.com.tr/en/middle-east/lebanon-to-take-part-in-us-backed-trilateral-talks-with-israel-on-oct-20-president-says/4092254"
+            ],
+            "observed_at": "2026-10-18T01:14:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 11,
+        "evidence": [
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-04f93007",
+            "story_title": "Lead 1: Trump issues executive order waiving most new Russia sanctions and tariffs under the Lindsey Graham…",
+            "source": "grok/grok-rolling-1246.md",
+            "slot": "1246",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+            "source_urls": [
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.aljazeera.com/news/2026/10/17/trump-puts-on-hold-new-russia-sanctions-he-signed-into-law",
+              "https://www.aljazeera.com/news/2026/10/17/trump-puts-on-hold-new-russia-sanctions-he-signed-into-law",
+              "https://www.aljazeera.com/news/2026/10/17/trump-puts-on-hold-new-russia-sanctions-he-signed-into-law",
+              "https://www.bbc.co.uk/news/articles/cxr5yvzv7rp0o",
+              "https://www.bbc.co.uk/news/articles/cxr5yvzv7rp0o",
+              "https://kyivindependent.com/russian-attacks-kill-7-injure-dozens-across-ukraine-amid-continued-strikes-on-energy-infrastructure/"
+            ],
+            "observed_at": "2026-10-17T10:46:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-29f59319",
+            "story_title": "Lead 3: Ukraine Air Force reports neutralizing 293 of ~332+ Russian drones/missiles overnight 16–17 Oct…",
+            "source": "grok/grok-rolling-1542.md",
+            "slot": "1542",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://uk.lapresse.it/world-en/2026/10/17/ukraine-293-russian-missiles-and-drones-shot-down-overnight/",
+            "source_urls": [
+              "https://uk.lapresse.it/world-en/2026/10/17/ukraine-293-russian-missiles-and-drones-shot-down-overnight/",
+              "https://uk.lapresse.it/world-en/2026/10/17/ukraine-293-russian-missiles-and-drones-shot-down-overnight/",
+              "https://uk.lapresse.it/world-en/2026/10/17/ukraine-293-russian-missiles-and-drones-shot-down-overnight/",
+              "https://uk.lapresse.it/world-en/2026/10/17/ukraine-293-russian-missiles-and-drones-shot-down-overnight/",
+              "https://www.ukrinform.net/rubric-ato/4175424-zelensky-russian-forces-attack-more-than-15-energy-facilities.html",
+              "https://www.dw.com/uk/ps-pro-nicnu-ataku-balistika-krilati-raketi-j-droni-vlucanna-na-22-lokaciah/a-79685585",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/"
+            ],
+            "observed_at": "2026-10-17T13:42:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-2f8d6ac6",
+            "story_title": "Zelensky says Washington is working on a leaders' trilateral, with the G20 floated as one venue",
+            "source": "chatgpt/chatgpt-rolling-1521.md",
+            "slot": "1521",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/zelenskiy-hopes-meeting-with-us-russia-during-g20-summit-2026-10-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/zelenskiy-hopes-meeting-with-us-russia-during-g20-summit-2026-10-17/",
+              "https://www.reuters.com/world/europe/zelenskiy-hopes-meeting-with-us-russia-during-g20-summit-2026-10-17/",
+              "https://www.reuters.com/world/europe/zelenskiy-hopes-meeting-with-us-russia-during-g20-summit-2026-10-17/",
+              "https://www.reuters.com/world/europe/zelenskiy-hopes-meeting-with-us-russia-during-g20-summit-2026-10-17/",
+              "https://www.reuters.com/world/europe/zelenskiy-hopes-meeting-with-us-russia-during-g20-summit-2026-10-17/",
+              "https://www.kyivpost.com/post/87380",
+              "https://www.kyivpost.com/post/87380",
+              "https://www.kyivpost.com/post/87380",
+              "https://www.kyivpost.com/post/87380",
+              "https://www.kyivpost.com/post/87380"
+            ],
+            "observed_at": "2026-10-17T13:21:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-41e12a2e",
+            "story_title": "Oleshky moves from chronic humanitarian crisis to an explicit evacuation-and-access test",
+            "source": "chatgpt/chatgpt-rolling-0314.md",
+            "slot": "0314",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/ukrainian-foreign-minister-says-russian-held-town-is-death-trap-with-starving-2026-10-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/ukrainian-foreign-minister-says-russian-held-town-is-death-trap-with-starving-2026-10-17/",
+              "https://www.reuters.com/world/ukrainian-foreign-minister-says-russian-held-town-is-death-trap-with-starving-2026-10-17/",
+              "https://www.reuters.com/world/ukrainian-foreign-minister-says-russian-held-town-is-death-trap-with-starving-2026-10-17/",
+              "https://apnews.com/article/russia-ukraine-war-oleshky-front-occupied-dc2ee1a9c31707f61674c598820a5900",
+              "https://apnews.com/article/russia-ukraine-war-oleshky-front-occupied-dc2ee1a9c31707f61674c598820a5900",
+              "https://apnews.com/article/russia-ukraine-war-oleshky-front-occupied-dc2ee1a9c31707f61674c598820a5900",
+              "https://www.coe.int/en/web/commissioner/-/ukraine-the-rapidly-deteriorating-humanitarian-crisis-in-oleshky-demands-attention-and-action",
+              "https://www.coe.int/en/web/commissioner/-/ukraine-the-rapidly-deteriorating-humanitarian-crisis-in-oleshky-demands-attention-and-action",
+              "https://www.coe.int/en/web/commissioner/-/ukraine-the-rapidly-deteriorating-humanitarian-crisis-in-oleshky-demands-attention-and-action"
+            ],
+            "observed_at": "2026-10-18T01:14:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-5d83d463",
+            "story_title": "Ukraine seeks an overland grain valve as the Black Sea route is choked",
+            "source": "chatgpt/chatgpt-rolling-2122.md",
+            "slot": "2122",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/zelenskiy-asked-neighbours-let-grain-cargoes-through-hungary-pm-magyar-says-2026-10-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/zelenskiy-asked-neighbours-let-grain-cargoes-through-hungary-pm-magyar-says-2026-10-17/",
+              "https://ukragroconsult.com/en/news/hungary-will-not-oppose-transit-of-ukrainian-grain-to-europe-magyar/",
+              "https://ukragroconsult.com/en/news/hungary-will-not-oppose-transit-of-ukrainian-grain-to-europe-magyar/",
+              "https://ukragroconsult.com/en/news/hungary-will-not-oppose-transit-of-ukrainian-grain-to-europe-magyar/",
+              "https://ukragroconsult.com/en/news/hungary-will-not-oppose-transit-of-ukrainian-grain-to-europe-magyar/",
+              "https://ukragroconsult.com/en/news/hungary-will-not-oppose-transit-of-ukrainian-grain-to-europe-magyar/",
+              "https://ukragroconsult.com/en/news/hungary-will-not-oppose-transit-of-ukrainian-grain-to-europe-magyar/",
+              "https://news.sky.com/story/ukraine-war-latest-putin-russia-trump-zelenskyy-peace-talks-12541713",
+              "https://news.sky.com/story/ukraine-war-latest-putin-russia-trump-zelenskyy-peace-talks-12541713",
+              "https://news.sky.com/story/ukraine-war-latest-putin-russia-trump-zelenskyy-peace-talks-12541713",
+              "https://news.sky.com/story/ukraine-war-latest-putin-russia-trump-zelenskyy-peace-talks-12541713",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/17/zelenskiy-asked-neighbours-to-let-grain-cargoes-through-hungary-pm-magyar-says"
+            ],
+            "observed_at": "2026-10-17T19:22:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-8bb2e1dd",
+            "story_title": "Lithuania red air alert and possible drone spillover (NATO Baltic airspace)",
+            "source": "grok/grok-rolling-0951.md",
+            "slot": "0951",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+            "source_urls": [
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.straitstimes.com/world/europe/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/18/lithuania-told-residents-to-go-to-shelters-after-detecting-a-flying-object",
+              "https://www.vg.no/nyheter/i/64M9vO/flyplassen-stenges-etter-droneobservasjon",
+              "https://www.vg.no/nyheter/i/64M9vO/flyplassen-stenges-etter-droneobservasjon",
+              "https://www.aftenposten.no/norge/i/xlzgpj/flyalarm-gikk-i-litauen-myndighetene-ba-innbyggerne-soeke-tilflukt",
+              "https://www.aftenposten.no/norge/i/xlzgpj/flyalarm-gikk-i-litauen-myndighetene-ba-innbyggerne-soeke-tilflukt",
+              "https://www.aftenposten.no/norge/i/xlzgpj/flyalarm-gikk-i-litauen-myndighetene-ba-innbyggerne-soeke-tilflukt",
+              "https://www.arabnews.com/world/lithuania-tells-residents-to-go-to-shelters-after-detecting-a-flying-object-3006966",
+              "https://nashaniva.com/en/407161",
+              "https://nashaniva.com/en/407161",
+              "https://nashaniva.com/en/407161",
+              "https://www.polsatnews.pl/wiadomosc/2026-10-18/alert-na-litwie-i-lotwie-czerwone-ostrzezenia-nakaz-udania-sie-do-schronu/",
+              "https://orf.at/stories/3445429/"
+            ],
+            "observed_at": "2026-10-18T07:51:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-99f1b805",
+            "story_title": "Lead 3: Ukraine schedules power restrictions for all regions on 18 October after 17 Oct energy attacks…",
+            "source": "grok/grok-rolling-0348.md",
+            "slot": "0348",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1",
+            "source_urls": [
+              "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1",
+              "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1",
+              "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1",
+              "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1",
+              "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1",
+              "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1",
+              "https://ua.news/en/energetika/u-vsikh-regionakh-ukrayini-18-zhovtnia-diiatimut-grafiki-vidkliuchennia-svitla-1"
+            ],
+            "observed_at": "2026-10-18T01:48:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-a0fc836b",
+            "story_title": "Lead 3: Overnight Russian combined missile-and-drone attack (332 drones + ballistic/cruise missiles) on…",
+            "source": "grok/grok-rolling-1246.md",
+            "slot": "1246",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://kyivindependent.com/russian-attacks-kill-7-injure-dozens-across-ukraine-amid-continued-strikes-on-energy-infrastructure/",
+            "source_urls": [
+              "https://kyivindependent.com/russian-attacks-kill-7-injure-dozens-across-ukraine-amid-continued-strikes-on-energy-infrastructure/",
+              "https://kyivindependent.com/russian-attacks-kill-7-injure-dozens-across-ukraine-amid-continued-strikes-on-energy-infrastructure/",
+              "https://kyivindependent.com/russian-attacks-kill-7-injure-dozens-across-ukraine-amid-continued-strikes-on-energy-infrastructure/",
+              "https://kyivindependent.com/russian-attacks-kill-7-injure-dozens-across-ukraine-amid-continued-strikes-on-energy-infrastructure/",
+              "https://kyivindependent.com/russian-attacks-kill-7-injure-dozens-across-ukraine-amid-continued-strikes-on-energy-infrastructure/",
+              "https://www.kyivpost.com/post/87357",
+              "https://www.kyivpost.com/post/87357",
+              "https://www.kyivpost.com/post/87357",
+              "https://uk.lapresse.it/world-en/2026/10/17/ukraine-293-russian-missiles-and-drones-shot-down-overnight/",
+              "https://uk.lapresse.it/world-en/2026/10/17/ukraine-293-russian-missiles-and-drones-shot-down-overnight/"
+            ],
+            "observed_at": "2026-10-17T10:46:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-ad7f650e",
+            "story_title": "Czech Senate second-round results: opposition wins 22 of 27 seats; governing ANO takes zero (first such…",
+            "source": "grok/grok-rolling-1842.md",
+            "slot": "1842",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.wral.com/news/ap/d206f-pro-western-opposition-wins-big-in-czech-senate-election-dealing-a-blow-to-populist-pm-babi/",
+            "source_urls": [
+              "https://www.wral.com/news/ap/d206f-pro-western-opposition-wins-big-in-czech-senate-election-dealing-a-blow-to-populist-pm-babi/",
+              "https://www.wral.com/news/ap/d206f-pro-western-opposition-wins-big-in-czech-senate-election-dealing-a-blow-to-populist-pm-babi/",
+              "https://www.wral.com/news/ap/d206f-pro-western-opposition-wins-big-in-czech-senate-election-dealing-a-blow-to-populist-pm-babi/",
+              "https://www.wral.com/news/ap/d206f-pro-western-opposition-wins-big-in-czech-senate-election-dealing-a-blow-to-populist-pm-babi/",
+              "https://www.wral.com/news/ap/d206f-pro-western-opposition-wins-big-in-czech-senate-election-dealing-a-blow-to-populist-pm-babi/",
+              "https://www.e15.cz/vysledky-voleb-a-referend/volby-do-senatu/vysledky-senatnich-voleb-2026-2-kolo-1436508",
+              "https://www.e15.cz/vysledky-voleb-a-referend/volby-do-senatu/vysledky-senatnich-voleb-2026-2-kolo-1436508",
+              "https://www.ceskenoviny.cz/zpravy/2889064",
+              "https://www.ceskenoviny.cz/zpravy/2889064",
+              "https://www.ceskenoviny.cz/zpravy/2889064",
+              "https://ct24.ceskatelevize.cz/clanek/regiony/hlavni-mesto-praha/v-praze-9-v-senatnich-volbach-podle-propoctu-opet-zvitezil-smoljak-za-stan-378643",
+              "https://en.wikipedia.org/wiki/2026_Czech_Senate_election"
+            ],
+            "observed_at": "2026-10-17T16:42:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-bd6b77d4",
+            "story_title": "Czech voters preserve an opposition-controlled Senate and shut ANO out of the contested seats",
+            "source": "chatgpt/chatgpt-rolling-2122.md",
+            "slot": "2122",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/czech-pm-babis-suffers-setback-senate-elections-2026-10-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/czech-pm-babis-suffers-setback-senate-elections-2026-10-17/",
+              "https://apnews.com/article/czech-republic-senate-election-babis-d206f3edbc7ea0f73b0dbd07b339820b",
+              "https://apnews.com/article/czech-republic-senate-election-babis-d206f3edbc7ea0f73b0dbd07b339820b",
+              "https://www.irozhlas.cz/zpravy-domov/online-lide-znovu-voli-rozhodnou-o-zbyvajicich-22-senatorech-mistnosti-se_2610170605_med",
+              "https://www.irozhlas.cz/zpravy-domov/online-lide-znovu-voli-rozhodnou-o-zbyvajicich-22-senatorech-mistnosti-se_2610170605_med",
+              "https://www.irozhlas.cz/zpravy-domov/online-lide-znovu-voli-rozhodnou-o-zbyvajicich-22-senatorech-mistnosti-se_2610170605_med",
+              "https://www.novinky.cz/clanek/volby-do-senatu-2026-druhe-kolo-vysledky-scitani-online-40603340",
+              "https://www.novinky.cz/clanek/volby-do-senatu-2026-druhe-kolo-vysledky-scitani-online-40603340",
+              "https://www.novinky.cz/clanek/volby-do-senatu-2026-druhe-kolo-vysledky-scitani-online-40603340",
+              "https://www.theguardian.com/world/2026/oct/17/uae-yemen-conflict-agreement-saudi-arabia-houthi-gains?utm_source=chatgpt.com",
+              "https://apnews.com/article/89ebd068167669db357ad1fa4f3a8758?utm_source=chatgpt.com",
+              "https://apnews.com/article/d206f3edbc7ea0f73b0dbd07b339820b?utm_source=chatgpt.com",
+              "https://www.theguardian.com/world/2026/oct/17/protests-france-high-prices-social-security-gilets-jaunes?utm_source=chatgpt.com",
+              "https://www.reuters.com/world/europe/zelenskiy-asked-neighbours-let-grain-cargoes-through-hungary-pm-magyar-says-2026-10-17/?utm_source=chatgpt.com"
+            ],
+            "observed_at": "2026-10-17T19:22:00Z"
+          },
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-eb8bafac",
+            "story_title": "Material update to the previously published story “Trump Waives Graham Act Russia Duties.”",
+            "source": "chatgpt/chatgpt-rolling-0922.md",
+            "slot": "0922",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/us/rubio-says-trump-take-up-60-days-weigh-russia-sanctions-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/us/rubio-says-trump-take-up-60-days-weigh-russia-sanctions-2026-10-18/",
+              "https://www.reuters.com/world/us/rubio-says-trump-take-up-60-days-weigh-russia-sanctions-2026-10-18/",
+              "https://www.reuters.com/world/us/rubio-says-trump-take-up-60-days-weigh-russia-sanctions-2026-10-18/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://www.whitehouse.gov/presidential-actions/2026/10/implementing-the-lindsey-o-graham-sanctioning-russia-and-iran-act-of-2026/",
+              "https://timesofindia.indiatimes.com/business/international-business/trump-waives-russia-sanctions-restrictions-and-duties-under-graham-act-diesel-us-midterms/articleshow/135005808.cms",
+              "https://timesofindia.indiatimes.com/business/international-business/trump-waives-russia-sanctions-restrictions-and-duties-under-graham-act-diesel-us-midterms/articleshow/135005808.cms",
+              "https://timesofindia.indiatimes.com/business/international-business/trump-waives-russia-sanctions-restrictions-and-duties-under-graham-act-diesel-us-midterms/articleshow/135005808.cms",
+              "https://www.pravda.com.ua/eng/news/2026/10/17/8058450/",
+              "https://www.pravda.com.ua/eng/news/2026/10/17/8058450/",
+              "https://www.pravda.com.ua/eng/news/2026/10/17/8058450/"
+            ],
+            "observed_at": "2026-10-18T07:22:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-626d1ecd",
+            "story_title": "Egypt opens a parliamentary gate for military action in defense of Saudi Arabia",
+            "source": "chatgpt/chatgpt-rolling-2122.md",
+            "slot": "2122",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/egypts-sisi-seeks-parliaments-backing-help-defend-saudi-arabia-if-asked-2026-10-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/egypts-sisi-seeks-parliaments-backing-help-defend-saudi-arabia-if-asked-2026-10-17/",
+              "https://english.ahram.org.eg/NewsContentP/1/580157/Egypt/ElSisi-calls-for-emergency-parliamentary-session-t.aspx",
+              "https://english.ahram.org.eg/NewsContentP/1/580157/Egypt/ElSisi-calls-for-emergency-parliamentary-session-t.aspx",
+              "https://english.ahram.org.eg/NewsContentP/1/580157/Egypt/ElSisi-calls-for-emergency-parliamentary-session-t.aspx",
+              "https://www.aljazeera.com/economy/2026/10/17/egypts-sisi-seeks-authorisation-for-defence-assistance-to-saudi-arabia",
+              "https://www.aljazeera.com/economy/2026/10/17/egypts-sisi-seeks-authorisation-for-defence-assistance-to-saudi-arabia",
+              "https://www.aljazeera.com/economy/2026/10/17/egypts-sisi-seeks-authorisation-for-defence-assistance-to-saudi-arabia",
+              "https://aa.com.tr/en/middle-east/egyptian-parliament-to-discuss-authorizing-action-to-defend-saudi-arabia-if-requested/4092025"
+            ],
+            "observed_at": "2026-10-17T19:22:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-18",
+            "story_id": "s-d5ee7e51",
+            "story_title": "Status: HOLD — Corroboration: single-domain.",
+            "source": "chatgpt/chatgpt-rolling-0314.md",
+            "slot": "0314",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/venezuela-expects-nearly-76-billion-oil-investment-over-five-years-acting-2026-10-17/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/venezuela-expects-nearly-76-billion-oil-investment-over-five-years-acting-2026-10-17/",
+              "https://www.reuters.com/business/energy/venezuela-expects-nearly-76-billion-oil-investment-over-five-years-acting-2026-10-17/",
+              "https://www.reuters.com/business/energy/venezuela-expects-nearly-76-billion-oil-investment-over-five-years-acting-2026-10-17/"
+            ],
+            "observed_at": "2026-10-18T01:14:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-16 and drew no qualifying story today",
+        "last_open_edition": "2026-10-16",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-6f376310",
+            "story_title": "Lead 5: China and North Korea open long-delayed New Yalu River Bridge",
+            "source": "grok/grok-rolling-0043.md",
+            "slot": "0043",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.chinadailyhk.com/hk/article/641149"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-c43ccee2",
+            "story_title": "Lead 3: China and North Korea open long-delayed New Yalu River Bridge after 12 years",
+            "source": "grok/grok-rolling-1249.md",
+            "slot": "1249",
+            "matched": [
+              "North Korea",
+              "DPRK"
+            ],
+            "source_url": "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+            "source_urls": [
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay"
+            ],
+            "observed_at": "2026-10-15T10:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-12 and drew no qualifying story today",
+        "last_open_edition": "2026-10-12",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-398eafd3",
+            "story_title": "Lead 4: Pakistani President Zardari imposes emergency and governor’s rule in Khyber Pakhtunkhwa, suspending…",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+            "source_urls": [
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://www.dawn.com/news/2036352",
+              "https://www.dawn.com/news/2036352",
+              "https://indianexpress.com/article/pakistan/pakistan-khyber-pakhtunkhwa-emergency-asif-ali-zardari-imran-khan-pti-government-suspended-10916856/"
+            ],
+            "observed_at": "2026-10-11T16:49:00Z"
+          },
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-3fa8b309",
+            "story_title": "Editorial status: high-consequence hold; underlying detention is independently corroborated, but the…",
+            "source": "chatgpt/chatgpt-rolling-0922.md",
+            "slot": "0922",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+            "source_urls": [
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://www.reuters.com/world/asia-pacific/pakistan-province-leaders-ex-pm-imran-khans-party-detained-junior-minister-says-2026-10-12/",
+              "https://www.tbsnews.net/world/south-asia/pakistan-province-leaders-ex-pm-imran-khans-party-detained-junior-minister-1570081",
+              "https://www.ft.com/content/786cb0a4-a235-4884-ab1c-b2234bc3cefe",
+              "https://www.reuters.com/world/china/imf-says-ai-investment-keeps-global-growth-around-3-with-major-asia-benefits-2026-10-12/",
+              "https://www.reuters.com/business/volkswagen-reports-14-drop-third-quarter-deliveries-2026-10-12/",
+              "https://www.reuters.com/world/india/german-finance-minister-cancels-india-trip-amid-berlin-turmoil-2026-10-12/"
+            ],
+            "observed_at": "2026-10-12T07:22:00Z"
+          },
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-c573ec0f",
+            "story_title": "Pakistan suspends the PTI provincial executive under emergency powers",
+            "source": "chatgpt/chatgpt-rolling-1515.md",
+            "slot": "1515",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+            "source_urls": [
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://www.dawn.com/news/2036352",
+              "https://www.dawn.com/news/2036352",
+              "https://www.dawn.com/news/2036352",
+              "https://www.geo.tv/latest/686046-kp-emergency-governors-rule-legal-experts-explain-govts-constitutional-powers",
+              "https://www.geo.tv/latest/686046-kp-emergency-governors-rule-legal-experts-explain-govts-constitutional-powers",
+              "https://www.geo.tv/latest/686046-kp-emergency-governors-rule-legal-experts-explain-govts-constitutional-powers",
+              "https://www.reuters.com/world/asia-pacific/pakistan-president-imposes-emergency-province-ruled-by-ex-pm-imran-khans-party-2026-10-11/",
+              "https://www.reuters.com/world/asia-pacific/pakistan-president-imposes-emergency-province-ruled-by-ex-pm-imran-khans-party-2026-10-11/",
+              "https://www.reuters.com/world/asia-pacific/pakistan-president-imposes-emergency-province-ruled-by-ex-pm-imran-khans-party-2026-10-11/"
+            ],
+            "observed_at": "2026-10-11T13:15:00Z"
+          },
+          {
+            "edition": "2026-10-12",
+            "story_id": "s-fcd6763b",
+            "story_title": "Pakistan’s emergency becomes a crackdown and a prospective court fight",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+            "source_urls": [
+              "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+              "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+              "https://www.geo.tv/latest/686054-emergency-governors-rule-imposed-in-kp-as-president-zardari-approves-summary-on-pms-advice",
+              "https://www.geo.tv/latest/686028-pti-calls-centres-move-to-impose-emergency-in-kp-a-grave-political-mistake",
+              "https://www.geo.tv/latest/686028-pti-calls-centres-move-to-impose-emergency-in-kp-a-grave-political-mistake",
+              "https://www.geo.tv/latest/686028-pti-calls-centres-move-to-impose-emergency-in-kp-a-grave-political-mistake",
+              "https://tribune.com.pk/story/2634339/pti-march-fizzles-out-after-k-p-emergency-arrests",
+              "https://tribune.com.pk/story/2634339/pti-march-fizzles-out-after-k-p-emergency-arrests",
+              "https://tribune.com.pk/story/2634339/pti-march-fizzles-out-after-k-p-emergency-arrests",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/pakistan-khan-march-khyber-pakhtunkhwa-3fee40be73c3f5632f2be3204e9c47f8",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-d2e0868ffb18d883c16465d7d6a87ccb",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-d2e0868ffb18d883c16465d7d6a87ccb",
+              "https://apnews.com/article/saudi-yemen-houthi-riyadh-airport-d2e0868ffb18d883c16465d7d6a87ccb",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-renew-warning-over-saudi-airports-after-deadly-riyadh-attack-2026-10-11/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-renew-warning-over-saudi-airports-after-deadly-riyadh-attack-2026-10-11/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-renew-warning-over-saudi-airports-after-deadly-riyadh-attack-2026-10-11/",
+              "https://www.spa.gov.sa/en/N2697996",
+              "https://apnews.com/article/north-korea-kim-missiles-south-5b2d3a2d9a31118648b9f82022b9c4e3",
+              "https://apnews.com/article/f621fa788196f204448e7f75fcc78c68?utm_source=chatgpt.com",
+              "https://apnews.com/article/d2e0868ffb18d883c16465d7d6a87ccb?utm_source=chatgpt.com",
+              "https://www.theguardian.com/politics/2026/oct/11/andy-burnham-russia-interfered-brexit-vote?utm_source=chatgpt.com",
+              "https://apnews.com/article/3fee40be73c3f5632f2be3204e9c47f8?utm_source=chatgpt.com",
+              "https://apnews.com/article/5b2d3a2d9a31118648b9f82022b9c4e3?utm_source=chatgpt.com",
+              "https://www.reuters.com/business/environment/panama-suffers-over-200-aftershocks-after-fridays-77-magnitude-earthquake-2026-10-11/?utm_source=chatgpt.com",
+              "https://apnews.com/article/93fa63c8a88e538f1456e7d448fc550d?utm_source=chatgpt.com"
+            ],
+            "observed_at": "2026-10-12T01:18:00Z"
+          }
+        ]
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-16",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
