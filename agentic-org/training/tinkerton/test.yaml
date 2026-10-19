@@ -1,0 +1,81 @@
+cases:
+  - id: 2026-10-10-s-3382b4d5
+    at: '2026-10-10T10:45:43.407053093Z'
+    grader: grading/2026-10-10-s-3382b4d5/grader.yaml
+    assignment:
+      room: assignment
+      from: brass
+      text: >-
+        @tinkerton two briefs. First: BRIEF — The Trump administration designated the
+        International Criminal Court itself, moving beyond sanctions on named officials.
+        Carry the OFAC listing, the time it landed, and that the target is now the
+        institution. Edition 2026-10-10, s-36eb723e.
+
+
+        Second: BRIEF — Reuters has documented 28 injuries linked to police action as
+        French student-protest injury investigations accumulate. Carry the injury count,
+        the police-scrutiny frame, and the investigations now open. s-3382b4d5. Nobody
+        pitched it; it continues the lycée sequence.
+  - id: 2026-10-10-s-36eb723e
+    at: '2026-10-10T10:45:43.407053093Z'
+    grader: grading/2026-10-10-s-36eb723e/grader.yaml
+    assignment:
+      room: assignment
+      from: brass
+      text: >-
+        @tinkerton two briefs. First: BRIEF — The Trump administration designated the
+        International Criminal Court itself, moving beyond sanctions on named officials.
+        Carry the OFAC listing, the time it landed, and that the target is now the
+        institution. Edition 2026-10-10, s-36eb723e.
+
+
+        Second: BRIEF — Reuters has documented 28 injuries linked to police action as
+        French student-protest injury investigations accumulate. Carry the injury count,
+        the police-scrutiny frame, and the investigations now open. s-3382b4d5. Nobody
+        pitched it; it continues the lycée sequence.
+  - id: 2026-10-11-s-ec7d213e
+    at: '2026-10-11T10:51:52.270019166Z'
+    grader: grading/2026-10-11-s-ec7d213e/grader.yaml
+    assignment:
+      room: assignment
+      from: brass
+      text: >-
+        @tinkerton BRIEF — A special Supreme Court bench (Justices Joymalya Bagchi and
+        V. Mohana) issued Sunday directives limiting further detentions from Saturday's
+        Delhi roundup and restoring metro, rail and internet. Carry the justices, the
+        directives, and which city systems the court ordered back on. The live authority
+        this morning is the bench, not the lock-down order.
+  - id: 2026-10-12-s-486732da
+    at: '2026-10-12T10:59:04.421282751Z'
+    grader: grading/2026-10-12-s-486732da/grader.yaml
+    assignment:
+      room: assignment
+      from: brass
+      text: >-
+        @tinkerton Edition 2026-10-12, two briefs. s-fcd6763b BRIEF — President Zardari
+        imposed emergency and governor's rule in opposition-run Khyber Pakhtunkhwa under
+        Articles 232 and 234, and the federal government displaced the PTI provincial
+        executive. Carry who signed, which articles moved, and that the opposition
+        provincial government is already off the books. The court fight is the live
+        appeal, not a second story. s-486732da BRIEF — Early Monday Delhi Metro closed
+        entry and exit at six central stations from 06:00 to 16:00 local while Congress
+        prepared a march toward the Supreme Court. Carry the stations, the hours, and
+        the march. Follow to yesterday's restoration; list s-ec7d213e in
+        previous_coverage.
+  - id: 2026-10-12-s-fcd6763b
+    at: '2026-10-12T10:59:04.421282751Z'
+    grader: grading/2026-10-12-s-fcd6763b/grader.yaml
+    assignment:
+      room: assignment
+      from: brass
+      text: >-
+        @tinkerton Edition 2026-10-12, two briefs. s-fcd6763b BRIEF — President Zardari
+        imposed emergency and governor's rule in opposition-run Khyber Pakhtunkhwa under
+        Articles 232 and 234, and the federal government displaced the PTI provincial
+        executive. Carry who signed, which articles moved, and that the opposition
+        provincial government is already off the books. The court fight is the live
+        appeal, not a second story. s-486732da BRIEF — Early Monday Delhi Metro closed
+        entry and exit at six central stations from 06:00 to 16:00 local while Congress
+        prepared a march toward the Supreme Court. Carry the stations, the hours, and
+        the march. Follow to yesterday's restoration; list s-ec7d213e in
+        previous_coverage.

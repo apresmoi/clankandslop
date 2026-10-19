@@ -1,0 +1,155 @@
+# version: v0
+# status: draft-pending-human-review
+schema: paideia.grader.v1
+id: 2026-10-12-s-486732da
+calibration: identity
+context:
+  grounding:
+    description: Frozen v0 independent case grounding; draft pending human review
+model:
+  backend: typesafe
+  name: jev-1.13.0
+max_spend_usd: 0.5
+questions:
+  - id: six_station_scope
+    type: yes-no
+    ask: Does the article tell readers that entry and exit were restricted at six
+      central Delhi Metro stations on Monday?
+    expected: yes
+    weight: 3
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: station_names
+    type: yes-no
+    ask: Does the article name Janpath, Mandi House, Barakhamba Road, Central
+      Secretariat, Rajiv Chowk and Patel Chowk as the six affected stations?
+    expected: yes
+    weight: 3
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: restriction_hours
+    type: yes-no
+    ask: Does the article give the announced restriction period as 06:00 to 16:00
+      Indian local time?
+    expected: yes
+    weight: 3
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: congress_march
+    type: yes-no
+    ask: Does the article tell readers that Congress planned a march towards the
+      Supreme Court?
+    expected: yes
+    weight: 3
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: sunday_continuity
+    type: yes-no
+    ask: Does the article connect Monday's restrictions to Sunday's Supreme Court
+      directions restoring normal Metro access?
+    expected: yes
+    weight: 2
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: interchange_exception
+    type: yes-no
+    ask: Does the article tell readers that interchange facilities remained
+      available at the affected stations?
+    expected: yes
+    weight: 2
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: electoral_allegation_overclaim
+    type: yes-no
+    ask: Does the article present politically motivated deletion of voters as an
+      established finding?
+    expected: no
+    weight: 3
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: continued_closure_overclaim
+    type: yes-no
+    ask: Does the article assert that the six stations remained closed after the
+      announced 16:00 end?
+    expected: no
+    weight: 3
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: contempt_outcome_overclaim
+    type: yes-no
+    ask: Does the article report a final contempt judgment against the authorities?
+    expected: no
+    weight: 3
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  - id: news_lede
+    type: yes-no
+    ask: Does the first paragraph report Monday's six-station access restrictions?
+    expected: yes
+    weight: 2
+    reads:
+      - context.grounding
+      - output.headline
+      - output.deck
+      - output.body
+  # --- shared newsroom style checks (same for every case) ---
+  - id: style_nut_graf
+    type: yes-no
+    ask: Does the second or third paragraph tell the reader plainly why this news matters (what changes, who is affected, or what is at stake)?
+    expected: yes
+    weight: 2
+    reads: [output.headline, output.deck, output.body]
+  - id: style_outlet_attribution
+    type: yes-no
+    ask: Does the article credit news outlets by name more than once (for example repeating "X reported" or "according to X newspaper") instead of attributing facts to the officials, court or documents themselves?
+    expected: no
+    weight: 2
+    reads: [output.headline, output.deck, output.body]
+  - id: style_headline_natural
+    type: yes-no
+    ask: Is the headline a natural news headline of about 12 words or fewer, naming a clear actor with an active verb?
+    expected: yes
+    weight: 1
+    reads: [output.headline, output.deck, output.body]
+  - id: style_headline_overclaim
+    type: yes-no
+    ask: Does the headline present something as already done or achieved (for example "restored", "freed", "ended") when the article only reports it as ordered, planned, proposed or claimed?
+    expected: no
+    weight: 2
+    reads: [output.headline, output.deck, output.body]
+  - id: style_meta_language
+    type: yes-no
+    ask: Does the article mention its own inputs or newsroom process, such as "the research", "the sources", "the summary", "the brief", "the material" or "evidence rows", instead of only reporting the news?
+    expected: no
+    weight: 3
+    reads: [output.headline, output.deck, output.body]
+score:
+  method: weighted
+  pass_at: 0.8

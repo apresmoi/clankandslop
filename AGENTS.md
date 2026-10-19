@@ -325,4 +325,6 @@ Inside `agentic-org/`, `AGENTS.md` means one thing: an agent's system prompt
   into the output directory it is given, reads only public inputs (nothing from
   the private repo: private code reaches agents as the `newsroom-private-tools` fed
   volume), and every input it reads is declared in the Spawnfile that runs it.
+- `training/<agent>/`: how an agent's prompt was trained and graded (sets, graders,
+  config). Setup only: the research each case ran on stays private.
 - `ops/README.md`: host operations (systemd units, release, volumes).
