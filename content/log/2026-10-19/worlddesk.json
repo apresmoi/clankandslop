@@ -1,0 +1,890 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-19",
+  "generated_at": "2026-10-19T07:49:09Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 126.55,
+        "observed_at": "2026-10-14",
+        "stale_days": 5,
+        "contributes": 3,
+        "reason": "126.55 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 101.91,
+        "observed_at": "2026-10-14",
+        "stale_days": 5,
+        "contributes": 1,
+        "reason": "101.91 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.179,
+        "observed_at": "2026-10-12",
+        "stale_days": 7,
+        "contributes": 2,
+        "reason": "6.179 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.22,
+        "observed_at": "2026-10-14",
+        "stale_days": 5,
+        "contributes": 0,
+        "reason": "3.22 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 16.46,
+        "observed_at": "2026-10-15",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "16.46 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.23,
+        "observed_at": "2026-10-15",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "3.23 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.6023,
+        "observed_at": "2026-10-09",
+        "stale_days": 10,
+        "contributes": 0,
+        "reason": "121.6023 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-19T07:49:08Z",
+        "http_status": 200,
+        "bytes": 170111,
+        "sha256": "cf9f077822a7620434e86b7d48aa44bada7ef99f57726d50035ae50b549e9011",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-19T07:49:08Z",
+        "http_status": 200,
+        "bytes": 175886,
+        "sha256": "dccb1f7fda2711b3cdedba44362f1e4300a319eaf822b47a716b22290bda286a",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-19T07:49:08Z",
+        "http_status": 200,
+        "bytes": 28925,
+        "sha256": "d91455eb9474f645256f000a6a31ac07f201b5e2301cb71c72e8e776d201bd2d",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-19T07:49:08Z",
+        "http_status": 200,
+        "bytes": 116169,
+        "sha256": "40ae0c0c11c1e1d735872905a23b9f9fe213b7de6da439ba256a52f13254043a",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-19T07:49:09Z",
+        "http_status": 200,
+        "bytes": 161612,
+        "sha256": "90b0099e6536c38d8ed72ef4347977722f33648bb7458827f6c6e5b17a18332c",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-19T07:49:09Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "0375dc59107089bac075b5cbb5144fe54431e539487c9cb861b3fdadba815a94",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-19T07:49:09Z",
+        "http_status": 200,
+        "bytes": 104637,
+        "sha256": "a7b6e593bf1c9dd6c4601c1bd52de979b148eb2e98679ce1cafcda789f372d59",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 42,
+    "open_conflicts": 2,
+    "watch": 4,
+    "dormant": 7,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-0038c8cc",
+            "story_title": "Lead 4: IRGC reports two crude tankers (~2 million barrels each) caught fire after striking mines in Strait…",
+            "source": "grok/grok-rolling-0346.md",
+            "slot": "0346",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.reuters.com/world/middle-east/irans-guards-say-two-tankers-hit-mines-strait-hormuz-2026-10-17/"
+            ],
+            "observed_at": "2026-10-19T01:46:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-1a210297",
+            "story_title": "Egypt moves Saudi support toward a parliamentary military gate",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404"
+            ],
+            "observed_at": "2026-10-18T19:16:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-35511ffe",
+            "story_title": "Iran keeps a six-day Hormuz reopening clock on the table",
+            "source": "chatgpt/chatgpt-rolling-1517.md",
+            "slot": "1517",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358"
+            ],
+            "observed_at": "2026-10-18T13:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 9,
+        "evidence": [
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-16284f8d",
+            "story_title": "Ukraine turns the outage story into a claimed week-long breach tally",
+            "source": "chatgpt/chatgpt-rolling-1517.md",
+            "slot": "1517",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/zelenskiy-says-russia-attacked-ukrainian-energy-sector-76-times-past-week-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/zelenskiy-says-russia-attacked-ukrainian-energy-sector-76-times-past-week-2026-10-18/",
+              "https://www.reuters.com/world/europe/zelenskiy-says-russia-attacked-ukrainian-energy-sector-76-times-past-week-2026-10-18/",
+              "https://www.reuters.com/world/europe/zelenskiy-says-russia-attacked-ukrainian-energy-sector-76-times-past-week-2026-10-18/",
+              "https://apnews.com/article/russia-ukraine-war-energy-diesel-trump-f813d3725b8b5f23958a68a95729fd0d",
+              "https://apnews.com/article/russia-ukraine-war-energy-diesel-trump-f813d3725b8b5f23958a68a95729fd0d",
+              "https://apnews.com/article/russia-ukraine-war-energy-diesel-trump-f813d3725b8b5f23958a68a95729fd0d",
+              "https://kyivindependent.com/zelensky-tells-trump-russia-keeps-violating-his-energy-ceasefire/",
+              "https://kyivindependent.com/zelensky-tells-trump-russia-keeps-violating-his-energy-ceasefire/",
+              "https://www.ukrinform.ua/rubric-ato/4175585-zelenskij-rosia-76-raziv-atakuvala-energetiku-ukraini-pisla-ogolosenna-peremira.html",
+              "https://www.ukrinform.ua/rubric-ato/4175585-zelenskij-rosia-76-raziv-atakuvala-energetiku-ukraini-pisla-ogolosenna-peremira.html"
+            ],
+            "observed_at": "2026-10-18T13:17:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-19a5de47",
+            "story_title": "Lead 3: Ukrainian forces launch >1,000 drones against St. Petersburg region, hitting oil terminal, depot…",
+            "source": "grok/grok-rolling-0648.md",
+            "slot": "0648",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/19/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.reuters.com/world/europe/one-killed-15-injured-ukrainian-drone-attack-st-petersburg-leningrad-region-2026-10-18/"
+            ],
+            "observed_at": "2026-10-19T04:48:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-2228095c",
+            "story_title": "St Petersburg attack links oil, logistics and data infrastructure in one deep-strike episode",
+            "source": "chatgpt/chatgpt-rolling-1517.md",
+            "slot": "1517",
+            "matched": [
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/one-killed-15-injured-ukrainian-drone-attack-st-petersburg-leningrad-region-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/one-killed-15-injured-ukrainian-drone-attack-st-petersburg-leningrad-region-2026-10-18/",
+              "https://www.reuters.com/world/europe/one-killed-15-injured-ukrainian-drone-attack-st-petersburg-leningrad-region-2026-10-18/",
+              "https://www.reuters.com/world/europe/one-killed-15-injured-ukrainian-drone-attack-st-petersburg-leningrad-region-2026-10-18/",
+              "https://apnews.com/article/russia-ukraine-war-energy-diesel-trump-f813d3725b8b5f23958a68a95729fd0d",
+              "https://apnews.com/article/russia-ukraine-war-energy-diesel-trump-f813d3725b8b5f23958a68a95729fd0d",
+              "https://apnews.com/article/russia-ukraine-war-energy-diesel-trump-f813d3725b8b5f23958a68a95729fd0d",
+              "https://kyivindependent.com/flames-explosions-reported-amid-large-ukrainian-drone-attack-on-st-petersburg/",
+              "https://kyivindependent.com/flames-explosions-reported-amid-large-ukrainian-drone-attack-on-st-petersburg/",
+              "https://www.ukrinform.net/rubric-ato/4175563-drones-strike-oil-facilities-ozon-warehouse-and-vkontakte-data-center-in-st-petersburg.html",
+              "https://www.ukrinform.net/rubric-ato/4175563-drones-strike-oil-facilities-ozon-warehouse-and-vkontakte-data-center-in-st-petersburg.html"
+            ],
+            "observed_at": "2026-10-18T13:17:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-26c5132e",
+            "story_title": "U.S.–Ukraine ballistic-warning intelligence is back after a three-day interruption",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/legal/government/us-resumes-intelligence-sharing-with-ukraine-after-pause-zelenskiy-says-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/legal/government/us-resumes-intelligence-sharing-with-ukraine-after-pause-zelenskiy-says-2026-10-18/",
+              "https://www.reuters.com/legal/government/us-resumes-intelligence-sharing-with-ukraine-after-pause-zelenskiy-says-2026-10-18/",
+              "https://www.reuters.com/legal/government/us-resumes-intelligence-sharing-with-ukraine-after-pause-zelenskiy-says-2026-10-18/",
+              "https://www.reuters.com/legal/government/us-resumes-intelligence-sharing-with-ukraine-after-pause-zelenskiy-says-2026-10-18/",
+              "https://www.theguardian.com/world/2026/oct/18/killed-injured-russia-ukraine-strikes-power-infrastructure",
+              "https://www.theguardian.com/world/2026/oct/18/killed-injured-russia-ukraine-strikes-power-infrastructure",
+              "https://www.theguardian.com/world/2026/oct/18/killed-injured-russia-ukraine-strikes-power-infrastructure",
+              "https://www.pravda.com.ua/eng/news/2026/10/18/8058606/",
+              "https://www.pravda.com.ua/eng/news/2026/10/18/8058606/",
+              "https://www.pravda.com.ua/eng/news/2026/10/18/8058606/"
+            ],
+            "observed_at": "2026-10-18T19:16:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-6892c283",
+            "story_title": "Lithuania treats attempted Starlink arson as Russia-linked sabotage against Ukraine's military connectivity",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/business/media-telecom/lithuania-says-attempted-starlink-arson-was-russia-linked-sabotage-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/business/media-telecom/lithuania-says-attempted-starlink-arson-was-russia-linked-sabotage-2026-10-18/",
+              "https://www.reuters.com/business/media-telecom/lithuania-says-attempted-starlink-arson-was-russia-linked-sabotage-2026-10-18/",
+              "https://www.reuters.com/business/media-telecom/lithuania-says-attempted-starlink-arson-was-russia-linked-sabotage-2026-10-18/",
+              "https://www.reuters.com/business/media-telecom/lithuania-says-attempted-starlink-arson-was-russia-linked-sabotage-2026-10-18/",
+              "https://reform.news/en/head-of-lithuania-s-national-crisis-management-centre-russia-sought-to-disrupt-ukraine-s-operations-by-setting-fire-to-starlink-equipment/",
+              "https://reform.news/en/head-of-lithuania-s-national-crisis-management-centre-russia-sought-to-disrupt-ukraine-s-operations-by-setting-fire-to-starlink-equipment/",
+              "https://reform.news/en/head-of-lithuania-s-national-crisis-management-centre-russia-sought-to-disrupt-ukraine-s-operations-by-setting-fire-to-starlink-equipment/",
+              "https://united24media.com/war-in-ukraine/lithuania-thwarts-attack-on-starlink-facility-as-sabotage-attempts-spread-across-europe-23559",
+              "https://united24media.com/war-in-ukraine/lithuania-thwarts-attack-on-starlink-facility-as-sabotage-attempts-spread-across-europe-23559",
+              "https://united24media.com/war-in-ukraine/lithuania-thwarts-attack-on-starlink-facility-as-sabotage-attempts-spread-across-europe-23559"
+            ],
+            "observed_at": "2026-10-18T19:16:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-aff0ad46",
+            "story_title": "Putin’s reported Trump–Xi summit proposal materially advances the Russia-waiver story",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/china/putin-proposes-summit-with-trump-xi-discuss-ukraine-deal-wsj-says-2026-10-19/",
+            "source_urls": [
+              "https://www.reuters.com/world/china/putin-proposes-summit-with-trump-xi-discuss-ukraine-deal-wsj-says-2026-10-19/",
+              "https://www.reuters.com/world/china/putin-proposes-summit-with-trump-xi-discuss-ukraine-deal-wsj-says-2026-10-19/",
+              "https://www.reuters.com/world/china/putin-proposes-summit-with-trump-xi-discuss-ukraine-deal-wsj-says-2026-10-19/",
+              "https://www.reuters.com/world/china/rubio-says-ukraine-russia-should-be-focused-ending-war-2026-10-19/",
+              "https://www.reuters.com/world/china/rubio-says-ukraine-russia-should-be-focused-ending-war-2026-10-19/",
+              "https://www.reuters.com/world/china/rubio-says-ukraine-russia-should-be-focused-ending-war-2026-10-19/",
+              "https://www.aa.com.tr/en/eurasia/putin-proposes-trilateral-summit-with-trump-and-xi-to-discuss-ukraine-report/4092954",
+              "https://www.aa.com.tr/en/eurasia/putin-proposes-trilateral-summit-with-trump-and-xi-to-discuss-ukraine-report/4092954",
+              "https://www.aa.com.tr/en/eurasia/putin-proposes-trilateral-summit-with-trump-and-xi-to-discuss-ukraine-report/4092954",
+              "https://www.wsj.com/world/russia/putin-floats-a-summit-with-trump-and-xi-to-decide-ukraines-fate-1cf6acc1"
+            ],
+            "observed_at": "2026-10-19T07:17:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-bd774fb2",
+            "story_title": "Lead 1: Ukrainian drone barrage sets St. Petersburg oil terminal and related infrastructure ablaze; Russia…",
+            "source": "grok/grok-rolling-1249.md",
+            "slot": "1249",
+            "matched": [
+              "Kyiv"
+            ],
+            "source_url": "https://www.kyivpost.com/post/87403",
+            "source_urls": [
+              "https://www.kyivpost.com/post/87403",
+              "https://www.kyivpost.com/post/87403",
+              "https://www.kyivpost.com/post/87403",
+              "https://www.kyivpost.com/post/87403",
+              "https://www.intellinews.com/missile-war-monitor-ukrainian-drones-set-st-petersburg-oil-terminal-on-fire-as-russia-claims-1-015-downed-476757/",
+              "https://www.intellinews.com/missile-war-monitor-ukrainian-drones-set-st-petersburg-oil-terminal-on-fire-as-russia-claims-1-015-downed-476757/",
+              "https://www.intellinews.com/missile-war-monitor-ukrainian-drones-set-st-petersburg-oil-terminal-on-fire-as-russia-claims-1-015-downed-476757/",
+              "https://www.independent.co.uk/news/world/americas/russia-donald-trump-kyiv-st-petersburg-washington-b3068727.html",
+              "https://www.independent.co.uk/news/world/americas/russia-donald-trump-kyiv-st-petersburg-washington-b3068727.html",
+              "https://www.independent.co.uk/news/world/americas/russia-donald-trump-kyiv-st-petersburg-washington-b3068727.html",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261018-930-855977/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261018-930-855977/"
+            ],
+            "observed_at": "2026-10-18T10:49:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-c6656ad7",
+            "story_title": "Ukraine: Large-scale drone attack hits St. Petersburg oil terminal, depot, logistics and data sites; one…",
+            "source": "grok/grok-rolling-1842.md",
+            "slot": "1842",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.cnn.com/2026/10/18/europe/ukraine-russia-drone-attack-trump-intl",
+              "https://www.cnn.com/2026/10/18/europe/ukraine-russia-drone-attack-trump-intl",
+              "https://www.cnn.com/2026/10/18/europe/ukraine-russia-drone-attack-trump-intl",
+              "https://www.cnn.com/2026/10/18/europe/ukraine-russia-drone-attack-trump-intl",
+              "https://www.reuters.com/world/europe/one-killed-15-injured-ukrainian-drone-attack-st-petersburg-leningrad-region-2026-10-18/"
+            ],
+            "observed_at": "2026-10-18T16:42:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-cc9ad517",
+            "story_title": "Lead 1: Ukraine launches one of its largest drone attacks, striking St. Petersburg oil terminal, depot…",
+            "source": "grok/grok-rolling-1543.md",
+            "slot": "1543",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.aljazeera.com/news/2026/10/18/ukrainian-drone-attack-on-russias-st-petersburg-kills-1-hits-energy-sites",
+              "https://www.independent.co.uk/news/world/americas/russia-donald-trump-kyiv-st-petersburg-washington-b3068727.html",
+              "https://www.independent.co.uk/news/world/americas/russia-donald-trump-kyiv-st-petersburg-washington-b3068727.html",
+              "https://www.independent.co.uk/news/world/americas/russia-donald-trump-kyiv-st-petersburg-washington-b3068727.html",
+              "https://euromaidanpress.com/2026/10/18/the-drones-flew-1000-km-st-petersburgs-oil-terminal-fuel-depot-and-a-nearby-data-center-were-waiting-at-the-end/",
+              "https://euromaidanpress.com/2026/10/18/the-drones-flew-1000-km-st-petersburgs-oil-terminal-fuel-depot-and-a-nearby-data-center-were-waiting-at-the-end/"
+            ],
+            "observed_at": "2026-10-18T13:43:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-1a210297",
+            "story_title": "Egypt moves Saudi support toward a parliamentary military gate",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404"
+            ],
+            "observed_at": "2026-10-18T19:16:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-2c954062",
+            "story_title": "Philippines summons China’s ambassador over force remark at the edge of the cutoff",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "South China Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/china/philippines-summons-chinas-envoy-over-remarks-conveying-threat-2026-10-19/",
+            "source_urls": [
+              "https://www.reuters.com/world/china/philippines-summons-chinas-envoy-over-remarks-conveying-threat-2026-10-19/",
+              "https://www.reuters.com/world/china/philippines-summons-chinas-envoy-over-remarks-conveying-threat-2026-10-19/",
+              "https://www.reuters.com/world/china/philippines-summons-chinas-envoy-over-remarks-conveying-threat-2026-10-19/",
+              "https://ph.china-embassy.gov.cn/eng/sgxx/dsjh/202610/t20261016_12041558.htm",
+              "https://ph.china-embassy.gov.cn/eng/sgxx/dsjh/202610/t20261016_12041558.htm",
+              "https://mb.com.ph/2026/10/19/dfa-summons-chinese-ambassador-over-threat-of-use-of-force-remark"
+            ],
+            "observed_at": "2026-10-19T07:17:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-16 and drew no qualifying story today",
+        "last_open_edition": "2026-10-16",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-6f376310",
+            "story_title": "Lead 5: China and North Korea open long-delayed New Yalu River Bridge",
+            "source": "grok/grok-rolling-0043.md",
+            "slot": "0043",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.chinadailyhk.com/hk/article/641149"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-c43ccee2",
+            "story_title": "Lead 3: China and North Korea open long-delayed New Yalu River Bridge after 12 years",
+            "source": "grok/grok-rolling-1249.md",
+            "slot": "1249",
+            "matched": [
+              "North Korea",
+              "DPRK"
+            ],
+            "source_url": "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+            "source_urls": [
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay"
+            ],
+            "observed_at": "2026-10-15T10:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-35511ffe",
+            "story_title": "Iran keeps a six-day Hormuz reopening clock on the table",
+            "source": "chatgpt/chatgpt-rolling-1517.md",
+            "slot": "1517",
+            "matched": [
+              "Islamabad"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358"
+            ],
+            "observed_at": "2026-10-18T13:17:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-17",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
