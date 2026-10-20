@@ -7,8 +7,8 @@ newsroom repository and is not published.
 ## How it works
 
 Each case is one real assignment from a past edition. A trial wakes Tinkerton on that
-assignment, with that day's research and today's newsroom code, and grades the article
-he files.
+assignment, with that day's research and today's newsroom code, and grades the filed
+article.
 
 ```
 train (3 cases)  →  GEPA rewrites the two sections below, 2 rounds
