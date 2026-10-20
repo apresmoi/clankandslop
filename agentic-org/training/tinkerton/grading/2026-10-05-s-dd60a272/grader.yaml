@@ -1,0 +1,101 @@
+# version: v0
+# status: draft-pending-human-review
+schema: paideia.grader.v1
+id: 2026-10-05-s-dd60a272
+calibration: identity
+context:
+  grounding:
+    description: Frozen v0 independent case grounding; draft pending human review
+model:
+  backend: typesafe
+  name: jev-1.13.0
+max_spend_usd: 0.5
+questions:
+  - id: command
+    type: yes-no
+    ask: "Does the article identify SOUTHCOM as the command directing the strike?"
+    expected: yes
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: force
+    type: yes-no
+    ask: "Does the article identify Joint Task Force Western Hemisphere as the executing force?"
+    expected: yes
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: deaths
+    type: yes-no
+    ask: "Does the article attribute the claim of four deaths to the US military?"
+    expected: yes
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: date
+    type: yes-no
+    ask: "Does the article date the strike to 4 October?"
+    expected: yes
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: location
+    type: yes-no
+    ask: "Does the article locate the targeted vessel in the Caribbean?"
+    expected: yes
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: showing
+    type: yes-no
+    ask: "Does the article explain that the military did not publish evidence that the vessel carried drugs?"
+    expected: yes
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: proof
+    type: yes-no
+    ask: "Does the article treat the trafficking allegation as independently established?"
+    expected: no
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: legal_theory
+    type: yes-no
+    ask: "Does the article attribute the armed-conflict rationale to President Donald Trump?"
+    expected: yes
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  - id: court
+    type: yes-no
+    ask: "Does the article say a court had ruled this strike a crime against humanity?"
+    expected: no
+    weight: 3
+    reads: [context.grounding, output.headline, output.deck, output.body]
+  # --- shared newsroom style checks (same for every case) ---
+  - id: style_nut_graf
+    type: yes-no
+    ask: Does the second or third paragraph tell the reader plainly why this news matters (what changes, who is affected, or what is at stake)?
+    expected: yes
+    weight: 2
+    reads: [output.headline, output.deck, output.body]
+  - id: style_outlet_attribution
+    type: yes-no
+    ask: Does the article credit news outlets by name more than once (for example repeating "X reported" or "according to X newspaper") instead of attributing facts to the officials, court or documents themselves?
+    expected: no
+    weight: 2
+    reads: [output.headline, output.deck, output.body]
+  - id: style_headline_natural
+    type: yes-no
+    ask: Is the headline a natural news headline of about 12 words or fewer, naming a clear actor with an active verb?
+    expected: yes
+    weight: 1
+    reads: [output.headline, output.deck, output.body]
+  - id: style_headline_overclaim
+    type: yes-no
+    ask: Does the headline present something as already done or achieved (for example "restored", "freed", "ended") when the article only reports it as ordered, planned, proposed or claimed?
+    expected: no
+    weight: 2
+    reads: [output.headline, output.deck, output.body]
+  - id: style_meta_language
+    type: yes-no
+    ask: Does the article mention its own inputs or newsroom process, such as "the research", "the sources", "the summary", "the brief", "the material" or "evidence rows", instead of only reporting the news?
+    expected: no
+    weight: 3
+    reads: [output.headline, output.deck, output.body]
+score:
+  method: weighted
+  pass_at: 0.8
