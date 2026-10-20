@@ -1,0 +1,953 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-20",
+  "generated_at": "2026-10-20T07:51:49Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 126.55,
+        "observed_at": "2026-10-14",
+        "stale_days": 6,
+        "contributes": 3,
+        "reason": "126.55 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 101.91,
+        "observed_at": "2026-10-14",
+        "stale_days": 6,
+        "contributes": 1,
+        "reason": "101.91 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.179,
+        "observed_at": "2026-10-12",
+        "stale_days": 8,
+        "contributes": 2,
+        "reason": "6.179 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.22,
+        "observed_at": "2026-10-14",
+        "stale_days": 6,
+        "contributes": 0,
+        "reason": "3.22 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 19.99,
+        "observed_at": "2026-10-16",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "19.99 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.31,
+        "observed_at": "2026-10-16",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "3.31 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.4048,
+        "observed_at": "2026-10-16",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "121.4048 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-20T07:51:48Z",
+        "http_status": 200,
+        "bytes": 170111,
+        "sha256": "cf9f077822a7620434e86b7d48aa44bada7ef99f57726d50035ae50b549e9011",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-20T07:51:48Z",
+        "http_status": 200,
+        "bytes": 175886,
+        "sha256": "dccb1f7fda2711b3cdedba44362f1e4300a319eaf822b47a716b22290bda286a",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-20T07:51:48Z",
+        "http_status": 200,
+        "bytes": 28925,
+        "sha256": "d91455eb9474f645256f000a6a31ac07f201b5e2301cb71c72e8e776d201bd2d",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-20T07:51:49Z",
+        "http_status": 200,
+        "bytes": 116169,
+        "sha256": "40ae0c0c11c1e1d735872905a23b9f9fe213b7de6da439ba256a52f13254043a",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-20T07:51:49Z",
+        "http_status": 200,
+        "bytes": 161629,
+        "sha256": "1d161118ce736399b012750820339bfa8c5bc4e63652d11814dd8fbcaf391511",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-20T07:51:49Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "38a801869141ac31d6c877b6b803ca138b22a6817fbf1ec2cd2ae4bd53312db4",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-20T07:51:49Z",
+        "http_status": 200,
+        "bytes": 104729,
+        "sha256": "d248a3103dc2a001a68187b827926e1353746314907888e57fd130b8ca585f82",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 44,
+    "open_conflicts": 3,
+    "watch": 4,
+    "dormant": 6,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-f2a1a1dc",
+            "story_title": "Lead 2: Germany summons Iranian ambassador after Hamburg court sentences two men over Iran-linked plot…",
+            "source": "grok/grok-rolling-2141.md",
+            "slot": "2141",
+            "matched": [
+              "IRGC"
+            ],
+            "source_url": "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-861120/",
+            "source_urls": [
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-861120/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-861120/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-861120/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-861120/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-861120/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-861120/",
+              "https://www.juedische-allgemeine.de/politik/auswaertiges-amt-bestellt-iranischen-botschafter-ein-2/",
+              "https://www.juedische-allgemeine.de/politik/auswaertiges-amt-bestellt-iranischen-botschafter-ein-2/",
+              "https://www.juedische-allgemeine.de/politik/auswaertiges-amt-bestellt-iranischen-botschafter-ein-2/",
+              "https://www.berliner-zeitung.de/article/anschlagsplaene-deutschland-bestellt-iranischen-botschafter-ein-10511221",
+              "https://www.berliner-zeitung.de/article/anschlagsplaene-deutschland-bestellt-iranischen-botschafter-ein-10511221",
+              "https://www.berliner-zeitung.de/article/anschlagsplaene-deutschland-bestellt-iranischen-botschafter-ein-10511221"
+            ],
+            "observed_at": "2026-10-19T19:41:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-3066155a",
+            "story_title": "Russia’s grid assault opens an intelligence-warning dispute; Lithuania materially escalates its…",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://apnews.com/article/russia-ukraine-war-kyiv-attack-b041f78e5d037a0f3377b7108eac1dc7",
+            "source_urls": [
+              "https://apnews.com/article/russia-ukraine-war-kyiv-attack-b041f78e5d037a0f3377b7108eac1dc7",
+              "https://apnews.com/article/russia-ukraine-war-kyiv-attack-b041f78e5d037a0f3377b7108eac1dc7",
+              "https://apnews.com/article/russia-ukraine-war-kyiv-attack-b041f78e5d037a0f3377b7108eac1dc7",
+              "https://apnews.com/article/russia-ukraine-war-kyiv-attack-b041f78e5d037a0f3377b7108eac1dc7",
+              "https://www.theguardian.com/world/2026/oct/19/no-us-warning-russian-strikes-kyiv-power-plants-zelenskyy-ukraine-trump",
+              "https://www.theguardian.com/world/2026/oct/19/no-us-warning-russian-strikes-kyiv-power-plants-zelenskyy-ukraine-trump",
+              "https://www.theguardian.com/world/2026/oct/19/no-us-warning-russian-strikes-kyiv-power-plants-zelenskyy-ukraine-trump",
+              "https://www.reuters.com/business/media-telecom/lithuania-increase-security-critical-infrastructure-prime-minister-says-2026-10-19/",
+              "https://www.reuters.com/business/media-telecom/lithuania-increase-security-critical-infrastructure-prime-minister-says-2026-10-19/",
+              "https://www.reuters.com/business/media-telecom/lithuania-increase-security-critical-infrastructure-prime-minister-says-2026-10-19/",
+              "https://www.pravda.com.ua/eng/news/2026/10/18/8058641/",
+              "https://www.pravda.com.ua/eng/news/2026/10/18/8058641/",
+              "https://www.pravda.com.ua/eng/news/2026/10/18/8058641/"
+            ],
+            "observed_at": "2026-10-19T13:16:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-585c359b",
+            "story_title": "Lead 1: Macron declines Interior Minister Laurent Nuñez’s resignation offer after weekend riots; Nuñez…",
+            "source": "grok/grok-rolling-1241.md",
+            "slot": "1241",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/19/frances-macron-declines-ministers-resignation-after-violent-protests",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/19/frances-macron-declines-ministers-resignation-after-violent-protests",
+              "https://www.aljazeera.com/news/2026/10/19/frances-macron-declines-ministers-resignation-after-violent-protests",
+              "https://www.aljazeera.com/news/2026/10/19/frances-macron-declines-ministers-resignation-after-violent-protests",
+              "https://www.aljazeera.com/news/2026/10/19/frances-macron-declines-ministers-resignation-after-violent-protests",
+              "https://www.aljazeera.com/news/2026/10/19/frances-macron-declines-ministers-resignation-after-violent-protests",
+              "https://www.aljazeera.com/news/2026/10/19/frances-macron-declines-ministers-resignation-after-violent-protests",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-860222/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-860222/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-860222/",
+              "https://www.theguardian.com/world/live/2026/oct/19/europe-france-protests-riots-macron-ukraine-russia-zelenskyy-sweden-latest-news-updates",
+              "https://www.theguardian.com/world/live/2026/oct/19/europe-france-protests-riots-macron-ukraine-russia-zelenskyy-sweden-latest-news-updates",
+              "https://www.afp.com/en/police-lost-control-during-french-protests-says-interior-minister",
+              "https://www.lemonde.fr/en/france/article/2026/10/19/macron-refuses-interior-minister-s-resignation-after-protests_6758746_7.html"
+            ],
+            "observed_at": "2026-10-19T10:41:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-8d70f1de",
+            "story_title": "Ukraine diplomacy moves toward Norway and Moscow while the support dispute becomes part of the negotiating…",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/us-officials-plan-travel-norway-ukraine-talks-sources-say-2026-10-19/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/us-officials-plan-travel-norway-ukraine-talks-sources-say-2026-10-19/",
+              "https://www.reuters.com/world/europe/us-officials-plan-travel-norway-ukraine-talks-sources-say-2026-10-19/",
+              "https://www.reuters.com/world/europe/us-officials-plan-travel-norway-ukraine-talks-sources-say-2026-10-19/",
+              "https://www.president.gov.ua/en/news/prezident-proviv-onlajn-zustrich-iz-dvopartijnoyu-ta-dvopala-106957",
+              "https://www.president.gov.ua/en/news/prezident-proviv-onlajn-zustrich-iz-dvopartijnoyu-ta-dvopala-106957",
+              "https://www.president.gov.ua/en/news/prezident-proviv-onlajn-zustrich-iz-dvopartijnoyu-ta-dvopala-106957",
+              "https://www.president.gov.ua/en/news/prezident-proviv-zustrich-iz-komandoyu-oboronnoyi-kompaniyi-106953",
+              "https://www.president.gov.ua/en/news/prezident-proviv-zustrich-iz-komandoyu-oboronnoyi-kompaniyi-106953",
+              "https://www.president.gov.ua/en/news/prezident-proviv-zustrich-iz-komandoyu-oboronnoyi-kompaniyi-106953",
+              "https://www.reuters.com/business/energy/russia-hits-no-energy-targets-ukraine-first-time-since-trumps-truce-2026-10-13/",
+              "https://www.reuters.com/business/energy/russia-hits-no-energy-targets-ukraine-first-time-since-trumps-truce-2026-10-13/",
+              "https://www.reuters.com/business/energy/russia-hits-no-energy-targets-ukraine-first-time-since-trumps-truce-2026-10-13/"
+            ],
+            "observed_at": "2026-10-20T01:18:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-3c0f31a9",
+            "story_title": "WFP cuts Gaza food assistance by roughly one-third (500,000 people) over funding shortfalls.",
+            "source": "grok/grok-rolling-1851.md",
+            "slot": "1851",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+            "source_urls": [
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-860844/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-860844/"
+            ],
+            "observed_at": "2026-10-19T16:51:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-79b8b5ae",
+            "story_title": "Lead 4: World Food Programme cuts monthly food assistance in Gaza by ~500,000 people due to funding shortages.",
+            "source": "grok/grok-rolling-0042.md",
+            "slot": "0042",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+            "source_urls": [
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-863669/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-863669/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-863669/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-f5ca67e4",
+            "story_title": "Lead 3: WFP cuts monthly food assistance in Gaza by ~500,000 people (1.6 m to 1.1 m) due to funding shortfalls",
+            "source": "grok/grok-rolling-2141.md",
+            "slot": "2141",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+            "source_urls": [
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo"
+            ],
+            "observed_at": "2026-10-19T19:41:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 7,
+        "evidence": [
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-1bc46c90",
+            "story_title": "Lead 2: Houthi ballistic-missile strike on Yemeni government training camp in Shabwa kills at least 18",
+            "source": "grok/grok-rolling-1544.md",
+            "slot": "1544",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-862444/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-862444/"
+            ],
+            "observed_at": "2026-10-19T13:44:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-5a61aa0b",
+            "story_title": "Houthi ballistic missile strike on al-Alam training camp in Shabwa kills at least 53 (mostly new…",
+            "source": "grok/grok-rolling-0346.md",
+            "slot": "0346",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.cbc.ca/news/world/houthi-attack-yemen-government-forces-camp-9.7386538",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa"
+            ],
+            "observed_at": "2026-10-20T01:46:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-65a6f91d",
+            "story_title": "Lead 1: Houthi ballistic missile strike on al-Alam training camp in Shabwa, Yemen, kills at least 53 new…",
+            "source": "grok/grok-rolling-0042.md",
+            "slot": "0042",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.aljazeera.com/news/2026/10/19/at-least-18-killed-in-houthi-attack-on-military-camp-in-yemens-shabwa",
+              "https://en.wikipedia.org/wiki/Portal:Current_events/2026_October_19"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-9e7d36c6",
+            "story_title": "Lead 1: Houthi ballistic-missile strike on Yemeni government training camp in Shabwa kills at least 53…",
+            "source": "grok/grok-rolling-0650.md",
+            "slot": "0650",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.japantimes.co.jp/news/2026/10/20/world/houthi-attack-yemen-camp/",
+              "https://www.japantimes.co.jp/news/2026/10/20/world/houthi-attack-yemen-camp/",
+              "https://www.japantimes.co.jp/news/2026/10/20/world/houthi-attack-yemen-camp/",
+              "https://www.japantimes.co.jp/news/2026/10/20/world/houthi-attack-yemen-camp/",
+              "https://www.dawn.com/news/2038443",
+              "https://www.dawn.com/news/2038443",
+              "https://www.dawn.com/news/2038443",
+              "https://en.wikipedia.org/wiki/2026_Shabwah_missile_attack",
+              "https://en.wikipedia.org/wiki/2026_Shabwah_missile_attack",
+              "https://en.wikipedia.org/wiki/2026_Shabwah_missile_attack"
+            ],
+            "observed_at": "2026-10-20T04:50:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-afaf1de4",
+            "story_title": "Egypt formalizes support for Saudi Arabia as a Houthi ballistic-missile strike kills scores in Yemen",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.presidency.eg/en/%D9%82%D8%B3%D9%85-%D8%A7%D9%84%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1-%D8%B1%D8%A6%D8%A7%D8%B3%D9%8A%D8%A9/news18102026/",
+            "source_urls": [
+              "https://www.presidency.eg/en/%D9%82%D8%B3%D9%85-%D8%A7%D9%84%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1-%D8%B1%D8%A6%D8%A7%D8%B3%D9%8A%D8%A9/news18102026/",
+              "https://www.presidency.eg/en/%D9%82%D8%B3%D9%85-%D8%A7%D9%84%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1-%D8%B1%D8%A6%D8%A7%D8%B3%D9%8A%D8%A9/news18102026/",
+              "https://www.presidency.eg/en/%D9%82%D8%B3%D9%85-%D8%A7%D9%84%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1-%D8%B1%D8%A6%D8%A7%D8%B3%D9%8A%D8%A9/news18102026/",
+              "https://www.presidency.eg/en/%D9%82%D8%B3%D9%85-%D8%A7%D9%84%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1-%D8%B1%D8%A6%D8%A7%D8%B3%D9%8A%D8%A9/news18102026/",
+              "https://www.aljazeera.com/news/2026/10/18/egypt-to-provide-all-necessary-and-possible-support-to-saudi",
+              "https://www.aljazeera.com/news/2026/10/18/egypt-to-provide-all-necessary-and-possible-support-to-saudi",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-6afad4ec4c22dcccd379152ea87cb0e2",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-6afad4ec4c22dcccd379152ea87cb0e2",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-6afad4ec4c22dcccd379152ea87cb0e2"
+            ],
+            "observed_at": "2026-10-19T13:16:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-edb2bdd0",
+            "story_title": "Saudi Arabia postpones FII10 to 2027 as attacks turn Gulf security risk into a capital-convening problem",
+            "source": "chatgpt/chatgpt-rolling-2115.md",
+            "slot": "2115",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://fii-institute.org/",
+            "source_urls": [
+              "https://fii-institute.org/",
+              "https://fii-institute.org/",
+              "https://fii-institute.org/",
+              "https://saudigazette.com.sa/article/665566/saudi-arabia/future-investment-initiative-postpones-fii10-conference-in-riyadh-to-2027",
+              "https://saudigazette.com.sa/article/665566/saudi-arabia/future-investment-initiative-postpones-fii10-conference-in-riyadh-to-2027",
+              "https://saudigazette.com.sa/article/665566/saudi-arabia/future-investment-initiative-postpones-fii10-conference-in-riyadh-to-2027",
+              "https://www.thenationalnews.com/business/economy/2026/10/19/saudi-arabia-postpones-fii-investment-in-riyadh-after-houthi-attacks/",
+              "https://www.thenationalnews.com/business/economy/2026/10/19/saudi-arabia-postpones-fii-investment-in-riyadh-after-houthi-attacks/",
+              "https://www.thenationalnews.com/business/economy/2026/10/19/saudi-arabia-postpones-fii-investment-in-riyadh-after-houthi-attacks/",
+              "https://www.semafor.com/article/10/19/2026/saudi-to-decide-on-postponing-fii-after-wall-street-lobbying",
+              "https://www.semafor.com/article/10/19/2026/saudi-to-decide-on-postponing-fii-after-wall-street-lobbying",
+              "https://www.semafor.com/article/10/19/2026/saudi-to-decide-on-postponing-fii-after-wall-street-lobbying"
+            ],
+            "observed_at": "2026-10-19T19:15:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-f47ea3a6",
+            "story_title": "Lead 1: Houthi ballistic missiles strike Yemeni government training camp in Shabwa, killing at least 53…",
+            "source": "grok/grok-rolling-2141.md",
+            "slot": "2141",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.bbc.com/news/articles/cv0ld6lrr2zeo",
+              "https://www.timesofisrael.com/houthi-ballistic-missile-strike-on-yemeni-military-camp-said-to-kill-over-50-soldiers/",
+              "https://www.timesofisrael.com/houthi-ballistic-missile-strike-on-yemeni-military-camp-said-to-kill-over-50-soldiers/",
+              "https://www.timesofisrael.com/houthi-ballistic-missile-strike-on-yemeni-military-camp-said-to-kill-over-50-soldiers/",
+              "https://www.cbc.ca/news/world/houthi-attack-yemen-government-forces-camp-9.7386538"
+            ],
+            "observed_at": "2026-10-19T19:41:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-cedef084",
+            "story_title": "Chinese forces track USS Charleston near Sabina Shoal as Taiwan reports a separate Pratas standoff",
+            "source": "chatgpt/chatgpt-rolling-0921.md",
+            "slot": "0921",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+            "source_urls": [
+              "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+              "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+              "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+              "https://news.tv5.com.ph/foreign/read/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://news.tv5.com.ph/foreign/read/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://news.tv5.com.ph/foreign/read/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/20/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/20/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/20/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://focustaiwan.tw/politics/202605240009",
+              "https://focustaiwan.tw/politics/202605240009",
+              "https://focustaiwan.tw/politics/202605240009"
+            ],
+            "observed_at": "2026-10-20T07:21:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-cedef084",
+            "story_title": "Chinese forces track USS Charleston near Sabina Shoal as Taiwan reports a separate Pratas standoff",
+            "source": "chatgpt/chatgpt-rolling-0921.md",
+            "slot": "0921",
+            "matched": [
+              "South China Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+            "source_urls": [
+              "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+              "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+              "https://www.reuters.com/world/china/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security-2026-10-20/",
+              "https://news.tv5.com.ph/foreign/read/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://news.tv5.com.ph/foreign/read/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://news.tv5.com.ph/foreign/read/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/20/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/20/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/20/chinese-navy-says-us-ship-near-sabina-shoal-jeopardised-maritime-security",
+              "https://focustaiwan.tw/politics/202605240009",
+              "https://focustaiwan.tw/politics/202605240009",
+              "https://focustaiwan.tw/politics/202605240009"
+            ],
+            "observed_at": "2026-10-20T07:21:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-16 and drew no qualifying story today",
+        "last_open_edition": "2026-10-16",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-6f376310",
+            "story_title": "Lead 5: China and North Korea open long-delayed New Yalu River Bridge",
+            "source": "grok/grok-rolling-0043.md",
+            "slot": "0043",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://www.bbc.co.uk/news/articles/ck1exgw3j115o",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.chinadailyhk.com/hk/article/641149"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-16",
+            "story_id": "s-c43ccee2",
+            "story_title": "Lead 3: China and North Korea open long-delayed New Yalu River Bridge after 12 years",
+            "source": "grok/grok-rolling-1249.md",
+            "slot": "1249",
+            "matched": [
+              "North Korea",
+              "DPRK"
+            ],
+            "source_url": "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+            "source_urls": [
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://news.cgtn.com/news/2026-10-15/New-Yalu-River-Bridge-opens-to-traffic-1RfWwFg0A2k/p.html",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay",
+              "https://www.euronews.com/2026/10/15/new-four-lane-bridge-between-china-and-north-korea-opens-after-a-decade-of-delay"
+            ],
+            "observed_at": "2026-10-15T10:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-18",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
