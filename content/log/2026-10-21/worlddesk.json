@@ -1,0 +1,965 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-21",
+  "generated_at": "2026-10-21T07:54:40Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 126.55,
+        "observed_at": "2026-10-14",
+        "stale_days": 7,
+        "contributes": 3,
+        "reason": "126.55 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 101.91,
+        "observed_at": "2026-10-14",
+        "stale_days": 7,
+        "contributes": 1,
+        "reason": "101.91 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.276,
+        "observed_at": "2026-10-19",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "6.276 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.22,
+        "observed_at": "2026-10-14",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "3.22 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 18.44,
+        "observed_at": "2026-10-19",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "18.44 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.29,
+        "observed_at": "2026-10-19",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3.29 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.4048,
+        "observed_at": "2026-10-16",
+        "stale_days": 5,
+        "contributes": 0,
+        "reason": "121.4048 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-21T07:54:39Z",
+        "http_status": 200,
+        "bytes": 170111,
+        "sha256": "cf9f077822a7620434e86b7d48aa44bada7ef99f57726d50035ae50b549e9011",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-21T07:54:40Z",
+        "http_status": 200,
+        "bytes": 175886,
+        "sha256": "dccb1f7fda2711b3cdedba44362f1e4300a319eaf822b47a716b22290bda286a",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-21T07:54:40Z",
+        "http_status": 200,
+        "bytes": 28942,
+        "sha256": "1bca7751063cff01b326cbdefda5370220439cbadc5e3887ad1f2e98939090fc",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-21T07:54:40Z",
+        "http_status": 200,
+        "bytes": 116169,
+        "sha256": "40ae0c0c11c1e1d735872905a23b9f9fe213b7de6da439ba256a52f13254043a",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-21T07:54:40Z",
+        "http_status": 200,
+        "bytes": 161646,
+        "sha256": "1f9f2a2887adaf66819e74b02ae9a4f2d76f49400cbda290f0fdc5e2880c4e43",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-21T07:54:40Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "74434a3ad61fee753ea6ecd8cf3de54785ce24a62c9fac4abf0e9562ab963dfd",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-21T07:54:40Z",
+        "http_status": 200,
+        "bytes": 104729,
+        "sha256": "d248a3103dc2a001a68187b827926e1353746314907888e57fd130b8ca585f82",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 49,
+    "open_conflicts": 3,
+    "watch": 2,
+    "dormant": 8,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-19 and drew no qualifying story today",
+        "last_open_edition": "2026-10-19",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-0038c8cc",
+            "story_title": "Lead 4: IRGC reports two crude tankers (~2 million barrels each) caught fire after striking mines in Strait…",
+            "source": "grok/grok-rolling-0346.md",
+            "slot": "0346",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.reuters.com/world/middle-east/irans-guards-say-two-tankers-hit-mines-strait-hormuz-2026-10-17/"
+            ],
+            "observed_at": "2026-10-19T01:46:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-1a210297",
+            "story_title": "Egypt moves Saudi support toward a parliamentary military gate",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404"
+            ],
+            "observed_at": "2026-10-18T19:16:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-35511ffe",
+            "story_title": "Iran keeps a six-day Hormuz reopening clock on the table",
+            "source": "chatgpt/chatgpt-rolling-1517.md",
+            "slot": "1517",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358"
+            ],
+            "observed_at": "2026-10-18T13:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 5,
+        "evidence": [
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-109fc971",
+            "story_title": "Lead 5: Overnight Russian drone/missile strikes kill two elderly civilians in Kharkiv region (21 October)",
+            "source": "grok/grok-rolling-0645.md",
+            "slot": "0645",
+            "matched": [
+              "Ukraine",
+              "Kharkiv"
+            ],
+            "source_url": "https://www.kyivpost.com/post/87679",
+            "source_urls": [
+              "https://www.kyivpost.com/post/87679",
+              "https://www.kyivpost.com/post/87679",
+              "https://www.kyivpost.com/post/87679",
+              "https://www.kyivpost.com/post/87679",
+              "https://nv.ua/ukraine/events/nichna-ataka-rf-u-kiyevi-nizci-oblastey-ogolosili-povitryanu-trivogu-cherez-zagrozu-bpla-ta-balistiki-50651876.html",
+              "https://nv.ua/ukraine/events/nichna-ataka-rf-u-kiyevi-nizci-oblastey-ogolosili-povitryanu-trivogu-cherez-zagrozu-bpla-ta-balistiki-50651876.html"
+            ],
+            "observed_at": "2026-10-21T04:45:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-16fa4669",
+            "story_title": "Oslo talks produce a concrete Russia handoff and Ukraine says US missile-warning intelligence is working again",
+            "source": "chatgpt/chatgpt-rolling-2122.md",
+            "slot": "2122",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.regjeringen.no/no/whats-new/the-prime-ministers-introduction-at-the-press-conference-with-ukraines-president-volodymyr-zelenskyy-and-the-finnish-president-alexander-stubb/id3179842/",
+            "source_urls": [
+              "https://www.regjeringen.no/no/whats-new/the-prime-ministers-introduction-at-the-press-conference-with-ukraines-president-volodymyr-zelenskyy-and-the-finnish-president-alexander-stubb/id3179842/",
+              "https://www.regjeringen.no/no/whats-new/the-prime-ministers-introduction-at-the-press-conference-with-ukraines-president-volodymyr-zelenskyy-and-the-finnish-president-alexander-stubb/id3179842/",
+              "https://www.regjeringen.no/no/whats-new/the-prime-ministers-introduction-at-the-press-conference-with-ukraines-president-volodymyr-zelenskyy-and-the-finnish-president-alexander-stubb/id3179842/",
+              "https://www.regjeringen.no/no/whats-new/the-prime-ministers-introduction-at-the-press-conference-with-ukraines-president-volodymyr-zelenskyy-and-the-finnish-president-alexander-stubb/id3179842/",
+              "https://www.regjeringen.no/no/whats-new/the-prime-ministers-introduction-at-the-press-conference-with-ukraines-president-volodymyr-zelenskyy-and-the-finnish-president-alexander-stubb/id3179842/",
+              "https://www.regjeringen.no/no/whats-new/the-prime-ministers-introduction-at-the-press-conference-with-ukraines-president-volodymyr-zelenskyy-and-the-finnish-president-alexander-stubb/id3179842/",
+              "https://apnews.com/article/russia-ukraine-zelenskyy-norway-trump-rubio-witkoff-140895c6c0a1682c46f4fe197e056996",
+              "https://apnews.com/article/russia-ukraine-zelenskyy-norway-trump-rubio-witkoff-140895c6c0a1682c46f4fe197e056996",
+              "https://apnews.com/article/russia-ukraine-zelenskyy-norway-trump-rubio-witkoff-140895c6c0a1682c46f4fe197e056996"
+            ],
+            "observed_at": "2026-10-20T19:22:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-3dd4d4ce",
+            "story_title": "NATO adds Black Sea surveillance assets as attacks on merchant shipping reach alliance borders",
+            "source": "chatgpt/chatgpt-rolling-2122.md",
+            "slot": "2122",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/oct/20/nato-black-sea-deployment-escalating-russian-attacks-ships",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/oct/20/nato-black-sea-deployment-escalating-russian-attacks-ships",
+              "https://www.theguardian.com/world/2026/oct/20/nato-black-sea-deployment-escalating-russian-attacks-ships",
+              "https://www.theguardian.com/world/2026/oct/20/nato-black-sea-deployment-escalating-russian-attacks-ships",
+              "https://www.euronews.com/2026/10/20/kallas-russian-black-sea-strikes-deepen-perfect-storm-for-world-food-supplies",
+              "https://www.euronews.com/2026/10/20/kallas-russian-black-sea-strikes-deepen-perfect-storm-for-world-food-supplies",
+              "https://www.euronews.com/2026/10/20/kallas-russian-black-sea-strikes-deepen-perfect-storm-for-world-food-supplies",
+              "https://www.nato.int/en/what-we-do/deterrence-and-defence/awacs-natos-eyes-in-the-sky",
+              "https://www.nato.int/en/what-we-do/deterrence-and-defence/awacs-natos-eyes-in-the-sky",
+              "https://www.nato.int/en/what-we-do/deterrence-and-defence/awacs-natos-eyes-in-the-sky",
+              "https://www.nato.int/en/what-we-do/deterrence-and-defence/awacs-natos-eyes-in-the-sky",
+              "https://www.reuters.com/business/aerospace-defense/nato-send-planes-drones-black-sea-after-attacks-shipping-2026-10-20/"
+            ],
+            "observed_at": "2026-10-20T19:22:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-b0866088",
+            "story_title": "Starshield attribution shifts toward Musk, but remains disputed",
+            "source": "chatgpt/chatgpt-rolling-0321.md",
+            "slot": "0321",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://apnews.com/article/russia-ukraine-zelenskyy-norway-trump-rubio-witkoff-140895c6c0a1682c46f4fe197e056996",
+            "source_urls": [
+              "https://apnews.com/article/russia-ukraine-zelenskyy-norway-trump-rubio-witkoff-140895c6c0a1682c46f4fe197e056996",
+              "https://apnews.com/article/russia-ukraine-zelenskyy-norway-trump-rubio-witkoff-140895c6c0a1682c46f4fe197e056996",
+              "https://apnews.com/article/russia-ukraine-zelenskyy-norway-trump-rubio-witkoff-140895c6c0a1682c46f4fe197e056996",
+              "https://www.theguardian.com/science/2026/oct/20/spacex-revenue-earnings-report",
+              "https://www.theguardian.com/science/2026/oct/20/spacex-revenue-earnings-report",
+              "https://www.theguardian.com/science/2026/oct/20/spacex-revenue-earnings-report",
+              "https://www.wsj.com/podcasts/whats-news/elon-musk-ordered-last-weeks-starlink-slowdown/472fa5ee-d1eb-408c-a262-392b02f3d358",
+              "https://www.wsj.com/podcasts/whats-news/elon-musk-ordered-last-weeks-starlink-slowdown/472fa5ee-d1eb-408c-a262-392b02f3d358",
+              "https://www.wsj.com/podcasts/whats-news/elon-musk-ordered-last-weeks-starlink-slowdown/472fa5ee-d1eb-408c-a262-392b02f3d358",
+              "https://www.wsj.com/podcasts/the-journal/trump-turns-on-ukraine/09dac333-103b-4ae1-8b81-0acb3cbd1139",
+              "https://www.wsj.com/podcasts/the-journal/trump-turns-on-ukraine/09dac333-103b-4ae1-8b81-0acb3cbd1139",
+              "https://www.wsj.com/podcasts/the-journal/trump-turns-on-ukraine/09dac333-103b-4ae1-8b81-0acb3cbd1139",
+              "https://www.wsj.com/world/ukraine-starlink-elon-musk-trump-dbc49193"
+            ],
+            "observed_at": "2026-10-21T01:21:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-ba15e156",
+            "story_title": "Lead 2: Seoul announces partial withdrawal of Ukraine embassy staff over lack of “constructive response” on…",
+            "source": "grok/grok-rolling-1547.md",
+            "slot": "1547",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://en.yna.co.kr/view/AEN20261020006753315",
+            "source_urls": [
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://www.aljazeera.com/news/2026/10/20/south-korea-to-pull-more-embassy-staff-from-ukraine-after-pow-row",
+              "https://www.aljazeera.com/news/2026/10/20/south-korea-to-pull-more-embassy-staff-from-ukraine-after-pow-row",
+              "https://www.koreaherald.com/article/10909026"
+            ],
+            "observed_at": "2026-10-20T13:47:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 9,
+        "evidence": [
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-0a154189",
+            "story_title": "Turkey sends the Mecca mutual-defence pact into its ratification process",
+            "source": "chatgpt/chatgpt-rolling-1514.md",
+            "slot": "1514",
+            "matched": [
+              "Yemen"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/turkey-submits-saudi-pakistan-defence-pact-parliament-ratification-sources-say-2026-10-20/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/turkey-submits-saudi-pakistan-defence-pact-parliament-ratification-sources-say-2026-10-20/",
+              "https://www.reuters.com/world/middle-east/turkey-submits-saudi-pakistan-defence-pact-parliament-ratification-sources-say-2026-10-20/",
+              "https://www.reuters.com/world/middle-east/turkey-submits-saudi-pakistan-defence-pact-parliament-ratification-sources-say-2026-10-20/",
+              "https://www.al-monitor.com/originals/2026/10/turkey-sends-mecca-defense-pact-saudi-arabia-pakistan-parliament-ratification",
+              "https://www.al-monitor.com/originals/2026/10/turkey-sends-mecca-defense-pact-saudi-arabia-pakistan-parliament-ratification",
+              "https://www.al-monitor.com/originals/2026/10/turkey-sends-mecca-defense-pact-saudi-arabia-pakistan-parliament-ratification"
+            ],
+            "observed_at": "2026-10-20T13:14:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-0b04402c",
+            "story_title": "Lead 2: Iraq closes Sheeb border crossing with Iran until further notice for security review",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://english.alarabiya.net/News/middle-east/2026/10/21/iraq-closes-sheeb-border-crossing-with-iran-to-check-security-sources-say",
+            "source_urls": [
+              "https://english.alarabiya.net/News/middle-east/2026/10/21/iraq-closes-sheeb-border-crossing-with-iran-to-check-security-sources-say",
+              "https://english.alarabiya.net/News/middle-east/2026/10/21/iraq-closes-sheeb-border-crossing-with-iran-to-check-security-sources-say",
+              "https://english.alarabiya.net/News/middle-east/2026/10/21/iraq-closes-sheeb-border-crossing-with-iran-to-check-security-sources-say",
+              "https://www.arabtimesonline.com/news/iraq-closes-sheeb-border-crossing-with-iran-until-further-notice/",
+              "https://www.arabtimesonline.com/news/iraq-closes-sheeb-border-crossing-with-iran-until-further-notice/",
+              "https://www.arabtimesonline.com/news/iraq-closes-sheeb-border-crossing-with-iran-until-further-notice/",
+              "https://www.arabtimesonline.com/news/iraq-closes-sheeb-border-crossing-with-iran-until-further-notice/",
+              "https://www.arabtimesonline.com/news/iraq-closes-sheeb-border-crossing-with-iran-until-further-notice/",
+              "https://www.arabnews.com/middle-east/iraq-closes-sheeb-border-crossing-with-iran-for-urgent-security-reasons-sources-say-3007475",
+              "https://shafaq.com/en/society/Al-Sheeb-crossing-with-Iran-to-shut-over-technical-issues"
+            ],
+            "observed_at": "2026-10-21T07:48:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-4be6cc43",
+            "story_title": "Egypt postpones the parliamentary gate for possible Saudi military support",
+            "source": "chatgpt/chatgpt-rolling-1514.md",
+            "slot": "1514",
+            "matched": [
+              "Yemen",
+              "Red Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/egypt-delays-vote-military-support-saudi-arabia-until-october-26-2026-10-19/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/egypt-delays-vote-military-support-saudi-arabia-until-october-26-2026-10-19/",
+              "https://www.reuters.com/world/middle-east/egypt-delays-vote-military-support-saudi-arabia-until-october-26-2026-10-19/",
+              "https://www.reuters.com/world/middle-east/egypt-delays-vote-military-support-saudi-arabia-until-october-26-2026-10-19/",
+              "https://www.aljazeera.com/news/2026/10/19/egyptian-parliament-delays-vote-on-military-support-for-saudi-arabia",
+              "https://www.aljazeera.com/news/2026/10/19/egyptian-parliament-delays-vote-on-military-support-for-saudi-arabia",
+              "https://www.aljazeera.com/news/2026/10/19/egyptian-parliament-delays-vote-on-military-support-for-saudi-arabia",
+              "https://english.aawsat.com/gulf/5331401-egypt-extends-next-week-discussions-military-support-saudi-arabia",
+              "https://english.aawsat.com/gulf/5331401-egypt-extends-next-week-discussions-military-support-saudi-arabia",
+              "https://english.aawsat.com/gulf/5331401-egypt-extends-next-week-discussions-military-support-saudi-arabia",
+              "https://www.arabnews.com/middle-east/egypt-parliament-delays-debate-on-military-support-to-saudi-arabia-to-next-week-al-akhbar-3007190",
+              "https://www.arabnews.com/middle-east/egypt-parliament-delays-debate-on-military-support-to-saudi-arabia-to-next-week-al-akhbar-3007190",
+              "https://www.arabnews.com/middle-east/egypt-parliament-delays-debate-on-military-support-to-saudi-arabia-to-next-week-al-akhbar-3007190"
+            ],
+            "observed_at": "2026-10-20T13:14:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-5a0c3697",
+            "story_title": "Lead 1: UK deploys RAF Typhoons for defensive missions over Saudi Arabia against Houthi attacks",
+            "source": "grok/grok-rolling-0645.md",
+            "slot": "0645",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+            "source_urls": [
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://www.bbc.com/news/articles/ckr5yqe1r1llo",
+              "https://www.bbc.com/news/articles/ckr5yqe1r1llo",
+              "https://www.bbc.com/news/articles/ckr5yqe1r1llo",
+              "https://www.aljazeera.com/news/2026/10/20/uk-to-deploy-raf-fighter-jets-to-defend-saudi-arabia-from-houthi-attacks",
+              "https://www.aljazeera.com/news/2026/10/20/uk-to-deploy-raf-fighter-jets-to-defend-saudi-arabia-from-houthi-attacks"
+            ],
+            "observed_at": "2026-10-21T04:45:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-9648e8b1",
+            "story_title": "Britain puts RAF Typhoons into the Saudi defensive-air mission",
+            "source": "chatgpt/chatgpt-rolling-1514.md",
+            "slot": "1514",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+            "source_urls": [
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://www.gov.uk/government/news/operational-update-20-october-uk-military-support-to-the-kingdom-of-saudi-arabia",
+              "https://apnews.com/article/uk-air-patrols-saudi-houthis-3e56f4679565c985fd036302168a4f79",
+              "https://apnews.com/article/uk-air-patrols-saudi-houthis-3e56f4679565c985fd036302168a4f79",
+              "https://apnews.com/article/uk-air-patrols-saudi-houthis-3e56f4679565c985fd036302168a4f79",
+              "https://www.aljazeera.com/news/2026/10/20/uk-to-deploy-raf-fighter-jets-to-defend-saudi-arabia-from-houthi-attacks",
+              "https://www.aljazeera.com/news/2026/10/20/uk-to-deploy-raf-fighter-jets-to-defend-saudi-arabia-from-houthi-attacks",
+              "https://www.aljazeera.com/news/2026/10/20/uk-to-deploy-raf-fighter-jets-to-defend-saudi-arabia-from-houthi-attacks",
+              "https://transcripts.un.org/en/briefing/sg/2026-10-12",
+              "https://transcripts.un.org/en/briefing/sg/2026-10-12",
+              "https://transcripts.un.org/en/briefing/sg/2026-10-12"
+            ],
+            "observed_at": "2026-10-20T13:14:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-9d447276",
+            "story_title": "Lead 3: Report: Netanyahu/IDF prepared multi-day Iran strikes for weekend of 10 October targeting nuclear…",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+            "source_urls": [
+              "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+              "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+              "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+              "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+              "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+              "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+              "https://www.timesofisrael.com/liveblog_entry/report-netanyahu-planned-to-attack-iran-earlier-this-month-but-trump-opposed-it/",
+              "https://www.jpost.com/middle-east/iran-news/article-912360",
+              "https://www.jpost.com/middle-east/iran-news/article-912360",
+              "https://www.jpost.com/middle-east/iran-news/article-912360",
+              "https://indianexpress.com/article/world/world-news-today-live-updates-trump-opposed-netanyahu-iran-strike-israel-us-midterm-elections-saudi-arabia-houthi-yemen-10930392/",
+              "https://www.ft.com/content/eb4d1101-45ed-4d03-9beb-42f7c87a58ea"
+            ],
+            "observed_at": "2026-10-21T07:48:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-a3d5c939",
+            "story_title": "Lead 1: Yemen — Houthi ballistic-missile strike on Shabwa training camp death toll rises to 60 (deadliest…",
+            "source": "grok/grok-rolling-1243.md",
+            "slot": "1243",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+            "source_urls": [
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+              "https://apnews.com/article/yemen-houthis-saudi-fighting-8a036054a8f0cd38ff8ee0101947f708",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.theguardian.com/world/2026/oct/19/houthi-attack-yemen-al-alam-camp-biggest-single-loss-of-life-civil-war",
+              "https://www.japantimes.co.jp/news/2026/10/20/world/houthi-attack-yemen-camp/",
+              "https://www.japantimes.co.jp/news/2026/10/20/world/houthi-attack-yemen-camp/",
+              "https://www.dawn.com/news/2038443"
+            ],
+            "observed_at": "2026-10-20T10:43:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-b1e93385",
+            "story_title": "Lead 1: Houthi death toll from Shabwa training-camp strike rises to 73 (with 14 still missing)",
+            "source": "grok/grok-rolling-0048.md",
+            "slot": "0048",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.cbc.ca/news/world/houthi-attack-yemen-forces-rises-9.7388015",
+            "source_urls": [
+              "https://www.cbc.ca/news/world/houthi-attack-yemen-forces-rises-9.7388015",
+              "https://www.cbc.ca/news/world/houthi-attack-yemen-forces-rises-9.7388015",
+              "https://www.cbc.ca/news/world/houthi-attack-yemen-forces-rises-9.7388015",
+              "https://www.cbc.ca/news/world/houthi-attack-yemen-forces-rises-9.7388015",
+              "https://www.cbc.ca/news/world/houthi-attack-yemen-forces-rises-9.7388015",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.anews.com.tr/middle-east/2026/10/20/death-toll-from-houthi-attack-in-yemens-shabwa-rises-to-73-with-14-missing",
+              "https://www.anews.com.tr/middle-east/2026/10/20/death-toll-from-houthi-attack-in-yemens-shabwa-rises-to-73-with-14-missing",
+              "https://www.anews.com.tr/middle-east/2026/10/20/death-toll-from-houthi-attack-in-yemens-shabwa-rises-to-73-with-14-missing"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-cff90aaf",
+            "story_title": "Lead 3: Houthi attack death toll on Shabwa government training camp rises to 73 (from ~53), with 14 missing",
+            "source": "grok/grok-rolling-0350.md",
+            "slot": "0350",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+            "source_urls": [
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://www.newarab.com/news/death-toll-houthi-strike-yemen-govt-camp-rises-73",
+              "https://english.alarabiya.net/News/middle-east/2026/10/20/death-toll-from-houthi-attack-on-yemen-training-camp-rises-to-73",
+              "https://english.alarabiya.net/News/middle-east/2026/10/20/death-toll-from-houthi-attack-on-yemen-training-camp-rises-to-73",
+              "https://english.alarabiya.net/News/middle-east/2026/10/20/death-toll-from-houthi-attack-on-yemen-training-camp-rises-to-73",
+              "https://english.alarabiya.net/News/middle-east/2026/10/20/death-toll-from-houthi-attack-on-yemen-training-camp-rises-to-73",
+              "https://english.alarabiya.net/News/middle-east/2026/10/20/death-toll-from-houthi-attack-on-yemen-training-camp-rises-to-73"
+            ],
+            "observed_at": "2026-10-21T01:50:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-a0e1adae",
+            "story_title": "Lead 4: North Korea orders border troops “prompt and resolute action” if South Korean forces threaten…",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.yahoo.com/news/world/articles/north-korean-army-chief-inspects-063446437.html",
+            "source_urls": [
+              "https://www.yahoo.com/news/world/articles/north-korean-army-chief-inspects-063446437.html",
+              "https://www.yahoo.com/news/world/articles/north-korean-army-chief-inspects-063446437.html",
+              "https://www.yahoo.com/news/world/articles/north-korean-army-chief-inspects-063446437.html",
+              "https://www.yahoo.com/news/world/articles/north-korean-army-chief-inspects-063446437.html",
+              "https://www.yahoo.com/news/world/articles/north-korean-army-chief-inspects-063446437.html",
+              "https://quews.news/north-korea-tells-border/",
+              "https://quews.news/north-korea-tells-border/",
+              "https://quews.news/north-korea-tells-border/",
+              "https://quews.news/north-korea-tells-border/",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/21/north-korean-army-chief-inspects-border-with-south-korea-says-troops-must-act-if-enemy-provokes"
+            ],
+            "observed_at": "2026-10-21T07:48:00Z"
+          },
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-ba15e156",
+            "story_title": "Lead 2: Seoul announces partial withdrawal of Ukraine embassy staff over lack of “constructive response” on…",
+            "source": "grok/grok-rolling-1547.md",
+            "slot": "1547",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://en.yna.co.kr/view/AEN20261020006753315",
+            "source_urls": [
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://en.yna.co.kr/view/AEN20261020006753315",
+              "https://www.aljazeera.com/news/2026/10/20/south-korea-to-pull-more-embassy-staff-from-ukraine-after-pow-row",
+              "https://www.aljazeera.com/news/2026/10/20/south-korea-to-pull-more-embassy-staff-from-ukraine-after-pow-row",
+              "https://www.koreaherald.com/article/10909026"
+            ],
+            "observed_at": "2026-10-20T13:47:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-21",
+            "story_id": "s-92096474",
+            "story_title": "Lead 4: Escalating drone strikes in Sudan kill scores, including in Abyei and West Kordofan",
+            "source": "grok/grok-rolling-1844.md",
+            "slot": "1844",
+            "matched": [
+              "Sudan"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/cr3el70jz1nqo",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/cr3el70jz1nqo",
+              "https://www.theguardian.com/world/2026/oct/19/drone-attack-market-al-dibab-west-kordofan-sudan",
+              "https://www.theguardian.com/world/2026/oct/19/drone-attack-market-al-dibab-west-kordofan-sudan",
+              "https://www.theguardian.com/world/2026/oct/19/drone-attack-market-al-dibab-west-kordofan-sudan",
+              "https://www.theguardian.com/world/2026/oct/19/drone-attack-market-al-dibab-west-kordofan-sudan",
+              "https://www.dawn.com/news/2038446"
+            ],
+            "observed_at": "2026-10-20T16:44:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-19",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
