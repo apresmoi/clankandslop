@@ -10,7 +10,7 @@ runtime:
       max_batch_messages: 8
       max_batch_bytes: 12000
       max_executions: 60
-      max_tokens: 8000000
+      max_tokens: 16000000
 execution:
   model:
     primary:
