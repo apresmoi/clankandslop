@@ -249,11 +249,9 @@ rm -f /etc/systemd/system/clank-seam.service /etc/systemd/system/clank-seam.time
       /etc/systemd/system/clank-handler-reaper.service /etc/systemd/system/clank-handler-reaper.timer
 systemctl daemon-reload
 
-# 2. Spawnfile with --runtime-env-file and --post-deploy-command (noopolis/spawnfile#59, #60),
+# 2. the published Spawnfile (see "The Spawnfile toolchain" below),
 #    the org checkout on exactly origin/main, the drain token, the bootstrap, disk
-git -C /home/clank/deploy-work/spawnfile-main fetch -q origin
-git -C /home/clank/deploy-work/spawnfile-main checkout -q --detach origin/main
-(cd /home/clank/deploy-work/spawnfile-main && PATH=/home/clank/deploy-work/node24/bin:$PATH npm ci --no-audit --no-fund && PATH=/home/clank/deploy-work/node24/bin:$PATH npm run build)
+/home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js --version   # 0.1.24 or later
 /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js release --help | grep -c -- '--post-deploy-command'   # 1
 git -C /root/work/clankandslop symbolic-ref --short HEAD                                   # main
 GIT_SSH_COMMAND="ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes" git -C /root/work/clankandslop pull --ff-only origin main
@@ -261,7 +259,6 @@ test -z "$(git -C /root/work/clankandslop status --porcelain)" && echo clean
 test "$(git -C /root/work/clankandslop rev-parse HEAD)" = "$(git -C /root/work/clankandslop rev-parse origin/main)" && echo at-origin-main
 grep -c '^SPAWNFILE_DAIMON_CONTROL_TOKEN=' /home/clank/deploy-work/deploy.env   # 1
 test -f /root/work/clankandslop/clankandslop-private/newsroom/runtime/bootstrap-control-token.sh && echo bootstrap-present
-test -f /home/clank/deploy-work/grok-runtime-identity-20261009b.json && echo identity-present
 df -h /var/lib/docker                                                                       # >= 20G available
 
 # 2b. the deployment record moves from clank's Spawnfile home to root's
@@ -474,6 +471,31 @@ setfacl -R -m u:clank:rwX /var/lib/clank-alarm
 find /var/lib/clank-alarm -type d -exec setfacl -d -m u:clank:rwX {} +
 sudo -u clank git config --global --add safe.directory /root/work/clankandslop
 sudo -u clank git config --global --add safe.directory /root/work/clankandslop/clankandslop-private
-# Moltnet local release lives where clank can write (compile writes a verify dir there)
-install -d -o clank -g clank /home/clank/deploy-work/moltnet-local-release
+```
+
+## The Spawnfile toolchain
+
+`/home/clank/deploy-work/spawnfile-main` is a symlink to an npm install of the
+published Spawnfile, not a git checkout. The release unit, the three feed units
+and the container guard all run `spawnfile-main/dist/cli/index.js`, so
+repointing the symlink switches all of them in one step. The published release
+pins the Daimon runtime image and the Moltnet release itself, so the unit sets
+**no** local overrides (`SPAWNFILE_ALLOW_LOCAL_E2E`,
+`SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR`, `SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY`)
+and has no drop-in. Spawnfile 0.1.24 refuses to compile with an old local
+runtime identity.
+
+To move to a new version (Hetzner, root), complete from clean state:
+
+```bash
+V=0.1.24
+DW=/home/clank/deploy-work
+install -d -o clank -g clank $DW/spawnfile-$V-npm
+runuser -u clank -- env HOME=/home/clank PATH=$DW/node24/bin:/usr/bin:/bin \
+  npm install --prefix $DW/spawnfile-$V-npm --no-audit --no-fund spawnfile@$V
+$DW/node24/bin/node $DW/spawnfile-$V-npm/node_modules/spawnfile/dist/cli/index.js --version   # $V
+readlink $DW/spawnfile-main                                                 # note it: the rollback target
+ln -sfn $DW/spawnfile-$V-npm/node_modules/spawnfile $DW/spawnfile-main.next && mv -T $DW/spawnfile-main.next $DW/spawnfile-main
+systemctl show clank-release.service -p Environment | tr ' ' '\n' | grep -c '^SPAWNFILE_' || true   # 0
+systemctl start clank-release.service
 ```
