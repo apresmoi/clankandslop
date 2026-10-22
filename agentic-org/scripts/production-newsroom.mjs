@@ -3,7 +3,7 @@ import { chmod, cp, link, lstat, mkdir, readFile, readdir, realpath, rename, rm,
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { validateCompositionArtifact } from './composition-contract.mjs';
+import { validateCompositionArtifact } from './composition-contract.mjs';import { assertCandidateValidates } from './compose-validate.mjs';
 import { CORPUS_IDENTITY_FILE, corpusIdentityFindings, corpusIdentityFromFeed, corpusLinkFindings, corpusRoot, verifyCorpusFreshness, verifyCorpusTree } from './corpus-contract.mjs';
 import { PASSED_ARTICLES_MINIMUM, assertCompositionCoverage, compositionCoverage, composeGateLine, composeGateStatus, hasNamedDissent, isDatedForecast } from './compose-gate.mjs';
 import { CITATION_GATE_NAMES, advisoryFilingWarnings, armedHardLintNames, describeLintFlag, hardLintFlags, knownTopicSlugs, lintFiling, writeEditionIndex } from './edition-index.mjs';
@@ -362,7 +362,7 @@ async function composeEditionAction(args){
   for(const page of args.pages){await converge(location(args.edition,'history',`pages/${page.name}/${sha(JSON.stringify(page.document)).slice(7)}`),page.document);await supersedeIndexed(args.edition,location(args.edition,'pages',page.name),page.document);}
   for(const [kind,documents] of [['maps',suppliedMaps],['glyphs',selected.glyphs]]){for(const name of await jsonNames(args.edition,kind))if(!documents.has(name))await(await stateAdapter()).removeJson(location(args.edition,kind,name));for(const [name,document] of documents){await converge(location(args.edition,'history',`${kind}/${name}/${sha(JSON.stringify(document)).slice(7)}`),document);await supersede(location(args.edition,kind,name),document);}}
   const pageNames=['front','tape'],mapNames=[...suppliedMaps.keys()].sort(),glyphNames=[...selected.glyphs.keys()].sort(),tree={articles,desk,pages:pageNames,maps:mapNames,glyphs:glyphNames,article_digests:await digests(args.edition,'articles',articles),desk_digests:await digests(args.edition,'desk',desk),page_digests:await digests(args.edition,'pages',pageNames),map_digests:await digests(args.edition,'maps',mapNames),glyph_digests:await digests(args.edition,'glyphs',glyphNames)};
-  const composition={tree,tree_digest:sha(JSON.stringify(tree)),corpus,compose_gates:composeGateLine(gates),forecasts:gates.forecasts,dissents:gates.dissents};return composedResult(args,composition);
+  await assertCandidateValidates({edition:args.edition,tree,read:(kind,name)=>readJson(location(args.edition,kind,name)),publicRoot:path.resolve(import.meta.dirname,'../..'),editionsRoot:publicEditionsRoot()});const composition={tree,tree_digest:sha(JSON.stringify(tree)),corpus,compose_gates:composeGateLine(gates),forecasts:gates.forecasts,dissents:gates.dissents};return composedResult(args,composition);
 }
 const jsonNames=async(edition,kind)=>(await stateAdapter()).jsonNames(within(root(),'editions',edition,kind));
 const run=async(command,args,cwd)=>{const home=path.join(cwd,'.release-home'),temporary=path.join(cwd,'.release-tmp');await mkdir(home,{recursive:true});await mkdir(temporary,{recursive:true});return new Promise((resolve,reject)=>{const child=spawn(command,args,{cwd,stdio:'pipe',env:{CI:'1',HOME:home,TMPDIR:temporary,PATH:'/usr/local/bin:/usr/bin:/bin',LANG:'C.UTF-8',TZ:'UTC'}});let stderr='';child.stderr.on('data',chunk=>{if(stderr.length<65536)stderr+=chunk;});child.once('error',reject);child.once('exit',code=>code===0?resolve():reject(new Error(`${command} failed: ${stderr.slice(-2000)}`)));});};
