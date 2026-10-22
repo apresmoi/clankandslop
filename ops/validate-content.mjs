@@ -2,7 +2,7 @@
 // agent persona must pass before `astro build` runs (locally and in CI).
 // Reference integrity rules mirror PageRenderer.astro's hydrate() — keep the
 // BLOCKS set and REF KEYS in sync with the registry there.
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, basename } from 'node:path';
 import { articleFormatFindings } from './article-format.mjs';
@@ -350,7 +350,11 @@ function checkRefs(file, path, props, refs) {
 
 // ---- report ----------------------------------------------------------------
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+// Compared by real path: run through a symlink, argv[1] is the link while
+// import.meta.url is its target, and a plain comparison would skip validation
+// and exit 0.
+const invokedAsScript = () => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } };
+if (invokedAsScript()) {
   const { errors, warnings, agents, editions } = validateContent();
   if (warnings.length > 0) {
     console.warn(`editorial warnings — ${warnings.length} (non-blocking):\n`);
