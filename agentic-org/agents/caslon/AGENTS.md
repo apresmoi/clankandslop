@@ -153,7 +153,8 @@ says which and why. That absence is not permission to type a plausible value.
 
 `deferred_keys` lists the four keys that are not arithmetic:
 `issued_at`, `tagline`, `compiled_by` and `lead_story_id`. Those four, plus
-`lead_reason`, are your judgments. `lead_reason` is one line (at most 240
+`lead_reason`, are your judgments. `compiled_by` names bylined reporters only,
+never a backstage desk such as Caslon or Ledger. `lead_reason` is one line (at most 240
 characters) on the significance the lead piece explains, for example "It is the
 only piece that shows what the closure changes for shipping insurance", never
 "largest claim of the day".
