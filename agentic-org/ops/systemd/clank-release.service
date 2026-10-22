@@ -31,14 +31,15 @@
 # The fetch needs an explicit identity: the public remote has no SSH host alias
 # and root's ~/.ssh/config only supplies keys for the github-clank-* aliases.
 #
-# SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY stays: the published Daimon image's
-# receipt lacks the attention attestation the compiler requires (Spawnfile
-# follow-up), so the host pins its local receipt for the same image.
+# No local runtime overrides: `spawnfile-main` is the published npm Spawnfile
+# (0.1.24+), which pins the published Daimon image and Moltnet release and
+# whose receipt carries the attention and schedule attestation. Never set
+# SPAWNFILE_ALLOW_LOCAL_E2E, SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR or
+# SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY here (or in a drop-in): 0.1.24
+# refuses to compile with an old local identity (manifest v3, needs v5).
 #
-# Runs as root, so the deployment record and the release store
-# (ledger, log, deferral, drain marker) live under /root/.spawnfile. The record
-# was clank's while `seam-run.mjs` deployed through `runuser -l clank`; the
-# cutover in ops/README.md moves it once.
+# The deployment record and the release store (ledger, log, deferral, drain
+# marker) live under /home/clank/.spawnfile, because the release runs as clank.
 #
 # The pull and the release run under the lock every clank-feed unit takes, so
 # no volume refresh interleaves with a checkout move or a container recreate.
@@ -61,9 +62,6 @@ Environment=HOME=/home/clank
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
 Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-Environment=SPAWNFILE_ALLOW_LOCAL_E2E=1
-Environment=SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR=/home/clank/deploy-work/moltnet-local-release
-Environment=SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY=/home/clank/deploy-work/grok-runtime-identity-20261009b.json
 Environment="GIT_SSH_COMMAND=ssh -i /root/.ssh/clank_public -o IdentitiesOnly=yes"
 # ($$ is systemd's escape for a literal $ handed to the shell.)
 # Exactly origin/main: on branch main, fast-forwarded to the fetched tip, and
