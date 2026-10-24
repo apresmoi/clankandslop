@@ -1,0 +1,1003 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-24",
+  "generated_at": "2026-10-24T07:52:12Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.6154,
+    "numerator": 8,
+    "denominator": 13,
+    "triggering": 4,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 115.22,
+        "observed_at": "2026-10-20",
+        "stale_days": 4,
+        "contributes": 3,
+        "reason": "115.22 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 107.89,
+        "observed_at": "2026-10-20",
+        "stale_days": 4,
+        "contributes": 1,
+        "reason": "107.89 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.276,
+        "observed_at": "2026-10-19",
+        "stale_days": 5,
+        "contributes": 2,
+        "reason": "6.276 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.1,
+        "observed_at": "2026-10-20",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "3.1 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 19.03,
+        "observed_at": "2026-10-22",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "19.03 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 3.4,
+        "observed_at": "2026-10-22",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "3.4 >= 3.388 is true"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.4048,
+        "observed_at": "2026-10-16",
+        "stale_days": 8,
+        "contributes": 0,
+        "reason": "121.4048 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-24T07:52:11Z",
+        "http_status": 200,
+        "bytes": 170183,
+        "sha256": "a1fec56bfa6bc77dc5e017fa8976e6eaca2fa2ae43773209ac5923f1269c8b33",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-24T07:52:11Z",
+        "http_status": 200,
+        "bytes": 175956,
+        "sha256": "44734a4f4507e0e888ee7555893fe3547085d1e8bc4fa68cb177df2fe96d764c",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-24T07:52:11Z",
+        "http_status": 200,
+        "bytes": 28942,
+        "sha256": "1bca7751063cff01b326cbdefda5370220439cbadc5e3887ad1f2e98939090fc",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-24T07:52:12Z",
+        "http_status": 200,
+        "bytes": 116233,
+        "sha256": "8a7cfd1990e595c5953d95c1b5865c64d92755caf5623aa99287ae5d5719bb79",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-24T07:52:12Z",
+        "http_status": 200,
+        "bytes": 161697,
+        "sha256": "a35974245b6bac3ab6031dacb2696cfe3fa9a4eaa36c533a93ae7a5ccb91db90",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-24T07:52:12Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "ec6af9e8e3a253f351156512f234d39467152ed9a81099327b58dff9d6e4fe04",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-24T07:52:12Z",
+        "http_status": 200,
+        "bytes": 104729,
+        "sha256": "d248a3103dc2a001a68187b827926e1353746314907888e57fd130b8ca585f82",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 42,
+    "open_conflicts": 4,
+    "watch": 2,
+    "dormant": 7,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-19 and drew no qualifying story today",
+        "last_open_edition": "2026-10-19",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-0038c8cc",
+            "story_title": "Lead 4: IRGC reports two crude tankers (~2 million barrels each) caught fire after striking mines in Strait…",
+            "source": "grok/grok-rolling-0346.md",
+            "slot": "0346",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/18/iran-says-two-tankers-catch-fire-after-hitting-mines-in-strait-of-hormuz",
+              "https://www.reuters.com/world/middle-east/irans-guards-say-two-tankers-hit-mines-strait-hormuz-2026-10-17/"
+            ],
+            "observed_at": "2026-10-19T01:46:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-1a210297",
+            "story_title": "Egypt moves Saudi support toward a parliamentary military gate",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/egypt-says-ready-give-saudi-arabia-necessary-support-amid-houthi-conflict-2026-10-18/",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404",
+              "https://apnews.com/article/saudi-arabia-yemen-egypt-houthis-f7d499cb13525df2bc7eb318e0fc1404"
+            ],
+            "observed_at": "2026-10-18T19:16:00Z"
+          },
+          {
+            "edition": "2026-10-19",
+            "story_id": "s-35511ffe",
+            "story_title": "Iran keeps a six-day Hormuz reopening clock on the table",
+            "source": "chatgpt/chatgpt-rolling-1517.md",
+            "slot": "1517",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.reuters.com/world/middle-east/iran-urges-us-accept-proposal-reopen-strait-hormuz-2026-10-18/",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.tasnimnews.ir/en/news/2026/10/17/3725165/iran-offers-7-day-plan-to-reopen-hormuz",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.newarab.com/news/iran-urges-us-accept-proposal-reopen-strait-hormuz?blockId=block_91033",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358",
+              "https://www.aa.com.tr/en/middle-east/iran-reviewing-us-feedback-on-7-day-plan-expects-to-respond-within-days/4082358"
+            ],
+            "observed_at": "2026-10-18T13:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 8,
+        "evidence": [
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-0f1dfdb7",
+            "story_title": "Lead 1: White House, Kremlin and Ukrainian officials confirm Melania Trump-brokered localized ceasefire in…",
+            "source": "grok/grok-rolling-1851.md",
+            "slot": "1851",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+            "source_urls": [
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.straitstimes.com/world/europe/kremlin-confirms-oleshky-ceasefire-says-working-with-ukraine-on-evacuation-timing",
+              "https://www.straitstimes.com/world/europe/kremlin-confirms-oleshky-ceasefire-says-working-with-ukraine-on-evacuation-timing",
+              "https://www.straitstimes.com/world/europe/kremlin-confirms-oleshky-ceasefire-says-working-with-ukraine-on-evacuation-timing",
+              "https://www.ukrinform.net/rubric-ato/4177572-ukraine-confirms-local-ceasefire-to-enable-evacuation-from-oleshky.html",
+              "https://www.ukrinform.net/rubric-ato/4177572-ukraine-confirms-local-ceasefire-to-enable-evacuation-from-oleshky.html",
+              "https://cyprus-mail.com/2026/10/23/kremlin-confirms-oleshky-ceasefire-says-working-with-ukraine-on-evacuation-timing"
+            ],
+            "observed_at": "2026-10-23T16:51:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-489186af",
+            "story_title": "Zelensky says Ukraine, Russia and the U.S. agreed on another technical negotiating round in Abu Dhabi",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://apnews.com/article/russia-ukraine-witkoff-putin-trump-zelenskyy-talks-3f00c0c6fd10bab948c2c3f8502e0a91",
+            "source_urls": [
+              "https://apnews.com/article/russia-ukraine-witkoff-putin-trump-zelenskyy-talks-3f00c0c6fd10bab948c2c3f8502e0a91",
+              "https://apnews.com/article/russia-ukraine-witkoff-putin-trump-zelenskyy-talks-3f00c0c6fd10bab948c2c3f8502e0a91",
+              "https://apnews.com/article/russia-ukraine-witkoff-putin-trump-zelenskyy-talks-3f00c0c6fd10bab948c2c3f8502e0a91",
+              "https://www.mofa.gov.ae/en/mediahub/news/2026/1/23/uae-russia-ukraine-united-states",
+              "https://www.mofa.gov.ae/en/mediahub/news/2026/1/23/uae-russia-ukraine-united-states",
+              "https://www.mofa.gov.ae/en/mediahub/news/2026/1/23/uae-russia-ukraine-united-states",
+              "https://www.mofa.gov.ae/en/mediahub/news/2026/9/30/al-hashimy-toronto",
+              "https://www.mofa.gov.ae/en/mediahub/news/2026/9/30/al-hashimy-toronto",
+              "https://www.mofa.gov.ae/en/mediahub/news/2026/9/30/al-hashimy-toronto",
+              "https://www.straitstimes.com/world/europe/zelenskiy-says-ukrainian-russian-and-us-negotiators-to-meet-in-early-november-in-abu-dhabi",
+              "https://www.straitstimes.com/world/europe/zelenskiy-says-ukrainian-russian-and-us-negotiators-to-meet-in-early-november-in-abu-dhabi",
+              "https://www.straitstimes.com/world/europe/zelenskiy-says-ukrainian-russian-and-us-negotiators-to-meet-in-early-november-in-abu-dhabi",
+              "https://www.reuters.com/world/europe/zelenskiy-says-ukrainian-russian-us-negotiators-meet-early-november-abu-dhabi-2026-10-23/",
+              "https://www.hudson.org/events/special-address-ukrainian-president-volodymyr-zelenskyy"
+            ],
+            "observed_at": "2026-10-23T19:14:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-4d2f933c",
+            "story_title": "Oleshky story materially advances into an implementation dispute and a November talks clock",
+            "source": "chatgpt/chatgpt-rolling-0322.md",
+            "slot": "0322",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+            "source_urls": [
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.theguardian.com/world/2026/oct/23/ukraine-troops-report-ongoing-problems-with-starlink-satellite-network",
+              "https://www.theguardian.com/world/2026/oct/23/ukraine-troops-report-ongoing-problems-with-starlink-satellite-network",
+              "https://www.theguardian.com/world/2026/oct/23/ukraine-troops-report-ongoing-problems-with-starlink-satellite-network",
+              "https://apnews.com/article/russia-ukraine-war-ceasefire-oleshky-melania-trump-60167627316e0e2f62fc359cf78f317d",
+              "https://apnews.com/article/russia-ukraine-war-ceasefire-oleshky-melania-trump-60167627316e0e2f62fc359cf78f317d",
+              "https://www.vaticannews.va/en/world/news/2026-10/humanitarian-truce-announced-for-ukrainian-city-of-oleshky.html",
+              "https://www.vaticannews.va/en/world/news/2026-10/humanitarian-truce-announced-for-ukrainian-city-of-oleshky.html",
+              "https://www.vaticannews.va/en/world/news/2026-10/humanitarian-truce-announced-for-ukrainian-city-of-oleshky.html",
+              "https://www.reuters.com/world/europe/russia-ukraine-agree-ceasefire-embattled-town-hold-peace-talks-next-month-2026-10-23/"
+            ],
+            "observed_at": "2026-10-24T01:22:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-648c5576",
+            "story_title": "Lead 3: Ukrainian officials say Starshield/Starlink speed limits remain in place despite Trump’s claim that…",
+            "source": "grok/grok-rolling-1244.md",
+            "slot": "1244",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.politico.eu/article/starlink-still-restricted-for-ukraine-donald-trump-elon-musk-lifted-speed-limits/",
+            "source_urls": [
+              "https://www.politico.eu/article/starlink-still-restricted-for-ukraine-donald-trump-elon-musk-lifted-speed-limits/",
+              "https://www.politico.eu/article/starlink-still-restricted-for-ukraine-donald-trump-elon-musk-lifted-speed-limits/",
+              "https://www.politico.eu/article/starlink-still-restricted-for-ukraine-donald-trump-elon-musk-lifted-speed-limits/",
+              "https://www.politico.eu/article/starlink-still-restricted-for-ukraine-donald-trump-elon-musk-lifted-speed-limits/",
+              "https://www.politico.eu/article/starlink-still-restricted-for-ukraine-donald-trump-elon-musk-lifted-speed-limits/",
+              "https://www.cnn.com/2026/10/23/world/trump-musk-restored-ukraines-starshield-intl",
+              "https://www.cnn.com/2026/10/23/world/trump-musk-restored-ukraines-starshield-intl",
+              "https://www.cnn.com/2026/10/23/world/trump-musk-restored-ukraines-starshield-intl",
+              "https://www.cnn.com/2026/10/23/world/trump-musk-restored-ukraines-starshield-intl",
+              "https://www.cnn.com/2026/10/23/world/trump-musk-restored-ukraines-starshield-intl",
+              "https://www.theguardian.com/world/2026/oct/23/ukraine-war-briefing-uncertainty-over-kyivs-starlink-access-after-trump-claims-musk-restored-service"
+            ],
+            "observed_at": "2026-10-23T10:44:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-69c86e92",
+            "story_title": "Lead 3 — Romania blames Russia for drone that sank cargo ship off Black Sea coast; 1 dead, 3 missing",
+            "source": "grok/grok-rolling-1542.md",
+            "slot": "1542",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+            "source_urls": [
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://www.marinelink.com/news/romania-blames-russia-ship-strike-sinking-543869",
+              "https://en.wikipedia.org/wiki/Portal:Current_events/2026_October_23"
+            ],
+            "observed_at": "2026-10-23T13:42:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-71af6806",
+            "story_title": "Lead 3: Melania Trump secures localized Oleshky ceasefire for humanitarian aid and evacuation",
+            "source": "grok/grok-rolling-2147.md",
+            "slot": "2147",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+            "source_urls": [
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.bbc.co.uk/news/articles/c6vgxkvl4w5eo",
+              "https://www.bbc.co.uk/news/articles/c6vgxkvl4w5eo",
+              "https://www.bbc.co.uk/news/articles/c6vgxkvl4w5eo",
+              "https://www.themoscowtimes.com/2026/10/23/melania-trump-brokers-ceasefire-in-occupied-ukraines-oleshky-a94069",
+              "https://www.themoscowtimes.com/2026/10/23/melania-trump-brokers-ceasefire-in-occupied-ukraines-oleshky-a94069",
+              "https://www.themoscowtimes.com/2026/10/23/melania-trump-brokers-ceasefire-in-occupied-ukraines-oleshky-a94069"
+            ],
+            "observed_at": "2026-10-23T19:47:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-cd29a11f",
+            "story_title": "Oleshky humanitarian ceasefire announced for Russian-occupied Ukrainian city",
+            "source": "chatgpt/chatgpt-rolling-1717.md",
+            "slot": "1717",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+            "source_urls": [
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.reuters.com/world/europe/melania-trump-secures-oleshky-ceasefire-between-russia-ukraine-white-house-says-2026-10-23/",
+              "https://www.reuters.com/world/europe/melania-trump-secures-oleshky-ceasefire-between-russia-ukraine-white-house-says-2026-10-23/",
+              "https://www.reuters.com/world/europe/melania-trump-secures-oleshky-ceasefire-between-russia-ukraine-white-house-says-2026-10-23/",
+              "https://apnews.com/article/russia-ukraine-war-ceasefire-oleshky-melania-trump-60167627316e0e2f62fc359cf78f317d",
+              "https://apnews.com/article/russia-ukraine-war-ceasefire-oleshky-melania-trump-60167627316e0e2f62fc359cf78f317d",
+              "https://www.euronews.com/2026/10/23/melania-trump-secures-ceasefire-in-russian-occupied-ukrainian-city-of-oleshky-white-house-",
+              "https://www.euronews.com/2026/10/23/melania-trump-secures-ceasefire-in-russian-occupied-ukrainian-city-of-oleshky-white-house-"
+            ],
+            "observed_at": "2026-10-23T15:17:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-d494281c",
+            "story_title": "Drone strike sinks a commercial vessel just outside Romanian waters, creating a new Black Sea escalation test",
+            "source": "chatgpt/chatgpt-rolling-1522.md",
+            "slot": "1522",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://agerpres.ro/english/2026/10/23/incident-at-sea-nine-sailors-rescued-after-vessel-sinking-brought-to-port-of-constanta--1606234",
+            "source_urls": [
+              "https://agerpres.ro/english/2026/10/23/incident-at-sea-nine-sailors-rescued-after-vessel-sinking-brought-to-port-of-constanta--1606234",
+              "https://agerpres.ro/english/2026/10/23/incident-at-sea-nine-sailors-rescued-after-vessel-sinking-brought-to-port-of-constanta--1606234",
+              "https://agerpres.ro/english/2026/10/23/incident-at-sea-nine-sailors-rescued-after-vessel-sinking-brought-to-port-of-constanta--1606234",
+              "https://aa.com.tr/en/europe/1-dead-3-missing-after-drone-strike-sinks-ship-off-romania-president-says/4098590",
+              "https://aa.com.tr/en/europe/1-dead-3-missing-after-drone-strike-sinks-ship-off-romania-president-says/4098590",
+              "https://aa.com.tr/en/europe/1-dead-3-missing-after-drone-strike-sinks-ship-off-romania-president-says/4098590"
+            ],
+            "observed_at": "2026-10-23T13:22:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-20 and drew no qualifying story today",
+        "last_open_edition": "2026-10-20",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-3c0f31a9",
+            "story_title": "WFP cuts Gaza food assistance by roughly one-third (500,000 people) over funding shortfalls.",
+            "source": "grok/grok-rolling-1851.md",
+            "slot": "1851",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+            "source_urls": [
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-860844/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-860844/"
+            ],
+            "observed_at": "2026-10-19T16:51:00Z"
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-79b8b5ae",
+            "story_title": "Lead 4: World Food Programme cuts monthly food assistance in Gaza by ~500,000 people due to funding shortages.",
+            "source": "grok/grok-rolling-0042.md",
+            "slot": "0042",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+            "source_urls": [
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-863669/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-863669/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261019-930-863669/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-20",
+            "story_id": "s-f5ca67e4",
+            "story_title": "Lead 3: WFP cuts monthly food assistance in Gaza by ~500,000 people (1.6 m to 1.1 m) due to funding shortfalls",
+            "source": "grok/grok-rolling-2141.md",
+            "slot": "2141",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+            "source_urls": [
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.wfp.org/news/funding-cuts-force-wfp-drastically-reduce-lifesaving-assistance-gaza",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.aljazeera.com/news/2026/10/19/wfp-cuts-aid-to-500000-palestinians-in-gaza-amid-funding-shortages",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo",
+              "https://www.bbc.co.uk/news/articles/cm79plrvpl4vo"
+            ],
+            "observed_at": "2026-10-19T19:41:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-0ee42e49",
+            "story_title": "Lead 1: U.S. intelligence memo warns of advanced Iranian plots against American personnel; State Department…",
+            "source": "grok/grok-rolling-0645.md",
+            "slot": "0645",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.axios.com/2026/10/24/iran-war-us-embassies-evacuations-threat",
+            "source_urls": [
+              "https://www.axios.com/2026/10/24/iran-war-us-embassies-evacuations-threat",
+              "https://www.cbsnews.com/news/iran-target-u-s-personnel/",
+              "https://www.cbsnews.com/news/iran-target-u-s-personnel/",
+              "https://www.cbsnews.com/news/iran-target-u-s-personnel/",
+              "https://www.cbsnews.com/news/iran-target-u-s-personnel/",
+              "https://www.cnn.com/2026/10/23/politics/us-moves-diplomats-middle-east-escalation-fears",
+              "https://www.seattletimes.com/nation-world/nation/us-is-reducing-staffing-at-4-middle-east-embassies-over-increased-threats-from-iran/",
+              "https://www.seattletimes.com/nation-world/nation/us-is-reducing-staffing-at-4-middle-east-embassies-over-increased-threats-from-iran/",
+              "https://www.seattletimes.com/nation-world/nation/us-is-reducing-staffing-at-4-middle-east-embassies-over-increased-threats-from-iran/",
+              "https://www.independent.co.uk/news/state-department-iran-middle-east-marco-rubio-saudi-arabia-b3072564.html"
+            ],
+            "observed_at": "2026-10-24T04:45:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-d68e6794",
+            "story_title": "Saudi Arabia — air defenses intercept another ballistic missile aimed at Riyadh",
+            "source": "chatgpt/chatgpt-rolling-0916.md",
+            "slot": "0916",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.spa.gov.sa/en/N2708936",
+            "source_urls": [
+              "https://www.spa.gov.sa/en/N2708936",
+              "https://gulfbusiness.com/en/2026/saudi-arabia/saudi-arabia-houthi-missile-riyadh-drone-october-24-2026/",
+              "https://gulfbusiness.com/en/2026/saudi-arabia/saudi-arabia-houthi-missile-riyadh-drone-october-24-2026/",
+              "https://gulfbusiness.com/en/2026/saudi-arabia/saudi-arabia-houthi-missile-riyadh-drone-october-24-2026/",
+              "https://www.aa.com.tr/en/middle-east/saudi-led-coalition-intercepts-houthi-missile-fired-toward-riyadh/4099163",
+              "https://www.aa.com.tr/en/middle-east/saudi-led-coalition-intercepts-houthi-missile-fired-toward-riyadh/4099163",
+              "https://www.aa.com.tr/en/middle-east/saudi-led-coalition-intercepts-houthi-missile-fired-toward-riyadh/4099163",
+              "https://www.daily-sun.com/world/905139/saudi-led-coalition-intercepts-ballistic-missile-launched-towards-riyadh",
+              "https://www.daily-sun.com/world/905139/saudi-led-coalition-intercepts-ballistic-missile-launched-towards-riyadh",
+              "https://www.daily-sun.com/world/905139/saudi-led-coalition-intercepts-ballistic-missile-launched-towards-riyadh",
+              "https://www.aljazeera.com/news/2026/10/12/houthi-missile-attack-targets-saudi-capital-riyadh-for-third-day-in-a-row",
+              "https://www.aljazeera.com/news/2026/10/12/houthi-missile-attack-targets-saudi-capital-riyadh-for-third-day-in-a-row",
+              "https://www.aljazeera.com/news/2026/10/12/houthi-missile-attack-targets-saudi-capital-riyadh-for-third-day-in-a-row"
+            ],
+            "observed_at": "2026-10-24T07:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-51d5b297",
+            "story_title": "Champi’s late-window Taiwan toll is revised sharply upward",
+            "source": "chatgpt/chatgpt-rolling-0322.md",
+            "slot": "0322",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+            "source_urls": [
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled"
+            ],
+            "observed_at": "2026-10-24T01:22:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-f60ec2a2",
+            "story_title": "Lead 1: Typhoon Champi injury toll rises sharply to 527 as storm glances Taiwan’s northeast and weakens",
+            "source": "grok/grok-rolling-0348.md",
+            "slot": "0348",
+            "matched": [
+              "Taiwan",
+              "Taipei"
+            ],
+            "source_url": "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+            "source_urls": [
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.channelnewsasia.com/east-asia/typhoon-champi-approaches-taiwan-flights-cancelled-6484571",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://www.taipeitimes.com/News/front/archives/2026/10/23/2003866495"
+            ],
+            "observed_at": "2026-10-24T01:48:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-050529b3",
+            "story_title": "South Korea renews a military-talks offer to North Korea over an increasingly ambiguous land border",
+            "source": "chatgpt/chatgpt-rolling-1522.md",
+            "slot": "1522",
+            "matched": [
+              "North Korea",
+              "Pyongyang"
+            ],
+            "source_url": "https://apnews.com/article/south-north-korea-border-mines-military-talks-9498c415c93ae9bc3767caf83e15b8b3",
+            "source_urls": [
+              "https://apnews.com/article/south-north-korea-border-mines-military-talks-9498c415c93ae9bc3767caf83e15b8b3",
+              "https://apnews.com/article/south-north-korea-border-mines-military-talks-9498c415c93ae9bc3767caf83e15b8b3",
+              "https://apnews.com/article/south-north-korea-border-mines-military-talks-9498c415c93ae9bc3767caf83e15b8b3",
+              "https://en.yna.co.kr/view/AEN20261023005752315?section=national/defense",
+              "https://en.yna.co.kr/view/AEN20261023005752315?section=national/defense",
+              "https://en.yna.co.kr/view/AEN20261023005752315?section=national/defense",
+              "https://www.channelnewsasia.com/east-asia/south-korea-proposes-holding-border-talks-north-6485461",
+              "https://www.channelnewsasia.com/east-asia/south-korea-proposes-holding-border-talks-north-6485461",
+              "https://www.channelnewsasia.com/east-asia/south-korea-proposes-holding-border-talks-north-6485461"
+            ],
+            "observed_at": "2026-10-23T13:22:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-0fa4dd16",
+            "story_title": "North Korean leader Kim Jong-un arrives in Dandong, China, via newly opened Yalu River Bridge",
+            "source": "grok/grok-rolling-0947.md",
+            "slot": "0947",
+            "matched": [
+              "North Korea",
+              "Pyongyang"
+            ],
+            "source_url": "https://www.koreajoongangdaily.com/korea/kim-jongun-makes-china-visit-is-greeted-by-chinese-premier-li-qiangnbspnbsp/12936338",
+            "source_urls": [
+              "https://www.koreajoongangdaily.com/korea/kim-jongun-makes-china-visit-is-greeted-by-chinese-premier-li-qiangnbspnbsp/12936338",
+              "https://www.koreajoongangdaily.com/korea/kim-jongun-makes-china-visit-is-greeted-by-chinese-premier-li-qiangnbspnbsp/12936338",
+              "https://www.koreajoongangdaily.com/korea/kim-jongun-makes-china-visit-is-greeted-by-chinese-premier-li-qiangnbspnbsp/12936338",
+              "https://www.koreajoongangdaily.com/korea/kim-jongun-makes-china-visit-is-greeted-by-chinese-premier-li-qiangnbspnbsp/12936338",
+              "https://www.koreajoongangdaily.com/korea/kim-jongun-makes-china-visit-is-greeted-by-chinese-premier-li-qiangnbspnbsp/12936338",
+              "https://www.koreajoongangdaily.com/korea/kim-jongun-makes-china-visit-is-greeted-by-chinese-premier-li-qiangnbspnbsp/12936338",
+              "https://www.koreaherald.com/article/10913525",
+              "https://www.koreaherald.com/article/10913525",
+              "https://www.koreaherald.com/article/10913525",
+              "https://www.koreaherald.com/article/10913525",
+              "https://www.koreaherald.com/article/10913525",
+              "https://www.koreaherald.com/article/10913525",
+              "https://www.aljazeera.com/news/2026/10/24/north-koreas-kim-jong-un-arrives-in-china-south-korean-media-says",
+              "https://www.arabnews.com/world/north-korean-leader-arrives-in-chinese-border-city-yonhap-says-3008005",
+              "https://www.arabnews.com/world/north-korean-leader-arrives-in-chinese-border-city-yonhap-says-3008005",
+              "https://www.mk.co.kr/en/politics/12184821"
+            ],
+            "observed_at": "2026-10-24T07:47:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-d5c412b8",
+            "story_title": "Lead 4: Australia sanctions two North Koreans and two companies over fraudulent IT-worker networks funding…",
+            "source": "grok/grok-rolling-0044.md",
+            "slot": "0044",
+            "matched": [
+              "DPRK"
+            ],
+            "source_url": "https://www.foreignminister.gov.au/minister/penny-wong/media-release/sanctions-targeting-north-korean-fraudulent-it-worker-networks-and-cybercrime",
+            "source_urls": [
+              "https://www.foreignminister.gov.au/minister/penny-wong/media-release/sanctions-targeting-north-korean-fraudulent-it-worker-networks-and-cybercrime",
+              "https://www.foreignminister.gov.au/minister/penny-wong/media-release/sanctions-targeting-north-korean-fraudulent-it-worker-networks-and-cybercrime",
+              "https://www.foreignminister.gov.au/minister/penny-wong/media-release/sanctions-targeting-north-korean-fraudulent-it-worker-networks-and-cybercrime",
+              "https://www.foreignminister.gov.au/minister/penny-wong/media-release/sanctions-targeting-north-korean-fraudulent-it-worker-networks-and-cybercrime",
+              "https://www.foreignminister.gov.au/minister/penny-wong/media-release/sanctions-targeting-north-korean-fraudulent-it-worker-networks-and-cybercrime",
+              "https://www.foreignminister.gov.au/minister/penny-wong/media-release/sanctions-targeting-north-korean-fraudulent-it-worker-networks-and-cybercrime",
+              "https://www.dfat.gov.au/news/two-persons-and-two-entities-listed-under-autonomous-sanctions-regulations-2011-democratic-peoples-republic-korea",
+              "https://www.dfat.gov.au/news/two-persons-and-two-entities-listed-under-autonomous-sanctions-regulations-2011-democratic-peoples-republic-korea"
+            ],
+            "observed_at": null
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "rising",
+    "current": 0.6154,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-21",
+    "change": 0.1539
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
