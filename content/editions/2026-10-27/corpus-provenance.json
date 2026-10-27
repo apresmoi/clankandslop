@@ -1,0 +1,20 @@
+{
+  "version": "clank.edition-corpus-provenance.v1",
+  "edition": "2026-10-27",
+  "asserted_by": "host",
+  "verification": "reverified-content",
+  "corpus": null,
+  "reverified_corpus": {
+    "commit": "c97ea8adcd2270351fc74956f976a505e70d4479",
+    "tree": "trees/bd43864c01e65ab88392801176e2627f55293b6fe7b26456afbc349a73d9e074",
+    "verified_at": "2026-10-28T00:51:36.252Z",
+    "manifest_sha256": "ebe700f3cfdd2e071bc337cda51f52bab8bd7129b90f781cfa9729a80b3ca107",
+    "files_checked": 100,
+    "entries_checked": 106,
+    "differences": 0,
+    "proof_sha256": "9f3c6911061d66bde2065b66cab9678a1b66e52a68ba65a26f991107ab1ca498"
+  },
+  "original_fetch_identity": null,
+  "original_landing_timestamp": null,
+  "disclosure": "Sources reverified; original host landing record unavailable."
+}
