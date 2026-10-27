@@ -154,6 +154,9 @@ retrieval. Direct-network restrictions also require runtime enforcement.
 There is no central editorial task controller. Native schedules provide
 checkpoints; agents coordinate through six Moltnet rooms:
 `conference`, `assignment`, `filing`, `sensor`, `research` and `release`.
+A seventh room, `machines`, is not a newsroom room: the host's `ops` reporter
+posts operational errors there for the operator. No agent is a member, so it
+wakes nobody, and it federates only to Luna, never to the public observer.
 Actionable `@agent-id` mentions queue work; informational updates should avoid
 unnecessary mentions. An agent may poll its own bounded build job.
 

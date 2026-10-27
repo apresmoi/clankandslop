@@ -62,3 +62,38 @@ for (const [id, suffix, room] of [
     rejects(relay, '          remote_base_url: https://peer.invalid', /inbound base url|inbound federation peer/);
   });
 }
+
+const machines = '- { id: machines, visibility: private, write_policy: members, federation: [clank-luna], members: [clank-luna:luna, ops] }';
+const newsroomAgents = ['klaxon', 'cogsworth', 'sprockett', 'foreman', 'graves', 'tinkerton', 'vesta', 'brass', 'spike', 'ledger', 'caslon', 'pressman'];
+
+test('machines is private to Luna and ops: never federated to the public observer, no newsroom agent member', () => {
+  const declared = source.split('\n').filter((line) => line.includes('{ id: machines,'));
+  assert.equal(declared.length, 1);
+  const [, federationList, memberList] = /federation: \[([^\]]*)\], members: \[([^\]]*)\]/u.exec(declared[0]) ?? [];
+  const members = memberList.split(',').map((item) => item.trim());
+  assert.deepEqual(federationList.split(',').map((item) => item.trim()), ['clank-luna']);
+  assert.ok(!declared[0].includes('clank-observer'));
+  assert.deepEqual(members.filter((member) => newsroomAgents.includes(member) || ['gatherer', 'research-sensor'].includes(member)), []);
+  assert.deepEqual(members.sort(), ['clank-luna:luna', 'ops']);
+});
+
+test('every way machines could reach the public mirror or wake an agent fails validation', () => {
+  for (const federation of ['[clank-observer, clank-luna]', '[clank-luna, clank-observer]', '[clank-observer]', 'all', 'none', '[rogue-peer]']) {
+    rejects('federation: [clank-luna], members: [clank-luna:luna, ops]', `federation: ${federation}, members: [clank-luna:luna, ops]`, /machines must federate only to Luna/);
+  }
+  for (const member of [...newsroomAgents, 'gatherer', 'research-sensor', 'clank-observer:watcher']) {
+    rejects('members: [clank-luna:luna, ops] }', `members: [clank-luna:luna, ops, ${member}] }`, /machines members must be exactly Luna and ops/);
+  }
+  rejects('members: [clank-luna:luna, ops] }', 'members: [ops] }', /machines members must be exactly Luna and ops/);
+  rejects('members: [clank-luna:luna, ops] }', 'members: [clank-luna:luna] }', /machines members must be exactly Luna and ops/);
+  rejects(machines, machines.replace('visibility: private', 'visibility: public'), /room federation declarations invalid/);
+  rejects(`      ${machines}\n`, '', /room federation declarations invalid/);
+});
+
+test('ops reports through its own write token and never the operator identity', () => {
+  const token = '{ id: ops, secret: CLANK_MOLTNET_OPS_TOKEN, scopes: [attach, observe, write], agents: [ops] }';
+  rejects(token, token.replace('agents: [ops]', 'agents: [brass]'), /operational error reporter token boundary invalid/);
+  rejects(token, token.replace('[attach, observe, write]', '[admin, observe, write]'), /operational error reporter token boundary invalid/);
+  rejects(token, token.replace('CLANK_MOLTNET_OPS_TOKEN', 'CLANK_MOLTNET_OPERATOR_TOKEN'), /operational error reporter token boundary invalid/);
+  rejects('auth: { token_id: ops }', 'auth: { token_id: operator }', /operational error reporter participant invalid/);
+});
