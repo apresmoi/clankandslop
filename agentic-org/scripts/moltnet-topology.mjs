@@ -1,6 +1,10 @@
 import { agents, assert, reporters } from './lib.mjs';
 
 // The Moltnet topology of the cloud newsroom: tokens, relay pairings and rooms.
+// Every newsroom room federates to both relay peers. `machines` is the one
+// exception: it carries operational errors for the operator, so it federates
+// only to Luna and must never reach clank-observer, which feeds the public
+// mirror. No newsroom agent is a member, so nothing posted there wakes one.
 // klaxon is here because it declares `allowed_wake_senders: [research-sensor]`
 // on its DM surface, i.e. the org expects the sensor to be able to reach it.
 // It cannot: Spawnfile never emits `outbound_dm_peers`, so every DM the sensor
@@ -34,7 +38,14 @@ export function declaredPairings(bytes) {
 
 const inlineField = (value, key) => new RegExp(`\\b${key}: "?([^,"}]+)"?`).exec(value ?? '')?.[1]?.trim();
 
+export const MACHINES_ROOM = 'machines';
 const csv = (value) => value.split(',').map((item) => item.trim()).filter(Boolean);
+
+export function validateMachinesRoom(room) {
+  assert(room !== undefined, 'machines room declaration missing');
+  assert(room.federation === '[clank-luna]', 'machines must federate only to Luna, never to the public observer');
+  assert(room.members.length === 2 && room.members.includes(LUNA_MEMBER) && room.members.includes('ops'), 'machines members must be exactly Luna and ops');
+}
 
 export function validateMoltnetTopology(bytes) {
   const tokens = new Map();
@@ -53,7 +64,9 @@ export function validateMoltnetTopology(bytes) {
   assert(consoleToken?.secret === 'CLANK_MOLTNET_CONSOLE_TOKEN' && consoleToken.scopes.join(',') === 'observe' && consoleToken.agents.length === 0, 'observe-only console token boundary invalid');
   const researchSensor = tokens.get('research-sensor');
   assert(researchSensor?.secret === 'CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN' && researchSensor.scopes.join(',') === 'attach,observe,write' && researchSensor.agents.join(',') === 'research-sensor', 'research sensor token boundary invalid');
-  assert(tokens.size === agents.length + 6, 'unexpected Moltnet token declaration');
+  const ops = tokens.get('ops');
+  assert(ops?.secret === 'CLANK_MOLTNET_OPS_TOKEN' && ops.scopes.join(',') === 'attach,observe,write' && ops.agents.join(',') === 'ops', 'operational error reporter token boundary invalid');
+  assert(tokens.size === agents.length + 7, 'unexpected Moltnet token declaration');
   const pairings = declaredPairings(bytes);
   assert(pairings.length === DECLARED_PAIRINGS.length && new Set(pairings.map(pairing => pairing.id)).size === pairings.length, 'cloud Moltnet must declare exactly the observer and Luna pairings');
   for (const expected of DECLARED_PAIRINGS) {
@@ -67,15 +80,17 @@ export function validateMoltnetTopology(bytes) {
   assert(!/^\s+remote_base_url:/m.test(bytes), 'cloud Moltnet must not accept an inbound federation peer');
   assert(bytes.includes('id: gatherer') && bytes.includes('network: clank-newsroom') && bytes.includes('auth: { token_id: gatherer }') && bytes.includes('dms: { enabled: true }'), 'research intake participant invalid');
   assert(bytes.includes('id: research-sensor') && bytes.includes('auth: { token_id: research-sensor }'), 'direct research sensor participant invalid');
+  assert(bytes.includes('  - id: ops\n    kind: service\n') && bytes.includes('auth: { token_id: ops }'), 'operational error reporter participant invalid');
   const roomPattern = /- \{ id: ([a-z-]+), visibility: private, write_policy: members, federation: (none|all|\[[^\]]+\]), members: \[([^\]]+)\] \}/g;
   const rooms = new Map([...bytes.matchAll(roomPattern)].map((match) => [match[1], { federation: match[2], members: csv(match[3]) }]));
-  assert(rooms.size === 6, 'Moltnet room federation declarations invalid');
+  assert(rooms.size === 7, 'Moltnet room federation declarations invalid');
   // Conference is where reporters pitch and the editor assigns; it holds the nine
   // colleagues and klaxon, and deliberately excludes the external research feeds.
   const conference = rooms.get('conference');
   assert(conference !== undefined, 'conference room declaration missing');
   assert(conference !== undefined && !conference.members.includes('gatherer') && !conference.members.includes('research-sensor'), 'conference room must exclude external feeds');
   for (const [id, room] of rooms) {
+    if (id === MACHINES_ROOM) continue;
     assert(room.federation === '[clank-observer, clank-luna]', `${id} must federate only to the observer and Luna pairings`);
     assert(room.members.includes(LUNA_MEMBER), `${id} must include the remote Luna operator`);
     assert(room.members.filter(member => member.includes(':')).every(member => member === LUNA_MEMBER), `${id} has an unauthorized remote member`);
@@ -83,5 +98,6 @@ export function validateMoltnetTopology(bytes) {
   assert(rooms.get('assignment')?.members.includes('gatherer'), 'assignment kickoff participant invalid');
   const research = rooms.get('research');
   assert(research?.members.includes('research-sensor'), 'research sensor local identity invalid');
+  validateMachinesRoom(rooms.get(MACHINES_ROOM));
   assert(research && new Set(research.members).size === researchMembers.size + 1 && research.members.every((member) => member === LUNA_MEMBER || researchMembers.has(member)), 'research room membership invalid');
 }

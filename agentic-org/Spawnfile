@@ -167,6 +167,13 @@ external_participants:
         - network: clank-newsroom
           auth: { token_id: research-sensor }
           dms: { enabled: true }
+  - id: ops
+    kind: service
+    surfaces:
+      moltnet:
+        - network: clank-newsroom
+          auth: { token_id: ops }
+          dms: { enabled: true }
 networks:
   - id: clank-newsroom
     name: Clank & Slop newsroom
@@ -196,6 +203,7 @@ networks:
           - { id: gatherer, secret: CLANK_MOLTNET_GATHERER_TOKEN, scopes: [attach, observe, write], agents: [gatherer] }
           - { id: console, secret: CLANK_MOLTNET_CONSOLE_TOKEN, scopes: [observe] }
           - { id: research-sensor, secret: CLANK_MOLTNET_RESEARCH_SENSOR_TOKEN, scopes: [attach, observe, write], agents: [research-sensor] }
+          - { id: ops, secret: CLANK_MOLTNET_OPS_TOKEN, scopes: [attach, observe, write], agents: [ops] }
           - { id: clank-observer, secret: CLANK_MOLTNET_PAIR_OBSERVER_TOKEN, scopes: [pair] }
           - { id: clank-luna, secret: CLANK_MOLTNET_PAIR_LUNA_TOKEN, scopes: [pair] }
       pairings:
@@ -225,3 +233,4 @@ networks:
       - { id: sensor, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, spike] }
       - { id: research, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, gatherer, research-sensor, klaxon, cogsworth, sprockett, foreman, graves, tinkerton, vesta, brass, ledger] }
       - { id: release, visibility: private, write_policy: members, federation: [clank-observer, clank-luna], members: [clank-luna:luna, brass, spike, ledger, caslon, pressman] }
+      - { id: machines, visibility: private, write_policy: members, federation: [clank-luna], members: [clank-luna:luna, ops] }

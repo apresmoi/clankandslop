@@ -1,6 +1,6 @@
 // Every room a tool tells an agent to post in is a room that agent can write.
 //
-// All six rooms are private with `write_policy: members`. On 2026-10-07 the
+// All seven rooms are private with `write_policy: members`. On 2026-10-07 the
 // facts-check tool told every writer to hand the edition to Caslon in
 // room:release, where no writer is a member: the send is refused and the
 // edition stalls. This test parses the org Spawnfile and runs the real
@@ -49,8 +49,10 @@ function assertWritable(agent, text, where) {
   }
 }
 
-test('the org Spawnfile declares the six rooms this test reads', () => {
-  assert.deepEqual([...ROOMS.keys()].sort(), ['assignment', 'conference', 'filing', 'release', 'research', 'sensor']);
+test('the org Spawnfile declares the seven rooms this test reads', () => {
+  assert.deepEqual([...ROOMS.keys()].sort(), ['assignment', 'conference', 'filing', 'machines', 'release', 'research', 'sensor']);
+  // room:machines is the operator's error channel: no agent writes or reads it.
+  assert.deepEqual([...ROOMS.get('machines')].sort(), ['clank-luna:luna', 'ops']);
   // The P0 itself: no writer can write room:release.
   for (const writer of WRITERS) assert.equal(writable(writer, 'release'), false, `${writer} unexpectedly writes room:release`);
 });
