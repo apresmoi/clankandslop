@@ -13,7 +13,8 @@
 # never interleaves with a container recreate, whose startup guard walks every
 # volume. A busy lock is "nothing to do" (exit 0); the next poll lands it.
 # Spawnfile exits 1 on a finding (tampering, repaired or not) or a refusal, which
-# is what OnFailure= reports.
+# is what OnFailure= reports. Validated host landing records are retained before
+# and after refresh under that same lock, so a late edition keeps its proof.
 [Unit]
 Description=Keep the newsroom's research corpus volume current
 After=network-online.target docker.service
@@ -24,5 +25,5 @@ OnFailure=clank-alarm@%n.service
 Type=oneshot
 WorkingDirectory=/root/work/clankandslop
 Environment=PATH=/home/clank/deploy-work/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ExecStart=/usr/bin/flock -n -E 0 /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js volume refresh research-corpus /root/work/clankandslop/agentic-org
+ExecStart=/usr/bin/flock -n -E 0 /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /root/work/clankandslop/agentic-org/scripts/corpus-host-record.mjs -- /home/clank/deploy-work/node24/bin/node /home/clank/deploy-work/spawnfile-main/dist/cli/index.js volume refresh research-corpus /root/work/clankandslop/agentic-org
 TimeoutStartSec=600

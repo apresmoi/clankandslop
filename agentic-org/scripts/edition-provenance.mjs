@@ -23,7 +23,6 @@
 // pushes -- refuses unless the edition's own durable records and that host
 // record name the SAME commit. What lands on the branch is the commit the HOST
 // vouches for, and nothing here ever reads the mount.
-import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 // The host record is Spawnfile's own: `spawnfile volume refresh research-corpus`
@@ -32,10 +31,10 @@ import path from 'node:path';
 // Only the fields this policy needs are read, and anything unexpected in them is
 // a refusal: the refresher may degrade a bad record and re-earn it, the
 // publisher may not.
-import { editionOfRef, isCorpusCommit, isCorpusTreePath } from './corpus-contract.mjs';
+import { isCorpusCommit, isCorpusTreePath } from './corpus-contract.mjs';
+import { DEFAULT_LANDED_RECORD, landedCorpus, selectHostCorpusRecord } from './corpus-host-record.mjs';
+export { DEFAULT_LANDED_RECORD, LANDED_VERSION, landedCorpus } from './corpus-host-record.mjs';
 
-export const LANDED_VERSION = 'spawnfile.volume-feed-landed.v1';
-export const DEFAULT_LANDED_RECORD = '/var/lib/docker/volumes/clank-newsroom-corpus/spawnfile-feed/landed.json';
 export const CORPUS_PROVENANCE_FILE = 'corpus-provenance.json';
 export const CORPUS_PROVENANCE_VERSION = 'clank.edition-corpus-provenance.v1';
 const readJson = async (file) => JSON.parse(await readFile(file, 'utf8'));
@@ -59,27 +58,6 @@ export async function editionCorpusClaim(stateRoot, edition, compositionDigest) 
   return { file, claim: { commit: corpus.commit, ref: typeof corpus.ref === 'string' ? corpus.ref : null, tree: corpus.tree }, reason: null };
 }
 
-// The host's own answer, written outside the volume and unreadable by the
-// container. EVERY failure here is a refusal: an edition whose corpus the host
-// cannot vouch for is exactly what this exists to stop, and "unknown" is not a
-// value a published paper may carry.
-export function landedCorpus(file, edition) {
-  if (!path.isAbsolute(file)) throw new Error(`the host corpus record path must be absolute, got ${JSON.stringify(file)}`);
-  let record, missing = false;
-  try { record = JSON.parse(readFileSync(file, 'utf8')); } catch (error) { missing = error.code === 'ENOENT'; record = { unreadable: error.code ?? error.message }; }
-  const identity = record?.identity, source = identity?.source;
-  const reason = record?.unreadable ? `it is unreadable (${record.unreadable})`
-    : record?.version !== LANDED_VERSION ? `it is not a ${LANDED_VERSION} record`
-    : identity?.resource !== 'research-corpus' ? 'it does not describe the research-corpus volume'
-    : source?.kind !== 'git' || !isCorpusCommit(source?.commit) || typeof source?.ref !== 'string' ? 'it names no git commit and ref'
-    : !isCorpusTreePath(identity?.tree) || `trees/${record.tree}` !== identity.tree ? 'its serving tree is not the tree its identity names'
-    : typeof identity?.landed_at !== 'string' || !identity.landed_at ? 'it records no landing instant'
-    : null;
-  if (reason) throw new Error(`the host's corpus record ${file} ${missing ? 'does not exist' : `cannot be trusted — ${reason}`} — only the host can say which corpus it landed, and this job does not publish provenance the container asserted about itself. Nothing was pushed`);
-  if (editionOfRef(source.ref) !== edition) throw new Error(`the host's corpus record ${file} has no entry for edition ${edition} — the host serves ${source.ref}, so nothing outside the container can vouch for what the paper read. Nothing was pushed`);
-  return { commit: source.commit, tree: identity.tree, landed_at: identity.landed_at };
-}
-
 // Fail closed, and loud when overridden. The record returned is what the branch
 // carries: host-asserted values only, no host paths, and nothing that moves
 // between two runs of one edition — a provenance file holding a publish instant
@@ -88,13 +66,14 @@ export function landedCorpus(file, edition) {
 export async function hostAssertedProvenance(options, staged, { warn = console.warn } = {}) {
   const edition = staged.edition;
   if (options.state === undefined) throw new Error(`publishing ${edition} requires --state <clank-edition-state volume path>: the host asserts which research corpus backed the edition, and the claim it is checked against lives in the edition's own durable records. Nothing was pushed`);
-  const landedFile = path.resolve(options.landed ?? process.env.CLANK_CORPUS_LANDED ?? DEFAULT_LANDED_RECORD);
+  let landedFile = path.resolve(options.landed ?? process.env.CLANK_CORPUS_LANDED ?? DEFAULT_LANDED_RECORD);
   const found = await editionCorpusClaim(options.state, edition, staged.receipt?.composition_digest);
   if (found.claim === null) {
     if (options.allowUnprovenanced !== true) throw new Error(`edition ${edition} carries no research-corpus identity in its own records — ${found.reason}. It was commissioned before corpus provenance existed, so it cannot prove which research its stories rest on, and this job never publishes a paper whose provenance is unknown. Recommission the lineup against the mounted corpus and stage it again, or — for a one-time backfill of an edition that predates provenance — re-run with --allow-unprovenanced-edition. Nothing was pushed`);
     warn(`publish-edition-branch: PUBLISHING ${edition} AS UNPROVENANCED — ${found.reason}. --allow-unprovenanced-edition was passed deliberately, so the branch itself records that this edition cannot say which research backed it.`);
     return { record: { version: CORPUS_PROVENANCE_VERSION, edition, asserted_by: 'host', corpus: null, unprovenanced: 'this edition predates host-asserted corpus provenance and was published with --allow-unprovenanced-edition' }, claim: null, landed: null, landed_record: landedFile, unprovenanced: true };
   }
+  if (options.landed === undefined) landedFile = selectHostCorpusRecord(landedFile, edition, found.claim);
   const landed = landedCorpus(landedFile, edition);
   if (landed.commit !== found.claim.commit) throw new Error(`edition ${edition} was commissioned against corpus ${found.claim.commit} (${found.file}), but the host landed ${landed.commit} for ${edition} (${landedFile}) — the container's claim and the host's record name different research, and the host's record is the one with authority. Nothing was pushed`);
   // `corpus` is the HOST's record and nothing else, because that is what
