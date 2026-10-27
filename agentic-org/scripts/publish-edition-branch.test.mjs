@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { refreshCorpusFeed } from './corpus-host-record.mjs';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
 import { PUBLIC_CONTENT_PATHS, isPublicContentPath } from './public-content.mjs';
@@ -813,4 +814,29 @@ test('the provenance record is stable across runs, so a retried push converges',
   const again = await publishEditionBranch({ ...options, dryRun: false, key }, origin.url);
   assert.equal(again.already_published, true, 'the provenance file must not look like drift on a republished edition');
   assert.equal(again.pushed, false);
+});
+
+test('default publication retains the prior host identity after the corpus rotates at midnight', async () => {
+  const edition = '2026-10-27', next = '2026-10-28';
+  const origin = remote(), ok = await provenanced(edition, 'abcdef0123456789', { claim: { corpus: { tree: `trees/${HOST_REVISION}` } } });
+  chmodSync(ok.landed, 0o600);
+  refreshCorpusFeed(['fixture'], { landed: ok.landed, run: () => {
+    writeFileSync(ok.landed, JSON.stringify(hostRecord(next, { commit: CORPUS_B, landed_at: '2026-10-27T23:00:00Z' })));
+    return { status: 0 };
+  } });
+  const key = join(scratch('keys'), 'deploy'); writeFileSync(key, 'unused-for-local-remote', { mode: 0o600 });
+  const previous = process.env.CLANK_CORPUS_LANDED;
+  process.env.CLANK_CORPUS_LANDED = ok.landed;
+  try {
+    const options = { staging: ok.root, state: ok.state, key };
+    const result = await publishEditionBranch(options, origin.url);
+    assert.equal(result.pushed, true);
+    assert.deepEqual(result.provenance.corpus, { commit: CORPUS_A, tree: `trees/${HOST_REVISION}`, landed_at: HOST_LANDED_AT });
+    origin.merge(result.commit);
+    const again = await publishEditionBranch(options, origin.url);
+    assert.equal(again.already_published, true); assert.equal(again.pushed, false);
+    await assert.rejects(publishEditionBranch({ ...options, landed: ok.landed }, origin.url), /has no entry for edition/);
+  } finally {
+    if (previous === undefined) delete process.env.CLANK_CORPUS_LANDED; else process.env.CLANK_CORPUS_LANDED = previous;
+  }
 });

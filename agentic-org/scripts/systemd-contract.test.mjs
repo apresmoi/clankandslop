@@ -43,7 +43,8 @@ test('the fed-volume refreshes and the release job serialize on one lock', () =>
   assert.match(unit('clank-release.service'), new RegExp(`^ExecStart=/usr/bin/flock ${lock} `, 'mu'));
   for (const [kind, id] of [['content', 'public-content-volume'], ['private-tools', 'newsroom-private-tools'], ['corpus', 'research-corpus']]) {
     const service = unit(`clank-feed-${kind}.service`);
-    assert.match(service, new RegExp(`^ExecStart=/usr/bin/flock -n -E 0 ${lock} \\S+node \\S+/dist/cli/index\\.js volume refresh ${id} /root/work/clankandslop/agentic-org$`, 'mu'), kind);
+    const wrapper = kind === 'corpus' ? '\\S+node /root/work/clankandslop/agentic-org/scripts/corpus-host-record\\.mjs -- ' : '';
+    assert.match(service, new RegExp(`^ExecStart=/usr/bin/flock -n -E 0 ${lock} ${wrapper}\\S+node \\S+/dist/cli/index\\.js volume refresh ${id} /root/work/clankandslop/agentic-org$`, 'mu'), kind);
     assert.match(unit(`clank-feed-${kind}.timer`), new RegExp(`^Unit=clank-feed-${kind}\\.service$`, 'mu'), kind);
   }
   assert.match(unit('clank-feed-content.service'), /^Environment="GIT_SSH_COMMAND=ssh -i \/root\/\.ssh\/clank_public -o IdentitiesOnly=yes"$/mu, 'the public fetch names the release identity, quoted so systemd keeps the whole value');

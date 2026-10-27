@@ -135,6 +135,12 @@ Two things the daily deploy was doing for free had to be given their own homes:
 - **corpus provenance.** It travels with the data now, as Spawnfile's
   `.spawnfile-feed.json` beside the tree, checked by `scripts/corpus-contract.mjs`
   when Brass commissions; the publisher checks it against Spawnfile's host record.
+  The corpus service retains exact validated host records before and after each
+  refresh in `spawnfile-feed/corpus-history/<edition>/`, outside the volume.
+  Immutable copies keep late publication verifiable after the current feed rotates;
+  absent or conflicting evidence refuses publication. `--landed` still selects
+  exactly one explicit record. Manual corpus refreshes must use the same wrapper
+  under `/run/lock/clank-corpus-refresh.lock`, as in the cutover command below.
 
 ## No bundle stage
 
@@ -212,7 +218,7 @@ VOL=/var/lib/docker/volumes
 # its old layout (the running container keeps reading CORPUS.json and the dated
 # links; the new names do not collide). Exit 1 here only reports those old names.
 systemctl disable --now clank-corpus-refresh.timer clank-content-refresh.timer
-$SF volume refresh research-corpus $ORG || true
+/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node "$ORG/scripts/corpus-host-record.mjs" -- $SF volume refresh research-corpus $ORG
 readlink $VOL/clank-newsroom-corpus/_data/current
 # DEPLOY (the release creates clank-newsroom-private-tools), then at once:
 C=$VOL/clank-newsroom-content/_data
