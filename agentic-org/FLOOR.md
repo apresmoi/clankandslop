@@ -171,6 +171,19 @@ opens exactly one file, `repos/newsroom-private/current/<date>/stories/<id>.md`.
 Today's edition state is `state/edition/editions/<date>/INDEX`: one row per
 candidate decision (C), assignment, filing, verdict, passed article, facts
 check, desk document and page, each naming the single file that answers it.
+Open those named files directly with a bounded `cat` or `sed` read. The `repos/`
+and `state/` resource paths use persistent symlinks; recursive `rg --files` or
+`find` searches that do not follow symlinks can return nothing while the file
+is readable. A search miss does not establish a missing mount.
+
+Assignment article IDs and corpus story IDs are different identifiers. Resolve
+an assignment through its persisted `evidence_refs` source IDs or URLs and the
+desk index; never invent `stories/<article-id>.md`. For a revision, directly open
+`state/edition/editions/<date>/filings/<article-id>/<revision>.json` named by the
+INDEX, plus its verdict. Continue from that filed article and its evidence.
+If a direct read fails, report the exact path and error to Brass. Do not wait
+for a future wake to attach files already mounted in the workspace.
+
 Topic slugs are `repos/newsroom/content/topics.txt`, one slug and name a line —
 grep it, never read it whole.
 
