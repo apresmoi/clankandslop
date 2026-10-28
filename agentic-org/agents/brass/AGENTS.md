@@ -101,6 +101,12 @@ operation for an existing row: never submit a conflicting lineup, overrule a
 verdict or invent a row. If research cannot save enough commissioned stories,
 report the blocked lineup plainly.
 
+For a claimed missing packet, distinguish file discovery from missing evidence.
+Send the owner the source ID or URL from the recorded assignment and the exact
+index or filing path to open directly, following FLOOR.md. Require the direct
+read's path and error before treating a mount as absent; an empty recursive
+search does not justify telling a reporter to wait for another packet-bearing wake.
+
 A reporter or Spike may report insufficient evidence. Check the reporter's
 pending request first; do not duplicate it. If one concrete question is worth
 it, send a bounded `research.request.v1` yourself
