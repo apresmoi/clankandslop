@@ -32,6 +32,7 @@ import path from 'node:path';
 // a refusal: the refresher may degrade a bad record and re-earn it, the
 // publisher may not.
 import { isCorpusCommit, isCorpusTreePath } from './corpus-contract.mjs';
+import { reverifiedCorpusProvenance } from './reverified-corpus.mjs';
 import { DEFAULT_LANDED_RECORD, landedCorpus, selectHostCorpusRecord } from './corpus-host-record.mjs';
 export { DEFAULT_LANDED_RECORD, LANDED_VERSION, landedCorpus } from './corpus-host-record.mjs';
 
@@ -68,6 +69,12 @@ export async function hostAssertedProvenance(options, staged, { warn = console.w
   if (options.state === undefined) throw new Error(`publishing ${edition} requires --state <clank-edition-state volume path>: the host asserts which research corpus backed the edition, and the claim it is checked against lives in the edition's own durable records. Nothing was pushed`);
   let landedFile = path.resolve(options.landed ?? process.env.CLANK_CORPUS_LANDED ?? DEFAULT_LANDED_RECORD);
   const found = await editionCorpusClaim(options.state, edition, staged.receipt?.composition_digest);
+  if (options.reverifiedCorpus !== undefined) {
+    if (options.landed !== undefined || options.allowUnprovenanced === true) throw new Error('--reverified-corpus cannot be combined with --landed or --allow-unprovenanced-edition');
+    const record = { version: CORPUS_PROVENANCE_VERSION, ...reverifiedCorpusProvenance(options.reverifiedCorpus, staged, found.claim) };
+    warn(`publish-edition-branch: ${record.disclosure}`);
+    return { record, claim: found.claim, landed: null, landed_record: null, reverified: true };
+  }
   if (found.claim === null) {
     if (options.allowUnprovenanced !== true) throw new Error(`edition ${edition} carries no research-corpus identity in its own records — ${found.reason}. It was commissioned before corpus provenance existed, so it cannot prove which research its stories rest on, and this job never publishes a paper whose provenance is unknown. Recommission the lineup against the mounted corpus and stage it again, or — for a one-time backfill of an edition that predates provenance — re-run with --allow-unprovenanced-edition. Nothing was pushed`);
     warn(`publish-edition-branch: PUBLISHING ${edition} AS UNPROVENANCED — ${found.reason}. --allow-unprovenanced-edition was passed deliberately, so the branch itself records that this edition cannot say which research backed it.`);

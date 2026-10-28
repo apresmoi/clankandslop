@@ -840,3 +840,37 @@ test('default publication retains the prior host identity after the corpus rotat
     if (previous === undefined) delete process.env.CLANK_CORPUS_LANDED; else process.env.CLANK_CORPUS_LANDED = previous;
   }
 });
+
+test('an explicit Oct27 content reverification publishes the approved disclosure without invented landing identity', async () => {
+  const { proofFor, DISCLOSURE } = await import('./reverified-corpus.fixture.mjs');
+  const edition = '2026-10-27', origin = remote();
+  const ok = await provenanced(edition, 'abcdef0123456789', { claim: { corpus: { tree: `trees/${HOST_REVISION}` } } });
+  const proof = join(scratch('reverified-proof'), 'proof.json');
+  writeFileSync(proof, JSON.stringify(proofFor(ok)), { mode: 0o600 });
+  const key = join(scratch('keys'), 'deploy'); writeFileSync(key, 'unused-for-local-remote', { mode: 0o600 });
+  const previous = process.env.CLANK_CORPUS_LANDED; process.env.CLANK_CORPUS_LANDED = landed('2026-10-28');
+  const options = { staging: ok.root, state: ok.state, key, reverifiedCorpus: proof };
+  try {
+    const result = await publishEditionBranch(options, origin.url);
+    assert.equal(result.pushed, true);
+    assert.equal(result.provenance.disclosure, DISCLOSURE);
+    assert.equal(result.provenance.verification, 'reverified-content');
+    assert.equal(result.provenance.corpus, null);
+    assert.equal(result.provenance.original_fetch_identity, null);
+    assert.equal(result.provenance.original_landing_timestamp, null);
+    assert.equal(result.provenance.reverified_corpus.commit, CORPUS_A);
+    assert.equal(result.provenance.reverified_corpus.tree, `trees/${HOST_REVISION}`);
+    assert.equal(result.provenance.unprovenanced, undefined);
+    assert.doesNotMatch(JSON.stringify(result.provenance), /\/root\/|\/var\/|\/tmp\/|predates|landed_at/);
+    await assert.rejects(publishEditionBranch({ staging: ok.root, state: ok.state, key }, origin.url), /has no entry/);
+    const artifactFile = join(ok.artifactPath, 'content', 'editions', edition, 'front.json'), original = readFileSync(artifactFile);
+    writeFileSync(artifactFile, 'changed after staging');
+    try { await assert.rejects(publishEditionBranch(options, origin.url), /promoted artifact hashes/); }
+    finally { writeFileSync(artifactFile, original); }
+    origin.merge(result.commit);
+    const again = await publishEditionBranch(options, origin.url);
+    assert.equal(again.already_published, true); assert.equal(again.pushed, false);
+  } finally {
+    if (previous === undefined) delete process.env.CLANK_CORPUS_LANDED; else process.env.CLANK_CORPUS_LANDED = previous;
+  }
+});

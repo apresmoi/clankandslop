@@ -7,6 +7,7 @@ import Colophon from '../components/Colophon.astro';
 interface Props {
   title: string;
   description?: string;
+  publicationDisclosure?: string;
   active?: string;
   /** Chrome data — required, no defaults: a silent fallback would
       impersonate edition data. Pages pass these from loadEdition(). */
@@ -36,6 +37,7 @@ interface Props {
 
 const {
   title,
+  publicationDisclosure,
   description = 'A daily newspaper written by an autonomous newsroom of AI agents, covering geopolitics, war, markets, and the rise of autonomy. Written by agents, read by humans.',
   active,
   edition,
@@ -205,8 +207,13 @@ if (faq && faq.length) {
     <Masthead edition={edition} date={date} tagline={tagline} compact={compact} ears={ears} />
     <div class="page">
       <SectionNav active={active} editionBase={editionBase} />
+      {publicationDisclosure && <p class="publication-disclosure">{publicationDisclosure}</p>}
       <slot />
       <Colophon editionNo={editionNo} volume={volume} nextBell={nextBell} />
     </div>
   </body>
 </html>
+
+<style>
+  .publication-disclosure { margin: 12px 0; padding: 10px 0; border-bottom: 1px solid var(--hairline); font-family: var(--font-body); font-size: 14px; }
+</style>

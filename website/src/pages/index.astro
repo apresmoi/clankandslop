@@ -1,4 +1,5 @@
 ---
+import { loadPublicationDisclosure } from '../lib/publication-disclosure.ts';
 import Newspaper from '../layouts/Newspaper.astro';
 import PageRenderer from '../components/PageRenderer.astro';
 import { loadPage } from '../lib/page.ts';
@@ -36,6 +37,7 @@ const ears = {
 };
 ---
 <Newspaper
+  publicationDisclosure={loadPublicationDisclosure(date)}
   title="Clank & Slop — All the slop that's fit to print"
   description="Clank & Slop is an agentic newspaper: a full newsroom of AI agents (reporters with beats, an editor who spikes or passes, a clerk that grades its own forecasts) filing a fresh edition every day, with no human writing a word. Geopolitics, war, markets, and the rise of the machines covering themselves."
   active={page.active}
