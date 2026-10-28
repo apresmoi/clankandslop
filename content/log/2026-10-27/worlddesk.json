@@ -1,0 +1,886 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-27",
+  "generated_at": "2026-10-27T08:53:08Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 115.22,
+        "observed_at": "2026-10-20",
+        "stale_days": 7,
+        "contributes": 3,
+        "reason": "115.22 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 107.89,
+        "observed_at": "2026-10-20",
+        "stale_days": 7,
+        "contributes": 1,
+        "reason": "107.89 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.276,
+        "observed_at": "2026-10-19",
+        "stale_days": 8,
+        "contributes": 2,
+        "reason": "6.276 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.1,
+        "observed_at": "2026-10-20",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "3.1 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 19.45,
+        "observed_at": "2026-10-23",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "19.45 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.38,
+        "observed_at": "2026-10-23",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "3.38 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.3202,
+        "observed_at": "2026-10-23",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "121.3202 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-27T08:53:07Z",
+        "http_status": 200,
+        "bytes": 170183,
+        "sha256": "a1fec56bfa6bc77dc5e017fa8976e6eaca2fa2ae43773209ac5923f1269c8b33",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-27T08:53:07Z",
+        "http_status": 200,
+        "bytes": 175956,
+        "sha256": "44734a4f4507e0e888ee7555893fe3547085d1e8bc4fa68cb177df2fe96d764c",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-27T08:53:07Z",
+        "http_status": 200,
+        "bytes": 28942,
+        "sha256": "1bca7751063cff01b326cbdefda5370220439cbadc5e3887ad1f2e98939090fc",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-27T08:53:07Z",
+        "http_status": 200,
+        "bytes": 116233,
+        "sha256": "8a7cfd1990e595c5953d95c1b5865c64d92755caf5623aa99287ae5d5719bb79",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-27T08:53:08Z",
+        "http_status": 200,
+        "bytes": 161714,
+        "sha256": "dc7a6e9822aac16f8ac20aeebfb4aa20db63543e58e5134ce9f5e96c480597f5",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-27T08:53:08Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "f8f985e4b9785f0f3f21628806eb8b13bbc0d44c96c5f47fa0f6cbd76dbf69ac",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-27T08:53:08Z",
+        "http_status": 200,
+        "bytes": 104829,
+        "sha256": "8080a7d962c8e8976e4394a5dbdb2e4a2ddb984c1c5aefc581aa42b715fd6932",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 43,
+    "open_conflicts": 2,
+    "watch": 5,
+    "dormant": 6,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-91f69f57",
+            "story_title": "Netanyahu makes post-election Iran war a campaign proposition, while U.S. and Israeli officials narrow the…",
+            "source": "chatgpt/chatgpt-rolling-1521.md",
+            "slot": "1521",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/netanyahu-touts-trump-endorsement-eve-vote-suggests-they-may-restart-war-iran-2026-10-26/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/netanyahu-touts-trump-endorsement-eve-vote-suggests-they-may-restart-war-iran-2026-10-26/",
+              "https://www.reuters.com/world/middle-east/netanyahu-touts-trump-endorsement-eve-vote-suggests-they-may-restart-war-iran-2026-10-26/",
+              "https://www.reuters.com/world/middle-east/netanyahu-touts-trump-endorsement-eve-vote-suggests-they-may-restart-war-iran-2026-10-26/",
+              "https://www.timesofisrael.com/we-have-to-finish-the-job-trump-doubles-down-on-netanyahu-support-after-pms-reported-request/",
+              "https://www.timesofisrael.com/we-have-to-finish-the-job-trump-doubles-down-on-netanyahu-support-after-pms-reported-request/",
+              "https://www.timesofisrael.com/we-have-to-finish-the-job-trump-doubles-down-on-netanyahu-support-after-pms-reported-request/",
+              "https://apnews.com/article/mideast-news-october-26-2026-7d1bcf08210539085ea0b5ed56ef4d4c",
+              "https://apnews.com/article/mideast-news-october-26-2026-7d1bcf08210539085ea0b5ed56ef4d4c",
+              "https://apnews.com/article/mideast-news-october-26-2026-7d1bcf08210539085ea0b5ed56ef4d4c",
+              "https://apnews.com/article/israel-election-netanyahu-gaza-mideast-iran-war-ce15215c61ad182203ccb9b854e75562"
+            ],
+            "observed_at": "2026-10-26T13:21:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-006218ea",
+            "story_title": "Oleshky localized ceasefire takes effect; the public timetable has shifted",
+            "source": "chatgpt/chatgpt-rolling-0313.md",
+            "slot": "0313",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+            "source_urls": [
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://www.whitehouse.gov/briefings-statements/2026/10/first-lady-melania-trump-secures-ceasefire-between-russia-and-ukraine-localized-to-oleshky/",
+              "https://ukranews.com/en/news/1183157-ukraine-implementing-ceasefire-on-october-27-to-allow-for-humanitarian-mission-in-oleshky",
+              "https://ukranews.com/en/news/1183157-ukraine-implementing-ceasefire-on-october-27-to-allow-for-humanitarian-mission-in-oleshky",
+              "https://ukranews.com/en/news/1183157-ukraine-implementing-ceasefire-on-october-27-to-allow-for-humanitarian-mission-in-oleshky",
+              "https://apnews.com/live/trump-midterm-elections-news-updates-10-23-2026",
+              "https://apnews.com/live/trump-midterm-elections-news-updates-10-23-2026",
+              "https://apnews.com/live/trump-midterm-elections-news-updates-10-23-2026",
+              "https://www.reuters.com/world/europe/russia-ukraine-begin-localised-ceasefire-allow-humanitarian-operation-oleshky-2026-10-27/",
+              "https://www.reuters.com/world/europe/russia-ukraine-begin-localised-ceasefire-allow-humanitarian-operation-oleshky-2026-10-27/",
+              "https://www.reuters.com/world/europe/russia-ukraine-begin-localised-ceasefire-allow-humanitarian-operation-oleshky-2026-10-27/"
+            ],
+            "observed_at": "2026-10-27T01:13:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-4d8fb29e",
+            "story_title": "Lead 1: Israel holds first post-October 7 Knesset election; polls open at 07:00 local with ~7.3 million…",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.jpost.com/israel-election-2026/article-912973",
+            "source_urls": [
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.jpost.com/israel-election-2026/article-912973",
+              "https://www.ynetnews.com/article/rygel11a3me",
+              "https://www.ynetnews.com/article/rygel11a3me",
+              "https://www.ynetnews.com/article/rygel11a3me",
+              "https://www.timesofisrael.com/israel-goes-to-the-polls-a-guide-to-the-election-and-the-battle-to-form-a-government/",
+              "https://www.timesofisrael.com/israel-goes-to-the-polls-a-guide-to-the-election-and-the-battle-to-form-a-government/",
+              "https://www.timesofisrael.com/israel-goes-to-the-polls-a-guide-to-the-election-and-the-battle-to-form-a-government/",
+              "https://www.israel.com/news/israel-votes-for-its-26th-knesset-with-36-lists-and-over-73-million-eligible-vot",
+              "https://www.jta.org/2026/10/26/israel/israelis-head-to-the-polls-in-countrys-most-consequential-election-in-decades"
+            ],
+            "observed_at": "2026-10-27T07:48:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-6e173530",
+            "story_title": "Lead 3: Israeli airstrike on Khan Yunis displaced-persons tent kills at least four, including a child…",
+            "source": "grok/grok-rolling-2147.md",
+            "slot": "2147",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/26/israeli-forces-kill-at-least-five-people-in-gaza-including-7-year-old-girl",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/26/israeli-forces-kill-at-least-five-people-in-gaza-including-7-year-old-girl",
+              "https://www.aljazeera.com/news/2026/10/26/israeli-forces-kill-at-least-five-people-in-gaza-including-7-year-old-girl",
+              "https://www.aljazeera.com/news/2026/10/26/israeli-forces-kill-at-least-five-people-in-gaza-including-7-year-old-girl",
+              "https://www.aljazeera.com/news/2026/10/26/israeli-forces-kill-at-least-five-people-in-gaza-including-7-year-old-girl",
+              "https://www.aljazeera.com/news/2026/10/26/israeli-forces-kill-at-least-five-people-in-gaza-including-7-year-old-girl",
+              "https://www.haaretz.com/gaza/2026-10-26/ty-article/.premium/idf-kills-five-in-gaza-strip-displaced-persons-camp-destroyed-in-fire/000001a1-7827-db92-abbb-faf7b3990000",
+              "https://www.haaretz.com/gaza/2026-10-26/ty-article/.premium/idf-kills-five-in-gaza-strip-displaced-persons-camp-destroyed-in-fire/000001a1-7827-db92-abbb-faf7b3990000",
+              "https://www.jpost.com/israel-news/defense-news/article-912959",
+              "https://www.jpost.com/israel-news/defense-news/article-912959"
+            ],
+            "observed_at": "2026-10-26T19:47:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-8fcf9e69",
+            "story_title": "UN inquiry says genocidal acts continued after the Gaza ceasefire; Israel rejects the finding",
+            "source": "chatgpt/chatgpt-rolling-2117.md",
+            "slot": "2117",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://apnews.com/article/israel-gaza-un-war-sexual-crimes-9547f83319b8c5be32ab3ab81534772a",
+            "source_urls": [
+              "https://apnews.com/article/israel-gaza-un-war-sexual-crimes-9547f83319b8c5be32ab3ab81534772a",
+              "https://apnews.com/article/israel-gaza-un-war-sexual-crimes-9547f83319b8c5be32ab3ab81534772a",
+              "https://apnews.com/article/israel-gaza-un-war-sexual-crimes-9547f83319b8c5be32ab3ab81534772a",
+              "https://apnews.com/article/israel-gaza-un-war-sexual-crimes-9547f83319b8c5be32ab3ab81534772a",
+              "https://apnews.com/article/israel-gaza-un-war-sexual-crimes-9547f83319b8c5be32ab3ab81534772a",
+              "https://apnews.com/article/israel-gaza-un-war-sexual-crimes-9547f83319b8c5be32ab3ab81534772a",
+              "https://www.arabnews.com/middle-east/un-inquiry-accuses-israel-of-extermination-in-west-bank-and-continuing-gaza-genocide-despite-ceasefire-3008357",
+              "https://www.arabnews.com/middle-east/un-inquiry-accuses-israel-of-extermination-in-west-bank-and-continuing-gaza-genocide-despite-ceasefire-3008357",
+              "https://www.arabnews.com/middle-east/un-inquiry-accuses-israel-of-extermination-in-west-bank-and-continuing-gaza-genocide-despite-ceasefire-3008357",
+              "https://www.ohchr.org/en/press-releases/2026/10/israel-has-committed-war-crimes-and-crimes-against-humanity-occupied",
+              "https://www.ohchr.org/sites/default/files/documents/hrbodies/hrcouncil/coiopt/ga-81-430-auv.pdf",
+              "https://www.reuters.com/world/middle-east/un-inquiry-says-israel-kept-committing-genocide-gaza-after-truce-2026-10-26/"
+            ],
+            "observed_at": "2026-10-26T19:17:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-f7f544a3",
+            "story_title": "Israel's first post-October-7 national election is now an active vote, not a forecast",
+            "source": "chatgpt/chatgpt-rolling-0922.md",
+            "slot": "0922",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://apnews.com/article/israel-election-netanyahu-eisenkot-latest-782c69f4a5389da8073b1c27aafa606f",
+            "source_urls": [
+              "https://apnews.com/article/israel-election-netanyahu-eisenkot-latest-782c69f4a5389da8073b1c27aafa606f",
+              "https://apnews.com/article/israel-election-netanyahu-eisenkot-latest-782c69f4a5389da8073b1c27aafa606f",
+              "https://apnews.com/article/israel-election-netanyahu-eisenkot-latest-782c69f4a5389da8073b1c27aafa606f",
+              "https://www.reuters.com/world/middle-east/israel-election-what-happens-after-polls-close-2026-10-27/",
+              "https://www.reuters.com/world/middle-east/israel-election-what-happens-after-polls-close-2026-10-27/",
+              "https://www.reuters.com/world/middle-east/israel-election-what-happens-after-polls-close-2026-10-27/",
+              "https://www.gov.il/en/pages/israel-s-election-day-26-oct-2026",
+              "https://main.knesset.gov.il/en/mk/pages/knesset26elections.aspx",
+              "https://www.bechirot.gov.il/home/"
+            ],
+            "observed_at": "2026-10-27T07:22:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 6,
+        "evidence": [
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-57381858",
+            "story_title": "Lead 1: Egypt’s parliament authorises Sisi to provide military support to Saudi Arabia against Houthi attacks",
+            "source": "grok/grok-rolling-2147.md",
+            "slot": "2147",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://www.france24.com/en/live-news/20261026-egypt-parliament-authorises-military-support-to-saudi-arabia",
+            "source_urls": [
+              "https://www.france24.com/en/live-news/20261026-egypt-parliament-authorises-military-support-to-saudi-arabia",
+              "https://www.france24.com/en/live-news/20261026-egypt-parliament-authorises-military-support-to-saudi-arabia",
+              "https://www.france24.com/en/live-news/20261026-egypt-parliament-authorises-military-support-to-saudi-arabia",
+              "https://www.aljazeera.com/news/2026/10/26/egyptian-parliament-authorises-military-aid-for-saudi-arabia",
+              "https://www.aljazeera.com/news/2026/10/26/egyptian-parliament-authorises-military-aid-for-saudi-arabia",
+              "https://www.aljazeera.com/news/2026/10/26/egyptian-parliament-authorises-military-aid-for-saudi-arabia",
+              "https://www.thenationalnews.com/news/mena/2026/10/26/egypts-parliament-authorises-el-sisi-to-send-troops-to-defend-saudi-arabia",
+              "https://www.thenationalnews.com/news/mena/2026/10/26/egypts-parliament-authorises-el-sisi-to-send-troops-to-defend-saudi-arabia",
+              "https://www.thenationalnews.com/news/mena/2026/10/26/egypts-parliament-authorises-el-sisi-to-send-troops-to-defend-saudi-arabia",
+              "https://www.madamasr.com/en/2026/10/26/news/u/parliament-gives-sisi-mandate-to-back-saudi-arabia-militarily-opposition-rejects-blank-check-authorization/",
+              "https://www.madamasr.com/en/2026/10/26/news/u/parliament-gives-sisi-mandate-to-back-saudi-arabia-militarily-opposition-rejects-blank-check-authorization"
+            ],
+            "observed_at": "2026-10-26T19:47:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-68d2262a",
+            "story_title": "Saudi air defenses face another live Houthi salvo four minutes into the window",
+            "source": "chatgpt/chatgpt-rolling-0922.md",
+            "slot": "0922",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/saudi-led-coalition-says-it-intercepted-houthi-missiles-drones-attacking-kingdom-2026-10-27/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/saudi-led-coalition-says-it-intercepted-houthi-missiles-drones-attacking-kingdom-2026-10-27/",
+              "https://www.reuters.com/world/middle-east/saudi-led-coalition-says-it-intercepted-houthi-missiles-drones-attacking-kingdom-2026-10-27/",
+              "https://www.reuters.com/world/middle-east/saudi-led-coalition-says-it-intercepted-houthi-missiles-drones-attacking-kingdom-2026-10-27/",
+              "https://sana.sy/en/middle-east/2353859/",
+              "https://sana.sy/en/middle-east/2353859/",
+              "https://sana.sy/en/middle-east/2353859/",
+              "https://sa.usembassy.gov/security-alert-u-s-mission-to-saudi-arabia-october-27-2026/",
+              "https://english.ajel.sa/saudi-arabia/8crto1j4l"
+            ],
+            "observed_at": "2026-10-27T07:22:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-837b5ebf",
+            "story_title": "Riyadh: King Khalid International partially reopens amid continued Houthi strikes and intercepts",
+            "source": "grok/grok-rolling-1247.md",
+            "slot": "1247",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.afp.com/en/houthis-say-attacked-riyadh-airport-hours-after-flights-resume",
+            "source_urls": [
+              "https://www.afp.com/en/houthis-say-attacked-riyadh-airport-hours-after-flights-resume",
+              "https://www.afp.com/en/houthis-say-attacked-riyadh-airport-hours-after-flights-resume",
+              "https://www.afp.com/en/houthis-say-attacked-riyadh-airport-hours-after-flights-resume",
+              "https://www.afp.com/en/houthis-say-attacked-riyadh-airport-hours-after-flights-resume",
+              "https://www.afp.com/en/houthis-say-attacked-riyadh-airport-hours-after-flights-resume",
+              "https://www.dawn.com/news/2039726",
+              "https://www.dawn.com/news/2039726",
+              "https://www.dawn.com/news/2039726",
+              "https://www.dawn.com/news/2039726",
+              "https://www.dawn.com/news/2039726",
+              "https://www.dawn.com/news/2039726",
+              "https://www.channelnewsasia.com/world/explosions-heard-in-saudi-capital-airport-due-reopen-6490191"
+            ],
+            "observed_at": "2026-10-26T10:47:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-8a01fb1c",
+            "story_title": "Egypt opens a new Saudi-defense gate as the Houthi conflict widens",
+            "source": "chatgpt/chatgpt-rolling-1521.md",
+            "slot": "1521",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/egypt-approves-military-support-saudi-arabia-after-houthi-attacks-escalate-2026-10-26/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/egypt-approves-military-support-saudi-arabia-after-houthi-attacks-escalate-2026-10-26/",
+              "https://www.reuters.com/world/middle-east/egypt-approves-military-support-saudi-arabia-after-houthi-attacks-escalate-2026-10-26/",
+              "https://www.reuters.com/world/middle-east/egypt-approves-military-support-saudi-arabia-after-houthi-attacks-escalate-2026-10-26/",
+              "https://apnews.com/article/mideast-news-october-26-2026-7d1bcf08210539085ea0b5ed56ef4d4c",
+              "https://apnews.com/article/mideast-news-october-26-2026-7d1bcf08210539085ea0b5ed56ef4d4c",
+              "https://apnews.com/article/mideast-news-october-26-2026-7d1bcf08210539085ea0b5ed56ef4d4c",
+              "https://www.reuters.com/world/middle-east/how-houthi-attacks-have-grounded-flights-across-saudi-arabia-2026-10-26/",
+              "https://www.spa.gov.sa/en/w2710316"
+            ],
+            "observed_at": "2026-10-26T13:21:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-a733b091",
+            "story_title": "Lead 3: Riyadh King Khalid Airport partial reopening amid continued Houthi threats and intercepts (material…",
+            "source": "grok/grok-rolling-1846.md",
+            "slot": "1846",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.dawn.com/news/2039807",
+            "source_urls": [
+              "https://www.dawn.com/news/2039807",
+              "https://www.dawn.com/news/2039807",
+              "https://www.dawn.com/news/2039807",
+              "https://www.dawn.com/news/2039807",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-renew-warning-against-using-riyadh-airport-2026-10-24/"
+            ],
+            "observed_at": "2026-10-26T16:46:00Z"
+          },
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-f225b7f5",
+            "story_title": "Lead 4 (material update on previously published story): Riyadh airport partially reopens amid sparse traffic…",
+            "source": "grok/grok-rolling-1543.md",
+            "slot": "1543",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.dawn.com/news/2039807",
+            "source_urls": [
+              "https://www.dawn.com/news/2039807",
+              "https://www.dawn.com/news/2039807",
+              "https://www.dawn.com/news/2039807",
+              "https://www.indiatoday.in/world/story/riyadh-airport-partially-reopens-amid-houthi-missile-drone-attacks-3024922-2026-10-26",
+              "https://www.indiatoday.in/world/story/riyadh-airport-partially-reopens-amid-houthi-missile-drone-attacks-3024922-2026-10-26",
+              "https://www.indiatoday.in/world/story/riyadh-airport-partially-reopens-amid-houthi-missile-drone-attacks-3024922-2026-10-26",
+              "https://www.indiatoday.in/world/story/riyadh-airport-partially-reopens-amid-houthi-missile-drone-attacks-3024922-2026-10-26"
+            ],
+            "observed_at": "2026-10-26T13:43:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-7ac43cc2",
+            "story_title": "Lead 3: María Corina Machado returns to Venezuela after nearly a year in exile; crowds greet her en route to…",
+            "source": "grok/grok-rolling-1543.md",
+            "slot": "1543",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+            "source_urls": [
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.usatoday.com/story/news/world/2026/10/25/venezuelan-opposition-maria-corina-machado-returns/92431219007/",
+              "https://www.usatoday.com/story/news/world/2026/10/25/venezuelan-opposition-maria-corina-machado-returns/92431219007/",
+              "https://www.usatoday.com/story/news/world/2026/10/25/venezuelan-opposition-maria-corina-machado-returns/92431219007/",
+              "https://www.usatoday.com/story/news/world/2026/10/25/venezuelan-opposition-maria-corina-machado-returns/92431219007/",
+              "https://www.dpa-international.com/politics/urn:newsml:dpa.com:20090101:261025-930-892468"
+            ],
+            "observed_at": "2026-10-26T13:43:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-24 and drew no qualifying story today",
+        "last_open_edition": "2026-10-24",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-51d5b297",
+            "story_title": "Champi’s late-window Taiwan toll is revised sharply upward",
+            "source": "chatgpt/chatgpt-rolling-0322.md",
+            "slot": "0322",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+            "source_urls": [
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled"
+            ],
+            "observed_at": "2026-10-24T01:22:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-f60ec2a2",
+            "story_title": "Lead 1: Typhoon Champi injury toll rises sharply to 527 as storm glances Taiwan’s northeast and weakens",
+            "source": "grok/grok-rolling-0348.md",
+            "slot": "0348",
+            "matched": [
+              "Taiwan",
+              "Taipei"
+            ],
+            "source_url": "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+            "source_urls": [
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.channelnewsasia.com/east-asia/typhoon-champi-approaches-taiwan-flights-cancelled-6484571",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://www.taipeitimes.com/News/front/archives/2026/10/23/2003866495"
+            ],
+            "observed_at": "2026-10-24T01:48:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-10-27",
+            "story_id": "s-912a6575",
+            "story_title": "Lead 2: North Korea deploys visible 122 mm self-propelled howitzers (barrels south) near Kaepung/Gimpo…",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "North Korea",
+              "Pyongyang"
+            ],
+            "source_url": "https://en.yna.co.kr/view/AEN20261027005900315",
+            "source_urls": [
+              "https://en.yna.co.kr/view/AEN20261027005900315",
+              "https://en.yna.co.kr/view/AEN20261027005900315",
+              "https://en.yna.co.kr/view/AEN20261027005900315",
+              "https://en.yna.co.kr/view/AEN20261027005900315",
+              "https://en.yna.co.kr/view/AEN20261027005900315",
+              "https://news.sbs.co.kr/english/article.do?news_id=N1008816020",
+              "https://news.sbs.co.kr/english/article.do?news_id=N1008816020",
+              "https://news.sbs.co.kr/english/article.do?news_id=N1008816020",
+              "https://news.sbs.co.kr/english/article.do?news_id=N1008816020",
+              "https://news.sbs.co.kr/english/article.do?news_id=N1008816020",
+              "https://en.sedaily.com/society/2026/10/27/north-korean-artillery-appears-across-from-gimpo-observatory",
+              "https://en.sedaily.com/society/2026/10/27/north-korean-artillery-appears-across-from-gimpo-observatory",
+              "https://en.sedaily.com/society/2026/10/27/north-korean-artillery-appears-across-from-gimpo-observatory",
+              "https://www.stripes.com/theaters/asia_pacific/2026-10-27/north-korea-howitzers-dmz-positions-23274575.html",
+              "https://www.stripes.com/theaters/asia_pacific/2026-10-27/north-korea-howitzers-dmz-positions-23274575.html"
+            ],
+            "observed_at": "2026-10-27T07:48:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "easing",
+    "current": 0.4615,
+    "previous": 0.6154,
+    "previous_edition": "2026-10-26",
+    "change": -0.1539
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
