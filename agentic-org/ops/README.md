@@ -432,6 +432,29 @@ workflow explicitly dispatches the website deployment for `main`.
   grow by ~6 cards a day because CI output is not committed, and buy a social
   preview image — measure a reason to want it before paying for it.
 
+## October 27 disclosed reverification
+
+The operator-only `--reverified-corpus /absolute/private/proof.json` option is
+restricted to edition `2026-10-27`. It records the approved disclosure, exactly:
+“Sources reverified; original host landing record unavailable.” The current and
+archived edition front pages display that note. Original fetch identity and
+landing time remain unknown; this is not the legacy predating-provenance mode.
+
+The proof must be a private host-owned regular file in a private real directory.
+Its `clank.reverified-corpus-publication.v1` wrapper carries `edition`, the exact
+`disclosure`, `composition_digest`, `artifact_digest`, and the complete fresh
+canonical `audit`. The audit's `latest_stage` must name the same validated staged
+receipt and corpus claim. Both archive and retained-tree comparisons must cover
+every manifest entry without drift. Generate the wrapper from that validated
+stage immediately before the approved call; a changed stage requires a fresh
+audit. No current or historical landing record is created by this path.
+
+This option requires `--state`, cannot be combined with `--landed` or
+`--allow-unprovenanced-edition`, and is never configured in unattended jobs.
+Existing staged-artifact, content-only push, CI and idempotency gates still run.
+The public record contains only verification facts and the disclosure; host paths
+and the raw private audit are not published.
+
 ## What the publisher commits, and what it no longer does
 
 `publish-edition-branch.mjs` commits the edition directory and regenerates

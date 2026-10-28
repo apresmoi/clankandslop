@@ -311,18 +311,22 @@ export function parseArguments(argv) {
     // Deliberate, never the default, and never quiet: it is the one-time
     // backfill for an edition commissioned before provenance existed.
     if (name === '--allow-unprovenanced-edition') { options.allowUnprovenanced = true; continue; }
+    if (name.startsWith('--reverified-corpus=')) { options.reverifiedCorpus = path.resolve(name.slice('--reverified-corpus='.length)); continue; }
     if (name.startsWith('--landed=')) { options.landed = path.resolve(name.slice('--landed='.length)); continue; }
     const value = argv[index += 1];
     if (value === undefined) throw new Error(`${name} requires a value`);
     if (name === '--staging') options.staging = path.resolve(value);
     else if (name === '--state') options.state = path.resolve(value);
     else if (name === '--key') options.key = path.resolve(value);
+    else if (name === '--reverified-corpus') options.reverifiedCorpus = path.resolve(value);
     else if (name === '--landed') options.landed = path.resolve(value);
     else if (name === '--edition') {
       if (value !== 'today' && !EDITION_PATTERN.test(value)) throw new Error(`--edition must be "today" or YYYY-MM-DD, got ${JSON.stringify(value)}`);
       options.edition = value;
     } else throw new Error(`unknown argument ${JSON.stringify(name)}`);
   }
+  if (options.reverifiedCorpus && (options.landed !== undefined || options.allowUnprovenanced)) throw new Error('--reverified-corpus cannot be combined with --landed or --allow-unprovenanced-edition');
+  if (options.reverifiedCorpus && !options.state) throw new Error('--reverified-corpus requires --state');
   if (!options.staging) throw new Error('--staging <clank-release-staging volume path> is required');
   if (!options.key && !options.dryRun) throw new Error('--key <deploy key path> is required unless --dry-run');
   // An unattended caller states which edition it means; it must also let the
