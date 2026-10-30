@@ -874,3 +874,27 @@ test('an explicit Oct27 content reverification publishes the approved disclosure
     if (previous === undefined) delete process.env.CLANK_CORPUS_LANDED; else process.env.CLANK_CORPUS_LANDED = previous;
   }
 });
+
+test('an edition on main is never touched by a newer artifact, even with its branch deleted or stale', async () => {
+  const origin = remote(), staged = stagedEdition('2026-09-11'), work = scratch('immutable');
+  let attempt = 0;
+  const call = () => pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-09-11'), editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, `repo-${++attempt}`), home: join(work, 'home'), message: editionCommitMessage('2026-09-11')
+  });
+  const first = await call();
+  origin.merge(first.commit);
+  git(['update-ref', '-d', `refs/heads/${editionBranch('2026-09-11')}`], origin.url);
+  writeFileSync(join(staged.source, 'articles', 'two.json'), '{"id":"two"}\n');
+  const before = git(['show-ref'], origin.url);
+  const deleted = await call();
+  assert.deepEqual([deleted.already_published, deleted.pushed, deleted.commit], [true, false, origin.head()]);
+  assert.equal(git(['show-ref'], origin.url), before, 'no ref moved');
+  // A stale unmerged branch must not be replaced once main holds the edition.
+  const tree = git(['rev-parse', `${first.commit}^{tree}`], origin.url);
+  const stale = git(['commit-tree', tree, '-p', first.commit, '-m', 'stale'], origin.url);
+  git(['update-ref', `refs/heads/${editionBranch('2026-09-11')}`, stale], origin.url);
+  const held = await call();
+  assert.deepEqual([held.already_published, held.pushed], [true, false]);
+  assert.equal(git(['rev-parse', `refs/heads/${editionBranch('2026-09-11')}`], origin.url), stale);
+});

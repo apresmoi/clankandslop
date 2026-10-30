@@ -259,6 +259,13 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
       .then(() => true, (error) => { if (error.code === 1) return false; throw error; });
     if (merged) return { branch, commit: observedSha, base: await git(['-C', workdir, 'rev-parse', baseRef], options), remote_url: url, generated: null, pushed: false, already_published: true };
   }
+  // Published editions are immutable. Main is the authority, whether or not the
+  // edition branch still exists and whatever newer artifact has been staged since.
+  const onBase = await git(['-C', workdir, 'ls-tree', '-d', baseRef, '--', scoped], options);
+  if (onBase) {
+    const baseCommit = await git(['-C', workdir, 'rev-parse', baseRef], options);
+    return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
+  }
   await git(['-C', workdir, 'checkout', '-q', '-b', branch, baseRef], options);
   const baseCommit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
   await rm(path.join(workdir, scoped), { recursive: true, force: true });
@@ -270,17 +277,9 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   if (traceSource !== undefined) await writeLogEntry(workdir, editionSource, branch.slice('edition/'.length), traceSource);
   // Inside the edition directory, so the host's assertion rides along in the one
   // pathspec the commit already carries: nothing about what may be committed or
-  // pushed widens by a byte. Written before `add`, so it is part of the tree the
-  // already-published comparison below is made against.
+  // pushed widens by a byte.
   if (provenance !== undefined) await writeFile(path.join(workdir, scoped, CORPUS_PROVENANCE_FILE), `${JSON.stringify(provenance, undefined, 2)}\n`);
-  // Whether the edition is worth a branch is still decided by the edition
-  // directory alone: a re-run of an edition already on the base branch is
-  // refused here, exactly as before, and never on generated-index drift.
   await git(['-C', workdir, 'add', '--', scoped, ...traced], options);
-  const staged = await git(['-C', workdir, 'status', '--porcelain', '--', scoped, ...traced], options);
-  // Byte-identical content is also a success after the merged ref was deleted.
-  if (staged.length === 0)
-    return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
   const generated = await regenerateIndexes(workdir);
   await git(['-C', workdir, 'add', '--', ...GENERATED_INDEX_PATHS], options);
   // Asked as "what is staged OUTSIDE the content paths", so the answer that lets
