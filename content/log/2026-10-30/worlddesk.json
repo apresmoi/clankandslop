@@ -1,0 +1,1017 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-10-30",
+  "generated_at": "2026-10-30T08:55:19Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 123.1,
+        "observed_at": "2026-10-27",
+        "stale_days": 3,
+        "contributes": 3,
+        "reason": "123.1 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 103.37,
+        "observed_at": "2026-10-27",
+        "stale_days": 3,
+        "contributes": 1,
+        "reason": "103.37 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.352,
+        "observed_at": "2026-10-26",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "6.352 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 2.76,
+        "observed_at": "2026-10-27",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "2.76 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 16.91,
+        "observed_at": "2026-10-28",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "16.91 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.14,
+        "observed_at": "2026-10-28",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3.14 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.3202,
+        "observed_at": "2026-10-23",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "121.3202 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-10-30T08:55:18Z",
+        "http_status": 200,
+        "bytes": 170273,
+        "sha256": "f3ad22ec3aa8800fc5edfa638d364ae388a5612ed895d233f0b2af67c807a393",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-10-30T08:55:18Z",
+        "http_status": 200,
+        "bytes": 176046,
+        "sha256": "d85c38f6f6e9078151ec4232b3c3653e8953bbd3b0506f72375e9912503d8295",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-10-30T08:55:18Z",
+        "http_status": 200,
+        "bytes": 28959,
+        "sha256": "eecf882f835954d1546708e5a358133170f181f5e0f1616fbf7359c33611ec2f",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-10-30T08:55:19Z",
+        "http_status": 200,
+        "bytes": 116313,
+        "sha256": "009cb63436a4492e1bd85df95de80181244fc3856a1a6a81e7ae6afbe5336899",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-10-30T08:55:19Z",
+        "http_status": 200,
+        "bytes": 161765,
+        "sha256": "1cdbbe4643427b9915cf1c53c50f9eb9e327717d89a6bd3e101d3726f56f5cec",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-10-30T08:55:19Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "0e180e1559d55e6fc54925d86050be1a966cb929cb955019c765806fe138a7a1",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-10-30T08:55:19Z",
+        "http_status": 200,
+        "bytes": 104829,
+        "sha256": "8080a7d962c8e8976e4394a5dbdb2e4a2ddb984c1c5aefc581aa42b715fd6932",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 41,
+    "open_conflicts": 3,
+    "watch": 4,
+    "dormant": 6,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-14daccde",
+            "story_title": "Lead 3: IRGC claims three (later four) oil tankers struck mines on “unauthorised” southern Hormuz route; US…",
+            "source": "grok/grok-rolling-0949.md",
+            "slot": "0949",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.channelnewsasia.com/world/iran-strait-hormuz-tankers-fire-6506076",
+            "source_urls": [
+              "https://www.channelnewsasia.com/world/iran-strait-hormuz-tankers-fire-6506076",
+              "https://www.channelnewsasia.com/world/iran-strait-hormuz-tankers-fire-6506076",
+              "https://www.channelnewsasia.com/world/iran-strait-hormuz-tankers-fire-6506076",
+              "https://www.channelnewsasia.com/world/iran-strait-hormuz-tankers-fire-6506076",
+              "https://english.alarabiya.net/News/middle-east/2026/10/29/iran-s-irgc-says-three-tankers-on-fire-after-hitting-mines-in-hormuz-",
+              "https://english.news.cn/20261029/302e024e233840209b1df5af7d66443e/c.html"
+            ],
+            "observed_at": "2026-10-30T07:49:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-66c7f660",
+            "story_title": "Hormuz tanker report changes materially: small boat allegedly attached two explosive devices directly to the…",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.ukmto.org/?adsBeforeAudio=true&adsBeforeVideo=true&core_dmena=pro&sdi=huff_home_cardlos40",
+            "source_urls": [
+              "https://www.ukmto.org/?adsBeforeAudio=true&adsBeforeVideo=true&core_dmena=pro&sdi=huff_home_cardlos40",
+              "https://www.seatrade-maritime.com/security/tanker-catches-fire-in-hormuz-after-explosives-attached-to-hull",
+              "https://www.seatrade-maritime.com/security/tanker-catches-fire-in-hormuz-after-explosives-attached-to-hull",
+              "https://www.seatrade-maritime.com/security/tanker-catches-fire-in-hormuz-after-explosives-attached-to-hull",
+              "https://www.iranintl.com/en/202610301775",
+              "https://www.iranintl.com/en/202610301775",
+              "https://www.iranintl.com/en/202610301775",
+              "https://www.devdiscourse.com/article/international/3999290-tanker-in-strait-of-hormuz-hit-by-explosives-attached-to-small-boat-ukmto-says",
+              "https://www.devdiscourse.com/article/international/3999290-tanker-in-strait-of-hormuz-hit-by-explosives-attached-to-small-boat-ukmto-says",
+              "https://www.devdiscourse.com/article/international/3999290-tanker-in-strait-of-hormuz-hit-by-explosives-attached-to-small-boat-ukmto-says",
+              "https://apnews.com/article/mideast-iran-israel-elections-netanyahu-october-282026-c11dac838a072af25ba8d0eb81d01035",
+              "https://apnews.com/article/mideast-iran-israel-elections-netanyahu-october-282026-c11dac838a072af25ba8d0eb81d01035",
+              "https://apnews.com/article/mideast-iran-israel-elections-netanyahu-october-282026-c11dac838a072af25ba8d0eb81d01035"
+            ],
+            "observed_at": "2026-10-30T07:17:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-b63ca9ee",
+            "story_title": "Qatari mediators return to Tehran, but the negotiating sequence remains the core unresolved dispute",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/qatari-mediators-return-tehran-push-us-iran-deal-official-says-2026-10-30/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/qatari-mediators-return-tehran-push-us-iran-deal-official-says-2026-10-30/",
+              "https://www.reuters.com/world/middle-east/qatari-mediators-return-tehran-push-us-iran-deal-official-says-2026-10-30/",
+              "https://www.reuters.com/world/middle-east/qatari-mediators-return-tehran-push-us-iran-deal-official-says-2026-10-30/",
+              "https://mofa.gov.qa/en/qatar/latest-articles/latest-news/details/2026/10/27/qatar-calls-for-new-regional-security-framework-based-on-state-sovereignty-respect",
+              "https://mofa.gov.qa/en/qatar/latest-articles/latest-news/details/2026/10/27/qatar-calls-for-new-regional-security-framework-based-on-state-sovereignty-respect",
+              "https://mofa.gov.qa/en/qatar/latest-articles/latest-news/details/2026/10/27/qatar-calls-for-new-regional-security-framework-based-on-state-sovereignty-respect",
+              "https://www.aa.com.tr/en/middle-east/iranian-foreign-minister-says-tehran-in-talks-with-mediators-to-implement-7-day-plan-with-us/4104227",
+              "https://www.aa.com.tr/en/middle-east/iranian-foreign-minister-says-tehran-in-talks-with-mediators-to-implement-7-day-plan-with-us/4104227",
+              "https://www.aa.com.tr/en/middle-east/iranian-foreign-minister-says-tehran-in-talks-with-mediators-to-implement-7-day-plan-with-us/4104227",
+              "https://www.iranintl.com/en/202610282816",
+              "https://www.iranintl.com/en/202610282816"
+            ],
+            "observed_at": "2026-10-30T07:17:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-eab79ce5",
+            "story_title": "Seoul hardens its stated DMZ response while keeping a military-talk off-ramp open",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.president.go.kr/briefings/i0O6djIg",
+            "source_urls": [
+              "https://www.president.go.kr/briefings/i0O6djIg",
+              "https://www.president.go.kr/briefings/i0O6djIg",
+              "https://www.president.go.kr/briefings/i0O6djIg",
+              "https://en.yna.co.kr/view/AEN20261030005151315",
+              "https://en.yna.co.kr/view/AEN20261030005151315",
+              "https://en.yna.co.kr/view/AEN20261030005151315",
+              "https://rki.kbs.co.kr/service/news_view.htm?Seq_Code=205240&id=Po&lang=e&page=0",
+              "https://rki.kbs.co.kr/service/news_view.htm?Seq_Code=205240&id=Po&lang=e&page=0",
+              "https://rki.kbs.co.kr/service/news_view.htm?Seq_Code=205240&id=Po&lang=e&page=0",
+              "https://en.fnnews.com/news/202610301153367377",
+              "https://en.fnnews.com/news/202610301153367377",
+              "https://en.fnnews.com/news/202610301153367377"
+            ],
+            "observed_at": "2026-10-30T07:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-33be047e",
+            "story_title": "Dnipro: the station-strike story becomes an evacuation and air-defense failure question",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Ukraine",
+              "Kyiv",
+              "Zaporizhzhia"
+            ],
+            "source_url": "https://www.pravda.com.ua/eng/news/2026/10/29/8060314/",
+            "source_urls": [
+              "https://www.pravda.com.ua/eng/news/2026/10/29/8060314/",
+              "https://www.pravda.com.ua/eng/news/2026/10/29/8060314/",
+              "https://www.pravda.com.ua/eng/news/2026/10/29/8060314/",
+              "https://amp.dw.com/en/ukraine-14-killed-in-russian-drone-strike-on-crowded-dnipro-train-station/a-79795076",
+              "https://amp.dw.com/en/ukraine-14-killed-in-russian-drone-strike-on-crowded-dnipro-train-station/a-79795076",
+              "https://amp.dw.com/en/ukraine-14-killed-in-russian-drone-strike-on-crowded-dnipro-train-station/a-79795076",
+              "https://www.aa.com.tr/en/europe/ukraine-says-14-killed-in-russian-drone-attack-on-railway-station-in-ukraine-s-dnipro/4104864",
+              "https://www.aa.com.tr/en/europe/ukraine-says-14-killed-in-russian-drone-attack-on-railway-station-in-ukraine-s-dnipro/4104864",
+              "https://www.aa.com.tr/en/europe/ukraine-says-14-killed-in-russian-drone-attack-on-railway-station-in-ukraine-s-dnipro/4104864",
+              "https://www.rte.ie/news/ukraine/2026/1029/1597186-ukraine-russia/"
+            ],
+            "observed_at": "2026-10-29T19:16:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-7b5483ac",
+            "story_title": "Commission reopens the remaining SAFE envelope and explicitly points it toward Ukraine-linked procurement",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://audiovisual.ec.europa.eu/de/media/video/I-296481",
+            "source_urls": [
+              "https://audiovisual.ec.europa.eu/de/media/video/I-296481",
+              "https://audiovisual.ec.europa.eu/de/media/video/I-296481",
+              "https://audiovisual.ec.europa.eu/de/media/video/I-296996",
+              "https://audiovisual.ec.europa.eu/de/media/video/I-296996",
+              "https://defence-industry-space.ec.europa.eu/eu-defence-industry/safe-security-action-europe_en",
+              "https://defence-industry-space.ec.europa.eu/eu-defence-industry/safe-security-action-europe_en",
+              "https://www.consilium.europa.eu/policies/safe/",
+              "https://www.consilium.europa.eu/policies/safe/",
+              "https://h.aa.com.tr/en/europe/eu-commission-invites-member-states-to-use-237b-in-defense-funds-for-joint-procurement-ukraine-support/4104953",
+              "https://h.aa.com.tr/en/europe/eu-commission-invites-member-states-to-use-237b-in-defense-funds-for-joint-procurement-ukraine-support/4104953"
+            ],
+            "observed_at": "2026-10-29T13:16:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-ff00189b",
+            "story_title": "Ukraine: Zelenskyy says intelligence sees preparations for new Russian ballistic strikes",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://unn.ua/en/news/the-defense-forces-struck-an-iskander-launcher-but-russia-is-preparing-new-strikes-zelenskyy",
+            "source_urls": [
+              "https://unn.ua/en/news/the-defense-forces-struck-an-iskander-launcher-but-russia-is-preparing-new-strikes-zelenskyy",
+              "https://unn.ua/en/news/the-defense-forces-struck-an-iskander-launcher-but-russia-is-preparing-new-strikes-zelenskyy",
+              "https://unn.ua/en/news/the-defense-forces-struck-an-iskander-launcher-but-russia-is-preparing-new-strikes-zelenskyy",
+              "https://glavnoe.in.ua/en/news-en/russia-preparing-new-ballistic-missile-strikes-on-ukraine-zelenskyy-says-citing-intelligence/amp",
+              "https://glavnoe.in.ua/en/news-en/russia-preparing-new-ballistic-missile-strikes-on-ukraine-zelenskyy-says-citing-intelligence/amp",
+              "https://glavnoe.in.ua/en/news-en/russia-preparing-new-ballistic-missile-strikes-on-ukraine-zelenskyy-says-citing-intelligence/amp",
+              "https://www.ukrinform.net/rubric-polytics/4177274-russia-to-step-up-ballistic-missile-attacks-as-us-cuts-patriot-missile-supplies-to-ukraine-zelensky.html",
+              "https://www.ukrinform.net/rubric-polytics/4177274-russia-to-step-up-ballistic-missile-attacks-as-us-cuts-patriot-missile-supplies-to-ukraine-zelensky.html",
+              "https://www.ukrinform.net/rubric-polytics/4177274-russia-to-step-up-ballistic-missile-attacks-as-us-cuts-patriot-missile-supplies-to-ukraine-zelensky.html",
+              "https://president.gov.ua/?trk=public_post_comment-text",
+              "https://president.gov.ua/?trk=public_post_comment-text",
+              "https://malaysia.news.yahoo.com/ukraines-zelenskiy-intelligence-russian-ballistic-191725919.html"
+            ],
+            "observed_at": "2026-10-29T19:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-29 and drew no qualifying story today",
+        "last_open_edition": "2026-10-29",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-29",
+            "story_id": "s-12e9afb7",
+            "story_title": "Lead 2: Israel election partial results show Netanyahu bloc at 53 seats, Eisenkot bloc at 48, Arab parties…",
+            "source": "grok/grok-rolling-2150.md",
+            "slot": "2150",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.timesofisrael.com/with-85-of-votes-counted-netanyahu-bloc-has-53-seats-eisenkots-48-arab-parties-surge-to-19/",
+            "source_urls": [
+              "https://www.timesofisrael.com/with-85-of-votes-counted-netanyahu-bloc-has-53-seats-eisenkots-48-arab-parties-surge-to-19/",
+              "https://www.timesofisrael.com/with-85-of-votes-counted-netanyahu-bloc-has-53-seats-eisenkots-48-arab-parties-surge-to-19/",
+              "https://www.bbc.com/news/articles/cmdx3knq1xexo",
+              "https://www.bbc.com/news/articles/cmdx3knq1xexo",
+              "https://www.bbc.com/news/articles/cmdx3knq1xexo",
+              "https://www.bbc.com/news/articles/cmdx3knq1xexo",
+              "https://www.thepetek.com/results"
+            ],
+            "observed_at": "2026-10-28T19:50:00Z"
+          },
+          {
+            "edition": "2026-10-29",
+            "story_id": "s-73542d0a",
+            "story_title": "Israel: real count replaces the forecast, with neither bloc near 61 and Arab parties holding 19 seats",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://apnews.com/article/israel-elections-netanyahu-eisenkot-gaza-iran-28102026-52c6f5a0a720a4ffc08633229e796415",
+            "source_urls": [
+              "https://apnews.com/article/israel-elections-netanyahu-eisenkot-gaza-iran-28102026-52c6f5a0a720a4ffc08633229e796415",
+              "https://apnews.com/article/israel-elections-netanyahu-eisenkot-gaza-iran-28102026-52c6f5a0a720a4ffc08633229e796415",
+              "https://apnews.com/article/israel-elections-netanyahu-eisenkot-gaza-iran-28102026-52c6f5a0a720a4ffc08633229e796415",
+              "https://apnews.com/article/israel-elections-netanyahu-eisenkot-gaza-iran-28102026-52c6f5a0a720a4ffc08633229e796415",
+              "https://apnews.com/article/israel-elections-netanyahu-eisenkot-gaza-iran-28102026-52c6f5a0a720a4ffc08633229e796415"
+            ],
+            "observed_at": "2026-10-28T13:19:00Z"
+          },
+          {
+            "edition": "2026-10-29",
+            "story_id": "s-7c032bbf",
+            "story_title": "Israel election partial counts: Netanyahu bloc leads but short of majority; Eisenkot short; Arab parties…",
+            "source": "grok/grok-rolling-1242.md",
+            "slot": "1242",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+            "source_urls": [
+              "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+              "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+              "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+              "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+              "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+              "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+              "https://www.timesofisrael.com/eisenkot-and-netanyahu-each-vow-to-form-next-coalition-even-as-exit-polls-predict-stalemate/",
+              "https://www.reuters.com/world/middle-east/netanyahu-eisenkot-stake-rival-claims-lead-israel-after-deadlocked-vote-2026-10-28/",
+              "https://www.reuters.com/world/middle-east/netanyahu-eisenkot-stake-rival-claims-lead-israel-after-deadlocked-vote-2026-10-28/",
+              "https://english.elpais.com/international/2026-10-28/netanyahu-wins-israel-elections-but-his-coalition-falls-short-of-a-majority.html",
+              "https://www.cbc.ca/news/world/israel-vote-deadlock-9.7399140"
+            ],
+            "observed_at": "2026-10-28T10:42:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-29 and drew no qualifying story today",
+        "last_open_edition": "2026-10-29",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-29",
+            "story_id": "s-00ff7061",
+            "story_title": "Lead 2: Saudi airstrikes hit Al-Hazm market in Al-Jawf, Yemen, killing at least 13–14 civilians",
+            "source": "grok/grok-rolling-0047.md",
+            "slot": "0047",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://english.almanar.com.lb/article/144167/",
+            "source_urls": [
+              "https://english.almanar.com.lb/article/144167/",
+              "https://english.almanar.com.lb/article/144167/",
+              "https://english.almanar.com.lb/article/144167/",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://en.wikipedia.org/wiki/Portal:Current_events/2026_October_28"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-10-29",
+            "story_id": "s-8510b82d",
+            "story_title": "Lead 3: Saudi-led airstrikes kill 14 civilians at Al Hazm market in Yemen as Houthi attacks continue",
+            "source": "grok/grok-rolling-2150.md",
+            "slot": "2150",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+            "source_urls": [
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://en.wikipedia.org/wiki/Portal:Current_events/2026_October_28",
+              "https://www.dawn.com/news/2040379",
+              "https://www.bankofcanada.ca/2026/10/fad-press-release-2026-10-28/"
+            ],
+            "observed_at": "2026-10-28T19:50:00Z"
+          },
+          {
+            "edition": "2026-10-29",
+            "story_id": "s-e7049df1",
+            "story_title": "Lead 4 (update in ongoing conflict): Saudi-led airstrikes reported to kill 13–14 civilians at Al-Hazm…",
+            "source": "grok/grok-rolling-1842.md",
+            "slot": "1842",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://english.almanar.com.lb/article/144167/",
+            "source_urls": [
+              "https://english.almanar.com.lb/article/144167/",
+              "https://english.almanar.com.lb/article/144167/",
+              "https://english.almanar.com.lb/article/144167/",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://www.indiatoday.in/world/story/yemen-airstrikes-kill-14-al-hazm-market-houthi-taiz-siege-ptag-3027233-2026-10-28",
+              "https://apnews.com/article/mideast-iran-saudi-yemen-israel-palestinians-october-282026-c032db4b09725fea0f6320eec49de5d4",
+              "https://apnews.com/article/mideast-iran-saudi-yemen-israel-palestinians-october-282026-c032db4b09725fea0f6320eec49de5d4"
+            ],
+            "observed_at": "2026-10-28T16:42:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-26 and drew no qualifying story today",
+        "last_open_edition": "2026-10-26",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-26",
+            "story_id": "s-08c7c4e8",
+            "story_title": "Lead 1: Venezuelan opposition leader María Corina Machado returns from exile",
+            "source": "grok/grok-rolling-1842.md",
+            "slot": "1842",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+            "source_urls": [
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://english.elpais.com/international/2026-10-25/maria-corina-machado-returns-to-venezuela.html",
+              "https://english.elpais.com/international/2026-10-25/maria-corina-machado-returns-to-venezuela.html"
+            ],
+            "observed_at": "2026-10-25T16:42:00Z"
+          },
+          {
+            "edition": "2026-10-26",
+            "story_id": "s-87a2ef9a",
+            "story_title": "Lead 2: Venezuelan opposition leader María Corina Machado returns from exile to crowds; US role confirmed",
+            "source": "grok/grok-rolling-0647.md",
+            "slot": "0647",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+            "source_urls": [
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://abcnews.com/International/wireStory/venezuelas-opposition-leader-machado-returns-after-months-exile-137555261",
+              "https://abcnews.com/International/wireStory/venezuelas-opposition-leader-machado-returns-after-months-exile-137555261"
+            ],
+            "observed_at": "2026-10-26T04:47:00Z"
+          },
+          {
+            "edition": "2026-10-26",
+            "story_id": "s-b48b6880",
+            "story_title": "María Corina Machado is physically back in Venezuela, reopening the election confrontation",
+            "source": "chatgpt/chatgpt-rolling-2117.md",
+            "slot": "2117",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+            "source_urls": [
+              "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+              "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+              "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+              "https://apnews.com/article/venezuela-maria-corina-machado-return-democracy-maduro-e6eff0c2ff962fd9b0f87270b24ef567",
+              "https://www.aljazeera.com/news/2026/10/25/venezuelas-opposition-leader-maria-corina-machado-returns-from-exile",
+              "https://www.aljazeera.com/news/2026/10/25/venezuelas-opposition-leader-maria-corina-machado-returns-from-exile",
+              "https://www.aljazeera.com/news/2026/10/25/venezuelas-opposition-leader-maria-corina-machado-returns-from-exile",
+              "https://x.com/Urruchurtu/status/2114447039203549598"
+            ],
+            "observed_at": "2026-10-25T19:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-24 and drew no qualifying story today",
+        "last_open_edition": "2026-10-24",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-51d5b297",
+            "story_title": "Champi’s late-window Taiwan toll is revised sharply upward",
+            "source": "chatgpt/chatgpt-rolling-0322.md",
+            "slot": "0322",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+            "source_urls": [
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://apnews.com/article/typhoon-champi-taiwan-japan-8cf1c88611fc6ede98ebac11201f91cb",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.nrm.gov.tw/News_Content.aspx?n=3307&s=263926",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.reuters.com/business/environment/typhoon-champi-sweeps-past-taiwan-one-dead-500-injured-2026-10-24/",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/10/23/taiwan-shuts-down-ahead-of-weakening-typhoon-champi-hundreds-flights-cancelled"
+            ],
+            "observed_at": "2026-10-24T01:22:00Z"
+          },
+          {
+            "edition": "2026-10-24",
+            "story_id": "s-f60ec2a2",
+            "story_title": "Lead 1: Typhoon Champi injury toll rises sharply to 527 as storm glances Taiwan’s northeast and weakens",
+            "source": "grok/grok-rolling-0348.md",
+            "slot": "0348",
+            "matched": [
+              "Taiwan",
+              "Taipei"
+            ],
+            "source_url": "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+            "source_urls": [
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.straitstimes.com/asia/typhoon-champi-sweeps-past-taiwan-one-dead-and-500-injured",
+              "https://www.channelnewsasia.com/east-asia/typhoon-champi-approaches-taiwan-flights-cancelled-6484571",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://focustaiwan.tw/society/202610230005",
+              "https://www.taipeitimes.com/News/front/archives/2026/10/23/2003866495"
+            ],
+            "observed_at": "2026-10-24T01:48:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-5af0d753",
+            "story_title": "Binance breach moves from an unexplained incident to a $6.3 billion infrastructure compromise with a North…",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "North Korea",
+              "DPRK"
+            ],
+            "source_url": "https://bitquery.io/investigations/binance-hack",
+            "source_urls": [
+              "https://bitquery.io/investigations/binance-hack",
+              "https://bitquery.io/investigations/binance-hack",
+              "https://bitquery.io/investigations/binance-hack",
+              "https://www.trmlabs.com/resources/blog/north-korea-steals-usd-6-36-billion-from-binance-in-the-largest-hack-in-history",
+              "https://www.trmlabs.com/resources/blog/north-korea-steals-usd-6-36-billion-from-binance-in-the-largest-hack-in-history",
+              "https://www.trmlabs.com/resources/blog/north-korea-steals-usd-6-36-billion-from-binance-in-the-largest-hack-in-history",
+              "https://apnews.com/article/binance-cryptocurrency-security-39cda8ceb8095e036334a18549d3d20d",
+              "https://apnews.com/article/binance-cryptocurrency-security-39cda8ceb8095e036334a18549d3d20d",
+              "https://apnews.com/article/binance-cryptocurrency-security-39cda8ceb8095e036334a18549d3d20d"
+            ],
+            "observed_at": "2026-10-30T07:17:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-ad8e90c8",
+            "story_title": "Lead 1: Binance reports $6.3bn security incident, potentially largest crypto heist on record; analytics…",
+            "source": "grok/grok-rolling-0949.md",
+            "slot": "0949",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/cwg7xp8kx4v5o",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/cwg7xp8kx4v5o",
+              "https://www.bbc.co.uk/news/articles/cwg7xp8kx4v5o",
+              "https://www.bbc.co.uk/news/articles/cwg7xp8kx4v5o",
+              "https://www.bbc.co.uk/news/articles/cwg7xp8kx4v5o",
+              "https://www.aljazeera.com/economy/2026/10/30/binance-says-2-54bn-in-crypto-funds-frozen-amid-potential-security-issue",
+              "https://www.aljazeera.com/economy/2026/10/30/binance-says-2-54bn-in-crypto-funds-frozen-amid-potential-security-issue",
+              "https://www.aljazeera.com/economy/2026/10/30/binance-says-2-54bn-in-crypto-funds-frozen-amid-potential-security-issue",
+              "https://www.theguardian.com/business/live/2026/oct/30/uk-house-price-growth-crypto-industry-6bn-binance-hack-eurozone-france-gdp-latest-news-updates",
+              "https://www.theguardian.com/business/live/2026/oct/30/uk-house-price-growth-crypto-industry-6bn-binance-hack-eurozone-france-gdp-latest-news-updates",
+              "https://www.theguardian.com/business/live/2026/oct/30/uk-house-price-growth-crypto-industry-6bn-binance-hack-eurozone-france-gdp-latest-news-updates",
+              "https://www.coindesk.com/business/2026/10/29/potential-multi-billion-binance-hack-hitting-crypto-markets",
+              "https://www.coindesk.com/business/2026/10/29/potential-multi-billion-binance-hack-hitting-crypto-markets",
+              "https://www.bbc.com/news/live/cqrmynd3042gt"
+            ],
+            "observed_at": "2026-10-30T07:49:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-d9a788ae",
+            "story_title": "Lead 1: Binance reports ~$6.3bn security incident (largest crypto heist on record), freezes ~$3bn with…",
+            "source": "grok/grok-rolling-0644.md",
+            "slot": "0644",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/cwg7xp8kx4v5o",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/cwg7xp8kx4v5o",
+              "https://www.bbc.com/news/articles/cwg7xp8kx4v5o",
+              "https://www.bbc.com/news/articles/cwg7xp8kx4v5o",
+              "https://www.bbc.com/news/articles/cwg7xp8kx4v5o",
+              "https://www.bbc.com/news/articles/cwg7xp8kx4v5o",
+              "https://www.aljazeera.com/economy/2026/10/30/binance-says-2-54bn-in-crypto-funds-frozen-amid-potential-security-issue",
+              "https://www.aljazeera.com/economy/2026/10/30/binance-says-2-54bn-in-crypto-funds-frozen-amid-potential-security-issue",
+              "https://www.aljazeera.com/economy/2026/10/30/binance-says-2-54bn-in-crypto-funds-frozen-amid-potential-security-issue",
+              "https://www.coindesk.com/markets/2026/10/30/binance-hacker-splits-usd1-4-billion-of-bitcoin-into-19-wallets-that-no-one-can-freeze",
+              "https://www.coindesk.com/markets/2026/10/30/binance-hacker-splits-usd1-4-billion-of-bitcoin-into-19-wallets-that-no-one-can-freeze",
+              "https://www.coindesk.com/business/2026/10/30/binance-hack-drained-wallets-backing-customer-assets-reserve-data-shows"
+            ],
+            "observed_at": "2026-10-30T04:44:00Z"
+          },
+          {
+            "edition": "2026-10-30",
+            "story_id": "s-eab79ce5",
+            "story_title": "Seoul hardens its stated DMZ response while keeping a military-talk off-ramp open",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "North Korea",
+              "Pyongyang"
+            ],
+            "source_url": "https://www.president.go.kr/briefings/i0O6djIg",
+            "source_urls": [
+              "https://www.president.go.kr/briefings/i0O6djIg",
+              "https://www.president.go.kr/briefings/i0O6djIg",
+              "https://www.president.go.kr/briefings/i0O6djIg",
+              "https://en.yna.co.kr/view/AEN20261030005151315",
+              "https://en.yna.co.kr/view/AEN20261030005151315",
+              "https://en.yna.co.kr/view/AEN20261030005151315",
+              "https://rki.kbs.co.kr/service/news_view.htm?Seq_Code=205240&id=Po&lang=e&page=0",
+              "https://rki.kbs.co.kr/service/news_view.htm?Seq_Code=205240&id=Po&lang=e&page=0",
+              "https://rki.kbs.co.kr/service/news_view.htm?Seq_Code=205240&id=Po&lang=e&page=0",
+              "https://en.fnnews.com/news/202610301153367377",
+              "https://en.fnnews.com/news/202610301153367377",
+              "https://en.fnnews.com/news/202610301153367377"
+            ],
+            "observed_at": "2026-10-30T07:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-10-29",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
