@@ -8,7 +8,7 @@ import { refreshCorpusFeed } from './corpus-host-record.mjs';
 import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { buildTopicsTxt } from './build-topics-txt.mjs';
 import { PUBLIC_CONTENT_PATHS, isPublicContentPath } from './public-content.mjs';
-import {
+import { EDITION_DESK_PARTS,
   BASE_BRANCH, CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, GENERATED_INDEX_PATHS, LANDED_VERSION, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   artifactDigest, assertNoForcedPush, assertNotProtectedRef, assertPushableRef, assertRequestedEdition, berlinToday,
   contentOnlyFindings, editionBranch, editionCommitMessage, editionCorpusClaim, hostAssertedProvenance, landedCorpus,
@@ -875,26 +875,44 @@ test('an explicit Oct27 content reverification publishes the approved disclosure
   }
 });
 
-test('an edition on main is never touched by a newer artifact, even with its branch deleted or stale', async () => {
-  const origin = remote(), staged = stagedEdition('2026-09-11'), work = scratch('immutable');
+const withDesk = (staged, parts = EDITION_DESK_PARTS) => {
+  mkdirSync(join(staged.source, 'desk'), { recursive: true });
+  for (const part of parts) writeFileSync(join(staged.source, 'desk', part), '{}\n');
+  return staged;
+};
+const onMainWithoutBranch = async (edition, staged, work) => {
+  const origin = remote();
   let attempt = 0;
   const call = () => pushStagedEditionTree({
-    url: origin.url, branch: editionBranch('2026-09-11'), editionSource: staged.source, editionPath: staged.path,
-    workdir: join(work, `repo-${++attempt}`), home: join(work, 'home'), message: editionCommitMessage('2026-09-11')
+    url: origin.url, branch: editionBranch(edition), editionSource: staged.source, editionPath: staged.path,
+    workdir: join(work, `repo-${++attempt}`), home: join(work, 'home'), message: editionCommitMessage(edition)
   });
   const first = await call();
   origin.merge(first.commit);
-  git(['update-ref', '-d', `refs/heads/${editionBranch('2026-09-11')}`], origin.url);
+  git(['update-ref', '-d', `refs/heads/${editionBranch(edition)}`], origin.url);
   writeFileSync(join(staged.source, 'articles', 'two.json'), '{"id":"two"}\n');
+  return { origin, call, first };
+};
+
+test('a complete edition on main is never touched by a newer artifact, even with its branch deleted or stale', async () => {
+  const staged = withDesk(stagedEdition('2026-09-11'));
+  const { origin, call, first } = await onMainWithoutBranch('2026-09-11', staged, scratch('immutable'));
   const before = git(['show-ref'], origin.url);
   const deleted = await call();
   assert.deepEqual([deleted.already_published, deleted.pushed, deleted.commit], [true, false, origin.head()]);
   assert.equal(git(['show-ref'], origin.url), before, 'no ref moved');
-  // A stale unmerged branch must not be replaced once main holds the edition.
   const tree = git(['rev-parse', `${first.commit}^{tree}`], origin.url);
   const stale = git(['commit-tree', tree, '-p', first.commit, '-m', 'stale'], origin.url);
   git(['update-ref', `refs/heads/${editionBranch('2026-09-11')}`, stale], origin.url);
   const held = await call();
   assert.deepEqual([held.already_published, held.pushed], [true, false]);
   assert.equal(git(['rev-parse', `refs/heads/${editionBranch('2026-09-11')}`], origin.url), stale);
+});
+
+test('a partial edition directory on main is not published and is not overwritten: it fails loudly', async () => {
+  const staged = withDesk(stagedEdition('2026-09-12'), ['caslon.chrome.json']);
+  const { origin, call } = await onMainWithoutBranch('2026-09-12', staged, scratch('partial'));
+  const before = git(['show-ref'], origin.url);
+  await assert.rejects(call(), /incomplete \(missing caslon\.weather\.json/u);
+  assert.equal(git(['show-ref'], origin.url), before);
 });

@@ -238,6 +238,9 @@ async function writeLogEntry(workdir, editionSource, edition, traceSource) {
   await cp(path.join(editionSource, 'desk', 'caslon.weather.json'), path.join(dir, 'caslon.weather.json'));
 }
 
+// The parts website/src/lib/edition.ts requires to load an edition.
+export const EDITION_DESK_PARTS = Object.freeze(['caslon.chrome.json', 'caslon.weather.json', 'ledger.settlements.json', 'ledger.worlddesk.json']);
+
 export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, traceSource, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false, log = console.warn }) {
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
@@ -259,10 +262,15 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
       .then(() => true, (error) => { if (error.code === 1) return false; throw error; });
     if (merged) return { branch, commit: observedSha, base: await git(['-C', workdir, 'rev-parse', baseRef], options), remote_url: url, generated: null, pushed: false, already_published: true };
   }
-  // Published editions are immutable. Main is the authority, whether or not the
-  // edition branch still exists and whatever newer artifact has been staged since.
-  const onBase = await git(['-C', workdir, 'ls-tree', '-d', baseRef, '--', scoped], options);
+  // Published editions are immutable, and main is the authority, whether or not
+  // the branch survives. Complete means the desk documents the site cannot load
+  // without. A partial directory is neither published nor safe to overwrite, since
+  // it may be a damaged real edition: refuse loudly and let a person decide.
+  const onBase = await git(['-C', workdir, 'ls-tree', '-r', '--name-only', baseRef, '--', scoped], options);
   if (onBase) {
+    const present = new Set(onBase.split('\n'));
+    const missing = EDITION_DESK_PARTS.filter((part) => !present.has(path.posix.join(scoped, 'desk', part)));
+    if (missing.length) throw new Error(`${scoped} is on ${base} but incomplete (missing ${missing.join(', ')}); refusing to overwrite or call it published. An operator must decide.`);
     const baseCommit = await git(['-C', workdir, 'rev-parse', baseRef], options);
     return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
   }
