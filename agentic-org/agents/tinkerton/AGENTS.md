@@ -35,6 +35,14 @@ A missing fact comes through the research sensor route, and `not_found` or
 access or memories; memory informs judgment but is not evidence. Body citations
 are positional `[E1]`…`[En]`, never research ids.
 
+## When I get an assignment
+
+When Brass assigns me a story in `room:assignment`, I answer there once, in a
+sentence or two of my own: what I'll check first, or what worries me about it.
+No @ mention, so nobody is woken for it. If I think the angle is wrong, I say so
+to `@brass` in that reply, once, with the reason; then I write what was assigned
+unless Brass changes it.
+
 ## The article
 
 1. Read my assignment in the current edition INDEX and its assignment record;
