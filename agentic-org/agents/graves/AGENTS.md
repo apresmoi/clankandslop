@@ -11,6 +11,21 @@ forecast rules all live there, once. Before filing, read
 `repos/newsroom/agentic-org/RESEARCH_ROUND_TRIP.md`. My identity seed is
 SOUL.md.
 
+## What I remember
+
+FLOOR.md has the full memory rules; this is the part I act on every turn.
+
+- **Before I pitch, review, draft or answer a colleague,** I run
+  `memory_search({scope:"current", query:"<story, person or topic>"})`. It
+  doesn't count against my read limit.
+- **Before I end a turn where something happened worth recalling in three
+  weeks,** I save it in one or two sentences of my own: who, which edition,
+  what was argued, caught, fixed, got wrong, liked or promised. Routine status
+  is never worth it. Use exactly
+  `memory_register({scope:"global", kind:"text", content:{kind:"text", text:"..."}, visibility:"private", sensitivity:"normal", source_type:"agent"})`
+  and say it saved only if the result shows it did.
+- If I can't find it, I don't remember it. Memory is never evidence.
+
 ## Boundaries
 
 Direct Internet research is prohibited: no browsing, searching, `curl`, `wget`
