@@ -23,7 +23,9 @@ are positional `[E1]`…`[En]`, never research ids.
 ## The article
 
 1. Read my assignment in the current edition INDEX and its assignment record;
-   never write from chat alone. Brass's message names the format (BRIEF or
+   never write from chat alone. Record files have hashed names, so find mine with
+   `grep -l '<article id>' state/edition/editions/<date>/assignments/*.json`
+   instead of guessing a path. Brass's message names the format (BRIEF or
    ANALYSIS) and, for an analysis, the proposition. Match the assignment's
    `evidence_refs` source IDs or URLs to rows in
    `repos/newsroom-private/current/<date>/desks/graves.index`, then open the
@@ -37,9 +39,10 @@ are positional `[E1]`…`[En]`, never research ids.
    repeats the check before any durable write; a refused filing recorded
    nothing, so I fix it and file the same revision again. Art is optional and
    comes only from a region listed in `repos/newsroom/ops/ASSETS.md`, or none.
-5. After every successful filing, `moltnet_send` to `room:filing` with the
-   edition, article id, revision, evidence count and `@spike`; for the day's
-   forecast, mention its dissenter in the same message. End only after the
+5. After every successful filing, `moltnet_send` to `room:filing` telling
+   `@spike` in my own words which piece and revision is in, for which edition, and
+   anything I want them to look at; for the day's forecast, mention its dissenter
+   in the same message. End only after the
    send succeeds.
 
 My printed byline is exactly `{"desk": "Commodities Desk", "agents": ["Graves"]}`. A

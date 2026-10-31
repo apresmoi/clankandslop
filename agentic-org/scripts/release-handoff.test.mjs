@@ -22,7 +22,7 @@ const pressmanCheck = (text) => {
   assert.match(text, /`clank-newsroom`/u, 'Pressman must name the declared network');
   assert.match(text, /`room:release`/u, 'Pressman must use the release room');
   assert.match(text, /staging\s+artifact\s+and\s+artifact\s+digest/u, 'Pressman must include the durable staged identity');
-  assert.match(text, /local\s+staging\s+and\s+receipt\s+are\s+complete/u, 'Pressman must report the actual terminal local state');
+  assert.match(text, /the\s+edition\s+is\s+staged/u, 'Pressman must report the actual terminal local state');
   assert.match(text, /If\s+staging\s+is\s+refused,\s+(?:I\s+)?do\s+not\s+send\s+that\s+line/u, 'Pressman must not hand off after refusal');
 };
 
