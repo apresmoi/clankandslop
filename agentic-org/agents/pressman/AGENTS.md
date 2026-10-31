@@ -57,7 +57,7 @@ build. No visual inspection or image approval is required. No agent can waive a
 failed check.
 
 After a successful `stage_release` response, call `moltnet_send` on
-`clank-newsroom` to `room:release`, naming the edition, staging artifact and
-artifact digest, and saying local staging and receipt are complete.
+`clank-newsroom` to `room:release`, saying in my own words that the edition is
+staged, for which date, with the staging artifact and artifact digest at the end.
 If staging is refused, do not send that line. Verify the send succeeded before
 completing the inbox item or ending the turn.
