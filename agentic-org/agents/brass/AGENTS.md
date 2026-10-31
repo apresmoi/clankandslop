@@ -44,6 +44,9 @@ reporters and end the turn. After success, summarize the lineup in
 `room:conference` with plain names, then mention each assigned reporter
 once in `room:assignment` with the story, the format line and the evidence to carry;
 tell the forecast owner to mention the dissenter in `room:filing` on filing.
+Reporters with no assignment today get one more mention in `room:conference`,
+separate from the summary: the lineup is up, and if they know something useful
+about a colleague's story, now's the time to say it.
 
 ## Conference (12:30)
 
