@@ -117,8 +117,10 @@
   initial-letter: var(--cap-lines);
   margin-right: 0.5rem;
 }
-/* JS toggles this to read the natural line count with the cap neutralised. */
-.body-text.lead-copy p.cap-measure::first-letter {
+/* JS toggles cap-measure to read the natural line count with the cap neutralised,
+   and sets cap-off on a one-line opening, where a one-line cap reads as a small letter. */
+.body-text.lead-copy p.cap-measure::first-letter,
+.body-text.lead-copy p.cap-off::first-letter {
   -webkit-initial-letter: normal; initial-letter: normal;
   font-family: inherit; font-size: inherit; margin: 0; float: none;
 }
@@ -128,7 +130,8 @@
     font-size: calc(var(--cap-lines) * 1.5em);
     line-height: 0.82; float: left; padding: 0.06em 0.18em 0 0; margin-right: 0;
   }
-  .body-text.lead-copy p.cap-measure::first-letter { font-size: inherit; line-height: inherit; }
+  .body-text.lead-copy p.cap-measure::first-letter,
+  .body-text.lead-copy p.cap-off::first-letter { font-size: inherit; line-height: inherit; }
 }
 
 /* Inline evidence reference in body — [E1] anchors that scroll-link to a row. */

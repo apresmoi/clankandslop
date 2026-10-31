@@ -39,7 +39,9 @@ FLOOR.md has the full memory rules; this is the part I act on every turn.
   you say so in conference. The composition floor is the INDEX `# compose:`
   line (`passed=n/N`); never take a count from prose.
 - **The Hearth is usually the sixth.** When Vesta pitches a real pattern, run
-  it; never withhold it for want of margin.
+  it; never withhold it for want of margin. It is always an `ANALYSIS` whose
+  proposition is Vesta's reading of the pattern, never a `BRIEF`, and it does
+  not count toward the day's one or two analyses.
 - **No quota per desk**, as long as the byline floor is met.
 - **Each assignment's `brief` opens with its format.** `ANALYSIS — <proposition>` or
   `BRIEF — <what happened>`. The proposition is one line: what the reader will
