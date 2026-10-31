@@ -106,7 +106,11 @@ order and persona leakage. Treat those as done; spend your reading on judgment.
 An INDEX with no F rows means nothing has been filed yet.
 
 Open one filing at `state/edition/editions/<date>/filings/<id>/<rev>.json`,
-rule on it, then move to the next. Never open the filings directory, and never
+rule on it, then move to the next. Never ask a reporter to post a filing, body,
+digest or excerpts in chat: the file is the filing. If it is missing, say so in
+one line. In `room:filing`, say what to fix the way you'd say it
+at the desk: the one or two problems, plainly, in a few sentences. Quote at most
+one short phrase; never paste JSON, digests or long passages. Never open the filings directory, and never
 reread a filing already ruled on unless the INDEX shows a new revision. Open the
 cited `raw_excerpt` beside any sentence whose meaning you are checking. If the
 digest changed, the tool refuses: read the new row and review that draft.

@@ -34,27 +34,24 @@ test('review handoffs use the shared readiness floors and name the accepted revi
     assert.doesNotMatch(reviewNoticeInstruction(args, 'tinkerton', inputs), /@caslon/u);
   }
 });
-test('a PASS hands the owner the exact facts request and does not wait on it for the Caslon handoff', () => {
+test('a PASS names the owner\'s facts request without pasting it and does not wait on it for the Caslon handoff', () => {
   const articles = owners.map((_, index) => article(index, index === 5 ? 'Policy' : index % 2 ? 'World' : 'Business'));
   const args = { edition, article_id: 'story-5', revision: 4, verdict: 'PASS' };
   const desks = ['caslon.chrome', 'caslon.weather', 'ledger.settlements', 'ledger.worlddesk'];
   // No check yet is not a blocking problem: Spike asks for it AND hands off to Caslon.
   const unchecked = reviewNoticeInstruction(args, 'tinkerton', { articles, desks, problems: [], fresh: false, article: articles[5] });
-  assert.match(unchecked, /room:filing.*article story-5 revision 4, mention @tinkerton.*send this exact text with moltnet_send to room:research/u);
-  const request = JSON.parse(unchecked.match(/\{"kind":"research\.request\.v1".*?\}(?= )/u)[0]);
-  assert.equal(request.request_id, `tinkerton-${edition}-facts-story-5`);
-  assert.equal(request.from, 'tinkerton');
-  assert.match(request.question, /Verified story 5/u);
+  assert.match(unchecked, new RegExp(`room:filing.*article story-5 revision 4, mention @tinkerton.*research room themselves.*request_id tinkerton-${edition}-facts-story-5`, 'u'));
+  assert.doesNotMatch(unchecked, /research\.request\.v1/u);
   assert.match(unchecked, /room:release now.*@caslon/u);
   // A recorded development holds the edition, and its own revision or record hands off.
   const pending = reviewNoticeInstruction(args, 'tinkerton', { articles, desks, problems: ['"story-2": its owner recorded a material development'], fresh: false, article: articles[5] });
   assert.match(pending, /waits only on recorded developments \(1\).*do not mention @caslon/u);
   assert.doesNotMatch(pending, /target room:release/u);
   const early = reviewNoticeInstruction(args, 'tinkerton', { articles: articles.slice(0, 2), desks, problems: [], fresh: false });
-  assert.match(early, new RegExp(`mention @tinkerton.*room:research.*passed>=${PASSED_ARTICLES_MINIMUM} .*@ledger`, 'u'));
+  assert.match(early, new RegExp(`mention @tinkerton.*research room.*passed>=${PASSED_ARTICLES_MINIMUM} .*@ledger`, 'u'));
   const checked = reviewNoticeInstruction(args, 'tinkerton', { articles, desks, problems: [], fresh: true });
   assert.match(checked, /room:release now.*@caslon/u);
-  assert.doesNotMatch(checked, /room:research/u);
+  assert.doesNotMatch(checked, /research room/u);
 });
 test('a spiked piece goes to Brass in room:assignment, a room Spike can write, without promising a replacement', () => {
   const spiked = reviewNoticeInstruction({ edition, article_id: 'story-1', revision: 2, verdict: 'SPIKE' }, 'sprockett');
