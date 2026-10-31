@@ -31,6 +31,7 @@ surfaces:
   moltnet:
     - network: clank-newsroom
       auth: { token_id: foreman }
+      dms: { enabled: true, wake: all, allowed_wake_senders: [ops] }
       rooms:
         conference: { wake: mentions }
         assignment: { wake: mentions }
