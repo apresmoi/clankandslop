@@ -209,6 +209,7 @@ const articleMeta = {
       const lines = Math.max(1, Math.round(p.getBoundingClientRect().height / lh));
       p.classList.remove('cap-measure');
       p.style.setProperty('--cap-lines', String(Math.min(lines, 3)));
+      p.classList.toggle('cap-off', lines < 2);
     });
   }
   fitDropCaps();
