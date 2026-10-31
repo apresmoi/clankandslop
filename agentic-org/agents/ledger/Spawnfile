@@ -30,6 +30,7 @@ surfaces:
   moltnet:
     - network: clank-newsroom
       auth: { token_id: ledger }
+      dms: { enabled: true, wake: all, allowed_wake_senders: [ops] }
       rooms:
         research: { wake: mentions }
         release: { wake: mentions }

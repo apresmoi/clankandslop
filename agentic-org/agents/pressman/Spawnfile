@@ -30,6 +30,7 @@ surfaces:
   moltnet:
     - network: clank-newsroom
       auth: { token_id: pressman }
+      dms: { enabled: true, wake: all, allowed_wake_senders: [ops] }
       rooms:
         release: { wake: mentions }
 environment:
