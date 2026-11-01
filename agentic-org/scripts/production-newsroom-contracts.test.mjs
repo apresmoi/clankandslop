@@ -137,7 +137,7 @@ test('Brass records assignments before any reporter wake handoff', async () => {
 
   const brassBrief = await instructionText(path.join(root, 'agents', 'brass', 'AGENTS.md'));
   assert.doesNotMatch(brassBrief, /forecast=0|paper still goes out/u, 'Brass brief must not say missing forecast still publishes');
-  assert.match(brassBrief, /exactly one forecast assignment|Exactly one assignment must be the forecast/u, 'Brass brief must state the actual forecast contract');
+  assert.match(brassBrief, /At most one forecast/u, 'Brass brief must state the actual forecast contract');
 });
 
 test('shared floor tells reporters to stop without a current assignment row', async () => {

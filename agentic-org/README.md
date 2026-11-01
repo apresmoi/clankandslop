@@ -90,7 +90,7 @@ Step IDs retain the references used by earlier workflow records.
 | 03B | 12:00 host timer, before writers begin | Hetzner daily launch service | Fresh public source and verified private corpus pinned, bundled, deployed and checked in agent mounts; stale or incomplete inputs stop admission |
 | 04 | Sensor mention or allowed DM | Klaxon | Durable lead decisions in the edition index; optional concise sensor-room digest without waking every desk |
 | 05 | 12:00 scheduled wake | Six reporters | At most one pitch each in `conference`, based on their beat index and colleagues' pitches |
-| 06 | 12:30 conference | Brass | At least five assignments, each a BRIEF or an ANALYSIS with its proposition; one forecast and a different named dissenter. Save assignments first, then mention each owner in `assignment` |
+| 06 | 12:30 conference | Brass | At least five assignments, each a BRIEF or an ANALYSIS with its proposition; at most one forecast, with a different named dissenter. A reporter's case against the format before filing may get the piece recast or withdrawn with `amend_assignment`. Save assignments first, then mention each owner in `assignment` |
 | 07 | Assignment or revision request | Assigned reporter | Article JSON: prose, canonical byline, epistemic label and cited Record. Forecasts carry probability and a dated next look. Call `validate_article` and repair errors |
 | 08 | Finished draft passes validation | Reporter and filing tool | `file_article` repeats checks and saves an attributed revision, Git commit and receipt. Separately announce it in `filing`, mentioning Spike and any named dissenter |
 | 09 | Forecast owner's filing mention | Assigned dissenter | Independent dissent or concurrence saved under their own identity against that revision |
