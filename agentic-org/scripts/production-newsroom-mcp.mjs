@@ -1,7 +1,7 @@
 import { compositionArtifactSchema } from './composition-contract.mjs';
 import { articleFilingSchema } from '../../ops/article-format.mjs';
 import { createInterface } from 'node:readline';
-import { composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, recordFreshness, reviewArticle, stageRelease } from './production-newsroom.mjs';
+import { amendAssignment, composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, recordFreshness, reviewArticle, stageRelease } from './production-newsroom.mjs';
 import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
 import { ASSIGNMENTS_MINIMUM, PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
 import { appendRefusal, withRefusalLog } from './refusal-log.mjs';
@@ -38,7 +38,7 @@ const assignmentItem = {
     owner: { type: 'string', enum: DESKS, description: 'Reporter agent this story is assigned to.' },
     brief: { type: 'string', minLength: 20, description: 'What to report, at least 20 characters.' },
     evidence_refs: { type: 'array', items: { type: 'string' }, description: 'source_url or source_id values the filed article must carry in evidence_box.' },
-    slot: { type: 'string', enum: ['forecast'], description: 'Optional, at most one item in the lineup: this is the day\'s forecast. file_article then requires epistemic "forecast", a dated next_update_utc and confidence.value in [0,1] from its owner.' },
+    slot: { type: 'string', enum: ['forecast'], description: 'Optional, at most one item in the lineup, and a day may run without one: this is the day\'s forecast. file_article then requires epistemic "forecast", a dated next_update_utc and confidence.value in [0,1] from its owner.' },
     dissenter: { type: 'string', enum: DESKS, description: 'Optional, only beside slot "forecast" and never the owner: the colleague who holds the dissent and will record it with record_dissent.' }
   }
 };
@@ -67,6 +67,18 @@ const definitions = {
     required: ['edition', 'event_key', 'assignments'],
     properties: { edition, event_key: eventKey, assignments: { type: 'array', minItems: ASSIGNMENTS_MINIMUM, items: assignmentItem, description: `At least ${ASSIGNMENTS_MINIMUM} items (the floor of ${PASSED_ARTICLES_MINIMUM} plus one spare); ids must be unique.` } },
     execute: recordAssignment
+  },
+  amend_assignment: {
+    description: 'Change one recorded assignment after conference, when a reporter has made the case that its format or angle cannot be carried. recast replaces the brief (open it with the new format line); a recast piece is never the forecast, so recasting the forecast leaves the day without one. withdraw drops the piece from the lineup. Refused once the piece has passed or the edition is composed, and a recast is refused for a spiked piece. A successful result sends no message; tell the owner in room:assignment.',
+    required: ['edition', 'event_key', 'article_id', 'change'],
+    optional: ['brief'],
+    properties: {
+      edition, event_key: eventKey,
+      article_id: componentId('Story id of the recorded assignment, from its INDEX A row.'),
+      change: { type: 'string', enum: ['recast', 'withdraw'] },
+      brief: { type: 'string', minLength: 20, description: 'Only for recast: the new brief, opening with its format line.' }
+    },
+    execute: amendAssignment
   },
   file_article: {
     description: 'File one assignment-bound complete sourced article revision. A successful result only saves the filing and sends no Moltnet message: you must then use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, and @spike; forecast filings mention @spike and the dissenter in the same message. The assignment is looked up by (edition, your own agent identity) — you do not need to know or supply assignment_event_key or the exact assigned id.',
@@ -163,7 +175,7 @@ const definitions = {
 // A dissent is a reporter's act, so the six desks carry record_dissent and
 // nobody else does — the tool set is the boundary, exactly as it is for
 // review_article and compose_edition.
-const roleTools={klaxon:['qualify_signal'],brass:['record_assignment','record_freshness_check'],cogsworth:['file_article','record_dissent','record_freshness_check'],sprockett:['file_article','record_dissent','record_freshness_check'],foreman:['file_article','record_dissent','record_freshness_check'],graves:['file_article','record_dissent','record_freshness_check'],tinkerton:['file_article','record_dissent','record_freshness_check'],vesta:['file_article','record_dissent','record_freshness_check'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
+const roleTools={klaxon:['qualify_signal'],brass:['record_assignment','amend_assignment','record_freshness_check'],cogsworth:['file_article','record_dissent','record_freshness_check'],sprockett:['file_article','record_dissent','record_freshness_check'],foreman:['file_article','record_dissent','record_freshness_check'],graves:['file_article','record_dissent','record_freshness_check'],tinkerton:['file_article','record_dissent','record_freshness_check'],vesta:['file_article','record_dissent','record_freshness_check'],spike:['review_article'],ledger:['file_desk'],caslon:['file_desk','compose_edition'],pressman:['stage_release']};
 if(process.env.CLANK_STATE_OFFLINE_FIXTURE!=='1'){const definition=definitions.compose_edition;definition.required=['edition','event_key','layout_sha256'];delete definition.oneOf;definition.properties=Object.fromEntries(definition.required.map(key=>[key,definition.properties[key]]));}
 // Every refusal and every filing lint warning lands in the edition's
 // refusals.jsonl (refusal-log.mjs), so a day's friction survives the container.
