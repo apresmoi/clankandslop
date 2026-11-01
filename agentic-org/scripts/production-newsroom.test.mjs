@@ -20,7 +20,7 @@ const required = Object.fromEntries(Object.entries(composeGateStatus({ edition: 
 // file_article sets each piece's section from its owner's desk, so five owners
 // on five desks always make five sections, whatever the fixture typed.
 const gateLine = ({ sections = 5, dissent = 0, state = 'ready' } = {}) => `# compose: passed=5/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=${sections}/${required.sections} owners=5/${required.owners} sources=5/${required.sources} domains=5/${required.domains} forecast=1 dissent=${dissent}  → ${state}`;
-import { collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, recordFreshness, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
+import { amendAssignment, collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, recordFreshness, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
 import { REPORTERS } from './corpus-contract.mjs';
 import { corpusDeskIndex, corpusIdentityFile, corpusPreparedFile, fixtureRevision, installCorpusFixture } from './corpus-fixture.mjs';
 import { corpusIdentityFromFeed } from './corpus-contract.mjs';
@@ -689,6 +689,43 @@ runtimeTest('an author cannot type a dissent into their own filing', async () =>
   }
 });
 
+runtimeTest('a day may run without a forecast, and Brass can recast the forecast or withdraw a piece after a reporter pushes back', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-recast-'));
+  const state = path.join(temporary, 'state'), edition = '2026-09-08', quiet = '2026-09-09';
+  try {
+    process.env.CLANK_EDITION_STATE_ROOT = state;
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    const assignments = owners.map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism and the falsifying fact for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
+    const none = await recordAssignment({ edition: quiet, event_key: `schedule:assignment-${quiet}`, assignments: assignments.map(({ slot, dissenter, ...item }) => item) });
+    assert.equal(none.forecast, null);
+    await recordAssignment({ edition, event_key: `schedule:assignment-${edition}`, assignments });
+
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    const brief = { ...article('story-1', 'Sprockett', edition, 2), id: 'story-1' };
+    await assert.rejects(fileArticle({ edition, event_key: 'flat-before-recast', article: brief }), /must be "forecast" for the forecast assignment/u);
+    await assert.rejects(amendAssignment({ edition, event_key: 'reporter-recast', article_id: 'story-1', change: 'recast', brief: 'BRIEF: what the communique says.' }), /may only be called by "brass"/u);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'brass';
+    const recast = await amendAssignment({ edition, event_key: 'brass-recast', article_id: 'story-1', change: 'recast', brief: 'BRIEF: what the communique says, no probability.' });
+    assert.equal(recast.owner, 'sprockett');
+    assert.match(recast.next, /@sprockett in room:assignment/u);
+    assert.match(recast.next, /without a forecast/u);
+    await assert.rejects(amendAssignment({ edition, event_key: 'brass-unknown', article_id: 'story-9', change: 'withdraw' }), /no recorded assignment carries id "story-9"/u);
+    const withdrawn = await amendAssignment({ edition, event_key: 'brass-withdraw', article_id: 'story-3', change: 'withdraw' });
+    assert.equal(withdrawn.owner, 'graves');
+    const index = await readFile(path.join(state, 'editions', edition, 'INDEX'), 'utf8');
+    assert.match(index, /A sprockett story-1 .*BRIEF: what the communique says/u);
+    assert.doesNotMatch(index, /A graves story-3 /u);
+
+    process.env.CLANK_NEWSROOM_AGENT = 'sprockett';
+    const filed = await fileArticle({ edition, event_key: 'brief-after-recast', article: brief });
+    assert.equal(filed.forecast, undefined);
+    assert.doesNotMatch(filed.next, /@vesta/u);
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
 runtimeTest('the forecast slot binds its owner at filing time, in the wake that can still fix it', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-forecast-slot-'));
   const state = path.join(temporary, 'state'), edition = '2026-09-07';
@@ -701,10 +738,9 @@ runtimeTest('the forecast slot binds its owner at filing time, in the wake that 
 
     // Brass's own shape is checked where Brass can fix it too.
     await assert.rejects(recordAssignment({ edition, event_key: 'bad-slot', assignments: assignments.map((item, index) => (index === 1 ? { ...item, slot: 'analysis' } : item)) }), /slot "analysis" must be "forecast"/u);
-    await assert.rejects(recordAssignment({ edition, event_key: 'bad-dissenter', assignments: assignments.map((item, index) => (index === 1 ? { ...item, dissenter: 'sprockett' } : item)) }), /is the owner of the piece — nobody dissents from their own byline/u);
+    await assert.rejects(recordAssignment({ edition, event_key: 'bad-dissenter', assignments: assignments.map((item, index) => (index === 1 ? { ...item, dissenter: 'sprockett' } : item)) }), /is the owner of the piece; nobody dissents from their own byline/u);
     await assert.rejects(recordAssignment({ edition, event_key: 'lonely-dissenter', assignments: assignments.map((item, index) => (index === 2 ? { ...item, dissenter: 'vesta' } : item)) }), /only meaningful beside slot "forecast"/u);
     await assert.rejects(recordAssignment({ edition, event_key: 'two-slots', assignments: assignments.map((item, index) => (index === 2 ? { ...item, slot: 'forecast' } : item)) }), /at most one assignment may carry slot "forecast", got 2/u);
-    await assert.rejects(recordAssignment({ edition, event_key: 'no-forecast-slot', assignments: assignments.map(({ slot, dissenter, ...item }) => item) }), /exactly one assignment must carry slot "forecast", got 0/u);
     await assert.rejects(recordAssignment({ edition, event_key: 'forecast-no-dissenter', assignments: assignments.map((item, index) => (index === 1 ? (({ dissenter, ...rest }) => rest)(item) : item)) }), /dissenter is required for the forecast slot/u);
     const duplicateOwner = assignments.map((item, index) => (index === 2 ? { ...item, owner: 'cogsworth' } : item));
     assert.deepEqual((await recordAssignment({ edition, event_key: 'duplicate-owner-is-permitted', assignments: duplicateOwner })).forecast, { id: 'story-1', owner: 'sprockett', dissenter: 'vesta' });
