@@ -14,10 +14,10 @@ import { proseLeakFindings } from '../../ops/prose-leaks.mjs';
 import { glyphSelectionFindings } from '../../ops/glyph-format.mjs';
 import { archiveIndex } from '../../ops/lay-page.mjs';import { assertCarriedRows, openDueCalls } from '../../ops/ledger-archive.mjs';import { authenticateWorldDeskFiling } from './worlddesk-filing.mjs';
 import { saveSignalDisposition, signalKey } from './signal-disposition.mjs';
-import { reviewNoticeInstruction } from './review-handoff.mjs';import { clockOf, freshnessStatus, recordFreshnessCheck, updateFor } from './freshness.mjs';import { escalationRoom } from './agent-rooms.mjs';import { assertLedgerDeskOpen, ledgerFilingNext } from './ledger-research.mjs';import { ASSIGNMENTS_MINIMUM } from '../../ops/edition-floor.mjs';
+import { reviewNoticeInstruction } from './review-handoff.mjs';import { clockOf, freshnessStatus, recordFreshnessCheck, updateFor } from './freshness.mjs';import { escalationRoom } from './agent-rooms.mjs';import { assertLedgerDeskOpen, ledgerFilingNext } from './ledger-research.mjs';import { LINEUP_DESKS, amendRecord, assertAmendment, assertLineup } from './assignment-lineup.mjs';
 import { publicEditionsRoot, stagePublicSource as stagePublicContent } from './public-content.mjs';
 
-const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(['cogsworth','sprockett','foreman','graves','tinkerton','vesta']);
+const date=/^\d{4}-\d{2}-\d{2}$/;const component=/^[a-z0-9][a-z0-9-]{0,127}$/;const desks=new Set(LINEUP_DESKS);
 const sha=value=>`sha256:${createHash('sha256').update(value).digest('hex')}`;const object=value=>{if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('object required');return value;};
 const exact=(value,required,optional=[])=>{object(value);const keys=Object.keys(value);const missing=required.filter(key=>!(key in value)),unexpected=keys.filter(key=>!required.includes(key)&&!optional.includes(key));if(missing.length||unexpected.length)throw new Error(`invalid fields — missing: [${missing.join(', ')}], unexpected: [${unexpected.join(', ')}]; required: [${required.join(', ')}]${optional.length?`, optional: [${optional.join(', ')}]`:''}`);return value;};
 const identity=args=>{object(args);if(!date.test(args.edition))throw new Error(`edition must be an ISO date "YYYY-MM-DD", got ${JSON.stringify(args.edition)}`);const wakeId=process.env.DAIMON_WAKE_ID;if(wakeId!==undefined){if(args.event_key!==wakeId)throw new Error(`event_key must equal the current wake id "${wakeId}", got ${JSON.stringify(args.event_key)}`);return args;}if(typeof args.event_key!=='string'||args.event_key.length<8||args.event_key.length>1024)throw new Error(`event_key must be a string between 8 and 1024 characters, got ${JSON.stringify(args.event_key)}`);return args;};
@@ -109,31 +109,21 @@ async function commissionedCorpus(edition){
   return corpusRecord(bound.corpus,edition,'the lineup was commissioned against');}
 async function recordAssignmentAction(args){
   identity(args);exact(args,['edition','event_key','assignments']);
-  if(!Array.isArray(args.assignments))throw new Error('assignments must be an array of {id, owner, brief, evidence_refs} objects');
-  if(args.assignments.length<ASSIGNMENTS_MINIMUM)throw new Error(`assignments must include at least ${ASSIGNMENTS_MINIMUM} items, got ${args.assignments.length}: composition needs ${ASSIGNMENTS_MINIMUM-1} passed pieces and the extra one is the spare against a spike; it may be a short piece`);
-  args.assignments.forEach((item,index)=>{
-    try{exact(item,['id','owner','brief','evidence_refs'],['slot','dissenter']);}catch(error){throw new Error(`assignments[${index}] ${error.message}`);}
-    if(!component.test(item.id))throw new Error(`assignments[${index}].id ${JSON.stringify(item.id)} must be 1-128 lowercase alphanumeric/hyphen characters, starting with a letter or digit`);
-    if(!desks.has(item.owner))throw new Error(`assignments[${index}].owner ${JSON.stringify(item.owner)} must be one of: ${[...desks].join(', ')}`);
-    if(typeof item.brief!=='string'||item.brief.length<20)throw new Error(`assignments[${index}].brief must be a string of at least 20 characters, got ${typeof item.brief==='string'?`${item.brief.length} characters`:typeof item.brief}`);
-    if(!Array.isArray(item.evidence_refs))throw new Error(`assignments[${index}].evidence_refs must be an array of strings`);
-    if(item.slot!==undefined&&item.slot!=='forecast')throw new Error(`assignments[${index}].slot ${JSON.stringify(item.slot)} must be "forecast" — it is the only slot the lineup names`);
-    if(item.dissenter!==undefined){
-      if(item.slot!=='forecast')throw new Error(`assignments[${index}].dissenter is only meaningful beside slot "forecast" — a dissent is held against a dated call, so name the slot too or drop the dissenter`);
-      if(!desks.has(item.dissenter))throw new Error(`assignments[${index}].dissenter ${JSON.stringify(item.dissenter)} must be one of: ${[...desks].join(', ')}`);
-      if(item.dissenter===item.owner)throw new Error(`assignments[${index}].dissenter ${JSON.stringify(item.dissenter)} is the owner of the piece — nobody dissents from their own byline, name a different desk`);
-    }
-  });
-  const ids=args.assignments.map(item=>item.id),duplicates=ids.filter((id,index)=>ids.indexOf(id)!==index);
-  if(duplicates.length>0)throw new Error(`assignments[].id must be unique, got duplicates: ${[...new Set(duplicates)].join(', ')}`);
-  const slotted=args.assignments.filter(item=>item.slot==='forecast');
-  if(slotted.length>1)throw new Error(`at most one assignment may carry slot "forecast", got ${slotted.length}: ${slotted.map(item=>item.id).join(', ')}`);
-  if(slotted.length!==1)throw new Error(`exactly one assignment must carry slot "forecast", got ${slotted.length}`);
-  if(slotted[0].dissenter===undefined)throw new Error(`assignments[${args.assignments.indexOf(slotted[0])}].dissenter is required for the forecast slot and must name a different desk`);
-  const corpus=await corpusIdentity(args.edition);
+  const slotted=assertLineup(args.assignments),corpus=await corpusIdentity(args.edition);
   await convergeIndexed(args.edition,location(args.edition,'assignments',sha(args.event_key).slice(7,39)),{version:'clank.assignments.v1',...args,corpus});
-  const forecast={id:slotted[0].id,owner:slotted[0].owner,dissenter:slotted[0].dissenter};
+  const forecast=slotted?{id:slotted.id,owner:slotted.owner,dissenter:slotted.dissenter}:null;
   return{recorded:args.assignments.length,forecast,corpus,receipt:await receipt(args,'assigned',{assignments:args.assignments,corpus})};
+}
+async function amendAssignmentAction(args){
+  identity(args);assertAmendment(args);
+  if(process.env.CLANK_NEWSROOM_AGENT!=='brass')throw new Error(`amend_assignment may only be called by "brass", got "${process.env.CLANK_NEWSROOM_AGENT}"`);
+  if((await jsonNames(args.edition,'receipts')).some(name=>name.startsWith('composed-')))throw new Error(`edition ${args.edition} is composed; the lineup is in print and nothing was changed`);
+  if((await jsonNames(args.edition,'articles')).includes(args.article_id))throw new Error(`"${args.article_id}" has already passed; a passed piece runs as Spike passed it and nothing was changed`);
+  const ruled=(await revisionNames(args.edition,'verdicts',args.article_id)).at(-1),last=ruled&&await readJson(location(args.edition,'verdicts',`${args.article_id}/${ruled}`));if(args.change==='recast'&&last?.verdict==='SPIKE')throw new Error(`Spike spiked revision ${ruled} of "${args.article_id}" and a spiked piece cannot be refiled, so a recast would strand its owner; withdraw it instead. Nothing was changed`);
+  const changed=[];for(const name of await jsonNames(args.edition,'assignments')){const file=location(args.edition,'assignments',name),record=await readJson(file),next=amendRecord(record,args);if(!next)continue;await converge(location(args.edition,'history',`assignments/${name}/${sha(JSON.stringify(record)).slice(7)}`),record);await supersedeIndexed(args.edition,file,next);changed.push(next.amendments.at(-1).prior);}
+  if(changed.length===0)throw new Error(`no recorded assignment carries id ${JSON.stringify(args.article_id)} in edition ${args.edition}; the INDEX A rows list the ids`);
+  const owner=changed[0].owner,next=args.change==='withdraw'?`Saved only; no message was sent. Tell @${owner} in room:assignment that "${args.article_id}" is dropped for ${args.edition} and why.`:`Saved only; no message was sent. Tell @${owner} in room:assignment the new format line for "${args.article_id}" on ${args.edition}; they file the next revision against it.${changed[0].slot==='forecast'?' The day now runs without a forecast.':''}`;
+  return{article_id:args.article_id,change:args.change,owner,next,receipt:await receipt(args,'amended',{article_id:args.article_id,change:args.change,brief:args.brief??null})};
 }
 const subdirNames=async(edition,kind)=>{try{return(await readdir(within(root(),'editions',edition,kind),{withFileTypes:true})).filter(entry=>entry.isDirectory()).map(entry=>entry.name).sort();}catch(error){if(error.code==='ENOENT')return[];throw error;}};
 const revisionNames=async(edition,kind,id)=>{try{return(await readdir(within(root(),'editions',edition,kind,id))).filter(name=>name.endsWith('.json')).map(name=>Number(name.slice(0,-5))).filter(value=>Number.isSafeInteger(value)&&value>=1).sort((left,right)=>left-right);}catch(error){if(error.code==='ENOENT')return[];throw error;}};
@@ -391,7 +381,7 @@ async function releaseAction(method,args){
 }
 async function operation(name,args,action,resource=name,{cache=true}={}){identity(args);const state=await stateAdapter();return state.runEditionOperation({root:root(),edition:args.edition,operation:name,role:process.env.CLANK_NEWSROOM_AGENT??null,wakeId:args.event_key,request:args,resource,cache,afterCommit:()=>writeEditionIndex(root(),args.edition)},()=>action(args));}
 export const qualifySignal=args=>operation('qualify_signal',args,qualifySignalAction,args.source_id===undefined?'qualify_signal':signalKey(args.source_id));
-export const recordAssignment=args=>operation('record_assignment',args,recordAssignmentAction);
+export const recordAssignment=args=>operation('record_assignment',args,recordAssignmentAction);export const amendAssignment=args=>operation('amend_assignment',args,amendAssignmentAction,`assignment/${args.article_id}`);
 export const fileArticle=args=>operation('file_article',args,fileArticleAction,async()=>{const {assignment}=await resolveAssignment(args,object(args.article),process.env.CLANK_NEWSROOM_AGENT);return `${assignment.id}/${args.article.revision}`;});
 export const recordDissent=args=>operation('record_dissent',args,recordDissentAction,`${args.article_id}/${args.revision}`);
 export const recordFreshness=args=>operation('record_freshness_check',args,recordFreshnessAction,`${args.article_id}/${args.revision}`);export const reviewArticle=args=>operation('review_article',args,reviewArticleAction,`${args.article_id}/${args.revision}`);

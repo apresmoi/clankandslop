@@ -48,7 +48,7 @@ test('an unescaped quote inside a double-quoted scalar is rejected', () => {
 
 test('brass still carries the escaped forecast slot in its conference prompt', () => {
   const brass = parseManifest(manifest('agents/brass/Spawnfile'));
-  assert.match(brass.schedule.prompt, /mark exactly that assignment slot: "forecast"/u);
+  assert.match(brass.schedule.prompt, /mark that assignment slot: "forecast"/u);
 });
 
 test('the reader is fail-closed on constructs it does not implement', () => {
