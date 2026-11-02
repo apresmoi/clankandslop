@@ -1,0 +1,931 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-02",
+  "generated_at": "2026-11-02T08:48:52Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 123.1,
+        "observed_at": "2026-10-27",
+        "stale_days": 6,
+        "contributes": 3,
+        "reason": "123.1 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 103.37,
+        "observed_at": "2026-10-27",
+        "stale_days": 6,
+        "contributes": 1,
+        "reason": "103.37 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.352,
+        "observed_at": "2026-10-26",
+        "stale_days": 7,
+        "contributes": 2,
+        "reason": "6.352 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 2.76,
+        "observed_at": "2026-10-27",
+        "stale_days": 6,
+        "contributes": 0,
+        "reason": "2.76 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 17.2,
+        "observed_at": "2026-10-29",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "17.2 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.26,
+        "observed_at": "2026-10-29",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "3.26 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.3202,
+        "observed_at": "2026-10-23",
+        "stale_days": 10,
+        "contributes": 0,
+        "reason": "121.3202 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-02T08:48:51Z",
+        "http_status": 200,
+        "bytes": 170273,
+        "sha256": "f3ad22ec3aa8800fc5edfa638d364ae388a5612ed895d233f0b2af67c807a393",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-02T08:48:51Z",
+        "http_status": 200,
+        "bytes": 176046,
+        "sha256": "d85c38f6f6e9078151ec4232b3c3653e8953bbd3b0506f72375e9912503d8295",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-02T08:48:52Z",
+        "http_status": 200,
+        "bytes": 28959,
+        "sha256": "eecf882f835954d1546708e5a358133170f181f5e0f1616fbf7359c33611ec2f",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-02T08:48:52Z",
+        "http_status": 200,
+        "bytes": 116313,
+        "sha256": "009cb63436a4492e1bd85df95de80181244fc3856a1a6a81e7ae6afbe5336899",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-02T08:48:52Z",
+        "http_status": 200,
+        "bytes": 161782,
+        "sha256": "7cfbdd416b37b45f1fb2ab7d476e9965aed3db8a402a258a56b207df73624702",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-02T08:48:52Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "9821f8417d061ba2304abd622034f2fb8581dffedaeccf353674bdca49d98c12",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-02T08:48:52Z",
+        "http_status": 200,
+        "bytes": 104829,
+        "sha256": "8080a7d962c8e8976e4394a5dbdb2e4a2ddb984c1c5aefc581aa42b715fd6932",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 34,
+    "open_conflicts": 3,
+    "watch": 3,
+    "dormant": 7,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-01 and drew no qualifying story today",
+        "last_open_edition": "2026-11-01",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-01",
+            "story_id": "s-08783ce8",
+            "story_title": "President Trump says the US has “knocked out” much of Iran’s nuclear capability but still has one or two…",
+            "source": "grok/grok-rolling-0345.md",
+            "slot": "0345",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://gulfnews.com/world/mena/middle-east-conflict-trump-says-us-still-has-to-take-care-of-one-or-two-targets-in-iran-1.500731311",
+            "source_urls": [
+              "https://gulfnews.com/world/mena/middle-east-conflict-trump-says-us-still-has-to-take-care-of-one-or-two-targets-in-iran-1.500731311",
+              "https://gulfnews.com/world/mena/middle-east-conflict-trump-says-us-still-has-to-take-care-of-one-or-two-targets-in-iran-1.500731311",
+              "https://gulfnews.com/world/mena/middle-east-conflict-trump-says-us-still-has-to-take-care-of-one-or-two-targets-in-iran-1.500731311",
+              "https://gulfnews.com/world/mena/middle-east-conflict-trump-says-us-still-has-to-take-care-of-one-or-two-targets-in-iran-1.500731311",
+              "https://www.news18.com/world/iran-will-never-have-a-nuclear-weapon-trump-says-us-still-has-one-or-two-targets-left-to-strike-ws-lrt-10407150.html",
+              "https://www.news18.com/world/iran-will-never-have-a-nuclear-weapon-trump-says-us-still-has-one-or-two-targets-left-to-strike-ws-lrt-10407150.html",
+              "https://www.news18.com/world/iran-will-never-have-a-nuclear-weapon-trump-says-us-still-has-one-or-two-targets-left-to-strike-ws-lrt-10407150.html",
+              "https://www.news18.com/world/iran-will-never-have-a-nuclear-weapon-trump-says-us-still-has-one-or-two-targets-left-to-strike-ws-lrt-10407150.html",
+              "https://en.royanews.tv/news/75548/Trump-says-US-still-has-to-%E2%80%9Ctake-care%E2%80%9D-of-one-or-two-targets-in-Iran"
+            ],
+            "observed_at": "2026-11-01T01:45:00Z"
+          },
+          {
+            "edition": "2026-11-01",
+            "story_id": "s-26b7d5c5",
+            "story_title": "Lead 1: Trump says US can hit remaining Iran targets “in 10 minutes,” including Pickaxe Mountain",
+            "source": "grok/grok-rolling-0643.md",
+            "slot": "0643",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://punchng.com/us-still-has-one-or-two-targets-in-iran-trump/",
+            "source_urls": [
+              "https://punchng.com/us-still-has-one-or-two-targets-in-iran-trump/",
+              "https://punchng.com/us-still-has-one-or-two-targets-in-iran-trump/",
+              "https://punchng.com/us-still-has-one-or-two-targets-in-iran-trump/",
+              "https://punchng.com/us-still-has-one-or-two-targets-in-iran-trump/",
+              "https://punchng.com/us-still-has-one-or-two-targets-in-iran-trump/",
+              "https://www.rte.ie/news/2026/1101/1597505-trump-iran/",
+              "https://www.rte.ie/news/2026/1101/1597505-trump-iran/",
+              "https://www.rte.ie/news/2026/1101/1597505-trump-iran/",
+              "https://www.indiatoday.in/world/story/donald-trump-iran-threat-targets-mojtaba-khamenei-warning-pickaxe-mountain-3029687-2026-11-01",
+              "https://www.indiatoday.in/world/story/donald-trump-iran-threat-targets-mojtaba-khamenei-warning-pickaxe-mountain-3029687-2026-11-01"
+            ],
+            "observed_at": "2026-11-01T04:43:00Z"
+          },
+          {
+            "edition": "2026-11-01",
+            "story_id": "s-cc34e6c7",
+            "story_title": "Lead 2: Oman rescues 25 crew from burning Panamanian-flagged tanker RITI in Strait of Hormuz; IRGC claims…",
+            "source": "grok/grok-rolling-1244.md",
+            "slot": "1244",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/10/30/oman-rescues-25-from-burning-oil-tanker-in-strait-of-hormuz",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/10/30/oman-rescues-25-from-burning-oil-tanker-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/30/oman-rescues-25-from-burning-oil-tanker-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/30/oman-rescues-25-from-burning-oil-tanker-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/30/oman-rescues-25-from-burning-oil-tanker-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/30/oman-rescues-25-from-burning-oil-tanker-in-strait-of-hormuz",
+              "https://www.aljazeera.com/news/2026/10/30/oman-rescues-25-from-burning-oil-tanker-in-strait-of-hormuz",
+              "https://www.straitstimes.com/world/middle-east/oman-rescues-25-from-burning-ship-iran-halts-tankers",
+              "https://www.straitstimes.com/world/middle-east/oman-rescues-25-from-burning-ship-iran-halts-tankers",
+              "https://www.straitstimes.com/world/middle-east/oman-rescues-25-from-burning-ship-iran-halts-tankers",
+              "https://www.straitstimes.com/world/middle-east/oman-rescues-25-from-burning-ship-iran-halts-tankers",
+              "https://www.thevibes.com/articles/world/129007/oman-rescues-25-crew-as-attacks-and-mine-threats-disrupt-hormuz-shipping"
+            ],
+            "observed_at": "2026-10-31T10:44:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 6,
+        "evidence": [
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-2626d3c2",
+            "story_title": "Russian strikes knock out power to hundreds of thousands in Ukraine",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/russian-strikes-cut-power-thousands-ukraine-drones-damage-russian-facility-2026-11-01/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/russian-strikes-cut-power-thousands-ukraine-drones-damage-russian-facility-2026-11-01/",
+              "https://www.reuters.com/world/europe/russian-strikes-cut-power-thousands-ukraine-drones-damage-russian-facility-2026-11-01/",
+              "https://www.reuters.com/world/europe/russian-strikes-cut-power-thousands-ukraine-drones-damage-russian-facility-2026-11-01/",
+              "https://www.reuters.com/world/europe/russian-strikes-cut-power-thousands-ukraine-drones-damage-russian-facility-2026-11-01/",
+              "https://www.reuters.com/world/europe/russian-strikes-cut-power-thousands-ukraine-drones-damage-russian-facility-2026-11-01/",
+              "https://www.reuters.com/world/europe/russian-strikes-cut-power-thousands-ukraine-drones-damage-russian-facility-2026-11-01/",
+              "https://www.theguardian.com/world/2026/nov/01/ukraine-defies-trump-resumes-attacks-russian-oil",
+              "https://www.theguardian.com/world/2026/nov/01/ukraine-defies-trump-resumes-attacks-russian-oil"
+            ],
+            "observed_at": "2026-11-01T19:16:00Z"
+          },
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-44a91033",
+            "story_title": "Lead 2: Kherson localized ceasefire expires; Ukraine reports major power cuts and air-alert app…",
+            "source": "grok/grok-rolling-0943.md",
+            "slot": "0943",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/c64g1y90p71eo",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/c64g1y90p71eo",
+              "https://www.bbc.co.uk/news/articles/c64g1y90p71eo",
+              "https://www.bbc.co.uk/news/articles/c64g1y90p71eo",
+              "https://www.bbc.co.uk/news/articles/c64g1y90p71eo",
+              "https://www.bbc.co.uk/news/articles/c64g1y90p71eo",
+              "https://www.bbc.co.uk/news/articles/c64g1y90p71eo",
+              "https://www.euronews.com/2026/11/01/russia-says-massive-drone-attack-targeted-industrial-enterprise-amid-reports-oil-refinery-",
+              "https://www.euronews.com/2026/11/01/russia-says-massive-drone-attack-targeted-industrial-enterprise-amid-reports-oil-refinery-",
+              "https://www.euronews.com/2026/11/01/russia-says-massive-drone-attack-targeted-industrial-enterprise-amid-reports-oil-refinery-",
+              "https://www.euronews.com/2026/11/01/russia-says-massive-drone-attack-targeted-industrial-enterprise-amid-reports-oil-refinery-",
+              "https://www.euronews.com/2026/11/01/russia-says-massive-drone-attack-targeted-industrial-enterprise-amid-reports-oil-refinery-",
+              "https://www.euronews.com/2026/11/01/russia-says-massive-drone-attack-targeted-industrial-enterprise-amid-reports-oil-refinery-"
+            ],
+            "observed_at": "2026-11-02T07:43:00Z"
+          },
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-7f31e686",
+            "story_title": "Lead 2: EU Commission states Polish Sejm holds constitutional power to appoint Constitutional Tribunal…",
+            "source": "grok/grok-rolling-1545.md",
+            "slot": "1545",
+            "matched": [
+              "Kyiv"
+            ],
+            "source_url": "https://www.politico.eu/article/european-commission-backs-donald-tusk-over-poland-constitutional-court-judges/",
+            "source_urls": [
+              "https://www.politico.eu/article/european-commission-backs-donald-tusk-over-poland-constitutional-court-judges/",
+              "https://www.politico.eu/article/european-commission-backs-donald-tusk-over-poland-constitutional-court-judges/",
+              "https://www.politico.eu/article/european-commission-backs-donald-tusk-over-poland-constitutional-court-judges/",
+              "https://www.politico.eu/article/european-commission-backs-donald-tusk-over-poland-constitutional-court-judges/",
+              "https://www.euronews.com/2026/11/01/eu-commission-polish-parliament-has-right-to-appoint-judges-to-the-constitutional-court",
+              "https://www.euronews.com/2026/11/01/eu-commission-polish-parliament-has-right-to-appoint-judges-to-the-constitutional-court",
+              "https://www.euronews.com/2026/11/01/eu-commission-polish-parliament-has-right-to-appoint-judges-to-the-constitutional-court",
+              "https://www.euronews.com/2026/11/01/eu-commission-polish-parliament-has-right-to-appoint-judges-to-the-constitutional-court",
+              "https://www.cnn.com/2026/11/01/europe/poland-constitutional-tribunal-tusk-intl",
+              "https://www.cnn.com/2026/11/01/europe/poland-constitutional-tribunal-tusk-intl",
+              "https://www.cnn.com/2026/11/01/europe/poland-constitutional-tribunal-tusk-intl",
+              "https://www.cnn.com/2026/11/01/europe/poland-constitutional-tribunal-tusk-intl",
+              "https://kyivindependent.com/eu-commission-backs-poland-government-over-constitutional-court-crisis/"
+            ],
+            "observed_at": "2026-11-01T13:45:00Z"
+          },
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-8a23e4d9",
+            "story_title": "Lead 2: Ukraine and Russia emergency alert apps hit by apparent cyberattacks hours apart, sending false…",
+            "source": "grok/grok-rolling-0643.md",
+            "slot": "0643",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+              "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+              "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+              "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+              "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+              "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+              "https://www.aljazeera.com/news/2026/11/2/ukraine-blames-russia-after-air-alert-app-sends-out-false-warnings",
+              "https://kyivindependent.com/ukraines-air-raid-alert-system-hacked-air-force-says-as-false-nuclear-chemical-warnings-sound/",
+              "https://kyivindependent.com/ukraines-air-raid-alert-system-hacked-air-force-says-as-false-nuclear-chemical-warnings-sound/",
+              "https://kyivindependent.com/ukraines-air-raid-alert-system-hacked-air-force-says-as-false-nuclear-chemical-warnings-sound/",
+              "https://kyivindependent.com/ukraines-air-raid-alert-system-hacked-air-force-says-as-false-nuclear-chemical-warnings-sound/",
+              "https://www.bbc.com/news/live/cm4g1yjxv38gt"
+            ],
+            "observed_at": "2026-11-02T04:43:00Z"
+          },
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-b38e0d4e",
+            "story_title": "Lead 1: Bulgaria presidential runoff — exit polls show Yotova ahead",
+            "source": "grok/grok-rolling-2143.md",
+            "slot": "2143",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://sofiaglobe.com/2026/11/01/bulgarias-2026-presidential-elections-yotova-52-5-gyurov-43-4-in-second-round-exit-poll/",
+            "source_urls": [
+              "https://sofiaglobe.com/2026/11/01/bulgarias-2026-presidential-elections-yotova-52-5-gyurov-43-4-in-second-round-exit-poll/",
+              "https://sofiaglobe.com/2026/11/01/bulgarias-2026-presidential-elections-yotova-52-5-gyurov-43-4-in-second-round-exit-poll/",
+              "https://sofiaglobe.com/2026/11/01/bulgarias-2026-presidential-elections-yotova-52-5-gyurov-43-4-in-second-round-exit-poll/",
+              "https://sofiaglobe.com/2026/11/01/bulgarias-2026-presidential-elections-yotova-52-5-gyurov-43-4-in-second-round-exit-poll/",
+              "https://sofiaglobe.com/2026/11/01/bulgarias-2026-presidential-elections-yotova-52-5-gyurov-43-4-in-second-round-exit-poll/",
+              "https://bnrnews.bg/en/post/551552/exit-poll-iliana-iotova-is-bulgarias-new-president",
+              "https://bnrnews.bg/en/post/551552/exit-poll-iliana-iotova-is-bulgarias-new-president",
+              "https://www.intellinews.com/bulgaria-s-iotova-wins-presidential-runoff-exit-polls-show-480753/",
+              "https://www.intellinews.com/bulgaria-s-iotova-wins-presidential-runoff-exit-polls-show-480753/",
+              "https://www.intellinews.com/bulgaria-s-iotova-wins-presidential-runoff-exit-polls-show-480753/",
+              "https://www.intellinews.com/bulgaria-s-iotova-wins-presidential-runoff-exit-polls-show-480753/"
+            ],
+            "observed_at": "2026-11-01T19:43:00Z"
+          },
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-b9ff80f5",
+            "story_title": "Latvia reports brief airspace incursion amid Ukraine spillover fears",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/latvia-reports-brief-airspace-intrusion-near-russia-belarus-borders-2026-11-01/",
+            "source_urls": [
+              "https://www.reuters.com/world/latvia-reports-brief-airspace-intrusion-near-russia-belarus-borders-2026-11-01/",
+              "https://www.reuters.com/world/latvia-reports-brief-airspace-intrusion-near-russia-belarus-borders-2026-11-01/",
+              "https://www.reuters.com/world/latvia-reports-brief-airspace-intrusion-near-russia-belarus-borders-2026-11-01/",
+              "https://www.reuters.com/world/latvia-reports-brief-airspace-intrusion-near-russia-belarus-borders-2026-11-01/",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/05/21/latvia-and-lithuania-issue-drone-alerts-scramble-nato-fighter-jets",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/05/21/latvia-and-lithuania-issue-drone-alerts-scramble-nato-fighter-jets",
+              "https://www.internazionale.it/ultime-notizie-reuters/2026/05/21/latvia-and-lithuania-issue-drone-alerts-scramble-nato-fighter-jets"
+            ],
+            "observed_at": "2026-11-01T19:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-23671523",
+            "story_title": "Israeli strikes in Gaza kill at least eight, including police",
+            "source": "chatgpt/chatgpt-rolling-2116.md",
+            "slot": "2116",
+            "matched": [
+              "Gaza",
+              "Khan Younis"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/israeli-strikes-kill-eight-people-gaza-medics-say-2026-11-01/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-eight-people-gaza-medics-say-2026-11-01/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-eight-people-gaza-medics-say-2026-11-01/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-eight-people-gaza-medics-say-2026-11-01/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-eight-people-gaza-medics-say-2026-11-01/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-eight-people-gaza-medics-say-2026-11-01/",
+              "https://english.news.cn/20261101/063e9ec55b9b452482c2ea63302b6346/c.html",
+              "https://english.news.cn/20261101/063e9ec55b9b452482c2ea63302b6346/c.html",
+              "https://english.news.cn/20261101/063e9ec55b9b452482c2ea63302b6346/c.html",
+              "https://english.news.cn/20261101/063e9ec55b9b452482c2ea63302b6346/c.html",
+              "https://english.news.cn/20261101/063e9ec55b9b452482c2ea63302b6346/c.html"
+            ],
+            "observed_at": "2026-11-01T19:16:00Z"
+          },
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-565473dd",
+            "story_title": "Lead 1: Israeli drone strikes kill at least eight Palestinians (including police officers and a child) in…",
+            "source": "grok/grok-rolling-1844.md",
+            "slot": "1844",
+            "matched": [
+              "Gaza",
+              "Khan Younis"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.middleeastmonitor.com/20261101-at-least-8-palestinians-killed-in-new-israeli-violations-of-gaza-ceasefire/",
+              "https://www.middleeastmonitor.com/20261101-at-least-8-palestinians-killed-in-new-israeli-violations-of-gaza-ceasefire/",
+              "https://www.middleeastmonitor.com/20261101-at-least-8-palestinians-killed-in-new-israeli-violations-of-gaza-ceasefire/",
+              "https://www.middleeastmonitor.com/20261101-at-least-8-palestinians-killed-in-new-israeli-violations-of-gaza-ceasefire/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261101-930-927283/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261101-930-927283/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261101-930-927283/",
+              "https://www.dailysabah.com/world/mid-east/child-among-8-killed-in-fresh-israeli-violation-of-gaza-truce",
+              "https://www.dailysabah.com/world/mid-east/child-among-8-killed-in-fresh-israeli-violation-of-gaza-truce",
+              "https://www.dailysabah.com/world/mid-east/child-among-8-killed-in-fresh-israeli-violation-of-gaza-truce"
+            ],
+            "observed_at": "2026-11-01T16:44:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-31 and drew no qualifying story today",
+        "last_open_edition": "2026-10-31",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-31",
+            "story_id": "s-3b96517c",
+            "story_title": "Yemen: Taiz governor declares city of ~1 million in famine amid Houthi siege; HRW says siege may amount to…",
+            "source": "grok/grok-rolling-1847.md",
+            "slot": "1847",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+            "source_urls": [
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.independent.co.uk/news/taiz-houthi-yemen-cairo-world-food-program-b3075955.html",
+              "https://www.democracynow.org/2026/10/30/headlines/famine_declared_in_yemeni_city_of_taiz_amid_houthi_siege",
+              "https://www.democracynow.org/2026/10/30/headlines/famine_declared_in_yemeni_city_of_taiz_amid_houthi_siege"
+            ],
+            "observed_at": "2026-10-30T16:47:00Z"
+          },
+          {
+            "edition": "2026-10-31",
+            "story_id": "s-ab554a19",
+            "story_title": "Lead 5: Governor of Taiz declares the city in famine under Houthi siege; HRW and UN document blocked aid…",
+            "source": "grok/grok-rolling-1546.md",
+            "slot": "1546",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+            "source_urls": [
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://news.un.org/en/story/2026/10/1168654"
+            ],
+            "observed_at": "2026-10-30T13:46:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-26 and drew no qualifying story today",
+        "last_open_edition": "2026-10-26",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-26",
+            "story_id": "s-08c7c4e8",
+            "story_title": "Lead 1: Venezuelan opposition leader María Corina Machado returns from exile",
+            "source": "grok/grok-rolling-1842.md",
+            "slot": "1842",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+            "source_urls": [
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://www.pbs.org/newshour/world/venezuelas-opposition-leader-machado-returns-after-months-in-exile",
+              "https://english.elpais.com/international/2026-10-25/maria-corina-machado-returns-to-venezuela.html",
+              "https://english.elpais.com/international/2026-10-25/maria-corina-machado-returns-to-venezuela.html"
+            ],
+            "observed_at": "2026-10-25T16:42:00Z"
+          },
+          {
+            "edition": "2026-10-26",
+            "story_id": "s-87a2ef9a",
+            "story_title": "Lead 2: Venezuelan opposition leader María Corina Machado returns from exile to crowds; US role confirmed",
+            "source": "grok/grok-rolling-0647.md",
+            "slot": "0647",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+            "source_urls": [
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.cnn.com/2026/10/25/americas/machado-returns-venezuela-latam-intl",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://www.afp.com/en/machado-returns-exile-jubilant-crowds-venezuela",
+              "https://abcnews.com/International/wireStory/venezuelas-opposition-leader-machado-returns-after-months-exile-137555261",
+              "https://abcnews.com/International/wireStory/venezuelas-opposition-leader-machado-returns-after-months-exile-137555261"
+            ],
+            "observed_at": "2026-10-26T04:47:00Z"
+          },
+          {
+            "edition": "2026-10-26",
+            "story_id": "s-b48b6880",
+            "story_title": "María Corina Machado is physically back in Venezuela, reopening the election confrontation",
+            "source": "chatgpt/chatgpt-rolling-2117.md",
+            "slot": "2117",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+            "source_urls": [
+              "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+              "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+              "https://www.reuters.com/world/americas/venezuela-opposition-leader-maria-corina-machado-returns-venezuela-2026-10-25/",
+              "https://apnews.com/article/venezuela-maria-corina-machado-return-democracy-maduro-e6eff0c2ff962fd9b0f87270b24ef567",
+              "https://www.aljazeera.com/news/2026/10/25/venezuelas-opposition-leader-maria-corina-machado-returns-from-exile",
+              "https://www.aljazeera.com/news/2026/10/25/venezuelas-opposition-leader-maria-corina-machado-returns-from-exile",
+              "https://www.aljazeera.com/news/2026/10/25/venezuelas-opposition-leader-maria-corina-machado-returns-from-exile",
+              "https://x.com/Urruchurtu/status/2114447039203549598"
+            ],
+            "observed_at": "2026-10-25T19:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-3252c000",
+            "story_title": "Lead 3: FBI attributes $6+ billion Binance cryptocurrency theft to North Korea’s TraderTraitor",
+            "source": "grok/grok-rolling-0042.md",
+            "slot": "0042",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+            "source_urls": [
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://en.yna.co.kr/view/AEN20261101000300315"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-02",
+            "story_id": "s-fa43551a",
+            "story_title": "Lead 3: FBI attributes record ~$6.3 billion Binance crypto theft (29 Oct) to North Korea’s TraderTraitor…",
+            "source": "grok/grok-rolling-0643.md",
+            "slot": "0643",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.aljazeera.com/news/2026/11/1/fbi-blames-north-korea-for-record-6-3bn-crypto-heist",
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist",
+              "https://www.theverge.com/tech/1024176/north-korea-binance-crypto-heist"
+            ],
+            "observed_at": "2026-11-02T04:43:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-11-01",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
