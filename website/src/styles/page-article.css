@@ -138,7 +138,7 @@
 .body-text a.evidence-ref,
 .deck a.evidence-ref {
   text-decoration: none;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-family: var(--font-mono);
   font-size: max(0.75rem, 0.62em);   /* a footnote marker, but never under the 12px floor */
   font-weight: 600;

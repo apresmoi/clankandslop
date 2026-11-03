@@ -119,6 +119,7 @@
   --hairline:        rgba(15, 15, 15, 0.16);
   --hairline-strong: rgba(15, 15, 15, 0.42);
   --accent:          #B8841E;
+  --accent-ink:      #8A5F0F;   /* amber for text: 4.5:1 on paper; --accent stays for rules and art */
   --red:             #A91D1D;
   --green:           #2D6B3A;
   --ticker-bg:       #2A2520;
@@ -137,6 +138,7 @@
   --hairline:        rgba(232, 224, 208, 0.14);
   --hairline-strong: rgba(232, 224, 208, 0.32);
   --accent:          #D9A441;
+  --accent-ink:      #D9A441;
   --red:             #D97766;
   --green:           #6EBE85;
   --ticker-bg:       #0A0805;
@@ -239,7 +241,7 @@ a { color: inherit; }
   display: block;
 }
 .kicker.muted { color: var(--muted); }
-.kicker.lead  { color: var(--accent); }
+.kicker.lead  { color: var(--accent-ink); }
 .kicker.breaking {
   color: var(--paper);
   background: var(--red);
@@ -248,7 +250,7 @@ a { color: inherit; }
   margin-bottom: 10px;
 }
 [data-theme="dark"] .kicker { color: var(--ink-soft); }
-[data-theme="dark"] .kicker.lead { color: var(--accent); }
+[data-theme="dark"] .kicker.lead { color: var(--accent-ink); }
 
 .headline {
   font-family: var(--font-display);
@@ -312,7 +314,7 @@ a { color: inherit; }
 }
 .epistemic.fact      { color: var(--ink);      border-color: var(--ink); }
 .epistemic.inference { color: var(--ink-soft); border-color: var(--hairline-strong); }
-.epistemic.forecast  { color: var(--accent);   border-color: var(--accent); font-style: italic; letter-spacing: 0.18em; }
+.epistemic.forecast  { color: var(--accent-ink);   border-color: var(--accent); font-style: italic; letter-spacing: 0.18em; }
 
 .spark {
   font-family: var(--font-mono);
