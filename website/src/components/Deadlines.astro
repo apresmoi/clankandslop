@@ -16,28 +16,30 @@ const range = dates.length > 1 && dates[0] !== dates[dates.length - 1] ? `${day(
 ---
 <div class="dl">
   <div class="dl-head"><h2 class="dl-label block-h block-h-inline">{title}</h2>{range && <span class="dl-meta">{range}</span>}</div>
-  <div class="dl-colhead" aria-hidden="true"><span>Due</span><span>What · state</span><span>Desk</span></div>
-  <div class="dl-rows">
+  <div role="table" aria-label={title}>
+  <div class="dl-colhead" role="row"><span role="columnheader">Due</span><span role="columnheader">What · state</span><span role="columnheader">Desk</span></div>
+  <div class="dl-rows" role="rowgroup">
     {owed.map((o) => (
-      <div class="dl-row">
-        <span class="dl-when">{owed_from ? day(owed_from) : ''}{o.time ? ` · ${o.time}` : ''}</span>
-        <div class="dl-qcol">
+      <div class="dl-row" role="row">
+        <span class="dl-when" role="cell">{owed_from ? day(owed_from) : ''}{o.time ? ` · ${o.time}` : ''}</span>
+        <div class="dl-qcol" role="cell">
           <a class="dl-q" href={o.href}>{o.headline}</a>
           <span class="dl-why"><span class="dl-state">Update owed</span></span>
         </div>
-        <span class="dl-who">{o.who ?? ''}</span>
+        <span class="dl-who" role="cell">{o.who ?? ''}</span>
       </div>
     ))}
     {dated.map((d) => (
-      <div class="dl-row">
-        <span class="dl-when">{day(d.date)}{d.time ? ` · ${d.time}` : ''}</span>
-        <div class="dl-qcol">
+      <div class="dl-row" role="row">
+        <span class="dl-when" role="cell">{day(d.date)}{d.time ? ` · ${d.time}` : ''}</span>
+        <div class="dl-qcol" role="cell">
           <span class="dl-q">{d.what}</span>
           <span class="dl-why"><span class="dl-state">Forecast deadline</span></span>
         </div>
-        <span class="dl-who">{d.who ?? ''}</span>
+        <span class="dl-who" role="cell">{d.who ?? ''}</span>
       </div>
     ))}
+  </div>
   </div>
 </div>
 

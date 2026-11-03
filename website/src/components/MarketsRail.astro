@@ -30,20 +30,21 @@ const { title = 'The Tape', kicker = '', rows, variant = 'list' } = Astro.props;
             <span class="pct">{r.pct}</span>
           </div>
         </div>
-        <div class={`ticker-card-spark ${r.dir}`}>{r.spark}</div>
+        <div class={`ticker-card-spark ${r.dir}`} aria-hidden="true">{r.spark}</div>
       </div>
     ))}
   </div>
 ) : (
   <div class="story markets-rail">
     <h2 class="rail-head block-h">{kicker ? `${title} · ${kicker}` : title}</h2>
-    <div class="markets-rows">
+    <div class="markets-rows" role="table" aria-label={title}>
+      <div role="row" class="visually-hidden"><span role="columnheader">Symbol</span><span role="columnheader">Value</span><span role="columnheader">Change</span></div>
       {rows.map((r) => (
-        <div class="ticker-row">
-          <span class="sym">{r.sym}</span>
-          <span>{r.value}</span>
-          <span class={`spark ${r.dir}`}>{r.spark}</span>
-          <span class={`pct ${r.dir}`}>{r.pct}</span>
+        <div class="ticker-row" role="row">
+          <span class="sym" role="cell">{r.sym}</span>
+          <span role="cell">{r.value}</span>
+          <span class={`spark ${r.dir}`} aria-hidden="true">{r.spark}</span>
+          <span class={`pct ${r.dir}`} role="cell">{r.pct}</span>
         </div>
       ))}
     </div>

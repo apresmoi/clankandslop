@@ -44,19 +44,20 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
     {meta && <span class="ledger-meta">{meta}</span>}
   </div>
 
-  <div class="ledger-colhead">
-    <span title={hint('Resolves')}>Resolves</span>
-    <span title={hint('State')}>Question · state</span>
-    <span>Call</span>
-    <span title={hint('Posterior')}>Posterior</span>
-    <span title={hint('Dissent')}>Dissent</span>
+  <div role="table" aria-label="The Forecast Ledger">
+  <div class="ledger-colhead" role="row">
+    <span role="columnheader" title={hint('Resolves')}>Resolves</span>
+    <span role="columnheader" title={hint('State')}>Question · state</span>
+    <span role="columnheader">Call</span>
+    <span role="columnheader" title={hint('Posterior')}>Posterior</span>
+    <span role="columnheader" title={hint('Dissent')}>Dissent</span>
   </div>
 
-  <div class="ledger-rows">
+  <div class="ledger-rows" role="rowgroup">
     {open_calls.map((c) => (
-      <div class={`ledger-row${c.state ? ` is-${c.state}` : ''}`}>
-        <span class="ledger-horizon">{c.horizon ?? '—'}</span>
-        <div class="ledger-qcol">
+      <div class={`ledger-row${c.state ? ` is-${c.state}` : ''}`} role="row">
+        <span class="ledger-horizon" role="cell">{c.horizon ?? '—'}</span>
+        <div class="ledger-qcol" role="cell">
           <span class="ledger-q">{c.question}</span>
           {(c.state_label || c.detail) && (
             <span class="ledger-why">
@@ -67,18 +68,19 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
           )}
           {c.note && <span class="ledger-note">Ledger{c.noted ? `, ${c.noted}` : ''}: {c.note}</span>}
         </div>
-        <span class={`ledger-call ${c.direction}`}>{c.call}<span class="arrow">{arrowFor(c.direction)}</span></span>
-        <div class="ledger-pcol">
+        <span class={`ledger-call ${c.direction}`} role="cell">{c.call}<span class="arrow" aria-hidden="true">{arrowFor(c.direction)}</span></span>
+        <div class="ledger-pcol" role="cell">
           {c.update && <span class="ledger-update">Update {c.updated}: {c.update}</span>}
           <span class="ledger-p">{c.p.toFixed(2)}{c.interval !== undefined && <span class="ledger-int"> ±{c.interval.toFixed(2)}</span>}</span>
         </div>
-        <span class="ledger-dis">
+        <span class="ledger-dis" role="cell">
           {c.dissent
             ? <><span class="dim">{c.dissent.agents.join(', ')}</span> {(c.dissent.p * 100).toFixed(0)}%</>
             : <span class="dim">—</span>}
         </span>
       </div>
     ))}
+  </div>
   </div>
 
   <p class="ledger-foot">
@@ -92,7 +94,7 @@ const arrowFor = (d: 'bull' | 'bear' | 'flat') => d === 'bull' ? '▲' : d === '
       {resolved.map((r, i) => (
         <span class="ledger-resolved-item">
           {r.call} <span class={r.outcome}>
-            {r.outcome === 'hit' ? '✓' : r.outcome === 'miss' ? '✗' : r.outcome === 'cancelled' ? '⊘' : '…'}
+            <span aria-hidden="true">{r.outcome === 'hit' ? '✓' : r.outcome === 'miss' ? '✗' : r.outcome === 'cancelled' ? '⊘' : '…'}</span><span class="visually-hidden">{r.outcome === 'hit' || r.outcome === 'miss' || r.outcome === 'cancelled' ? r.outcome : 'pending'}</span>
           </span><span class="dim"> p={r.prior_p.toFixed(2)}</span>{i < resolved.length - 1 ? <span class="dim"> · </span> : ''}
         </span>
       ))}
