@@ -87,7 +87,7 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     text-decoration: none;
     border-bottom: 1px dotted var(--hairline-strong);
   }
-  .head .counts:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .head .counts:hover { color: var(--accent-ink); border-bottom-color: var(--accent); }
   .evidence-row {
     display: grid;
     /* Fixed and minmax(0) tracks: every row is its own grid, so content-sized
@@ -109,7 +109,7 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--accent-ink);
     letter-spacing: 0;
     text-decoration: none;
     white-space: nowrap;
@@ -149,9 +149,9 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     white-space: nowrap;
   }
   .evidence-row details summary::-webkit-details-marker { display: none; }
-  .evidence-row details summary::before { content: "▸ "; color: var(--accent); margin-right: 2px; }
+  .evidence-row details summary::before { content: "▸ "; color: var(--accent-ink); margin-right: 2px; }
   .evidence-row details[open] summary::before { content: "▾ "; }
-  .evidence-row details summary:hover { color: var(--accent); }
+  .evidence-row details summary:hover { color: var(--accent-ink); }
 
   .evidence-row > .source-note {
     grid-column: 1 / -1;

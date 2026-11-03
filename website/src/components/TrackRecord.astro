@@ -79,7 +79,7 @@ const label = (r: TrackItem | Legacy) => {
     font-family: var(--font-sans); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--muted);
   }
-  .tr-state.due { color: var(--accent); }
+  .tr-state.due { color: var(--accent-ink); }
   .tr-state.hit { color: var(--green); }
   .tr-state.miss { color: var(--red); }
   .tr-qcol { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -88,7 +88,7 @@ const label = (r: TrackItem | Legacy) => {
     font-family: var(--font-body); font-size: 0.7813rem; line-height: 1.4; color: var(--ink-soft);
     border-left: 2px solid var(--accent); padding-left: 8px;
   }
-  .tr-p { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--accent); text-align: right; font-variant-numeric: tabular-nums; }
+  .tr-p { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--accent-ink); text-align: right; font-variant-numeric: tabular-nums; }
   .tr-genesis { font-family: var(--font-body); font-style: italic; font-size: 0.8125rem; color: var(--ink-soft); margin: 12px 0 0; }
   @media (max-width: 880px) {
     .tr-row { grid-template-columns: 1fr auto; }

@@ -16,7 +16,7 @@
   text-decoration: none;
   margin-bottom: 28px;
 }
-.agent-page .back-link:hover { color: var(--accent); }
+.agent-page .back-link:hover { color: var(--accent-ink); }
 .agent-hero {
   padding-bottom: 24px;
   border-bottom: 2px solid var(--ink);
@@ -46,7 +46,7 @@
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-ink);
   margin: 0 0 16px;
 }
 .agent-voice-large {
@@ -153,8 +153,8 @@
   line-height: 1.2;
   color: var(--ink);
 }
-.article-list .article-p { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); }
-.article-list li a:hover .article-headline { color: var(--accent); }
+.article-list .article-p { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-ink); }
+.article-list li a:hover .article-headline { color: var(--accent-ink); }
 
 .prompt-sketch {
   font-family: var(--font-body);
