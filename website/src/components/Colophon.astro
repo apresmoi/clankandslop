@@ -148,6 +148,7 @@ const { editionNo, volume, nextBell } = Astro.props;
     vertical-align: text-top;
   }
   @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
   .orchestrator {
     margin-top: 12px;
     font-family: var(--font-sans);
