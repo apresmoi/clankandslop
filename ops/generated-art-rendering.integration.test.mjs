@@ -40,6 +40,13 @@ const addEdition = (root, { heroArt = true, articleArt = false, glyphArt = true 
   writeJson(resolve(base, 'pages/tape.json'), { edition: fixtureDate, page: 'tape', title: 'Fixture Tape', active: '/tape', head: [], flow: [] });
 };
 const build = (root) => execFileSync('npm', ['run', 'build'], { cwd: resolve(root, 'website'), encoding: 'utf8', stdio: 'pipe' });
+// Every glyph raster is text; unhidden, a screen reader spells it out cell by cell.
+const assertArtHidden = (html) => {
+  const rasters = html.match(/<(pre|span)\b[^>]*class="(glyphart-pre|mg-label|legend-glyph)[^"]*"[^>]*>|<pre\b[^>]*>(?=<span class="mg-)/g) ?? [];
+  assert.ok(rasters.length > 0, 'fixture renders glyph rasters');
+  for (const tag of rasters) assert.match(tag, /aria-hidden="true"/, `raster exposed to screen readers: ${tag.slice(0, 120)}`);
+  assert.doesNotMatch(html, /<[a-z]+\b[^>]*\bclass="[^"]*"[^>]*\bclass="/, 'one class attribute per element');
+};
 const assertRendered = (root) => {
   const front = read(root, `website/dist/editions/${fixtureDate}/index.html`);
   assert.match(front, /hero-art-map/);
@@ -53,7 +60,11 @@ const assertRendered = (root) => {
   assert.match(front, /glyphart-generated/);
   assert.match(front, /Generated glyph caption\./);
   assert.match(front, /#####/);
+  assertArtHidden(front);
+  assert.match(front, /class="mapglyph-print"[^>]*role="img" aria-label="Map of Fixture Region\. Marked: PLACE\. Shaded: Zone One\. Route: Route One\."/);
+  assert.match(front, /class="glyphart-stage"[^>]*role="img"[^>]*aria-label="Illustration: Generated glyph fixture\."/);
   const article = read(root, `website/dist/editions/${fixtureDate}/articles/${leadSlug}/index.html`);
+  assertArtHidden(article);
   assert.match(article, /article-map/);
   assert.match(article, /mapglyph-print/);
   assert.match(article, /mapglyph-locator/);

@@ -11,6 +11,7 @@
     - desk (interactive: true) — glyphcss 3D plane with a drag camera, for
       standalone map-desk panels. */
 import type { RegionMap } from '../lib/edition.ts';
+import { mapLabel } from '../lib/artLabel.ts';
 
 interface Spot { name: string; lat: number; lon: number; label_side?: 'left' | 'right'; label_dy?: number; }
 interface Overlay { name?: string; color?: 'red' | 'accent' | 'green'; ring: Array<[number, number]>; }
@@ -45,6 +46,8 @@ const {
   rule = true,
   interactive = true,
 } = Astro.props;
+
+const artLabel = mapLabel({ place: title, spots, overlays, routes });
 
 const config = interactive
   ? JSON.stringify({ map: m, cols, rows, rotX, rotY, zoom, overlays, routes, spots })
@@ -248,7 +251,7 @@ if (!interactive) {
         <span class="mapglyph-legend">
           {legend.map((item) => (
             <span class="legend-item">
-              <span class={`legend-glyph mg-${item.glyph === '▓' ? 'o' : 'r'}-${item.color}`}>{item.glyph}</span>
+              <span aria-hidden="true" class={`legend-glyph mg-${item.glyph === '▓' ? 'o' : 'r'}-${item.color}`}>{item.glyph}</span>
               {item.label}
             </span>
           ))}
@@ -258,15 +261,17 @@ if (!interactive) {
   )}
 
   {interactive ? (
-    <div class="mapglyph-host is-interactive" data-mapglyph data-config={config}></div>
+    <div role="img" aria-label={artLabel}>
+      <div class="mapglyph-host is-interactive" data-mapglyph data-config={config} aria-hidden="true"></div>
+    </div>
   ) : (
-    <div class="mapglyph-print" style={`--map-cols: ${m.cols};`}>
-      <pre set:html={printHtml} />
+    <div class="mapglyph-print" style={`--map-cols: ${m.cols};`} role="img" aria-label={artLabel}>
+      <pre aria-hidden="true" set:html={printHtml} />
       {printSpots.map((s) => (
-        <span class:list={['mg-label', `side-${s.labelSide}`]} style={`left: ${s.leftPct}%; top: calc(${s.topPct}% + ${s.labelDy}px);`}>{s.name}</span>
+        <span aria-hidden="true" class:list={['mg-label', `side-${s.labelSide}`]} style={`left: ${s.leftPct}%; top: calc(${s.topPct}% + ${s.labelDy}px);`}>{s.name}</span>
       ))}
       {locatorHtml && (
-        <div class={`mapglyph-locator loc-${locatorCorner}`} aria-hidden="true" title="Where in the world">
+        <div class={`mapglyph-locator loc-${locatorCorner}`} aria-hidden="true">
           <pre set:html={locatorHtml} />
           <span class="locator-footprint" style={locatorFootprintStyle}></span>
         </div>
@@ -458,7 +463,7 @@ if (!interactive) {
     margin-bottom: 10px;
     border-bottom: 1px solid var(--hairline);
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: 0.75rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
   }
@@ -574,7 +579,7 @@ if (!interactive) {
     position: absolute;
     transform: translate(8px, -50%);
     font-family: var(--font-sans);
-    font-size: 9px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     line-height: 1.3;
@@ -616,7 +621,7 @@ if (!interactive) {
 
   .mapglyph-caption {
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: 0.75rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);

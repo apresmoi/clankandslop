@@ -46,33 +46,33 @@ const range = dates.length > 1 && dates[0] !== dates[dates.length - 1] ? `${day(
   .dl { margin: 28px 0; padding: 14px 0 10px; border-top: 1px solid var(--hairline-strong); }
   .dl-head {
     display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-    font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px;
+    font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.75rem;
     padding-bottom: 10px; border-bottom: 1px solid var(--hairline); margin-bottom: 6px;
   }
   .dl-label { font-weight: 700; color: var(--ink); }
-  .dl-meta { color: var(--muted); font-size: 10px; }
+  .dl-meta { color: var(--muted); font-size: 0.75rem; }
   .dl-colhead, .dl-row { display: grid; grid-template-columns: 110px 1fr 120px; gap: 16px; }
   .dl-colhead {
     padding: 6px 0; border-bottom: 1px solid var(--hairline-strong);
-    font-family: var(--font-sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em;
+    font-family: var(--font-sans); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em;
     text-transform: uppercase; color: var(--muted);
   }
   .dl-rows { display: flex; flex-direction: column; }
   .dl-row { align-items: start; padding: 12px 0; border-bottom: 1px dotted var(--hairline); }
   .dl-row:last-child { border-bottom: none; }
   .dl-when {
-    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--muted);
+    font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em; color: var(--muted);
     text-transform: uppercase; white-space: nowrap; padding-top: 2px;
   }
   .dl-qcol { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .dl-q { font-family: var(--font-body); font-size: 14.5px; line-height: 1.4; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+  .dl-q { font-family: var(--font-body); font-size: 0.9063rem; line-height: 1.4; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
   a.dl-q:hover { text-decoration: underline; }
-  .dl-why { font-family: var(--font-body); font-size: 12.5px; font-style: italic; line-height: 1.4; color: var(--muted); }
+  .dl-why { font-family: var(--font-body); font-size: 0.7813rem; font-style: italic; line-height: 1.4; color: var(--muted); }
   .dl-state {
-    font-family: var(--font-sans); font-style: normal; font-size: 9.5px; font-weight: 700;
+    font-family: var(--font-sans); font-style: normal; font-size: 0.75rem; font-weight: 700;
     letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
   }
-  .dl-who { font-family: var(--font-mono); font-size: 12px; color: var(--ink); white-space: nowrap; padding-top: 2px; }
+  .dl-who { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink); white-space: nowrap; padding-top: 2px; }
   @media (max-width: 880px) {
     .dl-colhead { display: none; }
     .dl-row { grid-template-columns: 1fr auto; }

@@ -12,7 +12,7 @@
 }
 .layout-gallery-h {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 600;
   margin: 0 0 8px;
   color: var(--ink);
@@ -20,14 +20,14 @@
 }
 .layout-gallery-p {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ink-soft);
   margin: 0;
 }
 .layout-gallery-p code {
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: 0.7813rem;
   background: var(--paper-mute);
   padding: 1px 6px;
   border-radius: 2px;
@@ -82,14 +82,14 @@
 }
 .layout-card-eyebrow {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 0.75rem;
   color: var(--muted);
   margin-bottom: 6px;
   letter-spacing: 0;
 }
 .layout-card-title {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 600;
   color: var(--ink);
   line-height: 1.15;
@@ -98,7 +98,7 @@
 .layout-card-tagline {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 13.5px;
+  font-size: 0.8438rem;
   color: var(--ink-soft);
   margin-top: 6px;
   line-height: 1.4;
@@ -106,7 +106,7 @@
 .layout-card-summary {
   margin-top: 10px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 0.75rem;
   color: var(--muted);
   line-height: 1.5;
   padding-top: 8px;

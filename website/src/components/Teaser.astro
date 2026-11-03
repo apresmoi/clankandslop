@@ -46,7 +46,7 @@ const recordRef = article.evidence_box && article.evidence_box.length > 0
   .teaser :global(.headline) { margin-bottom: 8px; }
   .teaser :global(.deck) {
     font-family: var(--font-body);
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.45;
     color: var(--ink-soft);
     margin-bottom: 10px;
@@ -61,39 +61,39 @@ const recordRef = article.evidence_box && article.evidence_box.length > 0
   /* Lead headline scales with the viewport — 62px on desktop down to ~30px
      on a phone, instead of the fixed size that ran off small screens. */
   .teaser-lead :global(.headline-lg) {
-    font-size: clamp(30px, 7.6vw, 62px);
+    font-size: clamp(1.875rem, 7.6vw, 3.875rem);
     line-height: 1.0;
     letter-spacing: -0.03em;
     margin-bottom: 18px;
   }
   .teaser-lead :global(.kicker.lead) {
     color: var(--accent);
-    font-size: 10.5px;
+    font-size: 0.75rem;
     letter-spacing: 0.26em;
     margin-bottom: 10px;
   }
   .teaser-lead :global(.deck) {
-    font-size: clamp(16px, 2.6vw, 19px);
+    font-size: clamp(1rem, 2.6vw, 1.1875rem);
     line-height: 1.42;
     margin-bottom: 16px;
   }
   /* Feature — paired with a glyph illustration; a bigger head so the row
      carries more weight than the plain teasers above it. */
   .teaser-feature :global(.headline-md) {
-    font-size: clamp(27px, 3.6vw, 40px);
+    font-size: clamp(1.6875rem, 3.6vw, 2.5rem);
     line-height: 1.1;
     letter-spacing: -0.018em;
     margin-bottom: 12px;
   }
-  .teaser-feature :global(.deck) { font-size: 16.5px; line-height: 1.5; margin-bottom: 12px; }
+  .teaser-feature :global(.deck) { font-size: 1.0313rem; line-height: 1.5; margin-bottom: 12px; }
 
   @media (max-width: 640px) {
     .teaser-lead :global(.headline-lg) { margin-bottom: 12px; }
     .teaser-rail :global(.headline-md),
-    .teaser-flow :global(.headline-md) { font-size: 21px; }
+    .teaser-flow :global(.headline-md) { font-size: 1.3125rem; }
   }
 
-  .teaser-rail :global(.headline-md) { font-size: 20px; line-height: 1.15; }
+  .teaser-rail :global(.headline-md) { font-size: 1.25rem; line-height: 1.15; }
 
   .teaser-flow {
     break-inside: avoid;
@@ -101,12 +101,12 @@ const recordRef = article.evidence_box && article.evidence_box.length > 0
     margin-bottom: 18px;
   }
   .teaser-flow :global(.headline-md) {
-    font-size: 22px;
+    font-size: 1.375rem;
     line-height: 1.15;
     margin-bottom: 10px;
   }
   .teaser-flow :global(.deck) {
-    font-size: 14.5px;
+    font-size: 0.9063rem;
     line-height: 1.45;
     margin-bottom: 10px;
   }

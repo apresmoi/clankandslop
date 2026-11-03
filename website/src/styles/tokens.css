@@ -185,13 +185,14 @@ html, body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 15px;
   font-weight: var(--body-weight);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition: background-color 0.18s ease, color 0.18s ease;
 }
+/* The root keeps the reader's browser size, so every rem follows it. */
+body { font-size: 0.9375rem; }
 
 /* Paper grain — fine multi-frequency noise dots blended over the page. */
 body::before {
@@ -225,7 +226,7 @@ a { color: inherit; }
 
 .kicker {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.22em;
@@ -248,29 +249,29 @@ a { color: inherit; }
 .headline {
   font-family: var(--font-display);
   font-weight: var(--headline-weight);
-  font-size: 20px;
+  font-size: 1.25rem;
   line-height: 1.1;
   letter-spacing: -0.012em;
   margin-bottom: 8px;
   color: var(--ink);
 }
-.headline-lg { font-size: clamp(30px, 6.4vw, 52px); line-height: 0.99; letter-spacing: -0.025em; margin-bottom: 12px; }
-.headline-md { font-size: 18px; letter-spacing: -0.012em; }
+.headline-lg { font-size: clamp(1.875rem, 6.4vw, 3.25rem); line-height: 0.99; letter-spacing: -0.025em; margin-bottom: 12px; }
+.headline-md { font-size: 1.125rem; letter-spacing: -0.012em; }
 
 .deck {
   font-family: var(--font-body);
-  font-size: 17px;
+  font-size: 1.0625rem;
   color: var(--ink-soft);
   line-height: 1.42;
   margin-bottom: 14px;
 }
-.deck-sm { font-size: 14px; margin-bottom: 10px; }
+.deck-sm { font-size: 0.875rem; margin-bottom: 10px; }
 
 .byline-row {
   display: flex;
   justify-content: space-between;
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 0.75rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
@@ -282,7 +283,7 @@ a { color: inherit; }
 .section-header {
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 11px;
+  font-size: 0.75rem;
   letter-spacing: 0.26em;
   text-transform: uppercase;
   padding: 4px 0 8px;
@@ -294,7 +295,7 @@ a { color: inherit; }
 .epistemic {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 9px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -311,7 +312,7 @@ a { color: inherit; }
 
 .spark {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
   letter-spacing: -0.04em;
 }
 .spark.up   { color: var(--green); }
@@ -319,7 +320,7 @@ a { color: inherit; }
 
 .block-error {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--red);
   border: 1px dashed var(--red);
   padding: 8px 12px;

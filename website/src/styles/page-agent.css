@@ -8,7 +8,7 @@
 .agent-page .back-link {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -24,7 +24,7 @@
 }
 .agent-eyebrow {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
@@ -34,7 +34,7 @@
 .agent-name-display {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 72px;
+  font-size: 4.5rem;
   line-height: 0.95;
   letter-spacing: -0.03em;
   color: var(--ink);
@@ -42,7 +42,7 @@
 }
 .agent-beat-line {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -51,7 +51,7 @@
 }
 .agent-voice-large {
   font-family: var(--font-body);
-  font-size: 19px;
+  font-size: 1.1875rem;
   line-height: 1.42;
   color: var(--ink-soft);
   margin: 0;
@@ -74,7 +74,7 @@
 .stat-cell:last-child { border-right: none; }
 .stat-cell .stat-label {
   font-family: var(--font-sans);
-  font-size: 9.5px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -82,7 +82,7 @@
 }
 .stat-cell .stat-value {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 1.625rem;
   line-height: 1;
   color: var(--ink);
 }
@@ -93,7 +93,7 @@
 .agent-section-head {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 24px;
+  font-size: 1.5rem;
   letter-spacing: -0.015em;
   color: var(--ink);
   padding-bottom: 8px;
@@ -109,15 +109,15 @@
   border-bottom: 1px dotted var(--hairline-strong);
   align-items: baseline;
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: 0.8438rem;
 }
 .call-row:last-child { border-bottom: none; }
-.call-row .call-date  { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.call-row .call-date  { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
 .call-row .call-claim { color: var(--ink); }
-.call-row .call-p     { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); text-align: right; }
+.call-row .call-p     { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-soft); text-align: right; }
 .call-row .call-outcome {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -141,7 +141,7 @@
 }
 .article-list .article-kicker {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -149,17 +149,17 @@
 }
 .article-list .article-headline {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.2;
   color: var(--ink);
 }
-.article-list .article-p { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); }
+.article-list .article-p { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); }
 .article-list li a:hover .article-headline { color: var(--accent); }
 
 .prompt-sketch {
   font-family: var(--font-body);
   font-style: italic;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.55;
   color: var(--ink);
   border-left: 3px solid var(--accent);
@@ -169,7 +169,7 @@
 }
 .caveat {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   font-style: italic;
   letter-spacing: 0.02em;
   color: var(--muted);
@@ -177,14 +177,14 @@
 }
 
 @media (max-width: 900px) {
-  .agent-name-display { font-size: 54px; }
+  .agent-name-display { font-size: 3.375rem; }
   .agent-stats-block { grid-template-columns: repeat(3, 1fr); }
   .stat-cell:nth-child(3n) { border-right: none; }
   .stat-cell:nth-child(n+4) { border-top: 1px solid var(--hairline); }
   .article-list li a { grid-template-columns: 1fr; gap: 4px; }
 }
 @media (max-width: 600px) {
-  .agent-name-display { font-size: 40px; }
+  .agent-name-display { font-size: 2.5rem; }
   .agent-stats-block { grid-template-columns: repeat(2, 1fr); }
   .stat-cell:nth-child(3n) { border-right: 1px solid var(--hairline); }
   .stat-cell:nth-child(2n) { border-right: none; }
