@@ -1,0 +1,1057 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-03",
+  "generated_at": "2026-11-03T08:54:33Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.6154,
+    "numerator": 8,
+    "denominator": 13,
+    "triggering": 4,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 123.1,
+        "observed_at": "2026-10-27",
+        "stale_days": 7,
+        "contributes": 3,
+        "reason": "123.1 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 103.37,
+        "observed_at": "2026-10-27",
+        "stale_days": 7,
+        "contributes": 1,
+        "reason": "103.37 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.352,
+        "observed_at": "2026-10-26",
+        "stale_days": 8,
+        "contributes": 2,
+        "reason": "6.352 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 2.76,
+        "observed_at": "2026-10-27",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "2.76 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 19.42,
+        "observed_at": "2026-10-30",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "19.42 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 3.44,
+        "observed_at": "2026-10-30",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "3.44 >= 3.388 is true"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.6656,
+        "observed_at": "2026-10-30",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "121.6656 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-03T08:54:32Z",
+        "http_status": 200,
+        "bytes": 170273,
+        "sha256": "f3ad22ec3aa8800fc5edfa638d364ae388a5612ed895d233f0b2af67c807a393",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-03T08:54:32Z",
+        "http_status": 200,
+        "bytes": 176046,
+        "sha256": "d85c38f6f6e9078151ec4232b3c3653e8953bbd3b0506f72375e9912503d8295",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-03T08:54:32Z",
+        "http_status": 200,
+        "bytes": 28959,
+        "sha256": "eecf882f835954d1546708e5a358133170f181f5e0f1616fbf7359c33611ec2f",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-03T08:54:32Z",
+        "http_status": 200,
+        "bytes": 116313,
+        "sha256": "009cb63436a4492e1bd85df95de80181244fc3856a1a6a81e7ae6afbe5336899",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-03T08:54:32Z",
+        "http_status": 200,
+        "bytes": 161799,
+        "sha256": "38e4dee3d14a0ea17d6a3ef86380afb1a6f346a4bcbbe6a8a3a0155996fadd36",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-03T08:54:33Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "dc51842be1fba9a654e5e4ccbc6c6b0701ac821fe69ef912a25b84f5294649fa",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-03T08:54:33Z",
+        "http_status": 200,
+        "bytes": 104929,
+        "sha256": "908a19a96d1ba529ef51ae559b8bc384bf8af4d4013185426e5ee9c3cca4213f",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 42,
+    "open_conflicts": 4,
+    "watch": 2,
+    "dormant": 7,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 7,
+        "evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-3a4d6a02",
+            "story_title": "Lead 4 (supporting context): Iran offers to implement a two-day plan to reopen the Strait of Hormuz if US…",
+            "source": "grok/grok-rolling-0343.md",
+            "slot": "0343",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+            "source_urls": [
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.dawn.com/news/2041754",
+              "https://www.dawn.com/news/2041754",
+              "https://www.dawn.com/news/2041754",
+              "https://www.dawn.com/news/2041754"
+            ],
+            "observed_at": "2026-11-03T01:43:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-7db8dfa6",
+            "story_title": "Lead 1: U.S. conducts limited “defensive” strikes on Iran’s Qeshm Island in the Strait of Hormuz; oil prices…",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/nov/03/us-strikes-irans-qeshm-island",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/nov/03/us-strikes-irans-qeshm-island",
+              "https://www.theguardian.com/world/2026/nov/03/us-strikes-irans-qeshm-island",
+              "https://www.theguardian.com/world/2026/nov/03/us-strikes-irans-qeshm-island",
+              "https://www.theguardian.com/world/2026/nov/03/us-strikes-irans-qeshm-island",
+              "https://www.aljazeera.com/news/2026/11/3/explosions-hit-irans-qeshm-island-as-us-media-report-us-strikes-in-hormuz",
+              "https://www.aljazeera.com/news/2026/11/3/explosions-hit-irans-qeshm-island-as-us-media-report-us-strikes-in-hormuz",
+              "https://www.aljazeera.com/news/2026/11/3/explosions-hit-irans-qeshm-island-as-us-media-report-us-strikes-in-hormuz",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://abcnews.com/International/us-carries-defensive-airstrikes-irans-qeshm-island-officials/story?id=137792518",
+              "https://abcnews.com/International/us-carries-defensive-airstrikes-irans-qeshm-island-officials/story?id=137792518",
+              "https://www.pbs.org/newshour/world/u-s-strikes-iranian-targets-in-strait-of-hormuz-u-s-official-tells-ap",
+              "https://www.pbs.org/newshour/world/u-s-strikes-iranian-targets-in-strait-of-hormuz-u-s-official-tells-ap",
+              "https://www.cnbc.com/2026/11/03/oil-prices-climb-after-us-reportedly-strikes-irans-qeshm-island.html",
+              "https://www.cnbc.com/2026/11/03/oil-prices-climb-after-us-reportedly-strikes-irans-qeshm-island.html",
+              "https://www.thehindu.com/news/morning-digest-on-november-3-2026/article71659121.ece"
+            ],
+            "observed_at": "2026-11-03T07:48:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-a2cecae1",
+            "story_title": "Lead 2: Netanyahu pressing Trump for post-midterms Iran strikes amid ongoing diplomacy",
+            "source": "grok/grok-rolling-0649.md",
+            "slot": "0649",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.bostonglobe.com/2026/11/02/world/iran-resume-nuclear-talks-us/",
+            "source_urls": [
+              "https://www.bostonglobe.com/2026/11/02/world/iran-resume-nuclear-talks-us/",
+              "https://www.bostonglobe.com/2026/11/02/world/iran-resume-nuclear-talks-us/",
+              "https://www.bostonglobe.com/2026/11/02/world/iran-resume-nuclear-talks-us/",
+              "https://www.bostonglobe.com/2026/11/02/world/iran-resume-nuclear-talks-us/",
+              "https://www.scmp.com/news/world/united-states-canada/article/3373046/netanyahu-pressing-trump-attack-iran-after-us-midterm-elections-officials-say",
+              "https://www.scmp.com/news/world/united-states-canada/article/3373046/netanyahu-pressing-trump-attack-iran-after-us-midterm-elections-officials-say",
+              "https://www.scmp.com/news/world/united-states-canada/article/3373046/netanyahu-pressing-trump-attack-iran-after-us-midterm-elections-officials-say"
+            ],
+            "observed_at": "2026-11-03T04:49:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-ac186101",
+            "story_title": "Lead 3: Iranian negotiators leave Doha talks with Qatari mediators; draft proposal for US deal circulated…",
+            "source": "grok/grok-rolling-1542.md",
+            "slot": "1542",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.turkiyetoday.com/region/iranian-team-leaves-doha-talks-as-draft-us-deal-circulates-3231542",
+            "source_urls": [
+              "https://www.turkiyetoday.com/region/iranian-team-leaves-doha-talks-as-draft-us-deal-circulates-3231542",
+              "https://www.turkiyetoday.com/region/iranian-team-leaves-doha-talks-as-draft-us-deal-circulates-3231542",
+              "https://www.justsecurity.org/162991/early-edition-november-2-2026/"
+            ],
+            "observed_at": "2026-11-02T13:42:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-db46c040",
+            "story_title": "China pushes for Middle East peace in Oman visit",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.al-monitor.com/originals/2026/11/chinas-xi-says-middle-east-should-not-become-battleground-great-power-rivalry",
+            "source_urls": [
+              "https://www.al-monitor.com/originals/2026/11/chinas-xi-says-middle-east-should-not-become-battleground-great-power-rivalry",
+              "https://www.al-monitor.com/originals/2026/11/chinas-xi-says-middle-east-should-not-become-battleground-great-power-rivalry",
+              "https://www.al-monitor.com/originals/2026/11/chinas-xi-says-middle-east-should-not-become-battleground-great-power-rivalry",
+              "https://www.al-monitor.com/originals/2026/11/chinas-xi-says-middle-east-should-not-become-battleground-great-power-rivalry",
+              "https://www.al-monitor.com/originals/2026/11/chinas-xi-says-middle-east-should-not-become-battleground-great-power-rivalry"
+            ],
+            "observed_at": "2026-11-02T13:16:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-defb26de",
+            "story_title": "Lead 3: Netanyahu presses Trump for Iran strikes after US midterms while talks advance and Trump signals a…",
+            "source": "grok/grok-rolling-0343.md",
+            "slot": "0343",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+            "source_urls": [
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.thehindu.com/news/international/netanyahu-pressing-trump-to-attack-iran-after-midterms-says-officials/article71658356.ece",
+              "https://www.scmp.com/news/world/united-states-canada/article/3373046/netanyahu-pressing-trump-attack-iran-after-us-midterm-elections-officials-say",
+              "https://www.scmp.com/news/world/united-states-canada/article/3373046/netanyahu-pressing-trump-attack-iran-after-us-midterm-elections-officials-say",
+              "https://www.jpost.com/middle-east/iran-news/article-913632"
+            ],
+            "observed_at": "2026-11-03T01:43:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-e04a5d68",
+            "story_title": "Lead 1: Limited US defensive strikes hit Iranian positions on Qeshm Island in the Strait of Hormuz on 2…",
+            "source": "grok/grok-rolling-0343.md",
+            "slot": "0343",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+            "source_urls": [
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.cnn.com/2026/11/02/politics/us-strikes-iran-qeshm-island",
+              "https://www.arabnews.com/middle-east/us-has-conducted-defensive-strikes-on-some-iranian-targets-in-the-strait-of-hormuz-us-official-says-3009496",
+              "https://www.arabnews.com/middle-east/us-has-conducted-defensive-strikes-on-some-iranian-targets-in-the-strait-of-hormuz-us-official-says-3009496",
+              "https://www.arabnews.com/middle-east/us-has-conducted-defensive-strikes-on-some-iranian-targets-in-the-strait-of-hormuz-us-official-says-3009496",
+              "https://www.arabnews.com/middle-east/us-has-conducted-defensive-strikes-on-some-iranian-targets-in-the-strait-of-hormuz-us-official-says-3009496",
+              "https://www.arabnews.com/middle-east/us-has-conducted-defensive-strikes-on-some-iranian-targets-in-the-strait-of-hormuz-us-official-says-3009496",
+              "https://www.ynetnews.com/article/hkq1vp8pfx",
+              "https://www.ynetnews.com/article/hkq1vp8pfx",
+              "https://www.ynetnews.com/article/hkq1vp8pfx",
+              "https://www.ynetnews.com/article/hkq1vp8pfx",
+              "https://www.abc.net.au/news/2026-11-03/us-official-confirms-strikes-on-iran/107341252",
+              "https://gulfnews.com/world/mena/us-strikes-irans-qeshm-island-wall-street-journal-1.500733518",
+              "https://indianexpress.com/article/world/us-iran-war-strikes-qeshm-island-trump-deal-hormuz-shipping-oil-prices-nuclear-threat-10948068/",
+              "https://thehill.com/policy/defense/6190947-us-strikes-iranian-radar-missiles/",
+              "https://thehill.com/policy/defense/6190947-us-strikes-iranian-radar-missiles/",
+              "https://www.washingtonexaminer.com/policy/defense/4788963/us-defensive-strikes-iran-qeshm-island/"
+            ],
+            "observed_at": "2026-11-03T01:43:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 7,
+        "evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-149b8f9d",
+            "story_title": "Ukraine ceasefire ends amid renewed shelling",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/",
+              "https://www.reuters.com/world/europe/ukraine-says-russia-used-oleshky-ceasefire-reinforce-positions-2026-11-02/"
+            ],
+            "observed_at": "2026-11-02T13:16:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-38ede269",
+            "story_title": "Lead 2: Russian aerial strikes hit humanitarian aid distribution point and shelter in Komyshuvakha…",
+            "source": "grok/grok-rolling-0051.md",
+            "slot": "0051",
+            "matched": [
+              "Ukraine",
+              "Zaporizhzhia"
+            ],
+            "source_url": "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+            "source_urls": [
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://en.wikipedia.org/wiki/Portal:Current_events/2026_November_2"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-7af6346b",
+            "story_title": "Lead 3: Localized Oleshky (Kherson) humanitarian ceasefire ends 1 November; Ukraine’s General Staff says…",
+            "source": "grok/grok-rolling-1250.md",
+            "slot": "1250",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://newsukraine.rbc.ua/news/ceasefire-in-oleshky-ends-ukraine-s-ombudsman-1793603665.html",
+            "source_urls": [
+              "https://newsukraine.rbc.ua/news/ceasefire-in-oleshky-ends-ukraine-s-ombudsman-1793603665.html",
+              "https://newsukraine.rbc.ua/news/ceasefire-in-oleshky-ends-ukraine-s-ombudsman-1793603665.html",
+              "https://newsukraine.rbc.ua/news/ceasefire-in-oleshky-ends-ukraine-s-ombudsman-1793603665.html",
+              "https://newsukraine.rbc.ua/news/ceasefire-in-oleshky-ends-ukraine-s-ombudsman-1793603665.html",
+              "https://newsukraine.rbc.ua/news/ceasefire-in-oleshky-ends-ukraine-s-ombudsman-1793603665.html",
+              "https://newsukraine.rbc.ua/news/ceasefire-in-oleshky-ends-ukraine-s-ombudsman-1793603665.html",
+              "https://www.pravda.com.ua/eng/news/2026/11/02/8060791/"
+            ],
+            "observed_at": "2026-11-02T10:50:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-7ba8b4f6",
+            "story_title": "Lead 3: Zelenskyy warns Russia preparing massive attack on energy/logistics timed to U.S. midterms attention",
+            "source": "grok/grok-rolling-0649.md",
+            "slot": "0649",
+            "matched": [
+              "Ukraine",
+              "Zaporizhzhia"
+            ],
+            "source_url": "https://www.kyivpost.com/post/88954",
+            "source_urls": [
+              "https://www.kyivpost.com/post/88954",
+              "https://www.kyivpost.com/post/88954",
+              "https://www.kyivpost.com/post/88954",
+              "https://www.kyivpost.com/post/88954",
+              "https://www.foxnews.com/world/russia-planning-massive-strike-midterms-zelenskyy-warns-urges-us-stop-putin",
+              "https://www.foxnews.com/world/russia-planning-massive-strike-midterms-zelenskyy-warns-urges-us-stop-putin",
+              "https://www.foxnews.com/world/russia-planning-massive-strike-midterms-zelenskyy-warns-urges-us-stop-putin",
+              "https://www.foxnews.com/world/russia-planning-massive-strike-midterms-zelenskyy-warns-urges-us-stop-putin",
+              "https://www.foxnews.com/world/russia-planning-massive-strike-midterms-zelenskyy-warns-urges-us-stop-putin",
+              "https://www.foxnews.com/world/russia-planning-massive-strike-midterms-zelenskyy-warns-urges-us-stop-putin"
+            ],
+            "observed_at": "2026-11-03T04:49:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-d547a9d1",
+            "story_title": "Ukraine Peace Talks: U.S. to Host Abu Dhabi Trilateral Meeting",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/us-hold-trilateral-talks-with-ukraine-russia-abu-dhabi-next-week-us-official-2026-11-02/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/us-hold-trilateral-talks-with-ukraine-russia-abu-dhabi-next-week-us-official-2026-11-02/",
+              "https://www.reuters.com/world/europe/us-hold-trilateral-talks-with-ukraine-russia-abu-dhabi-next-week-us-official-2026-11-02/",
+              "https://www.reuters.com/world/europe/us-hold-trilateral-talks-with-ukraine-russia-abu-dhabi-next-week-us-official-2026-11-02/"
+            ],
+            "observed_at": "2026-11-03T01:18:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-da062cfc",
+            "story_title": "Lead 1: Russian guided bombs kill 24 at Ukrainian aid-distribution school and shelter in Komyshuvakha…",
+            "source": "grok/grok-rolling-2146.md",
+            "slot": "2146",
+            "matched": [
+              "Kyiv",
+              "Zaporizhzhia"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/cjy56dndlyz0o",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/cjy56dndlyz0o",
+              "https://www.bbc.co.uk/news/articles/cjy56dndlyz0o",
+              "https://www.aljazeera.com/news/2026/11/2/russian-bombing-of-ukrainian-aid-centre-kills-24-people-zelenskyy",
+              "https://www.aljazeera.com/news/2026/11/2/russian-bombing-of-ukrainian-aid-centre-kills-24-people-zelenskyy",
+              "https://www.aljazeera.com/news/2026/11/2/russian-bombing-of-ukrainian-aid-centre-kills-24-people-zelenskyy",
+              "https://www.aljazeera.com/news/2026/11/2/russian-bombing-of-ukrainian-aid-centre-kills-24-people-zelenskyy",
+              "https://www.aljazeera.com/news/2026/11/2/russian-bombing-of-ukrainian-aid-centre-kills-24-people-zelenskyy",
+              "https://kyivindependent.com/exceptionally-horrific-strike-russian-bombs-strike-school-used-as-humanitarian-aid-center-in-zaporizhzhia-oblast-killing-24/",
+              "https://kyivindependent.com/exceptionally-horrific-strike-russian-bombs-strike-school-used-as-humanitarian-aid-center-in-zaporizhzhia-oblast-killing-24/"
+            ],
+            "observed_at": "2026-11-02T19:46:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-f77ccd91",
+            "story_title": "Lead 4: Iliana Iotova wins Bulgarian presidential runoff with ~57.6%, becoming first elected female head of…",
+            "source": "grok/grok-rolling-1250.md",
+            "slot": "1250",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.bta.bg/en/news/bulgaria/1237861-with-99-95-of-tally-sheets-processed-iotova-valchev-win-presidential-election-",
+            "source_urls": [
+              "https://www.bta.bg/en/news/bulgaria/1237861-with-99-95-of-tally-sheets-processed-iotova-valchev-win-presidential-election-",
+              "https://www.bta.bg/en/news/bulgaria/1237861-with-99-95-of-tally-sheets-processed-iotova-valchev-win-presidential-election-",
+              "https://www.bta.bg/en/news/bulgaria/1237861-with-99-95-of-tally-sheets-processed-iotova-valchev-win-presidential-election-",
+              "https://www.aljazeera.com/news/2026/11/1/bulgarian-president-yotova-leads-runoff-exit-polls-show",
+              "https://www.aljazeera.com/news/2026/11/1/bulgarian-president-yotova-leads-runoff-exit-polls-show",
+              "https://www.aljazeera.com/news/2026/11/1/bulgarian-president-yotova-leads-runoff-exit-polls-show",
+              "https://www.aljazeera.com/news/2026/11/1/bulgarian-president-yotova-leads-runoff-exit-polls-show",
+              "https://www.aljazeera.com/news/2026/11/1/bulgarian-president-yotova-leads-runoff-exit-polls-show",
+              "https://www.aljazeera.com/news/2026/11/1/bulgarian-president-yotova-leads-runoff-exit-polls-show"
+            ],
+            "observed_at": "2026-11-02T10:50:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-38ede269",
+            "story_title": "Lead 2: Russian aerial strikes hit humanitarian aid distribution point and shelter in Komyshuvakha…",
+            "source": "grok/grok-rolling-0051.md",
+            "slot": "0051",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+            "source_urls": [
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://en.wikipedia.org/wiki/Portal:Current_events/2026_November_2"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-601e9f5c",
+            "story_title": "Lead 3: Israeli forces end 10-/11-day Hebron (West Bank) operation; displaced residents told they can return",
+            "source": "grok/grok-rolling-0051.md",
+            "slot": "0051",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.washingtonpost.com/world/2026/11/02/israeli-military-ends-operation-west-bank-city-hebron/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-6e9bed8a",
+            "story_title": "Lead 4: Israeli strikes kill at least three (later reports four) Palestinians in Gaza on 2 November",
+            "source": "grok/grok-rolling-1542.md",
+            "slot": "1542",
+            "matched": [
+              "Gaza",
+              "Khan Younis"
+            ],
+            "source_url": "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+            "source_urls": [
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.usnews.com/news/world/articles/2026-11-02/israeli-strikes-kill-three-people-in-gaza-medics-say",
+              "https://www.brecorder.com/news/40447037"
+            ],
+            "observed_at": "2026-11-02T13:42:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-cc1b9313",
+            "story_title": "Israeli strikes resume in Gaza amid fragile truce",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Gaza",
+              "Khan Younis"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza"
+            ],
+            "observed_at": "2026-11-02T13:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-10-31 and drew no qualifying story today",
+        "last_open_edition": "2026-10-31",
+        "prior_evidence": [
+          {
+            "edition": "2026-10-31",
+            "story_id": "s-3b96517c",
+            "story_title": "Yemen: Taiz governor declares city of ~1 million in famine amid Houthi siege; HRW says siege may amount to…",
+            "source": "grok/grok-rolling-1847.md",
+            "slot": "1847",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+            "source_urls": [
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.independent.co.uk/news/taiz-houthi-yemen-cairo-world-food-program-b3075955.html",
+              "https://www.democracynow.org/2026/10/30/headlines/famine_declared_in_yemeni_city_of_taiz_amid_houthi_siege",
+              "https://www.democracynow.org/2026/10/30/headlines/famine_declared_in_yemeni_city_of_taiz_amid_houthi_siege"
+            ],
+            "observed_at": "2026-10-30T16:47:00Z"
+          },
+          {
+            "edition": "2026-10-31",
+            "story_id": "s-ab554a19",
+            "story_title": "Lead 5: Governor of Taiz declares the city in famine under Houthi siege; HRW and UN document blocked aid…",
+            "source": "grok/grok-rolling-1546.md",
+            "slot": "1546",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+            "source_urls": [
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://www.hrw.org/news/2026/10/29/yemen-houthis-depriving-taizz-civilians-of-food-medicine",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://apnews.com/article/taiz-yemen-hambruna-huties-64b7c193250d4a68ae1a433f8f4d10d6",
+              "https://news.un.org/en/story/2026/10/1168654"
+            ],
+            "observed_at": "2026-10-30T13:46:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-3a4d6a02",
+            "story_title": "Lead 4 (supporting context): Iran offers to implement a two-day plan to reopen the Strait of Hormuz if US…",
+            "source": "grok/grok-rolling-0343.md",
+            "slot": "0343",
+            "matched": [
+              "Taipei"
+            ],
+            "source_url": "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+            "source_urls": [
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.khaleejtimes.com/world/mena/iran-says-intensive-negotiations-us-avert-war",
+              "https://www.dawn.com/news/2041754",
+              "https://www.dawn.com/news/2041754",
+              "https://www.dawn.com/news/2041754",
+              "https://www.dawn.com/news/2041754"
+            ],
+            "observed_at": "2026-11-03T01:43:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-1edfc975",
+            "story_title": "South Korea: President Demands Cyber “Czar” After Binance Hack",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+            "source_urls": [
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501"
+            ],
+            "observed_at": "2026-11-03T01:18:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-265fdae8",
+            "story_title": "Lead 5: FBI attributes >$6 billion Binance cryptocurrency theft (on or about 29 October) to North Korea’s…",
+            "source": "grok/grok-rolling-1250.md",
+            "slot": "1250",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://en.yna.co.kr/view/AEN20261101000300315",
+            "source_urls": [
+              "https://en.yna.co.kr/view/AEN20261101000300315",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://www.securityweek.com/fbi-flags-over-600-addresses-tied-to-north-koreas-binance-heist/",
+              "https://www.securityweek.com/fbi-flags-over-600-addresses-tied-to-north-koreas-binance-heist/",
+              "https://www.coindesk.com/policy/2026/10/31/fbi-confirms-north-korea-s-role-in-usd6-billion-binance-hack-asks-defi-community-to-block-btc-eth-sol-addresses"
+            ],
+            "observed_at": "2026-11-02T10:50:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-6934514a",
+            "story_title": "Crypto security: FBI blames North Korea for Binance hack",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+            "source_urls": [
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.businessinsider.com/binance-hack-refunds-north-korea-fbi-reports-2026-11",
+              "https://www.businessinsider.com/binance-hack-refunds-north-korea-fbi-reports-2026-11"
+            ],
+            "observed_at": "2026-11-02T13:16:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-fec1ce5f",
+            "story_title": "Crypto Theft Attribution: FBI Names North Korea’s “TraderTraitor”",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+            "source_urls": [
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://trmlabs.com/reports/cryptex-hack"
+            ],
+            "observed_at": "2026-11-03T01:18:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "rising",
+    "current": 0.6154,
+    "previous": 0.4615,
+    "previous_edition": "2026-11-02",
+    "change": 0.1539
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
