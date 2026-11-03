@@ -2,6 +2,8 @@
 /** The World Desk globe — ETOPO1-derived land quads rendered as a rotating
     ASCII sphere by glyphcss. Plain-text output (no color spans) so the glyph
     ramp inherits the paper's ink color in both themes. */
+import { globeLabel } from '../lib/artLabel.ts';
+
 interface Hotspot {
   name: string;
   lat: number;
@@ -31,8 +33,8 @@ const caption = worldDesk
 const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
 ---
 <figure class="worldglyph">
-  <div class="worldglyph-stage" data-worldglyph-stage>
-    <div class="worldglyph-host" data-worldglyph data-config={config}></div>
+  <div class="worldglyph-stage" data-worldglyph-stage role="img" aria-label={globeLabel(hotspots)}>
+    <div class="worldglyph-host" data-worldglyph data-config={config} aria-hidden="true"></div>
   </div>
   {caption && <figcaption class="worldglyph-caption">{caption}</figcaption>}
 </figure>
@@ -284,7 +286,7 @@ const config = JSON.stringify({ cols, rows, stepDeg, rotX, rotY, hotspots });
   }
   .worldglyph-caption {
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: 0.75rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);

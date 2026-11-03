@@ -28,8 +28,8 @@ const cap = caption ?? glyph.caption ?? '';
 const dims = side === 'full' ? `--gw:${width}px;` : `--gw:${width}px;--gh:${height}px;`;
 const style = `--gfs:${FONT_PX}px;${dims}`;
 ---
-<figure class={`gimg ${side}`} style={style} aria-label={cap || glyph.name}>
-  <pre class="gimg-art gimg-light">{glyph.art}</pre>
+<figure class={`gimg ${side}`} style={style} aria-label={cap ? undefined : glyph.name}>
+  <pre class="gimg-art gimg-light" aria-hidden="true">{glyph.art}</pre>
   <pre class="gimg-art gimg-dark" aria-hidden="true">{glyph.artDark ?? glyph.art}</pre>
   {cap && (
     <figcaption>

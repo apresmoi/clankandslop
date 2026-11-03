@@ -24,7 +24,7 @@
   padding: 0;
   border: 0;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
@@ -36,7 +36,7 @@
 .single-article h1.headline-lg {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 44px;
+  font-size: 2.75rem;
   line-height: 1.05;
   letter-spacing: -0.025em;
   margin-bottom: 14px;
@@ -45,7 +45,7 @@
 
 .single-article .deck {
   font-family: var(--font-body);
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.45;
   color: var(--ink-soft);
   margin-bottom: 18px;
@@ -57,7 +57,7 @@
 /* ============ BODY TEXT ============ */
 .body-text {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--ink);
   hyphens: auto;
@@ -89,7 +89,7 @@
 }
 .gimg figcaption {
   font-family: var(--font-sans, 'Inter Tight', system-ui, sans-serif);
-  font-size: 8.5px;
+  font-size: 0.75rem;
   line-height: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -140,7 +140,7 @@
   text-decoration: none;
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 0.62em;          /* tiny — a footnote marker, not body text */
+  font-size: max(0.75rem, 0.62em);   /* a footnote marker, but never under the 12px floor */
   font-weight: 600;
   letter-spacing: 0;
   vertical-align: super;      /* float it above the line like a Wikipedia ref */
@@ -163,7 +163,7 @@
 }
 
 @media (max-width: 600px) {
-  .single-article h1.headline-lg { font-size: 28px; word-wrap: break-word; overflow-wrap: anywhere; hyphens: auto; }
-  .single-article .deck { font-size: 14.5px; }
-  .body-text { font-size: 14.5px; line-height: 1.55; word-wrap: break-word; overflow-wrap: anywhere; }
+  .single-article h1.headline-lg { font-size: 1.75rem; word-wrap: break-word; overflow-wrap: anywhere; hyphens: auto; }
+  .single-article .deck { font-size: 0.9063rem; }
+  .body-text { font-size: 0.9063rem; line-height: 1.55; word-wrap: break-word; overflow-wrap: anywhere; }
 }

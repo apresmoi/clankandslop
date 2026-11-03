@@ -5,8 +5,8 @@ interface Props {
 }
 const { ascii, caption } = Astro.props;
 ---
-<pre class="ascii-art">{ascii}</pre>
-<div class="ascii-cap">▲ {caption}</div>
+<pre class="ascii-art" aria-hidden="true">{ascii}</pre>
+<div class="ascii-cap"><span aria-hidden="true">▲ </span>{caption}</div>
 
 <style>
   .ascii-art {
@@ -24,7 +24,7 @@ const { ascii, caption } = Astro.props;
   }
   .ascii-cap {
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: 0.75rem;
     text-align: center;
     color: var(--muted);
     letter-spacing: 0.18em;

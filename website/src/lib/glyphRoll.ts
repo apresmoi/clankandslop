@@ -75,6 +75,6 @@ export async function bakeRoll(modelPath: string, opts: RollOptions = {}): Promi
     fr.slice(minR, maxR + 1).map((line) => (line.slice(minC, maxC + 1) + ' '.repeat(W)).slice(0, W)).join('\n'),
   );
 
-  const html = `<div class="glyph-roll"><pre class="glyph-output">${esc(out.join('\n'))}</pre></div>`;
+  const html = `<div class="glyph-roll" aria-hidden="true"><pre class="glyph-output">${esc(out.join('\n'))}</pre></div>`;
   return { html, frames, frameH: H * FONT, fontPx: FONT, scroll: frames * H, dur, alternate };
 }

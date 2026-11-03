@@ -75,10 +75,14 @@ const plain = isColor ? art.replace(/<[^>]+>/g, '') : art;
 const lines = plain.split('\n');
 const cols = Math.max(...lines.map((l) => l.length));
 const rows = lines.length;
+
+const SHAPE_NAMES: Record<string, string> = { colosseum: 'Colosseum', play: 'Play button', notfound: '404', satellite: 'Satellite', pumpjack: 'Oil pumpjack', missile: 'Missile', drone: 'Drone', chip: 'Microchip', campfire: 'Campfire', eclipse: 'Solar eclipse' };
+const subject = glyph ? (glyph.caption || glyph.name) : SHAPE_NAMES[roll ?? shape ?? 'colosseum'];
+const artLabel = `Illustration: ${subject}`;
 ---
 {r ? (
 <figure class={`glyphart glyphart-roll glyphart-${roll}${rAlt ? ' glyphart-rock' : ''}`} style={`--cols:${rCols};--rows:${rRows};--frames:${rFrames};--scroll:${rScroll};--dur:${rDur};--glyph-scale:${scale};`}>
-  <div class="glyphart-stage"><Fragment set:html={rollHtml} /></div>
+  <div class="glyphart-stage" role="img" aria-label={artLabel}><Fragment set:html={rollHtml} /></div>
   <figcaption class="glyphart-caption">
     {caption && <span class="glyphart-name">{caption}</span>}
     <a class="glyphart-credit" href="https://glyphcss.com" target="_blank" rel="noopener">glyphcss.com</a>
@@ -86,8 +90,8 @@ const rows = lines.length;
 </figure>
 ) : (
 <figure class={`glyphart glyphart-${glyph ? 'generated' : shape}${isColor ? ' glyphart-color' : ''}`} style={`--cols:${cols};--rows:${rows};--glyph-scale:${scale};`}>
-  <div class="glyphart-stage">
-    {isColor ? <pre class="glyphart-pre" set:html={art} /> : <pre class="glyphart-pre">{art}</pre>}
+  <div class="glyphart-stage" role="img" aria-label={artLabel}>
+    {isColor ? <pre class="glyphart-pre" aria-hidden="true" set:html={art} /> : <pre class="glyphart-pre" aria-hidden="true">{art}</pre>}
   </div>
   <figcaption class="glyphart-caption">
     {caption && <span class="glyphart-name">{caption}</span>}
@@ -139,8 +143,8 @@ const rows = lines.length;
     align-items: center;
     gap: 3px;
     font-family: var(--font-sans);
-    font-size: 10px;
-    letter-spacing: 0.18em;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--muted);
     margin-top: 8px;
@@ -149,8 +153,8 @@ const rows = lines.length;
   /* Tiny credit so readers learn the glyph art is glyphcss. */
   .glyphart-credit {
     font-family: var(--font-mono);
-    font-size: 8px;
-    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
     text-transform: lowercase;
     color: var(--muted);
     opacity: 0.7;

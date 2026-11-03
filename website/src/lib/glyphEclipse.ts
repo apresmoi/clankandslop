@@ -181,7 +181,7 @@ export async function bakeEclipse(): Promise<RollResult> {
   })).map((rows) => [' '.repeat(width), ...rows, ' '.repeat(width)].join('\n'));
 
   return {
-    html: `<div class="glyph-roll glyph-eclipse-roll"><pre class="glyph-output">${frames.join('\n')}</pre></div>`,
+    html: `<div class="glyph-roll glyph-eclipse-roll" aria-hidden="true"><pre class="glyph-output">${frames.join('\n')}</pre></div>`,
     frames: FRAMES,
     frameH: height * FONT,
     fontPx: FONT,

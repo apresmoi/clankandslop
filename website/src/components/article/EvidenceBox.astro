@@ -68,7 +68,7 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
   }
   .head {
     font-family: var(--font-sans);
-    font-size: 9.5px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.26em;
     text-transform: uppercase;
@@ -90,13 +90,15 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
   .head .counts:hover { color: var(--accent); border-bottom-color: var(--accent); }
   .evidence-row {
     display: grid;
-    grid-template-columns: 42px 1.1fr 3.4fr 0.9fr 60px;
+    /* Fixed and minmax(0) tracks: every row is its own grid, so content-sized
+       tracks would misalign the columns from row to row. */
+    grid-template-columns: 42px minmax(0, 1.1fr) minmax(0, 3.4fr) 136px 76px;
     gap: 12px;
     padding: 6px 0;
     border-bottom: 1px solid var(--hairline);
     align-items: baseline;
     font-family: var(--font-body);
-    font-size: 12.5px;
+    font-size: 0.7813rem;
     line-height: 1.4;
     scroll-margin-top: 24px;
   }
@@ -105,7 +107,7 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
 
   .eid {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--accent);
     letter-spacing: 0;
@@ -115,26 +117,28 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
   a.eid:hover { color: var(--ink); }
   .src {
     font-family: var(--font-sans);
-    font-size: 10.5px;
+    font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     font-variant: small-caps;
     text-transform: lowercase;
     color: var(--ink);
+    overflow-wrap: anywhere;
   }
   .frag { color: var(--ink); }
   .as-of {
     font-family: var(--font-mono);
-    font-size: 10.5px;
+    font-size: 0.75rem;
     color: var(--muted);
     text-align: right;
     letter-spacing: 0;
+    white-space: nowrap;
   }
 
   .evidence-row details { text-align: right; }
   .evidence-row details summary {
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: 0.75rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     font-weight: 600;
@@ -142,6 +146,7 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     cursor: pointer;
     list-style: none;
     user-select: none;
+    white-space: nowrap;
   }
   .evidence-row details summary::-webkit-details-marker { display: none; }
   .evidence-row details summary::before { content: "▸ "; color: var(--accent); margin-right: 2px; }
@@ -156,7 +161,7 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     background: var(--paper-shade);
     border-left: 2px solid var(--accent);
     font-family: var(--font-body);
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.5;
     color: var(--ink);
     text-align: left;
@@ -166,7 +171,7 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
   .source-note dl { display: grid; grid-template-columns: 110px 1fr; gap: 4px 14px; }
   .source-note dt {
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -175,25 +180,25 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
   }
   .source-note dd {
     font-family: var(--font-body);
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--ink);
   }
   .source-note dd.excerpt { font-style: italic; }
-  .source-note dd.mono { font-family: var(--font-mono); font-size: 11.5px; word-break: break-all; }
+  .source-note dd.mono { font-family: var(--font-mono); font-size: 0.75rem; word-break: break-all; }
 
   @media (max-width: 600px) {
     .evidence-row {
-      grid-template-columns: 32px 1fr auto;
+      grid-template-columns: 32px minmax(0, 1fr) auto;
       grid-template-rows: auto auto auto;
       gap: 4px 10px;
       padding: 10px 0;
     }
     .eid { grid-row: 1; grid-column: 1; }
-    .src { grid-row: 1; grid-column: 2; font-size: 9.5px; }
-    .as-of { grid-row: 1; grid-column: 3; font-size: 9.5px; }
-    .frag { grid-row: 2; grid-column: 1 / -1; padding-left: 42px; font-size: 12.5px; line-height: 1.4; }
+    .src { grid-row: 1; grid-column: 2; font-size: 0.8125rem; }
+    .as-of { grid-row: 1; grid-column: 3; font-size: 0.75rem; }
+    .frag { grid-row: 2; grid-column: 1 / -1; padding-left: 42px; font-size: 0.7813rem; line-height: 1.4; }
     .evidence-row details { grid-row: 3; grid-column: 1 / -1; padding-left: 42px; text-align: left; }
-    .evidence-row > .source-note { padding: 10px 12px 10px 18px; font-size: 12px; }
+    .evidence-row > .source-note { padding: 10px 12px 10px 18px; font-size: 0.75rem; }
     .source-note dl { grid-template-columns: 88px 1fr; gap: 3px 10px; }
   }
 </style>
