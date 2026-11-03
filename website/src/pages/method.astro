@@ -125,7 +125,7 @@ const pastNow = Math.round(wd.escalation_index * totalSeverity);
         </div>
         {today.map(({ article, counts }) => (
           <div class="tbl-row" role="row">
-            <a role="cell" class="tbl-q" href={`${articleHref(article)}#${evidenceRowId(article.id, 0)}`}>{article.headline}</a>
+            <span role="cell" class="tbl-q"><a href={`${articleHref(article)}#${evidenceRowId(article.id, 0)}`}>{article.headline}</a></span>
             <span role="cell" class="num">{counts.references}</span>
             <span role="cell" class="num">{counts.outlets}</span>
             <span role="cell" class="num p">{counts.independent}</span>
@@ -319,8 +319,8 @@ const pastNow = Math.round(wd.escalation_index * totalSeverity);
   .tbl-row { padding: 10px 0; border-bottom: 1px dotted var(--hairline); }
   .tbl-row:last-child { border-bottom: none; }
   .tbl-q { font-family: var(--font-body); font-size: 0.9063rem; line-height: 1.4; color: var(--ink); }
-  .explain a.tbl-q { border-bottom: none; }
-  .explain a.tbl-q:hover { color: var(--accent-ink); }
+  .explain .tbl-q a { border-bottom: none; }
+  .explain .tbl-q a:hover { color: var(--accent-ink); }
   .tbl-k { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em; color: var(--muted); }
   .tbl-row .num { font-family: var(--font-mono); font-size: 0.8125rem; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
   .tbl-head .num { text-align: right; }

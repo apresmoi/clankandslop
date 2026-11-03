@@ -38,18 +38,19 @@ const label = (r: TrackItem | Legacy) => {
       ? 'No call settled at this bell.'
       : 'The ledger opens today — the desk’s first calls resolve at the next bell. No record to demote yet.'}</p>
   ) : (
-    <div class="tr-rows">
+    <div class="tr-rows" role="table" aria-label={title}>
+      <div role="row" class="visually-hidden"><span role="columnheader">State</span><span role="columnheader">Call</span><span role="columnheader">Prior</span></div>
       {rows.map((r) => (
-        <div class="tr-row">
-          <span class="tr-scol">
+        <div class="tr-row" role="row">
+          <span class="tr-scol" role="cell">
             <span class={`tr-state ${stateOf(r)}`}>{label(r)}</span>
             {stateOf(r) === 'pending' && 'deadline' in r && r.deadline && <span class="tr-when">{r.deadline}</span>}
           </span>
-          <div class="tr-qcol">
+          <div class="tr-qcol" role="cell">
             <span class="tr-q">{r.call}</span>
             {'note' in r && r.note && <span class="tr-note">Ledger{r.noted ? `, ${r.noted}` : ''}: {r.note}</span>}
           </div>
-          <span class="tr-p">{r.prior_p.toFixed(2)}</span>
+          <span class="tr-p" role="cell">{r.prior_p.toFixed(2)}</span>
         </div>
       ))}
     </div>

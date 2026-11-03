@@ -17,18 +17,19 @@ const retrieved = markets?.retrieved_at ? markets.retrieved_at.slice(0, 16).repl
     </div>
     <div class="board-groups">
       {board.map((g) => (
-        <div class="board-group">
-          <div class="group-label">{g.label}</div>
+        <div class="board-group" role="table" aria-label={g.label}>
+          <div class="group-label" aria-hidden="true">{g.label}</div>
+          <div role="row" class="visually-hidden"><span role="columnheader">Series</span><span role="columnheader">Value</span><span role="columnheader">Change</span><span role="columnheader">As of</span></div>
           {g.rows.map((r) => (
-            <div class="board-row">
-              <a class="series" href={r.url} rel="noopener">{r.label}</a>
+            <div class="board-row" role="row">
+              <span role="cell" class="series-cell"><a class="series" href={r.url} rel="noopener">{r.label}</a></span>
               {r.unavailable !== undefined ? (
-                <span class="unavailable" title={r.unavailable}>unavailable</span>
+                <span class="unavailable" role="cell" title={r.unavailable}>unavailable</span>
               ) : (
                 <>
-                  <span class="value">{r.value}</span>
-                  <span class={`change ${r.dir ?? 'flat'}`}>{r.change ?? '—'}</span>
-                  <span class="asof">{r.vs ? `${r.asOf} · ${r.vs}` : r.asOf}</span>
+                  <span class="value" role="cell">{r.value}</span>
+                  <span class={`change ${r.dir ?? 'flat'}`} role="cell">{r.change ?? '—'}</span>
+                  <span class="asof" role="cell">{r.vs ? `${r.asOf} · ${r.vs}` : r.asOf}</span>
                 </>
               )}
             </div>
@@ -92,10 +93,12 @@ const retrieved = markets?.retrieved_at ? markets.retrieved_at.slice(0, 16).repl
     font-size: 0.75rem;
   }
   .board-row:last-child { border-bottom: none; }
-  .series {
+  .series-cell {
     grid-column: 1 / -1;
     font-family: var(--font-sans);
     font-size: 0.75rem;
+  }
+  .series {
     color: var(--ink);
     text-decoration: none;
   }
