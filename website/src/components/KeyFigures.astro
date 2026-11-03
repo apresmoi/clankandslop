@@ -11,7 +11,7 @@ interface Props { title?: string; groups: Group[] }
 const { title = "Today's Numbers", groups } = Astro.props;
 ---
 <div class="kf">
-  <div class="kf-title">{title}</div>
+  <h2 class="kf-title block-h">{title}</h2>
   <div class="kf-desks">
     {groups.map((g) => (
       <div class="kf-desk">

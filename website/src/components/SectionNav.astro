@@ -15,7 +15,7 @@ const sections = [
   { href: tape,  label: 'The Tape' },
 ];
 ---
-<nav class="section-nav">
+<nav class="section-nav" aria-label="Sections">
   {sections.map((s, i) => {
     const isFirstInGroup = s.group && (i === 0 || sections[i - 1].group !== s.group);
     return (

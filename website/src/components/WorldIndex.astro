@@ -22,7 +22,7 @@ const { title = '', items } = Astro.props;
 const CIRCLED = '①②③④⑤⑥⑦⑧⑨';
 ---
 <div class="worldindex">
-  {title && <div class="worldindex-head">{title}</div>}
+  {title && <h2 class="worldindex-head block-h">{title}</h2>}
   {items.map((it, i) => (
     <div class="wi-row">
       <span class="wi-n">{CIRCLED[i] ?? '◉'}</span>

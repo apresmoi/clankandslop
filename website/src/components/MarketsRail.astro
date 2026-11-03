@@ -36,7 +36,7 @@ const { title = 'The Tape', kicker = '', rows, variant = 'list' } = Astro.props;
   </div>
 ) : (
   <div class="story markets-rail">
-    <div class="rail-head">{kicker ? `${title} · ${kicker}` : title}</div>
+    <h2 class="rail-head block-h">{kicker ? `${title} · ${kicker}` : title}</h2>
     <div class="markets-rows">
       {rows.map((r) => (
         <div class="ticker-row">

@@ -20,20 +20,22 @@ const {
   compact = false,
   ears,
 } = Astro.props;
+// The front's banner is the masthead <header>; elsewhere the strip is the banner.
+const Strip = compact ? 'header' : 'section';
 ---
-<div class="meta-strip" data-meta-strip data-compact={compact ? '' : undefined}>
+<Strip class="meta-strip" aria-label={compact ? undefined : 'Edition bar'} data-meta-strip data-compact={compact ? '' : undefined}>
   <div class="meta-strip-inner">
     <div class="meta-left">
       <span class="meta-date">{date}</span>
       <a href="/archive" class="meta-archive">Archive ↗</a>
     </div>
-    <a href="/" class="meta-nameplate" aria-hidden="true">CLANK<span class="amp">&</span>SLOP</a>
+    <a href="/" class="meta-nameplate" data-meta-nameplate aria-hidden={compact ? undefined : 'true'} tabindex={compact ? undefined : -1}>CLANK<span class="amp">&</span>SLOP</a>
     <div class="meta-right">
       <GithubLink variant="button" />
       <ThemeToggle />
     </div>
   </div>
-</div>
+</Strip>
 
 {!compact && (
   <header class="masthead" data-masthead>
@@ -44,7 +46,7 @@ const {
         </div>
       )}
       <div class="masthead-center">
-        <a href="/" class="nameplate">CLANK<span class="amp">&</span>SLOP</a>
+        <h1 class="nameplate-h"><a href="/" class="nameplate">CLANK<span class="amp">&</span>SLOP</a></h1>
         <div class="tagline">{tagline}</div>
       </div>
       {ears && (
@@ -81,6 +83,9 @@ const {
     if (masthead) {
       const io = new IntersectionObserver(([entry]) => {
         strip.toggleAttribute('data-collapsed', !entry.isIntersecting);
+        const mini = strip.querySelector('[data-meta-nameplate]');
+        if (entry.isIntersecting) { mini.setAttribute('aria-hidden', 'true'); mini.tabIndex = -1; }
+        else { mini.removeAttribute('aria-hidden'); mini.removeAttribute('tabindex'); }
       }, { rootMargin: '-32px 0px 0px 0px', threshold: 0 });
       io.observe(masthead);
     }
@@ -231,6 +236,7 @@ const {
     .tagline { font-size: 0.75rem; margin-top: 8px; }
   }
 
+  .nameplate-h { font: inherit; }
   .nameplate {
     font-family: var(--font-display);
     font-weight: 400;

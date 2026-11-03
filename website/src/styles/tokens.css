@@ -160,6 +160,10 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+/* Block heads that are real headings keep their component's type; zero specificity, so any component rule wins. */
+:where(.block-h) { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
+:where(.block-h-inline) { display: inline; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* ============ RESPONSIVE BREAKPOINTS ============
    Two aligned tiers, used everywhere. Keep new media queries on these

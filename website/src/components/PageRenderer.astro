@@ -173,7 +173,7 @@ const items: RenderItem[] = blocks.map((b) => {
 {flow ? (
   <section class="paper-flow">
     {items.map((it) => (
-      it.type === 'section-header' ? <div class="section-header">{it.rawText}</div>
+      it.type === 'section-header' ? <h2 class="section-header block-h">{it.rawText}</h2>
       : it.type === 'grid' ? <it.Component {...it.props} />
       : it.props.__error ? <div class="block-error">{it.props.__error}</div>
       : <it.Component {...it.props} />
@@ -181,7 +181,7 @@ const items: RenderItem[] = blocks.map((b) => {
   </section>
 ) : (
   items.map((it) => (
-    it.type === 'section-header' ? <div class="section-header">{it.rawText}</div>
+    it.type === 'section-header' ? <h2 class="section-header block-h">{it.rawText}</h2>
     : it.type === 'grid' ? <it.Component {...it.props} />
     : it.props.__error ? <div class="block-error">{it.props.__error}</div>
     : <it.Component {...it.props} />

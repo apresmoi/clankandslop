@@ -12,7 +12,7 @@ const retrieved = markets?.retrieved_at ? markets.retrieved_at.slice(0, 16).repl
 {board.length > 0 && (
   <section class="markets-board" aria-label="Markets">
     <div class="board-head">
-      <span class="board-label">The Markets · last published closes</span>
+      <h2 class="board-label block-h block-h-inline">The Markets · last published closes</h2>
       <span class="board-meta">{markets!.source}{retrieved && ` · retrieved ${retrieved}`}</span>
     </div>
     <div class="board-groups">

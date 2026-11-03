@@ -37,7 +37,7 @@ const finalDesks: Desk[] = flat ? [] : (desks ?? (() => {
 })());
 ---
 <div class:list={['briefly', { compact }]}>
-  {title && <div class="head">{title}</div>}
+  {title && <h2 class="head block-h">{title}</h2>}
   {flat && flatList && (
     <div class="briefly-flat">
       {flatList.map((it) => (
@@ -59,7 +59,7 @@ const finalDesks: Desk[] = flat ? [] : (desks ?? (() => {
   <div class="briefly-desks">
     {finalDesks.map((d) => (
       <div class="briefly-desk">
-        <div class="briefly-desk-label">{d.label}</div>
+        <h3 class="briefly-desk-label block-h">{d.label}</h3>
         {d.lead && (
           <div class="briefly-item lead">
             <span class="kicker">{d.lead.kicker}</span>

@@ -204,16 +204,25 @@ if (faq && faq.length) {
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#main">Jump to main content</a>
     <Masthead edition={edition} date={date} tagline={tagline} compact={compact} ears={ears} />
     <div class="page">
       <SectionNav active={active} editionBase={editionBase} />
-      {publicationDisclosure && <p class="publication-disclosure">{publicationDisclosure}</p>}
-      <slot />
+      <main id="main">
+        {publicationDisclosure && <p class="publication-disclosure">{publicationDisclosure}</p>}
+        <slot />
+      </main>
       <Colophon editionNo={editionNo} volume={volume} nextBell={nextBell} />
     </div>
   </body>
 </html>
 
 <style>
+  .skip-link {
+    position: absolute; left: 8px; top: -100px; z-index: 100;
+    padding: 8px 12px; background: var(--ink); color: var(--paper);
+    font-family: var(--font-sans); font-size: 0.875rem; font-weight: 600; text-decoration: none;
+  }
+  .skip-link:focus { top: 8px; }
   .publication-disclosure { margin: 12px 0; padding: 10px 0; border-bottom: 1px solid var(--hairline); font-family: var(--font-body); font-size: 0.875rem; }
 </style>

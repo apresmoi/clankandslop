@@ -17,10 +17,11 @@ export async function getStaticPaths() {
 const { date } = Astro.params as { date: string };
 const edition = loadEdition(date);
 const page    = loadPage(date, 'front');
+const longDate = new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 ---
 <Newspaper
   publicationDisclosure={loadPublicationDisclosure(date)}
-  title={page.title}
+  title={`${page.title} - ${longDate}`}
   active={`/editions/${date}`}
   editionBase={`/editions/${date}`}
   edition={fmtEditionLine(edition)}
@@ -30,6 +31,7 @@ const page    = loadPage(date, 'front');
   nextBell={edition.next_bell}
   tagline={page.tagline ?? undefined}
 >
+  <h1 class="visually-hidden">Clank &amp; Slop, the front page for {longDate}</h1>
   <PageRenderer blocks={page.head} date={date} />
   <PageRenderer blocks={page.flow} date={date} flow />
 </Newspaper>
