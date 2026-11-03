@@ -28,13 +28,13 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     const n = e.source_note;
     return (
       <div class="evidence-row" id={rowId}>
-        <a class="eid" href={`#${rowId}-cite`} title="Back to citation">{eid} ↩</a>
+        <a class="eid" href={`#${rowId}-cite`} title="Back to citation" aria-label={`${eid}, back to citation`}>{eid} <span aria-hidden="true">↩</span></a>
         <span class="src">{e.source}</span>
         <span class="frag">{e.fragment}</span>
         <span class="as-of">{e.as_of}</span>
         {n && (
           <>
-            <details><summary>source</summary></details>
+            <details><summary>source<span class="visually-hidden"> for {eid}</span></summary></details>
             <div class="source-note">
               <dl>
                 {n.raw_excerpt     && <><dt>Excerpt</dt><dd class="excerpt">"{n.raw_excerpt}"</dd></>}
@@ -148,8 +148,8 @@ const withRef = (url: string) => url + (url.includes('?') ? '&' : '?') + 'ref=cl
     white-space: nowrap;
   }
   .evidence-row details summary::-webkit-details-marker { display: none; }
-  .evidence-row details summary::before { content: "▸ "; color: var(--accent-ink); margin-right: 2px; }
-  .evidence-row details[open] summary::before { content: "▾ "; }
+  .evidence-row details summary::before { content: "▸ "; content: "▸ " / ""; color: var(--accent-ink); margin-right: 2px; }
+  .evidence-row details[open] summary::before { content: "▾ "; content: "▾ " / ""; }
   .evidence-row details summary:hover { color: var(--accent-ink); }
 
   .evidence-row > .source-note {

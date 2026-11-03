@@ -422,7 +422,7 @@ export function renderParagraph(text: string, idPrefix?: string, seen?: Set<stri
       const target = idPrefix ? `${idPrefix}-${eid.toLowerCase()}` : eid;
       const citeId = seen && !seen.has(eid) ? ` id="${target}-cite"` : '';
       seen?.add(eid);
-      return `<a href="#${target}" class="evidence-ref"${citeId}>[${eid}]</a>`;
+      return `<a href="#${target}" class="evidence-ref"${citeId} aria-label="Reference ${eid}">[${eid}]</a>`;
     });
 }
 
