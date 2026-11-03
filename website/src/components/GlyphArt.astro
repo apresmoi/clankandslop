@@ -207,7 +207,10 @@ const artLabel = `Illustration: ${subject}`;
   }
   :global([data-theme="light"]) .glyphart-roll :global(.glyph-output) { font-weight: 700; }
   @media (prefers-reduced-motion: reduce) {
+    /* Rolls hold their first frame; the eclipse holds totality. */
+    .glyphart-roll :global(.glyph-output) { animation: none; }
     .glyphart-eclipse :global(.glyph-output) {
+      animation: glyphart-roll calc(var(--dur, 9) * 1s) steps(var(--frames)) infinite;
       animation-play-state: paused;
       animation-delay: -3.3s;
     }
