@@ -102,7 +102,6 @@ const artLabel = `Illustration: ${subject}`;
 
 <style>
   .glyphart { margin: 0; height: 100%; display: flex; flex-direction: column; }
-  /* Mobile (stacked): no text beside it — fill the column width. */
   .glyphart-stage { flex: 1 1 auto; min-height: 0; container-type: inline-size; display: flex; }
   .glyphart-generated .glyphart-stage { min-height: 220px; }
   .glyphart-pre {
@@ -124,9 +123,11 @@ const artLabel = `Illustration: ${subject}`;
       font-size: min(calc(100cqw * var(--glyph-scale) / (var(--cols) * 0.62)), calc(100cqh * var(--glyph-scale) / (var(--rows) + 1)));
     }
   }
+  /* Stacked: width alone lets a tall shape fill the phone screen, so every glyph
+     also gets a height cap from its own row count. */
   @media (max-width: 879px) {
-    .glyphart-generated .glyphart-pre {
-      font-size: min(calc(100cqw * var(--glyph-scale) / (var(--cols) * 0.62)), calc(260px / (var(--rows) + 1)));
+    .glyphart-pre {
+      font-size: min(calc(100cqw * var(--glyph-scale) / (var(--cols) * 0.62)), calc(260px * var(--glyph-scale) / (var(--rows) + 1)));
     }
   }
   .glyphart-play .glyphart-pre { color: var(--accent); }
