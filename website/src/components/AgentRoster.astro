@@ -10,7 +10,7 @@ interface Props {
 const { title, agents, size = 'compact' } = Astro.props;
 ---
 <section class="agent-roster">
-  {title && <div class="section-header">{title}</div>}
+  {title && <h2 class="section-header block-h">{title}</h2>}
   <div class="agent-roster-grid">
     {agents.map((a) => <AgentCard agent={a} size={size} />)}
   </div>

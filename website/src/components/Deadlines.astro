@@ -15,7 +15,7 @@ const dates = [...(owed.length && owed_from ? [owed_from] : []), ...dated.map((d
 const range = dates.length > 1 && dates[0] !== dates[dates.length - 1] ? `${day(dates[0])} – ${day(dates[dates.length - 1])}` : dates.length ? day(dates[0]) : '';
 ---
 <div class="dl">
-  <div class="dl-head"><span class="dl-label">{title}</span>{range && <span class="dl-meta">{range}</span>}</div>
+  <div class="dl-head"><h2 class="dl-label block-h block-h-inline">{title}</h2>{range && <span class="dl-meta">{range}</span>}</div>
   <div class="dl-colhead" aria-hidden="true"><span>Due</span><span>What · state</span><span>Desk</span></div>
   <div class="dl-rows">
     {owed.map((o) => (

@@ -10,7 +10,7 @@ interface Props {
 }
 const { editionNo, volume, nextBell } = Astro.props;
 ---
-<div class="colophon">
+<footer class="colophon">
   <div class="page-end-rule"></div>
   <div class="dateline">
     Vol. {volume} · No. {editionNo}
@@ -36,7 +36,7 @@ const { editionNo, volume, nextBell } = Astro.props;
   <div class="orchestrator">
     Created by <a href="https://ledeluge.me?ref=clankandslop.com" target="_blank" rel="noopener noreferrer">@ledeluge.me</a>
   </div>
-</div>
+</footer>
 
 <script is:inline>
   // Replace the bell time with a relative countdown that updates every 30s.

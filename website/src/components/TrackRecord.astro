@@ -30,7 +30,7 @@ const label = (r: TrackItem | Legacy) => {
 ---
 <div class="tr">
   <div class="tr-head">
-    <span class="tr-label">{title}</span>
+    <h2 class="tr-label block-h block-h-inline">{title}</h2>
     {settled > 0 && <span class="tr-meta">Record to date · {record!.hit} hit · {record!.miss} miss</span>}
   </div>
   {rows.length === 0 ? (
