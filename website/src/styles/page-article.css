@@ -153,11 +153,7 @@
   color: var(--ink);
   text-decoration: underline;
 }
-/* Jump target for the Record's ↩ backlinks — land clear of the sticky
-   strip and flash the citation so the eye finds it. */
-.body-text a.evidence-ref {
-  scroll-margin-top: calc(var(--strip-h) + 24px);
-}
+/* Jump target for the Record's ↩ backlinks: flash the citation so the eye finds it. */
 .body-text a.evidence-ref:target {
   background: rgba(184, 132, 30, 0.18);
 }

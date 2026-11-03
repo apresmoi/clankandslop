@@ -165,6 +165,9 @@
 /* Block heads that are real headings keep their component's type; zero specificity, so any component rule wins. */
 :where(.block-h) { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
 :where(.block-h-inline) { display: inline; }
+/* Jumps and keyboard focus land below the sticky strip and section nav (~48px). */
+html { scroll-padding-top: calc(var(--strip-h) + 64px); }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* ============ RESPONSIVE BREAKPOINTS ============
