@@ -7,11 +7,11 @@ import path from 'node:path';
 import test from 'node:test';
 import { CITATION_GATE_NAMES, HARD_LINT_NAMES, advisoryFilingWarnings, armedHardLintNames, buildEditionIndex, describeLintFlag, hardLintFlags, lintFiling, owedUpdates, renderEditionIndex, writeEditionIndex } from './edition-index.mjs';
 import { proseLintFindings } from '../../ops/prose-lint.mjs';
-import { PASSED_ARTICLES_MINIMUM } from './compose-gate.mjs';
+import { FULL_EDITION_ARTICLES } from './compose-gate.mjs';
 
 // Floors come from the source of truth, so a deliberate change to a SIZE cannot
 // fail a test that is really about row shape or an empty index.
-const F = PASSED_ARTICLES_MINIMUM;
+const F = FULL_EDITION_ARTICLES;
 import { existsSync } from 'node:fs';
 import { composeEdition, fileArticle, fileDesk, recordAssignment as recordAssignmentAgainstMount, recordDissent, reviewArticle as reviewArticleWithDigest } from './production-newsroom.mjs';
 import { corpusIdentityFile, installCorpusFixture } from './corpus-fixture.mjs';
@@ -392,7 +392,7 @@ test('a row is one line no matter what the headline carries', () => {
   for (const line of lines) assert.doesNotMatch(line, /[\n\r]/u);
   // No compose status supplied: the forecast floor is reported as unknown
   // rather than guessed at, and an unknown floor is not a green light.
-  assert.equal(lines[1], `# compose: passed=1/${F} desks=1/4 sections=?/3 owners=?/${F} sources=?/3 domains=?/3 forecast=? dissent=?  → blocked`);
+  assert.equal(lines[1], `# compose: passed=1/${F} desks=1/4 sections=?/3 owners=?/${F} sources=?/3 domains=?/3 forecast=? dissent=?  → partial`);
   assert.match(lines[4], /^A foreman x refs=0 +\| A brief split across lines and \/ carrying a separator.*…$/u);
   assert.match(lines[5], /^F x rev=1 owner=fore-man epi=fa-ct words=1 refs=1 domains=1 art=- topics=unknown:od-d lint=domains<2$/u);
   assert.match(lines[6], /^V x rev=1 PA-SS by=spike$/u);
