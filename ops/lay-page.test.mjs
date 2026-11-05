@@ -19,24 +19,41 @@ const refuses = (mutate, gate) => {
   return error;
 };
 
-test('a book at exactly the floor lays, and one below it is refused by the derived number', () => {
-  // 2026-09-27: compose-gate.mjs reported `passed=4/4 desks=4/4 sections=3/3
-  // owners=4/4 ... -> ready` while this assembler still demanded a literal 5, so
-  // Caslon refused to lay a book the gate had already cleared: "compose gate says
-  // ready, but the page assembler still wants five PASSed slugs". Both sides now
-  // read PASSED_ARTICLES_MINIMUM from ops/edition-floor.mjs.
-  const drop = (input, slug) => {
-    delete input.articles[slug];
-    delete input.decisions.art[slug];
-    input.decisions.order = input.decisions.order.filter((item) => item !== slug);
-    input.decisions.flashpoints = input.decisions.flashpoints.filter((spot) => spot.article !== slug);
-    return input;
-  };
-  const atFloor = (input) => drop(input, 'echo');
-  assert.equal(Object.keys(atFloor(synthetic()).articles).length, PASSED_ARTICLES_MINIMUM);
-  assert.ok(lay(atFloor), 'a book carrying exactly the floor must lay');
-  refuses((input) => drop(atFloor(input), 'delta'),
-    new RegExp(`at least ${PASSED_ARTICLES_MINIMUM} PASSed articles required, found ${PASSED_ARTICLES_MINIMUM - 1}`, 'u'));
+const keep = (input, slugs) => {
+  for (const slug of Object.keys(input.articles)) if (!slugs.includes(slug)) { delete input.articles[slug]; delete input.decisions.art[slug]; }
+  input.decisions.order = input.decisions.order.filter((item) => slugs.includes(item));
+  input.decisions.flashpoints = input.decisions.flashpoints.filter((spot) => slugs.includes(spot.article));
+  return input;
+};
+const visualsOf = (document) => (JSON.stringify(document).match(/"block":"(?:MapGlyph|GlyphArt|Illustration|Image)"/gu) ?? []).length;
+
+test('a short paper lays with what passed, and an empty one is refused', () => {
+  // 2026-11-04 printed nothing for want of a fourth body. The edition now ships
+  // with whatever passed: the floor is one piece, read from ops/edition-floor.mjs.
+  assert.equal(PASSED_ARTICLES_MINIMUM, 1);
+  const two = lay((input) => keep(input, ['alpha', 'bravo']));
+  assert.deepEqual(collectPublicArticleReferences(two.pages[0].document), ['alpha', 'bravo']);
+  assert.equal(visualsOf(two.pages[0].document), 2, 'the lead and the one feature each keep their art');
+  assert.equal(two.report.passed, 2);
+  const one = lay((input) => keep(input, ['alpha']));
+  assert.deepEqual(collectPublicArticleReferences(one.pages[0].document), ['alpha']);
+  assert.equal(visualsOf(one.pages[0].document), 1, 'a one-piece front has only its lead art');
+  refuses((input) => keep(input, []), /at least 1 PASSed article required, found 0/u);
+});
+
+test('a paper of one or two pieces may leave out the front Briefly, a paper of three may not', () => {
+  const withoutBriefly = (slugs) => (input) => { keep(input, slugs); delete input.decisions.briefly; return input; };
+  assert.deepEqual(lay(withoutBriefly(['alpha', 'bravo'])).pages[0].document.flow, []);
+  assert.equal(lay((input) => keep(input, ['alpha', 'bravo'])).pages[0].document.flow[0].block, 'Briefly', 'a supplied Briefly still prints');
+  refuses(withoutBriefly(['alpha', 'bravo', 'charlie']), /briefly must carry exactly 3 desks/u);
+});
+
+test('missing Ledger desk documents lay as an empty settlement desk without a markets board; Caslon\'s own still refuse', () => {
+  const laid = lay((input) => { keep(input, ['alpha', 'bravo']); delete input.desk['ledger.settlements']; delete input.desk['ledger.worlddesk']; return input; });
+  const tape = laid.pages[1].document;
+  assert.equal(tape.head.some((block) => block.block === 'MarketsBoard'), false);
+  assert.equal(tape.head[0].block, 'Briefly');
+  refuses((input) => { delete input.desk['caslon.chrome']; return input; }, /desk document "caslon.chrome" is missing/u);
 });
 
 test('the two pages carry different top-level paper values', () => {
@@ -113,8 +130,8 @@ test('a lead that disagrees with caslon.chrome is refused', () => {
   refuses((i) => { i.decisions.order = ['bravo', 'alpha', 'charlie', 'delta', 'echo']; return i; }, /lead story/);
 });
 
-test('a missing desk document is refused before any page is built', () => {
-  refuses((i) => { delete i.desk['ledger.worlddesk']; return i; }, /edition tree incomplete/);
+test('a missing Caslon desk document is refused before any page is built', () => {
+  refuses((i) => { delete i.desk['caslon.weather']; return i; }, /edition tree incomplete/);
 });
 
 test('an illustrated slot with neither article art nor a record entry is refused', () => {

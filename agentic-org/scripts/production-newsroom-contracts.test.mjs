@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { qualifySignal } from './production-newsroom.mjs';
-import { ASSIGNMENTS_MINIMUM, PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
+import { ASSIGNMENTS_MINIMUM, FULL_EDITION_ARTICLES } from '../../ops/edition-floor.mjs';
 
 // Covers the two newest contract fixes that the end-to-end test in
 // production-newsroom.test.mjs does not exercise: binding event_key to
@@ -72,10 +72,10 @@ test('Spike contract hands off to Ledger once current PASS coverage can support 
   ];
   for (const file of files) {
     const text = await instructionText(file);
-    // Keyed to the floor BEING MET, never to a literal count: the floor is a
+    // Keyed to a full paper BEING MET, never to a literal count: the size is a
     // size and it has already moved twice. A test that pins the number fails on
     // a deliberate change while proving nothing about the handoff.
-    assert.match(text, /passed-article floor|passed=\d+ or more|five or more passed/u, `${file} must key the handoff to current PASS coverage`);
+    assert.match(text, /a full paper|passed-article floor|passed=\d+ or more|five or more passed/u, `${file} must key the handoff to current PASS coverage`);
     assert.match(text, /@ledger/u, `${file} must name Ledger with a real mention`);
     assert.match(text, /room:release/u, `${file} must use Ledger's declared Moltnet room`);
     assert.match(text, /D ledger\.settlements/u, `${file} must avoid duplicate handoff after Ledger documents exist`);
@@ -250,12 +250,13 @@ test('mcp tool schemas type every property beyond edition/event_key', async () =
   assert.match(reviewArticleTool.description, /REVISION_REQUEST and HOLD/u);
   assert.match(reviewArticleTool.description, /SPIKE/u);
   assert.match(reviewArticleTool.description, /PASS continues from the fresh INDEX/u);
-  // The handoff threshold is the floor, read from the one place it lives.
-  assert.match(reviewArticleTool.description, new RegExp(`passed>=${PASSED_ARTICLES_MINIMUM} `, 'u'));
+  // The Ledger handoff threshold is a full paper, read from the one place it lives.
+  assert.match(reviewArticleTool.description, new RegExp(`passed>=${FULL_EDITION_ARTICLES} `, 'u'));
+  assert.match(reviewArticleTool.description, /late addition.*recompose/u);
   assert.doesNotMatch(reviewArticleTool.description, /@brass if a replacement/u);
   const recordAssignmentTool = (await mcpToolsList('brass')).find((tool) => tool.name === 'record_assignment');
   assert.equal(recordAssignmentTool.inputSchema.properties.assignments.minItems, ASSIGNMENTS_MINIMUM);
-  assert.match(recordAssignmentTool.description, new RegExp(`needs ${PASSED_ARTICLES_MINIMUM} passed pieces.*at least ${ASSIGNMENTS_MINIMUM}.*spare`, 'u'));
+  assert.match(recordAssignmentTool.description, new RegExp(`full paper is ${FULL_EDITION_ARTICLES} passed pieces.*at least ${ASSIGNMENTS_MINIMUM}.*spare`, 'u'));
   assert.match(reviewArticleTool.description, /@ledger in room:release/u);
   assert.match(reviewArticleTool.description, /composition prerequisites are ready/u);
   assert.match(reviewArticleTool.description, /@caslon in room:release with the edition, article id and revision/u);

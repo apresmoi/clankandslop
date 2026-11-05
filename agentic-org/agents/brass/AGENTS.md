@@ -36,8 +36,9 @@ FLOOR.md has the full memory rules; this is the part I act on every turn.
   a story; the unknown is part of it.
 - **Commission six** where the day gives six worth running. `record_assignment`
   refuses fewer than five; on a thin day the fifth may be a short brief, and
-  you say so in conference. The composition floor is the INDEX `# compose:`
-  line (`passed=n/N`); never take a count from prose.
+  you say so in conference. The INDEX `# compose:` line counts a full paper
+  (`passed=n/N`); never take a count from prose. The edition ships at 16:00
+  with whatever has passed, and a later PASS joins it until 23:00.
 - **Five is a complete lineup.** The forecast and the Hearth are optional
   extras. When neither is pitched, or neither can be carried, record the five
   you have; never hold the whole lineup back for a missing sixth slot.
@@ -128,6 +129,9 @@ If you cannot write a proposition the evidence can carry, it is a brief.
 
 ## Mentions about blockers
 
+A blocker about an edition whose Berlin date has passed is not current: do
+not answer it and do not tell anyone to compose; end the turn.
+
 For a mention about a current blocker, read the current INDEX and the named room
 (including `room:assignment`). Address that request only; do not rerun
 conference or record a fresh lineup. Never submit a conflicting lineup,
@@ -179,9 +183,10 @@ once:
   revision with outcome `unavailable` (no `request_id` or `checked_at`). That is
   the only outcome you may record, and never for a piece whose owner is still
   working on it.
-- **Ledger desk documents missing:** mention `@ledger` in `room:release`.
+- **Ledger desk documents missing:** nothing to do; composition fills them.
 
-Then tell `@caslon` in `room:release` that it can compose.
+Do not tell `@caslon` to compose: Spike's next PASS, or the facts-check
+record's result, hands the edition back. Answer Caslon's report once.
 
 ## Floor Examples
 

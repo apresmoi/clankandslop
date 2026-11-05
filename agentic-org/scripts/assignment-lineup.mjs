@@ -19,7 +19,7 @@ const assertBrief = (brief, label) => {
 /** Validates a lineup and returns its forecast item, or undefined on a day with no forecast. */
 export function assertLineup(assignments) {
   if (!Array.isArray(assignments)) throw new Error('assignments must be an array of {id, owner, brief, evidence_refs} objects');
-  if (assignments.length < ASSIGNMENTS_MINIMUM) throw new Error(`assignments must include at least ${ASSIGNMENTS_MINIMUM} items, got ${assignments.length}: composition needs ${ASSIGNMENTS_MINIMUM - 1} passed pieces and the extra one is the spare against a spike; it may be a short piece`);
+  if (assignments.length < ASSIGNMENTS_MINIMUM) throw new Error(`assignments must include at least ${ASSIGNMENTS_MINIMUM} items, got ${assignments.length}: a full paper is ${ASSIGNMENTS_MINIMUM - 1} passed pieces and the extra one is the spare against a spike; it may be a short piece`);
   assignments.forEach((item, index) => {
     try { fields(item, ['id', 'owner', 'brief', 'evidence_refs'], ['slot', 'dissenter']); } catch (error) { throw new Error(`assignments[${index}] ${error.message}`); }
     if (!component.test(item.id)) throw new Error(`assignments[${index}].id ${JSON.stringify(item.id)} must be 1-128 lowercase alphanumeric/hyphen characters, starting with a letter or digit`);

@@ -133,9 +133,13 @@ retrieval. Direct-network restrictions also require runtime enforcement.
 - Filing checks structure, citations, canonical attribution and known internal
   prose leaks. A validator pass does not establish source truth or good writing;
   Spike reviews those.
-- Composition requires five PASS articles from five authors, three sections,
-  three named sources across three domains, all four desk documents, an
-  illustrated lead and the required 2–3 front-page visuals.
+- Composition requires one PASS article, Caslon's two desk documents, an
+  illustrated lead and up to three front-page visuals (two once two pieces
+  passed). A full paper (`ready`) is four PASS articles from four authors, three
+  sections, three named sources across three domains and all four desk
+  documents; fewer composes as `partial` at 16:00, and a missing Ledger desk is
+  filled with its empty or stale form. A later PASS joins the same date's
+  edition until 23:00 Berlin.
 - Brass commissions a forecast and dissenter; filing enforces forecast shape.
   Forecast/dissent counts are reported, but are not composition gates.
 - Caslon uses the [art catalogue](../ops/ASSETS.md), installed ETOPO terrain and

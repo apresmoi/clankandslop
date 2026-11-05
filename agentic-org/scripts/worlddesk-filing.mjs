@@ -101,6 +101,12 @@ async function latestPriorDerived(publicRoot, edition, env) {
   throw new Error(`ledger.worlddesk fallback requires a prior public derived World Desk trace before ${edition}`);
 }
 
+/** The stale carry-forward of the latest prior derived public World Desk: what an edition prints when Ledger filed none. */
+export async function staleWorldDesk(edition, { publicRoot, env = process.env }) {
+  const prior = await latestPriorDerived(publicRoot, edition, env);
+  return { world_desk: { ...structuredClone(prior.document.world_desk), delta: 'stale' } };
+}
+
 // Reached only once the mount is declared and its corpus has been accepted for
 // this edition, so an absent refusal.json here means the producer has written
 // neither a document nor a refusal — never that the mount is missing. The two

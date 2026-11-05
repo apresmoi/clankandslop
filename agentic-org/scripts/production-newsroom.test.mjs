@@ -9,7 +9,7 @@ import { archiveResolver, layEdition, readEditionInputs } from '../../ops/lay-pa
 import { archiveLedger } from '../../ops/ledger-archive.mjs';
 import { ledgerHistory, missingLedgerRows } from '../../ops/open-clocks.mjs';
 import { writeEditionIndex } from './edition-index.mjs';
-import { DESK_DOCUMENTS_REQUIRED, PASSED_ARTICLES_MINIMUM, compositionCoverage, composeGateStatus } from './compose-gate.mjs';
+import { DESK_DOCUMENTS_REQUIRED, FULL_EDITION_ARTICLES, PASSED_ARTICLES_MINIMUM, compositionCoverage, composeGateStatus } from './compose-gate.mjs';
 // Every REQUIRED side of the gate line is read back out of the gate itself, so a
 // deliberate change to a floor cannot fail a test that is really about the found
 // counts and the ready/blocked word. These assertions used to pin a literal 5
@@ -19,7 +19,7 @@ import { DESK_DOCUMENTS_REQUIRED, PASSED_ARTICLES_MINIMUM, compositionCoverage, 
 const required = Object.fromEntries(Object.entries(composeGateStatus({ edition: '2026-01-01', passed: 0, desks: 0, forecasts: 0, dissents: 0, coverage: compositionCoverage([]) }).coverage).map(([key, gate]) => [key, gate.required]));
 // file_article sets each piece's section from its owner's desk, so five owners
 // on five desks always make five sections, whatever the fixture typed.
-const gateLine = ({ sections = 5, dissent = 0, state = 'ready' } = {}) => `# compose: passed=5/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=${sections}/${required.sections} owners=5/${required.owners} sources=5/${required.sources} domains=5/${required.domains} forecast=1 dissent=${dissent}  → ${state}`;
+const gateLine = ({ sections = 5, dissent = 0, state = 'ready' } = {}) => `# compose: passed=5/${FULL_EDITION_ARTICLES} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=${sections}/${required.sections} owners=5/${required.owners} sources=5/${required.sources} domains=5/${required.domains} forecast=1 dissent=${dissent}  → ${state}`;
 import { amendAssignment, collectPublicArticleReferences, composeEdition, fileArticle, fileDesk, isDatedForecast, qualifySignal, recordAssignment as recordAssignmentAgainstMount, recordDissent, recordFreshness, reviewArticle as reviewArticleWithDigest, stagePublicSource, stageRelease, mergeBundle, authenticatedCurrentComposition } from './production-newsroom.mjs';
 import { REPORTERS } from './corpus-contract.mjs';
 import { corpusDeskIndex, corpusIdentityFile, corpusPreparedFile, fixtureRevision, installCorpusFixture } from './corpus-fixture.mjs';
@@ -384,7 +384,7 @@ async function checkFacts(state, edition, outcome = Date.parse(`${edition}T13:30
     await recordFreshness({ edition, event_key: `facts-${edition}-${value.id}-${value.revision}`, article_id: value.id, revision: value.revision, outcome, request_id: `${owner}-${edition}-facts-${value.id}`, ...(outcome === 'unavailable' ? {} : { checked_at: `${edition}T13:30:00Z` }) });
   }
 }
-async function driveToCompose(state, edition, make, count = owners.length, beforeReview, { facts = true } = {}) {
+async function driveToCompose(state, edition, make, count = owners.length, beforeReview, { facts = true, ledger = true, passed = count } = {}) {
   process.env.CLANK_EDITION_STATE_ROOT = state;
   const day = [...owners, 'vesta'].slice(0, count);
   assert.equal(day.length, count, 'the fixture has no owner for that many stories');
@@ -394,11 +394,11 @@ async function driveToCompose(state, edition, make, count = owners.length, befor
   for (const [index, owner] of day.entries()) { process.env.CLANK_NEWSROOM_AGENT = owner; await fileArticle({ edition, event_key: `filing-${edition}-${index}`, article: make(`story-${index}`, owner[0].toUpperCase() + owner.slice(1), edition, index) }); }
   if (beforeReview) await beforeReview();
   process.env.CLANK_NEWSROOM_AGENT = 'spike';
-  for (const index of day.keys()) await reviewArticle({ edition, event_key: `review-${edition}-${index}`, article_id: `story-${index}`, revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
+  for (const index of [...day.keys()].slice(0, passed)) await reviewArticle({ edition, event_key: `review-${edition}-${index}`, article_id: `story-${index}`, revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
   if (facts) await checkFacts(state, edition);
-  process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ['ledger.settlements', 'ledger.worlddesk']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: preparedDeskDocument(name, edition) });
+  process.env.CLANK_NEWSROOM_AGENT = 'ledger'; for (const name of ledger ? ['ledger.settlements', 'ledger.worlddesk'] : []) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: preparedDeskDocument(name, edition) });
   process.env.CLANK_NEWSROOM_AGENT = 'caslon'; for (const name of ['caslon.chrome', 'caslon.weather']) await fileDesk({ edition, event_key: `desk-${edition}-${name}`, name, document: preparedDeskDocument(name, edition) });
-  const ids = day.map((_, index) => `story-${index}`);
+  const ids = day.map((_, index) => `story-${index}`).slice(0, passed);
   return { edition, pages: [{ name: 'front', document: page('front', ids.slice(0, 3), 'hormuz-hero') }, { name: 'tape', document: page('tape', ids.slice(3)) }], maps: [{ name: 'hormuz', document: archivedMap('hormuz') }, { name: 'hormuz-hero', document: archivedMap('hormuz-hero') }] };
 }
 
@@ -499,14 +499,14 @@ runtimeTest('Spike hands the owner its facts request at PASS, and the records na
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
-runtimeTest('record_assignment wants the floor plus one spare, and says the spare may be short', async () => {
+runtimeTest('record_assignment wants a full paper plus one spare, and says the spare may be short', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-assign-floor-'));
   try {
     process.env.CLANK_EDITION_STATE_ROOT = path.join(temporary, 'state'); process.env.CLANK_NEWSROOM_AGENT = 'brass';
-    const items = owners.slice(0, PASSED_ARTICLES_MINIMUM).map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
-    await assert.rejects(recordAssignment({ edition: '2026-09-18', event_key: 'schedule:assignment-floor', assignments: items }), new RegExp(`at least ${PASSED_ARTICLES_MINIMUM + 1} items, got ${PASSED_ARTICLES_MINIMUM}: composition needs ${PASSED_ARTICLES_MINIMUM} passed pieces and the extra one is the spare against a spike; it may be a short piece`, 'u'));
+    const items = owners.slice(0, FULL_EDITION_ARTICLES).map((owner, index) => ({ id: `story-${index}`, owner, brief: `Report the verified mechanism for story number ${index}.`, evidence_refs: [], ...(index === 1 ? { slot: 'forecast', dissenter: 'vesta' } : {}) }));
+    await assert.rejects(recordAssignment({ edition: '2026-09-18', event_key: 'schedule:assignment-floor', assignments: items }), new RegExp(`at least ${FULL_EDITION_ARTICLES + 1} items, got ${FULL_EDITION_ARTICLES}: a full paper is ${FULL_EDITION_ARTICLES} passed pieces and the extra one is the spare against a spike; it may be a short piece`, 'u'));
     const recorded = await recordAssignment({ edition: '2026-09-18', event_key: 'schedule:assignment-floor', assignments: [...items, { id: 'story-spare', owner: 'vesta', brief: 'A short spare piece on the day\'s second story.', evidence_refs: [] }] });
-    assert.equal(recorded.recorded, PASSED_ARTICLES_MINIMUM + 1);
+    assert.equal(recorded.recorded, FULL_EDITION_ARTICLES + 1);
   } finally { delete process.env.CLANK_NEWSROOM_AGENT; await rm(temporary, { recursive: true, force: true }); }
 });
 
@@ -627,7 +627,7 @@ runtimeTest('no other compose gate went with it', async () => {
     const composeArgs = await driveToCompose(state, edition, article);
     process.env.CLANK_NEWSROOM_AGENT = 'caslon';
     await rm(path.join(state, 'editions', edition, 'desk', 'caslon.weather.json'));
-    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-desk' }), /exactly 4 desk documents required.*found 3/su);
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-desk' }), /file caslon\.weather with file_desk first/su);
     // Strip PASSed articles down to one BELOW the floor, derived rather than
     // typed. This assertion used to read `found 4` against a literal 5, so when
     // #188 lowered the floor to four the test kept passing and the real
@@ -637,7 +637,35 @@ runtimeTest('no other compose gate went with it', async () => {
       await rm(path.join(state, 'editions', edition, 'reviews', `story-${index}.json`));
     }
     await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-short-passed' }),
-      new RegExp(`at least ${PASSED_ARTICLES_MINIMUM} PASSed articles required, found ${PASSED_ARTICLES_MINIMUM - 1}`, 'u'));
+      new RegExp(`at least ${PASSED_ARTICLES_MINIMUM} PASSed article required, found ${PASSED_ARTICLES_MINIMUM - 1}; a day with no passed piece stays unpublished. Its Berlin date has passed`, 'u'));
+  } finally {
+    delete process.env.CLANK_NEWSROOM_AGENT;
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
+
+runtimeTest('two passed pieces and no Ledger desk compose, and a published edition past its late-addition window is closed', async () => {
+  const temporary = await mkdtemp(path.join(os.tmpdir(), 'clank-partial-'));
+  const state = path.join(temporary, 'state'), edition = '2026-11-04';
+  try {
+    const composeArgs = await driveToCompose(state, edition, article, owners.length, undefined, { ledger: false, passed: 2 });
+    // The real assembler lays the short paper: a lead, one feature, no front Briefly.
+    const desks = (label) => [label, 'Open Clocks', 'Service Points'].map((name, n) => ({ label: name, lead: { kicker: `K${n}`, agent: 'Foreman', what: `W${n}` }, rest: [] }));
+    const laid = layEdition({ edition, ...readEditionInputs(state, edition), decisions: { order: ['story-0', 'story-1'], art: { 'story-0': { caption: 'Lead.' }, 'story-1': { shape: 'chip', caption: 'Feature.' } }, flashpoints: [], tape: { briefly: desks('Closed Clocks') } } });
+    composeArgs.pages = laid.pages; composeArgs.maps = laid.maps;
+    assert.match(await readIndexFile(state, edition), /^# compose: passed=2\/4 desks=2\/4 .* {2}→ partial$/mu);
+    process.env.CLANK_NEWSROOM_AGENT = 'caslon';
+    const composed = await composeEdition({ ...composeArgs, event_key: 'compose-two-pieces' });
+    assert.deepEqual(composed.receipt.composition.tree.articles, ['story-0', 'story-1']);
+    assert.deepEqual(composed.desk_fallbacks, ['ledger.settlements', 'ledger.worlddesk']);
+    const desk = (name) => readFile(path.join(state, 'editions', edition, 'desk', `${name}.json`), 'utf8').then(JSON.parse);
+    assert.deepEqual(await desk('ledger.settlements'), { resolved_last_edition: [] });
+    assert.equal((await desk('ledger.worlddesk')).world_desk.delta, 'stale');
+    assert.ok(await authenticatedCurrentComposition(edition));
+    // Once the host has proved it on main and the date has gone, nothing recomposes it.
+    await mkdir(path.join(state, 'editions', edition, 'recovery'), { recursive: true });
+    await writeFile(path.join(state, 'editions', edition, 'recovery', 'on-main.json'), JSON.stringify({ v: 'clank.edition-on-main.v1', edition, commit: 'a'.repeat(40) }));
+    await assert.rejects(composeEdition({ ...composeArgs, event_key: 'compose-after-close' }), /edition 2026-11-04 is published and closed.*send no message about edition 2026-11-04/su);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
     await rm(temporary, { recursive: true, force: true });
@@ -953,12 +981,12 @@ runtimeTest('Spike review results distinguish saved notes from delivered Moltnet
     const passed = await reviewArticle({ edition, event_key: 'pass-story', article_id: 'story-3', revision: 1, verdict: 'PASS', notes: 'Sources and voice pass.' });
     assert.match(passed.next, /PASS was saved/u);
     assert.match(passed.next, /fresh state\/edition\/editions\/2026-09-07\/INDEX/u);
-    assert.match(passed.next, /review other unreviewed filings one at a time/u);
-    assert.match(passed.next, new RegExp(`passed>=${PASSED_ARTICLES_MINIMUM} `, 'u'));
-    assert.match(passed.next, /no D ledger\.settlements or D ledger\.worlddesk rows/u);
+    // One passed piece on a date whose compose deadline has gone is an edition:
+    // it goes to Caslon (review-handoff.test.mjs pins the pre-deadline wait).
+    assert.match(passed.next, /composition prerequisites are ready/u);
     assert.match(passed.next, /moltnet_send/u);
-    assert.match(passed.next, /room:release/u);
-    assert.match(passed.next, /@ledger/u);
+    assert.match(passed.next, /room:release now.*@caslon/u);
+    assert.doesNotMatch(passed.next, /@ledger/u);
         assert.equal(story3.next.includes('@spike'), true);
   } finally {
     delete process.env.CLANK_NEWSROOM_AGENT;
