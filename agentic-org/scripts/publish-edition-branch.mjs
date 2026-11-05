@@ -52,7 +52,7 @@ export const remoteUrl = (remote) => `git@${PUSH_REMOTES[remote].alias}:${PUSH_R
 const BRANCH_PATTERN = /^edition\/\d{4}-\d{2}-\d{2}$/u;
 const EDITION_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
 export const editionBranch = (edition) => `edition/${edition}`;
-export const editionCommitMessage = (edition) => `chore(edition): add the ${edition} edition`;
+export const editionCommitMessage = (edition) => `chore(edition): add the ${edition} edition`;export const lateAdditionCommitMessage = (edition) => `chore(edition): add late pieces to the ${edition} edition`;
 
 // Refused whether they appear as the whole ref or as any component, so a ref
 // that survives the pattern check by nesting still cannot land on a branch
@@ -241,7 +241,7 @@ async function writeLogEntry(workdir, editionSource, edition, traceSource) {
 // The parts website/src/lib/edition.ts requires to load an edition.
 export const EDITION_DESK_PARTS = Object.freeze(['caslon.chrome.json', 'caslon.weather.json', 'ledger.settlements.json', 'ledger.worlddesk.json']);
 
-export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, traceSource, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false, log = console.warn }) {
+export async function pushStagedEditionTree({ url, branch, editionSource, editionPath, traceSource, workdir, home, sshCommand, base = BASE_BRANCH, message, provenance, dryRun = false, lateAddition = false, log = console.warn }) {
   assertPushableRef(branch);
   if (!path.isAbsolute(workdir) || !path.isAbsolute(editionSource) || !path.isAbsolute(home)) throw new Error('push workdir, source and home must be absolute paths');
   const scoped = path.normalize(editionPath);
@@ -260,10 +260,11 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
     observedSha = await git(['-C', workdir, 'rev-parse', remoteRef], options);
     const merged = await git(['-C', workdir, 'merge-base', '--is-ancestor', observedSha, baseRef], options)
       .then(() => true, (error) => { if (error.code === 1) return false; throw error; });
-    if (merged) return { branch, commit: observedSha, base: await git(['-C', workdir, 'rev-parse', baseRef], options), remote_url: url, generated: null, pushed: false, already_published: true };
+    if (merged && !lateAddition) return { branch, commit: observedSha, base: await git(['-C', workdir, 'rev-parse', baseRef], options), remote_url: url, generated: null, pushed: false, already_published: true };
   }
   // Published editions are immutable, and main is the authority, whether or not
-  // the branch survives. Complete means the desk documents the site cannot load
+  // the branch survives. A late addition (the host's explicit flag, inside the
+  // edition's evening) replaces the directory in a new commit; an identical tree stays published. Complete means the desk documents the site cannot load
   // without. A partial directory is neither published nor safe to overwrite, since
   // it may be a damaged real edition: refuse loudly and let a person decide.
   const onBase = await git(['-C', workdir, 'ls-tree', '-r', '--name-only', baseRef, '--', scoped], options);
@@ -272,7 +273,7 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
     const missing = EDITION_DESK_PARTS.filter((part) => !present.has(path.posix.join(scoped, 'desk', part)));
     if (missing.length) throw new Error(`${scoped} is on ${base} but incomplete (missing ${missing.join(', ')}); refusing to overwrite or call it published. An operator must decide.`);
     const baseCommit = await git(['-C', workdir, 'rev-parse', baseRef], options);
-    return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
+    if (!lateAddition) return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
   }
   await git(['-C', workdir, 'checkout', '-q', '-b', branch, baseRef], options);
   const baseCommit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
@@ -301,6 +302,7 @@ export async function pushStagedEditionTree({ url, branch, editionSource, editio
   const edition = branch.slice('edition/'.length);
   const date = `${edition}T${releaseClock(edition)}:00+02:00`;
   const committed = [scoped, ...traced, ...GENERATED_INDEX_PATHS];
+  if (onBase && await git(['-C', workdir, 'diff', '--cached', '--quiet', 'HEAD', '--', ...committed], options).then(() => true, (error) => { if (error.code === 1) return false; throw error; })) return { branch, commit: baseCommit, base: baseCommit, remote_url: url, generated: null, pushed: false, already_published: true };
   await git(['-C', workdir, '-c', `user.name=${COMMIT_NAME}`, '-c', `user.email=${COMMIT_EMAIL}`, 'commit', '-q', '-m', message, '--', ...committed], { ...options, date });
   const commit = await git(['-C', workdir, 'rev-parse', 'HEAD'], options);
   if (dryRun) return { branch, commit, base: baseCommit, remote_url: url, generated, pushed: false, already_published: false };
@@ -315,6 +317,7 @@ export function parseArguments(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const name = argv[index];
     if (name === '--dry-run') { options.dryRun = true; continue; }
+    if (name === '--late-addition') { options.lateAddition = true; continue; }
     // Deliberate, never the default, and never quiet: it is the one-time
     // backfill for an edition commissioned before provenance existed.
     if (name === '--allow-unprovenanced-edition') { options.allowUnprovenanced = true; continue; }
@@ -341,6 +344,7 @@ export function parseArguments(argv) {
   // proves current-edition is not stale; the receipt proves the artifact behind
   // it was not edited by hand since pressman built it. Neither substitutes for
   // the other, so `--edition` without `--state` is refused rather than half-run.
+  if (options.lateAddition && !EDITION_PATTERN.test(options.edition ?? '')) throw new Error('--late-addition requires an explicit --edition YYYY-MM-DD');
   if (options.edition && !options.state) throw new Error('--edition requires --state <clank-edition-state volume path>: an unattended publication binds the pushed bytes to the staged receipt');
   return options;
 }
@@ -368,8 +372,8 @@ export async function publishEditionBranch(options, url = remoteUrl(EDITION_PUSH
       editionSource: staged.source, editionPath: staged.editionPath,
       traceSource: await stagedTrace(staged),
       workdir: path.join(scratch, 'repo'), home: path.join(scratch, 'home'),
-      sshCommand: identity.sshCommand, message: editionCommitMessage(staged.edition),
-      provenance: provenance.record, dryRun: options.dryRun, log: warn
+      sshCommand: identity.sshCommand, message: (options.lateAddition ? lateAdditionCommitMessage : editionCommitMessage)(staged.edition),
+      provenance: provenance.record, dryRun: options.dryRun, lateAddition: options.lateAddition === true, log: warn
     });
     return { ...result, edition: staged.edition, remote: EDITION_PUSH_REMOTE, artifact: staged.artifact, published: false, provenance: provenance.record, landed_record: provenance.landed_record };
   } finally {

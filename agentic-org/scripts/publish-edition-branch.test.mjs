@@ -11,7 +11,7 @@ import { PUBLIC_CONTENT_PATHS, isPublicContentPath } from './public-content.mjs'
 import { EDITION_DESK_PARTS,
   BASE_BRANCH, CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, GENERATED_INDEX_PATHS, LANDED_VERSION, EDITION_PUSH_REMOTE, GITHUB_HOST_KEYS, PROTECTED_REFS, PUSH_REMOTES,
   artifactDigest, assertNoForcedPush, assertNotProtectedRef, assertPushableRef, assertRequestedEdition, berlinToday,
-  contentOnlyFindings, editionBranch, editionCommitMessage, editionCorpusClaim, hostAssertedProvenance, landedCorpus,
+  contentOnlyFindings, editionBranch, editionCommitMessage, lateAdditionCommitMessage, editionCorpusClaim, hostAssertedProvenance, landedCorpus,
   parseArguments, prepareSshIdentity, publishEditionBranch, pushArgv, pushStagedEditionTree,
   regenerateIndexes, remoteUrl, resolveStagedEdition, sshConfig
 } from './publish-edition-branch.mjs';
@@ -531,6 +531,29 @@ test('a merged edition ancestor is untouched even when main advances and staged 
   assert.equal(result.base, later);
   assert.equal(result.generated, null);
   assert.equal(git(['show-ref'], origin.url), before);
+});
+
+test('a late addition replaces a published edition in a new commit on main, and the same tree again is already published', async () => {
+  const origin = remote(), staged = stagedEdition('2026-09-08'), work = scratch('late');
+  let attempt = 0;
+  const call = (lateAddition) => pushStagedEditionTree({
+    url: origin.url, branch: editionBranch('2026-09-08'), editionSource: staged.source, editionPath: staged.path, lateAddition,
+    workdir: join(work, `repo-${++attempt}`), home: join(work, 'home'), message: (lateAddition ? lateAdditionCommitMessage : editionCommitMessage)('2026-09-08')
+  });
+  mkdirSync(join(staged.source, 'desk'), { recursive: true });
+  for (const part of EDITION_DESK_PARTS) writeFileSync(join(staged.source, 'desk', part), '{}\n');
+  const first = await call(false);
+  origin.merge(first.commit);
+  writeFileSync(join(staged.source, 'articles', 'late.json'), '{"id":"late"}\n');
+  assert.equal((await call(false)).already_published, true, 'without the flag a published date is never touched');
+  const late = await call(true);
+  assert.equal(late.pushed, true);
+  assert.equal(late.base, first.commit, 'cut from main, so the push is a fast-forward of the merged branch');
+  assert.match(git(['show', '--name-only', '--format=%s', late.commit], origin.url), /^chore\(edition\): add late pieces to the 2026-09-08 edition\n[\s\S]*content\/editions\/2026-09-08\/articles\/late\.json/u);
+  origin.merge(late.commit);
+  const again = await call(true);
+  assert.deepEqual([again.already_published, again.pushed, again.commit], [true, false, late.commit]);
+  assert.throws(() => parseArguments(['--staging', '/s', '--state', '/t', '--dry-run', '--late-addition']), /--late-addition requires an explicit --edition/u);
 });
 
 test('an edition already merged into the base is a quiet success, not a nightly alarm', async () => {
