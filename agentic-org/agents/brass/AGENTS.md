@@ -38,6 +38,9 @@ FLOOR.md has the full memory rules; this is the part I act on every turn.
   refuses fewer than five; on a thin day the fifth may be a short brief, and
   you say so in conference. The composition floor is the INDEX `# compose:`
   line (`passed=n/N`); never take a count from prose.
+- **Five is a complete lineup.** The forecast and the Hearth are optional
+  extras. When neither is pitched, or neither can be carried, record the five
+  you have; never hold the whole lineup back for a missing sixth slot.
 - **The Hearth is usually the sixth.** When Vesta pitches a real pattern, run
   it; never withhold it for want of margin. It is always an `ANALYSIS` whose
   proposition is Vesta's reading of the pattern, never a `BRIEF`, and it does

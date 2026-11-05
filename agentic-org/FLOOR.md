@@ -38,6 +38,8 @@ number a formula owns. Break either and the piece doesn't run.
 - **12:00** research freezes. Reporters read their beat and pitch one story.
 - **12:30** conference: Brass commissions the lineup, each piece a BRIEF or an
   ANALYSIS with its proposition (`WRITING.md`), and at most one forecast.
+  Five pieces is a complete lineup. The forecast and the Hearth are optional:
+  a day without either still records its lineup, never none.
   Reporters write and file; one who can't carry the assignment as given tells
   Brass before writing, with the reason and an alternative, and Brass decides.
 - **13:00–16:00** Spike reviews filings as they arrive. After each PASS the
