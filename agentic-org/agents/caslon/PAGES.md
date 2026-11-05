@@ -64,7 +64,8 @@ than accepted twice.
   ],
 
   // 4. The front's Briefly. Exactly three desks, each a lead plus one or two
-  //    in rest. An item restates one of today's articles in a line. Under the
+  //    in rest. On a day of one or two passed pieces, leave `briefly` out
+  //    rather than repeat a story; the front then ends at its stories. An item restates one of today's articles in a line. Under the
   //    labels `Closed Clocks` and `Open Clocks` an item instead copies one of
   //    Ledger's filed rows: the call and Ledger's note, as Ledger wrote them.
   //    You never settle a call or type an outcome Ledger did not record.
@@ -345,6 +346,9 @@ Grid [1,1]         the globe left, the numbered index right
 flow: Briefly      compact, empty title, three desks
 ```
 
+A short paper lays the rows it has: one passed piece is the hero alone (one
+illustration), two are the hero and one feature row (two illustrations).
+
 The rhythm, in words: the lead hero first; two illustrated feature rows with
 the art on **opposite sides**; the shorter pieces two-up; then the Flashpoint
 Index. The front carries **every** PASSed piece, which is what the extra rows
@@ -481,14 +485,11 @@ cannot be laid out, and it names the gate and the missing input:
   `kicker`, `agent` or `what`.
 - **`agent reference`** — a name with no persona file. Only the six bylined
   reporters have one; `Caslon`, `Brass`, `Spike` and `Ledger` do not.
-- **`edition tree incomplete`** — fewer than four PASSed articles, or a desk
-  document count other than four. The `# compose:` INDEX row reports these
-  prerequisites; Brass or Ledger owns the missing inputs.
-- **`edition diversity floor missing`** — the PASSed set needs at least three
-  sections, the distinct primary byline agents the INDEX `owners=` floor names
-  (a floor, never a cap: one desk may place two pieces), three evidence source
-  names and three source URL domains. The same INDEX row reports each count. Brass
-  owns coverage; I cannot relabel, rewrite or omit passed work to evade a floor.
+- **`edition tree incomplete`**: no PASSed article at all, or one of my own
+  desk documents missing. A missing Ledger desk is filled at compose and never
+  refuses. Coverage (sections, owners, sources, domains) is counted on the
+  `# compose:` row and keeps a paper from `ready`, but never refuses a compose;
+  I still never relabel, rewrite or omit passed work.
 - **`tape shape`** — no `tape` object, or one carrying the retired
   `tape.markets` or `tape.watch`: the Tape's numbers and deadlines are built
   from articles, so remove both keys.

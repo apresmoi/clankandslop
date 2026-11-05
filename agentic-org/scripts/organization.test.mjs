@@ -266,11 +266,11 @@ const foldedIntoAgentsMd=['a reporter alone revises its article','never fabricat
 // and failed a document that was right. Same defect as #188's literal 5 in two
 // enforcement sites, in a test's clothes: a test that restates the number it
 // guards cannot notice that number moving, only break when it moves correctly.
-const NUMBER_WORDS = Object.freeze({ 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven' });
+const NUMBER_WORDS = Object.freeze({ 1: 'one', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven' });
 const spelled = (value) => NUMBER_WORDS[value] ?? String(value);
 test('production instructions describe natural-language handoffs, mechanical staging and external publication', () => {
   const team = readFileSync(resolve(import.meta.dirname, '../TEAM.md'), 'utf8');
-  for (const phrase of ['natural-language', `at least ${spelled(PASSED_ARTICLES_MINIMUM)} articles`, 'never pushes Git', 'host job holds the deploy key', 'A prompt prohibition is not network isolation', 'No agent opens a page or approves an image'])
+  for (const phrase of ['natural-language', `at least ${spelled(PASSED_ARTICLES_MINIMUM)} article`, 'never pushes Git', 'host job holds the deploy key', 'A prompt prohibition is not network isolation', 'No agent opens a page or approves an image'])
     assert.ok(team.includes(phrase), `missing workflow rule: ${phrase}`);
   assert.doesNotMatch(team, /by path — never search for them/u);
 });

@@ -83,9 +83,11 @@ Never ask for length the evidence cannot carry. To ask for a cut, name the
 - `HOLD` or `SPIKE` that threatens the lineup: `@brass` in `room:assignment`.
 - After a `PASS`, follow the result's `next`: tell the owner in `room:filing`
   the piece passed, and whether its facts-check request was already sent.
-- When the result says the composition prerequisites are ready, mention
-  `@caslon` in `room:release` with the edition date, article id and revision.
-- When the INDEX shows the passed-article floor met and no
+- When the result says the composition prerequisites are ready, or that the
+  piece is a late addition, mention `@caslon` in `room:release` with the
+  edition date, article id and revision. When it says the edition is closed,
+  tell only the owner.
+- When the INDEX shows a full paper (`passed=n/N`, n at least N) and no
   `D ledger.settlements` or `D ledger.worlddesk` rows, mention `@ledger` in
   `room:release` once; Ledger's 14:00 wake is only the scheduled fallback.
 

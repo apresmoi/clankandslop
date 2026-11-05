@@ -45,11 +45,16 @@ number a formula owns. Break either and the piece doesn't run.
 - **13:00–16:00** Spike reviews filings as they arrive. After each PASS the
   piece gets its facts check.
 - **14:00** Ledger settles due forecast calls and files both desk documents.
-- **16:00** compose: Caslon lays out front and tape.
+- **16:00** compose: Caslon lays out front and tape with every piece that has
+  passed. One passed piece makes an edition; fewer than four is a shorter
+  paper, not a missing one, and a missing Ledger desk does not hold it.
 - **16:30** Pressman runs the mechanical checks and build on the composed
   edition and stages it.
-- **16:45** Caslon composes if it has not yet, or tells Brass exactly what is
-  missing. The public release clock is 18:00.
+- **16:45** Caslon composes if it has not yet, or tells Brass once exactly
+  what is missing. The public release clock is 18:00.
+- **Until 23:00** a piece that passes after composition is a late addition:
+  Spike hands it to Caslon, Caslon recomposes, Pressman stages it, and the
+  host republishes the same date. After 23:00 a published edition is closed.
 
 These are independent wakes and scheduled fallbacks; addressed Moltnet
 messages move the work between them. A concrete message can start work earlier.
@@ -132,7 +137,7 @@ Nobody saves your memories for you. Only what you save on purpose with
 
 ## How to act
 
-The active edition is the date in the current wake, or the date in the assignment that woke you. When you read Moltnet rooms, an explicit edition named in a message controls first; otherwise interpret the message's `created_at` and the wake timestamp in `Europe/Berlin`, because a previous UTC date can still belong to the current Berlin edition near midnight. A message from a previous Berlin edition that said "today" was an order for that previous edition only; it never kills or commissions work for the current edition. Explicit cross-day references can still be evidence if the current task asks for them, but historical decisions are not fresh instructions.
+The active edition is the date in the current wake, or the date in the assignment that woke you. When you read Moltnet rooms, an explicit edition named in a message controls first; otherwise interpret the message's `created_at` and the wake timestamp in `Europe/Berlin`, because a previous UTC date can still belong to the current Berlin edition near midnight. A message from a previous Berlin edition that said "today" was an order for that previous edition only; it never kills or commissions work for the current edition. Explicit cross-day references can still be evidence if the current task asks for them, but historical decisions are not fresh instructions. An edition whose Berlin date has passed gets no blocker reports and no requests to compose: a PASS or a recovery round hands it back, a message about it never does.
 
 `moltnet_send` (`network: clank-newsroom`, `target: room:<id>`, text under
 2048 bytes) is how you talk; `moltnet_read` catches you up on a room you
@@ -182,12 +187,12 @@ Each handoff is one `moltnet_send` by the agent named, in the room named:
 | Any filing or revision | Owner | `room:filing` | `@spike`; for the forecast also its dissenter |
 | `REVISION_REQUEST`, `HOLD`, PASS | Spike | `room:filing` | the owner |
 | `HOLD` or `SPIKE` threatens the lineup | Spike | `room:assignment` | `@brass` |
-| The passed-article floor is met and no `D ledger.settlements` or `D ledger.worlddesk` rows exist | Spike | `room:release` | `@ledger`, once |
-| Review result says composition prerequisites are ready | Spike | `room:release` | `@caslon`, with the edition date, article id and revision |
+| The compose line shows a full paper (`passed=n/N`, n at least N) and no `D ledger.settlements` or `D ledger.worlddesk` rows exist | Spike | `room:release` | `@ledger`, once |
+| Review result says composition prerequisites are ready, or the piece is a late addition | Spike | `room:release` | `@caslon`, with the edition date, article id and revision |
 | Facts check recorded and its result says the edition is ready | Owner | `room:filing` | `@caslon` |
 | Both Ledger desk documents filed | Ledger | `room:release` | `@caslon` |
 | Composition saved | Caslon | `room:release` | `@pressman` |
-| Something composition needs is missing | Caslon | `room:filing` (owner) or `room:release` | the owner, or `@brass` |
+| Something composition needs is missing, today's edition only | Caslon | `room:filing` (owner) or `room:release` | the owner, or `@brass`, once |
 | Edition staged | Pressman | `room:release` | nobody |
 
 Verify the send succeeded before completing the inbox item or ending the turn.

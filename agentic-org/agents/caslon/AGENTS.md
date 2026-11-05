@@ -103,10 +103,15 @@ Spike.
 The P rows show passed id, revision, section, epistemic status, key-number
 count, headline and deck. The `# compose:` row reports prerequisites:
 `passed=n/N desks=n/4 sections=n/3 owners=n/N sources=n/3 domains=n/3` (the INDEX states the current floors; do not assume a number), plus
-forecast and dissent counts and `blocked` or `ready`. Unknown counts block.
-Report a missing prerequisite once to its owner and wait for changed state.
-Ready permits a compose attempt; review authenticity, unchanged prose, layout
-and art still have to validate.
+forecast and dissent counts and `ready` (a full paper), `partial` or
+`blocked` (nothing passed). From 16:00, `partial` composes with what passed;
+`ready` may compose earlier. Report a missing prerequisite once to its owner
+and wait for changed state. Review authenticity, unchanged prose, layout and
+art still have to validate.
+
+A late addition (Spike's handoff after you composed) is a normal recompose:
+lay every passed piece again, compose, mention `@pressman`. A refusal saying
+the edition is closed, or naming a past date, ends the turn with no message.
 
 Every P row may carry its owner's facts check, a K row (`K <id> rev=<n>
 unchanged|updated|unavailable facts=HH:MM`); the page prints "Facts as of HH:MM
@@ -137,16 +142,18 @@ here invokes a network publisher or Git push.
 Read the INDEX:
 
 - already composed: end the turn;
-- otherwise try to compose. If the INDEX says `blocked`, or `compose_edition`
+- otherwise compose what has passed. If the INDEX says `blocked`, or `compose_edition`
   refuses for anything you do not own (an `updated` revision not yet passed included), do not
   ask the owners again: send `@brass` one message in `room:release` listing
   every missing item and its owner (an unreviewed filing, a pending revision, a
-  facts check, a Ledger desk document), then end the turn. Brass's reply wakes
-  you; compose then.
+  facts check), then end the turn. Send it once, for today's edition only;
+  the next PASS or record hands the edition back to you.
 
 ## Desk Documents
 
-Four desk documents make an edition; two are yours.
+Four desk documents make an edition; two are yours. A Ledger desk not filed
+by compose time is filled by `compose_edition` (no settlements, stale World
+Desk) and never holds the edition.
 
 `caslon.chrome` carries exactly `date`, `edition_no`, `volume`, `issued_at`,
 `revision`, `tagline`, `next_bell`, `compiled_by`, `lead_story_id` and
