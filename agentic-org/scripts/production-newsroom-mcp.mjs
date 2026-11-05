@@ -3,7 +3,7 @@ import { articleFilingSchema } from '../../ops/article-format.mjs';
 import { createInterface } from 'node:readline';
 import { amendAssignment, composeEdition, fileArticle, fileDesk, qualifySignal, recordAssignment, recordDissent, recordFreshness, reviewArticle, stageRelease } from './production-newsroom.mjs';
 import { deskDocumentKeys } from '../../ops/desk-contract.mjs';
-import { ASSIGNMENTS_MINIMUM, PASSED_ARTICLES_MINIMUM } from '../../ops/edition-floor.mjs';
+import { ASSIGNMENTS_MINIMUM, FULL_EDITION_ARTICLES } from '../../ops/edition-floor.mjs';
 import { appendRefusal, withRefusalLog } from './refusal-log.mjs';
 
 // Closed sets mirrored from production-newsroom.mjs's own validation (`desks`,
@@ -63,9 +63,9 @@ const definitions = {
     execute: qualifySignal
   },
   record_assignment: {
-    description: `Durably record the chief-approved lineup before sending natural-language assignments. Composition needs ${PASSED_ARTICLES_MINIMUM} passed pieces; the lineup carries at least ${ASSIGNMENTS_MINIMUM}, the extra one a spare against a spike, and the spare may be a short piece.`,
+    description: `Durably record the chief-approved lineup before sending natural-language assignments. A full paper is ${FULL_EDITION_ARTICLES} passed pieces; the lineup carries at least ${ASSIGNMENTS_MINIMUM}, the extra one a spare against a spike, and the spare may be a short piece. The edition ships at the compose deadline with whatever has passed.`,
     required: ['edition', 'event_key', 'assignments'],
-    properties: { edition, event_key: eventKey, assignments: { type: 'array', minItems: ASSIGNMENTS_MINIMUM, items: assignmentItem, description: `At least ${ASSIGNMENTS_MINIMUM} items (the floor of ${PASSED_ARTICLES_MINIMUM} plus one spare); ids must be unique.` } },
+    properties: { edition, event_key: eventKey, assignments: { type: 'array', minItems: ASSIGNMENTS_MINIMUM, items: assignmentItem, description: `At least ${ASSIGNMENTS_MINIMUM} items (a full paper of ${FULL_EDITION_ARTICLES} plus one spare); ids must be unique.` } },
     execute: recordAssignment
   },
   amend_assignment: {
@@ -121,7 +121,7 @@ const definitions = {
     execute: recordFreshness
   },
   review_article: {
-    description: `Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner, and tell @brass in room:assignment if the lineup needs another piece. PASS continues from the fresh INDEX and its next line, which carries the owner's facts-check request: when the result says the composition prerequisites are ready, use moltnet_send on clank-newsroom to @caslon in room:release with the edition, article id and revision; ask Caslon to read the fresh INDEX and compose. Verify the send succeeded before completing the inbox item or ending the turn; do not repeat an already delivered handoff. Otherwise review other filings one at a time, then when passed>=${PASSED_ARTICLES_MINIMUM} and the Ledger desk rows are missing, send @ledger in room:release.`,
+    description: `Record Spike's verdict for one immutable filing revision. A successful result only saves notes and mentions; it does not deliver them. For REVISION_REQUEST and HOLD, use moltnet_send on clank-newsroom room:filing with the current edition, article id, revision, @owner, and actionable notes; for SPIKE, notify the owner, and tell @brass in room:assignment if the lineup needs another piece. PASS continues from the fresh INDEX and its next line, which carries the owner's facts-check request: when the result says the composition prerequisites are ready, use moltnet_send on clank-newsroom to @caslon in room:release with the edition, article id and revision; ask Caslon to read the fresh INDEX and compose; when it says the piece is a late addition, send the same handoff asking Caslon to recompose. Verify the send succeeded before completing the inbox item or ending the turn; do not repeat an already delivered handoff. Otherwise review other filings one at a time, then when passed>=${FULL_EDITION_ARTICLES} and the Ledger desk rows are missing, send @ledger in room:release.`,
     required: ['edition', 'event_key', 'article_id', 'revision', 'filing_digest', 'verdict', 'notes'],
     properties: {
       edition, event_key: eventKey,

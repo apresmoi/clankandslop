@@ -8,7 +8,7 @@ import test from 'node:test';
 import { reviewArticle } from './production-newsroom.mjs';
 import { buildEditionIndex } from './edition-index.mjs';
 import { reviewNoticeInstruction } from './review-handoff.mjs';
-import { PASSED_ARTICLES_MINIMUM, DESK_DOCUMENTS_REQUIRED } from '../../ops/edition-floor.mjs';
+import { FULL_EDITION_ARTICLES, DESK_DOCUMENTS_REQUIRED } from '../../ops/edition-floor.mjs';
 
 const runtimeTest = (name, action) => test(name, { skip: !process.env.CLANK_NEWSROOM_STATE_ADAPTER && 'private newsroom state adapter required' }, action);
 const edition = '2026-09-11';
@@ -21,6 +21,7 @@ const article = (index, section) => ({
   evidence_box: [{ source: `Source ${index}`, fragment: 'A concrete event.', as_of: edition,
     source_note: { source_id: 'E1', source_kind: 'public_url', source_url: `https://source${index}.example/report`, used_by_agent: owners[index], retrieved_at: `${edition}T18:00:00Z` } }]
 });
+const at = (time, date = edition) => new Date(`${date}T${time}:00+02:00`);
 const hash = value => `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 test('review handoffs use the shared readiness floors and name the accepted revision', () => {
   const articles = owners.map((_, index) => article(index, index === 5 ? 'Policy' : index % 2 ? 'World' : 'Business'));
@@ -30,9 +31,25 @@ test('review handoffs use the shared readiness floors and name the accepted revi
   assert.match(ready, /edition 2026-09-11, article story-5 revision 4/u);
   assert.match(ready, /moltnet_send.*room:release.*@caslon/u);
   assert.match(ready, /Verify.*succeeded.*before.*(?:ending|completing)/u);
-  for (const inputs of [{ articles: articles.slice(0, 5), desks }, { articles, desks: desks.slice(0, 2) }, { articles, desks: [] }]) {
-    assert.doesNotMatch(reviewNoticeInstruction(args, 'tinkerton', inputs), /@caslon/u);
+  // Short of a full paper before the 16:00 compose wake, Caslon is not asked yet.
+  for (const inputs of [{ articles: articles.slice(0, 2), desks }, { articles, desks: desks.slice(0, 2) }, { articles, desks: [] }]) {
+    assert.doesNotMatch(reviewNoticeInstruction(args, 'tinkerton', { ...inputs, now: at('14:00') }), /@caslon/u);
   }
+});
+test('after the compose deadline a short paper composes, and a PASS after composition is a late addition until the cutoff', () => {
+  const articles = owners.slice(0, 2).map((_, index) => article(index, 'World'));
+  const args = { edition, article_id: 'story-1', revision: 1, verdict: 'PASS' };
+  const due = reviewNoticeInstruction(args, 'sprockett', { articles, desks: [], now: at('16:10') });
+  assert.match(due, /prerequisites are ready.*room:release now.*@caslon.*compose from the accepted inputs/u);
+  const late = reviewNoticeInstruction(args, 'sprockett', { articles, desks: [], composed: true, published: true, now: at('19:30') });
+  assert.match(late, /already composed and published, so this piece is a late addition.*room:release now.*@caslon.*recompose/u);
+  const closed = reviewNoticeInstruction(args, 'sprockett', { articles, desks: [], composed: true, published: true, now: at('23:10') });
+  assert.match(closed, /published and its late additions closed at 23:00 Berlin.*@sprockett in room:filing.*do not mention @caslon/u);
+  assert.doesNotMatch(closed, /target room:release/u);
+  const nextDay = reviewNoticeInstruction(args, 'sprockett', { articles, desks: [], composed: true, published: true, now: at('10:00', '2026-09-12') });
+  assert.match(nextDay, /late additions closed/u);
+  const developing = reviewNoticeInstruction(args, 'sprockett', { articles, desks: [], composed: true, problems: ['"story-0": update pending'], now: at('16:30') });
+  assert.match(developing, /waits only on recorded developments.*do not mention @caslon/u);
 });
 test('a PASS names the owner\'s facts request without pasting it and does not wait on it for the Caslon handoff', () => {
   const articles = owners.map((_, index) => article(index, index === 5 ? 'Policy' : index % 2 ? 'World' : 'Business'));
@@ -47,8 +64,8 @@ test('a PASS names the owner\'s facts request without pasting it and does not wa
   const pending = reviewNoticeInstruction(args, 'tinkerton', { articles, desks, problems: ['"story-2": its owner recorded a material development'], fresh: false, article: articles[5] });
   assert.match(pending, /waits only on recorded developments \(1\).*do not mention @caslon/u);
   assert.doesNotMatch(pending, /target room:release/u);
-  const early = reviewNoticeInstruction(args, 'tinkerton', { articles: articles.slice(0, 2), desks, problems: [], fresh: false });
-  assert.match(early, new RegExp(`mention @tinkerton.*research room.*passed>=${PASSED_ARTICLES_MINIMUM} .*@ledger`, 'u'));
+  const early = reviewNoticeInstruction(args, 'tinkerton', { articles: articles.slice(0, 2), desks, problems: [], fresh: false, now: at('14:00') });
+  assert.match(early, new RegExp(`mention @tinkerton.*research room.*passed>=${FULL_EDITION_ARTICLES} .*@ledger`, 'u'));
   const checked = reviewNoticeInstruction(args, 'tinkerton', { articles, desks, problems: [], fresh: true });
   assert.match(checked, /room:release now.*@caslon/u);
   assert.doesNotMatch(checked, /research room/u);
@@ -83,7 +100,7 @@ async function fixture({ section = 'Policy', ledger = true } = {}) {
 runtimeTest('the PASS that supplies the third section gives Spike the exact Caslon handoff', async () => {
   const f = await fixture();
   try {
-    assert.match(await buildEditionIndex(f.root, edition), /sections=2\/3.*→ blocked/u);
+    assert.match(await buildEditionIndex(f.root, edition), /sections=2\/3.*→ partial/u);
     const result = await reviewArticle(f.args);
     // The REQUIRED side is derived, never spelled. This line read `passed=6/5`
     // and went red the moment 10ddd3e lowered the floor to four, invisibly:
@@ -92,7 +109,7 @@ runtimeTest('the PASS that supplies the third section gives Spike the exact Casl
     // stays literal -- six passes and three sections are what this fixture
     // builds, and that is the thing under test.
     assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'),
-      new RegExp(`passed=6/${PASSED_ARTICLES_MINIMUM} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=3/3.*→ ready`, 'u'));
+      new RegExp(`passed=6/${FULL_EDITION_ARTICLES} desks=4/${DESK_DOCUMENTS_REQUIRED} sections=3/3.*→ ready`, 'u'));
     assert.match(result.next, /edition 2026-09-11, article story-5 revision 4/u);
     assert.match(result.next, /no Moltnet message was sent/u);
     assert.match(result.next, /moltnet_send.*clank-newsroom.*room:release.*@caslon/u);
@@ -105,23 +122,21 @@ runtimeTest('the PASS that supplies the third section gives Spike the exact Casl
   } finally { await f.cleanup(); }
 });
 
-runtimeTest('a PASS that still leaves two sections gives no composition handoff', async () => {
+runtimeTest('a PASS that still leaves two sections is a partial paper, handed to Caslon once compose is due', async () => {
   const f = await fixture({ section: 'World' });
   try {
     const result = await reviewArticle(f.args);
-    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'), /sections=2\/3.*→ blocked/u);
-    assert.doesNotMatch(result.next, /@caslon/u);
-    assert.match(result.next, /review other unreviewed filings one at a time/u);
+    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'), /sections=2\/3.*→ partial/u);
+    assert.match(result.next, /room:release now.*@caslon/u);
   } finally { await f.cleanup(); }
 });
 
-runtimeTest('a PASS with missing Ledger documents retains the Ledger handoff', async () => {
+runtimeTest('a PASS with missing Ledger documents no longer holds the paper', async () => {
   const f = await fixture({ ledger: false });
   try {
     const result = await reviewArticle(f.args);
-    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'), /desks=2\/4.*→ blocked/u);
-    assert.match(result.next, /@ledger/u);
-    assert.doesNotMatch(result.next, /@caslon/u);
+    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'), /desks=2\/4.*→ partial/u);
+    assert.match(result.next, /room:release now.*@caslon/u);
   } finally { await f.cleanup(); }
 });
 
@@ -138,6 +153,6 @@ runtimeTest('an exact PASS retry retains its recorded handoff and creates no sec
     assert.deepEqual(await reviewArticle(f.args), result);
     assert.deepEqual(await files(), before);
     assert.equal(head(), beforeHead);
-    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'), /desks=3\/4.*→ blocked/u);
+    assert.match(await readFile(path.join(f.base, 'INDEX'), 'utf8'), /desks=3\/4.*→ partial/u);
   } finally { await f.cleanup(); }
 });
