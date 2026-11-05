@@ -4,7 +4,7 @@ import { dirname, resolve, basename } from 'node:path';
 import { layoutArtifacts } from './layout-artifacts.mjs';
 import { mapPresentationProps } from './map-presentation.mjs';
 import { GLYPH_ROLLS, GLYPH_SHAPES, glyphSelectionFindings } from './glyph-format.mjs';
-import { PASSED_ARTICLES_MINIMUM } from './edition-floor.mjs';
+import { FRONT_VISUALS_MAXIMUM, PASSED_ARTICLES_MINIMUM, frontVisualsMinimum } from './edition-floor.mjs';
 import { publicContentRoot } from '../agentic-org/scripts/public-content.mjs';
 import { decisionSummaryFindings } from './summary-fidelity.mjs';
 import { LEDGER_EPOCH, carriedCalls, carryTape, followUps, ledgerHistory, ledgerSnapshot } from './open-clocks.mjs';
@@ -175,10 +175,10 @@ function frontPage(edition, order, articles, decisions, maps, agents) {
       ? grid([1, 2], [[art], [story]], { rule: false, align: 'stretch' })
       : grid([2, 1], [[story], [art]], { rule: false, align: 'stretch' });
   };
+  // A short paper lays the slots it has: the lead, then up to two illustrated features.
   const head = [
     { block: 'Hero', props: { variant: 'lead-only', withArt: true, lead, art: heroArt } },
-    artRow(featureA, 'right'),
-    artRow(featureB, 'left'),
+    ...[[featureA, 'right'], [featureB, 'left']].filter(([slug]) => slug !== undefined).map(([slug, side]) => artRow(slug, side)),
   ];
   const pairs = [];
   for (let i = 0; i + 1 < rest.length; i += 2) pairs.push(rest.slice(i, i + 2));
@@ -194,7 +194,10 @@ function frontPage(edition, order, articles, decisions, maps, agents) {
       [{ block: 'WorldIndex', props: { items: points.map(({ place, agent, note, p, article }) => ({ place, ...(agent ? { agent } : {}), note, ...(isNum(p) ? { p } : {}), ...(article ? { article } : {}) })) } }],
     ]));
   }
-  return { edition, page: 'front', paper: 'front', title: CHROME.front.title, active: CHROME.front.active, tagline: null, head, flow: [{ block: 'Briefly', props: { title: '', compact: true, desks: brieflyDesks('briefly', decisions.briefly, agents) } }] };
+  // Briefly recaps the day in three desks. A paper of one or two pieces has no
+  // day to recap beyond the stories above it, so there the record may omit it.
+  const briefly = decisions.briefly === undefined && order.length < 3 ? [] : [{ block: 'Briefly', props: { title: '', compact: true, desks: brieflyDesks('briefly', decisions.briefly, agents) } }];
+  return { edition, page: 'front', paper: 'front', title: CHROME.front.title, active: CHROME.front.active, tagline: null, head, flow: briefly };
 }
 
 function tapePage(edition, order, articles, decisions, desk, agents, carry) {
@@ -207,7 +210,7 @@ function tapePage(edition, order, articles, decisions, desk, agents, carry) {
   const head = [{ block: 'Briefly', props: { title: 'The Markets File', compact: true, desks: carried.desks } }];
   // Ledger's copy of the producer's FRED board; the site reads it off the desk
   // document, the way the globe reads the World Desk.
-  if (isObj(desk['ledger.worlddesk'].markets)) head.push({ block: 'MarketsBoard', props: { markets: 'edition' } });
+  if (isObj(desk['ledger.worlddesk']?.markets)) head.push({ block: 'MarketsBoard', props: { markets: 'edition' } });
   // The numbers and the deadlines are the paper's, built from what the
   // articles and the ledger already carry; nobody types them.
   const figures = keyFiguresBlock({ edition, order, articles });
@@ -284,11 +287,14 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
   const retired = RETIRED_TAPE_KEYS.filter((key) => Object.hasOwn(decisions.tape, key));
   if (retired.length > 0)
     fail('tape shape', `the decision record carries ${retired.map((key) => `tape.${key}`).join(' and ')}, which the assembler no longer accepts — the Tape's numbers and deadlines are built by the paper from articles; remove tape.markets / tape.watch and keep tape.briefly (and tape.forecast_meta, if any)`);
-  for (const part of ['caslon.chrome', 'caslon.weather', 'ledger.settlements', 'ledger.worlddesk'])
-    if (!isObj(desk[part])) fail('edition tree incomplete', `desk document "${part}" is missing — compose_edition requires exactly 4`);
+  for (const part of ['caslon.chrome', 'caslon.weather'])
+    if (!isObj(desk[part])) fail('edition tree incomplete', `desk document "${part}" is missing; file it with file_desk before laying the pages`);
+  // A Ledger desk nobody filed lays as compose_edition will print it: no
+  // settlements today (open calls still carry) and no markets board.
+  desk = { 'ledger.settlements': { resolved_last_edition: [] }, 'ledger.worlddesk': {}, ...desk };
 
   const passed = Object.keys(articles).sort();
-  if (passed.length < PASSED_ARTICLES_MINIMUM) fail('edition tree incomplete', `at least ${PASSED_ARTICLES_MINIMUM} PASSed articles required, found ${passed.length} — that is Brass's lineup, not a layout problem`);
+  if (passed.length < PASSED_ARTICLES_MINIMUM) fail('edition tree incomplete', `at least ${PASSED_ARTICLES_MINIMUM} PASSed article required, found ${passed.length}; a day with nothing passed stays unpublished, and that is Brass's lineup, not a layout problem`);
   const order = decisions.order;
   if (!Array.isArray(order) || order.some((slug) => !isStr(slug))) fail('page completeness invalid', 'the decision record must carry "order": every PASSed slug, in placement order — order[0] leads');
   const placed = [...order].sort();
@@ -320,7 +326,8 @@ export function layEdition({ edition, articles, desk, maps = {}, decisions, arti
   const tape = tapePage(edition, order, articles, decisions, desk, agents, carry);
 
   const visuals = visualCount(front);
-  if (visuals < 2 || visuals > 3) fail('illustration rhythm invalid', `the front carries ${visuals} MapGlyph/GlyphArt blocks; compose_edition requires 2-3`);
+  const visualFloor = frontVisualsMinimum(passed.length);
+  if (visuals < visualFloor || visuals > FRONT_VISUALS_MAXIMUM) fail('illustration rhythm invalid', `the front carries ${visuals} MapGlyph/GlyphArt blocks; compose_edition requires ${visualFloor}-${FRONT_VISUALS_MAXIMUM}`);
   const rolls = front.head.flatMap((block) => block.props?.columns?.flat() ?? []).filter((nested) => nested?.block === 'GlyphArt' && isStr(nested.props.roll));
   if (rolls.length > 1) fail('animated roll', `the front carries ${rolls.length} animated rolls (${rolls.map((r) => r.props.roll).join(', ')}); at most one runs in an edition — two competing motions read like a carnival, not a newspaper`);
   const papers = [front, tape].map((page) => page.paper).filter(isStr);
