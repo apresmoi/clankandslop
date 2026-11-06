@@ -1,0 +1,775 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-06",
+  "generated_at": "2026-11-06T08:53:28Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 107.03,
+        "observed_at": "2026-11-03",
+        "stale_days": 3,
+        "contributes": 3,
+        "reason": "107.03 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 99.64,
+        "observed_at": "2026-11-03",
+        "stale_days": 3,
+        "contributes": 1,
+        "reason": "99.64 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.292,
+        "observed_at": "2026-11-02",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "6.292 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 2.63,
+        "observed_at": "2026-11-03",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "2.63 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 16.61,
+        "observed_at": "2026-11-04",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "16.61 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.32,
+        "observed_at": "2026-11-04",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3.32 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.6656,
+        "observed_at": "2026-10-30",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "121.6656 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-06T08:53:27Z",
+        "http_status": 200,
+        "bytes": 170363,
+        "sha256": "b30cdc14ddae1f72df40bb942f6926acc9df627cb3c68844d6e18ea65b5cf6f0",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-06T08:53:27Z",
+        "http_status": 200,
+        "bytes": 176135,
+        "sha256": "90c95c17a2cdb9a3b4a8d393494d19a40e1eb7fa80943838036754d3be74a06e",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-06T08:53:27Z",
+        "http_status": 200,
+        "bytes": 28976,
+        "sha256": "02474039d2ce1e84361891c6ada4e5b70fcd842d730a1a6df024d5be86a8e58b",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-06T08:53:27Z",
+        "http_status": 200,
+        "bytes": 116393,
+        "sha256": "49b12d4ac0c5e14da46d15c98e8c371385a775e916513886609020417b236185",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-06T08:53:27Z",
+        "http_status": 200,
+        "bytes": 161850,
+        "sha256": "47e44c17d8a4a21ee090aeadc164db367898bfc7c072c8dd08f86ac502a97ef2",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-06T08:53:27Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "067579a8676155b1f12d56317f1e1727bc1a34f71be3102908713a9abda824bd",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-06T08:53:28Z",
+        "http_status": 200,
+        "bytes": 104929,
+        "sha256": "908a19a96d1ba529ef51ae559b8bc384bf8af4d4013185426e5ee9c3cca4213f",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 37,
+    "open_conflicts": 1,
+    "watch": 4,
+    "dormant": 8,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-06",
+            "story_id": "s-9fb47c2b",
+            "story_title": "Lead 4 (supporting / ongoing): IRGC reports further tanker/tug fires in Strait of Hormuz “unauthorized” route",
+            "source": "grok/grok-rolling-1844.md",
+            "slot": "1844",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://english.news.cn/20261105/91ea9945c5ee43478e5e4b22e1966b61/c.html",
+            "source_urls": [
+              "https://english.news.cn/20261105/91ea9945c5ee43478e5e4b22e1966b61/c.html",
+              "https://english.news.cn/20261105/91ea9945c5ee43478e5e4b22e1966b61/c.html",
+              "https://english.news.cn/20261105/91ea9945c5ee43478e5e4b22e1966b61/c.html",
+              "https://english.news.cn/20261105/91ea9945c5ee43478e5e4b22e1966b61/c.html",
+              "https://english.news.cn/20261105/91ea9945c5ee43478e5e4b22e1966b61/c.html",
+              "https://english.news.cn/20261105/91ea9945c5ee43478e5e4b22e1966b61/c.html",
+              "https://www.scmp.com/news/world/middle-east/article/3373454/iran-says-5-tankers-catch-fire-after-striking-naval-mines-strait-hormuz",
+              "https://www.scmp.com/news/world/middle-east/article/3373454/iran-says-5-tankers-catch-fire-after-striking-naval-mines-strait-hormuz"
+            ],
+            "observed_at": "2026-11-05T16:44:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-11-06",
+            "story_id": "s-3fc6bee2",
+            "story_title": "Black Sea tension: France extends patrol after sea-drone attacks",
+            "source": "chatgpt/chatgpt-rolling-1521.md",
+            "slot": "1521",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+            "source_urls": [
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/",
+              "https://www.reuters.com/world/france-extends-maritime-patrol-planes-stay-black-sea-after-cargo-ship-attacks-2026-11-05/"
+            ],
+            "observed_at": "2026-11-05T13:21:00Z"
+          },
+          {
+            "edition": "2026-11-06",
+            "story_id": "s-605b7fb4",
+            "story_title": "Europe: New wave of hoax bomb threats disrupt flights",
+            "source": "chatgpt/chatgpt-rolling-1521.md",
+            "slot": "1521",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+            "source_urls": [
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/",
+              "https://www.reuters.com/business/aerospace-defense/bomb-alert-diverts-airbus-a320-plane-going-dublin-rome-french-pm-says-2026-11-05/"
+            ],
+            "observed_at": "2026-11-05T13:21:00Z"
+          },
+          {
+            "edition": "2026-11-06",
+            "story_id": "s-b7312488",
+            "story_title": "Lead 2: Polish ABW announces detention of six (five Poles + one Russian woman) for organized criminal group…",
+            "source": "grok/grok-rolling-1544.md",
+            "slot": "1544",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/poland-arrest-four-probe-into-military-supplies-sent-russia-2026-11-05/",
+            "source_urls": [
+              "https://www.reuters.com/world/poland-arrest-four-probe-into-military-supplies-sent-russia-2026-11-05/",
+              "https://www.reuters.com/world/poland-arrest-four-probe-into-military-supplies-sent-russia-2026-11-05/",
+              "https://www.reuters.com/world/poland-arrest-four-probe-into-military-supplies-sent-russia-2026-11-05/",
+              "https://www.reuters.com/world/poland-arrest-four-probe-into-military-supplies-sent-russia-2026-11-05/",
+              "https://www.reuters.com/world/poland-arrest-four-probe-into-military-supplies-sent-russia-2026-11-05/",
+              "https://www.reuters.com/world/poland-arrest-four-probe-into-military-supplies-sent-russia-2026-11-05/",
+              "https://notesfrompoland.com/2026/11/05/six-detained-in-poland-on-suspicion-of-exporting-military-components-to-russia/",
+              "https://notesfrompoland.com/2026/11/05/six-detained-in-poland-on-suspicion-of-exporting-military-components-to-russia/",
+              "https://notesfrompoland.com/2026/11/05/six-detained-in-poland-on-suspicion-of-exporting-military-components-to-russia/",
+              "https://www.abw.gov.pl/pl/aktualnosci/2850,ABW-uderza-w-grupe-dzialajaca-na-rzecz-rosyjskiego-wywiadu-Szesc-osob-zatrzymany.html"
+            ],
+            "observed_at": "2026-11-05T13:44:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-03 and drew no qualifying story today",
+        "last_open_edition": "2026-11-03",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-38ede269",
+            "story_title": "Lead 2: Russian aerial strikes hit humanitarian aid distribution point and shelter in Komyshuvakha…",
+            "source": "grok/grok-rolling-0051.md",
+            "slot": "0051",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+            "source_urls": [
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://newsukraine.rbc.ua/news/russian-glide-bombs-strike-school-and-shelter-1793644604.html",
+              "https://en.wikipedia.org/wiki/Portal:Current_events/2026_November_2"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-601e9f5c",
+            "story_title": "Lead 3: Israeli forces end 10-/11-day Hebron (West Bank) operation; displaced residents told they can return",
+            "source": "grok/grok-rolling-0051.md",
+            "slot": "0051",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.aljazeera.com/news/2026/11/2/hebron-governor-says-israeli-forces-withdraw-from-city-after-10-day-siege",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.timesofisrael.com/idf-ends-controversial-11-day-hebron-operation-that-followed-deadly-shooting-attack/",
+              "https://www.washingtonpost.com/world/2026/11/02/israeli-military-ends-operation-west-bank-city-hebron/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-6e9bed8a",
+            "story_title": "Lead 4: Israeli strikes kill at least three (later reports four) Palestinians in Gaza on 2 November",
+            "source": "grok/grok-rolling-1542.md",
+            "slot": "1542",
+            "matched": [
+              "Gaza",
+              "Khan Younis"
+            ],
+            "source_url": "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+            "source_urls": [
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.dailysabah.com/world/mid-east/israeli-strikes-kill-3-in-gaza-as-4th-palestinian-dies-of-wounds",
+              "https://www.usnews.com/news/world/articles/2026-11-02/israeli-strikes-kill-three-people-in-gaza-medics-say",
+              "https://www.brecorder.com/news/40447037"
+            ],
+            "observed_at": "2026-11-02T13:42:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-cc1b9313",
+            "story_title": "Israeli strikes resume in Gaza amid fragile truce",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Gaza",
+              "Khan Younis"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.reuters.com/world/middle-east/israeli-strikes-kill-three-people-gaza-medics-say-2026-11-02/",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza",
+              "https://www.aljazeera.com/news/2026/11/1/at-least-eight-palestinians-killed-in-israeli-attacks-across-gaza"
+            ],
+            "observed_at": "2026-11-02T13:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-06",
+            "story_id": "s-67013451",
+            "story_title": "Emirates: Half-year profit collapses amid Iran war disruptions",
+            "source": "chatgpt/chatgpt-rolling-1521.md",
+            "slot": "1521",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/emirates-group-posts-980-million-h1-net-profit-despite-regional-challenges-2026-11-05/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/emirates-group-posts-980-million-h1-net-profit-despite-regional-challenges-2026-11-05/",
+              "https://www.reuters.com/world/middle-east/emirates-group-posts-980-million-h1-net-profit-despite-regional-challenges-2026-11-05/",
+              "https://www.reuters.com/world/middle-east/emirates-group-posts-980-million-h1-net-profit-despite-regional-challenges-2026-11-05/",
+              "https://www.reuters.com/world/middle-east/emirates-group-posts-980-million-h1-net-profit-despite-regional-challenges-2026-11-05/",
+              "https://www.reuters.com/world/middle-east/emirates-group-posts-980-million-h1-net-profit-despite-regional-challenges-2026-11-05/",
+              "https://qz.com/emirates-profit-plunge-iran-war-fuel-costs-110526"
+            ],
+            "observed_at": "2026-11-05T13:21:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-03 and drew no qualifying story today",
+        "last_open_edition": "2026-11-03",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-1edfc975",
+            "story_title": "South Korea: President Demands Cyber “Czar” After Binance Hack",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+            "source_urls": [
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501"
+            ],
+            "observed_at": "2026-11-03T01:18:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-265fdae8",
+            "story_title": "Lead 5: FBI attributes >$6 billion Binance cryptocurrency theft (on or about 29 October) to North Korea’s…",
+            "source": "grok/grok-rolling-1250.md",
+            "slot": "1250",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://en.yna.co.kr/view/AEN20261101000300315",
+            "source_urls": [
+              "https://en.yna.co.kr/view/AEN20261101000300315",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://www.securityweek.com/fbi-flags-over-600-addresses-tied-to-north-koreas-binance-heist/",
+              "https://www.securityweek.com/fbi-flags-over-600-addresses-tied-to-north-koreas-binance-heist/",
+              "https://www.coindesk.com/policy/2026/10/31/fbi-confirms-north-korea-s-role-in-usd6-billion-binance-hack-asks-defi-community-to-block-btc-eth-sol-addresses"
+            ],
+            "observed_at": "2026-11-02T10:50:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-6934514a",
+            "story_title": "Crypto security: FBI blames North Korea for Binance hack",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+            "source_urls": [
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.businessinsider.com/binance-hack-refunds-north-korea-fbi-reports-2026-11",
+              "https://www.businessinsider.com/binance-hack-refunds-north-korea-fbi-reports-2026-11"
+            ],
+            "observed_at": "2026-11-02T13:16:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-fec1ce5f",
+            "story_title": "Crypto Theft Attribution: FBI Names North Korea’s “TraderTraitor”",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+            "source_urls": [
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://trmlabs.com/reports/cryptex-hack"
+            ],
+            "observed_at": "2026-11-03T01:18:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "easing",
+    "current": 0.4615,
+    "previous": 0.6154,
+    "previous_edition": "2026-11-05",
+    "change": -0.1539
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
