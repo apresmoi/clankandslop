@@ -81,6 +81,11 @@ test('the release unit runs a drained spawnfile release from the pulled checkout
   for (const piece of ['symbolic-ref --short HEAD)" = main', 'fetch -q origin main', 'merge -q --ff-only FETCH_HEAD', 'rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)'])
     assert.ok(source.includes(piece), `the source step must build exactly origin/main (missing: ${piece})`);
   assert.match(text, /^ExecStartPre=\+\/bin\/sh -c 'test "\$\$\(df --output=avail -B1G \/var\/lib\/docker .* -ge 20'$/mu, 'the 20 GiB build floor');
+  const pre = [...text.matchAll(/^ExecStartPre=(.*)$/gmu)].map((match) => match[1]);
+  const cleanup = pre.findIndex((line) => line.includes('/agentic-org/scripts/release-disk-cleanup.mjs'));
+  assert.ok(cleanup > 0 && cleanup === pre.findIndex((line) => line.includes('df --output=avail')) - 1, 'the disk cleanup runs after the pull and right before the floor');
+  assert.match(pre[cleanup], /^-\+\/usr\/bin\/flock \/run\/lock\/clank-corpus-refresh\.lock .* --ledger \/home\/clank\/\.spawnfile\/releases\/clank-and-slop\/ledger\.json --repository clank-and-slop$/u, 'root, under the release lock, protecting the ledger\'s rollback pair; a failure leaves the floor to decide');
+  assert.ok(statSync(new URL('./release-disk-cleanup.mjs', import.meta.url)).mode & 0o111, 'the cleanup is executable');
   for (const name of ['SPAWNFILE_ALLOW_LOCAL_E2E', 'SPAWNFILE_LOCAL_MOLTNET_RELEASE_DIR', 'SPAWNFILE_DAIMON_LOCAL_RUNTIME_IDENTITY'])
     assert.doesNotMatch(text, new RegExp(`^Environment=${name}=`, 'mu'), `the published Spawnfile pins its own runtime; ${name} must not be set (0.1.24 refuses an old local identity)`);
   assert.match(text, /^Environment="GIT_SSH_COMMAND=ssh -i \/root\/\.ssh\/clank_public -o IdentitiesOnly=yes"$/mu);

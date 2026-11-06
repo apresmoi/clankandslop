@@ -52,7 +52,7 @@ OnFailure=clank-alarm@%n.service
 
 # Runs as clank: Spawnfile refuses to mount Daimon credentials as root
 # (callerUid <= 0), and the live deployment record and Grok bootstrap login are
-# clank's. The two ExecStartPre steps run as root (`+`): the fetch needs root's
+# clank's. The ExecStartPre steps run as root (`+`): the fetch needs root's
 # deploy key. clank reads /root/work/clankandslop through ACLs and writes only
 # its .runtime/ (see ops/README.md, "Release runs as clank").
 [Service]
@@ -68,6 +68,12 @@ Environment="GIT_SSH_COMMAND=ssh -i /root/.ssh/clank_public -o IdentitiesOnly=ye
 # refused when local commits sit ahead of it (Spawnfile's clean-tree check
 # accepts committed changes, so this is the only "reviewed code only" gate).
 ExecStartPre=+/usr/bin/flock /run/lock/clank-corpus-refresh.lock /bin/sh -c 'r=/root/work/clankandslop; test "$$(git -C $$r symbolic-ref --short HEAD)" = main && git -C $$r fetch -q origin main && git -C $$r merge -q --ff-only FETCH_HEAD && test "$$(git -C $$r rev-parse HEAD)" = "$$(git -C $$r rev-parse FETCH_HEAD)"'
+# Free what a release can rebuild before measuring: build cache unused for a
+# day, and release images no container uses. It keeps every container's image,
+# the ledger's current and previous release (the rollback pair), every
+# clank-rollback:* image and every non-release image; it never touches volumes
+# or containers. A cleanup failure (`-`) is logged and the floor below decides.
+ExecStartPre=-+/usr/bin/flock /run/lock/clank-corpus-refresh.lock /home/clank/deploy-work/node24/bin/node /root/work/clankandslop/agentic-org/scripts/release-disk-cleanup.mjs --ledger /home/clank/.spawnfile/releases/clank-and-slop/ledger.json --repository clank-and-slop
 # The build floor the seam enforced (the release hit the disk three times on
 # 2026-10-08); Spawnfile prunes release tags but keeps build cache. Fails loudly.
 ExecStartPre=+/bin/sh -c 'test "$$(df --output=avail -B1G /var/lib/docker | tail -1 | tr -d " ")" -ge 20'

@@ -27,7 +27,7 @@ now:  clank-release.timer      (Hetzner)      hourly `spawnfile release`: no-op 
 
 | File | Runs | Does |
 |---|---|---|
-| `systemd/clank-release.service` | Hetzner, hourly | fast-forward to `origin/main` + disk floor → `spawnfile release` (identity no-op, build, drain, deploy, settle, resume, control-token bootstrap, ledger, prune) |
+| `systemd/clank-release.service` | Hetzner, hourly | fast-forward to `origin/main` + disk cleanup + disk floor → `spawnfile release` (identity no-op, build, drain, deploy, settle, resume, control-token bootstrap, ledger, prune) |
 | `scripts/release-notify.mjs` | inside the release | Spawnfile's `--notify-command`: a failed or day-old deferred release → `alarm.mjs` spool |
 | `scripts/publish-edition-branch.mjs` | Hetzner, 17:00 Berlin | today's staged artifact → `edition/<date>` on GitHub |
 | `clank-feed-content.timer` | Hetzner, every 5 min | `spawnfile volume refresh public-content-volume`: published editions + bylines at `origin/main` → `clank-newsroom-content` fed volume |
@@ -53,6 +53,12 @@ What stayed in the org, and why:
 - **the source** (`ExecStartPre`): fast-forward the checkout to exactly
   `origin/main` on branch `main`, refusing local commits ahead of it; Spawnfile
   builds from the checkout and fetching it is the caller's job.
+- **the disk cleanup** (`ExecStartPre`, `scripts/release-disk-cleanup.mjs`):
+  right before the floor, prune build cache unused for 24 hours and remove
+  release images no container uses. It keeps every container's image, the
+  release ledger's current and previous tag (the rollback pair), every
+  `clank-rollback:*` image, every non-release image and digest-pinned pulls,
+  never forces a removal and never touches volumes or containers.
 - **the 20 GiB disk floor** (`ExecStartPre`): Spawnfile prunes release tags but
   not build cache; a full disk fails the unit loudly instead of mid-build.
 - **the control-token bootstrap** (`--post-deploy-command`): the newsroom
