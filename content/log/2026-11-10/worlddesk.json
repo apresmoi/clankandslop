@@ -1,0 +1,962 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-10",
+  "generated_at": "2026-11-10T08:56:33Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.7692,
+    "numerator": 10,
+    "denominator": 13,
+    "triggering": 5,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 107.03,
+        "observed_at": "2026-11-03",
+        "stale_days": 7,
+        "contributes": 3,
+        "reason": "107.03 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 99.64,
+        "observed_at": "2026-11-03",
+        "stale_days": 7,
+        "contributes": 1,
+        "reason": "99.64 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.292,
+        "observed_at": "2026-11-02",
+        "stale_days": 8,
+        "contributes": 2,
+        "reason": "6.292 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 2.63,
+        "observed_at": "2026-11-03",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "2.63 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 25.64,
+        "observed_at": "2026-11-06",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "25.64 >= 22.96 is true"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 3.42,
+        "observed_at": "2026-11-06",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "3.42 >= 3.388 is true"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.8803,
+        "observed_at": "2026-11-06",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "121.8803 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-10T08:56:33Z",
+        "http_status": 200,
+        "bytes": 170363,
+        "sha256": "b30cdc14ddae1f72df40bb942f6926acc9df627cb3c68844d6e18ea65b5cf6f0",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-10T08:56:33Z",
+        "http_status": 200,
+        "bytes": 176135,
+        "sha256": "90c95c17a2cdb9a3b4a8d393494d19a40e1eb7fa80943838036754d3be74a06e",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-10T08:56:33Z",
+        "http_status": 200,
+        "bytes": 28976,
+        "sha256": "02474039d2ce1e84361891c6ada4e5b70fcd842d730a1a6df024d5be86a8e58b",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-10T08:56:33Z",
+        "http_status": 200,
+        "bytes": 116393,
+        "sha256": "49b12d4ac0c5e14da46d15c98e8c371385a775e916513886609020417b236185",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-10T08:56:33Z",
+        "http_status": 200,
+        "bytes": 161884,
+        "sha256": "049654ab9cad9c14a587c843bb0e771d6a1610aa25a32b14100037f95ad2c4ad",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-10T08:56:33Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "b1b0a7cec089d39618fb2b886009698951a8e4e987369e270162f23b4881a61a",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-10T08:56:33Z",
+        "http_status": 200,
+        "bytes": 105029,
+        "sha256": "448522e5b4b78d787e08edd86028dfe67a92c4aeab1aded9266304d6c71f19bc",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 37,
+    "open_conflicts": 3,
+    "watch": 2,
+    "dormant": 8,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 5,
+        "evidence": [
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-188c0d5d",
+            "story_title": "Lead 2: France formally attributes October supermarket refrigeration cyberattacks to Iran’s IRGC, summons…",
+            "source": "grok/grok-rolling-0048.md",
+            "slot": "0048",
+            "matched": [
+              "IRGC"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.pbs.org/newshour/world/france-blames-iran-for-last-months-cyberattack-on-supermarket-fridges"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-2cc6c7cf",
+            "story_title": "Trump: “Highly unlikely” to strike Iran if deal emerges",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-4c667fe9",
+            "story_title": "Saudi: Houthis hit Aramco tower; no casualties reported",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+              "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province",
+              "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province",
+              "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province",
+              "https://www.reuters.com/world/middle-east/iran-says-unauthorised-vessels-transited-hormuz-after-navigation-aids-destroyed-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/iran-says-unauthorised-vessels-transited-hormuz-after-navigation-aids-destroyed-2026-11-09/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-65d18a8d",
+            "story_title": "Lead 1: Saudi Ministry of Energy reports East-West Pipeline targeted in Medina region; limited fire…",
+            "source": "grok/grok-rolling-2143.md",
+            "slot": "2143",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+            "source_urls": [
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://gulfnews.com/world/gulf/saudi/saudi-arabia-says-east-west-pipeline-targeted-operations-unaffected-1.500741614",
+              "https://gulfnews.com/world/gulf/saudi/saudi-arabia-says-east-west-pipeline-targeted-operations-unaffected-1.500741614",
+              "https://www.khaleejtimes.com/world/gulf/fire-saudi-east-west-pipeline-attack-no-injuries-operations-unaffected"
+            ],
+            "observed_at": "2026-11-09T19:43:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-ae7856f4",
+            "story_title": "Lead 3: France attributes October supermarket refrigeration cyberattacks to Iran’s IRGC, summons ambassador…",
+            "source": "grok/grok-rolling-0650.md",
+            "slot": "0650",
+            "matched": [
+              "IRGC"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.bbc.co.uk/news/articles/cmg474vk6dyqo",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges",
+              "https://www.theguardian.com/world/2026/nov/09/france-blames-irans-revolutionary-guards-for-cyber-attacks-on-supermarket-fridges"
+            ],
+            "observed_at": "2026-11-10T04:50:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 5,
+        "evidence": [
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-0b9b8f7f",
+            "story_title": "Ukraine strikes cause fuel rationing in Russia",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/",
+              "https://www.reuters.com/business/energy/fuel-shortages-return-russian-regions-after-ukrainian-refinery-attacks-2026-11-09/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-2cc6c7cf",
+            "story_title": "Trump: “Highly unlikely” to strike Iran if deal emerges",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/iran-suggests-blasts-are-not-us-attacks-both-sides-report-ships-hit-2026-11-08/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-59c08495",
+            "story_title": "China extends rare-earth export controls pause to Jan. 10, 2027",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/china/china-extends-suspension-new-rare-earth-controls-until-january-2026-11-09/",
+            "source_urls": [
+              "https://www.reuters.com/world/china/china-extends-suspension-new-rare-earth-controls-until-january-2026-11-09/",
+              "https://www.reuters.com/world/china/china-extends-suspension-new-rare-earth-controls-until-january-2026-11-09/",
+              "https://www.reuters.com/world/china/china-extends-suspension-new-rare-earth-controls-until-january-2026-11-09/",
+              "https://www.reuters.com/world/china/china-extends-suspension-new-rare-earth-controls-until-january-2026-11-09/",
+              "https://www.reuters.com/world/china/china-extends-suspension-new-rare-earth-controls-until-january-2026-11-09/",
+              "https://www.reuters.com/world/china/china-extends-suspension-new-rare-earth-controls-until-january-2026-11-09/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-8f88c01c",
+            "story_title": "Iranian response to U.S. ‘Iron Gate’ task force",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/iran-defends-two-day-proposal-peace-talks-after-us-rejects-conditions-2026-11-09/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/iran-defends-two-day-proposal-peace-talks-after-us-rejects-conditions-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/iran-defends-two-day-proposal-peace-talks-after-us-rejects-conditions-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/iran-defends-two-day-proposal-peace-talks-after-us-rejects-conditions-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/iran-defends-two-day-proposal-peace-talks-after-us-rejects-conditions-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/expanding-naval-blockade-us-military-looks-restrict-iranian-land-commerce-2026-11-07/",
+              "https://www.aljazeera.com/news/2026/11/8/us-launches-task-force-to-disrupt-irans-land-based-supply-routes",
+              "https://www.reuters.com/world/trump-administration-meet-ukraine-assistance-deadline-2026-09-25/",
+              "https://www.reuters.com/world/middle-east/trump-says-he-is-highly-unlikely-order-iran-strikes-if-talks-progress-2026-11-08/",
+              "https://www.reuters.com/world/middle-east/trump-says-he-is-highly-unlikely-order-iran-strikes-if-talks-progress-2026-11-08/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-eb379703",
+            "story_title": "Kraków shooting: investigators say motive still unknown",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/",
+              "https://www.reuters.com/world/europe/shot-cracow-officer-dies-gunman-dies-hospital-investigators-debate-motive-2026-11-09/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-09 and drew no qualifying story today",
+        "last_open_edition": "2026-11-09",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-09",
+            "story_id": "s-773d0761",
+            "story_title": "Lead 2: Israeli president tasks Gadi Eisenkot (Yashar) with forming government after Oct 27 election",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.timesofisrael.com/president-herzog-taps-eisenkot-to-form-coalition-but-path-remains-fraught/",
+              "https://www.timesofisrael.com/president-herzog-taps-eisenkot-to-form-coalition-but-path-remains-fraught/",
+              "https://www.timesofisrael.com/president-herzog-taps-eisenkot-to-form-coalition-but-path-remains-fraught/",
+              "https://www.channelnewsasia.com/world/israel-president-taps-eisenkot-form-new-government-6533711"
+            ],
+            "observed_at": "2026-11-08T10:48:00Z"
+          },
+          {
+            "edition": "2026-11-09",
+            "story_id": "s-f07bcbeb",
+            "story_title": "Lead 3: Fourth “Red Line” protest in Amsterdam draws organizers’ claim of ~200,000 demanding stronger Dutch…",
+            "source": "grok/grok-rolling-1847.md",
+            "slot": "1847",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://nos.nl/artikel/2638553-zeker-200-000-mensen-bij-rode-lijn-demonstratie-in-amsterdam-zegt-organisatie",
+            "source_urls": [
+              "https://nos.nl/artikel/2638553-zeker-200-000-mensen-bij-rode-lijn-demonstratie-in-amsterdam-zegt-organisatie",
+              "https://www.dutchnews.nl/2026/11/thousands-gather-for-red-line-gaza-protest-in-amsterdam/",
+              "https://www.independent.co.uk/news/dutch-gaza-israel-hamas-amsterdam-b3081245.html",
+              "https://www.lemonde.fr/international/article/2026/11/08/pays-bas-a-amsterdam-des-dizaines-de-milliers-de-personnes-manifestent-en-soutien-aux-palestiniens_6808452_3210.html"
+            ],
+            "observed_at": "2026-11-08T16:47:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 5,
+        "evidence": [
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-0304f9df",
+            "story_title": "Lead 2: Rep. Thomas Massie introduces privileged resolution with eight articles of impeachment against…",
+            "source": "grok/grok-rolling-2143.md",
+            "slot": "2143",
+            "matched": [
+              "Yemen"
+            ],
+            "source_url": "https://massie.house.gov/news/documentsingle.aspx?DocumentID=395863",
+            "source_urls": [
+              "https://massie.house.gov/news/documentsingle.aspx?DocumentID=395863",
+              "https://massie.house.gov/news/documentsingle.aspx?DocumentID=395863",
+              "https://massie.house.gov/news/documentsingle.aspx?DocumentID=395863",
+              "https://massie.house.gov/news/documentsingle.aspx?DocumentID=395863",
+              "https://massie.house.gov/news/documentsingle.aspx?DocumentID=395863",
+              "https://www.nbcnews.com/politics/trump-administration/thomas-massie-pete-hegseth-impeachment-house-defense-rcna597989",
+              "https://www.nbcnews.com/politics/trump-administration/thomas-massie-pete-hegseth-impeachment-house-defense-rcna597989",
+              "https://www.cnbc.com/2026/11/09/pete-hegseth-impeachment-articles-massie.html"
+            ],
+            "observed_at": "2026-11-09T19:43:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-4c667fe9",
+            "story_title": "Saudi: Houthis hit Aramco tower; no casualties reported",
+            "source": "chatgpt/chatgpt-rolling-1519.md",
+            "slot": "1519",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/saudi-arabia-says-danger-passed-riyadh-after-alert-day-after-houthi-attack-2026-11-09/",
+              "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province",
+              "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province",
+              "https://www.aljazeera.com/news/2026/11/8/saudi-arabia-intercepts-houthi-missiles-targeting-riyadh-eastern-province",
+              "https://www.reuters.com/world/middle-east/iran-says-unauthorised-vessels-transited-hormuz-after-navigation-aids-destroyed-2026-11-09/",
+              "https://www.reuters.com/world/middle-east/iran-says-unauthorised-vessels-transited-hormuz-after-navigation-aids-destroyed-2026-11-09/"
+            ],
+            "observed_at": "2026-11-09T13:19:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-65d18a8d",
+            "story_title": "Lead 1: Saudi Ministry of Energy reports East-West Pipeline targeted in Medina region; limited fire…",
+            "source": "grok/grok-rolling-2143.md",
+            "slot": "2143",
+            "matched": [
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+            "source_urls": [
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://english.alarabiya.net/News/saudi-arabia/2026/11/09/saudi-arabia-s-eastwest-pipeline-targeted-in-attack",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://www.firstpost.com/world/saudi-arabia-says-key-east-west-oil-pipeline-targeted-as-houthi-attacks-raise-fears-over-energy-supplies-14058872.html",
+              "https://gulfnews.com/world/gulf/saudi/saudi-arabia-says-east-west-pipeline-targeted-operations-unaffected-1.500741614",
+              "https://gulfnews.com/world/gulf/saudi/saudi-arabia-says-east-west-pipeline-targeted-operations-unaffected-1.500741614",
+              "https://www.khaleejtimes.com/world/gulf/fire-saudi-east-west-pipeline-attack-no-injuries-operations-unaffected"
+            ],
+            "observed_at": "2026-11-09T19:43:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-90febf94",
+            "story_title": "Lead 2: Rep. Thomas Massie (R-Ky.) files privileged resolution forcing House vote on impeaching Defense…",
+            "source": "grok/grok-rolling-0650.md",
+            "slot": "0650",
+            "matched": [
+              "Yemen"
+            ],
+            "source_url": "https://rollcall.com/2026/11/09/massie-moves-to-force-hegseth-impeachment-vote/",
+            "source_urls": [
+              "https://rollcall.com/2026/11/09/massie-moves-to-force-hegseth-impeachment-vote/",
+              "https://rollcall.com/2026/11/09/massie-moves-to-force-hegseth-impeachment-vote/",
+              "https://rollcall.com/2026/11/09/massie-moves-to-force-hegseth-impeachment-vote/",
+              "https://rollcall.com/2026/11/09/massie-moves-to-force-hegseth-impeachment-vote/",
+              "https://www.npr.org/2026/11/09/nx-s1-6034483/thomas-massie-impeachment-pete-hegseth",
+              "https://www.npr.org/2026/11/09/nx-s1-6034483/thomas-massie-impeachment-pete-hegseth",
+              "https://www.npr.org/2026/11/09/nx-s1-6034483/thomas-massie-impeachment-pete-hegseth",
+              "https://www.npr.org/2026/11/09/nx-s1-6034483/thomas-massie-impeachment-pete-hegseth",
+              "https://www.npr.org/2026/11/09/nx-s1-6034483/thomas-massie-impeachment-pete-hegseth",
+              "https://www.npr.org/2026/11/09/nx-s1-6034483/thomas-massie-impeachment-pete-hegseth"
+            ],
+            "observed_at": "2026-11-10T04:50:00Z"
+          },
+          {
+            "edition": "2026-11-10",
+            "story_id": "s-d9c82c17",
+            "story_title": "Lead 1: Republican Rep. Thomas Massie introduces eight articles of impeachment against Defense Secretary…",
+            "source": "grok/grok-rolling-0344.md",
+            "slot": "0344",
+            "matched": [
+              "Yemen"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+              "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+              "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+              "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+              "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+              "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+              "https://www.aljazeera.com/news/2026/11/9/us-congressman-files-resolution-to-impeach-defence-secretary-pete-hegseth",
+              "https://www.cnbc.com/2026/11/09/pete-hegseth-impeachment-articles-massie.html",
+              "https://www.cnbc.com/2026/11/09/pete-hegseth-impeachment-articles-massie.html",
+              "https://www.cnbc.com/2026/11/09/pete-hegseth-impeachment-articles-massie.html",
+              "https://www.cbsnews.com/news/pete-hegseth-impeachment-vote-house-thomas-massie/",
+              "https://www.cbsnews.com/news/pete-hegseth-impeachment-vote-house-thomas-massie/",
+              "https://www.cbsnews.com/news/pete-hegseth-impeachment-vote-house-thomas-massie/",
+              "https://www.cbsnews.com/news/pete-hegseth-impeachment-vote-house-thomas-massie/",
+              "https://www.cbsnews.com/news/pete-hegseth-impeachment-vote-house-thomas-massie/",
+              "https://www.pbs.org/newshour/politics/watch-live-rep-massie-speaks-after-filing-hegseth-impeachment-resolution"
+            ],
+            "observed_at": "2026-11-10T01:44:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-03 and drew no qualifying story today",
+        "last_open_edition": "2026-11-03",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-1edfc975",
+            "story_title": "South Korea: President Demands Cyber “Czar” After Binance Hack",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+            "source_urls": [
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://www.reuters.com/world/asia-pacific/south-koreas-lee-calls-powerful-government-wide-cybersecurity-body-2026-11-03/",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501",
+              "https://en.bloomingbit.io/feed/news/123501"
+            ],
+            "observed_at": "2026-11-03T01:18:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-265fdae8",
+            "story_title": "Lead 5: FBI attributes >$6 billion Binance cryptocurrency theft (on or about 29 October) to North Korea’s…",
+            "source": "grok/grok-rolling-1250.md",
+            "slot": "1250",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://en.yna.co.kr/view/AEN20261101000300315",
+            "source_urls": [
+              "https://en.yna.co.kr/view/AEN20261101000300315",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://therecord.media/fbi-blames-tradertraitor-for-binance-hack",
+              "https://www.securityweek.com/fbi-flags-over-600-addresses-tied-to-north-koreas-binance-heist/",
+              "https://www.securityweek.com/fbi-flags-over-600-addresses-tied-to-north-koreas-binance-heist/",
+              "https://www.coindesk.com/policy/2026/10/31/fbi-confirms-north-korea-s-role-in-usd6-billion-binance-hack-asks-defi-community-to-block-btc-eth-sol-addresses"
+            ],
+            "observed_at": "2026-11-02T10:50:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-6934514a",
+            "story_title": "Crypto security: FBI blames North Korea for Binance hack",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+            "source_urls": [
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.fbi.gov/sites/default/files/WMD/WMD-UCE-TraderTraitor-Oct2026.pdf",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.theguardian.com/technology/2026/nov/01/binance-cryptocurrency-hack-north-korea",
+              "https://www.businessinsider.com/binance-hack-refunds-north-korea-fbi-reports-2026-11",
+              "https://www.businessinsider.com/binance-hack-refunds-north-korea-fbi-reports-2026-11"
+            ],
+            "observed_at": "2026-11-02T13:16:00Z"
+          },
+          {
+            "edition": "2026-11-03",
+            "story_id": "s-fec1ce5f",
+            "story_title": "Crypto Theft Attribution: FBI Names North Korea’s “TraderTraitor”",
+            "source": "chatgpt/chatgpt-rolling-0318.md",
+            "slot": "0318",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+            "source_urls": [
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://www.fbi.gov/news/press-releases/north-korea-responsible-for-theft-of-more-than-6-billion-in-virtual-assets",
+              "https://trmlabs.com/reports/cryptex-hack"
+            ],
+            "observed_at": "2026-11-03T01:18:00Z"
+          }
+        ]
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.7692,
+    "previous": 0.7692,
+    "previous_edition": "2026-11-09",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
