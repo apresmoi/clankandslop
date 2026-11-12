@@ -1,0 +1,867 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-12",
+  "generated_at": "2026-11-12T08:50:36Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.4615,
+    "numerator": 6,
+    "denominator": 13,
+    "triggering": 3,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 107.03,
+        "observed_at": "2026-11-03",
+        "stale_days": 9,
+        "contributes": 3,
+        "reason": "107.03 >= 93.44 is true"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 99.64,
+        "observed_at": "2026-11-03",
+        "stale_days": 9,
+        "contributes": 1,
+        "reason": "99.64 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.127,
+        "observed_at": "2026-11-09",
+        "stale_days": 3,
+        "contributes": 2,
+        "reason": "6.127 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 2.63,
+        "observed_at": "2026-11-03",
+        "stale_days": 9,
+        "contributes": 0,
+        "reason": "2.63 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 19.46,
+        "observed_at": "2026-11-10",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "19.46 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.34,
+        "observed_at": "2026-11-09",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "3.34 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.8803,
+        "observed_at": "2026-11-06",
+        "stale_days": 6,
+        "contributes": 0,
+        "reason": "121.8803 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-12T08:50:35Z",
+        "http_status": 200,
+        "bytes": 170363,
+        "sha256": "b30cdc14ddae1f72df40bb942f6926acc9df627cb3c68844d6e18ea65b5cf6f0",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-12T08:50:35Z",
+        "http_status": 200,
+        "bytes": 176135,
+        "sha256": "90c95c17a2cdb9a3b4a8d393494d19a40e1eb7fa80943838036754d3be74a06e",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-12T08:50:36Z",
+        "http_status": 200,
+        "bytes": 28993,
+        "sha256": "f465aa924ef580d75c58599a2485cf27dda4cf43e77d1ac40816885bcf2a0472",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-12T08:50:36Z",
+        "http_status": 200,
+        "bytes": 116393,
+        "sha256": "49b12d4ac0c5e14da46d15c98e8c371385a775e916513886609020417b236185",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-12T08:50:36Z",
+        "http_status": 200,
+        "bytes": 161918,
+        "sha256": "14eae91a8bce543f45598a668c015143ec0df68eb12a79d326aa636fdd9cf317",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-12T08:50:36Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "62b2c67e85433a10486c59a407151cf03afa52b84dbd176b7abd088e6180b3a5",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-12T08:50:36Z",
+        "http_status": 200,
+        "bytes": 105029,
+        "sha256": "448522e5b4b78d787e08edd86028dfe67a92c4aeab1aded9266304d6c71f19bc",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 40,
+    "open_conflicts": 3,
+    "watch": 3,
+    "dormant": 7,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-74b4c298",
+            "story_title": "Iran’s Guards say two oil tankers disabled by explosions in Strait of Hormuz",
+            "source": "chatgpt/chatgpt-rolling-0913.md",
+            "slot": "0913",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.gulftoday.ae/news/2026/11/12/two-oil-tankers-disabled-by-explosions-in-strait-of-hormuz",
+            "source_urls": [
+              "https://www.gulftoday.ae/news/2026/11/12/two-oil-tankers-disabled-by-explosions-in-strait-of-hormuz",
+              "https://theinsightinternational.com/irgc-says-two-supertankers-disabled-by-explosions-in-strait-of-hormuz",
+              "https://theinsightinternational.com/irgc-says-two-supertankers-disabled-by-explosions-in-strait-of-hormuz"
+            ],
+            "observed_at": "2026-11-12T07:13:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-a798947f",
+            "story_title": "Kazakhstan detains sovereign wealth fund and railway chiefs on corruption charges",
+            "source": "chatgpt/chatgpt-rolling-0913.md",
+            "slot": "0913",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+            "source_urls": [
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.rbc.ru/politics/12/11/2026/6af566cbc440ee8a9f27cfb4",
+              "https://www.rbc.ru/politics/12/11/2026/6af566cbc440ee8a9f27cfb4",
+              "https://www.interfax.ru/world/1128505",
+              "https://www.interfax.ru/world/1128505",
+              "https://www.interfax.ru/world/1128505"
+            ],
+            "observed_at": "2026-11-12T07:13:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 8,
+        "evidence": [
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-392c0ff2",
+            "story_title": "Lead 2: Russian Ambassador to the United States Alexander Darchiev dies suddenly in Moscow",
+            "source": "grok/grok-rolling-0045.md",
+            "slot": "0045",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.cnn.com/2026/11/11/europe/russian-ambassador-to-us-dies-intl",
+            "source_urls": [
+              "https://www.cnn.com/2026/11/11/europe/russian-ambassador-to-us-dies-intl",
+              "https://www.cnn.com/2026/11/11/europe/russian-ambassador-to-us-dies-intl",
+              "https://www.cnn.com/2026/11/11/europe/russian-ambassador-to-us-dies-intl",
+              "https://www.cnn.com/2026/11/11/europe/russian-ambassador-to-us-dies-intl",
+              "https://www.cnn.com/2026/11/11/europe/russian-ambassador-to-us-dies-intl",
+              "https://www.theguardian.com/world/2026/nov/11/russia-ambassador-dies-alexander-darchiev",
+              "https://www.theguardian.com/world/2026/nov/11/russia-ambassador-dies-alexander-darchiev",
+              "https://www.theguardian.com/world/2026/nov/11/russia-ambassador-dies-alexander-darchiev",
+              "https://www.aljazeera.com/news/2026/11/11/russias-ambassador-to-the-us-alexander-darchiev-dies-at-66",
+              "https://www.aljazeera.com/news/2026/11/11/russias-ambassador-to-the-us-alexander-darchiev-dies-at-66",
+              "https://en.wikipedia.org/wiki/Alexander_Darchiev"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-5e28ad05",
+            "story_title": "Lead 2: Russia and Ukraine agree in principle on largest-yet POW exchange after second day of Abu Dhabi…",
+            "source": "grok/grok-rolling-0648.md",
+            "slot": "0648",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.kyivpost.com/post/89788",
+            "source_urls": [
+              "https://www.kyivpost.com/post/89788",
+              "https://www.kyivpost.com/post/89788",
+              "https://www.kyivpost.com/post/89788",
+              "https://www.kyivpost.com/post/89788",
+              "https://meduza.io/en/feature/2026/11/11/russia-ukraine-peace-talks-conclude-in-abu-dhabi-with-prisoner-exchange-agreement-but-no-breakthrough-on-territory",
+              "https://meduza.io/en/feature/2026/11/11/russia-ukraine-peace-talks-conclude-in-abu-dhabi-with-prisoner-exchange-agreement-but-no-breakthrough-on-territory",
+              "https://meduza.io/en/feature/2026/11/11/russia-ukraine-peace-talks-conclude-in-abu-dhabi-with-prisoner-exchange-agreement-but-no-breakthrough-on-territory",
+              "https://www.dawn.com/news/2043970",
+              "https://www.dawn.com/news/2043970",
+              "https://www.dawn.com/news/2043970",
+              "https://www.dawn.com/news/2043970"
+            ],
+            "observed_at": "2026-11-12T04:48:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-9c9fcbfa",
+            "story_title": "Lead 3: German Bundeswehr bans commercially available Chinese-made drones for training, citing data/IT…",
+            "source": "grok/grok-rolling-0648.md",
+            "slot": "0648",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.yahoo.com/news/world/articles/german-military-bans-chinese-made-123115880.html",
+            "source_urls": [
+              "https://www.yahoo.com/news/world/articles/german-military-bans-chinese-made-123115880.html",
+              "https://www.yahoo.com/news/world/articles/german-military-bans-chinese-made-123115880.html",
+              "https://www.yahoo.com/news/world/articles/german-military-bans-chinese-made-123115880.html",
+              "https://www.yahoo.com/news/world/articles/german-military-bans-chinese-made-123115880.html",
+              "https://www.yahoo.com/news/world/articles/german-military-bans-chinese-made-123115880.html",
+              "https://www.theguardian.com/world/2026/nov/11/germany-bans-chinese-drones-military-bases-spying-security",
+              "https://www.theguardian.com/world/2026/nov/11/germany-bans-chinese-drones-military-bases-spying-security",
+              "https://www.theguardian.com/world/2026/nov/11/germany-bans-chinese-drones-military-bases-spying-security",
+              "https://www.theguardian.com/world/2026/nov/11/germany-bans-chinese-drones-military-bases-spying-security",
+              "https://www.theguardian.com/world/2026/nov/11/germany-bans-chinese-drones-military-bases-spying-security"
+            ],
+            "observed_at": "2026-11-12T04:48:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-a798947f",
+            "story_title": "Kazakhstan detains sovereign wealth fund and railway chiefs on corruption charges",
+            "source": "chatgpt/chatgpt-rolling-0913.md",
+            "slot": "0913",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+            "source_urls": [
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.rbc.ru/politics/12/11/2026/6af566cbc440ee8a9f27cfb4",
+              "https://www.rbc.ru/politics/12/11/2026/6af566cbc440ee8a9f27cfb4",
+              "https://www.interfax.ru/world/1128505",
+              "https://www.interfax.ru/world/1128505",
+              "https://www.interfax.ru/world/1128505"
+            ],
+            "observed_at": "2026-11-12T07:13:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-c0c9e4ef",
+            "story_title": "US envoys Kushner and Witkoff arrive in Moscow for Ukraine peace talks",
+            "source": "chatgpt/chatgpt-rolling-0913.md",
+            "slot": "0913",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/us-envoys-arrive-moscow-latest-round-ukrainian-peace-talks-with-putin-2026-11-12/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/us-envoys-arrive-moscow-latest-round-ukrainian-peace-talks-with-putin-2026-11-12/",
+              "https://www.reuters.com/world/europe/us-envoys-arrive-moscow-latest-round-ukrainian-peace-talks-with-putin-2026-11-12/",
+              "https://www.reuters.com/world/europe/us-envoys-arrive-moscow-latest-round-ukrainian-peace-talks-with-putin-2026-11-12/",
+              "https://www.rferl.org/a/russia-ukraine-war-us-talks/33896823.html",
+              "https://www.rferl.org/a/russia-ukraine-war-us-talks/33896823.html",
+              "https://www.rferl.org/a/russia-ukraine-war-us-talks/33896823.html",
+              "https://www.rferl.org/a/russia-ukraine-war-us-talks/33896823.html",
+              "https://www.rferl.org/a/russia-ukraine-war-us-talks/33896823.html"
+            ],
+            "observed_at": "2026-11-12T07:13:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-c5a2ade5",
+            "story_title": "Lead 1: Second day of Abu Dhabi Russia-Ukraine-US talks ends with large-scale POW exchange agreement but no…",
+            "source": "grok/grok-rolling-1847.md",
+            "slot": "1847",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/ck792we7zrz4o",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/ck792we7zrz4o",
+              "https://www.bbc.com/news/articles/ck792we7zrz4o",
+              "https://www.bbc.com/news/articles/ck792we7zrz4o",
+              "https://www.bbc.com/news/articles/ck792we7zrz4o",
+              "https://www.bbc.com/news/articles/ck792we7zrz4o",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261111-930-979906/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261111-930-979906/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261111-930-979906/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261111-930-979906/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261111-930-979906/",
+              "https://newsukraine.rbc.ua/news/major-pow-exchange-next-round-of-talks-what-1794406309.html",
+              "https://www.themoscowtimes.com/2026/11/11/abu-dhabi-talks-end-with-prisoner-exchange-but-no-peace-breakthrough-a94227"
+            ],
+            "observed_at": "2026-11-11T16:47:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-d3863d13",
+            "story_title": "Lead 2: U.S.-mediated Russia-Ukraine talks resume in Abu Dhabi after nine-month pause; first day…",
+            "source": "grok/grok-rolling-1242.md",
+            "slot": "1242",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+            "source_urls": [
+              "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+              "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+              "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+              "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+              "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+              "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+              "https://kyivindependent.com/ukraine-russia-us-resume-trilateral-peace-talks-in-abu-dhabi-after-9-month-pause/",
+              "https://www.khaleejtimes.com/uae/sheikh-abdullah-bin-zayed-launch-third-round-talks-russia-ukraine-us-abu-dhabi",
+              "https://www.khaleejtimes.com/uae/sheikh-abdullah-bin-zayed-launch-third-round-talks-russia-ukraine-us-abu-dhabi",
+              "https://www.khaleejtimes.com/uae/sheikh-abdullah-bin-zayed-launch-third-round-talks-russia-ukraine-us-abu-dhabi",
+              "https://asia.nikkei.com/politics/ukraine-war/russia-and-ukraine-hold-nearly-4-hours-of-us-mediated-talks-in-abu-dhabi",
+              "https://asia.nikkei.com/politics/ukraine-war/russia-and-ukraine-hold-nearly-4-hours-of-us-mediated-talks-in-abu-dhabi",
+              "https://asia.nikkei.com/politics/ukraine-war/russia-and-ukraine-hold-nearly-4-hours-of-us-mediated-talks-in-abu-dhabi",
+              "https://www.upi.com/Top_News/World-News/2026/11/10/UAE-Abu-Dhabi-Ukraine-Russia-US-talks/6331794301980/"
+            ],
+            "observed_at": "2026-11-11T10:42:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-f63cf00c",
+            "story_title": "China’s Xi reiterates Taiwan “reunification” must happen, ahead of APEC and elections",
+            "source": "chatgpt/chatgpt-rolling-0913.md",
+            "slot": "0913",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+            "source_urls": [
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911"
+            ],
+            "observed_at": "2026-11-12T07:13:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-09 and drew no qualifying story today",
+        "last_open_edition": "2026-11-09",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-09",
+            "story_id": "s-773d0761",
+            "story_title": "Lead 2: Israeli president tasks Gadi Eisenkot (Yashar) with forming government after Oct 27 election",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.aljazeera.com/news/2026/11/7/israels-president-picks-eisenkot-over-netanyahu-to-form-next-government",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.israelhayom.com/2026/11/07/herzog-taps-eisenkot-to-form-next-government-after-securing-backing-of-67-mks/",
+              "https://www.timesofisrael.com/president-herzog-taps-eisenkot-to-form-coalition-but-path-remains-fraught/",
+              "https://www.timesofisrael.com/president-herzog-taps-eisenkot-to-form-coalition-but-path-remains-fraught/",
+              "https://www.timesofisrael.com/president-herzog-taps-eisenkot-to-form-coalition-but-path-remains-fraught/",
+              "https://www.channelnewsasia.com/world/israel-president-taps-eisenkot-form-new-government-6533711"
+            ],
+            "observed_at": "2026-11-08T10:48:00Z"
+          },
+          {
+            "edition": "2026-11-09",
+            "story_id": "s-f07bcbeb",
+            "story_title": "Lead 3: Fourth “Red Line” protest in Amsterdam draws organizers’ claim of ~200,000 demanding stronger Dutch…",
+            "source": "grok/grok-rolling-1847.md",
+            "slot": "1847",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://nos.nl/artikel/2638553-zeker-200-000-mensen-bij-rode-lijn-demonstratie-in-amsterdam-zegt-organisatie",
+            "source_urls": [
+              "https://nos.nl/artikel/2638553-zeker-200-000-mensen-bij-rode-lijn-demonstratie-in-amsterdam-zegt-organisatie",
+              "https://www.dutchnews.nl/2026/11/thousands-gather-for-red-line-gaza-protest-in-amsterdam/",
+              "https://www.independent.co.uk/news/dutch-gaza-israel-hamas-amsterdam-b3081245.html",
+              "https://www.lemonde.fr/international/article/2026/11/08/pays-bas-a-amsterdam-des-dizaines-de-milliers-de-personnes-manifestent-en-soutien-aux-palestiniens_6808452_3210.html"
+            ],
+            "observed_at": "2026-11-08T16:47:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-14457fb1",
+            "story_title": "Lead 4: U.S. Soccer withdraws Under-17 team from FIFA World Cup in Qatar over security concerns tied to…",
+            "source": "grok/grok-rolling-0648.md",
+            "slot": "0648",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://en.as.com/soccer/the-letter-confirming-the-united-states-withdrawal-from-the-u-17-world-cup-f202611-n/",
+            "source_urls": [
+              "https://en.as.com/soccer/the-letter-confirming-the-united-states-withdrawal-from-the-u-17-world-cup-f202611-n/",
+              "https://en.as.com/soccer/the-letter-confirming-the-united-states-withdrawal-from-the-u-17-world-cup-f202611-n/",
+              "https://en.as.com/soccer/the-letter-confirming-the-united-states-withdrawal-from-the-u-17-world-cup-f202611-n/",
+              "https://en.as.com/soccer/the-letter-confirming-the-united-states-withdrawal-from-the-u-17-world-cup-f202611-n/",
+              "https://www.espn.com/soccer/story/_/id/50455133/usa-fifa-mens-u17-world-cup-qatar-safety",
+              "https://www.espn.com/soccer/story/_/id/50455133/usa-fifa-mens-u17-world-cup-qatar-safety",
+              "https://www.espn.com/soccer/story/_/id/50455133/usa-fifa-mens-u17-world-cup-qatar-safety",
+              "https://www.espn.com/soccer/story/_/id/50455133/usa-fifa-mens-u17-world-cup-qatar-safety",
+              "https://www.espn.com/soccer/story/_/id/50455133/usa-fifa-mens-u17-world-cup-qatar-safety",
+              "https://www.espn.com/soccer/story/_/id/50455133/usa-fifa-mens-u17-world-cup-qatar-safety"
+            ],
+            "observed_at": "2026-11-12T04:48:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-11 and drew no qualifying story today",
+        "last_open_edition": "2026-11-11",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-11",
+            "story_id": "s-104bca09",
+            "story_title": "Lead 1: U.S. House votes 211-204 to refer Massie Hegseth impeachment articles to Judiciary Committee…",
+            "source": "grok/grok-rolling-0044.md",
+            "slot": "0044",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+            "source_urls": [
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://breakingdefense.com/2026/11/house-opts-to-stall-hegseth-impeachment-vote-sending-resolution-to-judiciary-committee/",
+              "https://breakingdefense.com/2026/11/house-opts-to-stall-hegseth-impeachment-vote-sending-resolution-to-judiciary-committee/",
+              "https://www.foxnews.com/politics/house-gop-leaders-block-massie-hegseth-impeachment-push",
+              "https://www.reuters.com/world/us/us-house-votes-derail-impeachment-defense-secretary-hegseth-2026-11-10/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-11",
+            "story_id": "s-6f8ff935",
+            "story_title": "Hegseth Impeachment Effort",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+            "source_urls": [
+              "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+              "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026"
+            ],
+            "observed_at": "2026-11-10T19:14:00Z"
+          }
+        ]
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-a798947f",
+            "story_title": "Kazakhstan detains sovereign wealth fund and railway chiefs on corruption charges",
+            "source": "chatgpt/chatgpt-rolling-0913.md",
+            "slot": "0913",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+            "source_urls": [
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.reuters.com/world/asia-pacific/heads-kazakh-sovereign-wealth-fund-state-railway-company-arrested-suspicion-2026-11-12/",
+              "https://www.rbc.ru/politics/12/11/2026/6af566cbc440ee8a9f27cfb4",
+              "https://www.rbc.ru/politics/12/11/2026/6af566cbc440ee8a9f27cfb4",
+              "https://www.interfax.ru/world/1128505",
+              "https://www.interfax.ru/world/1128505",
+              "https://www.interfax.ru/world/1128505"
+            ],
+            "observed_at": "2026-11-12T07:13:00Z"
+          },
+          {
+            "edition": "2026-11-12",
+            "story_id": "s-f63cf00c",
+            "story_title": "China’s Xi reiterates Taiwan “reunification” must happen, ahead of APEC and elections",
+            "source": "chatgpt/chatgpt-rolling-0913.md",
+            "slot": "0913",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+            "source_urls": [
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911",
+              "https://www.channelnewsasia.com/east-asia/china-xi-jinping-taiwan-reunification-history-6544911"
+            ],
+            "observed_at": "2026-11-12T07:13:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.4615,
+    "previous": 0.4615,
+    "previous_edition": "2026-11-11",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
