@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, readdir, rename, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { artifactDigest, resolveStagedEdition } from './staged-edition.mjs';
+import { artifactDigest, pruneEarlierEditions, resolveStagedEdition } from './staged-edition.mjs';
 
 const edition = '2026-09-11';
 async function stages(t) {
@@ -100,4 +100,15 @@ test('publication rechecks final evidence even when the receipt authenticates co
   latest.receipt.artifact_digest = await artifactDigest(latest.artifact);
   await writeFile(latest.file, JSON.stringify(latest.receipt));
   assert.equal((await f.resolve()).artifact, latest.artifact);
+});
+
+test('pruning after a publish removes only earlier editions and keeps the current link working', async t => {
+  const f = await stages(t);
+  const older = ['2026-09-09-aaaaaaaaaaaaaaaa', '2026-09-10-bbbbbbbbbbbbbbbb'];
+  for (const name of older) await mkdir(path.join(f.staging, name, 'website'), { recursive: true });
+  await mkdir(path.join(f.staging, 'scratch'));
+  assert.deepEqual((await pruneEarlierEditions(f.staging, edition)).sort(), older);
+  const left = (await readdir(f.staging)).sort();
+  assert.deepEqual(left, ['current-edition', ...f.entries.map(e => e.name), 'scratch'].sort());
+  assert.equal((await f.resolve()).artifact, f.entries.at(-1).artifact);
 });

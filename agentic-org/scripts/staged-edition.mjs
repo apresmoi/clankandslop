@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { lstat, readFile, readdir, readlink, stat } from 'node:fs/promises';
+import { lstat, readFile, readdir, readlink, rm, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { validateRenderedEvidence } from '../../ops/validate-rendered-evidence.mjs';
 
@@ -92,5 +92,20 @@ async function stagedReceipt(stateRoot, edition, artifact) {
   if (measured !== value.artifact_digest) throw new Error(`the promoted artifact hashes to ${measured}, but the staged receipt records ${value.artifact_digest} — the staging volume changed after pressman built it, and this job does not publish bytes nobody staged`);
   validateRenderedEvidence(artifact, edition);
   return value;
+}
+
+// Each staged artifact is a full site build (~0.5 GB) and only proves the
+// edition compiles; once its branch is pushed it is never read again. Only
+// earlier editions go: today's may still be restaged for a late addition, and a
+// candidate pressman is writing right now always carries today's date.
+export async function pruneEarlierEditions(stagingRoot, edition) {
+  const removed = [];
+  for (const name of await readdir(stagingRoot)) {
+    const date = name.slice(0, 10);
+    if (!EDITION_PATTERN.test(date) || name[10] !== '-' || date >= edition) continue;
+    await rm(path.join(stagingRoot, name), { recursive: true, force: true });
+    removed.push(name);
+  }
+  return removed;
 }
 
