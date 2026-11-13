@@ -1,0 +1,847 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-13",
+  "generated_at": "2026-11-13T08:55:26Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.2308,
+    "numerator": 3,
+    "denominator": 13,
+    "triggering": 2,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 92.14,
+        "observed_at": "2026-11-11",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "92.14 >= 93.44 is false"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 89.62,
+        "observed_at": "2026-11-11",
+        "stale_days": 2,
+        "contributes": 1,
+        "reason": "89.62 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 6.127,
+        "observed_at": "2026-11-09",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "6.127 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3,
+        "observed_at": "2026-11-11",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 17.49,
+        "observed_at": "2026-11-11",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "17.49 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.3,
+        "observed_at": "2026-11-11",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3.3 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 121.8803,
+        "observed_at": "2026-11-06",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "121.8803 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-13T08:55:25Z",
+        "http_status": 200,
+        "bytes": 170465,
+        "sha256": "24c21dcefd22454f23390f58e8472c6b8a3cdea283d6cc5b7cfade9fede1d985",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-13T08:55:25Z",
+        "http_status": 200,
+        "bytes": 176237,
+        "sha256": "2bab6974f96b57b1fe1bdfe6fd2edd44ae041dc135060dddc479ef1994a02bc3",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-13T08:55:25Z",
+        "http_status": 200,
+        "bytes": 28993,
+        "sha256": "f465aa924ef580d75c58599a2485cf27dda4cf43e77d1ac40816885bcf2a0472",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-13T08:55:26Z",
+        "http_status": 200,
+        "bytes": 116489,
+        "sha256": "7fc71f76d90130f07537a142e6bdc3c633b90ac03ea954f6438ed981026bac41",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-13T08:55:26Z",
+        "http_status": 200,
+        "bytes": 161935,
+        "sha256": "c7c111ba59acbab48f6c215d1912b1826ccf2d9da51762a72d8246dbb9d0f413",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-13T08:55:26Z",
+        "http_status": 200,
+        "bytes": 12686,
+        "sha256": "adc585d6d127ba8110b353e6ff72790d54dfe192190fd57df765ff2bb09c5f1e",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-13T08:55:26Z",
+        "http_status": 200,
+        "bytes": 105029,
+        "sha256": "448522e5b4b78d787e08edd86028dfe67a92c4aeab1aded9266304d6c71f19bc",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 44,
+    "open_conflicts": 3,
+    "watch": 4,
+    "dormant": 6,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-d55e33c9",
+            "story_title": "Iran claims strike on US radar in Bahrain – Escalation, Policy",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/13/iran-says-it-struck-us-radar-site-in-bahrain",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/13/iran-says-it-struck-us-radar-site-in-bahrain",
+              "https://www.aljazeera.com/news/2026/11/13/iran-says-it-struck-us-radar-site-in-bahrain",
+              "https://www.aljazeera.com/news/2026/11/13/iran-says-it-struck-us-radar-site-in-bahrain",
+              "https://www.jpost.com/middle-east/iran-news/article-914794",
+              "https://www.jpost.com/middle-east/iran-news/article-914794",
+              "https://www.jpost.com/middle-east/iran-news/article-914794",
+              "https://www.dawn.com/news/2044218",
+              "https://www.dawn.com/news/2044218"
+            ],
+            "observed_at": "2026-11-13T07:17:00Z"
+          },
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-dbf2fc20",
+            "story_title": "Yemen’s Houthis strike Saudi pipeline pump and Riyadh; Saudi intercepts drones",
+            "source": "chatgpt/chatgpt-rolling-0321.md",
+            "slot": "0321",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779"
+            ],
+            "observed_at": "2026-11-13T01:21:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 6,
+        "evidence": [
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-1694b829",
+            "story_title": "Lead 3: Overnight Ukrainian drone strikes hit Lukoil’s Volgograd oil refinery (fire reported) and a…",
+            "source": "grok/grok-rolling-0649.md",
+            "slot": "0649",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://kyivindependent.com/volgograd-oil-refinery-rostov-on-don-production-facility-in-flames-following-ukrainian-drone-attack/",
+            "source_urls": [
+              "https://kyivindependent.com/volgograd-oil-refinery-rostov-on-don-production-facility-in-flames-following-ukrainian-drone-attack/",
+              "https://kyivindependent.com/volgograd-oil-refinery-rostov-on-don-production-facility-in-flames-following-ukrainian-drone-attack/",
+              "https://kyivindependent.com/mass-drone-attack-on-moscow-grounds-flights-at-regions-airports/",
+              "https://kyivindependent.com/mass-drone-attack-on-moscow-grounds-flights-at-regions-airports/",
+              "https://www.ouest-france.fr/europe/ukraine/guerre-en-ukraine-attaques-de-drones-contre-moscou-et-volgograd-role-des-europeens-en-question-le-point-sur-la-nuit-7e7b8000-de59-11f1-86b6-0a2fbb1d8ed9",
+              "https://www.ouest-france.fr/europe/ukraine/guerre-en-ukraine-attaques-de-drones-contre-moscou-et-volgograd-role-des-europeens-en-question-le-point-sur-la-nuit-7e7b8000-de59-11f1-86b6-0a2fbb1d8ed9",
+              "https://www.ouest-france.fr/europe/ukraine/guerre-en-ukraine-attaques-de-drones-contre-moscou-et-volgograd-role-des-europeens-en-question-le-point-sur-la-nuit-7e7b8000-de59-11f1-86b6-0a2fbb1d8ed9",
+              "https://www.independent.co.uk/news/world/europe/ukraine-russia-war-live-putin-zelensky-ballistic-missile-moscow-kyiv-b3083543.html"
+            ],
+            "observed_at": "2026-11-13T04:49:00Z"
+          },
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-192b1767",
+            "story_title": "US envoy says largest prisoner exchange being negotiated in Russia-Ukraine war",
+            "source": "chatgpt/chatgpt-rolling-0321.md",
+            "slot": "0321",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/kushner-says-us-working-toward-largest-prisoner-exchange-russias-war-ukraine-2026-11-13/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/kushner-says-us-working-toward-largest-prisoner-exchange-russias-war-ukraine-2026-11-13/",
+              "https://www.jpost.com/international/article-914791",
+              "https://www.jpost.com/international/article-914791",
+              "https://www.jpost.com/international/article-914791",
+              "https://www.jpost.com/international/article-914791"
+            ],
+            "observed_at": "2026-11-13T01:21:00Z"
+          },
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-1dd85b94",
+            "story_title": "Lead 3: Ukraine reports renewed systematic speed restrictions on Starshield (military Starlink) across the…",
+            "source": "grok/grok-rolling-0050.md",
+            "slot": "0050",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.politico.eu/article/starlink-slowed-down-for-ukraine-again/",
+            "source_urls": [
+              "https://www.politico.eu/article/starlink-slowed-down-for-ukraine-again/",
+              "https://www.politico.eu/article/starlink-slowed-down-for-ukraine-again/",
+              "https://www.politico.eu/article/starlink-slowed-down-for-ukraine-again/",
+              "https://www.cnbc.com/2026/11/12/starlink-starshield-ukraine-restrictions-spacex.html",
+              "https://www.cnbc.com/2026/11/12/starlink-starshield-ukraine-restrictions-spacex.html",
+              "https://www.cnbc.com/2026/11/12/starlink-starshield-ukraine-restrictions-spacex.html",
+              "https://www.cnbc.com/2026/11/12/starlink-starshield-ukraine-restrictions-spacex.html",
+              "https://www.euronews.com/2026/11/12/zelenskyy-starlink-again-facing-restrictions-in-ukraine-hampering-russian-drone-intercepti",
+              "https://www.euronews.com/2026/11/12/zelenskyy-starlink-again-facing-restrictions-in-ukraine-hampering-russian-drone-intercepti",
+              "https://www.euronews.com/2026/11/12/zelenskyy-starlink-again-facing-restrictions-in-ukraine-hampering-russian-drone-intercepti"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-4611fc44",
+            "story_title": "Lead 2: US envoys Kushner and Witkoff state that Russia and Ukraine have agreed to include European partners…",
+            "source": "grok/grok-rolling-0649.md",
+            "slot": "0649",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://x.com/jaredkushner/status/2121039333100486752",
+            "source_urls": [
+              "https://x.com/jaredkushner/status/2121039333100486752",
+              "https://x.com/jaredkushner/status/2121039333100486752",
+              "https://x.com/jaredkushner/status/2121039333100486752",
+              "https://x.com/jaredkushner/status/2121039333100486752",
+              "https://www.bbc.com/news/articles/cwrkgmymk55zo",
+              "https://www.dw.com/en/ukraine-peace-talks-us-envoys-meet-with-putin-at-kremlin/live-79925580",
+              "https://www.france24.com/en/europe/20261113-live-zelensky-and-kushner-confirm-that-europe-will-join-next-round-of-russia-ukraine-talks",
+              "https://www.france24.com/en/europe/20261113-live-zelensky-and-kushner-confirm-that-europe-will-join-next-round-of-russia-ukraine-talks",
+              "https://kyivindependent.com/volgograd-oil-refinery-rostov-on-don-production-facility-in-flames-following-ukrainian-drone-attack/"
+            ],
+            "observed_at": "2026-11-13T04:49:00Z"
+          },
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-77dc0167",
+            "story_title": "Russia, Ukraine finalize terms for largest prisoner-of-war exchange – Escalation, Policy, Hearth",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://en.interfax.com.ua/news/general/1235881.html",
+            "source_urls": [
+              "https://en.interfax.com.ua/news/general/1235881.html",
+              "https://apnews.com/article/russia-ukraine-war-talks-kushner-witkoff-7c8d1024302e0c6ad8be064eec852a64",
+              "https://apnews.com/article/russia-ukraine-war-talks-kushner-witkoff-7c8d1024302e0c6ad8be064eec852a64",
+              "https://apnews.com/article/russia-ukraine-war-talks-kushner-witkoff-7c8d1024302e0c6ad8be064eec852a64",
+              "https://fact-news.com.ua/news/2026-11-13/47194/",
+              "https://fact-news.com.ua/news/2026-11-13/47194/",
+              "https://fact-news.com.ua/news/2026-11-13/47194/"
+            ],
+            "observed_at": "2026-11-13T07:17:00Z"
+          },
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-aca0e04c",
+            "story_title": "Sweden’s blocs in urgent talks as election deadlock looms",
+            "source": "chatgpt/chatgpt-rolling-0321.md",
+            "slot": "0321",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+            "source_urls": [
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/",
+              "https://www.reuters.com/world/europe/sweden-deadlock-centre-party-support-2026-11-13/"
+            ],
+            "observed_at": "2026-11-13T01:21:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-9c025283",
+            "story_title": "Israeli airstrike on Nasser Hospital in Khan Younis kills at least six, including surgeon Dr. Rizq/Rizk Abu…",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "Gaza",
+              "Khan Younis"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/ckzd9p7e4eqeo",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/ckzd9p7e4eqeo",
+              "https://www.bbc.co.uk/news/articles/ckzd9p7e4eqeo",
+              "https://www.bbc.co.uk/news/articles/ckzd9p7e4eqeo",
+              "https://www.bbc.co.uk/news/articles/ckzd9p7e4eqeo",
+              "https://abcnews.com/International/israeli-airstrike-gaza-hospital-kills-6-people-hamas/story?id=138073754",
+              "https://abcnews.com/International/israeli-airstrike-gaza-hospital-kills-6-people-hamas/story?id=138073754",
+              "https://abcnews.com/International/israeli-airstrike-gaza-hospital-kills-6-people-hamas/story?id=138073754",
+              "https://abcnews.com/International/israeli-airstrike-gaza-hospital-kills-6-people-hamas/story?id=138073754",
+              "https://www.cnn.com/2026/11/12/middleeast/israeli-strike-gaza-hospital-kills-six-intl",
+              "https://www.cnn.com/2026/11/12/middleeast/israeli-strike-gaza-hospital-kills-six-intl",
+              "https://www.aljazeera.com/news/2026/11/11/israeli-strikes-hit-tent-camp-as-five-killed-in-gaza"
+            ],
+            "observed_at": "2026-11-12T16:49:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-dbf2fc20",
+            "story_title": "Yemen’s Houthis strike Saudi pipeline pump and Riyadh; Saudi intercepts drones",
+            "source": "chatgpt/chatgpt-rolling-0321.md",
+            "slot": "0321",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea",
+              "Bab el-Mandeb"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-pumping-station-saudi-arabias-east-west-oil-2026-11-12/",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779",
+              "https://www.jpost.com/middle-east/article-914779"
+            ],
+            "observed_at": "2026-11-13T01:21:00Z"
+          },
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-f3b50fdd",
+            "story_title": "UN renews sanctions on Yemen’s Houthis – Policy, Commodities, Hearth",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://gulfnews.com/world/mena/un-security-council-renews-sanctions-on-yemens-houthis-1.500745762",
+            "source_urls": [
+              "https://gulfnews.com/world/mena/un-security-council-renews-sanctions-on-yemens-houthis-1.500745762",
+              "https://gulfnews.com/world/mena/un-security-council-renews-sanctions-on-yemens-houthis-1.500745762",
+              "https://gulfnews.com/world/mena/un-security-council-renews-sanctions-on-yemens-houthis-1.500745762",
+              "https://gulfnews.com/world/mena/un-security-council-renews-sanctions-on-yemens-houthis-1.500745762",
+              "https://gulfnews.com/world/mena/un-security-council-renews-sanctions-on-yemens-houthis-1.500745762",
+              "https://www.byteseu.com/2517818/",
+              "https://www.byteseu.com/2517818/",
+              "https://www.byteseu.com/2517818/",
+              "https://www.byteseu.com/2517818/",
+              "https://www.dawn.com/news/2044254",
+              "https://www.dawn.com/news/2044254"
+            ],
+            "observed_at": "2026-11-13T07:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-11 and drew no qualifying story today",
+        "last_open_edition": "2026-11-11",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-11",
+            "story_id": "s-104bca09",
+            "story_title": "Lead 1: U.S. House votes 211-204 to refer Massie Hegseth impeachment articles to Judiciary Committee…",
+            "source": "grok/grok-rolling-0044.md",
+            "slot": "0044",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+            "source_urls": [
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://breakingdefense.com/2026/11/house-opts-to-stall-hegseth-impeachment-vote-sending-resolution-to-judiciary-committee/",
+              "https://breakingdefense.com/2026/11/house-opts-to-stall-hegseth-impeachment-vote-sending-resolution-to-judiciary-committee/",
+              "https://www.foxnews.com/politics/house-gop-leaders-block-massie-hegseth-impeachment-push",
+              "https://www.reuters.com/world/us/us-house-votes-derail-impeachment-defense-secretary-hegseth-2026-11-10/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-11",
+            "story_id": "s-6f8ff935",
+            "story_title": "Hegseth Impeachment Effort",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+            "source_urls": [
+              "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+              "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026"
+            ],
+            "observed_at": "2026-11-10T19:14:00Z"
+          }
+        ]
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-e06394d3",
+            "story_title": "Lead 2: Taiwan security officials describe early-November unannounced Chinese military and coast-guard…",
+            "source": "grok/grok-rolling-0949.md",
+            "slot": "0949",
+            "matched": [
+              "Taiwan",
+              "Taipei",
+              "Taiwan Strait"
+            ],
+            "source_url": "https://www.japantimes.co.jp/news/2026/11/13/asia-pacific/politics/china-silent-intimidation/",
+            "source_urls": [
+              "https://www.japantimes.co.jp/news/2026/11/13/asia-pacific/politics/china-silent-intimidation/",
+              "https://www.japantimes.co.jp/news/2026/11/13/asia-pacific/politics/china-silent-intimidation/",
+              "https://www.reuters.com/world/china/china-stages-unannounced-pacific-drills-silent-intimidation-taiwan-officials-say-2026-11-13/",
+              "https://www.reuters.com/world/china/china-stages-unannounced-pacific-drills-silent-intimidation-taiwan-officials-say-2026-11-13/",
+              "https://www.reuters.com/world/china/china-stages-unannounced-pacific-drills-silent-intimidation-taiwan-officials-say-2026-11-13/",
+              "https://www.reuters.com/world/china/china-stages-unannounced-pacific-drills-silent-intimidation-taiwan-officials-say-2026-11-13/",
+              "https://www.reuters.com/world/china/china-stages-unannounced-pacific-drills-silent-intimidation-taiwan-officials-say-2026-11-13/"
+            ],
+            "observed_at": "2026-11-13T07:49:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-13",
+            "story_id": "s-539048c1",
+            "story_title": "Lead 1: US reopens secretive talks with Myanmar junta (accused of genocide) as Trump seeks rare earths ahead…",
+            "source": "grok/grok-rolling-0342.md",
+            "slot": "0342",
+            "matched": [
+              "Myanmar",
+              "Naypyidaw"
+            ],
+            "source_url": "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+            "source_urls": [
+              "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+              "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+              "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+              "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+              "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+              "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+              "https://www.abc.net.au/news/2026-11-13/trump-quest-for-rare-earths-brings-us-closer-to-myanmar-regime/107376926",
+              "https://international.astroawani.com/politics-news/us-strategy-links-myanmar-peace-talks-rare-earth-access",
+              "https://international.astroawani.com/politics-news/us-strategy-links-myanmar-peace-talks-rare-earth-access",
+              "https://international.astroawani.com/politics-news/us-strategy-links-myanmar-peace-talks-rare-earth-access",
+              "https://international.astroawani.com/politics-news/us-strategy-links-myanmar-peace-talks-rare-earth-access",
+              "https://mining.com.au/us-opens-myanmar-talks-discusses-rare-earths/",
+              "https://mining.com.au/us-opens-myanmar-talks-discusses-rare-earths/",
+              "https://mining.com.au/us-opens-myanmar-talks-discusses-rare-earths/",
+              "https://mining.com.au/us-opens-myanmar-talks-discusses-rare-earths/",
+              "https://responsiblestatecraft.org/trump-myanmar/"
+            ],
+            "observed_at": "2026-11-13T01:42:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "easing",
+    "current": 0.2308,
+    "previous": 0.4615,
+    "previous_edition": "2026-11-12",
+    "change": -0.2307
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
