@@ -30,8 +30,8 @@ import { buildBylinesTsv } from './build-bylines-tsv.mjs';
 import { CORPUS_PROVENANCE_FILE, hostAssertedProvenance } from './edition-provenance.mjs';
 import { PUBLIC_CONTENT_PATHS, isPublicContentPath } from './public-content.mjs';
 import { releaseClock } from './release-time.mjs';
-import { resolveStagedEdition } from './staged-edition.mjs';
-export { artifactDigest, resolveStagedEdition } from './staged-edition.mjs';
+import { pruneEarlierEditions, resolveStagedEdition } from './staged-edition.mjs';
+export { artifactDigest, pruneEarlierEditions, resolveStagedEdition } from './staged-edition.mjs';
 export { CORPUS_PROVENANCE_FILE, CORPUS_PROVENANCE_VERSION, DEFAULT_LANDED_RECORD, LANDED_VERSION, editionCorpusClaim, hostAssertedProvenance, landedCorpus } from './edition-provenance.mjs';
 
 // One ed25519 deploy key per repository, reached through an SSH host alias so
@@ -382,7 +382,8 @@ export async function publishEditionBranch(options, url = remoteUrl(EDITION_PUSH
 }
 
 export async function main(argv = process.argv.slice(2)) {
-  const result = await publishEditionBranch(parseArguments(argv));
+  const options = parseArguments(argv), result = await publishEditionBranch(options);
+  if (!options.dryRun && (result.pushed || result.already_published)) await pruneEarlierEditions(options.staging, result.edition).catch((error) => console.warn(`staging prune skipped: ${error.message}`));
   // A positive signal, not an exit code: the branch and commit are what a
   // person needs to open the pull request, and their absence is the failure.
   console.log(JSON.stringify(result, undefined, 2));
