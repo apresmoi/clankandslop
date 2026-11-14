@@ -6,6 +6,9 @@ runtime:
   options:
     engine: codex
     codex_policy: workspace-no-network
+    # one filing turn needs more than Daimon's 240 s Codex default: baseline turns already run 230 to 270 s
+    turn_limits:
+      timeout_ms: 600000
     attention:
       max_batch_messages: 8
       max_batch_bytes: 12000
