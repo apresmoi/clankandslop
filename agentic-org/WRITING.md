@@ -4,7 +4,9 @@ This is the editorial bar for every piece. Reporters write to it, Brass
 commissions against it, Spike reviews against it. Each rule lives here once.
 
 Our voice is skeptical of power, interested in how things work, and humane about
-consequences. Lead with the news. Let wit earn its place through a telling fact.
+consequences. Lead with the news. Let wit earn its place through a telling fact,
+never an adjective, an aside or a headline with a wry tail, and never on a story
+of death, injury or children.
 Write for a reader who reads each paragraph once. Shared standards never
 prescribe conclusions: desks may reach different judgments from the same
 evidence, and fact, inference, forecast and opinion stay distinct.
@@ -77,7 +79,8 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
 ## The reporting bar
 
 - **Lead with the news.** Actor, action and consequential detail first; context
-  after. Never open on what kind of thing happened, what it means or what the
+  after. The news is the most telling verified fact in the file, not the first
+  row: story order is the reporter's choice, and row order is not an order. Never open on what kind of thing happened, what it means or what the
   desk noticed. The first word becomes the dropcap, so it is never an
   abbreviation with a full stop or a spelled-out acronym: "Judge Talwani of the
   U.S. District Court", not "U.S. District Judge Talwani".
@@ -87,8 +90,9 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
   three-paragraph piece. More length needs more reporting, never comparison,
   gap or consequence paragraphs. In an analysis, the desk's reading and the
   next test are the only paragraphs not built on new facts.
-- **One fact, one paragraph.** Four outlets reporting one fact is one paragraph
-  with four citations. Never restate a fact in other words.
+- **One subject, one paragraph; each fact once.** Rows about the same thing
+  share a paragraph. Four outlets reporting one fact is one sentence with four
+  citations. Never restate a fact in other words.
 - **No working on the page.** No arithmetic, rounding or date checks that
   reconcile one outlet with another. If sources disagree about a fact a reader
   needs, say so in one plain sentence.
@@ -120,8 +124,10 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
   stations", "go-fast vessel") into what physically happened.
 - **End within the evidence.** The last paragraph follows from what the piece
   established, with no flourish that adds a meaning the reporting did not
-  develop. A brief closes on a fact still true next week (a date, a number, a
-  name), never on what would settle the question or a recap of method.
+  develop. A brief closes on a cited fact the reporter chose, in one sentence,
+  with the fact it answers close by: the last thing that happened, the duty or
+  deadline now in force, the route still open, or who is affected. Never the row
+  that was left over, what would settle the question or a recap of method.
 
 ## Names and meaning
 
@@ -136,7 +142,12 @@ them.** This is the most common reason a first draft goes back.
   the source gives the name.
 - A second mention uses the surname alone; a source that names only a role
   ("a ministry spokesman") is quoted with that role, never upgraded or dropped.
-- Say which outlet obtained a statement: "told Reuters".
+  A source that gives only a name is quoted with exactly that name: never add a
+  first name, title or office it does not give.
+- Name the outlet when a claim is single-source, disputed or unchecked, or when
+  who obtained it is part of the news ("told Reuters"). A verified, undisputed
+  fact is stated flat; the evidence box carries its source. Speakers are always
+  named.
 
 Anonymity is right only when the source itself withholds the name; then say so
 ("a security official who was not named"). When the source gives neither name
@@ -196,6 +207,9 @@ the same bar.
   never in quotation marks. It never carries the central claim alone. If its
   fragment starts "Unchecked pointer to a passage…", paraphrase the lead's claim
   and never print the pointer words.
+- A count or total a reader can make from figures or items the rows print is
+  supported (two vice-presidents the rows each name are two). Arithmetic that
+  reconciles one source with another stays off the page.
 - A claim is supported only by what the captured sentence says. A sensor's
   summary around an excerpt is not evidence: if a name, number or date appears
   only there, request the sentence or leave the claim out.
