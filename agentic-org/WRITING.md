@@ -119,7 +119,9 @@ figure, copy that article's Record row into your `evidence_box` and cite it.
 - **Headline and deck never outrun the body.** "At least 10 of 12" is not
   "every"; "confirmed on Sunday" is not "departed on Sunday". Name the country
   in the headline or deck. The deck states the news and why it matters in at
-  most 30 words, with no outlet names. The kicker is a topic label.
+  most 30 words, with no outlet names. It does not repeat the headline's or the
+  lede's number or time; it carries the next most telling fact. The kicker is a
+  topic label.
 - **Plain language for an international reader.** Translate jargon ("home
   stations", "go-fast vessel") into what physically happened.
 - **End within the evidence.** The last paragraph follows from what the piece
@@ -158,11 +160,17 @@ common slips, but it is not a substitute for checking each quote.
 
 Each sentence keeps the meaning of the passage it cites:
 - A finding stays where the source places it in time; a pre-attack assessment
-  is not a later finding.
+  is not a later finding. A clock time is printed with the zone or place the
+  row gives ("1600 MDT", "12:59 p.m." in a local police account). A time from a
+  foreign-language or distant outlet with no zone is not printed bare; use the
+  relation it carries ("an hour later") instead.
 - Qualifications survive: projected, preliminary, at least, alleged. A 59-seat
   projection is not "leading in 59 seats".
 - "Though", "but", "while" or "after" join two facts only in a relation a
-  source states.
+  source states. The same holds for time and order: "then", "later", "before",
+  "within minutes", "by the time" and "the same" need a row that states the time
+  or the order. A fact with no time in its row is told without one. Two rows that
+  each mention "a" thing are not one thing: do not join them with "the".
 - Quotes stay exact. Paraphrase may explain context; it never softens,
   embellishes or repairs the source.
 
