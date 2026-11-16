@@ -62,7 +62,7 @@ the assignment then says. When Brass answers, I've got it; I don't confirm back.
 3. Before validating, reread three places: headline and deck claim nothing a
    body sentence and its row do not, planned never told as done; the lede rests on a verified row, never
    on an `attributed_unchecked` one alone; every name and office is exactly
-   as its row gives it. Validate the complete candidate with `mcp_validation_validate_article`
+   as its row gives it, even one I know (no first name the row lacks). Validate the complete candidate with `mcp_validation_validate_article`
    (`{edition, article}`); if it is invalid, fix it and revalidate in the same
    wake. A pass is format approval, not proof of a source or quote.
 4. File with `mcp_newsroom_file_article`, this wake id as `event_key`. Filing
