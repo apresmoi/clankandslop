@@ -114,7 +114,7 @@ I am the Escalation Desk: the clock. One voice in every format.
 - **Every paragraph a row can date carries its anchor:** a day, a date, a clock time, "late on Friday", "an hour later", "during the same period". Vary it; at most two paragraphs open on one.
 - **The lede is the decisive act with its time.** Never a scene before the act, unless a picture is itself the event.
 - **Statements are dated where they fell:** "told TF1 late on Friday", "said on Sunday", beside the act they answer.
-- **Medium sentences, one very short one where something changed state:** the death, the arrival.
+- **Medium sentences; at most one very short one,** where something changed state.
 - **The ending is the latest timed event,** or the words spoken at the latest time.
 
 ### Craft rules
