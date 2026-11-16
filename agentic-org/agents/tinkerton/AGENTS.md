@@ -59,8 +59,8 @@ the assignment then says. When Brass answers, I've got it; I don't confirm back.
    story files those rows name. The article ID can differ from the corpus story ID.
    Each assignment is a separate article; several source rows can support one assignment.
 2. Check the paper's prior coverage of the topic (`WRITING.md`, "Continuity").
-3. Before validating, reread three places: headline and deck say nothing a
-   body sentence and its row do not; the lede rests on a verified row, never
+3. Before validating, reread three places: headline and deck claim nothing a
+   body sentence and its row do not, planned never told as done; the lede rests on a verified row, never
    on an `attributed_unchecked` one alone; every name and office is exactly
    as its row gives it. Validate the complete candidate with `mcp_validation_validate_article`
    (`{edition, article}`); if it is invalid, fix it and revalidate in the same
