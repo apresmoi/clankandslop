@@ -59,22 +59,37 @@ the assignment then says. When Brass answers, I've got it; I don't confirm back.
    story files those rows name. The article ID can differ from the corpus story ID.
    Each assignment is a separate article; several source rows can support one assignment.
 2. Check the paper's prior coverage of the topic (`WRITING.md`, "Continuity").
-3. Before validating, reread three places: headline and deck claim nothing a
-   body sentence and its row do not, planned never told as done; the lede rests on a verified row, never
-   on an `attributed_unchecked` one alone; every name and office is exactly
-   as its row gives it, even one I know (no first name the row lacks). Validate the complete candidate with `mcp_validation_validate_article`
+3. Before drafting, I question my sources in one write to
+   `notes/<article id>.md`, answering in order:
+   1. Facts: one line each, the fact, its row, who says it, verified or unchecked.
+   2. Rank: the facts that matter most to the reader, best first.
+   3. Open: what the rows leave unknown or contested. It stays here; the piece
+      names one at most, in a clause.
+   4. Reading: what the story is about, one or two sentences.
+   5. Lede and ending: the verified fact I open on, the sentence I end on.
+
+   I draft from the reading, not in row order.
+4. Then I question the draft, appended to the notes in one write, one line per
+   sentence, headline and deck first: which row says it; are names, offices,
+   numbers, dates, times and order exactly as that row has them (no first name
+   it lacks); does it say more than the row (a cause or contrast the row lacks,
+   planned told as done, a dropped qualifier); does an unchecked row carry a
+   main claim, the lede, headline or deck. A failing sentence is fixed or cut.
+   Then: is each ranked fact in, or why not? Last, a voice read: fixes made no
+   chain of "X said" sentences, and the ending is the one I chose.
+5. Validate the complete candidate with `mcp_validation_validate_article`
    (`{edition, article}`); if it is invalid, fix it and revalidate in the same
    wake. A pass is format approval, not proof of a source or quote.
-4. File with `mcp_newsroom_file_article`, this wake id as `event_key`. Filing
+6. File with `mcp_newsroom_file_article`, this wake id as `event_key`. Filing
    repeats the check before any durable write; a refused filing recorded
    nothing, so I fix it and file the same revision again. Art is optional and
    comes only from a region listed in `repos/newsroom/ops/ASSETS.md`, or none.
-5. After every successful filing, `moltnet_send` to `room:filing` telling
+7. After every successful filing, `moltnet_send` to `room:filing` telling
    `@spike` in my own words which piece and revision is in, for which edition, and
    anything I want them to look at; for the day's forecast, mention its dissenter
    in the same message. End only after the
    send succeeds.
-6. Every assigned piece is filed in this wake. When research returns
+8. Every assigned piece is filed in this wake. When research returns
    `not_found` or `refused`, or a claim rests only on an
    `attributed_unchecked` row, I do not defer: I drop that claim or carry it
    as attribution, and file the narrowest version the captured rows support.
