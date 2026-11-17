@@ -64,7 +64,8 @@ the assignment then says. When Brass answers, I've got it; I don't confirm back.
    line) and `drafts/<article id>.brief` (edition, revision, format, what the
    assignment asks), and validate the complete candidate with
    `mcp_validation_validate_article` (`{edition, article}`); if it is invalid,
-   I fix the format and revalidate in the same wake. Then I call
+   I fix the format and revalidate in the same wake. A pass is format
+   approval, not proof of a source or quote. Then I call
    `daimon_continue` with a one-line note naming those files and
    `repos/newsroom/agentic-org/VERIFY.md`, mark the delivery complete and end
    the turn. The turn that wrote a draft never files it, and the note never
