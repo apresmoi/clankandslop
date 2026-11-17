@@ -71,9 +71,9 @@ the assignment then says. When Brass answers, I've got it; I don't confirm back.
    5. Lede and ending: the verified fact I open on, the sentence I end on.
 
    I draft from the reading, not in row order, and store the draft unfiled.
-4. Only once the draft exists, I question it in a second write to the notes,
-   one line per sentence opening with its first words, headline and deck
-   first: which row says it; are names, offices, numbers, dates, times and
+4. Only after the call that stores the draft, never in the same write as the
+   source notes, I question the draft in a second write to the notes, one line
+   per sentence opening with its first words, headline and deck first: which row says it; are names, offices, numbers, dates, times and
    order exactly as that row has them (no first name it lacks); does it say
    more than the row (a cause or contrast the row lacks, planned told as done,
    a dropped qualifier); does an unchecked row carry a main claim, the lede,
