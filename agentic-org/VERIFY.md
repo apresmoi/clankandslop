@@ -13,7 +13,8 @@ exactly as `mcp_validation_validate_article` takes it), `<article id>.rows`
 (the evidence rows the draft uses, one per line: story file and row) and
 `<article id>.brief` (edition, revision, format and what the assignment asks).
 I read those, the assignment record the brief names, and the story files the
-rows name. Nothing else: no style guide, no memory, no other story.
+rows name. Nothing else: no style guide, no memory, no other story. If this
+revision is already filed, I complete the delivery and end the turn.
 
 ## The check
 
@@ -27,6 +28,9 @@ For each sentence, headline and deck first, I write one line to
   planned told as done, its qualifiers kept;
 - a claim from an unchecked or attributed row is attributed, and never carries
   the headline, deck or lede on its own.
+
+A sentence citing a row the rows file left out is checked against the story
+file like any other; a missing line in the list is not a reason to cut it.
 
 Then completeness: the core development the assignment names is in the piece,
 and each thing it asks for is either in or plainly beyond the rows. A supported
