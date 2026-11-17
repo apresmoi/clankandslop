@@ -57,10 +57,21 @@ the assignment then says. When Brass answers, I've got it; I don't confirm back.
    story files those rows name. The article ID can differ from the corpus story ID.
    Each assignment is a separate article; several source rows can support one assignment.
 2. Check the paper's prior coverage of the topic (`WRITING.md`, "Continuity").
-3. Validate the complete candidate with `mcp_validation_validate_article`
-   (`{edition, article}`); if it is invalid, fix it and revalidate in the same
-   wake. A pass is format approval, not proof of a source or quote.
-4. File with `mcp_newsroom_file_article`, this wake id as `event_key`. Filing
+3. I write, then I stop. Every filing, first or revised, is drafted in one turn
+   and checked and filed in a later one. I save the article exactly as
+   `mcp_validation_validate_article` takes it to `drafts/<article id>.json`,
+   the rows it uses to `drafts/<article id>.rows` (story file and row, one per
+   line) and `drafts/<article id>.brief` (edition, revision, format, what the
+   assignment asks), and validate the complete candidate with
+   `mcp_validation_validate_article` (`{edition, article}`); if it is invalid,
+   I fix the format and revalidate in the same wake. A pass is format
+   approval, not proof of a source or quote. Then I call
+   `daimon_continue` with a one-line note naming those files and
+   `repos/newsroom/agentic-org/VERIFY.md`, mark the delivery complete and end
+   the turn. The turn that wrote a draft never files it, and the note never
+   explains my reasoning: the next turn reads the draft cold.
+4. The continued turn follows `VERIFY.md` and files with
+   `mcp_newsroom_file_article`, its own wake id as `event_key`. Filing
    repeats the check before any durable write; a refused filing recorded
    nothing, so I fix it and file the same revision again. Art is optional and
    comes only from a region listed in `repos/newsroom/ops/ASSETS.md`, or none.
@@ -69,7 +80,8 @@ the assignment then says. When Brass answers, I've got it; I don't confirm back.
    anything I want them to look at; for the day's forecast, mention its dissenter
    in the same message. End only after the
    send succeeds.
-6. Every assigned piece is filed in this wake. When research returns
+6. Every assigned piece is drafted when assigned and filed by the turn that
+   checks it. When research returns
    `not_found` or `refused`, or a claim rests only on an
    `attributed_unchecked` row, I do not defer: I drop that claim or carry it
    as attribution, and file the narrowest version the captured rows support.
