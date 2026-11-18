@@ -1,0 +1,1176 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-18",
+  "generated_at": "2026-11-18T08:51:20Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.2308,
+    "numerator": 3,
+    "denominator": 13,
+    "triggering": 2,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 92.14,
+        "observed_at": "2026-11-11",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "92.14 >= 93.44 is false"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 89.62,
+        "observed_at": "2026-11-11",
+        "stale_days": 7,
+        "contributes": 1,
+        "reason": "89.62 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 5.937,
+        "observed_at": "2026-11-16",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "5.937 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3,
+        "observed_at": "2026-11-11",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "3 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 22.91,
+        "observed_at": "2026-11-16",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "22.91 >= 22.96 is false"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "not_triggering",
+        "observed": 3.34,
+        "observed_at": "2026-11-16",
+        "stale_days": 2,
+        "contributes": 0,
+        "reason": "3.34 >= 3.388 is false"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 122.6503,
+        "observed_at": "2026-11-13",
+        "stale_days": 5,
+        "contributes": 0,
+        "reason": "122.6503 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-18T08:51:19Z",
+        "http_status": 200,
+        "bytes": 170465,
+        "sha256": "24c21dcefd22454f23390f58e8472c6b8a3cdea283d6cc5b7cfade9fede1d985",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-18T08:51:19Z",
+        "http_status": 200,
+        "bytes": 176237,
+        "sha256": "2bab6974f96b57b1fe1bdfe6fd2edd44ae041dc135060dddc479ef1994a02bc3",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-18T08:51:19Z",
+        "http_status": 200,
+        "bytes": 29010,
+        "sha256": "99cd47541f8a6f7acb666581fdcaa10f5317ff6aa5d87aefe24a513b3eca45c5",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-18T08:51:20Z",
+        "http_status": 200,
+        "bytes": 116489,
+        "sha256": "7fc71f76d90130f07537a142e6bdc3c633b90ac03ea954f6438ed981026bac41",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-18T08:51:20Z",
+        "http_status": 200,
+        "bytes": 161986,
+        "sha256": "f446df921245c3998246c77c05218dd3d59db15c2dc6b24f14ff94d00ffb9653",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-18T08:51:20Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "3626f2ef6c0e036bc716cc2dfeb963f9d69b0ab613ff20e8fc4b58377296aef4",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-18T08:51:20Z",
+        "http_status": 200,
+        "bytes": 105121,
+        "sha256": "542aab261636608b3fb59fc913b8ad9d9767f15c551637b76ee16391d522f5d3",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 56,
+    "open_conflicts": 3,
+    "watch": 5,
+    "dormant": 5,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 9,
+        "evidence": [
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-050e3bbf",
+            "story_title": "Lead 2: Iran claims third recent drone strike on US radar in Bahrain; Bahrain and US say intercepted with no…",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "IRGC"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.euronews.com/2026/11/17/iran-claims-drone-attack-on-us-radar-system-at-sheikh-isa-air-base-in-bahrain",
+              "https://www.euronews.com/2026/11/17/iran-claims-drone-attack-on-us-radar-system-at-sheikh-isa-air-base-in-bahrain",
+              "https://www.euronews.com/2026/11/17/iran-claims-drone-attack-on-us-radar-system-at-sheikh-isa-air-base-in-bahrain",
+              "https://www.euronews.com/2026/11/17/iran-claims-drone-attack-on-us-radar-system-at-sheikh-isa-air-base-in-bahrain"
+            ],
+            "observed_at": "2026-11-17T16:49:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-18edafb9",
+            "story_title": "Tara Gas: India confirms missing seafarer and injuries after repeated tanker attack",
+            "source": "chatgpt/chatgpt-rolling-2117.md",
+            "slot": "2117",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://ddindia.co.in/2026/11/india-condemns-attack-on-lpg-tanker-in-strait-of-hormuz-one-indian-sailor-missing/",
+            "source_urls": [
+              "https://ddindia.co.in/2026/11/india-condemns-attack-on-lpg-tanker-in-strait-of-hormuz-one-indian-sailor-missing/",
+              "https://ddindia.co.in/2026/11/india-condemns-attack-on-lpg-tanker-in-strait-of-hormuz-one-indian-sailor-missing/",
+              "https://ddindia.co.in/2026/11/india-condemns-attack-on-lpg-tanker-in-strait-of-hormuz-one-indian-sailor-missing/",
+              "https://gcaptain.com/second-strike-on-lpg-tanker-in-strait-of-hormuz-leaves-one-missing-two-injured/",
+              "https://gcaptain.com/second-strike-on-lpg-tanker-in-strait-of-hormuz-leaves-one-missing-two-injured/",
+              "https://gcaptain.com/second-strike-on-lpg-tanker-in-strait-of-hormuz-leaves-one-missing-two-injured/",
+              "https://gulfnews.com/world/gulf/oman/oman-evacuates-24-crew-members-from-tanker-after-fire-off-musandam-1.500751134",
+              "https://gulfnews.com/world/gulf/oman/oman-evacuates-24-crew-members-from-tanker-after-fire-off-musandam-1.500751134",
+              "https://gulfnews.com/world/gulf/oman/oman-evacuates-24-crew-members-from-tanker-after-fire-off-musandam-1.500751134",
+              "https://www.arabnews.com/middle-east/crew-abandons-gas-tanker-off-oman-after-being-hit-by-projectile-sources-say-3012536",
+              "https://www.arabnews.com/middle-east/crew-abandons-gas-tanker-off-oman-after-being-hit-by-projectile-sources-say-3012536",
+              "https://www.arabnews.com/middle-east/crew-abandons-gas-tanker-off-oman-after-being-hit-by-projectile-sources-say-3012536"
+            ],
+            "observed_at": "2026-11-17T19:17:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-1be42f69",
+            "story_title": "Germany agrees to electricity-tax relief and a temporary fuel-price cap",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.tagesschau.de/inland/innenpolitik/eilmeldung-koalitionsausschuss-einigung-100.html",
+            "source_urls": [
+              "https://www.tagesschau.de/inland/innenpolitik/eilmeldung-koalitionsausschuss-einigung-100.html",
+              "https://www.tagesschau.de/inland/innenpolitik/eilmeldung-koalitionsausschuss-einigung-100.html",
+              "https://www.tagesschau.de/inland/innenpolitik/eilmeldung-koalitionsausschuss-einigung-100.html",
+              "https://www.zdfheute.de/politik/stromsteuer-senkung-beschlossen-100.html",
+              "https://www.zdfheute.de/politik/stromsteuer-senkung-beschlossen-100.html",
+              "https://www.t-online.de/nachrichten/deutschland/innenpolitik/id_101534016/spritpreis-an-der-tankstelle-benzin-diesel-und-co-ab-januar-gedeckelt.html",
+              "https://www.t-online.de/nachrichten/deutschland/innenpolitik/id_101534016/spritpreis-an-der-tankstelle-benzin-diesel-und-co-ab-januar-gedeckelt.html",
+              "https://www.cdu.de/aktuelles/cdu-deutschlands/merz-bekraeftigt-gemeinsamen-kurs-von-cdu-und-csu/",
+              "https://www.cdu.de/aktuelles/cdu-deutschlands/merz-bekraeftigt-gemeinsamen-kurs-von-cdu-und-csu/",
+              "https://www.cdu.de/aktuelles/cdu-deutschlands/merz-bekraeftigt-gemeinsamen-kurs-von-cdu-und-csu/"
+            ],
+            "observed_at": "2026-11-18T07:17:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-219015c0",
+            "story_title": "Lead 3: Iran’s third drone attack on U.S. radar in Bahrain intercepted with no damage or casualties",
+            "source": "grok/grok-rolling-2146.md",
+            "slot": "2146",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.indiatoday.in/world/story/iran-drone-attack-on-bahrain-targeting-us-radar-intercepted-without-damage-3040837-2026-11-17",
+            "source_urls": [
+              "https://www.indiatoday.in/world/story/iran-drone-attack-on-bahrain-targeting-us-radar-intercepted-without-damage-3040837-2026-11-17",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors"
+            ],
+            "observed_at": "2026-11-17T19:46:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-3f39acd8",
+            "story_title": "Bahrain reports fresh Iranian interceptions; Kuwait engages unidentified hostile drones",
+            "source": "chatgpt/chatgpt-rolling-0321.md",
+            "slot": "0321",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+              "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+              "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+              "https://www.arabnews.com/middle-east/kuwait-bahrain-fend-off-iranian-aerial-attacks-as-coalition-hits-houthi-military-sites-3012614",
+              "https://www.arabnews.com/middle-east/kuwait-bahrain-fend-off-iranian-aerial-attacks-as-coalition-hits-houthi-military-sites-3012614",
+              "https://www.arabnews.com/middle-east/kuwait-bahrain-fend-off-iranian-aerial-attacks-as-coalition-hits-houthi-military-sites-3012614",
+              "https://www.aljazeera.com/news/liveblog/2026/11/18/iran-war-live-kuwait-says-intercepting-hostile-drone-attacks"
+            ],
+            "observed_at": "2026-11-18T01:21:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-4e5c84c8",
+            "story_title": "U.S. military accounts identify a missile-launch site targeted on Iran's Qeshm Island",
+            "source": "chatgpt/chatgpt-rolling-2117.md",
+            "slot": "2117",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.iranintl.com/en/202611177708",
+            "source_urls": [
+              "https://www.iranintl.com/en/202611177708",
+              "https://www.iranintl.com/en/202611177708",
+              "https://www.iranintl.com/en/202611177708",
+              "https://www.aa.com.tr/en/middle-east/iran-says-us-military-struck-several-locations-in-area-of-qeshm-island/4128214",
+              "https://www.aa.com.tr/en/middle-east/iran-says-us-military-struck-several-locations-in-area-of-qeshm-island/4128214",
+              "https://www.aa.com.tr/en/middle-east/iran-says-us-military-struck-several-locations-in-area-of-qeshm-island/4128214",
+              "https://www.arabnews.com/middle-east/us-warplanes-struck-iran-missile-site-on-qeshm-island-us-official-3012499",
+              "https://www.arabnews.com/middle-east/us-warplanes-struck-iran-missile-site-on-qeshm-island-us-official-3012499",
+              "https://www.arabnews.com/middle-east/us-warplanes-struck-iran-missile-site-on-qeshm-island-us-official-3012499",
+              "https://apnews.com/article/e1fd6fce7b854d0d6d5e97a53138b47b",
+              "https://apnews.com/article/e1fd6fce7b854d0d6d5e97a53138b47b",
+              "https://apnews.com/article/e1fd6fce7b854d0d6d5e97a53138b47b"
+            ],
+            "observed_at": "2026-11-17T19:17:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-b377fbdc",
+            "story_title": "Lead 2: Iran’s third drone strike on Bahrain US radar (Sheikh Isa) intercepted; material update to 16 Nov…",
+            "source": "grok/grok-rolling-1550.md",
+            "slot": "1550",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.khaleejtimes.com/world/mena/iran-drone-attacks-bahrain-middle-east-war-ramps-up",
+            "source_urls": [
+              "https://www.khaleejtimes.com/world/mena/iran-drone-attacks-bahrain-middle-east-war-ramps-up",
+              "https://www.khaleejtimes.com/world/mena/iran-drone-attacks-bahrain-middle-east-war-ramps-up",
+              "https://www.khaleejtimes.com/world/mena/iran-drone-attacks-bahrain-middle-east-war-ramps-up",
+              "https://www.khaleejtimes.com/world/mena/iran-drone-attacks-bahrain-middle-east-war-ramps-up",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.aljazeera.com/news/2026/11/17/bahrain-thwarts-drone-attack-iran-claims-targeting-us-military-radar",
+              "https://www.indiatoday.in/world/story/iran-drone-attack-on-bahrain-targeting-us-radar-intercepted-without-damage-3040837-2026-11-17",
+              "https://www.indiatoday.in/world/story/iran-drone-attack-on-bahrain-targeting-us-radar-intercepted-without-damage-3040837-2026-11-17",
+              "https://www.indiatoday.in/world/story/iran-drone-attack-on-bahrain-targeting-us-radar-intercepted-without-damage-3040837-2026-11-17"
+            ],
+            "observed_at": "2026-11-17T13:50:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-b3888839",
+            "story_title": "ADNOC confirms an attacked vessel in Hormuz: one missing, eleven injured",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.aa.com.tr/en/middle-east/uae-company-says-vessel-attacked-while-transiting-strait-of-hormuz-/4128586",
+            "source_urls": [
+              "https://www.aa.com.tr/en/middle-east/uae-company-says-vessel-attacked-while-transiting-strait-of-hormuz-/4128586",
+              "https://www.aa.com.tr/en/middle-east/uae-company-says-vessel-attacked-while-transiting-strait-of-hormuz-/4128586",
+              "https://www.aa.com.tr/en/middle-east/uae-company-says-vessel-attacked-while-transiting-strait-of-hormuz-/4128586",
+              "https://apnews.com/article/mideast-news-iran-bahrain-us-november-18-2026-b71b1d25f3cff987b4b125196ecb4c3a",
+              "https://apnews.com/article/mideast-news-iran-bahrain-us-november-18-2026-b71b1d25f3cff987b4b125196ecb4c3a",
+              "https://apnews.com/article/mideast-news-iran-bahrain-us-november-18-2026-b71b1d25f3cff987b4b125196ecb4c3a",
+              "https://adnocls.ae/en/news-and-media/press-releases/2026/november-10-statement/",
+              "https://adnocls.ae/en/news-and-media/press-releases/2026/november-10-statement/",
+              "https://adnocls.ae/en/news-and-media/press-releases/2026/november-10-statement/"
+            ],
+            "observed_at": "2026-11-18T07:17:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-eeb704d5",
+            "story_title": "Lead 2: Iran launches third recent drone attack on US radar in Bahrain; US strikes Qeshm; Kuwait reports…",
+            "source": "grok/grok-rolling-0945.md",
+            "slot": "0945",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/17/kuwait-reports-drone-attacks-as-iran-us-trade-attacks-on-qeshm-and-bahrain",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/17/kuwait-reports-drone-attacks-as-iran-us-trade-attacks-on-qeshm-and-bahrain",
+              "https://www.aljazeera.com/news/2026/11/17/kuwait-reports-drone-attacks-as-iran-us-trade-attacks-on-qeshm-and-bahrain",
+              "https://www.aljazeera.com/news/2026/11/17/kuwait-reports-drone-attacks-as-iran-us-trade-attacks-on-qeshm-and-bahrain",
+              "https://www.aljazeera.com/news/2026/11/17/kuwait-reports-drone-attacks-as-iran-us-trade-attacks-on-qeshm-and-bahrain",
+              "https://www.aljazeera.com/news/2026/11/17/kuwait-reports-drone-attacks-as-iran-us-trade-attacks-on-qeshm-and-bahrain",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors",
+              "https://www.pbs.org/newshour/world/iran-fires-at-u-s-facility-in-bahrain-as-tehran-resumes-strikes-on-arab-neighbors",
+              "https://www.stripes.com/theaters/middle_east/2026-11-17/iran-bahrain-central-command-drone-attack-23493671.html"
+            ],
+            "observed_at": "2026-11-18T07:45:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 7,
+        "evidence": [
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-107da33f",
+            "story_title": "Lead 4: Magnitude ~5.3–5.7 earthquake in Romania’s Vrancea zone felt across multiple European countries",
+            "source": "grok/grok-rolling-0649.md",
+            "slot": "0649",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.news.com.au/world/europe/automated-65-magnitude-earthquake-warning-issued-across-17-european-countries-overnight/news-story/1a55bb80d1b8476c589021cdb4aed148",
+            "source_urls": [
+              "https://www.news.com.au/world/europe/automated-65-magnitude-earthquake-warning-issued-across-17-european-countries-overnight/news-story/1a55bb80d1b8476c589021cdb4aed148",
+              "https://www.news.com.au/world/europe/automated-65-magnitude-earthquake-warning-issued-across-17-european-countries-overnight/news-story/1a55bb80d1b8476c589021cdb4aed148",
+              "https://www.news.com.au/world/europe/automated-65-magnitude-earthquake-warning-issued-across-17-european-countries-overnight/news-story/1a55bb80d1b8476c589021cdb4aed148",
+              "https://www.news.com.au/world/europe/automated-65-magnitude-earthquake-warning-issued-across-17-european-countries-overnight/news-story/1a55bb80d1b8476c589021cdb4aed148",
+              "https://www.news.com.au/world/europe/automated-65-magnitude-earthquake-warning-issued-across-17-european-countries-overnight/news-story/1a55bb80d1b8476c589021cdb4aed148",
+              "https://moldova1.md/p/90502",
+              "https://moldova1.md/p/90502",
+              "https://moldova1.md/p/90502",
+              "https://moldova1.md/p/90502",
+              "https://moldova1.md/p/90502"
+            ],
+            "observed_at": "2026-11-18T04:49:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-2c460f2a",
+            "story_title": "Lead 1: Ukraine collapses Kerch Bridge road section in multi-stage strike (second in two days)",
+            "source": "grok/grok-rolling-1550.md",
+            "slot": "1550",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://euromaidanpress.com/2026/11/17/missile-drones-cruise-missiles-and-a-flamingo-guided-to-the-last-second-the-night-russias-kerch-bridge-lost-its-road/",
+            "source_urls": [
+              "https://euromaidanpress.com/2026/11/17/missile-drones-cruise-missiles-and-a-flamingo-guided-to-the-last-second-the-night-russias-kerch-bridge-lost-its-road/",
+              "https://euromaidanpress.com/2026/11/17/missile-drones-cruise-missiles-and-a-flamingo-guided-to-the-last-second-the-night-russias-kerch-bridge-lost-its-road/",
+              "https://euromaidanpress.com/2026/11/17/missile-drones-cruise-missiles-and-a-flamingo-guided-to-the-last-second-the-night-russias-kerch-bridge-lost-its-road/",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://www.aljazeera.com/news/2026/11/17/ukrainian-drone-attack-kills-two-in-crimea-as-kyiv-targets-kerch-bridge",
+              "https://www.aljazeera.com/news/2026/11/17/ukrainian-drone-attack-kills-two-in-crimea-as-kyiv-targets-kerch-bridge"
+            ],
+            "observed_at": "2026-11-17T13:50:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-48ccfe30",
+            "story_title": "Lead 2: Ukraine critically damages Kerch (Crimean) Bridge road span in second-day strike; railway also damaged",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://www.theguardian.com/world/2026/nov/17/ukraine-strikes-critical-damage-russia-kerch-bridge-crimea",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://www.reuters.com/world/europe/ukraine-strikes-crimean-bridge-second-day-russia-pounds-kyiv-bridges-2026-11-17/"
+            ],
+            "observed_at": "2026-11-17T10:48:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-68d39cac",
+            "story_title": "Lead 1: Ukraine collapses road arch of Kerch Bridge in multi-stage strike",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://en.interfax.com.ua/news/general/1237738.html",
+            "source_urls": [
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://www.bbc.com/news/articles/crz9dgz28zwdo",
+              "https://www.bbc.com/news/articles/crz9dgz28zwdo",
+              "https://www.bbc.com/news/articles/crz9dgz28zwdo",
+              "https://www.rferl.org/a/russia-ukraine-trade-strikes-on-key-bridges/33900167.html",
+              "https://www.kyivpost.com/post/90332",
+              "https://iz.ru/en/2203179/2026-11-17/peskov-said-there-was-no-doubt-about-restoration-crimean-bridge"
+            ],
+            "observed_at": "2026-11-17T16:49:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-cd619839",
+            "story_title": "Lead 4: President Trump arrives in Manila for first Quad leaders’ meeting and ASEAN-US Special Summit ahead…",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.rappler.com/philippines/trump-arrives-state-visit-asean-special-summit-2026/",
+            "source_urls": [
+              "https://www.rappler.com/philippines/trump-arrives-state-visit-asean-special-summit-2026/",
+              "https://www.theguardian.com/world/live/2026/nov/17/asean-apec-summit-2026-live-updates-trump-xi-putin-meeting-schedule-latest-news",
+              "https://www.theguardian.com/world/live/2026/nov/17/asean-apec-summit-2026-live-updates-trump-xi-putin-meeting-schedule-latest-news"
+            ],
+            "observed_at": "2026-11-17T10:48:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-d06259ad",
+            "story_title": "Lead 1: Ukrainian multi-stage operation collapses Kerch Bridge road arch/span; Russia reports casualties…",
+            "source": "grok/grok-rolling-2146.md",
+            "slot": "2146",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+            "source_urls": [
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://www.pbs.org/newshour/world/the-symbol-of-the-occupation-ukraine-destroys-span-of-kerch-bridge-linking-russia-with-crimea",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://en.interfax.com.ua/news/general/1237738.html",
+              "https://www.bbc.com/news/articles/crz9dgz28zwdo",
+              "https://www.bbc.com/news/articles/crz9dgz28zwdo"
+            ],
+            "observed_at": "2026-11-17T19:46:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-f8afc9d8",
+            "story_title": "Xi and Putin frame the APEC meeting around trade, sanctions and strategic power",
+            "source": "chatgpt/chatgpt-rolling-0917.md",
+            "slot": "0917",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.fmprc.gov.cn/eng/xw/zyxw/202611/t20261118_12061694.html",
+            "source_urls": [
+              "https://www.fmprc.gov.cn/eng/xw/zyxw/202611/t20261118_12061694.html",
+              "https://www.fmprc.gov.cn/eng/xw/zyxw/202611/t20261118_12061694.html",
+              "https://www.fmprc.gov.cn/eng/xw/zyxw/202611/t20261118_12061694.html",
+              "https://apnews.com/article/apec-china-economy-trump-putin-ai-1e3b6161b31196c9716ca02ac8c7720c",
+              "https://apnews.com/article/apec-china-economy-trump-putin-ai-1e3b6161b31196c9716ca02ac8c7720c",
+              "https://apnews.com/article/apec-china-economy-trump-putin-ai-1e3b6161b31196c9716ca02ac8c7720c",
+              "https://www.euronews.com/2026/11/18/chinas-xi-jinping-and-putin-hold-talks-in-shenzhen-on-eve-of-three-way-summit-with-trump",
+              "https://www.euronews.com/2026/11/18/chinas-xi-jinping-and-putin-hold-talks-in-shenzhen-on-eve-of-three-way-summit-with-trump",
+              "https://www.euronews.com/2026/11/18/chinas-xi-jinping-and-putin-hold-talks-in-shenzhen-on-eve-of-three-way-summit-with-trump",
+              "https://english.www.gov.cn/news/202611/18/content_WS6afd2bebc6d00ca5f9a0e61d.html",
+              "https://english.www.gov.cn/news/202611/18/content_WS6afd2bebc6d00ca5f9a0e61d.html"
+            ],
+            "observed_at": "2026-11-18T07:17:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-032261ab",
+            "story_title": "UK sanctions eight Israeli settlement firms and group accused of blocking Gaza aid",
+            "source": "chatgpt/chatgpt-rolling-1518.md",
+            "slot": "1518",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.gov.uk/government/news/uk-cracks-down-on-companies-building-settlements-in-the-west-bank-and-groups-blocking-aid-access-into-gaza",
+            "source_urls": [
+              "https://www.gov.uk/government/news/uk-cracks-down-on-companies-building-settlements-in-the-west-bank-and-groups-blocking-aid-access-into-gaza",
+              "https://www.gov.uk/government/news/uk-cracks-down-on-companies-building-settlements-in-the-west-bank-and-groups-blocking-aid-access-into-gaza",
+              "https://www.gov.uk/government/news/uk-cracks-down-on-companies-building-settlements-in-the-west-bank-and-groups-blocking-aid-access-into-gaza",
+              "https://en.globes.co.il/en/article-uk-imposes-sanctions-on-israeli-construction-cos-1001563760",
+              "https://en.globes.co.il/en/article-uk-imposes-sanctions-on-israeli-construction-cos-1001563760",
+              "https://en.globes.co.il/en/article-uk-imposes-sanctions-on-israeli-construction-cos-1001563760",
+              "https://www.aa.com.tr/en/world/uk-sanctions-firms-involved-in-illegal-west-bank-settlements-gaza-aid-blocking-group/4127667",
+              "https://www.aa.com.tr/en/world/uk-sanctions-firms-involved-in-illegal-west-bank-settlements-gaza-aid-blocking-group/4127667",
+              "https://www.aa.com.tr/en/world/uk-sanctions-firms-involved-in-illegal-west-bank-settlements-gaza-aid-blocking-group/4127667",
+              "https://www.theguardian.com/world/2026/nov/17/ed-miliband-israel-west-bank-settlements-sanctions",
+              "https://www.theguardian.com/world/2026/nov/17/ed-miliband-israel-west-bank-settlements-sanctions",
+              "https://www.theguardian.com/world/2026/nov/17/ed-miliband-israel-west-bank-settlements-sanctions"
+            ],
+            "observed_at": "2026-11-17T13:18:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-3f39acd8",
+            "story_title": "Bahrain reports fresh Iranian interceptions; Kuwait engages unidentified hostile drones",
+            "source": "chatgpt/chatgpt-rolling-0321.md",
+            "slot": "0321",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+              "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+              "https://www.reuters.com/world/middle-east/bahrain-warns-potential-threat-urges-residents-seek-safety-2026-11-17/",
+              "https://www.arabnews.com/middle-east/kuwait-bahrain-fend-off-iranian-aerial-attacks-as-coalition-hits-houthi-military-sites-3012614",
+              "https://www.arabnews.com/middle-east/kuwait-bahrain-fend-off-iranian-aerial-attacks-as-coalition-hits-houthi-military-sites-3012614",
+              "https://www.arabnews.com/middle-east/kuwait-bahrain-fend-off-iranian-aerial-attacks-as-coalition-hits-houthi-military-sites-3012614",
+              "https://www.aljazeera.com/news/liveblog/2026/11/18/iran-war-live-kuwait-says-intercepting-hostile-drone-attacks"
+            ],
+            "observed_at": "2026-11-18T01:21:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-11 and drew no qualifying story today",
+        "last_open_edition": "2026-11-11",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-11",
+            "story_id": "s-104bca09",
+            "story_title": "Lead 1: U.S. House votes 211-204 to refer Massie Hegseth impeachment articles to Judiciary Committee…",
+            "source": "grok/grok-rolling-0044.md",
+            "slot": "0044",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+            "source_urls": [
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://www.militarytimes.com/news/2026/11/10/house-republicans-sidestep-effort-to-impeach-hegseth/",
+              "https://breakingdefense.com/2026/11/house-opts-to-stall-hegseth-impeachment-vote-sending-resolution-to-judiciary-committee/",
+              "https://breakingdefense.com/2026/11/house-opts-to-stall-hegseth-impeachment-vote-sending-resolution-to-judiciary-committee/",
+              "https://www.foxnews.com/politics/house-gop-leaders-block-massie-hegseth-impeachment-push",
+              "https://www.reuters.com/world/us/us-house-votes-derail-impeachment-defense-secretary-hegseth-2026-11-10/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-11",
+            "story_id": "s-6f8ff935",
+            "story_title": "Hegseth Impeachment Effort",
+            "source": "chatgpt/chatgpt-rolling-2114.md",
+            "slot": "2114",
+            "matched": [
+              "Venezuela"
+            ],
+            "source_url": "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+            "source_urls": [
+              "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+              "https://www.reuters.com/world/us/what-are-impeachment-articles-facing-pete-hegseth-2026-11-10/",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026",
+              "https://apnews.com/live/trump-hegseth-congress-politics-news-updates-11-10-2026"
+            ],
+            "observed_at": "2026-11-10T19:14:00Z"
+          }
+        ]
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-8ca219fb",
+            "story_title": "Lead 3: Two suspected Russian aircraft violate Japanese airspace; Tokyo protests; concurrent ADIZ activity…",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+            "source_urls": [
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.japantimes.co.jp/news/2026/11/17/japan/russia-japan-airspace-violation-defense/"
+            ],
+            "observed_at": "2026-11-17T10:48:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-debbf25b",
+            "story_title": "Lead 4: Two suspected Russian aircraft violate Japanese airspace off Fukuoka; Tokyo protests and scrambles…",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+            "source_urls": [
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/"
+            ],
+            "observed_at": "2026-11-17T16:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-15 and drew no qualifying story today",
+        "last_open_edition": "2026-11-15",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-15",
+            "story_id": "s-424cb5eb",
+            "story_title": "South Sudan election calendar moves to February, opening a dispute over legal authority",
+            "source": "chatgpt/chatgpt-rolling-0301.md",
+            "slot": "0301",
+            "matched": [
+              "Sudan"
+            ],
+            "source_url": "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+            "source_urls": [
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://www.nta.ng/news/politics/south-sudan-postpones-first-national-elections-to-february-2027",
+              "https://www.nta.ng/news/politics/south-sudan-postpones-first-national-elections-to-february-2027",
+              "https://www.radiotamazuj.org/en/news/article/was-it-lawful-to-delay-south-sudans-elections-until-february-2027",
+              "https://www.radiotamazuj.org/en/news/article/was-it-lawful-to-delay-south-sudans-elections-until-february-2027"
+            ],
+            "observed_at": "2026-11-15T01:01:00Z"
+          },
+          {
+            "edition": "2026-11-15",
+            "story_id": "s-9fc580c3",
+            "story_title": "South Sudan election commission postpones first post-independence national vote to 11 February 2027.",
+            "source": "grok/grok-rolling-0046.md",
+            "slot": "0046",
+            "matched": [
+              "Sudan"
+            ],
+            "source_url": "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+            "source_urls": [
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february"
+            ],
+            "observed_at": null
+          }
+        ]
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-16 and drew no qualifying story today",
+        "last_open_edition": "2026-11-16",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-16",
+            "story_id": "s-4528237a",
+            "story_title": "ASEAN keeps Myanmar’s summit exclusion but adopts a conditional route back",
+            "source": "chatgpt/chatgpt-rolling-1522.md",
+            "slot": "1522",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://asean.org/asean-leaders-review-and-decision-on-the-implementation-of-the-five-point-consensus-4/",
+            "source_urls": [
+              "https://asean.org/asean-leaders-review-and-decision-on-the-implementation-of-the-five-point-consensus-4/",
+              "https://www.philstar.com/headlines/2026/11/15/2570333/asean-summit-day-1-south-china-sea-indonesia-haze-myanmar-review",
+              "https://www.philstar.com/headlines/2026/11/15/2570333/asean-summit-day-1-south-china-sea-indonesia-haze-myanmar-review",
+              "https://www.philstar.com/headlines/2026/11/15/2570333/asean-summit-day-1-south-china-sea-indonesia-haze-myanmar-review",
+              "https://www.channelnewsasia.com/asia/asean-myanmar-engagement-peace-plan-6552716",
+              "https://www.channelnewsasia.com/asia/asean-myanmar-engagement-peace-plan-6552716",
+              "https://www.channelnewsasia.com/asia/asean-myanmar-engagement-peace-plan-6552716",
+              "https://www.straitstimes.com/asia/se-asia/asean-seeks-calibrated-engagement-with-myanmar-statement",
+              "https://www.straitstimes.com/asia/se-asia/asean-seeks-calibrated-engagement-with-myanmar-statement",
+              "https://www.straitstimes.com/asia/se-asia/asean-seeks-calibrated-engagement-with-myanmar-statement",
+              "https://tribune.net.ph/2026/11/15/asean-reports-80-progress-on-scs-coc-maintains-myanmar-stance",
+              "https://tribune.net.ph/2026/11/15/asean-reports-80-progress-on-scs-coc-maintains-myanmar-stance",
+              "https://tribune.net.ph/2026/11/15/asean-reports-80-progress-on-scs-coc-maintains-myanmar-stance"
+            ],
+            "observed_at": "2026-11-15T13:22:00Z"
+          },
+          {
+            "edition": "2026-11-16",
+            "story_id": "s-6f6f47ca",
+            "story_title": "Lead 1: Phuket (Patong) motorcycle-rental shophouse fire kills 11, injures 16–38; cause under investigation…",
+            "source": "grok/grok-rolling-0641.md",
+            "slot": "0641",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+            "source_urls": [
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket",
+              "https://www.straitstimes.com/asia/se-asia/patong-motorcycle-rental-shop-fire-kills-11-injures-36-in-phuket",
+              "https://www.straitstimes.com/asia/se-asia/patong-motorcycle-rental-shop-fire-kills-11-injures-36-in-phuket",
+              "https://www.straitstimes.com/asia/se-asia/patong-motorcycle-rental-shop-fire-kills-11-injures-36-in-phuket",
+              "https://www.khaosodenglish.com/news/2026/11/16/patong-motorcycle-rental-shop-fire-injures-38-damages-five-units/",
+              "https://www.khaosodenglish.com/news/2026/11/16/patong-motorcycle-rental-shop-fire-injures-38-damages-five-units/",
+              "https://e.vnexpress.net/news/news/fire-at-phuket-motorcycle-rental-shop-kills-11-5145192.html",
+              "https://e.vnexpress.net/news/news/fire-at-phuket-motorcycle-rental-shop-kills-11-5145192.html",
+              "https://english.news.cn/20261116/0ec62994fa4041a39e4899773040e35d/c.html"
+            ],
+            "observed_at": "2026-11-16T04:41:00Z"
+          },
+          {
+            "edition": "2026-11-16",
+            "story_id": "s-b7913db7",
+            "story_title": "South China Sea code negotiations pass to Singapore without a binding agreement",
+            "source": "chatgpt/chatgpt-rolling-1522.md",
+            "slot": "1522",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://www.pna.gov.ph/article/code-of-conduct-talks-80-finished-negotiations-to-continue-through-2027",
+            "source_urls": [
+              "https://www.pna.gov.ph/article/code-of-conduct-talks-80-finished-negotiations-to-continue-through-2027",
+              "https://www.pna.gov.ph/article/code-of-conduct-talks-80-finished-negotiations-to-continue-through-2027",
+              "https://www.pna.gov.ph/article/code-of-conduct-talks-80-finished-negotiations-to-continue-through-2027",
+              "https://www.gmanetwork.com/news/topstories/nation/1009605/ph-south-china-sea-code-of-conduct-80-done-to-be-completed-at-asean-2027/story/",
+              "https://www.gmanetwork.com/news/topstories/nation/1009605/ph-south-china-sea-code-of-conduct-80-done-to-be-completed-at-asean-2027/story/",
+              "https://www.gmanetwork.com/news/topstories/nation/1009605/ph-south-china-sea-code-of-conduct-80-done-to-be-completed-at-asean-2027/story/",
+              "https://www.philstar.com/headlines/2026/11/15/2570309/philippines-misses-goal-south-china-sea-code-during-asean-chairship/amp/",
+              "https://www.philstar.com/headlines/2026/11/15/2570309/philippines-misses-goal-south-china-sea-code-during-asean-chairship/amp/",
+              "https://www.philstar.com/headlines/2026/11/15/2570309/philippines-misses-goal-south-china-sea-code-during-asean-chairship/amp/",
+              "https://tribune.net.ph/2026/11/15/asean-reports-80-progress-on-scs-coc-maintains-myanmar-stance",
+              "https://tribune.net.ph/2026/11/15/asean-reports-80-progress-on-scs-coc-maintains-myanmar-stance",
+              "https://tribune.net.ph/2026/11/15/asean-reports-80-progress-on-scs-coc-maintains-myanmar-stance"
+            ],
+            "observed_at": "2026-11-15T13:22:00Z"
+          },
+          {
+            "edition": "2026-11-16",
+            "story_id": "s-e6e17400",
+            "story_title": "Lead 1: Phuket (Patong) shophouse fire kills 11, injures 16 — electrical short/transformer suspected, arson…",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/16/shophouse-fire-on-thai-resort-island-kills-11",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/16/shophouse-fire-on-thai-resort-island-kills-11",
+              "https://www.aljazeera.com/news/2026/11/16/shophouse-fire-on-thai-resort-island-kills-11",
+              "https://www.aljazeera.com/news/2026/11/16/shophouse-fire-on-thai-resort-island-kills-11",
+              "https://www.aljazeera.com/news/2026/11/16/shophouse-fire-on-thai-resort-island-kills-11",
+              "https://www.aljazeera.com/news/2026/11/16/shophouse-fire-on-thai-resort-island-kills-11",
+              "https://www.aljazeera.com/news/2026/11/16/shophouse-fire-on-thai-resort-island-kills-11",
+              "https://www.bangkokpost.com/thailand/general/3355565/eleven-die-in-choking-smoke-from-phuket-fire",
+              "https://www.bangkokpost.com/thailand/general/3355565/eleven-die-in-choking-smoke-from-phuket-fire",
+              "https://www.bangkokpost.com/thailand/general/3355565/eleven-die-in-choking-smoke-from-phuket-fire",
+              "https://www.bangkokpost.com/thailand/general/3355565/eleven-die-in-choking-smoke-from-phuket-fire",
+              "https://www.bangkokpost.com/thailand/general/3355565/eleven-die-in-choking-smoke-from-phuket-fire",
+              "https://www.bangkokpost.com/thailand/general/3355565/eleven-die-in-choking-smoke-from-phuket-fire",
+              "https://www.channelnewsasia.com/asia/11-dead-fire-building-phuket-thailand-6554316",
+              "https://www.channelnewsasia.com/asia/11-dead-fire-building-phuket-thailand-6554316",
+              "https://thethaiger.com/news/phuket/patong-fire-kills-11-at-motorbike-rental-shop-in-phuket"
+            ],
+            "observed_at": "2026-11-16T07:48:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.2308,
+    "previous": 0.2308,
+    "previous_edition": "2026-11-17",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
