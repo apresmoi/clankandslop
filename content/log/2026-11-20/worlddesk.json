@@ -1,0 +1,1213 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-20",
+  "generated_at": "2026-11-20T08:51:38Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.5385,
+    "numerator": 7,
+    "denominator": 13,
+    "triggering": 4,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 92.94,
+        "observed_at": "2026-11-17",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "92.94 >= 93.44 is false"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 89.53,
+        "observed_at": "2026-11-17",
+        "stale_days": 3,
+        "contributes": 1,
+        "reason": "89.53 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 5.937,
+        "observed_at": "2026-11-16",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "5.937 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.1,
+        "observed_at": "2026-11-17",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "3.1 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 24.56,
+        "observed_at": "2026-11-18",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "24.56 >= 22.96 is true"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 3.47,
+        "observed_at": "2026-11-18",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "3.47 >= 3.388 is true"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 122.6503,
+        "observed_at": "2026-11-13",
+        "stale_days": 7,
+        "contributes": 0,
+        "reason": "122.6503 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-20T08:51:37Z",
+        "http_status": 200,
+        "bytes": 170533,
+        "sha256": "aa587e1c6edc32b9e3cdfe2dd332245c9d1076868d5735909b1f1644b325eb85",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-20T08:51:37Z",
+        "http_status": 200,
+        "bytes": 176305,
+        "sha256": "10ff6925e3b8a4bcf7f6968f51936a8fc9d841daa29ceaedada058690a06b3c9",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-20T08:51:37Z",
+        "http_status": 200,
+        "bytes": 29010,
+        "sha256": "99cd47541f8a6f7acb666581fdcaa10f5317ff6aa5d87aefe24a513b3eca45c5",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-20T08:51:37Z",
+        "http_status": 200,
+        "bytes": 116553,
+        "sha256": "381f9a5569736ad328236eefcc001a55f788487420823518daf6b81636a0ce19",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-20T08:51:38Z",
+        "http_status": 200,
+        "bytes": 162020,
+        "sha256": "c01d627ac148ee237379fa8bacba72890cfdf1d84516a67b2c9998a1be40fcd2",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-20T08:51:38Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "11f5c8aadf8193eecdc5c0ab996244464939bfffff71117178a278f6a1ac93f8",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-20T08:51:38Z",
+        "http_status": 200,
+        "bytes": 105121,
+        "sha256": "542aab261636608b3fb59fc913b8ad9d9767f15c551637b76ee16391d522f5d3",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 43,
+    "open_conflicts": 4,
+    "watch": 5,
+    "dormant": 4,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 4,
+        "evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-13513f79",
+            "story_title": "Lead 1: Trump, Xi and Putin hold first-ever trilateral summit in Shenzhen; no major breakthroughs announced",
+            "source": "grok/grok-rolling-1243.md",
+            "slot": "1243",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+            "source_urls": [
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://en.yna.co.kr/view/AEN20261119001356315",
+              "https://en.yna.co.kr/view/AEN20261119001356315",
+              "https://en.yna.co.kr/view/AEN20261119001356315",
+              "https://apnews.com/live/trump-xi-putin-china-politics-news-updates-11-19-2026"
+            ],
+            "observed_at": "2026-11-19T10:43:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-73b273f2",
+            "story_title": "Lead 4 (material update to prior Bahrain-Qeshm story): Iran attacks Kuwait’s Ali Al Salem Air Base and…",
+            "source": "grok/grok-rolling-1243.md",
+            "slot": "1243",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/18/kuwait-bahrain-face-new-iran-attacks-after-us-strike-on-qeshm-island",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/18/kuwait-bahrain-face-new-iran-attacks-after-us-strike-on-qeshm-island",
+              "https://www.aljazeera.com/news/2026/11/18/kuwait-bahrain-face-new-iran-attacks-after-us-strike-on-qeshm-island",
+              "https://www.aljazeera.com/news/2026/11/18/kuwait-bahrain-face-new-iran-attacks-after-us-strike-on-qeshm-island",
+              "https://kuwaittimes.com/article/53889/kuwait/kuwait-strongly-condemns-repeated-iranian-attacks-on-the-country/",
+              "https://kuwaittimes.com/article/53889/kuwait/kuwait-strongly-condemns-repeated-iranian-attacks-on-the-country/",
+              "https://kuwaittimes.com/article/53889/kuwait/kuwait-strongly-condemns-repeated-iranian-attacks-on-the-country/",
+              "https://kuwaittimes.com/article/53889/kuwait/kuwait-strongly-condemns-repeated-iranian-attacks-on-the-country/",
+              "https://defence-blog.com/iran-attacks-kuwait-and-bahrain-overnight-with-drones/",
+              "https://defence-blog.com/iran-attacks-kuwait-and-bahrain-overnight-with-drones/",
+              "https://defence-blog.com/iran-attacks-kuwait-and-bahrain-overnight-with-drones/",
+              "https://www.upi.com/Top_News/World-News/2026/11/18/Kuwait-Iran-targets-US-military-facility/1741795002578/"
+            ],
+            "observed_at": "2026-11-19T10:43:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-b0c76eae",
+            "story_title": "Hormuz reporting adds two fresh UKMTO attacks and a new Iranian mine claim",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Hormuz",
+              "Iranian navy"
+            ],
+            "source_url": "https://www.ukmto.org/recent-incidents",
+            "source_urls": [
+              "https://www.ukmto.org/recent-incidents",
+              "https://www.aa.com.tr/en/middle-east/3-oil-tankers-disabled-by-mine-blasts-in-strait-of-hormuz-iranian-army/4129906",
+              "https://www.aa.com.tr/en/middle-east/3-oil-tankers-disabled-by-mine-blasts-in-strait-of-hormuz-iranian-army/4129906",
+              "https://www.aa.com.tr/en/middle-east/3-oil-tankers-disabled-by-mine-blasts-in-strait-of-hormuz-iranian-army/4129906",
+              "https://irandossier.online/posts/iranian-press-monitor-2026-11-19/",
+              "https://irandossier.online/posts/iranian-press-monitor-2026-11-19/",
+              "https://irandossier.online/posts/iranian-press-monitor-2026-11-19/",
+              "https://partner-ship.org/war-risk-watch/register?month=2026-11&theatre=gulf",
+              "https://partner-ship.org/war-risk-watch/register?month=2026-11&theatre=gulf",
+              "https://partner-ship.org/war-risk-watch/register?month=2026-11&theatre=gulf",
+              "https://www.reuters.com/business/energy/oil-prices-steady-supply-surplus-softens-sentiment-though-gulf-war-supports-2026-11-19/",
+              "https://www.reuters.com/business/energy/oil-prices-steady-supply-surplus-softens-sentiment-though-gulf-war-supports-2026-11-19/",
+              "https://www.reuters.com/business/energy/oil-prices-steady-supply-surplus-softens-sentiment-though-gulf-war-supports-2026-11-19/"
+            ],
+            "observed_at": "2026-11-19T13:16:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-f209ebdb",
+            "story_title": "Shenzhen summit creates a trilateral nuclear dialogue but leaves the live wars unresolved",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+            "source_urls": [
+              "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+              "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+              "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+              "https://www.fmprc.gov.cn/mfa_eng./xw/zyxw/202611/t20261119_12063139.html",
+              "https://www.fmprc.gov.cn/mfa_eng./xw/zyxw/202611/t20261119_12063139.html",
+              "https://www.fmprc.gov.cn/mfa_eng./xw/zyxw/202611/t20261119_12063139.html",
+              "https://apnews.com/article/a04dc76ed8e786b087e2c1ea9598783a",
+              "https://apnews.com/article/a04dc76ed8e786b087e2c1ea9598783a",
+              "https://apnews.com/article/a04dc76ed8e786b087e2c1ea9598783a",
+              "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/",
+              "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/",
+              "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/"
+            ],
+            "observed_at": "2026-11-19T13:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 9,
+        "evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-13513f79",
+            "story_title": "Lead 1: Trump, Xi and Putin hold first-ever trilateral summit in Shenzhen; no major breakthroughs announced",
+            "source": "grok/grok-rolling-1243.md",
+            "slot": "1243",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+            "source_urls": [
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://english.elpais.com/international/2026-11-19/xi-trump-and-putin-begin-historic-trilateral-meeting-in-shenzhen.html",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://www.cbc.ca/news/world/trump-xi-putin-historic-meeting-9.7427718",
+              "https://en.yna.co.kr/view/AEN20261119001356315",
+              "https://en.yna.co.kr/view/AEN20261119001356315",
+              "https://en.yna.co.kr/view/AEN20261119001356315",
+              "https://apnews.com/live/trump-xi-putin-china-politics-news-updates-11-19-2026"
+            ],
+            "observed_at": "2026-11-19T10:43:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-2abdf399",
+            "story_title": "Lead 2: Trump-Xi-Putin Shenzhen trilateral ends with four-point “Declaration Toward Peace” (no Ukraine…",
+            "source": "grok/grok-rolling-1550.md",
+            "slot": "1550",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://novayagazeta.eu/en/articles/2026/11/19/putin-trump-and-xi-adopt-declaration-on-peace-that-makes-no-mention-of-ukraine-en-news",
+            "source_urls": [
+              "https://novayagazeta.eu/en/articles/2026/11/19/putin-trump-and-xi-adopt-declaration-on-peace-that-makes-no-mention-of-ukraine-en-news",
+              "https://novayagazeta.eu/en/articles/2026/11/19/putin-trump-and-xi-adopt-declaration-on-peace-that-makes-no-mention-of-ukraine-en-news",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://www.fmprc.gov.cn/eng/xw/zyxw/202611/t20261119_12063266.html",
+              "https://www.fmprc.gov.cn/eng/xw/zyxw/202611/t20261119_12063266.html",
+              "https://www.fmprc.gov.cn/eng/xw/zyxw/202611/t20261119_12063266.html"
+            ],
+            "observed_at": "2026-11-19T13:50:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-2e38600e",
+            "story_title": "Lead 1: Trump phones Berlin Coalition of the Willing from Air Force One, questions further Ukraine aid after…",
+            "source": "grok/grok-rolling-2144.md",
+            "slot": "2144",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.politico.eu/article/donald-trump-presses-european-leaders-about-ukraine-aid-after-vladimir-putin-summit/",
+            "source_urls": [
+              "https://www.politico.eu/article/donald-trump-presses-european-leaders-about-ukraine-aid-after-vladimir-putin-summit/",
+              "https://www.politico.eu/article/donald-trump-presses-european-leaders-about-ukraine-aid-after-vladimir-putin-summit/",
+              "https://www.spiegel.de/politik/deutschland/friedrich-merz-laestert-ueber-shenzhen-treffen-als-bildtermin-und-sichert-kyjiw-weitere-unterstuetzung-zu-a-1a623a3e-8112-4d7c-b509-2c29d1453e65",
+              "https://www.spiegel.de/politik/deutschland/friedrich-merz-laestert-ueber-shenzhen-treffen-als-bildtermin-und-sichert-kyjiw-weitere-unterstuetzung-zu-a-1a623a3e-8112-4d7c-b509-2c29d1453e65",
+              "https://www.spiegel.de/politik/deutschland/friedrich-merz-laestert-ueber-shenzhen-treffen-als-bildtermin-und-sichert-kyjiw-weitere-unterstuetzung-zu-a-1a623a3e-8112-4d7c-b509-2c29d1453e65",
+              "https://www.tagesschau.de/inland/innenpolitik/gipfel-koalition-willige-ukraine-100.html",
+              "https://www.tagesschau.de/inland/innenpolitik/gipfel-koalition-willige-ukraine-100.html",
+              "https://news.liga.net/en/politics/news/the-shenzhen-meeting-was-primarily-a-photo-op-merz-outlines-the-results-of-the-berlin-talks",
+              "https://news.liga.net/en/politics/news/the-shenzhen-meeting-was-primarily-a-photo-op-merz-outlines-the-results-of-the-berlin-talks",
+              "https://insiderpaper.com/merz-says-putin-xi-trump-summit-just-a-photo-op/",
+              "https://insiderpaper.com/merz-says-putin-xi-trump-summit-just-a-photo-op/"
+            ],
+            "observed_at": "2026-11-19T19:44:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-35f1236a",
+            "story_title": "Lead 2: Russia launches multi-wave ballistic missile attack on Kyiv overnight into early 20 November…",
+            "source": "grok/grok-rolling-0642.md",
+            "slot": "0642",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.kyivpost.com/post/90654",
+            "source_urls": [
+              "https://www.kyivpost.com/post/90654",
+              "https://www.kyivpost.com/post/90654",
+              "https://kyivindependent.com/russia-launches-mass-missile-attack-against-ukraine-after-putin-vows-revenge/",
+              "https://kyivindependent.com/russia-launches-mass-missile-attack-against-ukraine-after-putin-vows-revenge/",
+              "https://kyivindependent.com/russia-launches-mass-missile-attack-against-ukraine-after-putin-vows-revenge/",
+              "https://kyivindependent.com/russia-launches-mass-missile-attack-against-ukraine-after-putin-vows-revenge/",
+              "https://kyivindependent.com/russia-launches-mass-missile-attack-against-ukraine-after-putin-vows-revenge/",
+              "https://unn.ua/en/news/kyiv-endured-seven-waves-of-ballistic-strikes-russia-launched-about-30-missiles-and-power-outages-began-in-the-capital",
+              "https://unn.ua/en/news/kyiv-endured-seven-waves-of-ballistic-strikes-russia-launched-about-30-missiles-and-power-outages-began-in-the-capital",
+              "https://unn.ua/en/news/kyiv-endured-seven-waves-of-ballistic-strikes-russia-launched-about-30-missiles-and-power-outages-began-in-the-capital",
+              "https://ua.news/en/capital/povitriana-trivoga-v-kiievi-trivaie-vzhe-blizko-shesti-godin"
+            ],
+            "observed_at": "2026-11-20T04:42:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-a3d0309c",
+            "story_title": "Lead 2: Trump–Xi–Putin “Declaration Towards Peace” Issued; Silent on Ukraine and Iran",
+            "source": "grok/grok-rolling-0044.md",
+            "slot": "0044",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+            "source_urls": [
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://www.foxnews.com/world/trump-putin-xi-issue-4-point-declaration-historic-summit",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261119-930-20642",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261119-930-20642",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261119-930-20642",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261119-930-20642",
+              "https://novayagazeta.eu/en/articles/2026/11/19/putin-trump-and-xi-adopt-declaration-on-peace-that-makes-no-mention-of-ukraine-en-news"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-af9be731",
+            "story_title": "Lead 2: Shenzhen trilateral issues four-point “Declaration toward Peace” (UN reform, refined petroleum…",
+            "source": "grok/grok-rolling-1848.md",
+            "slot": "1848",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://thewire.in/world/full-text-what-china-russia-and-the-us-agreed-on-at-the-shenzhen-summit",
+            "source_urls": [
+              "https://thewire.in/world/full-text-what-china-russia-and-the-us-agreed-on-at-the-shenzhen-summit",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://en.people.cn/n3/2026/1119/c90000-20521189.html",
+              "https://www.rferl.org/a/trump-and-putin-hold-brief-apec-meeting/33901539.html",
+              "https://www.rferl.org/a/trump-and-putin-hold-brief-apec-meeting/33901539.html",
+              "https://www.rferl.org/a/trump-and-putin-hold-brief-apec-meeting/33901539.html",
+              "https://www.thenationalnews.com/news/mena/2026/11/19/nuclear-war-cannot-be-won-full-text-of-china-russia-and-us-peace-declaration/",
+              "https://www.thenationalnews.com/news/mena/2026/11/19/nuclear-war-cannot-be-won-full-text-of-china-russia-and-us-peace-declaration/"
+            ],
+            "observed_at": "2026-11-19T16:48:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-d0793532",
+            "story_title": "EU proposes another €45 billion for Ukraine’s 2027 financing gap",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://enlargement.ec.europa.eu/news/commission-proposes-eur45-billion-additional-financial-support-ukraine-2027-2026-11-18_en",
+            "source_urls": [
+              "https://enlargement.ec.europa.eu/news/commission-proposes-eur45-billion-additional-financial-support-ukraine-2027-2026-11-18_en",
+              "https://enlargement.ec.europa.eu/news/commission-proposes-eur45-billion-additional-financial-support-ukraine-2027-2026-11-18_en",
+              "https://enlargement.ec.europa.eu/news/commission-proposes-eur45-billion-additional-financial-support-ukraine-2027-2026-11-18_en",
+              "https://www.eeas.europa.eu/delegations/ukraine/press-point-president-von-der-leyen-together-commissioners-dombrovskis-and-kubilius-instrument_en?s=232",
+              "https://www.eeas.europa.eu/delegations/ukraine/press-point-president-von-der-leyen-together-commissioners-dombrovskis-and-kubilius-instrument_en?s=232",
+              "https://www.eeas.europa.eu/delegations/ukraine/press-point-president-von-der-leyen-together-commissioners-dombrovskis-and-kubilius-instrument_en?s=232",
+              "https://apnews.com/article/europe-ukraine-loan-russia-summit-8c1baf00b55973a3534096aae2cc73a2",
+              "https://apnews.com/article/europe-ukraine-loan-russia-summit-8c1baf00b55973a3534096aae2cc73a2",
+              "https://apnews.com/article/europe-ukraine-loan-russia-summit-8c1baf00b55973a3534096aae2cc73a2",
+              "https://www.reuters.com/world/eu-proposes-new-45-billion-loan-ukraine-2027-be-repaid-by-russia-2026-11-18/",
+              "https://www.reuters.com/world/eu-proposes-new-45-billion-loan-ukraine-2027-be-repaid-by-russia-2026-11-18/",
+              "https://www.reuters.com/world/eu-proposes-new-45-billion-loan-ukraine-2027-be-repaid-by-russia-2026-11-18/"
+            ],
+            "observed_at": "2026-11-19T13:16:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-d858d08c",
+            "story_title": "Previously published Shenzhen/Ukraine story: the window added direct pressure on Putin and a clearer…",
+            "source": "chatgpt/chatgpt-rolling-0919.md",
+            "slot": "0919",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.pm.gov.au/media/press-conference-shenzhen-china-20-november-2026",
+            "source_urls": [
+              "https://www.pm.gov.au/media/press-conference-shenzhen-china-20-november-2026",
+              "https://www.president.gov.ua/en/news/spilna-zayava-lideriv-nimechchini-franciyi-velikoyi-britaniy-107409",
+              "https://www.president.gov.ua/en/news/spilna-zayava-lideriv-nimechchini-franciyi-velikoyi-britaniy-107409",
+              "https://www.president.gov.ua/en/news/spilna-zayava-lideriv-nimechchini-franciyi-velikoyi-britaniy-107409",
+              "https://amp.dw.com/en/new-ukraine-talks-including-europe-to-be-held-soon-merz/a-79997961",
+              "https://amp.dw.com/en/new-ukraine-talks-including-europe-to-be-held-soon-merz/a-79997961",
+              "https://amp.dw.com/en/new-ukraine-talks-including-europe-to-be-held-soon-merz/a-79997961",
+              "https://apnews.com/article/trump-xi-putin-china-apec-25e17ec8d9c55fbff960d5631eaba71d",
+              "https://apnews.com/article/trump-xi-putin-china-apec-25e17ec8d9c55fbff960d5631eaba71d",
+              "https://apnews.com/article/trump-xi-putin-china-apec-25e17ec8d9c55fbff960d5631eaba71d"
+            ],
+            "observed_at": "2026-11-20T07:19:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-f209ebdb",
+            "story_title": "Shenzhen summit creates a trilateral nuclear dialogue but leaves the live wars unresolved",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+            "source_urls": [
+              "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+              "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+              "https://www.fmprc.gov.cn/mfa_eng/xw/zyxw/202611/t20261119_12063224.html",
+              "https://www.fmprc.gov.cn/mfa_eng./xw/zyxw/202611/t20261119_12063139.html",
+              "https://www.fmprc.gov.cn/mfa_eng./xw/zyxw/202611/t20261119_12063139.html",
+              "https://www.fmprc.gov.cn/mfa_eng./xw/zyxw/202611/t20261119_12063139.html",
+              "https://apnews.com/article/a04dc76ed8e786b087e2c1ea9598783a",
+              "https://apnews.com/article/a04dc76ed8e786b087e2c1ea9598783a",
+              "https://apnews.com/article/a04dc76ed8e786b087e2c1ea9598783a",
+              "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/",
+              "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/",
+              "https://www.reuters.com/world/china/trumps-historic-meeting-with-xi-putin-headlines-asia-trip-2026-11-18/"
+            ],
+            "observed_at": "2026-11-19T13:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-09b5d186",
+            "story_title": "Lead 1: ICJ rules Myanmar committed genocide against Rohingya (first state finding by the Court)",
+            "source": "grok/grok-rolling-1848.md",
+            "slot": "1848",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+            "source_urls": [
+              "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+              "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide"
+            ],
+            "observed_at": "2026-11-19T16:48:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-e08b6825",
+            "story_title": "Israel’s rare Gaza ground operation ended, but the ceasefire dispute widened",
+            "source": "chatgpt/chatgpt-rolling-0320.md",
+            "slot": "0320",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+            "source_urls": [
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://www.timesofisrael.com/liveblog_entry/idf-confirms-wrapping-up-one-day-operation-against-hamas-tunnel-that-crossed-gazas-yellow-line/",
+              "https://www.timesofisrael.com/liveblog_entry/idf-confirms-wrapping-up-one-day-operation-against-hamas-tunnel-that-crossed-gazas-yellow-line/",
+              "https://www.timesofisrael.com/liveblog_entry/idf-confirms-wrapping-up-one-day-operation-against-hamas-tunnel-that-crossed-gazas-yellow-line/"
+            ],
+            "observed_at": "2026-11-20T01:20:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-0a4db18c",
+            "story_title": "Saudi-Houthi exchange widens to five drones, a ballistic missile, and reported Saudi strikes on Sana'a and…",
+            "source": "chatgpt/chatgpt-rolling-0919.md",
+            "slot": "0919",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://saudigazette.com.sa/article/666393/saudi-arabia/coalition-intercepts-five-houthi-drones-one-ballistic-missile-as-civil-defense-issues-alerts-in-asir-jazan",
+            "source_urls": [
+              "https://saudigazette.com.sa/article/666393/saudi-arabia/coalition-intercepts-five-houthi-drones-one-ballistic-missile-as-civil-defense-issues-alerts-in-asir-jazan",
+              "https://saudigazette.com.sa/article/666393/saudi-arabia/coalition-intercepts-five-houthi-drones-one-ballistic-missile-as-civil-defense-issues-alerts-in-asir-jazan",
+              "https://saudigazette.com.sa/article/666393/saudi-arabia/coalition-intercepts-five-houthi-drones-one-ballistic-missile-as-civil-defense-issues-alerts-in-asir-jazan",
+              "https://saba.ye/en/news3838899.htm",
+              "https://saba.ye/en/news3838899.htm",
+              "https://saba.ye/en/news3838899.htm",
+              "https://saba.ye/en/news3838893.htm",
+              "https://saba.ye/en/news3838893.htm",
+              "https://saba.ye/en/news3838892.htm",
+              "https://saba.ye/en/news3838892.htm",
+              "https://www.reuters.com/world/middle-east/saudi-led-coalition-says-it-intercepted-houthi-missile-targeting-southern-region-2026-11-20/"
+            ],
+            "observed_at": "2026-11-20T07:19:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-4d5c5487",
+            "story_title": "Lead 3: U.S. and Venezuela sign military cooperation deal; Hegseth announces in Caracas",
+            "source": "grok/grok-rolling-1243.md",
+            "slot": "1243",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.pbs.org/newshour/world/hegseth-meets-with-venezuelan-interim-leaders-in-latest-trump-cabinet-visit-since-maduros-ouster",
+            "source_urls": [
+              "https://www.pbs.org/newshour/world/hegseth-meets-with-venezuelan-interim-leaders-in-latest-trump-cabinet-visit-since-maduros-ouster",
+              "https://www.pbs.org/newshour/world/hegseth-meets-with-venezuelan-interim-leaders-in-latest-trump-cabinet-visit-since-maduros-ouster",
+              "https://www.pbs.org/newshour/world/hegseth-meets-with-venezuelan-interim-leaders-in-latest-trump-cabinet-visit-since-maduros-ouster",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html"
+            ],
+            "observed_at": "2026-11-19T10:43:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-18 and drew no qualifying story today",
+        "last_open_edition": "2026-11-18",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-8ca219fb",
+            "story_title": "Lead 3: Two suspected Russian aircraft violate Japanese airspace; Tokyo protests; concurrent ADIZ activity…",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+            "source_urls": [
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.japantimes.co.jp/news/2026/11/17/japan/russia-japan-airspace-violation-defense/"
+            ],
+            "observed_at": "2026-11-17T10:48:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-debbf25b",
+            "story_title": "Lead 4: Two suspected Russian aircraft violate Japanese airspace off Fukuoka; Tokyo protests and scrambles…",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+            "source_urls": [
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/"
+            ],
+            "observed_at": "2026-11-17T16:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-45dafeff",
+            "story_title": "Indonesia and China move South China Sea joint-development language forward and launch CEPA negotiations",
+            "source": "chatgpt/chatgpt-rolling-0919.md",
+            "slot": "0919",
+            "matched": [
+              "South China Sea"
+            ],
+            "source_url": "https://en.antaranews.com/news/444007/prabowo-subianto-xi-jinping-hold-bilateral-talks-in-shenzhen",
+            "source_urls": [
+              "https://en.antaranews.com/news/444007/prabowo-subianto-xi-jinping-hold-bilateral-talks-in-shenzhen",
+              "https://en.antaranews.com/news/444007/prabowo-subianto-xi-jinping-hold-bilateral-talks-in-shenzhen",
+              "https://en.antaranews.com/news/444007/prabowo-subianto-xi-jinping-hold-bilateral-talks-in-shenzhen",
+              "https://english.news.cn/20261120/630540f10178469ea76cd096bda50301/c.html",
+              "https://english.news.cn/20261120/630540f10178469ea76cd096bda50301/c.html",
+              "https://english.news.cn/20261120/630540f10178469ea76cd096bda50301/c.html",
+              "https://presidenri.go.id/siaran-pers/presiden-prabowo-dan-presiden-xi-jinping-tegaskan-penguatan-kemitraan-strategis-indonesia-tiongkok/",
+              "https://presidenri.go.id/transkrip/pertemuan-bilateral-pemerintah-republik-indonesia-dan-pemerintah-republik-rakyat-tiongkok/",
+              "https://english.www.gov.cn/news/202611/20/content_WS6affaf07c6d00ca5f9a0e7e0.html",
+              "https://english.www.gov.cn/news/202611/20/content_WS6affaf07c6d00ca5f9a0e7e0.html"
+            ],
+            "observed_at": "2026-11-20T07:19:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-15 and drew no qualifying story today",
+        "last_open_edition": "2026-11-15",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-15",
+            "story_id": "s-424cb5eb",
+            "story_title": "South Sudan election calendar moves to February, opening a dispute over legal authority",
+            "source": "chatgpt/chatgpt-rolling-0301.md",
+            "slot": "0301",
+            "matched": [
+              "Sudan"
+            ],
+            "source_url": "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+            "source_urls": [
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://www.nta.ng/news/politics/south-sudan-postpones-first-national-elections-to-february-2027",
+              "https://www.nta.ng/news/politics/south-sudan-postpones-first-national-elections-to-february-2027",
+              "https://www.radiotamazuj.org/en/news/article/was-it-lawful-to-delay-south-sudans-elections-until-february-2027",
+              "https://www.radiotamazuj.org/en/news/article/was-it-lawful-to-delay-south-sudans-elections-until-february-2027"
+            ],
+            "observed_at": "2026-11-15T01:01:00Z"
+          },
+          {
+            "edition": "2026-11-15",
+            "story_id": "s-9fc580c3",
+            "story_title": "South Sudan election commission postpones first post-independence national vote to 11 February 2027.",
+            "source": "grok/grok-rolling-0046.md",
+            "slot": "0046",
+            "matched": [
+              "Sudan"
+            ],
+            "source_url": "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+            "source_urls": [
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february"
+            ],
+            "observed_at": null
+          }
+        ]
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "open",
+        "evidence_count": 6,
+        "evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-09b5d186",
+            "story_title": "Lead 1: ICJ rules Myanmar committed genocide against Rohingya (first state finding by the Court)",
+            "source": "grok/grok-rolling-1848.md",
+            "slot": "1848",
+            "matched": [
+              "Myanmar",
+              "Rakhine"
+            ],
+            "source_url": "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+            "source_urls": [
+              "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+              "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide"
+            ],
+            "observed_at": "2026-11-19T16:48:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-17075055",
+            "story_title": "Lead 3: ICJ rules Myanmar committed genocide against Rohingya (first state finding); reactions continue",
+            "source": "grok/grok-rolling-0349.md",
+            "slot": "0349",
+            "matched": [
+              "Myanmar",
+              "Rakhine"
+            ],
+            "source_url": "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+            "source_urls": [
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.crisisgroup.org/qna/asia-pacific/myanmar/world-court-finds-myanmar-committed-genocide-against-rohingya"
+            ],
+            "observed_at": "2026-11-20T01:49:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-249a1e1e",
+            "story_title": "Lead 3: ICJ rules Myanmar committed genocide against Rohingya (first state held responsible); Myanmar rejects",
+            "source": "grok/grok-rolling-0945.md",
+            "slot": "0945",
+            "matched": [
+              "Myanmar",
+              "Rakhine"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://thediplomat.com/2026/11/icj-delivers-historic-verdict-myanmar-guilty-of-genocide-against-the-rohingya/",
+              "https://thediplomat.com/2026/11/icj-delivers-historic-verdict-myanmar-guilty-of-genocide-against-the-rohingya/",
+              "https://thediplomat.com/2026/11/icj-delivers-historic-verdict-myanmar-guilty-of-genocide-against-the-rohingya/",
+              "https://thediplomat.com/2026/11/icj-delivers-historic-verdict-myanmar-guilty-of-genocide-against-the-rohingya/",
+              "https://www.malaymail.com/news/world/2026/11/20/not-fair-myanmar-rejects-world-courts-historic-genocide-verdict/244092",
+              "https://www.malaymail.com/news/world/2026/11/20/not-fair-myanmar-rejects-world-courts-historic-genocide-verdict/244092",
+              "https://www.malaymail.com/news/world/2026/11/20/not-fair-myanmar-rejects-world-courts-historic-genocide-verdict/244092",
+              "https://www.theguardian.com/law/2026/nov/19/myanmar-ruling-new-relevance-genocide-convention-messages-israel",
+              "https://www.theguardian.com/law/2026/nov/19/myanmar-ruling-new-relevance-genocide-convention-messages-israel",
+              "https://www.hurriyetdailynews.com/ankara-welcomes-icj-genocide-ruling-against-myanmar-229623"
+            ],
+            "observed_at": "2026-11-20T07:45:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-45976ee2",
+            "story_title": "Lead 1: ICJ rules Myanmar committed genocide against Rohingya (first state finding by the Court)",
+            "source": "grok/grok-rolling-1550.md",
+            "slot": "1550",
+            "matched": [
+              "Myanmar",
+              "Rakhine"
+            ],
+            "source_url": "https://www.cbsnews.com/news/myanmar-genocide-rohingyas-un-top-court/",
+            "source_urls": [
+              "https://www.cbsnews.com/news/myanmar-genocide-rohingyas-un-top-court/",
+              "https://www.cbsnews.com/news/myanmar-genocide-rohingyas-un-top-court/",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.euronews.com/2026/11/19/myanmar-guilty-of-genocide-against-rohingya-un-court-rules",
+              "https://www.euronews.com/2026/11/19/myanmar-guilty-of-genocide-against-rohingya-un-court-rules",
+              "https://www.euronews.com/2026/11/19/myanmar-guilty-of-genocide-against-rohingya-un-court-rules",
+              "https://www.euronews.com/2026/11/19/myanmar-guilty-of-genocide-against-rohingya-un-court-rules"
+            ],
+            "observed_at": "2026-11-19T13:50:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-73ef6754",
+            "story_title": "Lead 1: ICJ Rules Myanmar Committed Genocide Against Rohingya (Historic First State Finding)",
+            "source": "grok/grok-rolling-0044.md",
+            "slot": "0044",
+            "matched": [
+              "Myanmar",
+              "Rakhine"
+            ],
+            "source_url": "https://apnews.com/article/rohingya-myanmar-genocide-court-icj-30df77b12bf3f911f1100e77ebe3973a",
+            "source_urls": [
+              "https://apnews.com/article/rohingya-myanmar-genocide-court-icj-30df77b12bf3f911f1100e77ebe3973a",
+              "https://apnews.com/article/rohingya-myanmar-genocide-court-icj-30df77b12bf3f911f1100e77ebe3973a",
+              "https://apnews.com/article/rohingya-myanmar-genocide-court-icj-30df77b12bf3f911f1100e77ebe3973a",
+              "https://apnews.com/article/rohingya-myanmar-genocide-court-icj-30df77b12bf3f911f1100e77ebe3973a",
+              "https://www.bbc.co.uk/news/articles/c804wzp20ddvo",
+              "https://www.bbc.co.uk/news/articles/c804wzp20ddvo",
+              "https://www.bbc.co.uk/news/articles/c804wzp20ddvo",
+              "https://www.bbc.co.uk/news/articles/c804wzp20ddvo",
+              "https://www.bbc.co.uk/news/articles/c804wzp20ddvo",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.rfa.org/english/myanmar/2026/11/19/rohingya-genocide-icj-ruling-myanmar/"
+            ],
+            "observed_at": null
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-fe3f4820",
+            "story_title": "Myanmar government publicly rejects the ICJ genocide judgment as “unfair”",
+            "source": "chatgpt/chatgpt-rolling-0919.md",
+            "slot": "0919",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://apnews.com/article/bangladesh-rohingya-myanmar-un-world-court-ruling-c76dcb3f97c1077262f87e0cba01bb78",
+            "source_urls": [
+              "https://apnews.com/article/bangladesh-rohingya-myanmar-un-world-court-ruling-c76dcb3f97c1077262f87e0cba01bb78",
+              "https://apnews.com/article/bangladesh-rohingya-myanmar-un-world-court-ruling-c76dcb3f97c1077262f87e0cba01bb78",
+              "https://apnews.com/article/bangladesh-rohingya-myanmar-un-world-court-ruling-c76dcb3f97c1077262f87e0cba01bb78",
+              "https://iimm.un.org/en/node/509",
+              "https://iimm.un.org/en/node/509",
+              "https://iimm.un.org/en/node/509",
+              "https://www.mofa.gov.mm/en/press-release-by-the-ministry-of-foreign-affairs-of-the-republic-of-the/",
+              "https://www.mofa.gov.mm/en/press-release-by-the-ministry-of-foreign-affairs-of-the-republic-of-the/",
+              "https://www.mofa.gov.mm/en/press-release-by-the-ministry-of-foreign-affairs-of-the-republic-of-the/"
+            ],
+            "observed_at": "2026-11-20T07:19:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.5385,
+    "previous": 0.5385,
+    "previous_edition": "2026-11-19",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
