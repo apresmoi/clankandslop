@@ -1,0 +1,1010 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-21",
+  "generated_at": "2026-11-21T08:50:04Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.5385,
+    "numerator": 7,
+    "denominator": 13,
+    "triggering": 4,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 92.94,
+        "observed_at": "2026-11-17",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "92.94 >= 93.44 is false"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 89.53,
+        "observed_at": "2026-11-17",
+        "stale_days": 4,
+        "contributes": 1,
+        "reason": "89.53 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 5.937,
+        "observed_at": "2026-11-16",
+        "stale_days": 5,
+        "contributes": 2,
+        "reason": "5.937 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.1,
+        "observed_at": "2026-11-17",
+        "stale_days": 4,
+        "contributes": 0,
+        "reason": "3.1 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 28.44,
+        "observed_at": "2026-11-19",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "28.44 >= 22.96 is true"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 3.52,
+        "observed_at": "2026-11-19",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "3.52 >= 3.388 is true"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "not_triggering",
+        "observed": 122.6503,
+        "observed_at": "2026-11-13",
+        "stale_days": 8,
+        "contributes": 0,
+        "reason": "122.6503 >= 123.2115 is false"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-21T08:50:02Z",
+        "http_status": 200,
+        "bytes": 170533,
+        "sha256": "aa587e1c6edc32b9e3cdfe2dd332245c9d1076868d5735909b1f1644b325eb85",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-21T08:50:02Z",
+        "http_status": 200,
+        "bytes": 176305,
+        "sha256": "10ff6925e3b8a4bcf7f6968f51936a8fc9d841daa29ceaedada058690a06b3c9",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-21T08:50:03Z",
+        "http_status": 200,
+        "bytes": 29010,
+        "sha256": "99cd47541f8a6f7acb666581fdcaa10f5317ff6aa5d87aefe24a513b3eca45c5",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-21T08:50:03Z",
+        "http_status": 200,
+        "bytes": 116553,
+        "sha256": "381f9a5569736ad328236eefcc001a55f788487420823518daf6b81636a0ce19",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-21T08:50:03Z",
+        "http_status": 200,
+        "bytes": 162037,
+        "sha256": "5fdb14015c8fee857f1aae7ea54d799fe8e2eebc1b4dcab047cc7ac70e3a78a0",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-21T08:50:03Z",
+        "http_status": 200,
+        "bytes": 12702,
+        "sha256": "bc168c032a4ee7fea9f80c6f834f505e79626c05aefe3b6d0101de7922019a5b",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-21T08:50:03Z",
+        "http_status": 200,
+        "bytes": 105121,
+        "sha256": "542aab261636608b3fb59fc913b8ad9d9767f15c551637b76ee16391d522f5d3",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 42,
+    "open_conflicts": 3,
+    "watch": 5,
+    "dormant": 5,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-3d94cb69",
+            "story_title": "Iran claims a newly deployed air-defense system downed another US MQ-9 over Hormuz",
+            "source": "chatgpt/chatgpt-rolling-0916.md",
+            "slot": "0916",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.presstv.co.uk/Detail/2026/11/21/781214/irgc-announces-downing-of-58th-us-mq-9-drone-over-strait-of-hormuz",
+            "source_urls": [
+              "https://www.presstv.co.uk/Detail/2026/11/21/781214/irgc-announces-downing-of-58th-us-mq-9-drone-over-strait-of-hormuz",
+              "https://www.presstv.co.uk/Detail/2026/11/21/781214/irgc-announces-downing-of-58th-us-mq-9-drone-over-strait-of-hormuz",
+              "https://www.presstv.co.uk/Detail/2026/11/21/781214/irgc-announces-downing-of-58th-us-mq-9-drone-over-strait-of-hormuz",
+              "https://www.presstv.co.uk/Detail/2026/11/21/781214/irgc-announces-downing-of-58th-us-mq-9-drone-over-strait-of-hormuz",
+              "https://www.trend.az/iran/4249063.html",
+              "https://www.trend.az/iran/4249063.html",
+              "https://www.trend.az/iran/4249063.html",
+              "https://en.royanews.com/Iran%27s-Revolutionary-Guard-announces-downing-of-drone/",
+              "https://en.royanews.com/Iran%27s-Revolutionary-Guard-announces-downing-of-drone/",
+              "https://en.royanews.com/Iran%27s-Revolutionary-Guard-announces-downing-of-drone/"
+            ],
+            "observed_at": "2026-11-21T07:16:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-3f28c207",
+            "story_title": "A newly reported tanker strike near Khasab materially changes the Hormuz file — but corroboration is…",
+            "source": "chatgpt/chatgpt-rolling-0916.md",
+            "slot": "0916",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/tanker-hit-by-unknown-projectile-near-omans-khasab-ukmto-says-2026-11-21/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/tanker-hit-by-unknown-projectile-near-omans-khasab-ukmto-says-2026-11-21/",
+              "https://www.reuters.com/business/energy/tanker-hit-by-unknown-projectile-near-omans-khasab-ukmto-says-2026-11-21/",
+              "https://www.reuters.com/business/energy/tanker-hit-by-unknown-projectile-near-omans-khasab-ukmto-says-2026-11-21/",
+              "https://www.reuters.com/business/energy/tanker-hit-by-unknown-projectile-near-omans-khasab-ukmto-says-2026-11-21/",
+              "https://www.ukmto.org/recent-incidents?gsid=81c2c680-3583-486d-ab9c-f40c815f8bbe",
+              "https://www.ukmto.org/recent-incidents?gsid=81c2c680-3583-486d-ab9c-f40c815f8bbe",
+              "https://www.ukmto.org/recent-incidents?gsid=81c2c680-3583-486d-ab9c-f40c815f8bbe",
+              "https://www.ukmto.org/recent-incidents?gsid=81c2c680-3583-486d-ab9c-f40c815f8bbe",
+              "https://www.reuters.com/world/middle-east/fire-reported-tanker-after-projectile-strike-off-oman-ukmto-says-2026-11-20/",
+              "https://www.reuters.com/world/middle-east/fire-reported-tanker-after-projectile-strike-off-oman-ukmto-says-2026-11-20/",
+              "https://www.reuters.com/world/middle-east/fire-reported-tanker-after-projectile-strike-off-oman-ukmto-says-2026-11-20/",
+              "https://www.iranintl.com/en/202611207005",
+              "https://www.iranintl.com/en/202611207005",
+              "https://www.iranintl.com/en/202611207005",
+              "https://www.iranintl.com/en/202611207005"
+            ],
+            "observed_at": "2026-11-21T07:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 9,
+        "evidence": [
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-229d2979",
+            "story_title": "Lead 1: Russian ballistic and drone barrage hits three Kyiv bridges over the Dnipro, kills at least 8…",
+            "source": "grok/grok-rolling-2148.md",
+            "slot": "2148",
+            "matched": [
+              "Kyiv"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/c6x29gn4pdn9o",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/c6x29gn4pdn9o",
+              "https://www.bbc.com/news/articles/c6x29gn4pdn9o",
+              "https://www.bbc.com/news/articles/c6x29gn4pdn9o",
+              "https://www.bbc.com/news/articles/c6x29gn4pdn9o",
+              "https://www.bbc.com/news/articles/c6x29gn4pdn9o",
+              "https://www.aljazeera.com/news/2026/11/20/russia-unleashes-retaliatory-barrage-on-kyiv-bridges",
+              "https://www.aljazeera.com/news/2026/11/20/russia-unleashes-retaliatory-barrage-on-kyiv-bridges",
+              "https://www.aljazeera.com/news/2026/11/20/russia-unleashes-retaliatory-barrage-on-kyiv-bridges",
+              "https://www.aljazeera.com/news/2026/11/20/russia-unleashes-retaliatory-barrage-on-kyiv-bridges",
+              "https://en.interfax.com.ua/news/general/1239655.html",
+              "https://en.interfax.com.ua/news/general/1239655.html"
+            ],
+            "observed_at": "2026-11-20T19:48:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-3abf13ed",
+            "story_title": "Denmark attributes a thwarted assassination attempt to Russian intelligence and expels the defence attaché",
+            "source": "chatgpt/chatgpt-rolling-2122.md",
+            "slot": "2122",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://stm.dk/presse/pressemeddelelser/2026/statement-by-the-prime-minister/",
+            "source_urls": [
+              "https://stm.dk/presse/pressemeddelelser/2026/statement-by-the-prime-minister/",
+              "https://stm.dk/presse/pressemeddelelser/2026/statement-by-the-prime-minister/",
+              "https://stm.dk/presse/pressemeddelelser/2026/statement-by-the-prime-minister/",
+              "https://stm.dk/presse/pressemeddelelser/2026/statement-by-the-prime-minister/",
+              "https://www.reuters.com/world/europe/two-danes-suspected-being-hired-by-russia-kill-us-ukrainian-rapper-2026-11-20/",
+              "https://www.reuters.com/world/europe/two-danes-suspected-being-hired-by-russia-kill-us-ukrainian-rapper-2026-11-20/",
+              "https://www.reuters.com/world/europe/two-danes-suspected-being-hired-by-russia-kill-us-ukrainian-rapper-2026-11-20/",
+              "https://www.reuters.com/world/europe/two-danes-suspected-being-hired-by-russia-kill-us-ukrainian-rapper-2026-11-20/",
+              "https://apnews.com/article/denmark-russia-ukraine-intelligence-tensions-poland-plot-03494b78067c9572120deac038addd23",
+              "https://apnews.com/article/denmark-russia-ukraine-intelligence-tensions-poland-plot-03494b78067c9572120deac038addd23",
+              "https://apnews.com/article/denmark-russia-ukraine-intelligence-tensions-poland-plot-03494b78067c9572120deac038addd23"
+            ],
+            "observed_at": "2026-11-20T19:22:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-3b931bdb",
+            "story_title": "Lead 3: Russian Kh-101 missile, second missile and jet-powered drone land in south-eastern Poland; Tusk…",
+            "source": "grok/grok-rolling-1841.md",
+            "slot": "1841",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.theguardian.com/world/2026/nov/20/russian-missiles-drone-poland-attacks-ukraine",
+            "source_urls": [
+              "https://www.theguardian.com/world/2026/nov/20/russian-missiles-drone-poland-attacks-ukraine",
+              "https://www.theguardian.com/world/2026/nov/20/russian-missiles-drone-poland-attacks-ukraine",
+              "https://www.theguardian.com/world/2026/nov/20/russian-missiles-drone-poland-attacks-ukraine",
+              "https://www.bbc.com/news/articles/cqx2x9dklxnro",
+              "https://www.bbc.com/news/articles/cqx2x9dklxnro",
+              "https://www.euronews.com/2026/11/20/unidentified-object-falls-in-eastern-poland-amid-major-russian-attack-on-ukraine",
+              "https://www.euronews.com/2026/11/20/unidentified-object-falls-in-eastern-poland-amid-major-russian-attack-on-ukraine",
+              "https://www.euronews.com/2026/11/20/unidentified-object-falls-in-eastern-poland-amid-major-russian-attack-on-ukraine",
+              "https://www.afp.com/en/warsaw-says-russian-missiles-hit-poland-denounces-intentional-provocation"
+            ],
+            "observed_at": "2026-11-20T16:41:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-5e5d906e",
+            "story_title": "EU executes a record €7.9 billion Ukraine Facility payment",
+            "source": "chatgpt/chatgpt-rolling-1515.md",
+            "slot": "1515",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://enlargement.ec.europa.eu/news/commission-disburses-eur79-billion-strengthen-ukraines-financial-stability-and-advance-reform-2026-11-20_en",
+            "source_urls": [
+              "https://enlargement.ec.europa.eu/news/commission-disburses-eur79-billion-strengthen-ukraines-financial-stability-and-advance-reform-2026-11-20_en",
+              "https://enlargement.ec.europa.eu/news/commission-disburses-eur79-billion-strengthen-ukraines-financial-stability-and-advance-reform-2026-11-20_en",
+              "https://mof.gov.ua/en/news/ukraine_received_record_eur_8_billion_from_the_eu_under_ukraine_facility-6032",
+              "https://mof.gov.ua/en/news/ukraine_received_record_eur_8_billion_from_the_eu_under_ukraine_facility-6032",
+              "https://en.interfax.com.ua/news/general/1239839-amp.html",
+              "https://en.interfax.com.ua/news/general/1239839-amp.html",
+              "https://www.ukrinform.net/rubric-economy/4186826-eu-disburses-eur-79-bln-to-strengthen-ukraines-financial-stability.html",
+              "https://www.ukrinform.net/rubric-economy/4186826-eu-disburses-eur-79-bln-to-strengthen-ukraines-financial-stability.html",
+              "https://www.pravda.com.ua/eng/news/2026/11/20/8063795/",
+              "https://www.pravda.com.ua/eng/news/2026/11/20/8063795/"
+            ],
+            "observed_at": "2026-11-20T13:15:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-c78b386a",
+            "story_title": "Russia’s large-scale overnight strike on Ukraine spills into Polish airspace",
+            "source": "grok/grok-rolling-0644.md",
+            "slot": "0644",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.cbc.ca/news/world/russian-attacks-on-kyiv-9.7429460",
+            "source_urls": [
+              "https://www.cbc.ca/news/world/russian-attacks-on-kyiv-9.7429460",
+              "https://meduza.io/en/feature/2026/11/21/russia-launches-massive-attack-on-ukraine-a-day-after-putin-s-meeting-with-trump-and-xi",
+              "https://meduza.io/en/feature/2026/11/21/russia-launches-massive-attack-on-ukraine-a-day-after-putin-s-meeting-with-trump-and-xi",
+              "https://meduza.io/en/feature/2026/11/21/russia-launches-massive-attack-on-ukraine-a-day-after-putin-s-meeting-with-trump-and-xi",
+              "https://meduza.io/en/feature/2026/11/21/russia-launches-massive-attack-on-ukraine-a-day-after-putin-s-meeting-with-trump-and-xi",
+              "https://meduza.io/en/feature/2026/11/21/russia-launches-massive-attack-on-ukraine-a-day-after-putin-s-meeting-with-trump-and-xi",
+              "https://meduza.io/en/feature/2026/11/21/russia-launches-massive-attack-on-ukraine-a-day-after-putin-s-meeting-with-trump-and-xi",
+              "https://meduza.io/en/feature/2026/11/21/russia-launches-massive-attack-on-ukraine-a-day-after-putin-s-meeting-with-trump-and-xi",
+              "https://www.bbc.co.uk/news/articles/cqx2x9dklxnro",
+              "https://www.bbc.co.uk/news/articles/cqx2x9dklxnro",
+              "https://www.bbc.co.uk/news/articles/cqx2x9dklxnro",
+              "https://www.theguardian.com/world/2026/nov/20/russian-missiles-drone-poland-attacks-ukraine",
+              "https://www.theguardian.com/world/2026/nov/20/russian-missiles-drone-poland-attacks-ukraine",
+              "https://www.theguardian.com/world/2026/nov/20/russian-missiles-drone-poland-attacks-ukraine"
+            ],
+            "observed_at": "2026-11-21T04:44:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-cbcd0318",
+            "story_title": "Lead 5 (material update on prior Shenzhen coverage): Trump, Xi, Putin issue four-point “Declaration Toward…",
+            "source": "grok/grok-rolling-1245.md",
+            "slot": "1245",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://peoplesdaily.pdnews.cn/world/er/30053597977",
+            "source_urls": [
+              "https://peoplesdaily.pdnews.cn/world/er/30053597977",
+              "https://peoplesdaily.pdnews.cn/world/er/30053597977",
+              "https://peoplesdaily.pdnews.cn/world/er/30053597977",
+              "https://peoplesdaily.pdnews.cn/world/er/30053597977"
+            ],
+            "observed_at": "2026-11-20T10:45:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-cde4dd39",
+            "story_title": "EU converts the September Ukraine agreement into €1 billion of joint weapons procurement",
+            "source": "chatgpt/chatgpt-rolling-2122.md",
+            "slot": "2122",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://www.consilium.europa.eu/et/press/press-releases/2026/11/20/european-peace-facility-council-mobilises-additional-1-billion-in-new-military-aid-to-ukraine/",
+            "source_urls": [
+              "https://www.consilium.europa.eu/et/press/press-releases/2026/11/20/european-peace-facility-council-mobilises-additional-1-billion-in-new-military-aid-to-ukraine/",
+              "https://www.consilium.europa.eu/et/press/press-releases/2026/11/20/european-peace-facility-council-mobilises-additional-1-billion-in-new-military-aid-to-ukraine/",
+              "https://www.consilium.europa.eu/et/press/press-releases/2026/11/20/european-peace-facility-council-mobilises-additional-1-billion-in-new-military-aid-to-ukraine/",
+              "https://www.consilium.europa.eu/et/press/press-releases/2026/11/20/european-peace-facility-council-mobilises-additional-1-billion-in-new-military-aid-to-ukraine/",
+              "https://kyivindependent.com/eu-greenlights-1-billion-euros-in-military-support-for-ukraine-as-top-diplomat-says-russia-rejects-peace/",
+              "https://kyivindependent.com/eu-greenlights-1-billion-euros-in-military-support-for-ukraine-as-top-diplomat-says-russia-rejects-peace/",
+              "https://kyivindependent.com/eu-greenlights-1-billion-euros-in-military-support-for-ukraine-as-top-diplomat-says-russia-rejects-peace/",
+              "https://www.ukrinform.net/amp/rubric-polytics/4186902-eu-approves-another-eur-1b-in-military-aid-for-ukraine.html"
+            ],
+            "observed_at": "2026-11-20T19:22:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-efa252bb",
+            "story_title": "Russian missiles and a jet-powered drone entered Poland during the Ukraine barrage",
+            "source": "chatgpt/chatgpt-rolling-1515.md",
+            "slot": "1515",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.gov.pl/web/obrona-narodowa/wicepremier-w-kosiniak-kamysz-o-naruszeniu-polskiej-przestrzeni-powietrznej",
+            "source_urls": [
+              "https://www.gov.pl/web/obrona-narodowa/wicepremier-w-kosiniak-kamysz-o-naruszeniu-polskiej-przestrzeni-powietrznej",
+              "https://www.gov.pl/web/obrona-narodowa/wicepremier-w-kosiniak-kamysz-o-naruszeniu-polskiej-przestrzeni-powietrznej",
+              "https://k.prezydent.pl/kancelaria/aktywnosc-ministrow/szef-bbn-o-naruszeniu-polskiej-przestrzeni-powietrznej,130407",
+              "https://k.prezydent.pl/kancelaria/aktywnosc-ministrow/szef-bbn-o-naruszeniu-polskiej-przestrzeni-powietrznej,130407",
+              "https://apnews.com/article/63386266cef90907913df2b456808a4d",
+              "https://apnews.com/article/63386266cef90907913df2b456808a4d",
+              "https://www.polskieradio.pl/395/7784/Artykul/3755199%2Ctwo-russian-missiles-drone-crash-in-poland-during%C2%A0air-attack-on-ukraine-defence-minister-says",
+              "https://www.polskieradio.pl/395/7784/Artykul/3755199%2Ctwo-russian-missiles-drone-crash-in-poland-during%C2%A0air-attack-on-ukraine-defence-minister-says",
+              "https://www.onet.pl/informacje/onetwiadomosci/naruszenie-polskiej-przestrzeni-powietrznej-sa-nowe-informacje-z-rzadu/ne8lxs6%2C79cfc278",
+              "https://www.onet.pl/informacje/onetwiadomosci/naruszenie-polskiej-przestrzeni-powietrznej-sa-nowe-informacje-z-rzadu/ne8lxs6%2C79cfc278"
+            ],
+            "observed_at": "2026-11-20T13:15:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-f720c53e",
+            "story_title": "Lead 1: Russian Kh-101 missile, second missile and jet-powered drone enter Polish airspace during major…",
+            "source": "grok/grok-rolling-1543.md",
+            "slot": "1543",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.bbc.com/news/articles/cqx2x9dklxnro",
+            "source_urls": [
+              "https://www.bbc.com/news/articles/cqx2x9dklxnro",
+              "https://www.bbc.com/news/articles/cqx2x9dklxnro",
+              "https://www.bbc.com/news/articles/cqx2x9dklxnro",
+              "https://www.bbc.com/news/articles/cqx2x9dklxnro",
+              "https://www.politico.eu/article/russian-missile-incursion-into-poland-seems-intentional-tusk-says/",
+              "https://www.politico.eu/article/russian-missile-incursion-into-poland-seems-intentional-tusk-says/",
+              "https://www.politico.eu/article/russian-missile-incursion-into-poland-seems-intentional-tusk-says/",
+              "https://www.politico.eu/article/russian-missile-incursion-into-poland-seems-intentional-tusk-says/",
+              "https://notesfrompoland.com/2026/11/20/unidentified-object-hits-poland-amid-russian-attacks-on-western-ukraine/",
+              "https://notesfrompoland.com/2026/11/20/unidentified-object-hits-poland-amid-russian-attacks-on-western-ukraine/",
+              "https://notesfrompoland.com/2026/11/20/unidentified-object-hits-poland-amid-russian-attacks-on-western-ukraine/",
+              "https://notesfrompoland.com/2026/11/20/unidentified-object-hits-poland-amid-russian-attacks-on-western-ukraine/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261120-930-25420/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261120-930-25420/",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261120-930-25420/",
+              "https://www.aerotime.aero/articles/russian-kh-101-poland-swedish-gripens-interception"
+            ],
+            "observed_at": "2026-11-20T13:43:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-ee5ea839",
+            "story_title": "Lead 4: Israel concludes first public tank raid beyond Gaza Yellow Line since Oct 2025 ceasefire; road…",
+            "source": "grok/grok-rolling-1245.md",
+            "slot": "1245",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.channelnewsasia.com/world/israel-army-completed-central-gaza-ground-operation-6565931",
+            "source_urls": [
+              "https://www.channelnewsasia.com/world/israel-army-completed-central-gaza-ground-operation-6565931",
+              "https://www.channelnewsasia.com/world/israel-army-completed-central-gaza-ground-operation-6565931",
+              "https://www.channelnewsasia.com/world/israel-army-completed-central-gaza-ground-operation-6565931",
+              "https://www.channelnewsasia.com/world/israel-army-completed-central-gaza-ground-operation-6565931",
+              "https://www.bbc.co.uk/news/articles/cw8r7510degno",
+              "https://www.bbc.co.uk/news/articles/cw8r7510degno",
+              "https://www.bbc.co.uk/news/articles/cw8r7510degno",
+              "https://www.bbc.co.uk/news/articles/cw8r7510degno",
+              "https://www.bbc.co.uk/news/articles/cw8r7510degno"
+            ],
+            "observed_at": "2026-11-20T10:45:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-27bf5be8",
+            "story_title": "Houthis claim strikes on Saudi power station and port after Hodeidah hits",
+            "source": "grok/grok-rolling-0344.md",
+            "slot": "0344",
+            "matched": [
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://www.dawn.com/news/2045987",
+            "source_urls": [
+              "https://www.dawn.com/news/2045987",
+              "https://www.dawn.com/news/2045987",
+              "https://www.dawn.com/news/2045987",
+              "https://www.dawn.com/news/2045987",
+              "https://www.dawn.com/news/2045987",
+              "https://www.dawn.com/news/2045987",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-threaten-strike-saudi-red-sea-ports-2026-11-20/",
+              "https://www.al-monitor.com/originals/2026/11/saudi-coalition-launches-special-operation-yemens-houthis-vow-reprisals"
+            ],
+            "observed_at": "2026-11-21T01:44:00Z"
+          },
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-2e5ecb45",
+            "story_title": "Lead 2: Saudi-led coalition intercepts three Houthi ballistic missiles targeting Riyadh early Saturday",
+            "source": "grok/grok-rolling-0944.md",
+            "slot": "0944",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+              "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+              "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+              "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+              "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+              "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+              "https://www.aljazeera.com/news/2026/11/21/saudi-led-coalition-intercepts-three-houthi-missiles-headed-for-riyadh",
+              "https://www.arabnews.com/saudi-arabia/coalition-air-defenses-intercept-3-houthi-ballistic-missiles-targeting-riyadh-3013264",
+              "https://www.arabnews.com/saudi-arabia/coalition-air-defenses-intercept-3-houthi-ballistic-missiles-targeting-riyadh-3013264",
+              "https://www.arabnews.com/saudi-arabia/coalition-air-defenses-intercept-3-houthi-ballistic-missiles-targeting-riyadh-3013264",
+              "https://www.arabnews.com/saudi-arabia/coalition-air-defenses-intercept-3-houthi-ballistic-missiles-targeting-riyadh-3013264",
+              "https://www.dawn.com/news/2046096",
+              "https://www.dawn.com/news/2046096"
+            ],
+            "observed_at": "2026-11-21T07:44:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-19 and drew no qualifying story today",
+        "last_open_edition": "2026-11-19",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-19",
+            "story_id": "s-3af4134d",
+            "story_title": "United States and Venezuela announce a military-cooperation agreement after years of severed ties",
+            "source": "chatgpt/chatgpt-rolling-2117.md",
+            "slot": "2117",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+            "source_urls": [
+              "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+              "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+              "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://www.aa.com.tr/en/americas/us-venezuela-announce-military-cooperation-agreement-during-hegseth-visit-to-caracas/4129756"
+            ],
+            "observed_at": "2026-11-18T19:17:00Z"
+          },
+          {
+            "edition": "2026-11-19",
+            "story_id": "s-c5c0cb1f",
+            "story_title": "Lead 1: U.S. Defense Secretary Hegseth Announces Military Cooperation Agreement with Interim Venezuelan…",
+            "source": "grok/grok-rolling-0042.md",
+            "slot": "0042",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+            "source_urls": [
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/"
+            ],
+            "observed_at": null
+          }
+        ]
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-18 and drew no qualifying story today",
+        "last_open_edition": "2026-11-18",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-8ca219fb",
+            "story_title": "Lead 3: Two suspected Russian aircraft violate Japanese airspace; Tokyo protests; concurrent ADIZ activity…",
+            "source": "grok/grok-rolling-1248.md",
+            "slot": "1248",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+            "source_urls": [
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.bbc.co.uk/news/articles/c60evw20qe47o",
+              "https://www.japantimes.co.jp/news/2026/11/17/japan/russia-japan-airspace-violation-defense/"
+            ],
+            "observed_at": "2026-11-17T10:48:00Z"
+          },
+          {
+            "edition": "2026-11-18",
+            "story_id": "s-debbf25b",
+            "story_title": "Lead 4: Two suspected Russian aircraft violate Japanese airspace off Fukuoka; Tokyo protests and scrambles…",
+            "source": "grok/grok-rolling-1849.md",
+            "slot": "1849",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+            "source_urls": [
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://asia.nikkei.com/politics/defense/suspected-russian-aircraft-violate-japan-airspace-as-bilateral-ties-sour",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/",
+              "https://jen.jiji.com/japan/society/2026111700423/"
+            ],
+            "observed_at": "2026-11-17T16:49:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-15 and drew no qualifying story today",
+        "last_open_edition": "2026-11-15",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-15",
+            "story_id": "s-424cb5eb",
+            "story_title": "South Sudan election calendar moves to February, opening a dispute over legal authority",
+            "source": "chatgpt/chatgpt-rolling-0301.md",
+            "slot": "0301",
+            "matched": [
+              "Sudan"
+            ],
+            "source_url": "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+            "source_urls": [
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://www.radiotamazuj.org/en/news/article/nec-pushes-elections-beyond-december-deadline-set-in-law",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://amp.dw.com/en/south-sudan-pushes-back-elections-amid-violent-flare-ups/a-79949622",
+              "https://www.nta.ng/news/politics/south-sudan-postpones-first-national-elections-to-february-2027",
+              "https://www.nta.ng/news/politics/south-sudan-postpones-first-national-elections-to-february-2027",
+              "https://www.radiotamazuj.org/en/news/article/was-it-lawful-to-delay-south-sudans-elections-until-february-2027",
+              "https://www.radiotamazuj.org/en/news/article/was-it-lawful-to-delay-south-sudans-elections-until-february-2027"
+            ],
+            "observed_at": "2026-11-15T01:01:00Z"
+          },
+          {
+            "edition": "2026-11-15",
+            "story_id": "s-9fc580c3",
+            "story_title": "South Sudan election commission postpones first post-independence national vote to 11 February 2027.",
+            "source": "grok/grok-rolling-0046.md",
+            "slot": "0046",
+            "matched": [
+              "Sudan"
+            ],
+            "source_url": "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+            "source_urls": [
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://abcnews.com/International/wireStory/south-sudan-postpones-national-elections-february-2027-138138151",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february",
+              "https://www.aljazeera.com/news/2026/11/14/south-sudan-postpones-first-ever-national-elections-until-february"
+            ],
+            "observed_at": null
+          }
+        ]
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-21",
+            "story_id": "s-3f390c89",
+            "story_title": "Lead 1: ICJ finds Myanmar committed genocide against Rohingya (first such state finding by the Court)",
+            "source": "grok/grok-rolling-1245.md",
+            "slot": "1245",
+            "matched": [
+              "Myanmar",
+              "Rakhine"
+            ],
+            "source_url": "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+            "source_urls": [
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar"
+            ],
+            "observed_at": "2026-11-20T10:45:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.5385,
+    "previous": 0.5385,
+    "previous_edition": "2026-11-20",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
