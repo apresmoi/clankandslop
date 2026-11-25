@@ -1,0 +1,838 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-25",
+  "generated_at": "2026-11-25T08:47:49Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.6154,
+    "numerator": 8,
+    "denominator": 13,
+    "triggering": 5,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 92.94,
+        "observed_at": "2026-11-17",
+        "stale_days": 8,
+        "contributes": 0,
+        "reason": "92.94 >= 93.44 is false"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "triggering",
+        "observed": 89.53,
+        "observed_at": "2026-11-17",
+        "stale_days": 8,
+        "contributes": 1,
+        "reason": "89.53 >= 88.334 is true"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 5.695,
+        "observed_at": "2026-11-23",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "5.695 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.1,
+        "observed_at": "2026-11-17",
+        "stale_days": 8,
+        "contributes": 0,
+        "reason": "3.1 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 26.62,
+        "observed_at": "2026-11-23",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "26.62 >= 22.96 is true"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 3.63,
+        "observed_at": "2026-11-23",
+        "stale_days": 2,
+        "contributes": 2,
+        "reason": "3.63 >= 3.388 is true"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 123.5978,
+        "observed_at": "2026-11-20",
+        "stale_days": 5,
+        "contributes": 1,
+        "reason": "123.5978 >= 123.2115 is true"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-25T08:47:48Z",
+        "http_status": 200,
+        "bytes": 170533,
+        "sha256": "aa587e1c6edc32b9e3cdfe2dd332245c9d1076868d5735909b1f1644b325eb85",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-25T08:47:48Z",
+        "http_status": 200,
+        "bytes": 176305,
+        "sha256": "10ff6925e3b8a4bcf7f6968f51936a8fc9d841daa29ceaedada058690a06b3c9",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-25T08:47:49Z",
+        "http_status": 200,
+        "bytes": 29027,
+        "sha256": "1ef3b5d1ca8dce803a5587a7ff23e692feb3caa3cd61fb6cc39e78f5865872b5",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-25T08:47:49Z",
+        "http_status": 200,
+        "bytes": 116553,
+        "sha256": "381f9a5569736ad328236eefcc001a55f788487420823518daf6b81636a0ce19",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-25T08:47:49Z",
+        "http_status": 200,
+        "bytes": 162071,
+        "sha256": "549fd346d0f111f1e3d0949f7eb89171e2c4e20684140ede37f397161210c0fe",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-25T08:47:49Z",
+        "http_status": 200,
+        "bytes": 12670,
+        "sha256": "e6f1be18f6f2f31edf22afcf66d8289b71f43e8f87599f6b8718b29bec5144ae",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-25T08:47:49Z",
+        "http_status": 200,
+        "bytes": 105221,
+        "sha256": "816a2678ffdbac9276fce6b5c8e380912488cdb3de09cae27eb7a3c28aab6b0b",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 39,
+    "open_conflicts": 2,
+    "watch": 7,
+    "dormant": 4,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-a45dab80",
+            "story_title": "Iran hardens its Hormuz negotiating position while its claim of three new mine strikes remains unverified",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.tasnimnews.ir/en/news/2026/11/24/3756889/three-more-tankers-hit-by-naval-mines-in-strait-of-hormuz/amp",
+            "source_urls": [
+              "https://www.tasnimnews.ir/en/news/2026/11/24/3756889/three-more-tankers-hit-by-naval-mines-in-strait-of-hormuz/amp",
+              "https://www.tasnimnews.ir/en/news/2026/11/24/3756889/three-more-tankers-hit-by-naval-mines-in-strait-of-hormuz/amp",
+              "https://www.tasnimnews.ir/en/news/2026/11/24/3756889/three-more-tankers-hit-by-naval-mines-in-strait-of-hormuz/amp",
+              "https://www.tasnimnews.ir/en/news/2026/11/24/3756889/three-more-tankers-hit-by-naval-mines-in-strait-of-hormuz/amp",
+              "https://www.tasnimnews.ir/en/news/2026/11/24/3756889/three-more-tankers-hit-by-naval-mines-in-strait-of-hormuz/amp",
+              "https://apnews.com/article/mideast-iran-gaza-israel-houthis-libya-november-24-2026-ba01cb036a849ba69873da5000ee08d5",
+              "https://www.euronews.com/2026/11/24/iran-orders-hormuz-closed-further-day-by-day-as-qatar-seeks-to-revive-peace-talks",
+              "https://www.euronews.com/2026/11/24/iran-orders-hormuz-closed-further-day-by-day-as-qatar-seeks-to-revive-peace-talks",
+              "https://www.aegir-maritime.org/home/archive/nov2026/24nov26",
+              "https://www.aegir-maritime.org/home/archive/nov2026/24nov26"
+            ],
+            "observed_at": "2026-11-24T13:16:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-06d89860",
+            "story_title": "Kurdistan’s prime minister rejects Baghdad’s attempt to federalize border crossings, oil exports and…",
+            "source": "chatgpt/chatgpt-rolling-1516.md",
+            "slot": "1516",
+            "matched": [
+              "Hezbollah"
+            ],
+            "source_url": "https://rudaw.net/english/categories/iraq/1080288",
+            "source_urls": [
+              "https://rudaw.net/english/categories/iraq/1080288",
+              "https://rudaw.net/english/categories/iraq/1080288",
+              "https://rudaw.net/english/categories/iraq/1080288",
+              "https://api.shafaq.com/en/Kurdistan/Kurdistan-rejects-Baghdad-takeover-of-border-crossings-oil-fields",
+              "https://api.shafaq.com/en/Kurdistan/Kurdistan-rejects-Baghdad-takeover-of-border-crossings-oil-fields",
+              "https://api.shafaq.com/en/Kurdistan/Kurdistan-rejects-Baghdad-takeover-of-border-crossings-oil-fields",
+              "https://api.shafaq.com/en/Kurdistan/Kurdistan-rejects-Baghdad-takeover-of-border-crossings-oil-fields",
+              "https://en.964media.com/56332/",
+              "https://en.964media.com/56332/",
+              "https://en.964media.com/56332/"
+            ],
+            "observed_at": "2026-11-24T13:16:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-b54b374b",
+            "story_title": "Libyan deaths turn the Benghazi strike into a state-to-state escalation problem",
+            "source": "chatgpt/chatgpt-rolling-0919.md",
+            "slot": "0919",
+            "matched": [
+              "Ukraine",
+              "Kyiv"
+            ],
+            "source_url": "https://apnews.com/article/russia-ukraine-war-libya-drone-attack-warship-officers-5719d6750c0619695c7f23a373cecd7b",
+            "source_urls": [
+              "https://apnews.com/article/russia-ukraine-war-libya-drone-attack-warship-officers-5719d6750c0619695c7f23a373cecd7b",
+              "https://apnews.com/article/russia-ukraine-war-libya-drone-attack-warship-officers-5719d6750c0619695c7f23a373cecd7b",
+              "https://apnews.com/article/russia-ukraine-war-libya-drone-attack-warship-officers-5719d6750c0619695c7f23a373cecd7b",
+              "https://mobile.aa.com.tr/en/middle-east/2-libyan-naval-personnel-die-from-wounds-sustained-in-benghazi-port-drone-attack/4136524",
+              "https://mobile.aa.com.tr/en/middle-east/2-libyan-naval-personnel-die-from-wounds-sustained-in-benghazi-port-drone-attack/4136524",
+              "https://mobile.aa.com.tr/en/middle-east/2-libyan-naval-personnel-die-from-wounds-sustained-in-benghazi-port-drone-attack/4136524",
+              "https://lana.gov.ly/post.php?id=370759&lang=en",
+              "https://lana.gov.ly/post.php?id=370759&lang=en",
+              "https://lana.gov.ly/post.php?id=370759&lang=en",
+              "https://ssu.gov.ua/en/novyny/syly-oborony-ukrainy-spilno-z-sbu-znyshchyly-rosiiskyi-viiskovyi-korvet-merkurii-ta-urazyly-pidsanktsiine-sudno-rf-bilia-portu-benhazi-liviia",
+              "https://ssu.gov.ua/en/novyny/syly-oborony-ukrainy-spilno-z-sbu-znyshchyly-rosiiskyi-viiskovyi-korvet-merkurii-ta-urazyly-pidsanktsiine-sudno-rf-bilia-portu-benhazi-liviia",
+              "https://ssu.gov.ua/en/novyny/syly-oborony-ukrainy-spilno-z-sbu-znyshchyly-rosiiskyi-viiskovyi-korvet-merkurii-ta-urazyly-pidsanktsiine-sudno-rf-bilia-portu-benhazi-liviia"
+            ],
+            "observed_at": "2026-11-25T07:19:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-17c6189a",
+            "story_title": "Israeli forces kill Hamas internal security apparatus director Naeem Abu Nahel in Gaza City airstrike…",
+            "source": "grok/grok-rolling-1550.md",
+            "slot": "1550",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.bbc.co.uk/news/articles/c6rrg7ggq190o",
+              "https://www.channelnewsasia.com/world/israeli-strikes-in-gaza-kill-seven-including-senior-security-official-6578251",
+              "https://www.channelnewsasia.com/world/israeli-strikes-in-gaza-kill-seven-including-senior-security-official-6578251"
+            ],
+            "observed_at": "2026-11-24T13:50:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-352a871e",
+            "story_title": "Saudi-Houthi cycle expands from Riyadh to Ras Tanura and Hodeidah",
+            "source": "chatgpt/chatgpt-rolling-0919.md",
+            "slot": "0919",
+            "matched": [
+              "Yemen",
+              "Houthi",
+              "Red Sea"
+            ],
+            "source_url": "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-saudi-oil-refinery-riyadh-financial-district-2026-11-25/",
+            "source_urls": [
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-saudi-oil-refinery-riyadh-financial-district-2026-11-25/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-saudi-oil-refinery-riyadh-financial-district-2026-11-25/",
+              "https://www.reuters.com/world/middle-east/yemens-houthis-say-they-attacked-saudi-oil-refinery-riyadh-financial-district-2026-11-25/",
+              "https://www.arabnews.com/middle-east/coalition-targets-%E2%80%98operational-capabilities%E2%80%99-hodeidah-port-diplomats-condemn-houthis-3013941",
+              "https://www.arabnews.com/middle-east/coalition-targets-%E2%80%98operational-capabilities%E2%80%99-hodeidah-port-diplomats-condemn-houthis-3013941",
+              "https://www.arabnews.com/middle-east/coalition-targets-%E2%80%98operational-capabilities%E2%80%99-hodeidah-port-diplomats-condemn-houthis-3013941",
+              "https://gulfnews.com/amp/story/world%2Fmena%2Fmiddle-east-conflict-trump-says-iran-war-funded-through-january-amid-saudi-yemen-escalation-1.500759977",
+              "https://gulfnews.com/amp/story/world%2Fmena%2Fmiddle-east-conflict-trump-says-iran-war-funded-through-january-amid-saudi-yemen-escalation-1.500759977",
+              "https://gulfnews.com/amp/story/world%2Fmena%2Fmiddle-east-conflict-trump-says-iran-war-funded-through-january-amid-saudi-yemen-escalation-1.500759977",
+              "https://sabq.org/en/article/air-defense-intercepts-and-destroys-4-drones-in-ras-tanura",
+              "https://sabq.org/en/article/air-defense-intercepts-and-destroys-4-drones-in-ras-tanura",
+              "https://sabq.org/en/article/air-defense-intercepts-and-destroys-4-drones-in-ras-tanura"
+            ],
+            "observed_at": "2026-11-25T07:19:00Z"
+          },
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-8e62f4f6",
+            "story_title": "Saudi coalition says the Riyadh financial-district strike used a drone and promises a “firm response”",
+            "source": "chatgpt/chatgpt-rolling-0316.md",
+            "slot": "0316",
+            "matched": [
+              "Houthi"
+            ],
+            "source_url": "https://www.spa.gov.sa/en/N2735613",
+            "source_urls": [
+              "https://www.spa.gov.sa/en/N2735613",
+              "https://www.spa.gov.sa/en/N2735613",
+              "https://www.spa.gov.sa/en/N2735283",
+              "https://www.spa.gov.sa/en/N2735283",
+              "https://www.spa.gov.sa/en/N2735283",
+              "https://www.arabnews.com/saudi-arabia/11-injured-in-houthi-attack-on-tower-in-riyadhs-financial-district-3013857",
+              "https://www.arabnews.com/saudi-arabia/11-injured-in-houthi-attack-on-tower-in-riyadhs-financial-district-3013857",
+              "https://www.arabnews.com/saudi-arabia/11-injured-in-houthi-attack-on-tower-in-riyadhs-financial-district-3013857",
+              "https://www.arabnews.com/saudi-arabia/11-injured-in-houthi-attack-on-tower-in-riyadhs-financial-district-3013857",
+              "https://saudigazette.com.sa/article/666506/saudi-arabia/coalition-houthi-terrorists-used-drone-to-attack-kafd-tower",
+              "https://saudigazette.com.sa/article/666506/saudi-arabia/coalition-houthi-terrorists-used-drone-to-attack-kafd-tower"
+            ],
+            "observed_at": "2026-11-25T01:16:00Z"
+          }
+        ]
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-19 and drew no qualifying story today",
+        "last_open_edition": "2026-11-19",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-19",
+            "story_id": "s-3af4134d",
+            "story_title": "United States and Venezuela announce a military-cooperation agreement after years of severed ties",
+            "source": "chatgpt/chatgpt-rolling-2117.md",
+            "slot": "2117",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+            "source_urls": [
+              "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+              "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+              "https://www.afp.com/en/hegseth-makes-surprise-trip-venezuela-inks-defense-pact",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://www.aa.com.tr/en/americas/us-venezuela-announce-military-cooperation-agreement-during-hegseth-visit-to-caracas/4129756"
+            ],
+            "observed_at": "2026-11-18T19:17:00Z"
+          },
+          {
+            "edition": "2026-11-19",
+            "story_id": "s-c5c0cb1f",
+            "story_title": "Lead 1: U.S. Defense Secretary Hegseth Announces Military Cooperation Agreement with Interim Venezuelan…",
+            "source": "grok/grok-rolling-0042.md",
+            "slot": "0042",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+            "source_urls": [
+              "https://english.elpais.com/international/2026-11-18/us-defense-secretary-announces-agreement-with-venezuela-against-threats-from-foreign-actors.html",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.aljazeera.com/news/2026/11/18/us-defence-secretary-announces-military-partnership-on-trip-to-venezuela",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.cnn.com/2026/11/18/americas/us-venezuela-military-deal-hegseth-latam-intl",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/",
+              "https://www.airandspaceforces.com/hegseth-makes-surprise-visit-venezuela-to-strengthen-military-ties/"
+            ],
+            "observed_at": null
+          }
+        ]
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-4f0a3228",
+            "story_title": "U.S. tariff plan moves from insider report to broader confirmation and starts hitting Asian risk assets",
+            "source": "chatgpt/chatgpt-rolling-0316.md",
+            "slot": "0316",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://apnews.com/article/d97ed6f4017152ca4c18de5517db6d51",
+            "source_urls": [
+              "https://apnews.com/article/d97ed6f4017152ca4c18de5517db6d51",
+              "https://apnews.com/article/d97ed6f4017152ca4c18de5517db6d51",
+              "https://apnews.com/article/d97ed6f4017152ca4c18de5517db6d51",
+              "https://apnews.com/article/d97ed6f4017152ca4c18de5517db6d51",
+              "https://apnews.com/article/d97ed6f4017152ca4c18de5517db6d51",
+              "https://apnews.com/article/d97ed6f4017152ca4c18de5517db6d51",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production",
+              "https://ustr.gov/about/policy-offices/press-office/fact-sheets/2026/march/fact-sheet-ustr-initiates-section-301-investigations-structural-excess-capacity-and-production",
+              "https://ustr.gov/about/policy-offices/press-office/fact-sheets/2026/march/fact-sheet-ustr-initiates-section-301-investigations-structural-excess-capacity-and-production",
+              "https://www.reuters.com/world/us/trump-administration-set-unveil-new-tariffs-after-probe-on-excess-factory-2026-11-24/",
+              "https://www.reuters.com/world/china/global-markets-global-markets-2026-11-25/"
+            ],
+            "observed_at": "2026-11-25T01:16:00Z"
+          },
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-8c3ed4e8",
+            "story_title": "Asia chip markets sell off as tariff risk becomes immediate",
+            "source": "chatgpt/chatgpt-rolling-0919.md",
+            "slot": "0919",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://apnews.com/article/stock-markets-ai-earnings-oil-10044b4fb55d3ff20fde9ba9e9acaab1",
+            "source_urls": [
+              "https://apnews.com/article/stock-markets-ai-earnings-oil-10044b4fb55d3ff20fde9ba9e9acaab1",
+              "https://apnews.com/article/stock-markets-ai-earnings-oil-10044b4fb55d3ff20fde9ba9e9acaab1",
+              "https://apnews.com/article/stock-markets-ai-earnings-oil-10044b4fb55d3ff20fde9ba9e9acaab1",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production",
+              "https://live.euronext.com/en/financial-news/stocks-retreat-ai-rebound-stumbles-tariff-threats-loom",
+              "https://live.euronext.com/en/financial-news/stocks-retreat-ai-rebound-stumbles-tariff-threats-loom",
+              "https://live.euronext.com/en/financial-news/stocks-retreat-ai-rebound-stumbles-tariff-threats-loom",
+              "https://en.yna.co.kr/view/AEN20261125001251320?section=economy-finance/economy",
+              "https://en.yna.co.kr/view/AEN20261125001251320?section=economy-finance/economy",
+              "https://en.yna.co.kr/view/AEN20261125001251320?section=economy-finance/economy"
+            ],
+            "observed_at": "2026-11-25T07:19:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-25",
+            "story_id": "s-eb5ffc75",
+            "story_title": "Lead 2: Brooklyn jury convicts Huawei on 10 of 12 counts (trade secrets, bank fraud, sanctions) but acquits…",
+            "source": "grok/grok-rolling-0350.md",
+            "slot": "0350",
+            "matched": [
+              "North Korea"
+            ],
+            "source_url": "https://www.bbc.co.uk/news/articles/cmy49ngydqzpo",
+            "source_urls": [
+              "https://www.bbc.co.uk/news/articles/cmy49ngydqzpo",
+              "https://www.bbc.co.uk/news/articles/cmy49ngydqzpo",
+              "https://www.bbc.co.uk/news/articles/cmy49ngydqzpo",
+              "https://www.bbc.co.uk/news/articles/cmy49ngydqzpo",
+              "https://www.politico.com/news/2026/11/24/chinese-tech-giant-huawei-found-guilty-of-conspiracy-to-steal-trade-secrets-01182780",
+              "https://www.politico.com/news/2026/11/24/chinese-tech-giant-huawei-found-guilty-of-conspiracy-to-steal-trade-secrets-01182780",
+              "https://www.cnn.com/2026/11/24/china/china-huawei-iran-conviction-intl-hnk",
+              "https://www.cnn.com/2026/11/24/china/china-huawei-iran-conviction-intl-hnk"
+            ],
+            "observed_at": "2026-11-25T01:50:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-22 and drew no qualifying story today",
+        "last_open_edition": "2026-11-22",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-22",
+            "story_id": "s-43918033",
+            "story_title": "Myanmar government hardens its challenge to ASEAN’s representation restrictions",
+            "source": "chatgpt/chatgpt-rolling-0918.md",
+            "slot": "0918",
+            "matched": [
+              "Myanmar",
+              "Naypyidaw"
+            ],
+            "source_url": "https://asean.org/asean-leaders-review-and-decision-on-the-implementation-of-the-five-point-consensus-4/",
+            "source_urls": [
+              "https://asean.org/asean-leaders-review-and-decision-on-the-implementation-of-the-five-point-consensus-4/",
+              "https://www.mofa.gov.mm/en/statement-by-the-ministry-of-foreign-affairs-of-the-republic-of-the-union-of-myanmar-on-the-asean-leaders-review-and-decision/",
+              "https://www.mofa.gov.mm/en/statement-by-the-ministry-of-foreign-affairs-of-the-republic-of-the-union-of-myanmar-on-the-asean-leaders-review-and-decision/",
+              "https://www.mofa.gov.mm/en/statement-by-the-ministry-of-foreign-affairs-of-the-republic-of-the-union-of-myanmar-on-the-asean-leaders-review-and-decision/",
+              "https://www.reuters.com/world/asia-pacific/myanmars-army-backed-government-calls-asean-decision-unfair-imbalanced-2026-11-22/",
+              "https://www.reuters.com/world/asia-pacific/myanmars-army-backed-government-calls-asean-decision-unfair-imbalanced-2026-11-22/",
+              "https://www.reuters.com/world/asia-pacific/myanmars-army-backed-government-calls-asean-decision-unfair-imbalanced-2026-11-22/",
+              "https://aappb.org/daily-briefing-20-11-26/",
+              "https://aappb.org/daily-briefing-20-11-26/",
+              "https://aappb.org/daily-briefing-20-11-26/",
+              "https://apnews.com/article/myanmar-violence-asean-philippines-660b4a8df06082f79b673912b2f3e655",
+              "https://apnews.com/article/myanmar-violence-asean-philippines-660b4a8df06082f79b673912b2f3e655",
+              "https://www.reuters.com/sustainability/cop/cop31-climate-talks-close-final-deal-says-summit-president-2026-11-21/",
+              "https://www.reuters.com/sustainability/cop/cop31-climate-talks-close-final-deal-says-summit-president-2026-11-21/",
+              "https://www.reuters.com/sustainability/cop/cop31-climate-talks-close-final-deal-says-summit-president-2026-11-21/",
+              "https://apnews.com/article/climate-un-turkey-fossil-fuels-global-warming-f6e36c4caf13ec6fed57c9f077cbd067",
+              "https://apnews.com/article/climate-un-turkey-fossil-fuels-global-warming-f6e36c4caf13ec6fed57c9f077cbd067",
+              "https://apnews.com/article/climate-un-turkey-fossil-fuels-global-warming-f6e36c4caf13ec6fed57c9f077cbd067",
+              "https://www.theguardian.com/environment/live/2026/nov/22/cop31-climate-crisis-talks-turkey-latest-news-updates",
+              "https://www.theguardian.com/environment/live/2026/nov/22/cop31-climate-crisis-talks-turkey-latest-news-updates",
+              "https://www.theguardian.com/environment/live/2026/nov/22/cop31-climate-crisis-talks-turkey-latest-news-updates",
+              "https://350.org/press-release/new-cop31-draft-fossil-fuels-still-missing-but-a-gigatonne-gift-to-carbon-capture/",
+              "https://350.org/press-release/new-cop31-draft-fossil-fuels-still-missing-but-a-gigatonne-gift-to-carbon-capture/"
+            ],
+            "observed_at": "2026-11-22T07:18:00Z"
+          },
+          {
+            "edition": "2026-11-22",
+            "story_id": "s-bc597dc5",
+            "story_title": "Thailand targets a chemical chokepoint in Myanmar rare-earth mining",
+            "source": "chatgpt/chatgpt-rolling-0918.md",
+            "slot": "0918",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://www.reuters.com/sustainability/climate-energy/thailand-plans-block-exports-chemicals-used-myanmar-rare-earth-mining-2026-11-22/",
+            "source_urls": [
+              "https://www.reuters.com/sustainability/climate-energy/thailand-plans-block-exports-chemicals-used-myanmar-rare-earth-mining-2026-11-22/",
+              "https://www.reuters.com/sustainability/climate-energy/thailand-plans-block-exports-chemicals-used-myanmar-rare-earth-mining-2026-11-22/",
+              "https://www.reuters.com/sustainability/climate-energy/thailand-plans-block-exports-chemicals-used-myanmar-rare-earth-mining-2026-11-22/",
+              "https://www.nationthailand.com/news/40073770",
+              "https://www.nationthailand.com/news/40073770",
+              "https://www.nationthailand.com/news/40073770",
+              "https://en.thairath.co.th/news/politic/2973925",
+              "https://en.thairath.co.th/news/politic/2973925",
+              "https://en.thairath.co.th/news/politic/2973925",
+              "https://news.mongabay.com/2026/11/thailand-myanmar-river-pollution-agreement-was-weakened-then-signed-china-remains-silent/",
+              "https://news.mongabay.com/2026/11/thailand-myanmar-river-pollution-agreement-was-weakened-then-signed-china-remains-silent/",
+              "https://news.mongabay.com/2026/11/thailand-myanmar-river-pollution-agreement-was-weakened-then-signed-china-remains-silent/"
+            ],
+            "observed_at": "2026-11-22T07:18:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.6154,
+    "previous": 0.6154,
+    "previous_edition": "2026-11-24",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
