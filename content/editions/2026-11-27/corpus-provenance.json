@@ -1,0 +1,11 @@
+{
+  "version": "clank.edition-corpus-provenance.v1",
+  "edition": "2026-11-27",
+  "asserted_by": "host",
+  "corpus": {
+    "commit": "0a2b500ad4acffff7459838672f698fb325fe5e2",
+    "tree": "trees/7af3d4379c43b4da3d945041f7bacec21f84b80b89f8dd6a86b5e47cb80fb425",
+    "landed_at": "2026-11-27T08:53:55Z"
+  },
+  "commissioned_ref": "origin/edition/2026-11-27"
+}
