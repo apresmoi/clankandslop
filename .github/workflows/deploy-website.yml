@@ -10,22 +10,57 @@ on:
       - "website/**"
       - ".github/workflows/deploy-website.yml"
   workflow_dispatch:
+  # The safety net: once an hour, redeploy only if the last deploy did not succeed.
+  schedule:
+    - cron: "23 * * * *"
 
-permissions:
-  contents: read
-  id-token: write
-  pages: write
+permissions: {}
 
 concurrency:
   group: github-pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  # A push or a manual dispatch always deploys. The hourly run deploys only
+  # when the most recent finished deploy failed, so a merged edition cannot sit
+  # unpublished until a person notices.
+  gate:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      deploy: ${{ steps.decide.outputs.deploy }}
+    steps:
+      - name: Decide whether to deploy
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" != "schedule" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          last="$(gh api "repos/$REPO/actions/workflows/deploy-website.yml/runs?status=completed&per_page=5" \
+            --jq "[.workflow_runs[] | select(.id != $RUN_ID)][0].conclusion // \"none\"")"
+          echo "last finished deploy: $last"
+          if [ "$last" = "success" ] || [ "$last" = "none" ]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: gate
+    if: needs.gate.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -55,6 +90,30 @@ jobs:
         with:
           path: website/dist
 
+  # A separate job, as in GitHub's own Pages template. Deploying in the same
+  # job as the upload asked for the artifact a fraction of a second after it
+  # was finalized, before GitHub listed it, and the deploy found nothing.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      id-token: write
+      pages: write
+    environment:
+      name: github-pages
+      url: ${{ steps.retry.outputs.page_url || steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before the second attempt
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+
+      - name: Deploy to GitHub Pages (second attempt)
+        id: retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
