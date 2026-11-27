@@ -1,0 +1,859 @@
+{
+  "version": "clank.worlddesk-trace.v1",
+  "edition": "2026-11-27",
+  "generated_at": "2026-11-27T08:50:37Z",
+  "reads": {
+    "what": "The World Desk numbers on the masthead ear and the WorldGlyph caption, and how each was produced.",
+    "escalation_index": "escalation_index = (sum of severity over registry proxies past their frozen threshold) / (sum of severity over all registry proxies). It measures conflict-linked market and energy stress over this fixed population, on a 0-1 scale. It is not a forecast and not a count of wars. Thresholds were frozen before this reading: each threshold is that series' p80 over the 5 years ending at minted_at, computed by sensors/automation/mint-escalation-registry.mjs.",
+    "open_conflicts": "Corroborated in THIS edition's story corpus by at least `open_min_stories` distinct stories, each carrying at least one source URL in its own prepared filing block. A story with no retrievable URL is not corroboration.",
+    "watch": "One of the two mechanically distinct reasons to keep an eye on a place: either it drew at least `watch_min_stories` qualifying stories this edition but fell short of the `open` bar (named, not yet stood up), or it met the `open` bar on one of the previous `watch_window_editions` editions and drew no qualifying story today. The trace records which of the two fired for every watch entry.",
+    "delta": "Computed against the previous DERIVED reading only. The escalation values published before this trace existed (0.72 across thirteen editions, 0.68 on 2026-09-05) were never computed and are not comparable, so the first derived edition prints \"first reading\" rather than a direction against a number that was never a measurement."
+  },
+  "escalation": {
+    "registry": {
+      "version": "clank.escalation-registry.v1",
+      "rev": 1,
+      "sha256": "f90f34f927ef6aa4a51fa9d4f7230bf3db98d1125162547ecc9332a5570fa7cc",
+      "minted_at": "2026-09-06"
+    },
+    "formula": "index = sum(severity where triggering) / sum(severity over all entries)",
+    "index": 0.5385,
+    "numerator": 7,
+    "denominator": 13,
+    "triggering": 4,
+    "proxies": 7,
+    "unresolved": [],
+    "terms": [
+      {
+        "id": "brent",
+        "label": "Brent crude, USD/bbl",
+        "series_id": "DCOILBRENTEU",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "severity": 3,
+        "op": "gte",
+        "threshold": 93.44,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 91.8,
+        "observed_at": "2026-11-24",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "91.8 >= 93.44 is false"
+      },
+      {
+        "id": "wti",
+        "label": "WTI crude, USD/bbl",
+        "series_id": "DCOILWTICO",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 88.334,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 82.24,
+        "observed_at": "2026-11-24",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "82.24 >= 88.334 is false"
+      },
+      {
+        "id": "diesel",
+        "label": "US retail diesel, USD/gal",
+        "series_id": "GASDESW",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 5.033,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 261,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 5.695,
+        "observed_at": "2026-11-23",
+        "stale_days": 4,
+        "contributes": 2,
+        "reason": "5.695 >= 5.033 is true"
+      },
+      {
+        "id": "natgas",
+        "label": "Henry Hub natural gas, USD/mmBtu",
+        "series_id": "DHHNGSP",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 4.904,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 10,
+        "state": "not_triggering",
+        "observed": 3.3,
+        "observed_at": "2026-11-24",
+        "stale_days": 3,
+        "contributes": 0,
+        "reason": "3.3 >= 4.904 is false"
+      },
+      {
+        "id": "vix",
+        "label": "CBOE volatility index",
+        "series_id": "VIXCLS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 22.96,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1286,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 26.36,
+        "observed_at": "2026-11-24",
+        "stale_days": 3,
+        "contributes": 2,
+        "reason": "26.36 >= 22.96 is true"
+      },
+      {
+        "id": "hy_oas",
+        "label": "US high-yield option-adjusted spread, pct",
+        "series_id": "BAMLH0A0HYM2",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "severity": 2,
+        "op": "gte",
+        "threshold": 3.388,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 787,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 7,
+        "state": "triggering",
+        "observed": 3.72,
+        "observed_at": "2026-11-24",
+        "stale_days": 3,
+        "contributes": 2,
+        "reason": "3.72 >= 3.388 is true"
+      },
+      {
+        "id": "usd_broad",
+        "label": "Broad trade-weighted US dollar index",
+        "series_id": "DTWEXBGS",
+        "source": "FRED",
+        "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "severity": 1,
+        "op": "gte",
+        "threshold": 123.2115,
+        "threshold_basis": {
+          "rule": "p80 of the series' own observations over the 5 years ending at mint",
+          "percentile": 80,
+          "window_years": 5,
+          "window_start": "2021-09-05",
+          "window_end": "2026-09-06",
+          "observations": 1245,
+          "minted_at": "2026-09-06"
+        },
+        "max_stale_days": 14,
+        "state": "triggering",
+        "observed": 123.5978,
+        "observed_at": "2026-11-20",
+        "stale_days": 7,
+        "contributes": 1,
+        "reason": "123.5978 >= 123.2115 is true"
+      }
+    ],
+    "fetch_receipts": [
+      {
+        "id": "brent",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU",
+        "fetched_at": "2026-11-27T08:50:37Z",
+        "http_status": 200,
+        "bytes": 170618,
+        "sha256": "0dacd2bc58608f9c27d6fc0bc1484750380ff8632a0906d912235453a26cbedf",
+        "cached": false
+      },
+      {
+        "id": "wti",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+        "fetched_at": "2026-11-27T08:50:37Z",
+        "http_status": 200,
+        "bytes": 176390,
+        "sha256": "ac63b46195f29dece8ff7e87a756740e4acc3915c4fade329d38ef591b4e0fe0",
+        "cached": false
+      },
+      {
+        "id": "diesel",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GASDESW",
+        "fetched_at": "2026-11-27T08:50:37Z",
+        "http_status": 200,
+        "bytes": 29027,
+        "sha256": "1ef3b5d1ca8dce803a5587a7ff23e692feb3caa3cd61fb6cc39e78f5865872b5",
+        "cached": false
+      },
+      {
+        "id": "natgas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DHHNGSP",
+        "fetched_at": "2026-11-27T08:50:37Z",
+        "http_status": 200,
+        "bytes": 116633,
+        "sha256": "26a62640fd213f9fdfa53e1042789e12d0acc9723832091b77b820365ab84621",
+        "cached": false
+      },
+      {
+        "id": "vix",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+        "fetched_at": "2026-11-27T08:50:37Z",
+        "http_status": 200,
+        "bytes": 162088,
+        "sha256": "de66008969442eb61aad83cdeb4d238e91d07a5fef3b9ab8d99949db5c354a44",
+        "cached": false
+      },
+      {
+        "id": "hy_oas",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+        "fetched_at": "2026-11-27T08:50:37Z",
+        "http_status": 200,
+        "bytes": 12686,
+        "sha256": "4981d5a2653d47ff4921a03076209bf780dc8c02ac2ff8a9f9653a261027e765",
+        "cached": false
+      },
+      {
+        "id": "usd_broad",
+        "source": "FRED",
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+        "fetched_at": "2026-11-27T08:50:37Z",
+        "http_status": 200,
+        "bytes": 105221,
+        "sha256": "816a2678ffdbac9276fce6b5c8e380912488cdb3de09cae27eb7a3c28aab6b0b",
+        "cached": false
+      }
+    ]
+  },
+  "flashpoints": {
+    "registry": {
+      "version": "clank.flashpoint-registry.v1",
+      "rev": 1,
+      "sha256": "2d0de347e0d3f7a6377969f1e365de21f24dad5a16d392be0f6b7c51ecd24dd8"
+    },
+    "policy": {
+      "open_min_stories": 2,
+      "watch_min_stories": 1,
+      "watch_window_editions": 7
+    },
+    "stories_scanned": 36,
+    "open_conflicts": 2,
+    "watch": 5,
+    "dormant": 6,
+    "entries": [
+      {
+        "id": "hormuz-gulf",
+        "name": "Strait of Hormuz and the Gulf",
+        "lat": 26.57,
+        "lon": 56.25,
+        "opened": "2026-09-06",
+        "note": "US-Iran maritime exchange: tanker strikes, Kharg, IRGC-linked shadow fleet.",
+        "status": "open",
+        "evidence_count": 2,
+        "evidence": [
+          {
+            "edition": "2026-11-27",
+            "story_id": "s-5630a7f3",
+            "story_title": "Iran adds a two-tanker mine claim, but the verification gap remains",
+            "source": "chatgpt/chatgpt-rolling-1520.md",
+            "slot": "1520",
+            "matched": [
+              "Hormuz",
+              "IRGC"
+            ],
+            "source_url": "https://www.tasnimnews.ir/en/news/2026/11/26/3758849/irgc-reports-explosion-of-two-violating-oil-tankers-south-of-hormuz-strait",
+            "source_urls": [
+              "https://www.tasnimnews.ir/en/news/2026/11/26/3758849/irgc-reports-explosion-of-two-violating-oil-tankers-south-of-hormuz-strait",
+              "https://www.tasnimnews.ir/en/news/2026/11/26/3758849/irgc-reports-explosion-of-two-violating-oil-tankers-south-of-hormuz-strait",
+              "https://www.tasnimnews.ir/en/news/2026/11/26/3758849/irgc-reports-explosion-of-two-violating-oil-tankers-south-of-hormuz-strait",
+              "https://aa.com.tr/en/middle-east/iran-says-2-oil-tankers-hit-naval-mines-catch-fire-near-oman-s-khasab-port-/4138606",
+              "https://aa.com.tr/en/middle-east/iran-says-2-oil-tankers-hit-naval-mines-catch-fire-near-oman-s-khasab-port-/4138606",
+              "https://aa.com.tr/en/middle-east/iran-says-2-oil-tankers-hit-naval-mines-catch-fire-near-oman-s-khasab-port-/4138606",
+              "https://www.ukmto.org/recent-incidents",
+              "https://www.ukmto.org/recent-incidents",
+              "https://www.ukmto.org/recent-incidents",
+              "https://www.ukmto.org/-/media/ukmto/products/20261125-ukmto_warning-222-26.pdf?rev=d10d7544e1274cb594c1257ad0ec6dc2",
+              "https://www.iranintl.com/en/202611263445",
+              "https://www.iranintl.com/en/202611263445",
+              "https://www.iranintl.com/en/202611263445"
+            ],
+            "observed_at": "2026-11-26T13:20:00Z"
+          },
+          {
+            "edition": "2026-11-27",
+            "story_id": "s-8d9b1333",
+            "story_title": "Lead 3: Iranian cargo ship Alvan (under U.S. sanctions) reported damaged near Benghazi; attribution…",
+            "source": "grok/grok-rolling-1241.md",
+            "slot": "1241",
+            "matched": [
+              "Hormuz"
+            ],
+            "source_url": "https://www.corriere.it/esteri/26_novembre_25/libia-raid-droni-colpita-nave-iraniana-586228be-9de6-4aa0-a37c-71275409cxlk.shtml",
+            "source_urls": [
+              "https://www.corriere.it/esteri/26_novembre_25/libia-raid-droni-colpita-nave-iraniana-586228be-9de6-4aa0-a37c-71275409cxlk.shtml",
+              "https://www.ynetnews.com/article/sjbppye1ml",
+              "https://www.i24news.tv/en/news/middle-east/north-africa/artc-ukrainian-drones-allegedly-strike-iranian-smuggling-ship-off-libya-on-behalf-of-us-report",
+              "https://iranwire.com/en/news/160768-iranian-cargo-ship-carrying-drone-parts-hit-near-libyas-benghazi/"
+            ],
+            "observed_at": "2026-11-26T10:41:00Z"
+          }
+        ]
+      },
+      {
+        "id": "lebanon-south",
+        "name": "Southern Lebanon",
+        "lat": 33.27,
+        "lon": 35.2,
+        "opened": "2026-09-06",
+        "note": "Israel-Hezbollah strike exchange across the Litani and the Bekaa.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "ukraine-russia",
+        "name": "Ukraine-Russia front",
+        "lat": 48.5,
+        "lon": 35,
+        "opened": "2026-09-06",
+        "note": "Front line, deep strikes, and the Zaporizhzhia plant.",
+        "status": "open",
+        "evidence_count": 3,
+        "evidence": [
+          {
+            "edition": "2026-11-27",
+            "story_id": "s-0f3372fc",
+            "story_title": "EU budget talks break without agreement; Ukraine financing pushed into December",
+            "source": "chatgpt/chatgpt-rolling-0316.md",
+            "slot": "0316",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.consilium.europa.eu/en/press/press-releases/2026/11/27/remarks-by-president-antonio-costa-at-the-press-conference-following-the-special-european-council-meeting-of-26-november-2026/",
+            "source_urls": [
+              "https://www.consilium.europa.eu/en/press/press-releases/2026/11/27/remarks-by-president-antonio-costa-at-the-press-conference-following-the-special-european-council-meeting-of-26-november-2026/",
+              "https://www.consilium.europa.eu/en/press/press-releases/2026/11/27/remarks-by-president-antonio-costa-at-the-press-conference-following-the-special-european-council-meeting-of-26-november-2026/",
+              "https://www.consilium.europa.eu/en/press/press-releases/2026/11/27/remarks-by-president-antonio-costa-at-the-press-conference-following-the-special-european-council-meeting-of-26-november-2026/",
+              "https://www.bundesregierung.de/breg-de/aktuelles/pressekonferenzen/doorstep-bk-bruessel-2462854",
+              "https://www.bundesregierung.de/breg-de/aktuelles/pressekonferenzen/doorstep-bk-bruessel-2462854",
+              "https://www.bundesregierung.de/breg-de/aktuelles/pressekonferenzen/doorstep-bk-bruessel-2462854",
+              "https://enlargement.ec.europa.eu/news/commission-proposes-eur45-billion-additional-financial-support-ukraine-2027-2026-11-18_en",
+              "https://enlargement.ec.europa.eu/news/commission-proposes-eur45-billion-additional-financial-support-ukraine-2027-2026-11-18_en"
+            ],
+            "observed_at": "2026-11-27T01:16:00Z"
+          },
+          {
+            "edition": "2026-11-27",
+            "story_id": "s-727639c3",
+            "story_title": "Lead 2: EU leaders cut short special summit on 2028–2034 budget; Merz announces no Friday session",
+            "source": "grok/grok-rolling-0347.md",
+            "slot": "0347",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+            "source_urls": [
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://www.tagesschau.de/ausland/europa/eu-haushalt-vorzeitig-beendet-100.html",
+              "https://dpa-international.com/politics/urn:newsml:dpa.com:20090101:261127-930-57856/"
+            ],
+            "observed_at": "2026-11-27T01:47:00Z"
+          },
+          {
+            "edition": "2026-11-27",
+            "story_id": "s-8d9b1333",
+            "story_title": "Lead 3: Iranian cargo ship Alvan (under U.S. sanctions) reported damaged near Benghazi; attribution…",
+            "source": "grok/grok-rolling-1241.md",
+            "slot": "1241",
+            "matched": [
+              "Ukraine"
+            ],
+            "source_url": "https://www.corriere.it/esteri/26_novembre_25/libia-raid-droni-colpita-nave-iraniana-586228be-9de6-4aa0-a37c-71275409cxlk.shtml",
+            "source_urls": [
+              "https://www.corriere.it/esteri/26_novembre_25/libia-raid-droni-colpita-nave-iraniana-586228be-9de6-4aa0-a37c-71275409cxlk.shtml",
+              "https://www.ynetnews.com/article/sjbppye1ml",
+              "https://www.i24news.tv/en/news/middle-east/north-africa/artc-ukrainian-drones-allegedly-strike-iranian-smuggling-ship-off-libya-on-behalf-of-us-report",
+              "https://iranwire.com/en/news/160768-iranian-cargo-ship-carrying-drone-parts-hit-near-libyas-benghazi/"
+            ],
+            "observed_at": "2026-11-26T10:41:00Z"
+          }
+        ]
+      },
+      {
+        "id": "gaza",
+        "name": "Gaza",
+        "lat": 31.5,
+        "lon": 34.45,
+        "opened": "2026-09-06",
+        "note": "Gaza strip operations and displacement.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-20 and drew no qualifying story today",
+        "last_open_edition": "2026-11-20",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-09b5d186",
+            "story_title": "Lead 1: ICJ rules Myanmar committed genocide against Rohingya (first state finding by the Court)",
+            "source": "grok/grok-rolling-1848.md",
+            "slot": "1848",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+            "source_urls": [
+              "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+              "https://www.hrw.org/news/2026/11/19/world-court-finds-myanmar-responsible-for-rohingya-genocide",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.pbs.org/newshour/world/uns-highest-court-finds-myanmar-responsible-for-genocide-in-historic-ruling",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.theguardian.com/world/2026/nov/19/genocide-rohingya-international-court-of-justice-ruling-myanmar",
+              "https://www.aljazeera.com/news/2026/11/19/un-top-court-finds-myanmar-killed-10000-rohingya-as-it-rules-on-genocide"
+            ],
+            "observed_at": "2026-11-19T16:48:00Z"
+          },
+          {
+            "edition": "2026-11-20",
+            "story_id": "s-e08b6825",
+            "story_title": "Israel’s rare Gaza ground operation ended, but the ceasefire dispute widened",
+            "source": "chatgpt/chatgpt-rolling-0320.md",
+            "slot": "0320",
+            "matched": [
+              "Gaza"
+            ],
+            "source_url": "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+            "source_urls": [
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://www.marketscreener.com/news/israel-says-it-concludes-gaza-tank-raid-ce785ed2d98aff20",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://origin-zh9p7m-www.afp.com/en/gazans-return-after-israel-army-ends-rare-ground-operation",
+              "https://www.timesofisrael.com/liveblog_entry/idf-confirms-wrapping-up-one-day-operation-against-hamas-tunnel-that-crossed-gazas-yellow-line/",
+              "https://www.timesofisrael.com/liveblog_entry/idf-confirms-wrapping-up-one-day-operation-against-hamas-tunnel-that-crossed-gazas-yellow-line/",
+              "https://www.timesofisrael.com/liveblog_entry/idf-confirms-wrapping-up-one-day-operation-against-hamas-tunnel-that-crossed-gazas-yellow-line/"
+            ],
+            "observed_at": "2026-11-20T01:20:00Z"
+          }
+        ]
+      },
+      {
+        "id": "yemen-red-sea",
+        "name": "Yemen and the Red Sea",
+        "lat": 15.35,
+        "lon": 42.9,
+        "opened": "2026-09-06",
+        "note": "Houthi shipping interdiction and the Bab el-Mandeb approach.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-27",
+            "story_id": "s-edf3e564",
+            "story_title": "Lead 3: Saudi-led coalition says it destroyed 50 Houthi targets in Yemen (material update on prior…",
+            "source": "grok/grok-rolling-0048.md",
+            "slot": "0048",
+            "matched": [
+              "Yemen",
+              "Houthi"
+            ],
+            "source_url": "https://www.cnn.com/2026/11/26/middleeast/houthi-saudi-oil-refinery-strike-satellite-imagery-intl",
+            "source_urls": [
+              "https://www.cnn.com/2026/11/26/middleeast/houthi-saudi-oil-refinery-strike-satellite-imagery-intl",
+              "https://saudigazette.com.sa/article/666569/saudi-arabia/coalition-destroys-50-houthi-military-targets-and-ballistic-missile-launcher-in-yemen",
+              "https://www.anews.com.tr/middle-east/2026/11/26/saudi-led-coalition-says-it-destroyed-50-houthi-military-targets-across-yemen",
+              "https://www.anews.com.tr/middle-east/2026/11/26/saudi-led-coalition-says-it-destroyed-50-houthi-military-targets-across-yemen",
+              "https://www.anews.com.tr/middle-east/2026/11/26/saudi-led-coalition-says-it-destroyed-50-houthi-military-targets-across-yemen",
+              "https://www.anews.com.tr/middle-east/2026/11/26/saudi-led-coalition-says-it-destroyed-50-houthi-military-targets-across-yemen",
+              "https://www.anews.com.tr/middle-east/2026/11/26/saudi-led-coalition-says-it-destroyed-50-houthi-military-targets-across-yemen"
+            ],
+            "observed_at": null
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "venezuela-caribbean",
+        "name": "Venezuela and the Caribbean",
+        "lat": 10.5,
+        "lon": -66.9,
+        "opened": "2026-09-06",
+        "note": "US maritime interdiction campaign in the southern Caribbean.",
+        "status": "watch",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "edition": "2026-11-27",
+            "story_id": "s-55294cff",
+            "story_title": "U.S. pressure on Venezuela and Iraq opened a direct challenge to OPEC",
+            "source": "chatgpt/chatgpt-rolling-0916.md",
+            "slot": "0916",
+            "matched": [
+              "Venezuela",
+              "Caracas"
+            ],
+            "source_url": "https://www.reuters.com/business/energy/us-pushed-venezuela-iraq-consider-leaving-opec-sources-say-2026-11-27/",
+            "source_urls": [
+              "https://www.reuters.com/business/energy/us-pushed-venezuela-iraq-consider-leaving-opec-sources-say-2026-11-27/",
+              "https://www.reuters.com/business/energy/us-pushed-venezuela-iraq-consider-leaving-opec-sources-say-2026-11-27/",
+              "https://www.reuters.com/business/energy/us-pushed-venezuela-iraq-consider-leaving-opec-sources-say-2026-11-27/",
+              "https://www.opec.org/pr-detail/605-7-june-2026.html",
+              "https://www.opec.org/pr-detail/605-7-june-2026.html",
+              "https://www.thenationalnews.com/business/energy/2026/11/26/iraqs-oil-revenues-hit-88bn-as-it-prepares-to-ask-for-higher-opec-quota/",
+              "https://www.thenationalnews.com/business/energy/2026/11/26/iraqs-oil-revenues-hit-88bn-as-it-prepares-to-ask-for-higher-opec-quota/",
+              "https://www.thenationalnews.com/business/energy/2026/11/26/iraqs-oil-revenues-hit-88bn-as-it-prepares-to-ask-for-higher-opec-quota/",
+              "https://apnews.com/article/venezuela-oil-sales-maduro-trump-6982bfdc5d64482e3500eea39891f0d1",
+              "https://apnews.com/article/venezuela-oil-sales-maduro-trump-6982bfdc5d64482e3500eea39891f0d1"
+            ],
+            "observed_at": "2026-11-27T07:16:00Z"
+          }
+        ],
+        "watch_reason": "named by 1 qualifying story/stories today, below the open bar of 2",
+        "last_open_edition": null,
+        "prior_evidence": []
+      },
+      {
+        "id": "taiwan-strait",
+        "name": "Taiwan Strait",
+        "lat": 24,
+        "lon": 119.5,
+        "opened": "2026-09-06",
+        "note": "Cross-strait military and blockade risk.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-26 and drew no qualifying story today",
+        "last_open_edition": "2026-11-26",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-26",
+            "story_id": "s-0c5bfd4b",
+            "story_title": "USTR determines 14 economies’ manufacturing excess-capacity practices unreasonable under Section 301 and…",
+            "source": "grok/grok-rolling-0344.md",
+            "slot": "0344",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+            "source_urls": [
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://indianexpress.com/article/business/united-states-proposes-25-percent-section-301-tariffs-india-17-percent-trade-deal-ustr-10978398/",
+              "https://indianexpress.com/article/business/united-states-proposes-25-percent-section-301-tariffs-india-17-percent-trade-deal-ustr-10978398/",
+              "https://www.business-standard.com/economy/news/us-proposes-up-to-25-tariff-on-india-offers-17-upon-trade-deal-126112501255_1.html"
+            ],
+            "observed_at": "2026-11-26T01:44:00Z"
+          },
+          {
+            "edition": "2026-11-26",
+            "story_id": "s-44dd03a1",
+            "story_title": "Lead 1: U.S. proposes new Section 301 tariffs on 14 partners including China and the EU over alleged excess…",
+            "source": "grok/grok-rolling-1543.md",
+            "slot": "1543",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://www.politico.com/news/2026/11/25/us-threatens-new-tariffs-on-eu-china-12-others-after-investigation-01182957",
+            "source_urls": [
+              "https://www.politico.com/news/2026/11/25/us-threatens-new-tariffs-on-eu-china-12-others-after-investigation-01182957",
+              "https://www.politico.com/news/2026/11/25/us-threatens-new-tariffs-on-eu-china-12-others-after-investigation-01182957",
+              "https://www.politico.com/news/2026/11/25/us-threatens-new-tariffs-on-eu-china-12-others-after-investigation-01182957",
+              "https://www.politico.com/news/2026/11/25/us-threatens-new-tariffs-on-eu-china-12-others-after-investigation-01182957",
+              "https://www.politico.com/news/2026/11/25/us-threatens-new-tariffs-on-eu-china-12-others-after-investigation-01182957",
+              "https://www.politico.com/news/2026/11/25/us-threatens-new-tariffs-on-eu-china-12-others-after-investigation-01182957",
+              "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html",
+              "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html",
+              "https://www.cnbc.com/2026/11/25/us-tariffs-trump-section-301.html",
+              "https://www.axios.com/2026/11/25/trump-tariffs-china",
+              "https://www.bbc.com/news/live/cqglr4708r85t",
+              "https://www.bbc.com/news/live/cqglr4708r85t",
+              "https://www.bbc.com/news/live/cqglr4708r85t",
+              "https://www.bbc.com/news/live/cqglr4708r85t"
+            ],
+            "observed_at": "2026-11-25T13:43:00Z"
+          },
+          {
+            "edition": "2026-11-26",
+            "story_id": "s-9209d91f",
+            "story_title": "USTR proposes a new Section 301 tariff architecture against fourteen economies",
+            "source": "chatgpt/chatgpt-rolling-1518.md",
+            "slot": "1518",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+            "source_urls": [
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural",
+              "https://apnews.com/article/trump-tariffs-china-european-union-367083ea32f71fd7f70029ba7df66bf0",
+              "https://apnews.com/article/trump-tariffs-china-european-union-367083ea32f71fd7f70029ba7df66bf0",
+              "https://apnews.com/article/trump-tariffs-china-european-union-367083ea32f71fd7f70029ba7df66bf0",
+              "https://apnews.com/article/trump-tariffs-china-european-union-367083ea32f71fd7f70029ba7df66bf0",
+              "https://apnews.com/article/trump-tariffs-china-european-union-367083ea32f71fd7f70029ba7df66bf0"
+            ],
+            "observed_at": "2026-11-25T13:18:00Z"
+          },
+          {
+            "edition": "2026-11-26",
+            "story_id": "s-a52d7733",
+            "story_title": "Lead 2: USTR Proposes New Section 301 Tariffs on 14 Trading Partners Including China and India",
+            "source": "grok/grok-rolling-0948.md",
+            "slot": "0948",
+            "matched": [
+              "Taiwan"
+            ],
+            "source_url": "https://nypost.com/2026/11/25/business/us-proposes-new-tariffs-on-14-trading-partners-including-china-japan-eu-and-india/",
+            "source_urls": [
+              "https://nypost.com/2026/11/25/business/us-proposes-new-tariffs-on-14-trading-partners-including-china-japan-eu-and-india/",
+              "https://nypost.com/2026/11/25/business/us-proposes-new-tariffs-on-14-trading-partners-including-china-japan-eu-and-india/",
+              "https://nypost.com/2026/11/25/business/us-proposes-new-tariffs-on-14-trading-partners-including-china-japan-eu-and-india/",
+              "https://nypost.com/2026/11/25/business/us-proposes-new-tariffs-on-14-trading-partners-including-china-japan-eu-and-india/",
+              "https://www.aljazeera.com/news/2026/11/25/trump-announces-new-trade-tariffs-which-countries-will-they-target",
+              "https://www.aljazeera.com/news/2026/11/25/trump-announces-new-trade-tariffs-which-countries-will-they-target",
+              "https://www.aljazeera.com/news/2026/11/25/trump-announces-new-trade-tariffs-which-countries-will-they-target",
+              "https://www.aljazeera.com/news/2026/11/25/trump-announces-new-trade-tariffs-which-countries-will-they-target",
+              "https://www.aljazeera.com/news/2026/11/25/trump-announces-new-trade-tariffs-which-countries-will-they-target",
+              "https://www.aljazeera.com/news/2026/11/25/trump-announces-new-trade-tariffs-which-countries-will-they-target"
+            ],
+            "observed_at": "2026-11-26T07:48:00Z"
+          }
+        ]
+      },
+      {
+        "id": "south-china-sea",
+        "name": "South China Sea",
+        "lat": 15,
+        "lon": 115,
+        "opened": "2026-09-06",
+        "note": "Reef and shoal confrontations on the Philippine claim lines.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "korea-peninsula",
+        "name": "Korean peninsula",
+        "lat": 38,
+        "lon": 127,
+        "opened": "2026-09-06",
+        "note": "DPRK launches and the inter-Korean line.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sahel",
+        "name": "The Sahel",
+        "lat": 14,
+        "lon": 0,
+        "opened": "2026-09-06",
+        "note": "Junta belt insurgency across Mali, Burkina Faso and Niger.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "sudan",
+        "name": "Sudan",
+        "lat": 15.5,
+        "lon": 32.5,
+        "opened": "2026-09-06",
+        "note": "SAF-RSF civil war and the Darfur famine belt.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "kashmir",
+        "name": "Kashmir line of control",
+        "lat": 34,
+        "lon": 74.8,
+        "opened": "2026-09-06",
+        "note": "India-Pakistan exchanges across the line of control.",
+        "status": "dormant",
+        "evidence_count": 0,
+        "evidence": []
+      },
+      {
+        "id": "myanmar",
+        "name": "Myanmar",
+        "lat": 21.9,
+        "lon": 96.1,
+        "opened": "2026-09-06",
+        "note": "Post-coup civil war and the Rakhine corridor.",
+        "status": "watch",
+        "evidence_count": 0,
+        "evidence": [],
+        "watch_reason": "met the open bar on 2026-11-26 and drew no qualifying story today",
+        "last_open_edition": "2026-11-26",
+        "prior_evidence": [
+          {
+            "edition": "2026-11-26",
+            "story_id": "s-50f83a03",
+            "story_title": "Israel confirms killing Hamas-linked Gaza education and economy official as overnight toll reaches eight",
+            "source": "chatgpt/chatgpt-rolling-0918.md",
+            "slot": "0918",
+            "matched": [
+              "Myanmar",
+              "Naypyidaw"
+            ],
+            "source_url": "https://www.timesofisrael.com/liveblog_entry/netanyahu-confirms-killing-senior-hamas-education-official-amid-wider-assassination-campaign/",
+            "source_urls": [
+              "https://www.timesofisrael.com/liveblog_entry/netanyahu-confirms-killing-senior-hamas-education-official-amid-wider-assassination-campaign/",
+              "https://www.timesofisrael.com/liveblog_entry/netanyahu-confirms-killing-senior-hamas-education-official-amid-wider-assassination-campaign/",
+              "https://www.timesofisrael.com/liveblog_entry/netanyahu-confirms-killing-senior-hamas-education-official-amid-wider-assassination-campaign/",
+              "https://aa.com.tr/en/middle-east/israeli-strikes-kill-5-palestinians-including-deputy-education-minister-in-gaza/4138210",
+              "https://aa.com.tr/en/middle-east/israeli-strikes-kill-5-palestinians-including-deputy-education-minister-in-gaza/4138210",
+              "https://aa.com.tr/en/middle-east/israeli-strikes-kill-5-palestinians-including-deputy-education-minister-in-gaza/4138210",
+              "https://en.royanews.com/8-Palestinians-killed-in-airstrikes-on-Gaza-and-Deir/",
+              "https://en.royanews.com/8-Palestinians-killed-in-airstrikes-on-Gaza-and-Deir/",
+              "https://en.royanews.com/8-Palestinians-killed-in-airstrikes-on-Gaza-and-Deir/",
+              "https://israel.fm/business/netanyahu-katz-hamas-economy-education-chief-khaled-abu-nada-eliminated/",
+              "https://israel.fm/business/netanyahu-katz-hamas-economy-education-chief-khaled-abu-nada-eliminated/",
+              "https://israel.fm/business/netanyahu-katz-hamas-economy-education-chief-khaled-abu-nada-eliminated/",
+              "https://www.reuters.com/world/asia-pacific/myanmar-says-it-will-not-fully-comply-with-icj-genocide-orders-2026-11-26/?utm_source=chatgpt.com",
+              "https://apnews.com/article/522676f17532b878878ff7a4347d0e31?utm_source=chatgpt.com",
+              "https://www.reuters.com/world/china/trump-nato-chief-urge-russia-avoid-actions-that-widen-ukraine-war-2026-11-26/?utm_source=chatgpt.com"
+            ],
+            "observed_at": "2026-11-26T07:18:00Z"
+          },
+          {
+            "edition": "2026-11-26",
+            "story_id": "s-68877ec3",
+            "story_title": "Myanmar’s president says he will not comply with unspecified parts of ICJ genocide judgment",
+            "source": "chatgpt/chatgpt-rolling-0918.md",
+            "slot": "0918",
+            "matched": [
+              "Myanmar"
+            ],
+            "source_url": "https://elevenmyanmar.com/news/president-says-myanmar-will-fulfil-its-responsibilities-as-a-responsible-nation-regarding-icj?language=my",
+            "source_urls": [
+              "https://elevenmyanmar.com/news/president-says-myanmar-will-fulfil-its-responsibilities-as-a-responsible-nation-regarding-icj?language=my",
+              "https://elevenmyanmar.com/news/president-says-myanmar-will-fulfil-its-responsibilities-as-a-responsible-nation-regarding-icj?language=my",
+              "https://elevenmyanmar.com/news/president-says-myanmar-will-fulfil-its-responsibilities-as-a-responsible-nation-regarding-icj?language=my",
+              "https://iimm.un.org/icj-gambia-v-myanmar",
+              "https://iimm.un.org/icj-gambia-v-myanmar",
+              "https://iimm.un.org/icj-gambia-v-myanmar",
+              "https://iimm.un.org/icj-gambia-v-myanmar",
+              "https://iimm.un.org/icj-gambia-v-myanmar",
+              "https://iimm.un.org/icj-gambia-v-myanmar",
+              "https://www.diplomatie.gouv.fr/en/presse-et-ressources/decouvrir-et-informer/actualites/birmanie-arret-rendu-par-la-cour-internationale-de-justice",
+              "https://www.diplomatie.gouv.fr/en/presse-et-ressources/decouvrir-et-informer/actualites/birmanie-arret-rendu-par-la-cour-internationale-de-justice",
+              "https://www.diplomatie.gouv.fr/en/presse-et-ressources/decouvrir-et-informer/actualites/birmanie-arret-rendu-par-la-cour-internationale-de-justice"
+            ],
+            "observed_at": "2026-11-26T07:18:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "delta": {
+    "word": "steady",
+    "current": 0.5385,
+    "previous": 0.5385,
+    "previous_edition": "2026-11-26",
+    "change": 0
+  },
+  "review": {
+    "not_measured": [
+      "This index measures conflict-linked market and energy stress, not conflict. Every proxy is a price, a spread or a volatility index; a war that moves no market moves this number not at all.",
+      "Flashpoint matching is deterministic keyword matching over story prose, not entity resolution. Each counted entry lists the terms that fired and the story they fired on so a wrong match is arguable."
+    ],
+    "dropped_sources": [
+      "stooq: the q/l/ CSV endpoint returned HTTP 404 on 2026-09-06 and is not a live keyless option, so no stooq term is in the registry."
+    ],
+    "superseded_specs": [
+      "SYSTEMS.md 2.7 (v1) needs a per-claim house probability and content/forecasts/<id>.json; DESIGN-v3-binary deletes the house probability and the forecasts have never existed.",
+      "DESIGN-v2-hardened 8 needs content/log/<date>/<agent>.jsonl and score-forecasts.mjs, and FINDINGS.md:106 records it as mathematically undefined at genesis."
+    ]
+  }
+}
